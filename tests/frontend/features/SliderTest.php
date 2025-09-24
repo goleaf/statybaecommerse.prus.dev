@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Livewire\HomeSlider;
 use App\Models\Slider;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use App\Livewire\HomeSlider;
 
 uses(RefreshDatabase::class);
 
@@ -35,7 +35,7 @@ test('slider model can be created', function () {
 });
 
 test('slider model has correct fillable attributes', function () {
-    $slider = new Slider();
+    $slider = new Slider;
     $fillable = $slider->getFillable();
 
     expect($fillable)->toContain('title');
@@ -70,7 +70,7 @@ test('slider active scope works correctly', function () {
     $activeSliders = Slider::active()->get();
 
     expect($activeSliders)->toHaveCount(2);
-    expect($activeSliders->every(fn($slider) => $slider->is_active))->toBeTrue();
+    expect($activeSliders->every(fn ($slider) => $slider->is_active))->toBeTrue();
 });
 
 test('slider ordered scope works correctly', function () {
@@ -90,13 +90,13 @@ test('home slider component displays active sliders', function () {
         'is_active' => true,
         'sort_order' => 1,
     ]);
-    
+
     $slider2 = Slider::factory()->create([
         'title' => 'Second Slider',
         'is_active' => true,
         'sort_order' => 2,
     ]);
-    
+
     Slider::factory()->create([
         'title' => 'Inactive Slider',
         'is_active' => false,
@@ -120,22 +120,22 @@ test('home slider component navigation methods work', function () {
     Slider::factory()->count(3)->create(['is_active' => true]);
 
     $component = Livewire::test(HomeSlider::class);
-    
+
     // Test next slide
     $component->call('nextSlide')
         ->assertSet('currentSlide', 1);
-    
+
     $component->call('nextSlide')
         ->assertSet('currentSlide', 2);
-    
+
     // Test wrap around
     $component->call('nextSlide')
         ->assertSet('currentSlide', 0);
-    
+
     // Test previous slide
     $component->call('previousSlide')
         ->assertSet('currentSlide', 2);
-    
+
     // Test go to specific slide
     $component->call('goToSlide', 1)
         ->assertSet('currentSlide', 1);
@@ -143,7 +143,7 @@ test('home slider component navigation methods work', function () {
 
 test('home slider component toggle auto play works', function () {
     $component = Livewire::test(HomeSlider::class);
-    
+
     $component->assertSet('autoPlay', true)
         ->call('toggleAutoPlay')
         ->assertSet('autoPlay', false)

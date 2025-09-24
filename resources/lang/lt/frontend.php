@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'navigation' => [
@@ -370,7 +372,6 @@ return [
         'working_hours' => 'Darbo laikas',
         'monday_friday' => 'Pirmadienis - Penktadienis: 9:00 - 17:00',
         'shipping_to' => 'Pristatymas į',
-        'change_zone' => 'keisti zoną',
         'copyright' => 'Visos teisės saugomos',
         'created_with' => 'Sukurta su',
     ],

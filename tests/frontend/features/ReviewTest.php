@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Product;
 use App\Models\Review;
@@ -178,4 +180,3 @@ it('has author relationship', function () {
     expect($review->author)->toBeInstanceOf(User::class);
     expect($review->author->id)->toBe($this->user->id);
 });
-

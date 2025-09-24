@@ -1,4 +1,94 @@
-make multitranslationable if need, make all labels translatable, add widgets, make all relations, show maximum information, make filtering, make all to frontend and make for admin all solutions using filament 4, make updates for models, and update existing migrations, update tests, update all for this  module, run tests for model, run test for resource file, and for all related files, check all relations, check all values, does crud is working, does all relations are working in test, try to create edit update and delete information via test and make it with all relations in test, check all in frontend, create for frontend or edit for frontend test, run tests and fix all errors, update git with this prompt changesd files. write in commit message what was changed and do not put in commit any another files what is not in git 
+
+run command:
+php artisan migrate:fresh --seed
+
+
+
+
+
+
+
+
+
+
+
+loop untill all will works
+read all models, use all features and all relations in admin, check all features, all relations, in every admin page, do not create new blades to admin side, use filament v4
+make admin maximum features, using models and use maximum crud and relations in admin side
+recheck for every model does exists seed file, make seed for model if need translation and multilanguage translations in files
+use mcp
+
+use schema class, do not use form class
+
+recheck does for every model has crud in admin, or has as relation item, always use translations and multilanguage for admin using filament v4
+make test file for every resources, run test for ever resource and make maximum features, crud and maximum relations, make maximum of all tests for all relations from model
+---------------------------
+
+analyze code, analyze existing code, 
+
+find in existing code all related files and functions, make all relations, make test if not exists, edit test if need, run test for this files, fix all errors, do not remove existing features and functionality
+
+make all filtering, make tabs with relations, make filtering, make tabs if need, make all relations if need, make all what need, update and add best practice
+
+scan and analyze models, resources, another related files, do not remove existing code if not need, make update if need using Laravel 12 and filament v4
+
+use mcp, use filament v4 documentation from google
+
+in admin side make widgets, relations, tabs, Multilanguage, translations, make updates for blades, update blades, create all with al functions in frontend for users
+
+for frontend update seeds if need, run tests for every admin side, run tests for frontend. create seed if need, create or update test for this resource
+
+do not create temp code files for bash generation, work with all code file by file, one by one, do not make batch file files for updates
+
+if need, create enums models, controllers, or another things. create one big control admin panel module for enums using filament v4 for every needed places, or find in internet to use any package for filament v4 or Laravel 12
+
+create admin route, create admin menu, create routes, create all features to admin in filament v4 and frontend
+
+for every enums create admin in one group all full crud and all features. maximum as possible for enums all features and all maximum crud
+
+update memory bank in the end of prompt and after all fixing of all errors
+
+for all admin select filter selection for example like a SelectFilter create enums via database with translation and translations and multilanguage for selecting
+
+remove all relations and all files what has relations with countries zones, zones, zona and another things. remove all with zones
+
+do not use any filenaming in database table naming with starting "sh_" remove all files if exists or make optimization where i do not want to see database tables with starting database naming "sh_"
+
+make all works with database only with MySQL type, and do not change for another type, remove another database tuning files or optimization, remove files if exists and remove all code if exists about SQLite
+
+create migrations if need, if can edit existing migration - make editing in existing migrations, make editing in models, make editing for frontend and for admin side using filament v 4 and use mcp 
+
+create seeds, create translations for admin and frontend side, make if need or edit files to multilanguage, make migrations editing or create migration files
+
+make or all admin routes, make for super admin all features, make editing for all maximum permissions for admin for user admin@example.com, make maximum permission for all, make editing in existing files for permissions
+
+remove empty folders in "app" folder
+
+do not create fucking temp files where in one file are making fixing for a lot ot files per one command like a "php filename.php"
+
+do not create fucking files, where in one php request or running one file do not fucming make all changes 
+
+read cursor rules, use mcp
+
+create if not exists all types of tests for this file, run, and fix all error
+one more time recheck does all types of tests exists, run all types of tests for this file
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

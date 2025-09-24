@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\Pages;
 
 use App\Filament\Resources\DiscountCodeResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
 final class ViewDiscountCode extends ViewRecord
 {

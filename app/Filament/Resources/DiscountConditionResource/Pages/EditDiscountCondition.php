@@ -7,7 +7,6 @@ namespace App\Filament\Resources\DiscountConditionResource\Pages;
 use App\Filament\Resources\DiscountConditionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions\DeleteAction;
 
 final class EditDiscountCondition extends EditRecord
 {

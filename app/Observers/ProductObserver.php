@@ -1,23 +1,22 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Observers;
 
 use App\Models\Product;
 use App\Services\Images\GradientImageService;
 use Illuminate\Support\Facades\Log;
+
 /**
  * ProductObserver
- * 
+ *
  * Model observer for ProductObserver Eloquent model events with automatic side effect handling and data consistency.
- * 
  */
 final class ProductObserver
 {
     /**
      * Handle created functionality with proper error handling.
-     * @param Product $product
-     * @return void
      */
     public function created(Product $product): void
     {

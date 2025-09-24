@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * NewsTag
@@ -18,9 +20,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed $table
  * @property mixed $fillable
  * @property string $translationModel
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|NewsTag newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|NewsTag newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|NewsTag query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class])]
@@ -30,11 +34,11 @@ final class NewsTag extends Model
     use HasTranslations;
 
     protected $table = 'news_tags';
+
     protected $fillable = ['is_visible', 'color', 'sort_order'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -45,7 +49,6 @@ final class NewsTag extends Model
 
     /**
      * Handle news functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function news(): BelongsToMany
     {
@@ -54,7 +57,6 @@ final class NewsTag extends Model
 
     /**
      * Handle isVisible functionality with proper error handling.
-     * @return bool
      */
     public function isVisible(): bool
     {
@@ -63,8 +65,6 @@ final class NewsTag extends Model
 
     /**
      * Handle scopeVisible functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeVisible(Builder $query): Builder
     {
@@ -73,7 +73,6 @@ final class NewsTag extends Model
 
     /**
      * Handle getRouteKeyName functionality with proper error handling.
-     * @return string
      */
     public function getRouteKeyName(): string
     {
@@ -82,7 +81,6 @@ final class NewsTag extends Model
 
     /**
      * Handle getSlugAttribute functionality with proper error handling.
-     * @return string
      */
     public function getSlugAttribute(): string
     {
@@ -91,7 +89,6 @@ final class NewsTag extends Model
 
     /**
      * Handle getNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getNameAttribute(): string
     {
@@ -100,7 +97,6 @@ final class NewsTag extends Model
 
     /**
      * Handle getDescriptionAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getDescriptionAttribute(): ?string
     {

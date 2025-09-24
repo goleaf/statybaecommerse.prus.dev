@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Translations\CountryTranslation;
+declare(strict_types=1);
+
 use App\Models\Country;
+use App\Models\Translations\CountryTranslation;
 
 uses(Illuminate\Foundation\Testing\RefreshDatabase::class);
 

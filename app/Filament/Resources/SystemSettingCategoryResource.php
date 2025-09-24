@@ -1,24 +1,28 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
+use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 use App\Models\SystemSettingCategory;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -26,9 +30,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
@@ -40,30 +41,28 @@ use UnitEnum;
 final class SystemSettingCategoryResource extends Resource
 {
     protected static ?string $model = SystemSettingCategory::class;
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'System';
+    }
+
     protected static ?int $navigationSort = 2;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
      */
     public static function getNavigationLabel(): string
     {
         return __('system_setting_categories.title');
     }
 
-    /**
-     * Handle getNavigationGroup functionality with proper error handling.
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
+    /** Handle getNavigationGroup functionality with proper error handling. */
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -72,7 +71,6 @@ final class SystemSettingCategoryResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -81,13 +79,11 @@ final class SystemSettingCategoryResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Section::make(__('system_setting_categories.basic_information'))
                     ->schema([
                         Grid::make(2)
@@ -97,8 +93,7 @@ final class SystemSettingCategoryResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live()
-                                    ->afterStateUpdated(fn($state, callable $set) =>
-                                        $set('slug', \Str::slug($state)))
+                                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state)))
                                     ->helperText(__('system_setting_categories.name_help')),
                                 TextInput::make('slug')
                                     ->label(__('system_setting_categories.slug'))
@@ -155,8 +150,6 @@ final class SystemSettingCategoryResource extends Resource
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -178,12 +171,13 @@ final class SystemSettingCategoryResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('icon')
                     ->label(__('system_setting_categories.icon'))
-                    ->formatStateUsing(fn($state) => $state ?: 'heroicon-o-cog-6-tooth')
+                    ->formatStateUsing(fn ($state) => $state ?: 'heroicon-o-cog-6-tooth')
                     ->toggleable(isToggledHiddenByDefault: true),
                 ColorColumn::make('color')
                     ->label(__('system_setting_categories.color'))
@@ -200,7 +194,7 @@ final class SystemSettingCategoryResource extends Resource
                     ->color('primary'),
                 TextColumn::make('active_settings_count')
                     ->label(__('system_setting_categories.active_settings_count'))
-                    ->counts(['settings' => fn($query) => $query->where('is_active', true)])
+                    ->counts(['settings' => fn ($query) => $query->where('is_active', true)])
                     ->sortable()
                     ->badge()
                     ->color('success'),
@@ -233,7 +227,7 @@ final class SystemSettingCategoryResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('duplicate')
                     ->label(__('system_setting_categories.duplicate'))
@@ -241,8 +235,8 @@ final class SystemSettingCategoryResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingCategory $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->name = $record->name . ' (Copy)';
-                        $newRecord->slug = $record->slug . '-copy';
+                        $newRecord->name = $record->name.' (Copy)';
+                        $newRecord->slug = $record->slug.'-copy';
                         $newRecord->save();
 
                         Notification::make()
@@ -283,18 +277,18 @@ final class SystemSettingCategoryResource extends Resource
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\TranslationsRelationManager::class,
+            RelationManagers\SettingsRelationManager::class,
+            RelationManagers\ChildrenRelationManager::class,
         ];
     }
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

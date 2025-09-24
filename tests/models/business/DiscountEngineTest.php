@@ -9,10 +9,10 @@ uses()->group('engine');
 beforeEach(function () {
     // Run the package/app migrations to ensure tables exist
     $this->artisan('migrate', ['--force' => true]);
-    
+
     // Clean up any existing data - disable foreign key checks for SQLite
     DB::statement('PRAGMA foreign_keys=OFF');
-    
+
     if (Schema::hasTable('discount_codes')) {
         DB::table('discount_codes')->delete();
     }
@@ -22,10 +22,10 @@ beforeEach(function () {
     if (Schema::hasTable('orders')) {
         DB::table('orders')->delete();
     }
-    
+
     // Re-enable foreign key checks
     DB::statement('PRAGMA foreign_keys=ON');
-    if (!Schema::hasTable('discounts')) {
+    if (! Schema::hasTable('discounts')) {
         Schema::create('discounts', function ($table) {
             $table->id();
             $table->string('type')->nullable();
@@ -51,30 +51,30 @@ beforeEach(function () {
         });
     } else {
         Schema::table('discounts', function ($table) {
-            if (!Schema::hasColumn('discounts', 'status')) {
+            if (! Schema::hasColumn('discounts', 'status')) {
                 $table->string('status')->nullable();
             }
-            if (!Schema::hasColumn('discounts', 'stacking_policy')) {
+            if (! Schema::hasColumn('discounts', 'stacking_policy')) {
                 $table->string('stacking_policy')->default('stack');
             }
-            if (!Schema::hasColumn('discounts', 'first_order_only')) {
+            if (! Schema::hasColumn('discounts', 'first_order_only')) {
                 $table->boolean('first_order_only')->default(false);
             }
-            if (!Schema::hasColumn('discounts', 'code')) {
+            if (! Schema::hasColumn('discounts', 'code')) {
                 $table->string('code')->nullable();
             }
-            if (!Schema::hasColumn('discounts', 'apply_to')) {
+            if (! Schema::hasColumn('discounts', 'apply_to')) {
                 $table->string('apply_to')->nullable();
             }
-            if (!Schema::hasColumn('discounts', 'min_required')) {
+            if (! Schema::hasColumn('discounts', 'min_required')) {
                 $table->decimal('min_required', 12, 2)->default(0);
             }
-            if (!Schema::hasColumn('discounts', 'eligibility')) {
+            if (! Schema::hasColumn('discounts', 'eligibility')) {
                 $table->string('eligibility')->nullable();
             }
         });
     }
-    if (!Schema::hasTable('discount_codes')) {
+    if (! Schema::hasTable('discount_codes')) {
         Schema::create('discount_codes', function ($table) {
             $table->id();
             $table->unsignedBigInteger('discount_id');
@@ -84,7 +84,7 @@ beforeEach(function () {
             $table->unsignedInteger('usage_count')->default(0);
             $table->timestamps();
         });
-        
+
         // Add unique index if it doesn't exist
         try {
             Schema::table('discount_codes', function ($table) {
@@ -94,7 +94,7 @@ beforeEach(function () {
             // Index already exists, ignore the error
         }
     }
-    if (!Schema::hasTable('orders')) {
+    if (! Schema::hasTable('orders')) {
         Schema::create('orders', function ($table) {
             $table->id();
             $table->unsignedBigInteger('customer_id')->nullable();
@@ -110,26 +110,26 @@ beforeEach(function () {
         });
     }
     // Minimal product table and pivots used by engine scoping
-    if (!Schema::hasTable('products')) {
+    if (! Schema::hasTable('products')) {
         Schema::create('products', function ($table) {
             $table->id();
             $table->unsignedBigInteger('brand_id')->nullable();
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('category_product')) {
+    if (! Schema::hasTable('category_product')) {
         Schema::create('category_product', function ($table) {
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('product_id');
         });
     }
-    if (!Schema::hasTable('collection_product')) {
+    if (! Schema::hasTable('collection_product')) {
         Schema::create('collection_product', function ($table) {
             $table->unsignedBigInteger('collection_id');
             $table->unsignedBigInteger('product_id');
         });
     }
-    if (!Schema::hasTable('users')) {
+    if (! Schema::hasTable('users')) {
         Schema::create('users', function ($table) {
             $table->id();
             $table->string('first_name');
@@ -194,7 +194,7 @@ it('applies percentage cart discount with code', function () {
 });
 
 it('respects first order only flag', function () {
-    $userInsert = ['email' => 'a' . rand() . '@x.tld', 'password' => bcrypt('x'), 'created_at' => now(), 'updated_at' => now()];
+    $userInsert = ['email' => 'a'.rand().'@x.tld', 'password' => bcrypt('x'), 'created_at' => now(), 'updated_at' => now()];
     if (Schema::hasColumn('users', 'name')) {
         $userInsert['name'] = 'A B';
     } else {

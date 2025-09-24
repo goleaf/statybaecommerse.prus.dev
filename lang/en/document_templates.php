@@ -4,11 +4,11 @@ return [
     'title' => 'Document Templates',
     'plural' => 'Document Templates',
     'single' => 'Document Template',
-    
+
     'basic_information' => 'Basic Information',
     'content' => 'Content',
     'settings' => 'Settings',
-    
+
     'name' => 'Name',
     'slug' => 'Slug',
     'description' => 'Description',
@@ -18,7 +18,7 @@ return [
     'is_active' => 'Active',
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
-    
+
     'types' => [
         'invoice' => 'Invoice',
         'receipt' => 'Receipt',
@@ -26,7 +26,7 @@ return [
         'contract' => 'Contract',
         'report' => 'Report',
     ],
-    
+
     'categories' => [
         'financial' => 'Financial',
         'legal' => 'Legal',
@@ -34,4 +34,3 @@ return [
         'operational' => 'Operational',
     ],
 ];
-

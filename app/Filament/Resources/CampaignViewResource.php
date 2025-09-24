@@ -1,31 +1,32 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignViewResource\Pages;
-use App\Models\Campaign;
 use App\Models\CampaignView;
-use App\Models\User;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
 final class CampaignViewResource extends Resource
 {
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Marketing';
+    }
+
     protected static ?string $model = CampaignView::class;
 
-    // protected static $navigationGroup = NavigationGroup::Marketing;
-
+    // /** @var UnitEnum|string|null */
     protected static ?int $navigationSort = 7;
 
     protected static ?string $recordTitleAttribute = 'ip_address';
@@ -110,6 +111,7 @@ final class CampaignViewResource extends Resource
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -121,6 +123,7 @@ final class CampaignViewResource extends Resource
                         if (strlen($state) <= 30) {
                             return null;
                         }
+
                         return $state;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),

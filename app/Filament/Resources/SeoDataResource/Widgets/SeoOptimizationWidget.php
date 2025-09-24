@@ -6,7 +6,6 @@ namespace App\Filament\Resources\SeoDataResource\Widgets;
 
 use App\Models\SeoData;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class SeoOptimizationWidget extends ChartWidget
 {
@@ -21,7 +20,7 @@ final class SeoOptimizationWidget extends ChartWidget
             ->whereNotNull('description')
             ->whereNotNull('keywords')
             ->count();
-        
+
         $needsOptimization = $totalSeoData - $optimizedSeoData;
 
         return [

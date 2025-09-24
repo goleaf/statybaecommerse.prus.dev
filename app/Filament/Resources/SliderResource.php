@@ -1,22 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
-
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -29,11 +26,9 @@ use Filament\Tables\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 /**
  * SliderResource
@@ -43,13 +38,17 @@ use Illuminate\Database\Eloquent\Collection;
 final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
-    // protected static $navigationGroup = NavigationGroup::Content;
+
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+
     protected static ?int $navigationSort = 4;
+
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
      */
     public static function getNavigationLabel(): string
     {
@@ -58,7 +57,6 @@ final class SliderResource extends Resource
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -67,25 +65,19 @@ final class SliderResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
         return __('sliders.single');
     }
 
-    /**
-     * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
-     */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make(__('sliders.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('title')
                                 ->label(__('sliders.title'))
                                 ->required()
@@ -106,7 +98,7 @@ final class SliderResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('sliders.media'))
-                ->components([
+                ->schema([
                     FileUpload::make('image')
                         ->label(__('sliders.image'))
                         ->image()
@@ -115,9 +107,9 @@ final class SliderResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('sliders.appearance'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             ColorPicker::make('background_color')
                                 ->label(__('sliders.background_color'))
                                 ->default('#ffffff'),
@@ -132,7 +124,7 @@ final class SliderResource extends Resource
                         ->minValue(0),
                 ]),
             Section::make(__('sliders.settings'))
-                ->components([
+                ->schema([
                     Toggle::make('is_active')
                         ->label(__('sliders.is_active'))
                         ->default(true),
@@ -142,8 +134,6 @@ final class SliderResource extends Resource
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -197,7 +187,6 @@ final class SliderResource extends Resource
 
     /**
      * Handle getRelations functionality with proper error handling.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -208,7 +197,6 @@ final class SliderResource extends Resource
 
     /**
      * Handle getPages functionality with proper error handling.
-     * @return array
      */
     public static function getPages(): array
     {

@@ -7,13 +7,13 @@ return [
     'navigation' => [
         'campaigns' => 'Kampanijos',
     ],
-    
+
     // Models
     'models' => [
         'campaign' => 'Kampanija',
         'campaigns' => 'Kampanijos',
     ],
-    
+
     // Sections
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
@@ -25,7 +25,7 @@ return [
         'seo' => 'SEO',
         'automation' => 'Automatizavimas',
     ],
-    
+
     // Fields
     'fields' => [
         'name' => 'Pavadinimas',
@@ -51,7 +51,6 @@ return [
         'target_categories' => 'Tikslinės kategorijos',
         'target_customer_groups' => 'Tikslinės klientų grupės',
         'channel' => 'Kanalas',
-        'zone' => 'Zona',
         'discounts' => 'Nuolaidos',
         'display_priority' => 'Rodymo prioritetas',
         'is_featured' => 'Rekomenduojama',
@@ -73,7 +72,7 @@ return [
         'created_at' => 'Sukurta',
         'updated_at' => 'Atnaujinta',
     ],
-    
+
     // Status
     'status' => [
         'draft' => 'Juodraštis',
@@ -83,7 +82,7 @@ return [
         'cancelled' => 'Atšaukta',
         'scheduled' => 'Suplanuota',
     ],
-    
+
     // Types
     'types' => [
         'email' => 'El. paštas',
@@ -95,7 +94,7 @@ return [
         'display' => 'Ekrano reklama',
         'search' => 'Paieškos reklama',
     ],
-    
+
     // Actions
     'actions' => [
         'create' => 'Sukurti kampaniją',
@@ -111,7 +110,7 @@ return [
         'send' => 'Siųsti',
         'schedule' => 'Suplanuoti',
     ],
-    
+
     // Notifications
     'notifications' => [
         'created' => 'Kampanija sėkmingai sukurta',
@@ -124,7 +123,7 @@ return [
         'sent' => 'Kampanija sėkmingai išsiųsta',
         'scheduled' => 'Kampanija sėkmingai suplanuota',
     ],
-    
+
     // Filters
     'filters' => [
         'status' => 'Būsena',
@@ -136,7 +135,7 @@ return [
         'completed' => 'Užbaigtos',
         'inactive' => 'Neaktyvios',
     ],
-    
+
     // Widgets
     'widgets' => [
         'total_campaigns' => 'Iš viso kampanijų',

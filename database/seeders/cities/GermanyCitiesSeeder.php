@@ -18,7 +18,7 @@ final class GermanyCitiesSeeder extends Seeder
         $euZone = Zone::where('code', 'EU')->first();
 
         // Regions are no longer used in the database schema
-        
+
         $cities = [
             // Berlin
             [
@@ -32,8 +32,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['10115', '10117', '10119'],
                 'translations' => [
                     'lt' => ['name' => 'Berlynas', 'description' => 'Vokietijos sostinė'],
-                    'en' => ['name' => 'Berlin', 'description' => 'Capital of Germany']
-            ],
+                    'en' => ['name' => 'Berlin', 'description' => 'Capital of Germany'],
+                ],
             ],
             // Hamburg
             [
@@ -45,8 +45,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['20095', '20097', '20099'],
                 'translations' => [
                     'lt' => ['name' => 'Hamburgas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Hamburg', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Hamburg', 'description' => 'Port city'],
+                ],
             ],
             // Bavaria
             [
@@ -58,8 +58,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['80331', '80333', '80335'],
                 'translations' => [
                     'lt' => ['name' => 'Miunchenas', 'description' => 'Bavarijos sostinė'],
-                    'en' => ['name' => 'Munich', 'description' => 'Capital of Bavaria']
-            ],
+                    'en' => ['name' => 'Munich', 'description' => 'Capital of Bavaria'],
+                ],
             ],
             [
                 'name' => 'Nuremberg',
@@ -70,8 +70,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['90402', '90403', '90408'],
                 'translations' => [
                     'lt' => ['name' => 'Niurnbergas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Nuremberg', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Nuremberg', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Augsburg',
@@ -82,8 +82,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['86150', '86152', '86153'],
                 'translations' => [
                     'lt' => ['name' => 'Augsburgas', 'description' => 'Senovinis miestas'],
-                    'en' => ['name' => 'Augsburg', 'description' => 'Ancient city']
-            ],
+                    'en' => ['name' => 'Augsburg', 'description' => 'Ancient city'],
+                ],
             ],
             [
                 'name' => 'Würzburg',
@@ -94,8 +94,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['97070', '97072', '97074'],
                 'translations' => [
                     'lt' => ['name' => 'Vircburgas', 'description' => 'Vyno miestas'],
-                    'en' => ['name' => 'Würzburg', 'description' => 'Wine city']
-            ],
+                    'en' => ['name' => 'Würzburg', 'description' => 'Wine city'],
+                ],
             ],
             [
                 'name' => 'Regensburg',
@@ -106,8 +106,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['93047', '93049', '93051'],
                 'translations' => [
                     'lt' => ['name' => 'Regensburgas', 'description' => 'UNESCO miestas'],
-                    'en' => ['name' => 'Regensburg', 'description' => 'UNESCO city']
-            ],
+                    'en' => ['name' => 'Regensburg', 'description' => 'UNESCO city'],
+                ],
             ],
             [
                 'name' => 'Ingolstadt',
@@ -118,8 +118,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['85049', '85051', '85053'],
                 'translations' => [
                     'lt' => ['name' => 'Ingolštatas', 'description' => 'Automobilių pramonės centras'],
-                    'en' => ['name' => 'Ingolstadt', 'description' => 'Automotive industry center']
-            ],
+                    'en' => ['name' => 'Ingolstadt', 'description' => 'Automotive industry center'],
+                ],
             ],
             [
                 'name' => 'Fürth',
@@ -130,8 +130,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['90762', '90763', '90765'],
                 'translations' => [
                     'lt' => ['name' => 'Fiurtas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Fürth', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Fürth', 'description' => 'Industrial city'],
+                ],
             ],
             // Baden-Württemberg
             [
@@ -143,8 +143,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['70173', '70174', '70176'],
                 'translations' => [
                     'lt' => ['name' => 'Štutgartas', 'description' => 'Badeno-Viurtembergo sostinė'],
-                    'en' => ['name' => 'Stuttgart', 'description' => 'Capital of Baden-Württemberg']
-            ],
+                    'en' => ['name' => 'Stuttgart', 'description' => 'Capital of Baden-Württemberg'],
+                ],
             ],
             [
                 'name' => 'Mannheim',
@@ -155,8 +155,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['68159', '68161', '68163'],
                 'translations' => [
                     'lt' => ['name' => 'Manheimas', 'description' => 'Pramonės centras'],
-                    'en' => ['name' => 'Mannheim', 'description' => 'Industrial center']
-            ],
+                    'en' => ['name' => 'Mannheim', 'description' => 'Industrial center'],
+                ],
             ],
             [
                 'name' => 'Karlsruhe',
@@ -167,8 +167,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['76133', '76135', '76137'],
                 'translations' => [
                     'lt' => ['name' => 'Karlsruhė', 'description' => 'Teismo miestas'],
-                    'en' => ['name' => 'Karlsruhe', 'description' => 'Court city']
-            ],
+                    'en' => ['name' => 'Karlsruhe', 'description' => 'Court city'],
+                ],
             ],
             [
                 'name' => 'Freiburg',
@@ -179,8 +179,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['79098', '79100', '79102'],
                 'translations' => [
                     'lt' => ['name' => 'Freiburgas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Freiburg', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Freiburg', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Heidelberg',
@@ -191,8 +191,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['69115', '69117', '69118'],
                 'translations' => [
                     'lt' => ['name' => 'Heidelbergas', 'description' => 'Romantikos miestas'],
-                    'en' => ['name' => 'Heidelberg', 'description' => 'Romantic city']
-            ],
+                    'en' => ['name' => 'Heidelberg', 'description' => 'Romantic city'],
+                ],
             ],
             [
                 'name' => 'Ulm',
@@ -203,8 +203,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['89073', '89075', '89077'],
                 'translations' => [
                     'lt' => ['name' => 'Ulmai', 'description' => 'Einšteino gimtasis miestas'],
-                    'en' => ['name' => 'Ulm', 'description' => "Einstein's birthplace"]
-            ],
+                    'en' => ['name' => 'Ulm', 'description' => "Einstein's birthplace"],
+                ],
             ],
             [
                 'name' => 'Tübingen',
@@ -215,8 +215,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['72070', '72072', '72074'],
                 'translations' => [
                     'lt' => ['name' => 'Tiubingenas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Tübingen', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Tübingen', 'description' => 'University city'],
+                ],
             ],
             // North Rhine-Westphalia
             [
@@ -228,8 +228,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['50667', '50668', '50670'],
                 'translations' => [
                     'lt' => ['name' => 'Kelnas', 'description' => 'Katedros miestas'],
-                    'en' => ['name' => 'Cologne', 'description' => 'Cathedral city']
-            ],
+                    'en' => ['name' => 'Cologne', 'description' => 'Cathedral city'],
+                ],
             ],
             [
                 'name' => 'Düsseldorf',
@@ -240,8 +240,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['40210', '40211', '40212'],
                 'translations' => [
                     'lt' => ['name' => 'Diūseldorfas', 'description' => 'Šiaurės Reino-Vestfalijos sostinė'],
-                    'en' => ['name' => 'Düsseldorf', 'description' => 'Capital of North Rhine-Westphalia']
-            ],
+                    'en' => ['name' => 'Düsseldorf', 'description' => 'Capital of North Rhine-Westphalia'],
+                ],
             ],
             [
                 'name' => 'Dortmund',
@@ -252,8 +252,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['44135', '44137', '44139'],
                 'translations' => [
                     'lt' => ['name' => 'Dortmundas', 'description' => 'Anglies pramonės centras'],
-                    'en' => ['name' => 'Dortmund', 'description' => 'Coal industry center']
-            ],
+                    'en' => ['name' => 'Dortmund', 'description' => 'Coal industry center'],
+                ],
             ],
             [
                 'name' => 'Essen',
@@ -264,8 +264,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['45127', '45128', '45130'],
                 'translations' => [
                     'lt' => ['name' => 'Esenas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Essen', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Essen', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Duisburg',
@@ -276,8 +276,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['47051', '47053', '47055'],
                 'translations' => [
                     'lt' => ['name' => 'Diūsburgas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Duisburg', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Duisburg', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Bochum',
@@ -288,8 +288,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['44787', '44789', '44791'],
                 'translations' => [
                     'lt' => ['name' => 'Bochumas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Bochum', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Bochum', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Wuppertal',
@@ -300,8 +300,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['42103', '42105', '42107'],
                 'translations' => [
                     'lt' => ['name' => 'Vuperatalis', 'description' => 'Pakabinamosios geležinkelio miestas'],
-                    'en' => ['name' => 'Wuppertal', 'description' => 'Suspension railway city']
-            ],
+                    'en' => ['name' => 'Wuppertal', 'description' => 'Suspension railway city'],
+                ],
             ],
             [
                 'name' => 'Bielefeld',
@@ -312,8 +312,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['33602', '33604', '33605'],
                 'translations' => [
                     'lt' => ['name' => 'Bilefeldas', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Bielefeld', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Bielefeld', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Bonn',
@@ -324,8 +324,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['53111', '53113', '53115'],
                 'translations' => [
                     'lt' => ['name' => 'Bonas', 'description' => 'Buvo Vokietijos sostinė'],
-                    'en' => ['name' => 'Bonn', 'description' => 'Former capital of Germany']
-            ],
+                    'en' => ['name' => 'Bonn', 'description' => 'Former capital of Germany'],
+                ],
             ],
             [
                 'name' => 'Münster',
@@ -336,8 +336,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['48143', '48145', '48147'],
                 'translations' => [
                     'lt' => ['name' => 'Miunsteris', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Münster', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Münster', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Gelsenkirchen',
@@ -348,8 +348,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['45879', '45881', '45883'],
                 'translations' => [
                     'lt' => ['name' => 'Gelzenkirhenas', 'description' => 'Anglies pramonės centras'],
-                    'en' => ['name' => 'Gelsenkirchen', 'description' => 'Coal industry center']
-            ],
+                    'en' => ['name' => 'Gelsenkirchen', 'description' => 'Coal industry center'],
+                ],
             ],
             [
                 'name' => 'Mönchengladbach',
@@ -360,8 +360,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['41061', '41063', '41065'],
                 'translations' => [
                     'lt' => ['name' => 'Menhengladbachas', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Mönchengladbach', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Mönchengladbach', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Aachen',
@@ -372,8 +372,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['52062', '52064', '52066'],
                 'translations' => [
                     'lt' => ['name' => 'Achenas', 'description' => 'Karolio Didžiojo miestas'],
-                    'en' => ['name' => 'Aachen', 'description' => "Charlemagne's city"]
-            ],
+                    'en' => ['name' => 'Aachen', 'description' => "Charlemagne's city"],
+                ],
             ],
             // Hesse
             [
@@ -385,8 +385,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['60311', '60313', '60316'],
                 'translations' => [
                     'lt' => ['name' => 'Frankfurtas', 'description' => 'Finansų centras'],
-                    'en' => ['name' => 'Frankfurt', 'description' => 'Financial center']
-            ],
+                    'en' => ['name' => 'Frankfurt', 'description' => 'Financial center'],
+                ],
             ],
             [
                 'name' => 'Wiesbaden',
@@ -397,8 +397,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['65183', '65185', '65187'],
                 'translations' => [
                     'lt' => ['name' => 'Viesbadenas', 'description' => 'Hesės sostinė'],
-                    'en' => ['name' => 'Wiesbaden', 'description' => 'Capital of Hesse']
-            ],
+                    'en' => ['name' => 'Wiesbaden', 'description' => 'Capital of Hesse'],
+                ],
             ],
             [
                 'name' => 'Kassel',
@@ -409,8 +409,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['34117', '34119', '34121'],
                 'translations' => [
                     'lt' => ['name' => 'Kasselis', 'description' => 'Dokumentų parodos miestas'],
-                    'en' => ['name' => 'Kassel', 'description' => 'Documenta exhibition city']
-            ],
+                    'en' => ['name' => 'Kassel', 'description' => 'Documenta exhibition city'],
+                ],
             ],
             [
                 'name' => 'Darmstadt',
@@ -421,8 +421,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['64283', '64285', '64287'],
                 'translations' => [
                     'lt' => ['name' => 'Darmštatas', 'description' => 'Mokslo miestas'],
-                    'en' => ['name' => 'Darmstadt', 'description' => 'Science city']
-            ],
+                    'en' => ['name' => 'Darmstadt', 'description' => 'Science city'],
+                ],
             ],
             // Saxony
             [
@@ -434,8 +434,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['01067', '01069', '01097'],
                 'translations' => [
                     'lt' => ['name' => 'Drezdenas', 'description' => 'Saksonijos sostinė'],
-                    'en' => ['name' => 'Dresden', 'description' => 'Capital of Saxony']
-            ],
+                    'en' => ['name' => 'Dresden', 'description' => 'Capital of Saxony'],
+                ],
             ],
             [
                 'name' => 'Leipzig',
@@ -446,8 +446,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['04109', '04105', '04107'],
                 'translations' => [
                     'lt' => ['name' => 'Leipcigas', 'description' => 'Knygų mugės miestas'],
-                    'en' => ['name' => 'Leipzig', 'description' => 'Book fair city']
-            ],
+                    'en' => ['name' => 'Leipzig', 'description' => 'Book fair city'],
+                ],
             ],
             [
                 'name' => 'Chemnitz',
@@ -458,8 +458,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['09111', '09113', '09117'],
                 'translations' => [
                     'lt' => ['name' => 'Chemnicas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Chemnitz', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Chemnitz', 'description' => 'Industrial city'],
+                ],
             ],
             // Lower Saxony
             [
@@ -471,8 +471,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['30159', '30161', '30163'],
                 'translations' => [
                     'lt' => ['name' => 'Hanoveris', 'description' => 'Žemutinės Saksonijos sostinė'],
-                    'en' => ['name' => 'Hanover', 'description' => 'Capital of Lower Saxony']
-            ],
+                    'en' => ['name' => 'Hanover', 'description' => 'Capital of Lower Saxony'],
+                ],
             ],
             [
                 'name' => 'Braunschweig',
@@ -483,8 +483,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['38100', '38102', '38104'],
                 'translations' => [
                     'lt' => ['name' => 'Braunšvaigas', 'description' => 'Lionų miestas'],
-                    'en' => ['name' => 'Braunschweig', 'description' => 'Lion city']
-            ],
+                    'en' => ['name' => 'Braunschweig', 'description' => 'Lion city'],
+                ],
             ],
             [
                 'name' => 'Osnabrück',
@@ -495,8 +495,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['49074', '49076', '49078'],
                 'translations' => [
                     'lt' => ['name' => 'Osnabriukas', 'description' => 'Taikos miestas'],
-                    'en' => ['name' => 'Osnabrück', 'description' => 'Peace city']
-            ],
+                    'en' => ['name' => 'Osnabrück', 'description' => 'Peace city'],
+                ],
             ],
             // Brandenburg
             [
@@ -508,8 +508,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['14467', '14469', '14471'],
                 'translations' => [
                     'lt' => ['name' => 'Potsdamas', 'description' => 'Brandenburgo sostinė'],
-                    'en' => ['name' => 'Potsdam', 'description' => 'Capital of Brandenburg']
-            ],
+                    'en' => ['name' => 'Potsdam', 'description' => 'Capital of Brandenburg'],
+                ],
             ],
             [
                 'name' => 'Cottbus',
@@ -520,8 +520,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['03042', '03044', '03046'],
                 'translations' => [
                     'lt' => ['name' => 'Kotbusas', 'description' => 'Sorbų kultūros centras'],
-                    'en' => ['name' => 'Cottbus', 'description' => 'Sorbian culture center']
-            ],
+                    'en' => ['name' => 'Cottbus', 'description' => 'Sorbian culture center'],
+                ],
             ],
             // Saxony-Anhalt
             [
@@ -533,8 +533,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['39104', '39106', '39108'],
                 'translations' => [
                     'lt' => ['name' => 'Magdeburgas', 'description' => 'Saksonijos-Anhalto sostinė'],
-                    'en' => ['name' => 'Magdeburg', 'description' => 'Capital of Saxony-Anhalt']
-            ],
+                    'en' => ['name' => 'Magdeburg', 'description' => 'Capital of Saxony-Anhalt'],
+                ],
             ],
             [
                 'name' => 'Halle',
@@ -545,8 +545,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['06108', '06110', '06112'],
                 'translations' => [
                     'lt' => ['name' => 'Halė', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Halle', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Halle', 'description' => 'University city'],
+                ],
             ],
             // Thuringia
             [
@@ -558,8 +558,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['99084', '99086', '99089'],
                 'translations' => [
                     'lt' => ['name' => 'Erfurtas', 'description' => 'Tiuringijos sostinė'],
-                    'en' => ['name' => 'Erfurt', 'description' => 'Capital of Thuringia']
-            ],
+                    'en' => ['name' => 'Erfurt', 'description' => 'Capital of Thuringia'],
+                ],
             ],
             [
                 'name' => 'Jena',
@@ -570,8 +570,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['07743', '07745', '07747'],
                 'translations' => [
                     'lt' => ['name' => 'Jena', 'description' => 'Optikos pramonės centras'],
-                    'en' => ['name' => 'Jena', 'description' => 'Optics industry center']
-            ],
+                    'en' => ['name' => 'Jena', 'description' => 'Optics industry center'],
+                ],
             ],
             // Mecklenburg-Vorpommern
             [
@@ -583,8 +583,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['18055', '18057', '18059'],
                 'translations' => [
                     'lt' => ['name' => 'Rostokas', 'description' => 'Baltijos jūros uostas'],
-                    'en' => ['name' => 'Rostock', 'description' => 'Baltic Sea port']
-            ],
+                    'en' => ['name' => 'Rostock', 'description' => 'Baltic Sea port'],
+                ],
             ],
             [
                 'name' => 'Schwerin',
@@ -595,8 +595,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['19053', '19055', '19057'],
                 'translations' => [
                     'lt' => ['name' => 'Šverinas', 'description' => 'Meklenburgo-Pomeranijos sostinė'],
-                    'en' => ['name' => 'Schwerin', 'description' => 'Capital of Mecklenburg-Vorpommern']
-            ],
+                    'en' => ['name' => 'Schwerin', 'description' => 'Capital of Mecklenburg-Vorpommern'],
+                ],
             ],
             // Schleswig-Holstein
             [
@@ -608,8 +608,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['24103', '24105', '24107'],
                 'translations' => [
                     'lt' => ['name' => 'Kilis', 'description' => 'Šlėzvigo-Holšteino sostinė'],
-                    'en' => ['name' => 'Kiel', 'description' => 'Capital of Schleswig-Holstein']
-            ],
+                    'en' => ['name' => 'Kiel', 'description' => 'Capital of Schleswig-Holstein'],
+                ],
             ],
             [
                 'name' => 'Lübeck',
@@ -620,8 +620,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['23552', '23554', '23556'],
                 'translations' => [
                     'lt' => ['name' => 'Liubekas', 'description' => 'Hanzos miestas'],
-                    'en' => ['name' => 'Lübeck', 'description' => 'Hanseatic city']
-            ],
+                    'en' => ['name' => 'Lübeck', 'description' => 'Hanseatic city'],
+                ],
             ],
             // Saarland
             [
@@ -633,8 +633,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['66111', '66113', '66115'],
                 'translations' => [
                     'lt' => ['name' => 'Zarbrūkenas', 'description' => 'Zarlando sostinė'],
-                    'en' => ['name' => 'Saarbrücken', 'description' => 'Capital of Saarland']
-            ],
+                    'en' => ['name' => 'Saarbrücken', 'description' => 'Capital of Saarland'],
+                ],
             ],
             // Bremen
             [
@@ -646,8 +646,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['28195', '28197', '28199'],
                 'translations' => [
                     'lt' => ['name' => 'Bremenas', 'description' => 'Hanzos miestas'],
-                    'en' => ['name' => 'Bremen', 'description' => 'Hanseatic city']
-            ],
+                    'en' => ['name' => 'Bremen', 'description' => 'Hanseatic city'],
+                ],
             ],
             // Rhineland-Palatinate
             [
@@ -659,8 +659,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['55116', '55118', '55120'],
                 'translations' => [
                     'lt' => ['name' => 'Maincas', 'description' => 'Reino krašto-Pfalco sostinė'],
-                    'en' => ['name' => 'Mainz', 'description' => 'Capital of Rhineland-Palatinate']
-            ],
+                    'en' => ['name' => 'Mainz', 'description' => 'Capital of Rhineland-Palatinate'],
+                ],
             ],
             [
                 'name' => 'Ludwigshafen',
@@ -671,8 +671,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['67059', '67061', '67063'],
                 'translations' => [
                     'lt' => ['name' => 'Ludvigshafenas', 'description' => 'Chemijos pramonės centras'],
-                    'en' => ['name' => 'Ludwigshafen', 'description' => 'Chemical industry center']
-            ],
+                    'en' => ['name' => 'Ludwigshafen', 'description' => 'Chemical industry center'],
+                ],
             ],
             [
                 'name' => 'Koblenz',
@@ -683,8 +683,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['56068', '56070', '56072'],
                 'translations' => [
                     'lt' => ['name' => 'Koblencas', 'description' => 'Upės susijungimo miestas'],
-                    'en' => ['name' => 'Koblenz', 'description' => 'River confluence city']
-            ],
+                    'en' => ['name' => 'Koblenz', 'description' => 'River confluence city'],
+                ],
             ],
             // Additional Bavaria cities
             [
@@ -696,8 +696,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['63739'],
                 'translations' => [
                     'lt' => ['name' => 'Aschaffenburgas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Aschaffenburg', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Aschaffenburg', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Bamberg',
@@ -708,8 +708,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['96047'],
                 'translations' => [
                     'lt' => ['name' => 'Bambergas', 'description' => 'UNESCO miestas'],
-                    'en' => ['name' => 'Bamberg', 'description' => 'UNESCO city']
-            ],
+                    'en' => ['name' => 'Bamberg', 'description' => 'UNESCO city'],
+                ],
             ],
             [
                 'name' => 'Bayreuth',
@@ -720,8 +720,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['95444'],
                 'translations' => [
                     'lt' => ['name' => 'Baireutas', 'description' => 'Vagnerio festivalio miestas'],
-                    'en' => ['name' => 'Bayreuth', 'description' => 'Wagner festival city']
-            ],
+                    'en' => ['name' => 'Bayreuth', 'description' => 'Wagner festival city'],
+                ],
             ],
             [
                 'name' => 'Landshut',
@@ -732,8 +732,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['84028'],
                 'translations' => [
                     'lt' => ['name' => 'Landšutas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Landshut', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Landshut', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Rosenheim',
@@ -744,8 +744,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['83022'],
                 'translations' => [
                     'lt' => ['name' => 'Rozenheimas', 'description' => 'Alpų miestas'],
-                    'en' => ['name' => 'Rosenheim', 'description' => 'Alpine city']
-            ],
+                    'en' => ['name' => 'Rosenheim', 'description' => 'Alpine city'],
+                ],
             ],
             [
                 'name' => 'Schweinfurt',
@@ -756,8 +756,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['97421'],
                 'translations' => [
                     'lt' => ['name' => 'Švainfurtas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Schweinfurt', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Schweinfurt', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Passau',
@@ -768,8 +768,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['94032'],
                 'translations' => [
                     'lt' => ['name' => 'Pasau', 'description' => 'Upės susijungimo miestas'],
-                    'en' => ['name' => 'Passau', 'description' => 'River confluence city']
-            ],
+                    'en' => ['name' => 'Passau', 'description' => 'River confluence city'],
+                ],
             ],
             [
                 'name' => 'Straubing',
@@ -780,8 +780,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['94315'],
                 'translations' => [
                     'lt' => ['name' => 'Straubingas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Straubing', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Straubing', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Amberg',
@@ -792,8 +792,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['92224'],
                 'translations' => [
                     'lt' => ['name' => 'Ambergas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Amberg', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Amberg', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Weiden',
@@ -804,8 +804,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['92637'],
                 'translations' => [
                     'lt' => ['name' => 'Veidenas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Weiden', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Weiden', 'description' => 'Industrial city'],
+                ],
             ],
             // Additional Baden-Württemberg cities
             [
@@ -817,8 +817,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['75172'],
                 'translations' => [
                     'lt' => ['name' => 'Pforcheimas', 'description' => 'Aukso miestas'],
-                    'en' => ['name' => 'Pforzheim', 'description' => 'Gold city']
-            ],
+                    'en' => ['name' => 'Pforzheim', 'description' => 'Gold city'],
+                ],
             ],
             [
                 'name' => 'Reutlingen',
@@ -829,8 +829,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['72764'],
                 'translations' => [
                     'lt' => ['name' => 'Reutlingenas', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Reutlingen', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Reutlingen', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Esslingen',
@@ -841,8 +841,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['73728'],
                 'translations' => [
                     'lt' => ['name' => 'Eslingenas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Esslingen', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Esslingen', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Ludwigsburg',
@@ -853,8 +853,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['71634'],
                 'translations' => [
                     'lt' => ['name' => 'Ludvigburgas', 'description' => 'Baroko miestas'],
-                    'en' => ['name' => 'Ludwigsburg', 'description' => 'Baroque city']
-            ],
+                    'en' => ['name' => 'Ludwigsburg', 'description' => 'Baroque city'],
+                ],
             ],
             [
                 'name' => 'Tuttlingen',
@@ -865,8 +865,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['78532'],
                 'translations' => [
                     'lt' => ['name' => 'Tutlingenas', 'description' => 'Medicinos technikos centras'],
-                    'en' => ['name' => 'Tuttlingen', 'description' => 'Medical technology center']
-            ],
+                    'en' => ['name' => 'Tuttlingen', 'description' => 'Medical technology center'],
+                ],
             ],
             [
                 'name' => 'Villingen-Schwenningen',
@@ -877,8 +877,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['78048'],
                 'translations' => [
                     'lt' => ['name' => 'Vilingenas-Šveningenas', 'description' => 'Dvigubas miestas'],
-                    'en' => ['name' => 'Villingen-Schwenningen', 'description' => 'Twin city']
-            ],
+                    'en' => ['name' => 'Villingen-Schwenningen', 'description' => 'Twin city'],
+                ],
             ],
             [
                 'name' => 'Sindelfingen',
@@ -889,8 +889,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['71063'],
                 'translations' => [
                     'lt' => ['name' => 'Sindelfingenas', 'description' => 'Automobilių pramonės centras'],
-                    'en' => ['name' => 'Sindelfingen', 'description' => 'Automotive industry center']
-            ],
+                    'en' => ['name' => 'Sindelfingen', 'description' => 'Automotive industry center'],
+                ],
             ],
             [
                 'name' => 'Ravensburg',
@@ -901,8 +901,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['88212'],
                 'translations' => [
                     'lt' => ['name' => 'Ravensburgas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Ravensburg', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Ravensburg', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Baden-Baden',
@@ -913,8 +913,8 @@ final class GermanyCitiesSeeder extends Seeder
                 'postal_codes' => ['76530'],
                 'translations' => [
                     'lt' => ['name' => 'Badenas-Badenas', 'description' => 'Kurortinis miestas'],
-                    'en' => ['name' => 'Baden-Baden', 'description' => 'Spa city']
-            ],
+                    'en' => ['name' => 'Baden-Baden', 'description' => 'Spa city'],
+                ],
             ],
             [
                 'name' => 'Konstanz',
@@ -935,7 +935,7 @@ final class GermanyCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,

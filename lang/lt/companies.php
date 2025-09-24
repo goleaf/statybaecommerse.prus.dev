@@ -33,4 +33,3 @@ return [
     'active_only' => 'Tik aktyvūs',
     'inactive_only' => 'Tik neaktyvūs',
 ];
-

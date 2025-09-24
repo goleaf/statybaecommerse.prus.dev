@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -31,4 +33,3 @@ final class CartController extends Controller
         return response()->json(['message' => 'Cart item removal not implemented yet', 'id' => $id]);
     }
 }
-

@@ -12,7 +12,7 @@ return [
     */
 
     'european_locales' => [
-        'lt', 'lv', 'et', 'pl', 'sk', 'cs', 'hu', 'ro', 'bg', 'hr', 'sl', 'de'
+        'lt', 'lv', 'et', 'pl', 'sk', 'cs', 'hu', 'ro', 'bg', 'hr', 'sl', 'de',
     ],
 
     'formats' => [

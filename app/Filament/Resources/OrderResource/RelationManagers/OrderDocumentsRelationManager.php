@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
@@ -8,23 +10,22 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -54,7 +55,7 @@ final class OrderDocumentsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Section::make(__('orders.document_information'))
                     ->description(__('orders.document_information_description'))
                     ->icon('heroicon-o-document')
@@ -191,6 +192,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 30 ? $state : null;
                     })
                     ->prefixIcon('heroicon-o-document-text'),
@@ -206,7 +208,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                         'gray' => 'manual',
                         'slate' => 'other',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.document_types.{$state}") : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.document_types.{$state}") : '-'),
                 BadgeColumn::make('status')
                     ->label(__('orders.document_status'))
                     ->colors([
@@ -216,14 +218,14 @@ final class OrderDocumentsRelationManager extends RelationManager
                         'danger' => 'rejected',
                         'secondary' => 'archived',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.document_statuses.{$state}") : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.document_statuses.{$state}") : '-'),
                 TextColumn::make('version')
                     ->label(__('orders.version'))
                     ->sortable()
                     ->prefixIcon('heroicon-o-hashtag'),
                 TextColumn::make('file_size')
                     ->label(__('orders.file_size'))
-                    ->formatStateUsing(fn(?int $state): string => $state ? number_format($state / 1024, 2) . ' MB' : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 2).' MB' : '-')
                     ->sortable()
                     ->prefixIcon('heroicon-o-archive-box'),
                 IconColumn::make('is_public')
@@ -280,14 +282,14 @@ final class OrderDocumentsRelationManager extends RelationManager
                 TernaryFilter::make('is_public')
                     ->label(__('orders.is_public'))
                     ->queries(
-                        true: fn(Builder $query) => $query->where('is_public', true),
-                        false: fn(Builder $query) => $query->where('is_public', false),
+                        true: fn (Builder $query) => $query->where('is_public', true),
+                        false: fn (Builder $query) => $query->where('is_public', false),
                     ),
                 TernaryFilter::make('is_downloadable')
                     ->label(__('orders.is_downloadable'))
                     ->queries(
-                        true: fn(Builder $query) => $query->where('is_downloadable', true),
-                        false: fn(Builder $query) => $query->where('is_downloadable', false),
+                        true: fn (Builder $query) => $query->where('is_downloadable', true),
+                        false: fn (Builder $query) => $query->where('is_downloadable', false),
                     ),
             ])
             ->headerActions([
@@ -305,20 +307,20 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ->label(__('orders.download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('info')
-                    ->url(fn(Document $record): string => $record->file_path)
+                    ->url(fn (Document $record): string => $record->file_path)
                     ->openUrlInNewTab()
-                    ->visible(fn(Document $record): bool => $record->is_downloadable),
+                    ->visible(fn (Document $record): bool => $record->is_downloadable),
                 Action::make('preview')
                     ->label(__('orders.preview'))
                     ->icon('heroicon-o-eye')
                     ->color('gray')
-                    ->url(fn(Document $record): string => $record->file_path)
+                    ->url(fn (Document $record): string => $record->file_path)
                     ->openUrlInNewTab(),
                 Action::make('approve')
                     ->label(__('orders.approve'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(Document $record): bool => $record->status === 'pending')
+                    ->visible(fn (Document $record): bool => $record->status === 'pending')
                     ->action(function (Document $record): void {
                         $record->update(['status' => 'approved']);
 
@@ -332,7 +334,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ->label(__('orders.reject'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn(Document $record): bool => $record->status === 'pending')
+                    ->visible(fn (Document $record): bool => $record->status === 'pending')
                     ->action(function (Document $record): void {
                         $record->update(['status' => 'rejected']);
 

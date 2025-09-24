@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SettingResource\Pages;
 
 use App\Filament\Resources\SettingResource;
-use Filament\Actions\EditAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
 final class ViewSetting extends ViewRecord
@@ -15,7 +15,7 @@ final class ViewSetting extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
+            Actions\EditAction::make(),
         ];
     }
 }

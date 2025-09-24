@@ -1,15 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
 
 final class SliderManagementWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
+
     protected int|string|array $columnSpan = 'full';
 
     protected function getStats(): array

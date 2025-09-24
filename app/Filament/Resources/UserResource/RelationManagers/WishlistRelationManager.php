@@ -1,75 +1,56 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use Filament\Forms;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-final class WishlistRelationManager extends RelationManager
+class WishlistRelationManager extends RelationManager
 {
-    protected static string $relationship = 'wishlist';
-    protected static ?string $title = 'admin.sections.wishlist';
+    protected static string $relationship = 'wishlists';
 
-    public function form(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                Forms\Components\Select::make('product_id')
-                    ->relationship('product', 'name')
-                    ->required(),
-                    ->searchable(),
-                    ->preload(),
-            ]);
-    }
+    protected static ?string $title = 'Wishlist';
+
+    protected static ?string $modelLabel = 'Wishlist Item';
+
+    protected static ?string $pluralModelLabel = 'Wishlist Items';
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('product.name')
             ->columns([
-                Tables\Columns\ImageColumn::make('product.images.0.url')
-                    ->label(__('admin.fields.image'))
-                    ->circular(),
-                Tables\Columns\TextColumn::make('product.name')
-                    ->label(__('admin.fields.product_name'))
-                    ->searchable()\n                    ->sortable(),
-                Tables\Columns\TextColumn::make('product.price')
-                    ->label(__('admin.fields.price'))
-                    ->money('EUR'),
+                ImageColumn::make('product.main_image')
+                    ->label(__('wishlist.fields.image'))
+                    ->circular()
+                    ->size(50),
+                TextColumn::make('product.name')
+                    ->label(__('wishlist.fields.product'))
+                    ->searchable()
+                    ->sortable()
+                    ->limit(50),
+                TextColumn::make('product.sku')
+                    ->label(__('wishlist.fields.sku'))
+                    ->searchable()
+                    ->copyable(),
+                TextColumn::make('product.price')
+                    ->label(__('wishlist.fields.price'))
+                    ->money('EUR')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('product.stock_quantity')
-                    ->label(__('admin.fields.stock'))
-                    ->numeric(),
+                TextColumn::make('created_at')
+                    ->label(__('wishlist.fields.added_at'))
+                    ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('admin.fields.added_at'))
-                    ->dateTime(),
-                    ->sortable(),
-            ])
-            ->filters([
-                Tables\Filters\Filter::make('in_stock')
-                    ->label(__('admin.filters.in_stock'))
-                    ->query(fn($query) => $query->whereHas('product', fn($q) => $q->where('stock_quantity', '>', 0))),
-                Tables\Filters\Filter::make('out_of_stock')
-                    ->label(__('admin.filters.out_of_stock'))
-                    ->query(fn($query) => $query->whereHas('product', fn($q) => $q->where('stock_quantity', '<=', 0))),
-            ])
-            ->headerActions([
-                Tables\Actions\AttachAction::make()
-                    ->preloadRecordSelect(),
             ])
             ->actions([
-                Tables\Actions\DetachAction::make(),
+                ViewAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
-                ]),
-            ]);
+            ->defaultSort('created_at', 'desc');
     }
 }

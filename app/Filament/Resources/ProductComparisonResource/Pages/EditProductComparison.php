@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductComparisonResource\Pages;
 
 use App\Filament\Resources\ProductComparisonResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
-class EditProductComparison extends EditRecord
+final class EditProductComparison extends EditRecord
 {
     protected static string $resource = ProductComparisonResource::class;
 

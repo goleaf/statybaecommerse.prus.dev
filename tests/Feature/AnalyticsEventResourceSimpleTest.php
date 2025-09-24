@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\AnalyticsEventResource;
 use App\Models\AnalyticsEvent;
@@ -34,7 +36,7 @@ it('can track analytics event using static method', function () {
 
     $event = AnalyticsEvent::track('page_view', [
         'page' => '/test-page',
-        'title' => 'Test Page'
+        'title' => 'Test Page',
     ], $user);
 
     expect($event)->toBeInstanceOf(AnalyticsEvent::class);

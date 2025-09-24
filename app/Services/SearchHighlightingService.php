@@ -1,26 +1,26 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services;
 
-use Illuminate\Support\Str;
 /**
  * SearchHighlightingService
- * 
+ *
  * Service class containing SearchHighlightingService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class SearchHighlightingService
 {
     private const HIGHLIGHT_TAG = '<mark class="search-highlight">';
+
     private const HIGHLIGHT_TAG_CLOSE = '</mark>';
+
     private const MAX_SNIPPET_LENGTH = 150;
+
     private const SNIPPET_PADDING = 20;
+
     /**
      * Handle highlightSearchTerms functionality with proper error handling.
-     * @param string $text
-     * @param string $query
-     * @return string
      */
     public function highlightSearchTerms(string $text, string $query): string
     {
@@ -32,14 +32,12 @@ final class SearchHighlightingService
         foreach ($searchTerms as $term) {
             $highlightedText = $this->highlightTerm($highlightedText, $term);
         }
+
         return $highlightedText;
     }
+
     /**
      * Handle createSnippet functionality with proper error handling.
-     * @param string $text
-     * @param string $query
-     * @param int $maxLength
-     * @return string
      */
     public function createSnippet(string $text, string $query, int $maxLength = self::MAX_SNIPPET_LENGTH): string
     {
@@ -48,14 +46,12 @@ final class SearchHighlightingService
         }
         $searchTerms = $this->extractSearchTerms($query);
         $snippet = $this->extractSnippet($text, $searchTerms, $maxLength);
+
         return $this->highlightSearchTerms($snippet, $query);
     }
+
     /**
      * Handle highlightResult functionality with proper error handling.
-     * @param array $result
-     * @param string $query
-     * @param array $fields
-     * @return array
      */
     public function highlightResult(array $result, string $query, array $fields = ['title', 'subtitle', 'description']): array
     {
@@ -64,14 +60,12 @@ final class SearchHighlightingService
                 $result[$field] = $this->highlightSearchTerms($result[$field], $query);
             }
         }
+
         return $result;
     }
+
     /**
      * Handle highlightResults functionality with proper error handling.
-     * @param array $results
-     * @param string $query
-     * @param array $fields
-     * @return array
      */
     public function highlightResults(array $results, string $query, array $fields = ['title', 'subtitle', 'description']): array
     {
@@ -79,10 +73,9 @@ final class SearchHighlightingService
             return $this->highlightResult($result, $query, $fields);
         }, $results);
     }
+
     /**
      * Handle extractSearchTerms functionality with proper error handling.
-     * @param string $query
-     * @return array
      */
     private function extractSearchTerms(string $query): array
     {
@@ -90,29 +83,26 @@ final class SearchHighlightingService
         $cleanQuery = preg_replace('/[^\w\s]/', ' ', $query);
         $terms = array_filter(explode(' ', $cleanQuery));
         // Remove short terms (less than 2 characters)
-        $terms = array_filter($terms, fn($term) => strlen($term) >= 2);
+        $terms = array_filter($terms, fn ($term) => strlen($term) >= 2);
         // Sort by length (longer terms first for better highlighting)
-        usort($terms, fn($a, $b) => strlen($b) <=> strlen($a));
+        usort($terms, fn ($a, $b) => strlen($b) <=> strlen($a));
+
         return array_unique($terms);
     }
+
     /**
      * Handle highlightTerm functionality with proper error handling.
-     * @param string $text
-     * @param string $term
-     * @return string
      */
     private function highlightTerm(string $text, string $term): string
     {
-        $pattern = '/\b(' . preg_quote($term, '/') . ')\b/i';
-        $replacement = self::HIGHLIGHT_TAG . '$1' . self::HIGHLIGHT_TAG_CLOSE;
+        $pattern = '/\b('.preg_quote($term, '/').')\b/i';
+        $replacement = self::HIGHLIGHT_TAG.'$1'.self::HIGHLIGHT_TAG_CLOSE;
+
         return preg_replace($pattern, $replacement, $text);
     }
+
     /**
      * Handle extractSnippet functionality with proper error handling.
-     * @param string $text
-     * @param array $searchTerms
-     * @param int $maxLength
-     * @return string
      */
     private function extractSnippet(string $text, array $searchTerms, int $maxLength): string
     {
@@ -126,19 +116,17 @@ final class SearchHighlightingService
         $snippet = substr($text, $start, $maxLength);
         // Add ellipsis if needed
         if ($start > 0) {
-            $snippet = '...' . $snippet;
+            $snippet = '...'.$snippet;
         }
         if ($start + $maxLength < strlen($text)) {
-            $snippet = $snippet . '...';
+            $snippet = $snippet.'...';
         }
+
         return $snippet;
     }
+
     /**
      * Handle findBestSnippetPosition functionality with proper error handling.
-     * @param string $text
-     * @param array $searchTerms
-     * @param int $maxLength
-     * @return int
      */
     private function findBestSnippetPosition(string $text, array $searchTerms, int $maxLength): int
     {
@@ -154,13 +142,12 @@ final class SearchHighlightingService
                 }
             }
         }
+
         return $bestPosition;
     }
+
     /**
      * Handle findTermPositions functionality with proper error handling.
-     * @param string $text
-     * @param string $term
-     * @return array
      */
     private function findTermPositions(string $text, string $term): array
     {
@@ -170,15 +157,12 @@ final class SearchHighlightingService
             $positions[] = $pos;
             $offset = $pos + 1;
         }
+
         return $positions;
     }
+
     /**
      * Handle calculateSnippetScore functionality with proper error handling.
-     * @param string $text
-     * @param int $position
-     * @param array $searchTerms
-     * @param int $maxLength
-     * @return int
      */
     private function calculateSnippetScore(string $text, int $position, array $searchTerms, int $maxLength): int
     {
@@ -196,14 +180,12 @@ final class SearchHighlightingService
         if ($relativePosition < $maxLength / 3) {
             $score += 5;
         }
+
         return $score;
     }
+
     /**
      * Handle createSummary functionality with proper error handling.
-     * @param string $text
-     * @param string $query
-     * @param int $maxLength
-     * @return string
      */
     public function createSummary(string $text, string $query, int $maxLength = 200): string
     {
@@ -215,13 +197,12 @@ final class SearchHighlightingService
                 $snippet = $extendedSnippet;
             }
         }
+
         return $snippet;
     }
+
     /**
      * Handle getSearchSuggestions functionality with proper error handling.
-     * @param string $query
-     * @param array $results
-     * @return array
      */
     public function getSearchSuggestions(string $query, array $results): array
     {
@@ -231,7 +212,7 @@ final class SearchHighlightingService
             if (isset($result['title'])) {
                 $titleWords = $this->extractWords($result['title']);
                 foreach ($titleWords as $word) {
-                    if (strlen($word) >= 3 && !in_array(strtolower($word), array_map('strtolower', $searchTerms))) {
+                    if (strlen($word) >= 3 && ! in_array(strtolower($word), array_map('strtolower', $searchTerms))) {
                         $suggestions[] = $word;
                     }
                 }
@@ -240,16 +221,17 @@ final class SearchHighlightingService
         // Count word frequency and return top suggestions
         $wordCounts = array_count_values($suggestions);
         arsort($wordCounts);
+
         return array_slice(array_keys($wordCounts), 0, 5);
     }
+
     /**
      * Handle extractWords functionality with proper error handling.
-     * @param string $text
-     * @return array
      */
     private function extractWords(string $text): array
     {
         $words = preg_split('/\s+/', $text);
-        return array_filter($words, fn($word) => strlen($word) >= 3);
+
+        return array_filter($words, fn ($word) => strlen($word) >= 3);
     }
 }

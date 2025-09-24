@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderItemResource\Pages;
 
 use App\Filament\Resources\OrderItemResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 
 final class ListOrderItems extends ListRecords
 {
@@ -17,4 +19,3 @@ final class ListOrderItems extends ListRecords
         ];
     }
 }
-

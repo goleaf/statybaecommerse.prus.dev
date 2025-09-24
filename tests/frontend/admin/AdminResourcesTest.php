@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Filament\Resources\CampaignResource;
-use App\Filament\Resources\SystemSettingsResource;
-use App\Filament\Resources\NotificationResource;
+declare(strict_types=1);
+
 use App\Filament\Resources\AnalyticsEventResource;
 use App\Filament\Resources\AnalyticsResource;
+use App\Filament\Resources\CampaignResource;
+use App\Filament\Resources\NotificationResource;
 use App\Filament\Resources\PartnerTierResource;
-use App\Models\Campaign;
-use App\Models\Setting;
-use App\Models\Notification;
+use App\Filament\Resources\SystemSettingsResource;
 use App\Models\AnalyticsEvent;
+use App\Models\Campaign;
+use App\Models\Notification;
 use App\Models\PartnerTier;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

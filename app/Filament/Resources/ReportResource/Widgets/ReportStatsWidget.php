@@ -7,7 +7,6 @@ namespace App\Filament\Resources\ReportResource\Widgets;
 use App\Models\Report;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class ReportStatsWidget extends BaseWidget
 {

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionRuleResource\Pages;
 
 use App\Filament\Resources\CollectionRuleResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
-class ViewCollectionRule extends ViewRecord
+final class ViewCollectionRule extends ViewRecord
 {
     protected static string $resource = CollectionRuleResource::class;
 
@@ -17,4 +19,3 @@ class ViewCollectionRule extends ViewRecord
         ];
     }
 }
-

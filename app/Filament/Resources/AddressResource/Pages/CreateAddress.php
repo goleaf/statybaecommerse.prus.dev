@@ -22,7 +22,7 @@ final class CreateAddress extends CreateRecord
         $data['is_active'] = $data['is_active'] ?? true;
         $data['is_default'] = $data['is_default'] ?? false;
         $data['type'] = $data['type'] ?? 'shipping';
-        
+
         return $data;
     }
 }

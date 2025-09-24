@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CartItemResource\Widgets;
 
 use App\Models\CartItem;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
 
 final class LowStockCartItemsWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
-    protected ?string $heading = 'Low Stock Cart Items';
+    protected static ?string $heading = 'Low Stock Cart Items';
 
     public function table(Table $table): Table
     {
@@ -33,26 +33,22 @@ final class LowStockCartItemsWidget extends BaseWidget
                     ->searchable()
                     ->sortable()
                     ->limit(30),
-
                 Tables\Columns\TextColumn::make('product.name')
                     ->label(__('cart_items.product'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('product.sku')
                     ->label(__('cart_items.sku'))
                     ->searchable()
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-
                 Tables\Columns\TextColumn::make('quantity')
                     ->label(__('cart_items.quantity'))
                     ->sortable()
                     ->badge()
                     ->color('warning'),
-
                 Tables\Columns\TextColumn::make('product.inventories.quantity')
                     ->label(__('cart_items.stock_quantity'))
                     ->sortable()
@@ -63,12 +59,10 @@ final class LowStockCartItemsWidget extends BaseWidget
                         $state <= 10 => 'info',
                         default => 'success',
                     }),
-
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('cart_items.is_active'))
                     ->boolean()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('cart_items.created_at'))
                     ->dateTime()
@@ -81,13 +75,11 @@ final class LowStockCartItemsWidget extends BaseWidget
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-
                 Tables\Filters\SelectFilter::make('product')
                     ->label(__('cart_items.product'))
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload(),
-
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label(__('cart_items.is_active'))
                     ->boolean()

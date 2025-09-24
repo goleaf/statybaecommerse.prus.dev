@@ -246,7 +246,7 @@ return [
     'time_year' => 'год',
     'time_years' => 'лет',
     'time_ago' => 'назад',
-    
+
     // Newsletter translations
     'newsletter' => [
         'email_address' => 'Адрес электронной почты',
@@ -268,10 +268,10 @@ return [
         'subscribing' => 'Подписка...',
         'privacy_notice' => 'Подписываясь, вы соглашаетесь с нашей политикой конфиденциальности',
     ],
-    
+
     // Product image alt text
     'product_image_alt' => 'Изображение продукта',
-    
+
     // Additional search translations
     'search_for' => 'по',
     'search_result_count' => ':count результат найден|:count результата найдено|:count результатов найдено',

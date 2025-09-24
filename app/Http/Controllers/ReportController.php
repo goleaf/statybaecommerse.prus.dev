@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Report;
@@ -9,18 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+
 /**
  * ReportController
- * 
+ *
  * HTTP controller handling ReportController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class ReportController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -35,7 +34,7 @@ final class ReportController extends Controller
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
-                $q->where('name->' . app()->getLocale(), 'like', "%{$search}%")->orWhere('description->' . app()->getLocale(), 'like', "%{$search}%");
+                $q->where('name->'.app()->getLocale(), 'like', "%{$search}%")->orWhere('description->'.app()->getLocale(), 'like', "%{$search}%");
             });
         }
         // Apply sorting
@@ -46,22 +45,22 @@ final class ReportController extends Controller
         }
         $reports = $query->get()->skipWhile(function ($report) {
             // Skip reports that are not properly configured for display
-            return empty($report->name) || !$report->is_active || !$report->is_public || empty($report->type) || empty($report->category);
+            return empty($report->name) || ! $report->is_active || ! $report->is_public || empty($report->type) || empty($report->category);
         })->paginate(12);
         // Get filter options
-        $types = Report::select('type')->where('is_active', true)->where('is_public', true)->distinct()->pluck('type')->mapWithKeys(fn($type) => [$type => __("admin.reports.types.{$type}")]);
-        $categories = Report::select('category')->where('is_active', true)->where('is_public', true)->distinct()->pluck('category')->mapWithKeys(fn($category) => [$category => __("admin.reports.categories.{$category}")]);
+        $types = Report::select('type')->where('is_active', true)->where('is_public', true)->distinct()->pluck('type')->mapWithKeys(fn ($type) => [$type => __("admin.reports.types.{$type}")]);
+        $categories = Report::select('category')->where('is_active', true)->where('is_public', true)->distinct()->pluck('category')->mapWithKeys(fn ($category) => [$category => __("admin.reports.categories.{$category}")]);
+
         return view('reports.index', compact('reports', 'types', 'categories'));
     }
+
     /**
      * Display the specified resource with related data.
-     * @param Report $report
-     * @return View
      */
     public function show(Report $report): View
     {
         // Check if report is public or user has access
-        if (!$report->is_public && !auth()->check()) {
+        if (! $report->is_public && ! auth()->check()) {
             abort(403, __('reports.messages.access_denied'));
         }
         // Increment view count
@@ -71,47 +70,47 @@ final class ReportController extends Controller
             $query->where('type', $report->type)->orWhere('category', $report->category);
         })->limit(4)->get()->skipWhile(function ($relatedReport) {
             // Skip related reports that are not properly configured for display
-            return empty($relatedReport->name) || !$relatedReport->is_active || !$relatedReport->is_public || empty($relatedReport->type) || empty($relatedReport->category);
+            return empty($relatedReport->name) || ! $relatedReport->is_active || ! $relatedReport->is_public || empty($relatedReport->type) || empty($relatedReport->category);
         });
+
         return view('reports.show', compact('report', 'relatedReports'));
     }
+
     /**
      * Handle download functionality with proper error handling.
-     * @param Report $report
-     * @return Response
      */
     public function download(Report $report): Response
     {
         // Check if report is public or user has access
-        if (!$report->is_public && !auth()->check()) {
+        if (! $report->is_public && ! auth()->check()) {
             abort(403, __('reports.messages.access_denied'));
         }
         // Increment download count
         $report->incrementDownloadCount();
         // Generate PDF or return content based on report type
         $content = $this->generateReportContent($report);
-        $filename = Str::slug($report->name) . '_' . now()->format('Y-m-d') . '.pdf';
-        return response($content)->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        $filename = Str::slug($report->name).'_'.now()->format('Y-m-d').'.pdf';
+
+        return response($content)->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
     }
+
     /**
      * Handle generate functionality with proper error handling.
-     * @param Report $report
-     * @return RedirectResponse
      */
     public function generate(Report $report): RedirectResponse
     {
         // Check if user has permission to generate reports
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             abort(403, __('reports.messages.access_denied'));
         }
         // Update report generation info
         $report->update(['last_generated_at' => now(), 'generated_by' => auth()->id()]);
+
         return redirect()->back()->with('success', __('reports.messages.generated_successfully'));
     }
+
     /**
      * Handle generateReportContent functionality with proper error handling.
-     * @param Report $report
-     * @return string
      */
     private function generateReportContent(Report $report): string
     {
@@ -122,6 +121,7 @@ final class ReportController extends Controller
         // For now, return a simple HTML content
         // In production, you would use a PDF generation library like DomPDF
         $html = view('reports.pdf', $data)->render();
+
         return $html;
     }
 }

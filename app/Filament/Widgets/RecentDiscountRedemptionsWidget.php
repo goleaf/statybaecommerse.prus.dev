@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\DiscountRedemption;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
 
 class RecentDiscountRedemptionsWidget extends BaseWidget
 {
@@ -61,10 +63,8 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->url(fn(DiscountRedemption $record): string =>
-                        route('filament.admin.resources.discount-redemptions.view', $record)),
+                    ->url(fn (DiscountRedemption $record): string => route('filament.admin.resources.discount-redemptions.view', $record)),
             ])
             ->defaultSort('redeemed_at', 'desc');
     }
 }
-

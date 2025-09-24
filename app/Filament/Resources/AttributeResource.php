@@ -1,33 +1,47 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Grid;
+use BackedEnum;
+use Filament\Actions;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+
+final class AttributeResource extends Resource
+{
+    protected static ?string $model = Attribute::class;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-tag';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -47,8 +61,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $schema
-     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -138,6 +150,7 @@ use Illuminate\Database\Eloquent\Collection;
                 ->schema([
                     Repeater::make('options')
                         ->label(__('attributes.options'))
+                        ->defaultItems(0)
                         ->schema([
                             TextInput::make('value')
                                 ->label(__('attributes.option_value'))
@@ -170,7 +183,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->label(__('attributes.sort_order'))
                                 ->numeric()
                                 ->default(0),
-                            Select::make('group')
+                            Select::make('group_name')
                                 ->label(__('attributes.group'))
                                 ->options([
                                     'general' => __('attributes.groups.general'),
@@ -189,12 +202,11 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading(false)
             ->columns([
                 TextColumn::make('name')
                     ->label(__('attributes.name'))
@@ -208,8 +220,8 @@ use Illuminate\Database\Eloquent\Collection;
                     ->color('gray'),
                 TextColumn::make('type')
                     ->label(__('attributes.type'))
-                    ->formatStateUsing(fn(string $state): string => __("attributes.types.{$state}"))
-                    ->color(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
+                    ->color(fn (string $state): string => match ($state) {
                         'text' => 'blue',
                         'number' => 'green',
                         'select' => 'purple',
@@ -222,14 +234,14 @@ use Illuminate\Database\Eloquent\Collection;
                         'url' => 'teal',
                         default => 'gray',
                     }),
-                TextColumn::make('group')
+                TextColumn::make('group_name')
                     ->label(__('attributes.group'))
-                    ->formatStateUsing(fn(string $state): string => __("attributes.groups.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("attributes.groups.{$state}"))
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('options_count')
                     ->label(__('attributes.options_count'))
-                    ->counts('options')
+                    ->counts('values')
                     ->sortable(),
                 IconColumn::make('is_required')
                     ->label(__('attributes.is_required'))
@@ -275,7 +287,7 @@ use Illuminate\Database\Eloquent\Collection;
                         'file' => __('attributes.types.file'),
                         'url' => __('attributes.types.url'),
                     ]),
-                SelectFilter::make('group')
+                SelectFilter::make('group_name')
                     ->options([
                         'general' => __('attributes.groups.general'),
                         'technical' => __('attributes.groups.technical'),
@@ -303,14 +315,14 @@ use Illuminate\Database\Eloquent\Collection;
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('toggle_active')
-                    ->label(fn(Attribute $record): string => $record->is_active ? __('attributes.deactivate') : __('attributes.activate'))
-                    ->icon(fn(Attribute $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Attribute $record): string => $record->is_active ? 'warning' : 'success')
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+                Actions\Action::make('toggle_active')
+                    ->label(fn (Attribute $record): string => $record->is_active ? __('attributes.deactivate') : __('attributes.activate'))
+                    ->icon(fn (Attribute $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Attribute $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Attribute $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active ? __('attributes.activated_successfully') : __('attributes.deactivated_successfully'))
@@ -320,9 +332,9 @@ use Illuminate\Database\Eloquent\Collection;
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('activate')
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                    Actions\BulkAction::make('activate')
                         ->label(__('attributes.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -334,7 +346,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    Actions\BulkAction::make('deactivate')
                         ->label(__('attributes.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
@@ -353,7 +365,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsTagResource\Pages;
 
 use App\Filament\Resources\NewsTagResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
-class EditNewsTag extends EditRecord
+final class EditNewsTag extends EditRecord
 {
     protected static string $resource = NewsTagResource::class;
 
@@ -18,4 +20,3 @@ class EditNewsTag extends EditRecord
         ];
     }
 }
-

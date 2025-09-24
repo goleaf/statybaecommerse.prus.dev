@@ -1,27 +1,33 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
-use App\Models\Order;
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
+
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 final class OrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'orders';
+
     protected static ?string $title = 'Orders';
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Forms\Components\TextInput::make('order_number')
-                    ->required()\n                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->options([
                         'pending' => 'Pending',
@@ -32,21 +38,23 @@ final class OrdersRelationManager extends RelationManager
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('total')
-                    ->numeric(),
+                    ->numeric()
                     ->prefix('€'),
                 Forms\Components\Textarea::make('notes')
                     ->maxLength(1000),
             ]);
     }
+
     public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('order_number')
             ->columns([
                 Tables\Columns\TextColumn::make('order_number')
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'processing' => 'info',
@@ -61,24 +69,28 @@ final class OrdersRelationManager extends RelationManager
                     ->dateTime(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ]),
+                Tables\Filters\SelectFilter::make('status'),
                 Tables\Filters\TrashedFilter::make(),
+            ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
+            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                 ]),
+            ])
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
+    }
 }

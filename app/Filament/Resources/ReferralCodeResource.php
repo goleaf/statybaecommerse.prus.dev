@@ -1,12 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCode;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -15,9 +19,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -25,94 +27,97 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
+use UnitEnum;
 
 final class ReferralCodeResource extends Resource
 {
     protected static ?string $model = ReferralCode::class;
-    protected static ?string $navigationIcon = 'heroicon-o-ticket';
-    protected static ?int $navigationSort = 16;
-    protected static ?string $recordTitleAttribute = 'code';
 
-    public static function getNavigationGroup(): string
-    {
-        return NavigationGroup::Referrals->getLabel();
-    }
+    protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->columns(3)
-            ->schema([
-                Section::make('Code Details')
+            ->components([
+                Section::make(__('referral.resource.referral_code.section.code_details'))
                     ->columns(2)
                     ->schema([
                         Select::make('user_id')
+                            ->label(__('referral.form.user'))
                             ->relationship('user', 'name')
                             ->required(),
                         TextInput::make('code')
+                            ->label(__('referral.form.code'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         TextInput::make('title')
+                            ->label(__('referral.form.title'))
                             ->required()
                             ->maxLength(255),
                         Textarea::make('description')
+                            ->label(__('referral.form.description'))
                             ->maxLength(65535)
                             ->nullable(),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('referral.form.is_active'))
                             ->inline(false)
                             ->default(true),
                         DatePicker::make('expires_at')
+                            ->label(__('referral.form.expires_at'))
                             ->nullable(),
                         TextInput::make('usage_limit')
+                            ->label(__('referral.form.usage_limit'))
                             ->numeric()
                             ->integer()
                             ->nullable(),
                         TextInput::make('usage_count')
+                            ->label(__('referral.form.usage_count'))
                             ->numeric()
                             ->integer()
                             ->default(0),
                         TextInput::make('reward_amount')
+                            ->label(__('referral.form.reward_amount'))
                             ->numeric()
-                            ->default(0.00),
+                            ->default(0.0)
+                            ->prefix('€'),
                         Select::make('reward_type')
+                            ->label(__('referral.form.reward_type'))
                             ->options([
-                                'discount' => 'Discount',
-                                'credit' => 'Credit',
-                                'points' => 'Points',
-                                'gift' => 'Gift',
+                                'discount' => __('referral.reward_types.discount'),
+                                'credit' => __('referral.reward_types.credit'),
+                                'points' => __('referral.reward_types.points'),
+                                'gift' => __('referral.reward_types.gift'),
                             ])
                             ->nullable(),
                         TextInput::make('campaign_id')
+                            ->label(__('referral.form.campaign_id'))
                             ->maxLength(255)
                             ->nullable(),
                         TextInput::make('source')
+                            ->label(__('referral.form.source'))
                             ->maxLength(255)
                             ->nullable(),
                         KeyValue::make('conditions')
-                            ->label('Conditions (JSON)')
-                            ->keyLabel('Key')
-                            ->valueLabel('Value')
+                            ->label(__('referral.form.conditions'))
+                            ->keyLabel(__('referral.form.conditions_key'))
+                            ->valueLabel(__('referral.form.conditions_value'))
                             ->reorderable()
-                            ->addActionLabel('Add Condition')
+                            ->addActionLabel(__('referral.form.conditions_add'))
                             ->columnSpanFull(),
                         KeyValue::make('tags')
-                            ->label('Tags (JSON)')
-                            ->keyLabel('Tag')
-                            ->valueLabel('Value')
+                            ->label(__('referral.form.tags'))
+                            ->keyLabel(__('referral.form.tags_key'))
+                            ->valueLabel(__('referral.form.tags_value'))
                             ->reorderable()
-                            ->addActionLabel('Add Tag')
+                            ->addActionLabel(__('referral.form.tags_add'))
                             ->columnSpanFull(),
                         KeyValue::make('metadata')
-                            ->label('Metadata (JSON)')
-                            ->keyLabel('Key')
-                            ->valueLabel('Value')
+                            ->label(__('referral.form.metadata'))
+                            ->keyLabel(__('referral.form.metadata_key'))
+                            ->valueLabel(__('referral.form.metadata_value'))
                             ->reorderable()
-                            ->addActionLabel('Add Metadata Item')
+                            ->addActionLabel(__('referral.form.metadata_add'))
                             ->columnSpanFull(),
                     ]),
             ]);
@@ -145,7 +150,7 @@ final class ReferralCodeResource extends Resource
                     ->sortable(),
                 IconColumn::make('is_active')
                     ->boolean()
-                    ->label('Active'),
+                    ->label(__('referral.columns.is_active')),
                 TextColumn::make('expires_at')
                     ->dateTime()
                     ->sortable(),
@@ -160,18 +165,21 @@ final class ReferralCodeResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active')
+                    ->label(__('referral.filters.is_active'))
                     ->boolean(),
                 SelectFilter::make('reward_type')
+                    ->label(__('referral.filters.reward_type'))
                     ->options([
-                        'discount' => 'Discount',
-                        'credit' => 'Credit',
-                        'points' => 'Points',
-                        'gift' => 'Gift',
+                        'discount' => __('referral.reward_types.discount'),
+                        'credit' => __('referral.reward_types.credit'),
+                        'points' => __('referral.reward_types.points'),
+                        'gift' => __('referral.reward_types.gift'),
                     ]),
                 SelectFilter::make('user_id')
+                    ->label(__('referral.filters.user'))
                     ->relationship('user', 'name'),
                 SelectFilter::make('campaign_id')
+                    ->label(__('referral.filters.campaign_id'))
                     ->options(ReferralCode::distinct()->pluck('campaign_id', 'campaign_id')->toArray()),
             ])
             ->actions([
@@ -209,6 +217,6 @@ final class ReferralCodeResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::$model::count();
+        return self::$model::count();
     }
 }

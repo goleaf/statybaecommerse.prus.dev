@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
@@ -13,4 +15,3 @@ class DashboardController extends Controller
         return view('admin.dashboard');
     }
 }
-

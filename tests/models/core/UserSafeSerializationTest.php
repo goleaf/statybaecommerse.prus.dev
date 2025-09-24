@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\User;
-use App\Http\Resources\UserResource;
 use App\Http\Resources\AdminUserResource;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 
 beforeEach(function () {
     $this->user = User::factory()->create([
@@ -34,7 +34,7 @@ beforeEach(function () {
 
 it('can get safe attributes excluding sensitive fields', function () {
     $safeAttributes = $this->user->getSafeAttributes();
-    
+
     // Should exclude sensitive fields
     expect($safeAttributes)->not->toHaveKey('password');
     expect($safeAttributes)->not->toHaveKey('remember_token');
@@ -46,7 +46,7 @@ it('can get safe attributes excluding sensitive fields', function () {
     expect($safeAttributes)->not->toHaveKey('stripe_customer_id');
     expect($safeAttributes)->not->toHaveKey('stripe_account_id');
     expect($safeAttributes)->not->toHaveKey('last_login_ip');
-    
+
     // Should include safe fields
     expect($safeAttributes)->toHaveKey('id');
     expect($safeAttributes)->toHaveKey('name');
@@ -58,7 +58,7 @@ it('can get safe attributes excluding sensitive fields', function () {
 
 it('can get API safe attributes excluding more sensitive fields', function () {
     $apiSafeAttributes = $this->user->getApiSafeAttributes();
-    
+
     // Should exclude all sensitive fields plus additional API-sensitive fields
     expect($apiSafeAttributes)->not->toHaveKey('password');
     expect($apiSafeAttributes)->not->toHaveKey('remember_token');
@@ -74,7 +74,7 @@ it('can get API safe attributes excluding more sensitive fields', function () {
     expect($apiSafeAttributes)->not->toHaveKey('referral_code');
     expect($apiSafeAttributes)->not->toHaveKey('subscription_status');
     expect($apiSafeAttributes)->not->toHaveKey('subscription_plan');
-    
+
     // Should include safe fields
     expect($apiSafeAttributes)->toHaveKey('id');
     expect($apiSafeAttributes)->toHaveKey('name');
@@ -84,7 +84,7 @@ it('can get API safe attributes excluding more sensitive fields', function () {
 
 it('can get admin safe attributes excluding only most sensitive fields', function () {
     $adminSafeAttributes = $this->user->getAdminSafeAttributes();
-    
+
     // Should exclude only the most sensitive fields
     expect($adminSafeAttributes)->not->toHaveKey('password');
     expect($adminSafeAttributes)->not->toHaveKey('remember_token');
@@ -93,7 +93,7 @@ it('can get admin safe attributes excluding only most sensitive fields', functio
     expect($adminSafeAttributes)->not->toHaveKey('two_factor_recovery_codes');
     expect($adminSafeAttributes)->not->toHaveKey('verification_token');
     expect($adminSafeAttributes)->not->toHaveKey('password_reset_token');
-    
+
     // Should include admin-relevant fields
     expect($adminSafeAttributes)->toHaveKey('id');
     expect($adminSafeAttributes)->toHaveKey('name');
@@ -107,7 +107,7 @@ it('can get admin safe attributes excluding only most sensitive fields', functio
 
 it('can use toSafeArray method', function () {
     $safeArray = $this->user->toSafeArray();
-    
+
     expect($safeArray)->not->toHaveKey('password');
     expect($safeArray)->not->toHaveKey('remember_token');
     expect($safeArray)->toHaveKey('id');
@@ -116,7 +116,7 @@ it('can use toSafeArray method', function () {
 
 it('can use toApiSafeArray method', function () {
     $apiSafeArray = $this->user->toApiSafeArray();
-    
+
     expect($apiSafeArray)->not->toHaveKey('password');
     expect($apiSafeArray)->not->toHaveKey('email');
     expect($apiSafeArray)->toHaveKey('id');
@@ -125,7 +125,7 @@ it('can use toApiSafeArray method', function () {
 
 it('can use toAdminSafeArray method', function () {
     $adminSafeArray = $this->user->toAdminSafeArray();
-    
+
     expect($adminSafeArray)->not->toHaveKey('password');
     expect($adminSafeArray)->toHaveKey('email');
     expect($adminSafeArray)->toHaveKey('id');
@@ -134,7 +134,7 @@ it('can use toAdminSafeArray method', function () {
 
 it('can exclude additional fields when specified', function () {
     $safeAttributes = $this->user->getSafeAttributes(['email', 'phone_number']);
-    
+
     expect($safeAttributes)->not->toHaveKey('password');
     expect($safeAttributes)->not->toHaveKey('email');
     expect($safeAttributes)->not->toHaveKey('phone_number');
@@ -144,7 +144,7 @@ it('can exclude additional fields when specified', function () {
 
 it('can use except method directly', function () {
     $excludedAttributes = $this->user->except(['password', 'remember_token', 'api_token']);
-    
+
     expect($excludedAttributes)->not->toHaveKey('password');
     expect($excludedAttributes)->not->toHaveKey('remember_token');
     expect($excludedAttributes)->not->toHaveKey('api_token');
@@ -156,14 +156,14 @@ it('can use except method directly', function () {
 it('user resource excludes sensitive fields', function () {
     $resource = new UserResource($this->user);
     $resourceArray = $resource->toArray(request());
-    
+
     // Should not contain sensitive fields
     expect($resourceArray)->not->toHaveKey('password');
     expect($resourceArray)->not->toHaveKey('remember_token');
     expect($resourceArray)->not->toHaveKey('api_token');
     expect($resourceArray)->not->toHaveKey('email');
     expect($resourceArray)->not->toHaveKey('phone_number');
-    
+
     // Should contain safe fields
     expect($resourceArray)->toHaveKey('id');
     expect($resourceArray)->toHaveKey('name');
@@ -174,12 +174,12 @@ it('user resource excludes sensitive fields', function () {
 it('admin user resource excludes only most sensitive fields', function () {
     $resource = new AdminUserResource($this->user);
     $resourceArray = $resource->toArray(request());
-    
+
     // Should not contain most sensitive fields
     expect($resourceArray)->not->toHaveKey('password');
     expect($resourceArray)->not->toHaveKey('remember_token');
     expect($resourceArray)->not->toHaveKey('api_token');
-    
+
     // Should contain admin-relevant fields
     expect($resourceArray)->toHaveKey('id');
     expect($resourceArray)->toHaveKey('name');

@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Data;
 
 use App\Rules\UrlRule;
@@ -18,38 +19,16 @@ use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\ValidationContext;
+
 /**
  * CampaignClickData
- * 
+ *
  * Data transfer object for CampaignClickData structured data handling with validation and type safety.
- * 
  */
 final class CampaignClickData extends Data
 {
     /**
      * Initialize the class instance with required dependencies.
-     * @param int $campaign_id
-     * @param string|null $session_id
-     * @param string|null $ip_address
-     * @param string|null $user_agent
-     * @param string $click_type
-     * @param string|null $clicked_url
-     * @param int|null $customer_id
-     * @param string|null $clicked_at
-     * @param string|null $referer
-     * @param string|null $device_type
-     * @param string|null $browser
-     * @param string|null $os
-     * @param string|null $country
-     * @param string|null $city
-     * @param string|null $utm_source
-     * @param string|null $utm_medium
-     * @param string|null $utm_campaign
-     * @param string|null $utm_term
-     * @param string|null $utm_content
-     * @param float|null $conversion_value
-     * @param bool|null $is_converted
-     * @param array|null $conversion_data
      */
     public function __construct(
         #[Required, IntegerType, Exists('discount_campaigns', 'id')]
@@ -96,16 +75,13 @@ final class CampaignClickData extends Data
         public ?bool $is_converted,
         #[Nullable]
         public ?array $conversion_data
-    )
-    {
-    }
+    ) {}
+
     /**
      * Handle rules functionality with proper error handling.
-     * @param ValidationContext $context
-     * @return array
      */
     public static function rules(ValidationContext $context): array
     {
-        return ['clicked_url' => ['nullable', new UrlRule(), 'max:500'], 'referer' => ['nullable', new UrlRule(), 'max:500']];
+        return ['clicked_url' => ['nullable', new UrlRule, 'max:500'], 'referer' => ['nullable', new UrlRule, 'max:500']];
     }
 }

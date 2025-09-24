@@ -16,7 +16,7 @@ class CollectionSeeder extends Seeder
 
     public function __construct()
     {
-        $this->imageGenerator = new LocalImageGeneratorService();
+        $this->imageGenerator = new LocalImageGeneratorService;
     }
 
     public function run(): void
@@ -48,9 +48,9 @@ class CollectionSeeder extends Seeder
                     ],
                     [
                         'name' => $translation['name'],
-                        'slug' => $locale === 'lt' ? $slug : $slug . '-' . $locale,
+                        'slug' => $locale === 'lt' ? $slug : $slug.'-'.$locale,
                         'description' => $translation['description'],
-                        'meta_title' => $translation['name'] . ' | ' . config('app.name'),
+                        'meta_title' => $translation['name'].' | '.config('app.name'),
                         'meta_description' => $translation['description'],
                         'meta_keywords' => $translation['keywords'] ?? [],
                     ],
@@ -71,7 +71,7 @@ class CollectionSeeder extends Seeder
                 $collection
                     ->addMedia($imagePath)
                     ->withCustomProperties(['source' => 'generated'])
-                    ->usingName($label . ' Image')
+                    ->usingName($label.' Image')
                     ->toMediaCollection('images');
 
                 if (file_exists($imagePath)) {
@@ -80,11 +80,11 @@ class CollectionSeeder extends Seeder
             }
 
             if (! $collection->hasMedia('banner')) {
-                $bannerPath = $this->imageGenerator->generateCollectionImage($label . ' Banner');
+                $bannerPath = $this->imageGenerator->generateCollectionImage($label.' Banner');
                 $collection
                     ->addMedia($bannerPath)
                     ->withCustomProperties(['source' => 'generated'])
-                    ->usingName($label . ' Banner')
+                    ->usingName($label.' Banner')
                     ->toMediaCollection('banner');
 
                 if (file_exists($bannerPath)) {
@@ -92,7 +92,7 @@ class CollectionSeeder extends Seeder
                 }
             }
         } catch (\Throwable $exception) {
-            $this->command?->warn('CollectionSeeder: failed to generate imagery for ' . $collection->slug . ': ' . $exception->getMessage());
+            $this->command?->warn('CollectionSeeder: failed to generate imagery for '.$collection->slug.': '.$exception->getMessage());
         }
     }
 

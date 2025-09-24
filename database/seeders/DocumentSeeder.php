@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -19,6 +21,7 @@ final class DocumentSeeder extends Seeder
 
         if ($templates->isEmpty() || $users->isEmpty()) {
             $this->command->warn('No templates or users found. Skipping document seeding.');
+
             return;
         }
 
@@ -115,7 +118,7 @@ final class DocumentSeeder extends Seeder
             ]));
         }
 
-        $this->command->info('Created ' . count($documents) . ' documents.');
+        $this->command->info('Created '.count($documents).' documents.');
     }
 
     private function getInvoiceContent(): string
@@ -221,5 +224,3 @@ final class DocumentSeeder extends Seeder
         </div>';
     }
 }
-
-

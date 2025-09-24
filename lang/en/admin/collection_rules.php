@@ -52,4 +52,3 @@ return [
         'bulk_reordered_successfully' => 'Bulk reordered successfully',
     ],
 ];
-

@@ -1,23 +1,25 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 final class CampaignsRelationManager extends RelationManager
 {
     protected static string $relationship = 'targetCustomerGroups';
+
     protected static ?string $title = 'customer_groups.relation_campaigns';
 
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -43,7 +45,7 @@ final class CampaignsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('campaigns.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'draft' => 'gray',
                         'paused' => 'warning',

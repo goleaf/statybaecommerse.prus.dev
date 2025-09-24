@@ -18,12 +18,12 @@ final class VariantPerformanceChart extends ChartWidget
     {
         // Get analytics data for the last 30 days
         $analytics = VariantAnalytics::select([
-                DB::raw('DATE(date) as date'),
-                DB::raw('SUM(views) as total_views'),
-                DB::raw('SUM(clicks) as total_clicks'),
-                DB::raw('SUM(add_to_cart) as total_add_to_cart'),
-                DB::raw('SUM(purchases) as total_purchases'),
-            ])
+            DB::raw('DATE(date) as date'),
+            DB::raw('SUM(views) as total_views'),
+            DB::raw('SUM(clicks) as total_clicks'),
+            DB::raw('SUM(add_to_cart) as total_add_to_cart'),
+            DB::raw('SUM(purchases) as total_purchases'),
+        ])
             ->where('date', '>=', now()->subDays(30))
             ->groupBy('date')
             ->orderBy('date')
@@ -60,7 +60,7 @@ final class VariantPerformanceChart extends ChartWidget
                     'tension' => 0.4,
                 ],
             ],
-            'labels' => $analytics->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('M j'))->toArray(),
+            'labels' => $analytics->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M j'))->toArray(),
         ];
     }
 

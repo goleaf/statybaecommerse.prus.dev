@@ -1,18 +1,20 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services\Shared;
 
 /**
  * ComponentValidationService
- * 
+ *
  * Service class containing ComponentValidationService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
+ *
  * @property array $componentRules
  */
 final class ComponentValidationService
 {
     private array $componentRules = [];
+
     /**
      * Initialize the class instance with required dependencies.
      */
@@ -20,11 +22,9 @@ final class ComponentValidationService
     {
         $this->initializeValidationRules();
     }
+
     /**
      * Handle validateComponent functionality with proper error handling.
-     * @param string $component
-     * @param array $props
-     * @return array
      */
     public function validateComponent(string $component, array $props): array
     {
@@ -37,31 +37,28 @@ final class ComponentValidationService
                 $errors[$prop] = $error;
             }
         }
+
         return $errors;
     }
+
     /**
      * Handle getComponentSchema functionality with proper error handling.
-     * @param string $component
-     * @return array
      */
     public function getComponentSchema(string $component): array
     {
         return $this->componentRules[$component] ?? [];
     }
+
     /**
      * Handle getAllComponentSchemas functionality with proper error handling.
-     * @return array
      */
     public function getAllComponentSchemas(): array
     {
         return $this->componentRules;
     }
+
     /**
      * Handle validateProp functionality with proper error handling.
-     * @param string $prop
-     * @param mixed $value
-     * @param array $rule
-     * @return string|null
      */
     private function validateProp(string $prop, mixed $value, array $rule): ?string
     {
@@ -82,8 +79,9 @@ final class ComponentValidationService
         }
         // Enum validation
         if (isset($rule['enum'])) {
-            if (!in_array($value, $rule['enum'])) {
+            if (! in_array($value, $rule['enum'])) {
                 $validOptions = implode(', ', $rule['enum']);
+
                 return "The {$prop} must be one of: {$validOptions}.";
             }
         }
@@ -98,14 +96,12 @@ final class ComponentValidationService
                 return "The {$prop} must be at least {$rule['min_length']} characters.";
             }
         }
+
         return null;
     }
+
     /**
      * Handle validateType functionality with proper error handling.
-     * @param string $prop
-     * @param mixed $value
-     * @param string $expectedType
-     * @return string|null
      */
     private function validateType(string $prop, mixed $value, string $expectedType): ?string
     {
@@ -115,12 +111,12 @@ final class ComponentValidationService
         if ($actualType !== $expectedPhpType) {
             return "The {$prop} must be of type {$expectedType}.";
         }
+
         return null;
     }
+
     /**
      * Handle isEmpty functionality with proper error handling.
-     * @param mixed $value
-     * @return bool
      */
     private function isEmpty(mixed $value): bool
     {
@@ -130,11 +126,12 @@ final class ComponentValidationService
         if (is_array($value) && empty($value)) {
             return true;
         }
+
         return false;
     }
+
     /**
      * Handle initializeValidationRules functionality with proper error handling.
-     * @return void
      */
     private function initializeValidationRules(): void
     {

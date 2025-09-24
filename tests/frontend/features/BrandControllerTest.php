@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Brand;
 use App\Models\User;
@@ -44,7 +46,7 @@ it('displays localized brands index page', function () {
 it('displays localized brand page', function () {
     $response = $this->get(route('localized.brands.show', [
         'locale' => 'en',
-        'slug' => $this->brand->slug
+        'slug' => $this->brand->slug,
     ]));
 
     $response->assertOk();

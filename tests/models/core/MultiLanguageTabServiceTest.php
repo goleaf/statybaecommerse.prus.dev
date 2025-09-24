@@ -67,7 +67,8 @@ it('populates form with translations from a record-like object', function (): vo
     $translationEn = (object) ['locale' => 'en', 'title' => 'Title EN', 'description' => 'Description EN'];
 
     // Minimal stub that satisfies method_exists($record, 'translations') and exposes $record->translations collection
-    $record = new class($translationLt, $translationEn) {
+    $record = new class($translationLt, $translationEn)
+    {
         public Collection $translations;
 
         public function __construct($lt, $en)
@@ -88,7 +89,7 @@ it('populates form with translations from a record-like object', function (): vo
 });
 
 it('creates simple tabs for each language when TabLayout plugin is available', function (): void {
-    if (!class_exists(\SolutionForest\TabLayoutPlugin\Components\Tabs\Tab::class)) {
+    if (! class_exists(\SolutionForest\TabLayoutPlugin\Components\Tabs\Tab::class)) {
         $this->markTestSkipped('TabLayout plugin not installed.');
     }
 
@@ -108,7 +109,7 @@ it('creates simple tabs for each language when TabLayout plugin is available', f
 });
 
 it('creates advanced tabs with a schema builder per language', function (): void {
-    if (!class_exists(\SolutionForest\TabLayoutPlugin\Components\Tabs\Tab::class)) {
+    if (! class_exists(\SolutionForest\TabLayoutPlugin\Components\Tabs\Tab::class)) {
         $this->markTestSkipped('TabLayout plugin not installed.');
     }
 
@@ -127,7 +128,7 @@ it('creates advanced tabs with a schema builder per language', function (): void
 });
 
 it('creates simple tab schemas for a Livewire component', function (): void {
-    if (!class_exists(\SolutionForest\TabLayoutPlugin\Schemas\SimpleTabSchema::class)) {
+    if (! class_exists(\SolutionForest\TabLayoutPlugin\Schemas\SimpleTabSchema::class)) {
         $this->markTestSkipped('TabLayout plugin not installed.');
     }
 

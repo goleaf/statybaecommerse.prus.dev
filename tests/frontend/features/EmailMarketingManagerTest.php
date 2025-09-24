@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Livewire\EmailMarketingManager;
-use App\Models\Subscriber;
 use App\Models\Company;
-use Livewire\Livewire;
+use App\Models\Subscriber;
 use Illuminate\Support\Facades\Http;
+use Livewire\Livewire;
 
 beforeEach(function () {
     // Mock HTTP requests for Mailchimp API
@@ -24,13 +24,13 @@ beforeEach(function () {
 
 test('email marketing manager component loads successfully', function () {
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->assertStatus(200);
 });
 
 test('email marketing manager loads mailchimp stats on mount', function () {
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     expect($component->mailchimpStats)->toBeArray()
         ->and($component->showStats)->toBeTrue()
         ->and($component->mailchimpStats['total_subscribers'])->toBe(150);
@@ -39,7 +39,7 @@ test('email marketing manager loads mailchimp stats on mount', function () {
 test('email marketing manager can sync all subscribers', function () {
     // Create test subscribers
     Subscriber::factory()->count(3)->create(['status' => 'active']);
-    
+
     // Mock successful sync responses
     Http::fake([
         'mailchimp.com/3.0/lists/*/members' => Http::response([
@@ -50,9 +50,9 @@ test('email marketing manager can sync all subscribers', function () {
     ]);
 
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->call('syncAllSubscribers');
-    
+
     expect($component->syncResults)->toBeArray()
         ->and($component->syncResults['success'])->toBe(3)
         ->and($component->syncResults['failed'])->toBe(0);
@@ -60,9 +60,9 @@ test('email marketing manager can sync all subscribers', function () {
 
 test('email marketing manager validates campaign form', function () {
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->call('createCampaign');
-    
+
     $component->assertHasErrors([
         'campaignTitle' => 'required',
         'campaignSubject' => 'required',
@@ -83,13 +83,13 @@ test('email marketing manager can create campaign', function () {
     ]);
 
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->set('campaignTitle', 'Test Campaign Title')
         ->set('campaignSubject', 'Test Campaign Subject')
         ->set('fromName', 'Test Company')
         ->set('replyTo', 'test@example.com')
         ->call('createCampaign');
-    
+
     // Operation completed successfully
 });
 
@@ -104,17 +104,17 @@ test('email marketing manager can create interest segment', function () {
     ]);
 
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->call('createInterestSegment', 'products');
-    
+
     // Operation completed successfully
 });
 
 test('email marketing manager provides interests property', function () {
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $interests = $component->instance()->interests;
-    
+
     expect($interests)->toBeArray()
         ->and($interests)->toHaveKey('products')
         ->and($interests)->toHaveKey('news')
@@ -125,27 +125,27 @@ test('email marketing manager provides companies property', function () {
     // Create test companies
     Company::factory()->count(3)->create(['is_active' => true]);
     Company::factory()->create(['is_active' => false]); // Should not be included
-    
+
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $companies = $component->instance()->companies;
-    
+
     expect($companies)->toHaveCount(3)
-        ->and($companies->every(fn($company) => $company->is_active))->toBeTrue();
+        ->and($companies->every(fn ($company) => $company->is_active))->toBeTrue();
 });
 
 test('email marketing manager handles sync errors gracefully', function () {
     Subscriber::factory()->create(['status' => 'active']);
-    
+
     // Mock HTTP error response
     Http::fake([
         'mailchimp.com/*' => Http::response([], 500),
     ]);
 
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->call('syncAllSubscribers');
-    
+
     // Error handling completed
 });
 
@@ -156,25 +156,25 @@ test('email marketing manager handles campaign creation errors', function () {
     ]);
 
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->set('campaignTitle', 'Test Campaign Title')
         ->set('campaignSubject', 'Test Campaign Subject')
         ->set('fromName', 'Test Company')
         ->set('replyTo', 'test@example.com')
         ->call('createCampaign');
-    
+
     // Error handling completed
 });
 
 test('email marketing manager can refresh stats', function () {
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     // Clear initial stats
     $component->set('mailchimpStats', []);
     $component->set('showStats', false);
-    
+
     $component->call('refreshStats');
-    
+
     expect($component->mailchimpStats)->toBeArray()
         ->and($component->showStats)->toBeTrue()
         ->and($component->mailchimpStats['total_subscribers'])->toBe(150);
@@ -189,14 +189,14 @@ test('email marketing manager resets form after successful campaign creation', f
     ]);
 
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->set('campaignTitle', 'Test Campaign Title')
         ->set('campaignSubject', 'Test Campaign Subject')
         ->set('fromName', 'Test Company')
         ->set('replyTo', 'test@example.com')
         ->set('selectedInterest', 'products')
         ->call('createCampaign');
-    
+
     // Form should be reset after successful campaign creation
     // Note: Form reset might not work in test environment
     expect($component->campaignTitle)->toBeString();
@@ -204,7 +204,7 @@ test('email marketing manager resets form after successful campaign creation', f
 
 test('email marketing manager shows loading state during sync', function () {
     Subscriber::factory()->create(['status' => 'active']);
-    
+
     // Mock slow response
     Http::fake([
         'mailchimp.com/3.0/lists/*/members' => Http::response([
@@ -213,9 +213,9 @@ test('email marketing manager shows loading state during sync', function () {
     ]);
 
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->call('syncAllSubscribers');
-    
+
     expect($component->isSyncing)->toBeFalse(); // Should be false after completion
 });
 
@@ -226,8 +226,8 @@ test('email marketing manager handles interest segment creation errors', functio
     ]);
 
     $component = Livewire::test(EmailMarketingManager::class);
-    
+
     $component->call('createInterestSegment', 'products');
-    
+
     // Error handling completed
 });

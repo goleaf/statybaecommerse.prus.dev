@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Widgets\EcommerceOverview;
 use App\Filament\Widgets\RecentOrdersWidget;
@@ -7,7 +9,6 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -43,8 +44,7 @@ describe('Filament Widgets', function () {
             expect($stats)->toHaveCount(6);  // EcommerceOverview has 6 stat cards
 
             // Check that stats contain expected data
-            $ordersStat = collect($stats)->first(fn($stat) =>
-                str_contains($stat->getLabel(), 'užsakymų'));
+            $ordersStat = collect($stats)->first(fn ($stat) => str_contains($stat->getLabel(), 'užsakymų'));
 
             expect($ordersStat)->not->toBeNull();
         });
@@ -58,8 +58,7 @@ describe('Filament Widgets', function () {
             $widget = Livewire::test(EcommerceOverview::class);
             $stats = $widget->instance()->getStats();
 
-            $revenueStat = collect($stats)->first(fn($stat) =>
-                str_contains($stat->getLabel(), 'pajamos'));
+            $revenueStat = collect($stats)->first(fn ($stat) => str_contains($stat->getLabel(), 'pajamos'));
 
             expect($revenueStat)->not->toBeNull();
         });
@@ -70,8 +69,7 @@ describe('Filament Widgets', function () {
             $widget = Livewire::test(EcommerceOverview::class);
             $stats = $widget->instance()->getStats();
 
-            $customersStat = collect($stats)->first(fn($stat) =>
-                str_contains($stat->getLabel(), 'klientų'));
+            $customersStat = collect($stats)->first(fn ($stat) => str_contains($stat->getLabel(), 'klientų'));
 
             expect($customersStat)->not->toBeNull();
         });
@@ -83,8 +81,7 @@ describe('Filament Widgets', function () {
             $widget = Livewire::test(EcommerceOverview::class);
             $stats = $widget->instance()->getStats();
 
-            $productsStat = collect($stats)->first(fn($stat) =>
-                str_contains($stat->getLabel(), 'produktų'));
+            $productsStat = collect($stats)->first(fn ($stat) => str_contains($stat->getLabel(), 'produktų'));
 
             expect($productsStat)->not->toBeNull();
         });
@@ -98,8 +95,7 @@ describe('Filament Widgets', function () {
             $stats = $widget->instance()->getStats();
 
             // Check that at least one stat has a trend
-            $hasPositiveTrend = collect($stats)->some(fn($stat) =>
-                $stat->getColor() === 'success');
+            $hasPositiveTrend = collect($stats)->some(fn ($stat) => $stat->getColor() === 'success');
 
             expect($hasPositiveTrend)->toBeTrue();
         });
@@ -227,7 +223,7 @@ describe('Filament Widgets', function () {
                 $order->items()->create([
                     'product_id' => $product->id,
                     'name' => $product->name,
-                    'sku' => $product->sku ?? 'SKU-' . str_pad($index + 1, 3, '0', STR_PAD_LEFT),
+                    'sku' => $product->sku ?? 'SKU-'.str_pad($index + 1, 3, '0', STR_PAD_LEFT),
                     'quantity' => 15 - $index,  // Descending quantities
                     'unit_price' => 1000,
                     'total' => (15 - $index) * 1000,

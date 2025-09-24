@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Traits;
 
 use Illuminate\Support\Facades\DB;
+
 // Using native Laravel helpers and custom PriceData DTO
 
 /**
@@ -15,8 +18,8 @@ trait HasProductPricing
     public function getPrice(): ?PriceData
     {
         $currencyCode = current_currency();
-        $basePrice = $this->loadMissing('prices', 'prices.currency')->prices->reject(fn($price) => $price->currency->code !== $currencyCode)->first();
-        if (!$basePrice) {
+        $basePrice = $this->loadMissing('prices', 'prices.currency')->prices->reject(fn ($price) => $price->currency->code !== $currencyCode)->first();
+        if (! $basePrice) {
             return null;
         }
         $value = (float) $basePrice->amount;
@@ -41,6 +44,7 @@ trait HasProductPricing
         } catch (\Throwable $e) {
             // Fallback silently to base price if price list tables missing
         }
+
         return new PriceData(value: $value, compare: $compare, percentage: $compare && $compare > 0 ? round(($compare - $value) / $compare * 100) : null);
     }
 }

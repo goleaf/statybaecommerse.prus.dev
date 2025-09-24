@@ -27,16 +27,21 @@ class PHPDocUpgradeCommand extends Command
     protected $description = 'Upgrade PHPDoc comments to modern standards';
 
     private array $processedFiles = [];
+
     private array $errors = [];
+
     private Standard $printer;
+
     private int $totalFiles = 0;
+
     private int $upgradedFiles = 0;
+
     private bool $dryRun = false;
 
     public function __construct()
     {
         parent::__construct();
-        $this->printer = new Standard();
+        $this->printer = new Standard;
     }
 
     /**
@@ -45,7 +50,7 @@ class PHPDocUpgradeCommand extends Command
     public function handle(): int
     {
         $this->dryRun = $this->option('dry-run');
-        
+
         $this->info('⬆️  Starting PHPDoc Upgrade...');
         $this->newLine();
 
@@ -73,14 +78,15 @@ class PHPDocUpgradeCommand extends Command
     private function getDirectoriesToProcess(): array
     {
         $specificDirectory = $this->option('directory');
-        
+
         if ($specificDirectory) {
             $fullPath = base_path($specificDirectory);
-            if (!File::isDirectory($fullPath)) {
+            if (! File::isDirectory($fullPath)) {
                 $this->error("❌ Directory not found: {$specificDirectory}");
+
                 return [];
             }
-            
+
             return [$specificDirectory => "Custom Directory: {$specificDirectory}"];
         }
 
@@ -116,14 +122,14 @@ class PHPDocUpgradeCommand extends Command
     private function processDirectory(string $directory, string $description): void
     {
         $fullPath = base_path($directory);
-        
-        if (!File::isDirectory($fullPath)) {
+
+        if (! File::isDirectory($fullPath)) {
             return;
         }
 
         $files = $this->getPhpFiles($fullPath);
         $this->totalFiles += count($files);
-        
+
         foreach ($files as $file) {
             $this->processFile($file, $directory);
         }
@@ -153,37 +159,37 @@ class PHPDocUpgradeCommand extends Command
      */
     private function processFile(string $filePath, string $relativeDirectory): void
     {
-        $relativePath = str_replace(base_path() . '/', '', $filePath);
-        
+        $relativePath = str_replace(base_path().'/', '', $filePath);
+
         try {
             $content = File::get($filePath);
 
-            $parser = (new ParserFactory())->createForNewestSupportedVersion();
+            $parser = (new ParserFactory)->createForNewestSupportedVersion();
             $ast = $parser->parse($content);
 
             if ($ast === null) {
                 throw new \Exception("Could not parse file: {$filePath}");
             }
 
-            $traverser = new NodeTraverser();
+            $traverser = new NodeTraverser;
             $visitor = new PHPDocUpgradeVisitor($relativeDirectory);
             $traverser->addVisitor($visitor);
             $modifiedAst = $traverser->traverse($ast);
 
             $newContent = $this->printer->prettyPrintFile($modifiedAst);
-            
+
             // Only write if content changed
             if ($newContent !== $content) {
-                if (!$this->dryRun) {
+                if (! $this->dryRun) {
                     File::put($filePath, $newContent);
                 }
-                
+
                 $this->processedFiles[] = $relativePath;
                 $this->upgradedFiles++;
             }
 
         } catch (\Exception $e) {
-            $this->errors[] = "Error processing {$relativePath}: " . $e->getMessage();
+            $this->errors[] = "Error processing {$relativePath}: ".$e->getMessage();
         }
     }
 
@@ -194,27 +200,27 @@ class PHPDocUpgradeCommand extends Command
     {
         $this->info('📊 PHPDoc Upgrade Report');
         $this->line('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        
+
         if ($this->dryRun) {
             $this->warn('🔍 DRY RUN MODE - No files were actually modified');
             $this->newLine();
         }
-        
-        $this->line("📈 Statistics:");
-        $this->line("  • Total Files Scanned: {$this->totalFiles}");
-        $this->line("  • Files " . ($this->dryRun ? 'Would Be Upgraded' : 'Upgraded') . ": {$this->upgradedFiles}");
-        $this->line("  • Files Already Current: " . ($this->totalFiles - $this->upgradedFiles - count($this->errors)));
-        $this->line("  • Errors: " . count($this->errors));
 
-        if (!empty($this->processedFiles)) {
+        $this->line('📈 Statistics:');
+        $this->line("  • Total Files Scanned: {$this->totalFiles}");
+        $this->line('  • Files '.($this->dryRun ? 'Would Be Upgraded' : 'Upgraded').": {$this->upgradedFiles}");
+        $this->line('  • Files Already Current: '.($this->totalFiles - $this->upgradedFiles - count($this->errors)));
+        $this->line('  • Errors: '.count($this->errors));
+
+        if (! empty($this->processedFiles)) {
             $this->newLine();
-            $this->info('✅ ' . ($this->dryRun ? 'Files that would be upgraded' : 'Upgraded Files') . ':');
+            $this->info('✅ '.($this->dryRun ? 'Files that would be upgraded' : 'Upgraded Files').':');
             foreach ($this->processedFiles as $file) {
                 $this->line("  - {$file}");
             }
         }
 
-        if (!empty($this->errors)) {
+        if (! empty($this->errors)) {
             $this->newLine();
             $this->error('❌ Errors:');
             foreach ($this->errors as $error) {
@@ -222,12 +228,12 @@ class PHPDocUpgradeCommand extends Command
             }
         }
 
-        $successRate = $this->totalFiles > 0 ? 
+        $successRate = $this->totalFiles > 0 ?
             round((($this->totalFiles - count($this->errors)) / $this->totalFiles) * 100, 2) : 100;
 
         $this->newLine();
         $this->line("🎯 Success Rate: {$successRate}%");
-        
+
         if ($this->dryRun && $this->upgradedFiles > 0) {
             $this->newLine();
             $this->info('💡 To apply these changes, run the command without --dry-run');
@@ -241,6 +247,7 @@ class PHPDocUpgradeCommand extends Command
 class PHPDocUpgradeVisitor extends NodeVisitorAbstract
 {
     private string $directory;
+
     private array $classInfo = [];
 
     public function __construct(string $directory)
@@ -266,7 +273,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     private function upgradeClass(Node\Stmt\Class_ $node): void
     {
         $className = $node->name->name ?? 'Unknown';
-        
+
         // Analyze class structure
         $this->classInfo = [
             'name' => $className,
@@ -275,7 +282,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
             'methods' => [],
             'relationships' => [],
             'extends' => $node->extends ? $node->extends->toString() : null,
-            'implements' => array_map(fn($impl) => $impl->toString(), $node->implements),
+            'implements' => array_map(fn ($impl) => $impl->toString(), $node->implements),
         ];
 
         foreach ($node->stmts as $stmt) {
@@ -344,7 +351,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     private function upgradeMethodPHPDoc(Node\Stmt\ClassMethod $method): void
     {
         // Only upgrade if method doesn't have comprehensive PHPDoc
-        if (!$this->hasComprehensiveMethodPHPDoc($method)) {
+        if (! $this->hasComprehensiveMethodPHPDoc($method)) {
             $phpdoc = $this->generateMethodPHPDoc($method);
             $method->setDocComment(new \PhpParser\Comment\Doc($phpdoc));
         }
@@ -372,7 +379,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     {
         $className = $this->classInfo['name'];
         $description = $this->getUpgradedClassDescription();
-        
+
         $phpdoc = "/**\n";
         $phpdoc .= " * {$className}\n";
         $phpdoc .= " * \n";
@@ -399,7 +406,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
             $phpdoc .= " * @method static \\Filament\\Tables\\Table table(\\Filament\\Tables\\Table \$table)\n";
         }
 
-        $phpdoc .= " */";
+        $phpdoc .= ' */';
 
         return $phpdoc;
     }
@@ -408,10 +415,10 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     {
         $methodName = $method->name->name;
         $description = $this->getMethodDescription($methodName);
-        
+
         $phpdoc = "/**\n";
         $phpdoc .= " * {$description}\n";
-        
+
         // Add parameter documentation
         foreach ($method->params as $param) {
             $type = $param->type ? $this->getTypeString($param->type) : 'mixed';
@@ -425,7 +432,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
             $phpdoc .= " * @return {$returnType}\n";
         }
 
-        $phpdoc .= " */";
+        $phpdoc .= ' */';
 
         return $phpdoc;
     }
@@ -433,21 +440,21 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     private function generateInterfacePHPDoc(Node\Stmt\Interface_ $node): string
     {
         $interfaceName = $node->name->name;
-        
+
         return "/**\n * {$interfaceName}\n * \n * Interface contract defining required methods and behavior.\n */";
     }
 
     private function generateTraitPHPDoc(Node\Stmt\Trait_ $node): string
     {
         $traitName = $node->name->name;
-        
+
         return "/**\n * {$traitName}\n * \n * Trait providing reusable functionality across multiple classes.\n */";
     }
 
     private function generateEnumPHPDoc(Node\Stmt\Enum_ $node): string
     {
         $enumName = $node->name->name;
-        
+
         return "/**\n * {$enumName}\n * \n * Enumeration defining a set of named constants with type safety.\n */";
     }
 
@@ -455,7 +462,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     {
         $directory = $this->directory;
         $className = $this->classInfo['name'];
-        
+
         if (str_contains($directory, 'Models')) {
             return "Eloquent model representing the {$className} entity with comprehensive relationships, scopes, and business logic for the e-commerce system.";
         } elseif (str_contains($directory, 'Controllers')) {
@@ -537,10 +544,12 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
         foreach ($comments as $comment) {
             if ($comment instanceof Node\Comment\Doc) {
                 $text = $comment->getText();
-                return strpos($text, '/**') === 0 && 
+
+                return strpos($text, '/**') === 0 &&
                        (strpos($text, '@param') !== false || strpos($text, '@return') !== false);
             }
         }
+
         return false;
     }
 
@@ -549,6 +558,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
         if ($property->type) {
             return $this->getTypeString($property->type);
         }
+
         return null;
     }
 
@@ -559,11 +569,11 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
         } elseif ($type instanceof Node\Identifier) {
             return $type->name;
         } elseif ($type instanceof Node\NullableType) {
-            return $this->getTypeString($type->type) . '|null';
+            return $this->getTypeString($type->type).'|null';
         } elseif ($type instanceof Node\UnionType) {
             return implode('|', array_map([$this, 'getTypeString'], $type->types));
         }
-        
+
         return 'mixed';
     }
 
@@ -576,6 +586,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
         } elseif ($node->flags & Node\Stmt\Class_::MODIFIER_PRIVATE) {
             return 'private';
         }
+
         return 'public';
     }
 
@@ -588,6 +599,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
                 'type' => $param->type ? $this->getTypeString($param->type) : null,
             ];
         }
+
         return $parameters;
     }
 
@@ -596,6 +608,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
         if ($method->returnType) {
             return $this->getTypeString($method->returnType);
         }
+
         return null;
     }
 }

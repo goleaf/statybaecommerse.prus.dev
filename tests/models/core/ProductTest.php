@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Product;
+declare(strict_types=1);
+
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
-use App\Models\User;
+use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -30,7 +31,7 @@ describe('Product Model', function () {
     });
 
     it('has correct fillable attributes', function () {
-        $product = new Product();
+        $product = new Product;
         $fillable = $product->getFillable();
 
         expect($fillable)->toContain(
@@ -305,13 +306,13 @@ describe('Product Model', function () {
     it('can get formatted price', function () {
         $product = Product::factory()->create(['price' => 29.99]);
 
-        expect($product->formatted_price)->toBe('29,99' . "\u{00A0}" . '€');
+        expect($product->formatted_price)->toBe('29,99'."\u{00A0}".'€');
     });
 
     it('can get formatted compare price', function () {
         $product = Product::factory()->create(['compare_price' => 39.99]);
 
-        expect($product->formatted_compare_price)->toBe('39,99' . "\u{00A0}" . '€');
+        expect($product->formatted_compare_price)->toBe('39,99'."\u{00A0}".'€');
     });
 
     it('can get stock status', function () {

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->json('meta_data')->nullable(); // Additional metadata
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
-            
+
             $table->index(['type', 'is_enabled']);
             $table->index(['is_required', 'is_enabled']);
             $table->index('sort_order');

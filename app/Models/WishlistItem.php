@@ -1,12 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * WishlistItem
@@ -15,9 +18,11 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property mixed $fillable
  * @property mixed $casts
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|WishlistItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|WishlistItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|WishlistItem query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([UserOwnedScope::class])]
@@ -26,11 +31,16 @@ final class WishlistItem extends Model
     use HasFactory;
 
     protected $fillable = ['wishlist_id', 'product_id', 'variant_id', 'quantity', 'notes'];
-    protected $casts = ['quantity' => 'integer'];
+
+    protected function casts(): array
+    {
+        return [
+            'quantity' => 'integer',
+        ];
+    }
 
     /**
      * Handle wishlist functionality with proper error handling.
-     * @return BelongsTo
      */
     public function wishlist(): BelongsTo
     {
@@ -39,7 +49,6 @@ final class WishlistItem extends Model
 
     /**
      * Handle product functionality with proper error handling.
-     * @return BelongsTo
      */
     public function product(): BelongsTo
     {
@@ -48,7 +57,6 @@ final class WishlistItem extends Model
 
     /**
      * Handle variant functionality with proper error handling.
-     * @return BelongsTo
      */
     public function variant(): BelongsTo
     {
@@ -57,32 +65,35 @@ final class WishlistItem extends Model
 
     /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getDisplayNameAttribute(): string
     {
-        $name = $this->product->name;
-        if ($this->variant) {
-            $name .= ' - ' . $this->variant->name;
+        $name = $this->product?->name ?? '';
+        if ($this->variant?->name) {
+            $name .= ($name !== '' ? ' - ' : '').$this->variant->name;
         }
+
         return $name;
     }
 
     /**
      * Handle getCurrentPriceAttribute functionality with proper error handling.
-     * @return float|null
      */
     public function getCurrentPriceAttribute(): ?float
     {
-        if ($this->variant) {
+        if ($this->variant?->price !== null) {
             return (float) $this->variant->price;
         }
-        return (float) $this->product->price;
+
+        if ($this->product?->price !== null) {
+            return (float) $this->product->price;
+        }
+
+        return null;
     }
 
     /**
      * Handle getFormattedCurrentPriceAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedCurrentPriceAttribute(): string
     {
@@ -91,10 +102,8 @@ final class WishlistItem extends Model
 
     /**
      * Handle scopeForUser functionality with proper error handling.
-     * @param mixed $query
-     * @param int $userId
      */
-    public function scopeForUser($query, int $userId)
+    public function scopeForUser(Builder $query, int $userId): Builder
     {
         return $query->whereHas('wishlist', function ($q) use ($userId) {
             $q->where('user_id', $userId);
@@ -103,20 +112,16 @@ final class WishlistItem extends Model
 
     /**
      * Handle scopeForProduct functionality with proper error handling.
-     * @param mixed $query
-     * @param int $productId
      */
-    public function scopeForProduct($query, int $productId)
+    public function scopeForProduct(Builder $query, int $productId): Builder
     {
         return $query->where('product_id', $productId);
     }
 
     /**
      * Handle scopeRecent functionality with proper error handling.
-     * @param mixed $query
-     * @param int $days
      */
-    public function scopeRecent($query, int $days = 7)
+    public function scopeRecent(Builder $query, int $days = 7): Builder
     {
         return $query->where('created_at', '>=', now()->subDays($days));
     }

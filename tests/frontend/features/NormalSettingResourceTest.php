@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\NormalSettingResource;
 use App\Models\NormalSetting;
 use App\Models\User;
+
 use function Pest\Laravel\actingAs;
 
 beforeEach(function () {
@@ -80,4 +83,3 @@ it('views, edits and deletes a normal setting', function () {
 
     expect(NormalSetting::query()->whereKey($record->getKey())->exists())->toBeFalse();
 });
-

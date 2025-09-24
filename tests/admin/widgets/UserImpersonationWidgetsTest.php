@@ -1,12 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\User;
+declare(strict_types=1);
+
 use App\Models\Order;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
@@ -18,17 +16,17 @@ describe('User Impersonation Widgets Tests', function () {
     beforeEach(function () {
         $this->admin = User::factory()->create();
         $this->admin->assignRole('administrator');
-        
+
         $this->regularUser = User::factory()->create(['is_admin' => false]);
         $this->anotherAdmin = User::factory()->create(['is_admin' => true]);
-        
+
         $this->actingAs($this->admin);
     });
 
     describe('User Statistics Widget', function () {
         it('displays total user count', function () {
             User::factory()->count(5)->create(['is_admin' => false]);
-            
+
             // Test widget displays correct user count
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -36,14 +34,14 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays active user count', function () {
             User::factory()->count(3)->create(['is_admin' => false, 'is_active' => true]);
             User::factory()->count(2)->create(['is_admin' => false, 'is_active' => false]);
-            
+
             // Test widget displays correct active user count
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
 
         it('displays admin user count', function () {
             User::factory()->count(2)->create(['is_admin' => true]);
-            
+
             // Test widget displays correct admin user count
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -51,14 +49,14 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays new users today', function () {
             User::factory()->count(3)->create([
                 'is_admin' => false,
-                'created_at' => now()
+                'created_at' => now(),
             ]);
-            
+
             User::factory()->count(2)->create([
                 'is_admin' => false,
-                'created_at' => now()->subDays(1)
+                'created_at' => now()->subDays(1),
             ]);
-            
+
             // Test widget displays correct new users count
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -68,9 +66,9 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays recent user logins', function () {
             User::factory()->count(5)->create([
                 'is_admin' => false,
-                'last_login_at' => now()->subHours(1)
+                'last_login_at' => now()->subHours(1),
             ]);
-            
+
             // Test widget displays recent logins
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -79,14 +77,14 @@ describe('User Impersonation Widgets Tests', function () {
             // Create users with different login patterns
             User::factory()->count(3)->create([
                 'is_admin' => false,
-                'last_login_at' => now()->subDays(1)
+                'last_login_at' => now()->subDays(1),
             ]);
-            
+
             User::factory()->count(2)->create([
                 'is_admin' => false,
-                'last_login_at' => now()->subDays(7)
+                'last_login_at' => now()->subDays(7),
             ]);
-            
+
             // Test widget displays activity trends
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -94,9 +92,9 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays most active users', function () {
             $activeUser = User::factory()->create(['is_admin' => false]);
             Order::factory()->count(5)->create(['user_id' => $activeUser->id]);
-            
+
             $inactiveUser = User::factory()->create(['is_admin' => false]);
-            
+
             // Test widget displays most active users
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -106,10 +104,10 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays total orders by impersonated users', function () {
             $user1 = User::factory()->create(['is_admin' => false]);
             $user2 = User::factory()->create(['is_admin' => false]);
-            
+
             Order::factory()->count(3)->create(['user_id' => $user1->id]);
             Order::factory()->count(2)->create(['user_id' => $user2->id]);
-            
+
             // Test widget displays total orders
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -118,9 +116,9 @@ describe('User Impersonation Widgets Tests', function () {
             $user = User::factory()->create(['is_admin' => false]);
             Order::factory()->count(3)->create([
                 'user_id' => $user->id,
-                'total' => 100.00
+                'total' => 100.00,
             ]);
-            
+
             // Test widget displays order value
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -129,9 +127,9 @@ describe('User Impersonation Widgets Tests', function () {
             $user = User::factory()->create(['is_admin' => false]);
             Order::factory()->count(5)->create([
                 'user_id' => $user->id,
-                'created_at' => now()->subHours(1)
+                'created_at' => now()->subHours(1),
             ]);
-            
+
             // Test widget displays recent orders
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -158,9 +156,9 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays users with two-factor authentication', function () {
             User::factory()->count(3)->create([
                 'is_admin' => false,
-                'two_factor_enabled' => true
+                'two_factor_enabled' => true,
             ]);
-            
+
             // Test widget displays 2FA users
             expect(true)->toBeTrue(); // Placeholder for widget test
         });
@@ -190,14 +188,14 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays users by language preference', function () {
             User::factory()->count(3)->create([
                 'is_admin' => false,
-                'preferred_locale' => 'en'
+                'preferred_locale' => 'en',
             ]);
-            
+
             User::factory()->count(2)->create([
                 'is_admin' => false,
-                'preferred_locale' => 'lt'
+                'preferred_locale' => 'lt',
             ]);
-            
+
             // Test widget displays users by language
             expect(true)->toBeTrue(); // Placeholder for widget test
         });

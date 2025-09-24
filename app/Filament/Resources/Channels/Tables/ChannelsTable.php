@@ -7,8 +7,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
@@ -19,72 +23,63 @@ class ChannelsTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('slug')
-                    ->searchable(),
-                TextColumn::make('timezone')
-                    ->searchable(),
+                    ->label(__('admin.channels.name'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('code')
+                    ->label(__('admin.channels.code'))
+                    ->searchable()
+                    ->sortable(),
+                BadgeColumn::make('type')
+                    ->label(__('admin.channels.type'))
+                    ->colors([
+                        'success' => 'web',
+                        'info' => 'mobile',
+                        'warning' => 'api',
+                        'danger' => 'pos',
+                    ]),
                 TextColumn::make('url')
-                    ->searchable(),
+                    ->label(__('admin.channels.url'))
+                    ->limit(30)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        return strlen($state) > 30 ? $state : null;
+                    }),
                 IconColumn::make('is_enabled')
+                    ->label(__('admin.channels.is_enabled'))
                     ->boolean(),
                 IconColumn::make('is_default')
+                    ->label(__('admin.channels.is_default'))
+                    ->boolean(),
+                IconColumn::make('is_active')
+                    ->label(__('admin.channels.is_active'))
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label(__('admin.common.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('code')
-                    ->searchable(),
-                TextColumn::make('type')
-                    ->searchable(),
-                IconColumn::make('is_active')
-                    ->boolean(),
-                TextColumn::make('sort_order')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('domain')
-                    ->searchable(),
-                IconColumn::make('ssl_enabled')
-                    ->boolean(),
-                TextColumn::make('meta_title')
-                    ->searchable(),
-                TextColumn::make('analytics_tracking_id')
-                    ->searchable(),
-                IconColumn::make('analytics_enabled')
-                    ->boolean(),
-                TextColumn::make('default_payment_method')
-                    ->searchable(),
-                TextColumn::make('default_shipping_method')
-                    ->searchable(),
-                TextColumn::make('free_shipping_threshold')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('currency_code')
-                    ->searchable(),
-                TextColumn::make('currency_symbol')
-                    ->searchable(),
-                TextColumn::make('currency_position')
-                    ->searchable(),
-                TextColumn::make('default_language')
-                    ->searchable(),
-                TextColumn::make('contact_email')
-                    ->searchable(),
-                TextColumn::make('contact_phone')
-                    ->searchable(),
             ])
             ->filters([
+                SelectFilter::make('type')
+                    ->label(__('admin.channels.type'))
+                    ->options([
+                        'web' => __('admin.channels.types.web'),
+                        'mobile' => __('admin.channels.types.mobile'),
+                        'api' => __('admin.channels.types.api'),
+                        'pos' => __('admin.channels.types.pos'),
+                    ]),
+                TernaryFilter::make('is_enabled')
+                    ->label(__('admin.channels.is_enabled')),
+                TernaryFilter::make('is_default')
+                    ->label(__('admin.channels.is_default')),
+                TernaryFilter::make('is_active')
+                    ->label(__('admin.channels.is_active')),
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([
@@ -93,6 +88,7 @@ class ChannelsTable
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('sort_order');
     }
 }

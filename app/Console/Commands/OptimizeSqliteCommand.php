@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Optimize SQLite Database Command
- * 
+ *
  * Applies production-ready SQLite optimizations and displays current settings.
  */
 final class OptimizeSqliteCommand extends Command
@@ -35,6 +35,7 @@ final class OptimizeSqliteCommand extends Command
     {
         if (config('database.default') !== 'sqlite') {
             $this->error('Current database connection is not SQLite. This command only works with SQLite.');
+
             return 1;
         }
 
@@ -90,7 +91,8 @@ final class OptimizeSqliteCommand extends Command
 
             return 0;
         } catch (\Exception $e) {
-            $this->error('Failed to check SQLite settings: ' . $e->getMessage());
+            $this->error('Failed to check SQLite settings: '.$e->getMessage());
+
             return 1;
         }
     }
@@ -126,7 +128,7 @@ final class OptimizeSqliteCommand extends Command
             $autoVacuumResult = $pdo->query('PRAGMA auto_vacuum')->fetchColumn();
             if ($autoVacuumResult == 0) {
                 $this->line("⚠️  auto_vacuum cannot be changed on existing database (current: {$autoVacuumResult})");
-                $this->line("   To enable auto_vacuum, you would need to recreate the database.");
+                $this->line('   To enable auto_vacuum, you would need to recreate the database.');
                 $this->line("   For now, you can run 'PRAGMA incremental_vacuum' manually when needed.");
             } else {
                 $this->line("✅ auto_vacuum is already set to: {$autoVacuumResult}");
@@ -144,8 +146,9 @@ final class OptimizeSqliteCommand extends Command
 
             return 0;
         } catch (\Exception $e) {
-            $this->error('Failed to apply SQLite optimizations: ' . $e->getMessage());
-            Log::error('Failed to apply SQLite optimizations: ' . $e->getMessage());
+            $this->error('Failed to apply SQLite optimizations: '.$e->getMessage());
+            Log::error('Failed to apply SQLite optimizations: '.$e->getMessage());
+
             return 1;
         }
     }
@@ -160,10 +163,10 @@ final class OptimizeSqliteCommand extends Command
 
         try {
             $pdo = DB::connection('sqlite')->getPdo();
-            
+
             // Get database size before vacuum
             $sizeBefore = $pdo->query('SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()')->fetchColumn();
-            $this->line("Database size before vacuum: " . number_format($sizeBefore / 1024 / 1024, 2) . " MB");
+            $this->line('Database size before vacuum: '.number_format($sizeBefore / 1024 / 1024, 2).' MB');
 
             // Run incremental vacuum
             $pdo->exec('PRAGMA incremental_vacuum');
@@ -171,13 +174,13 @@ final class OptimizeSqliteCommand extends Command
 
             // Get database size after vacuum
             $sizeAfter = $pdo->query('SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()')->fetchColumn();
-            $this->line("Database size after vacuum: " . number_format($sizeAfter / 1024 / 1024, 2) . " MB");
+            $this->line('Database size after vacuum: '.number_format($sizeAfter / 1024 / 1024, 2).' MB');
 
             $spaceReclaimed = $sizeBefore - $sizeAfter;
             if ($spaceReclaimed > 0) {
-                $this->line("Space reclaimed: " . number_format($spaceReclaimed / 1024 / 1024, 2) . " MB");
+                $this->line('Space reclaimed: '.number_format($spaceReclaimed / 1024 / 1024, 2).' MB');
             } else {
-                $this->line("No space was reclaimed (database was already optimized)");
+                $this->line('No space was reclaimed (database was already optimized)');
             }
 
             $this->newLine();
@@ -187,8 +190,9 @@ final class OptimizeSqliteCommand extends Command
 
             return 0;
         } catch (\Exception $e) {
-            $this->error('Failed to run incremental vacuum: ' . $e->getMessage());
-            Log::error('Failed to run incremental vacuum: ' . $e->getMessage());
+            $this->error('Failed to run incremental vacuum: '.$e->getMessage());
+            Log::error('Failed to run incremental vacuum: '.$e->getMessage());
+
             return 1;
         }
     }

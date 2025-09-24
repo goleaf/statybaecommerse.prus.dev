@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<categories>
+  <category>
+    <id>1</id>
+    <slug>statybine-medziaga</slug>
+    <base>
+      <is_enabled>true</is_enabled>
+      <is_visible>true</is_visible>
+      <sort_order>1</sort_order>
+      <show_in_menu>true</show_in_menu>
+    </base>
+    <translations>
+      <translation locale="lt">
+        <name>Statybinė medžiaga</name>
+        <description>Statybinės medžiagos kategorija</description>
+        <seo_title>Statybinės medžiagos</seo_title>
+      </translation>
+      <translation locale="en">
+        <name>Building materials</name>
+        <description>Building materials category</description>
+        <seo_title>Building materials</seo_title>
+      </translation>
+    </translations>
+    <seo>
+      <canonical_url>https://example.com/c/statybine-medziaga</canonical_url>
+    </seo>
+    <images>
+      <image src="https://example.com/images/cat-statybine.jpg" alt="Statybinės medžiagos" />
+    </images>
+    <children>
+      <child_slug>cementas</child_slug>
+    </children>
+    <tags>
+      <tag>statyba</tag>
+    </tags>
+    <custom>
+      <field key="menu_icon">heroicon-o-cube</field>
+    </custom>
+  </category>
+  <category>
+    <id>2</id>
+    <parent_id>1</parent_id>
+    <parent_slug>statybine-medziaga</parent_slug>
+    <slug>cementas</slug>
+    <base>
+      <is_enabled>true</is_enabled>
+      <is_visible>true</is_visible>
+      <sort_order>2</sort_order>
+      <show_in_menu>true</show_in_menu>
+    </base>
+    <translations>
+      <translation locale="lt">
+        <name>Cementas</name>
+        <description>Cemento produktai</description>
+        <seo_title>Cementas</seo_title>
+      </translation>
+      <translation locale="en">
+        <name>Cement</name>
+        <description>Cement products</description>
+        <seo_title>Cement</seo_title>
+      </translation>
+    </translations>
+  </category>
+</categories>
+
+

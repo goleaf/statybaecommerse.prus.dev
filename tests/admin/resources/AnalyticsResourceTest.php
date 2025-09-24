@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Filament\Resources\AnalyticsResource\Pages\AnalyticsDashboard;
+declare(strict_types=1);
+
 use App\Filament\Resources\AnalyticsResource;
+use App\Filament\Resources\AnalyticsResource\Pages\AnalyticsDashboard;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -11,7 +11,6 @@ use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\LazyCollection;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -291,7 +290,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
     {
         // Update existing products with enhanced fields if they exist with timeout protection
         $timeout = now()->addMinutes(10); // 10 minute timeout for product enhancement
-        
+
         Product::where('is_visible', true)
             ->cursor()
             ->takeUntilTimeout($timeout)
@@ -305,32 +304,32 @@ final class ComprehensiveFilamentSeeder extends Seeder
                         $updateData['meta_title'] = $product->name;
                     }
 
-                if (! $product->is_featured) {
-                    $updateData['is_featured'] = fake()->boolean(15); // 15% featured
-                }
+                    if (! $product->is_featured) {
+                        $updateData['is_featured'] = fake()->boolean(15); // 15% featured
+                    }
 
-                if (! $product->sort_order) {
-                    $updateData['sort_order'] = fake()->numberBetween(1, 1000);
-                }
+                    if (! $product->sort_order) {
+                        $updateData['sort_order'] = fake()->numberBetween(1, 1000);
+                    }
 
-                if (! $product->published_at) {
-                    $updateData['published_at'] = fake()->dateTimeBetween('-6 months', 'now');
-                }
+                    if (! $product->published_at) {
+                        $updateData['published_at'] = fake()->dateTimeBetween('-6 months', 'now');
+                    }
 
-                if (! empty($updateData)) {
-                    try {
-                        $product->update($updateData);
-                    } catch (\Exception $e) {
-                        // Skip if columns don't exist yet
-                        continue;
+                    if (! empty($updateData)) {
+                        try {
+                            $product->update($updateData);
+                        } catch (\Exception $e) {
+                            // Skip if columns don't exist yet
+                            continue;
+                        }
                     }
                 }
-            }
-        });
+            });
 
         // Update existing categories with timeout protection
         $categoryTimeout = now()->addMinutes(5); // 5 minute timeout for category updates
-        
+
         Category::where('is_visible', true)
             ->cursor()
             ->takeUntilTimeout($categoryTimeout)
@@ -351,7 +350,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
         // Update existing brands with timeout protection
         $brandTimeout = now()->addMinutes(5); // 5 minute timeout for brand updates
-        
+
         Brand::where('is_visible', true)
             ->cursor()
             ->takeUntilTimeout($brandTimeout)

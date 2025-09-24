@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
@@ -11,30 +12,38 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+
+final class AnalyticsEventResource extends Resource
+{
+    protected static ?string $model = AnalyticsEvent::class;
+
+    protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Analytics';
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -43,7 +52,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -52,8 +60,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $schema
-     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -98,7 +104,7 @@ use Illuminate\Database\Eloquent\Collection;
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, \Filament\Forms\Set $set) {
                             if ($state) {
                                 $user = User::find($state);
                                 if ($user) {
@@ -125,7 +131,7 @@ use Illuminate\Database\Eloquent\Collection;
                         ->label(__('analytics_events.event_data'))
                         ->keyLabel(__('analytics_events.event_data_key'))
                         ->valueLabel(__('analytics_events.event_data_value'))
-                        ->addActionLabel(__('analytics_events.add_event_data_field'))
+                        ->addActionLabel(__('analytics_events.add_event_data_field')),
                 ]),
             Section::make(__('analytics_events.context_information'))
                 ->schema([
@@ -193,15 +199,13 @@ use Illuminate\Database\Eloquent\Collection;
                         ->default('EUR')
                         ->rules(['alpha']),
                     Textarea::make('notes')
-                        ->label(__('analytics_events.notes'))
+                        ->label(__('analytics_events.notes')),
                 ]),
         ]);
     }
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -215,9 +219,9 @@ use Illuminate\Database\Eloquent\Collection;
                     ->limit(100),
                 TextColumn::make('event_type')
                     ->label(__('analytics_events.event_type'))
-                    ->formatStateUsing(fn(string $state): string => __("analytics_events.types.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("analytics_events.types.{$state}"))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'page_view' => 'blue',
                         'click' => 'green',
                         'form_submit' => 'purple',
@@ -279,7 +283,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('analytics_events.created_at'))
                     ->dateTime(),
                 TextColumn::make('updated_at')
-                    ->label(__('analytics_events.updated_at'))
+                    ->label(__('analytics_events.updated_at')),
             ])
             ->filters([
                 SelectFilter::make('event_type')
@@ -304,16 +308,16 @@ use Illuminate\Database\Eloquent\Collection;
                     ->native(false),
                 TernaryFilter::make('is_conversion')
                     ->trueLabel(__('analytics_events.conversions_only'))
-                    ->falseLabel(__('analytics_events.non_conversions_only'))
+                    ->falseLabel(__('analytics_events.non_conversions_only')),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('mark_important')
                     ->label(__('analytics_events.mark_important'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn(AnalyticsEvent $record): bool => !$record->is_important)
+                    ->visible(fn (AnalyticsEvent $record): bool => ! $record->is_important)
                     ->action(function (AnalyticsEvent $record): void {
                         $record->update(['is_important' => true]);
 
@@ -325,7 +329,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->requiresConfirmation(),
                 Action::make('unmark_important')
                     ->label(__('analytics_events.unmark_important'))
-                    ->visible(fn(AnalyticsEvent $record): bool => $record->is_important)
+                    ->visible(fn (AnalyticsEvent $record): bool => $record->is_important)
                     ->action(function (AnalyticsEvent $record): void {
                         $record->update(['is_important' => false]);
 
@@ -339,7 +343,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('analytics_events.mark_conversion'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(AnalyticsEvent $record): bool => !$record->is_conversion)
+                    ->visible(fn (AnalyticsEvent $record): bool => ! $record->is_conversion)
                     ->action(function (AnalyticsEvent $record): void {
                         $record->update(['is_conversion' => true]);
 
@@ -352,7 +356,7 @@ use Illuminate\Database\Eloquent\Collection;
                 Action::make('unmark_conversion')
                     ->label(__('analytics_events.unmark_conversion'))
                     ->icon('heroicon-o-x-circle')
-                    ->visible(fn(AnalyticsEvent $record): bool => $record->is_conversion)
+                    ->visible(fn (AnalyticsEvent $record): bool => $record->is_conversion)
                     ->action(function (AnalyticsEvent $record): void {
                         $record->update(['is_conversion' => false]);
 
@@ -415,14 +419,13 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                ])
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -433,7 +436,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

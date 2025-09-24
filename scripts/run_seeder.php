@@ -2,15 +2,15 @@
 
 require_once 'vendor/autoload.php';
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
 
 $capsule = new Capsule;
 
 $capsule->addConnection([
     'driver' => 'sqlite',
-    'database' => __DIR__ . '/database/database.sqlite',
+    'database' => __DIR__.'/database/database.sqlite',
     'prefix' => '',
 ]);
 
@@ -19,7 +19,7 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
 // Create tables if they don't exist
-if (!Capsule::schema()->hasTable('system_setting_categories')) {
+if (! Capsule::schema()->hasTable('system_setting_categories')) {
     Capsule::schema()->create('system_setting_categories', function ($table) {
         $table->id();
         $table->string('name');
@@ -35,7 +35,7 @@ if (!Capsule::schema()->hasTable('system_setting_categories')) {
     });
 }
 
-if (!Capsule::schema()->hasTable('system_settings')) {
+if (! Capsule::schema()->hasTable('system_settings')) {
     Capsule::schema()->create('system_settings', function ($table) {
         $table->id();
         $table->unsignedBigInteger('category_id')->nullable();
@@ -268,4 +268,4 @@ foreach ($settings as $setting) {
 }
 
 echo "System settings seeder completed successfully!\n";
-echo "Created " . count($categories) . " categories and " . count($settings) . " settings.\n";
+echo 'Created '.count($categories).' categories and '.count($settings)." settings.\n";

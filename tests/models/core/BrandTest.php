@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Brand;
 use App\Models\Product;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -25,7 +26,7 @@ describe('Brand Model', function () {
     });
 
     it('has correct fillable attributes', function () {
-        $brand = new Brand();
+        $brand = new Brand;
         $fillable = $brand->getFillable();
 
         expect($fillable)->toContain('name', 'slug', 'description', 'website', 'is_enabled', 'seo_title', 'seo_description');
@@ -120,7 +121,7 @@ describe('Brand Model', function () {
     });
 
     it('has media collections', function () {
-        $brand = new Brand();
+        $brand = new Brand;
         $brand->registerMediaCollections();
 
         expect($brand->getMediaCollections())->toHaveCount(2);
@@ -220,7 +221,7 @@ describe('Brand Model', function () {
 
     it('can get logo and banner URLs with sizes', function () {
         $brand = Brand::factory()->create();
-        
+
         // Test without media
         expect($brand->getLogoUrl())->toBeNull();
         expect($brand->getBannerUrl())->toBeNull();

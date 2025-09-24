@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components\Checkout;
 
-use App\Actions\Payment\PayWithCash;
 use App\Actions\CreateOrder;
+use App\Actions\Payment\PayWithCash;
 use App\Enums\PaymentType;
-use App\Models\Country;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Validate;
@@ -31,7 +32,6 @@ class Payment extends StepComponent
 
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -42,22 +42,20 @@ class Payment extends StepComponent
 
     /**
      * Handle save functionality with proper error handling.
-     * @return void
      */
     public function save(): void
     {
         $this->validate();
         session()->forget('checkout.payment');
         session()->push('checkout.payment', PaymentMethod::query()->find($this->currentSelected)->toArray());
-        $order = (new CreateOrder())->handle();
+        $order = (new CreateOrder)->handle();
         match (data_get(session()->get('checkout'), 'payment')[0]['slug']) {
-            PaymentType::Cash() => (new PayWithCash())->handle($order),
+            PaymentType::Cash() => (new PayWithCash)->handle($order),
         };
     }
 
     /**
      * Handle stepInfo functionality with proper error handling.
-     * @return array
      */
     public function stepInfo(): array
     {
@@ -66,7 +64,6 @@ class Payment extends StepComponent
 
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

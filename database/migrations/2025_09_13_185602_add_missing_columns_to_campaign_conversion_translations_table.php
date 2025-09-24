@@ -13,10 +13,10 @@ return new class extends Migration
         }
 
         Schema::table('campaign_conversion_translations', function (Blueprint $table) {
-            if (!Schema::hasColumn('campaign_conversion_translations', 'created_at')) {
+            if (! Schema::hasColumn('campaign_conversion_translations', 'created_at')) {
                 $table->timestamps();
             }
-            if (!Schema::hasColumn('campaign_conversion_translations', 'custom_attributes')) {
+            if (! Schema::hasColumn('campaign_conversion_translations', 'custom_attributes')) {
                 $table->json('custom_attributes')->nullable()->after('custom_data');
             }
         });

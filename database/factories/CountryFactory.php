@@ -18,7 +18,7 @@ final class CountryFactory extends Factory
     {
         $regions = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania', 'Antarctica'];
         $currencies = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'CNY', 'RUB', 'INR'];
-        
+
         return [
             'name' => $this->faker->country(),
             'name_official' => $this->faker->optional(0.7)->country(),

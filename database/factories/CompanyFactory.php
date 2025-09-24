@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -35,7 +37,7 @@ final class CompanyFactory extends Factory
                 'Real Estate',
                 'Consulting',
                 'Media',
-                'Transportation'
+                'Transportation',
             ]),
             'size' => fake()->randomElement(['small', 'medium', 'large']),
             'description' => fake()->paragraph(),
@@ -53,7 +55,7 @@ final class CompanyFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
         ]);
     }
@@ -63,7 +65,7 @@ final class CompanyFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
         ]);
     }
@@ -73,7 +75,7 @@ final class CompanyFactory extends Factory
      */
     public function small(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'size' => 'small',
         ]);
     }
@@ -83,7 +85,7 @@ final class CompanyFactory extends Factory
      */
     public function medium(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'size' => 'medium',
         ]);
     }
@@ -93,7 +95,7 @@ final class CompanyFactory extends Factory
      */
     public function large(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'size' => 'large',
         ]);
     }
@@ -103,7 +105,7 @@ final class CompanyFactory extends Factory
      */
     public function technology(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'industry' => 'Technology',
         ]);
     }
@@ -113,7 +115,7 @@ final class CompanyFactory extends Factory
      */
     public function healthcare(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'industry' => 'Healthcare',
         ]);
     }

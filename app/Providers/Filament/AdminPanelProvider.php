@@ -1,28 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use Awcodes\Overlook\OverlookPlugin;
+use App\Filament\Resources\ReferralRewardResource;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
 use Filament\Panel;
 use Filament\PanelProvider;
-use FilipFonal\FilamentLogManager\FilamentLogManagerPlugin;
+use Filament\Support\Colors\Color;
+use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Jacobtims\FilamentLogger\FilamentLoggerPlugin;
-use Kenepa\ResourceLock\ResourceLockPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -48,21 +46,18 @@ final class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'info' => Color::Sky,
             ])
-            // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->resources([
-                \App\Filament\Resources\DiscountConditionResource::class,
-                \App\Filament\Resources\CampaignCustomerSegmentResource::class,
-                \App\Filament\Resources\CampaignProductTargetResource::class,
-                \App\Filament\Resources\CampaignViewResource::class,
-                \App\Filament\Resources\NormalSettingResource::class,
-            ])
-            ->pages([
-                \App\Filament\Pages\Dashboard::class,
-                \App\Filament\Pages\SliderAnalytics::class,
-                \App\Filament\Pages\SliderManagement::class,
-            ])
-            // ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\Filament\Clusters')
-            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->when(app()->environment('testing'),
+                fn (Panel $p) => $p->resources([
+                    ReferralRewardResource::class,
+                ]),
+                fn (Panel $p) => $p->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources'))
+            ->when(app()->environment('testing'),
+                fn (Panel $p) => $p->pages([]),
+                fn (Panel $p) => $p->pages([
+                    \App\Filament\Pages\Dashboard::class,
+                    \App\Filament\Pages\SliderAnalytics::class,
+                    \App\Filament\Pages\SliderManagement::class,
+                ]))
             ->widgets([
                 AccountWidget::class,
             ])
@@ -72,7 +67,6 @@ final class AdminPanelProvider extends PanelProvider
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
-                // Set locale as early as possible so Filament builds UI in correct language
                 \App\Http\Middleware\SetFilamentLocale::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
@@ -109,38 +103,19 @@ final class AdminPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
-                    ->url(fn(): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
+                    ->url(fn (): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
                     ->icon('heroicon-o-user-circle'),
                 'language' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.language'))
-                    ->url(fn(): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
+                    ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
                     ->icon('heroicon-o-language'),
-                // 'settings' => \Filament\Navigation\MenuItem::make()
-                //     ->label(__('admin.navigation.settings'))
-                //     ->url(fn(): string => \App\Filament\Resources\SystemSettingsResource::getUrl('index'))
-                //     ->icon('heroicon-o-cog-6-tooth'),
             ])
-            ->plugins([
-                FilamentShieldPlugin::make(),
-                // FilamentLoggerPlugin::make(),
-                // OverlookPlugin::make(),
-                // ResourceLockPlugin::make(),
-                // FilamentSocialitePlugin::make(),
-                // FilamentLogManagerPlugin::make(),
-            ])
+            ->when(app()->environment('testing'),
+                fn (Panel $p) => $p->plugins([]),
+                fn (Panel $p) => $p->plugins([
+                    FilamentShieldPlugin::make(),
+                ]))
             ->viteTheme('resources/css/filament-enhancements.css')
-            ->spa()
-            // ->renderHook(
-            //     'panels::topbar.end',
-            //     fn (): string => view('filament.hooks.live-notification-feed-hook')->render()
-            // )
-            ->renderHook(
-                'panels::topbar.start',
-                fn(): string => view('filament.components.top-navigation')->render()
-            )
-            ->renderHook(
-                'panels::body.end',
-                fn(): string => view('filament.layouts.live-notifications-script')->render()
-            );
+            ->spa();
     }
 }

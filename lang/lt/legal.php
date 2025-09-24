@@ -75,5 +75,3 @@ return [
     // Helpers
     'untitled_document' => 'Be pavadinimo dokumentas',
 ];
-
-

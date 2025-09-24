@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('seo_description')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->index(['is_enabled', 'is_featured']);
             $table->index(['slug']);
         });

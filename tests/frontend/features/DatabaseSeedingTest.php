@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
@@ -10,6 +12,7 @@ it('runs database seeder without errors and creates base users', function (): vo
         // Skip this test for SQLite as it cannot handle VACUUM operations within transactions
         // The RefreshDatabase trait runs migrations in a transaction which conflicts with VACUUM
         $this->markTestSkipped('SQLite cannot run VACUUM operations within transactions. This test requires a non-transactional database setup.');
+
         return;
     }
 

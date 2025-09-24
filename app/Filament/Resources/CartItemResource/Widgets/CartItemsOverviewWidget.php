@@ -7,7 +7,6 @@ namespace App\Filament\Resources\CartItemResource\Widgets;
 use App\Models\CartItem;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class CartItemsOverviewWidget extends BaseWidget
 {
@@ -37,7 +36,7 @@ final class CartItemsOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-bookmark')
                 ->color('info'),
 
-            Stat::make(__('cart_items.stats.total_value'), '€' . number_format($totalValue, 2))
+            Stat::make(__('cart_items.stats.total_value'), '€'.number_format($totalValue, 2))
                 ->description(__('cart_items.stats.total_value_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('warning'),

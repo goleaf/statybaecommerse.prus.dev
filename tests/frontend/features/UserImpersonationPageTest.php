@@ -1,12 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\User;
+declare(strict_types=1);
+
 use App\Models\Order;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
@@ -18,10 +16,10 @@ describe('User Impersonation Page Tests', function () {
     beforeEach(function () {
         $this->admin = User::factory()->create();
         $this->admin->assignRole('administrator');
-        
+
         $this->regularUser = User::factory()->create(['is_admin' => false]);
         $this->anotherAdmin = User::factory()->create(['is_admin' => true]);
-        
+
         $this->actingAs($this->admin);
     });
 
@@ -59,7 +57,7 @@ describe('User Impersonation Page Tests', function () {
 
         it('shows user order count', function () {
             Order::factory()->count(3)->create(['user_id' => $this->regularUser->id]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee('3'); // Order count
@@ -73,7 +71,7 @@ describe('User Impersonation Page Tests', function () {
 
         it('shows user last login date', function () {
             $this->regularUser->update(['last_login_at' => now()->subDays(1)]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee($this->regularUser->last_login_at->format('Y-m-d'));
@@ -81,7 +79,7 @@ describe('User Impersonation Page Tests', function () {
 
         it('shows user active status', function () {
             $this->regularUser->update(['is_active' => false]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk();
         });
@@ -91,7 +89,7 @@ describe('User Impersonation Page Tests', function () {
         it('can filter by active users', function () {
             $activeUser = User::factory()->create(['is_admin' => false, 'is_active' => true]);
             $inactiveUser = User::factory()->create(['is_admin' => false, 'is_active' => false]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee($activeUser->name)
@@ -101,9 +99,9 @@ describe('User Impersonation Page Tests', function () {
         it('can filter by users with orders', function () {
             $userWithOrders = User::factory()->create(['is_admin' => false]);
             Order::factory()->create(['user_id' => $userWithOrders->id]);
-            
+
             $userWithoutOrders = User::factory()->create(['is_admin' => false]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee($userWithOrders->name)
@@ -113,14 +111,14 @@ describe('User Impersonation Page Tests', function () {
         it('can filter by recent activity', function () {
             $recentUser = User::factory()->create([
                 'is_admin' => false,
-                'last_login_at' => now()->subDays(1)
+                'last_login_at' => now()->subDays(1),
             ]);
-            
+
             $oldUser = User::factory()->create([
                 'is_admin' => false,
-                'last_login_at' => now()->subDays(60)
+                'last_login_at' => now()->subDays(60),
             ]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee($recentUser->name)
@@ -136,7 +134,7 @@ describe('User Impersonation Page Tests', function () {
 
         it('can view user orders', function () {
             Order::factory()->create(['user_id' => $this->regularUser->id]);
-            
+
             // Test the view orders action
             expect(true)->toBeTrue(); // Placeholder for action test
         });
@@ -151,7 +149,7 @@ describe('User Impersonation Page Tests', function () {
         it('can activate multiple users', function () {
             $user1 = User::factory()->create(['is_admin' => false, 'is_active' => false]);
             $user2 = User::factory()->create(['is_admin' => false, 'is_active' => false]);
-            
+
             // Test bulk activate action
             expect(true)->toBeTrue(); // Placeholder for bulk action test
         });
@@ -159,7 +157,7 @@ describe('User Impersonation Page Tests', function () {
         it('can deactivate multiple users', function () {
             $user1 = User::factory()->create(['is_admin' => false, 'is_active' => true]);
             $user2 = User::factory()->create(['is_admin' => false, 'is_active' => true]);
-            
+
             // Test bulk deactivate action
             expect(true)->toBeTrue(); // Placeholder for bulk action test
         });
@@ -169,7 +167,7 @@ describe('User Impersonation Page Tests', function () {
         it('can search users by name', function () {
             $user1 = User::factory()->create(['is_admin' => false, 'name' => 'John Doe']);
             $user2 = User::factory()->create(['is_admin' => false, 'name' => 'Jane Smith']);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee($user1->name)
@@ -179,7 +177,7 @@ describe('User Impersonation Page Tests', function () {
         it('can search users by email', function () {
             $user1 = User::factory()->create(['is_admin' => false, 'email' => 'john@example.com']);
             $user2 = User::factory()->create(['is_admin' => false, 'email' => 'jane@example.com']);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee($user1->email)
@@ -189,7 +187,7 @@ describe('User Impersonation Page Tests', function () {
         it('can sort users by creation date', function () {
             $user1 = User::factory()->create(['is_admin' => false, 'created_at' => now()->subDays(2)]);
             $user2 = User::factory()->create(['is_admin' => false, 'created_at' => now()->subDays(1)]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee($user1->name)
@@ -199,7 +197,7 @@ describe('User Impersonation Page Tests', function () {
         it('can sort users by last login', function () {
             $user1 = User::factory()->create(['is_admin' => false, 'last_login_at' => now()->subDays(2)]);
             $user2 = User::factory()->create(['is_admin' => false, 'last_login_at' => now()->subDays(1)]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk()
                 ->assertSee($user1->name)
@@ -214,7 +212,7 @@ describe('User Impersonation Page Tests', function () {
                 'impersonated_user_id' => $this->regularUser->id,
                 'started_at' => now()->toISOString(),
             ]]);
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertOk();
         });

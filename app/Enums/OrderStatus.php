@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -57,8 +59,8 @@ enum OrderStatus: string
 
     public static function getOptions(): array
     {
-        return collect(self::cases())->mapWithKeys(fn($case) => [
-            $case->value => $case->getLabel()
+        return collect(self::cases())->mapWithKeys(fn ($case) => [
+            $case->value => $case->getLabel(),
         ])->toArray();
     }
 }

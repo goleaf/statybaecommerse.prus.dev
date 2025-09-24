@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -43,7 +45,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function view(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'interaction_type' => 'view',
             'rating' => null,
             'count' => fake()->numberBetween(1, 50),
@@ -55,7 +57,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function click(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'interaction_type' => 'click',
             'rating' => null,
             'count' => fake()->numberBetween(1, 10),
@@ -67,7 +69,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function addToCart(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'interaction_type' => 'add_to_cart',
             'rating' => null,
             'count' => fake()->numberBetween(1, 5),
@@ -79,7 +81,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function purchase(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'interaction_type' => 'purchase',
             'rating' => null,
             'count' => fake()->numberBetween(1, 3),
@@ -91,7 +93,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function review(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'interaction_type' => 'review',
             'rating' => fake()->randomFloat(1, 1, 5),
             'count' => 1,
@@ -103,7 +105,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function share(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'interaction_type' => 'share',
             'rating' => null,
             'count' => fake()->numberBetween(1, 5),
@@ -115,7 +117,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function highRated(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'rating' => fake()->randomFloat(1, 4, 5),
         ]);
     }
@@ -125,7 +127,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function lowRated(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'rating' => fake()->randomFloat(1, 1, 3),
         ]);
     }
@@ -136,7 +138,8 @@ final class UserProductInteractionFactory extends Factory
     public function recent(): static
     {
         $now = now();
-        return $this->state(fn(array $attributes) => [
+
+        return $this->state(fn (array $attributes) => [
             'first_interaction' => fake()->dateTimeBetween('-7 days', '-1 day'),
             'last_interaction' => fake()->dateTimeBetween('-1 day', $now),
         ]);
@@ -147,7 +150,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function old(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'first_interaction' => fake()->dateTimeBetween('-1 year', '-6 months'),
             'last_interaction' => fake()->dateTimeBetween('-6 months', '-1 month'),
         ]);
@@ -158,7 +161,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function frequent(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'count' => fake()->numberBetween(20, 100),
         ]);
     }
@@ -168,7 +171,7 @@ final class UserProductInteractionFactory extends Factory
      */
     public function rare(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'count' => 1,
         ]);
     }

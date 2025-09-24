@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\NewsCategoryTranslation;
-use App\Models\Translations\NewsTagTranslation;
-use App\Models\Translations\NewsTranslation;
 use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\NewsComment;
 use App\Models\NewsImage;
 use App\Models\NewsTag;
+use App\Models\Translations\NewsCategoryTranslation;
+use App\Models\Translations\NewsTagTranslation;
+use App\Models\Translations\NewsTranslation;
 use Illuminate\Database\Seeder;
 
 final class NewsSeeder extends Seeder
@@ -18,7 +20,7 @@ final class NewsSeeder extends Seeder
     {
         $supportedLocales = config('app.supported_locales', 'lt,en');
         $locales = collect(explode(',', (string) $supportedLocales))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values();
@@ -45,9 +47,9 @@ final class NewsSeeder extends Seeder
                 $summary = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
                 $content = '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio.</p><p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>';
 
-                $title = $locale === 'lt' ? "Demonstracinė naujiena {$i}" : ($locale === 'en' ? $titleBase : $titleBase . " ({$locale})");
-                $slug = $locale === 'lt' ? str("Demonstracinė naujiena {$i}")->slug()->toString() : $slugBase . ($locale === 'en' ? '' : "-{$locale}");
-                $slug = $slug . "-{$news->id}";
+                $title = $locale === 'lt' ? "Demonstracinė naujiena {$i}" : ($locale === 'en' ? $titleBase : $titleBase." ({$locale})");
+                $slug = $locale === 'lt' ? str("Demonstracinė naujiena {$i}")->slug()->toString() : $slugBase.($locale === 'en' ? '' : "-{$locale}");
+                $slug = $slug."-{$news->id}";
 
                 NewsTranslation::updateOrCreate([
                     'news_id' => $news->id,
@@ -94,7 +96,7 @@ final class NewsSeeder extends Seeder
     {
         $categoryNames = [
             'Technology', 'Business', 'Sports', 'Entertainment', 'Health', 'Science',
-            'Politics', 'Education', 'Travel', 'Food', 'Fashion', 'Automotive'
+            'Politics', 'Education', 'Travel', 'Food', 'Fashion', 'Automotive',
         ];
 
         $categories = collect();
@@ -112,7 +114,7 @@ final class NewsSeeder extends Seeder
                         'Politika', 'Švietimas', 'Kelionės', 'Maistas', 'Mada', 'Automobiliai'][$index]
                     : $name;
 
-                $slug = str($localizedName)->slug()->toString() . '-' . $category->id;
+                $slug = str($localizedName)->slug()->toString().'-'.$category->id;
 
                 NewsCategoryTranslation::updateOrCreate([
                     'news_category_id' => $category->id,
@@ -134,7 +136,7 @@ final class NewsSeeder extends Seeder
     {
         $tagNames = [
             'Breaking', 'Exclusive', 'Trending', 'Popular', 'Latest', 'Important',
-            'Update', 'Announcement', 'Event', 'News', 'Report', 'Analysis'
+            'Update', 'Announcement', 'Event', 'News', 'Report', 'Analysis',
         ];
 
         $tags = collect();
@@ -151,7 +153,7 @@ final class NewsSeeder extends Seeder
                         'Atnaujinimai', 'Pranešimai', 'Renginiai', 'Naujienos', 'Ataskaitos', 'Analizės'][array_search($name, $tagNames)]
                     : $name;
 
-                $slug = str($localizedName)->slug()->toString() . '-' . $tag->id;
+                $slug = str($localizedName)->slug()->toString().'-'.$tag->id;
 
                 NewsTagTranslation::updateOrCreate([
                     'news_tag_id' => $tag->id,

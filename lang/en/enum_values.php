@@ -1,0 +1,57 @@
+<?php
+
+return [
+    'title' => 'Enum Values',
+    'plural' => 'Enum Values',
+    'single' => 'Enum Value',
+    'fields' => [
+        'type' => 'Type',
+        'key' => 'Key',
+        'value' => 'Value',
+        'name' => 'Name',
+        'description' => 'Description',
+        'sort_order' => 'Sort Order',
+        'is_active' => 'Is Active',
+        'is_default' => 'Is Default',
+        'metadata' => 'Metadata',
+        'metadata_key' => 'Metadata Key',
+        'metadata_value' => 'Metadata Value',
+        'usage_count' => 'Usage Count',
+        'formatted_value' => 'Formatted Value',
+        'created_at' => 'Created At',
+        'updated_at' => 'Updated At',
+    ],
+    'types' => [
+        'product_status' => 'Product Status',
+        'order_status' => 'Order Status',
+        'payment_status' => 'Payment Status',
+        'shipping_status' => 'Shipping Status',
+        'user_role' => 'User Role',
+        'notification_type' => 'Notification Type',
+        'campaign_status' => 'Campaign Status',
+        'discount_type' => 'Discount Type',
+        'inventory_status' => 'Inventory Status',
+        'review_status' => 'Review Status',
+    ],
+    'filters' => [
+        'type' => 'Type',
+        'is_active' => 'Is Active',
+        'is_default' => 'Is Default',
+    ],
+    'actions' => [
+        'activate' => 'Activate',
+        'deactivate' => 'Deactivate',
+        'set_default' => 'Set as Default',
+    ],
+    'notifications' => [
+        'activated' => 'Enum values have been activated.',
+        'deactivated' => 'Enum values have been deactivated.',
+        'default_set' => 'Default enum values have been set.',
+    ],
+    'messages' => [
+        'created' => 'Enum value has been created successfully.',
+        'updated' => 'Enum value has been updated successfully.',
+        'deleted' => 'Enum value has been deleted successfully.',
+        'bulk_deleted' => 'Selected enum values have been deleted successfully.',
+    ],
+];

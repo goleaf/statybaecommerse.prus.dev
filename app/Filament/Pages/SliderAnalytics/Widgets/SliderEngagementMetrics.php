@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
 use App\Models\Slider;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
 
 final class SliderEngagementMetrics extends ChartWidget
@@ -28,20 +30,20 @@ final class SliderEngagementMetrics extends ChartWidget
         $status = $this->pageFilters['status'] ?? 'all';
 
         $query = Slider::query()
-            ->when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate))
-            ->when($sliderId, fn(Builder $query) => $query->where('id', $sliderId))
-            ->when($status !== 'all', fn(Builder $query) => $query->where('is_active', $status === 'active'));
+            ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+            ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
+            ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
         $sliders = $query->get();
 
         // Calculate engagement metrics
-        $withImages = $sliders->filter(fn($slider) => $slider->hasMedia('slider_images'))->count();
-        $withBackgrounds = $sliders->filter(fn($slider) => $slider->hasMedia('slider_backgrounds'))->count();
-        $withButtons = $sliders->filter(fn($slider) => !empty($slider->button_text) && !empty($slider->button_url))->count();
-        $withCustomColors = $sliders->filter(fn($slider) => !empty($slider->background_color) || !empty($slider->text_color))->count();
-        $withDescriptions = $sliders->filter(fn($slider) => !empty($slider->description))->count();
-        $withSettings = $sliders->filter(fn($slider) => !empty($slider->settings))->count();
+        $withImages = $sliders->filter(fn ($slider) => $slider->hasMedia('slider_images'))->count();
+        $withBackgrounds = $sliders->filter(fn ($slider) => $slider->hasMedia('slider_backgrounds'))->count();
+        $withButtons = $sliders->filter(fn ($slider) => ! empty($slider->button_text) && ! empty($slider->button_url))->count();
+        $withCustomColors = $sliders->filter(fn ($slider) => ! empty($slider->background_color) || ! empty($slider->text_color))->count();
+        $withDescriptions = $sliders->filter(fn ($slider) => ! empty($slider->description))->count();
+        $withSettings = $sliders->filter(fn ($slider) => ! empty($slider->settings))->count();
 
         return [
             'datasets' => [

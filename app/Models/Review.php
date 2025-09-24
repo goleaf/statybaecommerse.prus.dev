@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
@@ -11,24 +12,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 /**
  * Review
- * 
+ *
  * Eloquent model representing the Review entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @property string $translationModel
  * @property mixed $appends
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Review newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, ApprovedScope::class])]
 final class Review extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
+
     /**
      * Boot the service provider or trait functionality.
      */
@@ -40,7 +45,7 @@ final class Review extends Model
                 throw new \InvalidArgumentException('Rating must be between 1 and 5');
             }
             // Ensure required reviewer fields are populated
-            if (empty($review->reviewer_name) && !empty($review->user_id)) {
+            if (empty($review->reviewer_name) && ! empty($review->user_id)) {
                 $user = User::find($review->user_id);
                 if ($user) {
                     $review->reviewer_name = $user->name ?? 'Guest';
@@ -60,305 +65,317 @@ final class Review extends Model
             }
         });
     }
+
     protected $table = 'reviews';
+
     protected $fillable = ['product_id', 'user_id', 'reviewer_name', 'reviewer_email', 'rating', 'title', 'content', 'is_approved', 'is_featured', 'locale', 'approved_at', 'rejected_at', 'metadata'];
+
     protected string $translationModel = \App\Models\Translations\ReviewTranslation::class;
+
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
         return ['rating' => 'integer', 'is_approved' => 'boolean', 'is_featured' => 'boolean', 'approved_at' => 'datetime', 'rejected_at' => 'datetime', 'metadata' => 'array'];
     }
+
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
     protected $appends = ['status', 'status_color', 'status_label', 'rating_stars', 'rating_label', 'rating_color', 'is_high_rated', 'is_low_rated', 'is_recent', 'days_old', 'reviewer_type'];
+
     /**
      * Handle product functionality with proper error handling.
-     * @return BelongsTo
      */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
+
     /**
      * Handle user functionality with proper error handling.
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
+
     // Alias for clarity: a review's author is a customer (User)
     /**
      * Handle author functionality with proper error handling.
-     * @return BelongsTo
      */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
     /**
      * Handle scopeApproved functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeApproved($query)
     {
         return $query->where('is_approved', true);
     }
+
     /**
      * Handle scopeForLocale functionality with proper error handling.
-     * @param mixed $query
-     * @param string $locale
+     *
+     * @param  mixed  $query
      */
     public function scopeForLocale($query, string $locale)
     {
         return $query->where('locale', $locale);
     }
+
     /**
      * Handle scopeByRating functionality with proper error handling.
-     * @param mixed $query
-     * @param int $rating
+     *
+     * @param  mixed  $query
      */
     public function scopeByRating($query, int $rating)
     {
         return $query->where('rating', $rating);
     }
+
     /**
      * Handle scopePending functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopePending($query)
     {
         return $query->withoutGlobalScope(ApprovedScope::class)->where('is_approved', false)->whereNull('rejected_at');
     }
+
     /**
      * Handle approve functionality with proper error handling.
-     * @return bool
      */
     public function approve(): bool
     {
         $this->is_approved = true;
         $this->approved_at = now();
         $this->rejected_at = null;
+
         return $this->save();
     }
+
     /**
      * Handle reject functionality with proper error handling.
-     * @return bool
      */
     public function reject(): bool
     {
         $this->is_approved = false;
         $this->rejected_at = now();
         $this->approved_at = null;
+
         return $this->save();
     }
+
     /**
      * Handle scopeFeatured functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true);
     }
+
     /**
      * Handle scopeRecent functionality with proper error handling.
-     * @param mixed $query
-     * @param int $days
+     *
+     * @param  mixed  $query
      */
     public function scopeRecent($query, int $days = 30)
     {
         return $query->where('created_at', '>=', now()->subDays($days));
     }
+
     /**
      * Handle scopeHighRated functionality with proper error handling.
-     * @param mixed $query
-     * @param int $minRating
+     *
+     * @param  mixed  $query
      */
     public function scopeHighRated($query, int $minRating = 4)
     {
         return $query->where('rating', '>=', $minRating);
     }
+
     /**
      * Handle scopeLowRated functionality with proper error handling.
-     * @param mixed $query
-     * @param int $maxRating
+     *
+     * @param  mixed  $query
      */
     public function scopeLowRated($query, int $maxRating = 2)
     {
         return $query->where('rating', '<=', $maxRating);
     }
+
     /**
      * Handle getAverageRatingForProduct functionality with proper error handling.
-     * @param int $productId
-     * @return float
      */
     public static function getAverageRatingForProduct(int $productId): float
     {
         return self::where('product_id', $productId)->where('is_approved', true)->avg('rating') ?? 0;
     }
+
     /**
      * Handle getReviewCountForProduct functionality with proper error handling.
-     * @param int $productId
-     * @return int
      */
     public static function getReviewCountForProduct(int $productId): int
     {
         return self::where('product_id', $productId)->where('is_approved', true)->count();
     }
+
     /**
      * Handle getRatingDistributionForProduct functionality with proper error handling.
-     * @param int $productId
-     * @return array
      */
     public static function getRatingDistributionForProduct(int $productId): array
     {
         return self::where('product_id', $productId)->where('is_approved', true)->selectRaw('rating, COUNT(*) as count')->groupBy('rating')->orderBy('rating')->pluck('count', 'rating')->toArray();
     }
+
     // Advanced Translation Methods
     /**
      * Handle getTranslatedTitle functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedTitle(?string $locale = null): ?string
     {
         return $this->trans('title', $locale) ?: $this->title;
     }
+
     /**
      * Handle getTranslatedComment functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedComment(?string $locale = null): ?string
     {
         return $this->trans('comment', $locale) ?: $this->content;
     }
+
     // Scope for translated reviews
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
-     * @param mixed $query
-     * @param string|null $locale
+     *
+     * @param  mixed  $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
+
         return $query->with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }]);
     }
+
     // Translation Management Methods
     /**
      * Handle getAvailableLocales functionality with proper error handling.
-     * @return array
      */
     public function getAvailableLocales(): array
     {
         return $this->translations()->pluck('locale')->unique()->values()->toArray();
     }
+
     /**
      * Handle hasTranslationFor functionality with proper error handling.
-     * @param string $locale
-     * @return bool
      */
     public function hasTranslationFor(string $locale): bool
     {
         return $this->translations()->where('locale', $locale)->exists();
     }
+
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     * @param string $locale
+     *
      * @return App\Models\Translations\ReviewTranslation
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\ReviewTranslation
     {
         return $this->translations()->firstOrCreate(['locale' => $locale], ['title' => $this->title, 'comment' => $this->comment]);
     }
+
     /**
      * Handle updateTranslation functionality with proper error handling.
-     * @param string $locale
-     * @param array $data
-     * @return bool
      */
     public function updateTranslation(string $locale, array $data): bool
     {
         $translation = $this->getOrCreateTranslation($locale);
+
         return $translation->update($data);
     }
+
     /**
      * Handle updateTranslations functionality with proper error handling.
-     * @param array $translations
-     * @return bool
      */
     public function updateTranslations(array $translations): bool
     {
         foreach ($translations as $locale => $data) {
             $this->updateTranslation($locale, $data);
         }
+
         return true;
     }
+
     // Helper Methods
     /**
      * Handle getFullDisplayName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string
      */
     public function getFullDisplayName(?string $locale = null): string
     {
         $title = $this->getTranslatedTitle($locale);
         $rating = str_repeat('⭐', $this->rating);
+
         return "{$title} ({$rating})";
     }
+
     /**
      * Handle getReviewInfo functionality with proper error handling.
-     * @return array
      */
     public function getReviewInfo(): array
     {
         return ['id' => $this->id, 'product_id' => $this->product_id, 'user_id' => $this->user_id, 'reviewer_name' => $this->reviewer_name, 'reviewer_email' => $this->reviewer_email, 'rating' => $this->rating, 'title' => $this->title, 'comment' => $this->comment, 'is_approved' => $this->is_approved, 'is_featured' => $this->is_featured, 'locale' => $this->locale, 'approved_at' => $this->approved_at?->toISOString(), 'rejected_at' => $this->rejected_at?->toISOString()];
     }
+
     /**
      * Handle getStatusInfo functionality with proper error handling.
-     * @return array
      */
     public function getStatusInfo(): array
     {
         return ['is_approved' => $this->is_approved, 'is_featured' => $this->is_featured, 'status' => $this->getStatus(), 'status_color' => $this->getStatusColor(), 'status_label' => $this->getStatusLabel(), 'approved_at' => $this->approved_at?->toISOString(), 'rejected_at' => $this->rejected_at?->toISOString()];
     }
+
     /**
      * Handle getRatingInfo functionality with proper error handling.
-     * @return array
      */
     public function getRatingInfo(): array
     {
         return ['rating' => $this->rating, 'rating_stars' => str_repeat('⭐', $this->rating), 'rating_label' => $this->getRatingLabel(), 'rating_color' => $this->getRatingColor(), 'is_high_rated' => $this->rating >= 4, 'is_low_rated' => $this->rating <= 2];
     }
+
     /**
      * Handle getBusinessInfo functionality with proper error handling.
-     * @return array
      */
     public function getBusinessInfo(): array
     {
         return ['is_approved' => $this->is_approved, 'is_featured' => $this->is_featured, 'is_recent' => $this->created_at->isAfter(now()->subDays(30)), 'days_old' => $this->created_at->diffInDays(now()), 'product_name' => $this->product?->name, 'reviewer_type' => $this->user_id ? 'registered' : 'guest'];
     }
+
     /**
      * Handle getCompleteInfo functionality with proper error handling.
-     * @param string|null $locale
-     * @return array
      */
     public function getCompleteInfo(?string $locale = null): array
     {
         return array_merge($this->getReviewInfo(), $this->getStatusInfo(), $this->getRatingInfo(), $this->getBusinessInfo(), ['translations' => $this->getAvailableLocales(), 'has_translations' => count($this->getAvailableLocales()) > 0, 'created_at' => $this->created_at?->toISOString(), 'updated_at' => $this->updated_at?->toISOString()]);
     }
+
     // Additional helper methods
     /**
      * Handle getStatus functionality with proper error handling.
-     * @return string
      */
     public function getStatus(): string
     {
@@ -368,11 +385,12 @@ final class Review extends Model
         if ($this->rejected_at) {
             return 'rejected';
         }
+
         return 'pending';
     }
+
     /**
      * Handle getStatusColor functionality with proper error handling.
-     * @return string
      */
     public function getStatusColor(): string
     {
@@ -383,9 +401,9 @@ final class Review extends Model
             default => 'gray',
         };
     }
+
     /**
      * Handle getStatusLabel functionality with proper error handling.
-     * @return string
      */
     public function getStatusLabel(): string
     {
@@ -396,9 +414,9 @@ final class Review extends Model
             default => __('admin.reviews.status.unknown'),
         };
     }
+
     /**
      * Handle getRatingLabel functionality with proper error handling.
-     * @return string
      */
     public function getRatingLabel(): string
     {
@@ -411,9 +429,9 @@ final class Review extends Model
             default => __('admin.reviews.ratings.unknown'),
         };
     }
+
     /**
      * Handle getRatingColor functionality with proper error handling.
-     * @return string
      */
     public function getRatingColor(): string
     {
@@ -424,60 +442,57 @@ final class Review extends Model
             default => 'gray',
         };
     }
+
     /**
      * Handle isRecent functionality with proper error handling.
-     * @param int $days
-     * @return bool
      */
     public function isRecent(int $days = 30): bool
     {
         return $this->created_at->isAfter(now()->subDays($days));
     }
+
     /**
      * Handle isHighRated functionality with proper error handling.
-     * @param int $minRating
-     * @return bool
      */
     public function isHighRated(int $minRating = 4): bool
     {
         return $this->rating >= $minRating;
     }
+
     /**
      * Handle isLowRated functionality with proper error handling.
-     * @param int $maxRating
-     * @return bool
      */
     public function isLowRated(int $maxRating = 2): bool
     {
         return $this->rating <= $maxRating;
     }
+
     /**
      * Handle canBeApproved functionality with proper error handling.
-     * @return bool
      */
     public function canBeApproved(): bool
     {
-        return !$this->is_approved && !$this->rejected_at;
+        return ! $this->is_approved && ! $this->rejected_at;
     }
+
     /**
      * Handle canBeRejected functionality with proper error handling.
-     * @return bool
      */
     public function canBeRejected(): bool
     {
-        return !$this->rejected_at;
+        return ! $this->rejected_at;
     }
+
     /**
      * Handle canBeFeatured functionality with proper error handling.
-     * @return bool
      */
     public function canBeFeatured(): bool
     {
-        return $this->is_approved && !$this->is_featured;
+        return $this->is_approved && ! $this->is_featured;
     }
+
     /**
      * Handle canBeUnfeatured functionality with proper error handling.
-     * @return bool
      */
     public function canBeUnfeatured(): bool
     {

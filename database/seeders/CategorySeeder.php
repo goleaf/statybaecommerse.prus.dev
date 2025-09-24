@@ -893,13 +893,13 @@ class CategorySeeder extends Seeder
         );
 
         // Add main image if category was created and doesn't have one
-        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('images')) && isset($categoryData['image_url'])) {
-            $this->downloadAndAttachImage($category, $categoryData['image_url'], 'images', $categoryData['name'] . ' Image');
+        if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('images')) && isset($categoryData['image_url'])) {
+            $this->downloadAndAttachImage($category, $categoryData['image_url'], 'images', $categoryData['name'].' Image');
         }
 
         // Add banner if category was created and doesn't have one
-        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('banner')) && isset($categoryData['banner_url'])) {
-            $this->downloadAndAttachImage($category, $categoryData['banner_url'], 'banner', $categoryData['name'] . ' Banner');
+        if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('banner')) && isset($categoryData['banner_url'])) {
+            $this->downloadAndAttachImage($category, $categoryData['banner_url'], 'banner', $categoryData['name'].' Banner');
         }
 
         // Create children categories
@@ -920,7 +920,7 @@ class CategorySeeder extends Seeder
             $imagePath = $this->imageGenerator->generateCategoryImage($category->name);
 
             if (file_exists($imagePath)) {
-                $filename = Str::slug($name) . '.webp';
+                $filename = Str::slug($name).'.webp';
 
                 // Add media to category
                 $category
@@ -940,14 +940,14 @@ class CategorySeeder extends Seeder
                 $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}");
             }
         } catch (\Exception $e) {
-            $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}: " . $e->getMessage());
+            $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}: ".$e->getMessage());
         }
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -961,7 +961,7 @@ class CategorySeeder extends Seeder
             'en' => $this->translateToEnglish($text),
             'ru' => $this->translateToRussian($text),
             'de' => $this->translateToGerman($text),
-            default => $text . ' (' . strtoupper($locale) . ')',
+            default => $text.' ('.strtoupper($locale).')',
         };
     }
 
@@ -1362,7 +1362,7 @@ class CategorySeeder extends Seeder
             'en' => $this->translateSlugToEnglish($slug),
             'ru' => $this->translateSlugToRussian($slug),
             'de' => $this->translateSlugToGerman($slug),
-            default => $slug . '-' . $locale,
+            default => $slug.'-'.$locale,
         };
     }
 

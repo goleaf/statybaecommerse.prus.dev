@@ -54,4 +54,3 @@ return [
         'bulk_report_exported_successfully' => 'Bulk report exported successfully',
     ],
 ];
-

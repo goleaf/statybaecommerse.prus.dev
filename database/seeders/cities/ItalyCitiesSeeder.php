@@ -18,7 +18,7 @@ final class ItalyCitiesSeeder extends Seeder
         $euZone = Zone::where('code', 'EU')->first();
 
         // Regions are no longer used in the database schema
-        
+
         $cities = [
             // Lazio (Rome region)
             [
@@ -32,8 +32,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['00100', '00118', '00119'],
                 'translations' => [
                     'lt' => ['name' => 'Roma', 'description' => 'Italijos sostinė'],
-                    'en' => ['name' => 'Rome', 'description' => 'Capital of Italy']
-            ],
+                    'en' => ['name' => 'Rome', 'description' => 'Capital of Italy'],
+                ],
             ],
             [
                 'name' => 'Latina',
@@ -44,8 +44,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['04100'],
                 'translations' => [
                     'lt' => ['name' => 'Latina', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Latina', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Latina', 'description' => 'Industrial city'],
+                ],
             ],
             // Lombardy
             [
@@ -57,8 +57,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['20100', '20121', '20122'],
                 'translations' => [
                     'lt' => ['name' => 'Milanas', 'description' => 'Lombardijos sostinė'],
-                    'en' => ['name' => 'Milan', 'description' => 'Capital of Lombardy']
-            ],
+                    'en' => ['name' => 'Milan', 'description' => 'Capital of Lombardy'],
+                ],
             ],
             [
                 'name' => 'Brescia',
@@ -69,8 +69,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['25100'],
                 'translations' => [
                     'lt' => ['name' => 'Brešija', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Brescia', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Brescia', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Bergamo',
@@ -81,8 +81,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['24100'],
                 'translations' => [
                     'lt' => ['name' => 'Bergamas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Bergamo', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Bergamo', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Monza',
@@ -93,8 +93,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['20900'],
                 'translations' => [
                     'lt' => ['name' => 'Monca', 'description' => 'Automobilių lenktynių miestas'],
-                    'en' => ['name' => 'Monza', 'description' => 'Car racing city']
-            ],
+                    'en' => ['name' => 'Monza', 'description' => 'Car racing city'],
+                ],
             ],
             [
                 'name' => 'Como',
@@ -105,8 +105,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['22100'],
                 'translations' => [
                     'lt' => ['name' => 'Komas', 'description' => 'Ežero miestas'],
-                    'en' => ['name' => 'Como', 'description' => 'Lake city']
-            ],
+                    'en' => ['name' => 'Como', 'description' => 'Lake city'],
+                ],
             ],
             // Campania
             [
@@ -118,8 +118,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['80100', '80121', '80122'],
                 'translations' => [
                     'lt' => ['name' => 'Neapolis', 'description' => 'Kampanijos sostinė'],
-                    'en' => ['name' => 'Naples', 'description' => 'Capital of Campania']
-            ],
+                    'en' => ['name' => 'Naples', 'description' => 'Capital of Campania'],
+                ],
             ],
             [
                 'name' => 'Salerno',
@@ -130,8 +130,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['84100'],
                 'translations' => [
                     'lt' => ['name' => 'Salernas', 'description' => 'Pajūrio miestas'],
-                    'en' => ['name' => 'Salerno', 'description' => 'Seaside city']
-            ],
+                    'en' => ['name' => 'Salerno', 'description' => 'Seaside city'],
+                ],
             ],
             [
                 'name' => 'Caserta',
@@ -142,8 +142,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['81100'],
                 'translations' => [
                     'lt' => ['name' => 'Kazerta', 'description' => 'Karališkojo rūmo miestas'],
-                    'en' => ['name' => 'Caserta', 'description' => 'Royal palace city']
-            ],
+                    'en' => ['name' => 'Caserta', 'description' => 'Royal palace city'],
+                ],
             ],
             // Sicily
             [
@@ -155,8 +155,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['90100'],
                 'translations' => [
                     'lt' => ['name' => 'Palermas', 'description' => 'Sicilijos sostinė'],
-                    'en' => ['name' => 'Palermo', 'description' => 'Capital of Sicily']
-            ],
+                    'en' => ['name' => 'Palermo', 'description' => 'Capital of Sicily'],
+                ],
             ],
             [
                 'name' => 'Catania',
@@ -167,8 +167,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['95100'],
                 'translations' => [
                     'lt' => ['name' => 'Katanija', 'description' => 'Etna ugnikalnio miestas'],
-                    'en' => ['name' => 'Catania', 'description' => 'Mount Etna city']
-            ],
+                    'en' => ['name' => 'Catania', 'description' => 'Mount Etna city'],
+                ],
             ],
             [
                 'name' => 'Messina',
@@ -179,8 +179,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['98100'],
                 'translations' => [
                     'lt' => ['name' => 'Mesina', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Messina', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Messina', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Syracuse',
@@ -191,8 +191,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['96100'],
                 'translations' => [
                     'lt' => ['name' => 'Sirakūzai', 'description' => 'Senovinis miestas'],
-                    'en' => ['name' => 'Syracuse', 'description' => 'Ancient city']
-            ],
+                    'en' => ['name' => 'Syracuse', 'description' => 'Ancient city'],
+                ],
             ],
             // Veneto
             [
@@ -204,8 +204,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['30100'],
                 'translations' => [
                     'lt' => ['name' => 'Venecija', 'description' => 'Kanalų miestas'],
-                    'en' => ['name' => 'Venice', 'description' => 'City of canals']
-            ],
+                    'en' => ['name' => 'Venice', 'description' => 'City of canals'],
+                ],
             ],
             [
                 'name' => 'Verona',
@@ -216,8 +216,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['37100'],
                 'translations' => [
                     'lt' => ['name' => 'Verona', 'description' => 'Romeo ir Džuljetos miestas'],
-                    'en' => ['name' => 'Verona', 'description' => 'Romeo and Juliet city']
-            ],
+                    'en' => ['name' => 'Verona', 'description' => 'Romeo and Juliet city'],
+                ],
             ],
             [
                 'name' => 'Padua',
@@ -228,8 +228,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['35100'],
                 'translations' => [
                     'lt' => ['name' => 'Paduja', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Padua', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Padua', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Vicenza',
@@ -240,8 +240,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['36100'],
                 'translations' => [
                     'lt' => ['name' => 'Vičenca', 'description' => 'Palladio miestas'],
-                    'en' => ['name' => 'Vicenza', 'description' => 'Palladio city']
-            ],
+                    'en' => ['name' => 'Vicenza', 'description' => 'Palladio city'],
+                ],
             ],
             // Emilia-Romagna
             [
@@ -253,8 +253,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['40100'],
                 'translations' => [
                     'lt' => ['name' => 'Bolonija', 'description' => 'Emilijos-Romanijos sostinė'],
-                    'en' => ['name' => 'Bologna', 'description' => 'Capital of Emilia-Romagna']
-            ],
+                    'en' => ['name' => 'Bologna', 'description' => 'Capital of Emilia-Romagna'],
+                ],
             ],
             [
                 'name' => 'Modena',
@@ -265,8 +265,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['41100'],
                 'translations' => [
                     'lt' => ['name' => 'Modena', 'description' => 'Automobilių pramonės centras'],
-                    'en' => ['name' => 'Modena', 'description' => 'Automotive industry center']
-            ],
+                    'en' => ['name' => 'Modena', 'description' => 'Automotive industry center'],
+                ],
             ],
             [
                 'name' => 'Parma',
@@ -277,8 +277,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['43100'],
                 'translations' => [
                     'lt' => ['name' => 'Parma', 'description' => 'Maisto pramonės centras'],
-                    'en' => ['name' => 'Parma', 'description' => 'Food industry center']
-            ],
+                    'en' => ['name' => 'Parma', 'description' => 'Food industry center'],
+                ],
             ],
             [
                 'name' => 'Reggio Emilia',
@@ -289,8 +289,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['42100'],
                 'translations' => [
                     'lt' => ['name' => 'Redžo Emilija', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Reggio Emilia', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Reggio Emilia', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Ravenna',
@@ -301,8 +301,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['48100'],
                 'translations' => [
                     'lt' => ['name' => 'Ravena', 'description' => 'Bizantijos miestas'],
-                    'en' => ['name' => 'Ravenna', 'description' => 'Byzantine city']
-            ],
+                    'en' => ['name' => 'Ravenna', 'description' => 'Byzantine city'],
+                ],
             ],
             // Piedmont
             [
@@ -314,8 +314,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['10100'],
                 'translations' => [
                     'lt' => ['name' => 'Torinas', 'description' => 'Pjemonto sostinė'],
-                    'en' => ['name' => 'Turin', 'description' => 'Capital of Piedmont']
-            ],
+                    'en' => ['name' => 'Turin', 'description' => 'Capital of Piedmont'],
+                ],
             ],
             [
                 'name' => 'Novara',
@@ -326,8 +326,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['28100'],
                 'translations' => [
                     'lt' => ['name' => 'Novara', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Novara', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Novara', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Alessandria',
@@ -338,8 +338,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['15100'],
                 'translations' => [
                     'lt' => ['name' => 'Aleksandrija', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Alessandria', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Alessandria', 'description' => 'Historic city'],
+                ],
             ],
             // Apulia
             [
@@ -351,8 +351,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['70100'],
                 'translations' => [
                     'lt' => ['name' => 'Bari', 'description' => 'Apulijos sostinė'],
-                    'en' => ['name' => 'Bari', 'description' => 'Capital of Apulia']
-            ],
+                    'en' => ['name' => 'Bari', 'description' => 'Capital of Apulia'],
+                ],
             ],
             [
                 'name' => 'Taranto',
@@ -363,8 +363,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['74100'],
                 'translations' => [
                     'lt' => ['name' => 'Tarantas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Taranto', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Taranto', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Foggia',
@@ -375,8 +375,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['71100'],
                 'translations' => [
                     'lt' => ['name' => 'Fodžija', 'description' => 'Žemės ūkio centras'],
-                    'en' => ['name' => 'Foggia', 'description' => 'Agricultural center']
-            ],
+                    'en' => ['name' => 'Foggia', 'description' => 'Agricultural center'],
+                ],
             ],
             // Tuscany
             [
@@ -388,8 +388,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['50100'],
                 'translations' => [
                     'lt' => ['name' => 'Florencija', 'description' => 'Toskanos sostinė'],
-                    'en' => ['name' => 'Florence', 'description' => 'Capital of Tuscany']
-            ],
+                    'en' => ['name' => 'Florence', 'description' => 'Capital of Tuscany'],
+                ],
             ],
             [
                 'name' => 'Pisa',
@@ -400,8 +400,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['56100'],
                 'translations' => [
                     'lt' => ['name' => 'Piza', 'description' => 'Kreivosios bokšto miestas'],
-                    'en' => ['name' => 'Pisa', 'description' => 'Leaning tower city']
-            ],
+                    'en' => ['name' => 'Pisa', 'description' => 'Leaning tower city'],
+                ],
             ],
             [
                 'name' => 'Siena',
@@ -412,8 +412,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['53100'],
                 'translations' => [
                     'lt' => ['name' => 'Siena', 'description' => 'UNESCO miestas'],
-                    'en' => ['name' => 'Siena', 'description' => 'UNESCO city']
-            ],
+                    'en' => ['name' => 'Siena', 'description' => 'UNESCO city'],
+                ],
             ],
             [
                 'name' => 'Livorno',
@@ -424,8 +424,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['57100'],
                 'translations' => [
                     'lt' => ['name' => 'Livornas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Livorno', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Livorno', 'description' => 'Port city'],
+                ],
             ],
             // Calabria
             [
@@ -437,8 +437,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['89100'],
                 'translations' => [
                     'lt' => ['name' => 'Redžo Kalabrija', 'description' => 'Kalabrijos sostinė'],
-                    'en' => ['name' => 'Reggio Calabria', 'description' => 'Capital of Calabria']
-            ],
+                    'en' => ['name' => 'Reggio Calabria', 'description' => 'Capital of Calabria'],
+                ],
             ],
             [
                 'name' => 'Catanzaro',
@@ -449,8 +449,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['88100'],
                 'translations' => [
                     'lt' => ['name' => 'Katancaras', 'description' => 'Administracinis centras'],
-                    'en' => ['name' => 'Catanzaro', 'description' => 'Administrative center']
-            ],
+                    'en' => ['name' => 'Catanzaro', 'description' => 'Administrative center'],
+                ],
             ],
             // Sardinia
             [
@@ -462,8 +462,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['09100'],
                 'translations' => [
                     'lt' => ['name' => 'Kaljaris', 'description' => 'Sardinijos sostinė'],
-                    'en' => ['name' => 'Cagliari', 'description' => 'Capital of Sardinia']
-            ],
+                    'en' => ['name' => 'Cagliari', 'description' => 'Capital of Sardinia'],
+                ],
             ],
             [
                 'name' => 'Sassari',
@@ -474,8 +474,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['07100'],
                 'translations' => [
                     'lt' => ['name' => 'Sasaris', 'description' => 'Šiaurės Sardinijos centras'],
-                    'en' => ['name' => 'Sassari', 'description' => 'Center of Northern Sardinia']
-            ],
+                    'en' => ['name' => 'Sassari', 'description' => 'Center of Northern Sardinia'],
+                ],
             ],
             // Liguria
             [
@@ -487,8 +487,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['16100'],
                 'translations' => [
                     'lt' => ['name' => 'Genuja', 'description' => 'Ligūrijos sostinė'],
-                    'en' => ['name' => 'Genoa', 'description' => 'Capital of Liguria']
-            ],
+                    'en' => ['name' => 'Genoa', 'description' => 'Capital of Liguria'],
+                ],
             ],
             // Marche
             [
@@ -500,8 +500,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['60100'],
                 'translations' => [
                     'lt' => ['name' => 'Ankona', 'description' => 'Markės sostinė'],
-                    'en' => ['name' => 'Ancona', 'description' => 'Capital of Marche']
-            ],
+                    'en' => ['name' => 'Ancona', 'description' => 'Capital of Marche'],
+                ],
             ],
             // Abruzzo
             [
@@ -513,8 +513,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['67100'],
                 'translations' => [
                     'lt' => ['name' => "L'Akila", 'description' => 'Abruco sostinė'],
-                    'en' => ['name' => "L'Aquila", 'description' => 'Capital of Abruzzo']
-            ],
+                    'en' => ['name' => "L'Aquila", 'description' => 'Capital of Abruzzo'],
+                ],
             ],
             // Friuli-Venezia Giulia
             [
@@ -526,8 +526,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['34100'],
                 'translations' => [
                     'lt' => ['name' => 'Triestas', 'description' => 'Friulio-Venecijos Džulijos sostinė'],
-                    'en' => ['name' => 'Trieste', 'description' => 'Capital of Friuli-Venezia Giulia']
-            ],
+                    'en' => ['name' => 'Trieste', 'description' => 'Capital of Friuli-Venezia Giulia'],
+                ],
             ],
             // Trentino-Alto Adige
             [
@@ -539,8 +539,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['38100'],
                 'translations' => [
                     'lt' => ['name' => 'Trentas', 'description' => 'Trentino-Alto Adidžės sostinė'],
-                    'en' => ['name' => 'Trento', 'description' => 'Capital of Trentino-Alto Adige']
-            ],
+                    'en' => ['name' => 'Trento', 'description' => 'Capital of Trentino-Alto Adige'],
+                ],
             ],
             // Umbria
             [
@@ -552,8 +552,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['06100'],
                 'translations' => [
                     'lt' => ['name' => 'Perudžija', 'description' => 'Umbrijos sostinė'],
-                    'en' => ['name' => 'Perugia', 'description' => 'Capital of Umbria']
-            ],
+                    'en' => ['name' => 'Perugia', 'description' => 'Capital of Umbria'],
+                ],
             ],
             // Basilicata
             [
@@ -565,8 +565,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['85100'],
                 'translations' => [
                     'lt' => ['name' => 'Potenca', 'description' => 'Bazilikatos sostinė'],
-                    'en' => ['name' => 'Potenza', 'description' => 'Capital of Basilicata']
-            ],
+                    'en' => ['name' => 'Potenza', 'description' => 'Capital of Basilicata'],
+                ],
             ],
             // Molise
             [
@@ -578,8 +578,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['86100'],
                 'translations' => [
                     'lt' => ['name' => 'Kampobasas', 'description' => 'Molizės sostinė'],
-                    'en' => ['name' => 'Campobasso', 'description' => 'Capital of Molise']
-            ],
+                    'en' => ['name' => 'Campobasso', 'description' => 'Capital of Molise'],
+                ],
             ],
             // Valle d\'Aosta
             [
@@ -591,8 +591,8 @@ final class ItalyCitiesSeeder extends Seeder
                 'postal_codes' => ['11100'],
                 'translations' => [
                     'lt' => ['name' => 'Aosta', 'description' => "Valle d'Aostos sostinė"],
-                    'en' => ['name' => 'Aosta', 'description' => "Capital of Valle d'Aosta"]
-            ],
+                    'en' => ['name' => 'Aosta', 'description' => "Capital of Valle d'Aosta"],
+                ],
             ],
         ];
 
@@ -601,7 +601,7 @@ final class ItalyCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -621,8 +621,8 @@ final class ItalyCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

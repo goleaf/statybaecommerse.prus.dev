@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Translations\BrandTranslation;
+declare(strict_types=1);
+
 use App\Models\Brand;
+use App\Models\Translations\BrandTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -29,7 +31,7 @@ describe('BrandTranslation Model', function () {
     });
 
     it('has correct fillable attributes', function () {
-        $translation = new BrandTranslation();
+        $translation = new BrandTranslation;
         $fillable = $translation->getFillable();
 
         expect($fillable)->toContain(

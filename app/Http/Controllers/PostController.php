@@ -1,24 +1,23 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Services\PaginationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 /**
  * PostController
- * 
+ *
  * HTTP controller handling PostController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class PostController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -39,12 +38,12 @@ final class PostController extends Controller
             });
         }
         $posts = PaginationService::paginateWithContext($query, 'posts');
+
         return view('posts.index', compact('posts'));
     }
+
     /**
      * Display the specified resource with related data.
-     * @param Post $post
-     * @return View
      */
     public function show(Post $post): View
     {
@@ -59,33 +58,33 @@ final class PostController extends Controller
             // Skip related posts that are not properly configured for display
             return empty($relatedPost->title) || empty($relatedPost->slug) || $relatedPost->status !== 'published' || empty($relatedPost->excerpt);
         });
+
         return view('posts.show', compact('post', 'relatedPosts'));
     }
+
     /**
      * Handle featured functionality with proper error handling.
-     * @return View
      */
     public function featured(): View
     {
         $posts = PaginationService::paginateWithContext(Post::published()->featured()->with('user')->latest('published_at'), 'posts');
+
         return view('posts.featured', compact('posts'));
     }
+
     /**
      * Handle byAuthor functionality with proper error handling.
-     * @param Request $request
-     * @param int $authorId
-     * @return View
      */
     public function byAuthor(Request $request, int $authorId): View
     {
         $posts = Post::published()->byAuthor($authorId)->with('user')->latest('published_at')->paginate(12);
         $author = $posts->first()?->user;
+
         return view('posts.by-author', compact('posts', 'author'));
     }
+
     /**
      * Handle search functionality with proper error handling.
-     * @param Request $request
-     * @return View
      */
     public function search(Request $request): View
     {
@@ -98,6 +97,7 @@ final class PostController extends Controller
         }
         $posts = $query->paginate(12);
         $searchTerm = $request->q;
+
         return view('posts.search', compact('posts', 'searchTerm'));
     }
 }

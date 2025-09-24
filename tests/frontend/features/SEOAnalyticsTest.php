@@ -1,11 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Filament\Pages\SEOAnalytics;
+declare(strict_types=1);
+
 use App\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-
-use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
     $permissions = [
@@ -50,5 +49,3 @@ it('resolves route name and returns 200', function (): void {
 });
 
 // Table rendering is covered in other Filament resource tests. Here we focus on routing/auth.
-
-

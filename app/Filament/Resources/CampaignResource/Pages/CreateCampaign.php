@@ -21,7 +21,7 @@ final class CreateCampaign extends CreateRecord
     {
         $data['is_active'] = $data['is_active'] ?? true;
 
-        if (empty($data['slug']) && !empty($data['name'])) {
+        if (empty($data['slug']) && ! empty($data['name'])) {
             $data['slug'] = Str::slug((string) $data['name']);
         }
 

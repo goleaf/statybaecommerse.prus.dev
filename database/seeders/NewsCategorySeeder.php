@@ -14,8 +14,8 @@ final class NewsCategorySeeder extends Seeder
     public function run(): void
     {
         $supportedLocales = config('app.supported_locales', 'lt,en');
-        $locales = collect(is_array($supportedLocales) 
-            ? $supportedLocales 
+        $locales = collect(is_array($supportedLocales)
+            ? $supportedLocales
             : array_filter(array_map('trim', explode(',', (string) $supportedLocales))))
             ->map(fn ($v) => trim((string) $v))
             ->filter()

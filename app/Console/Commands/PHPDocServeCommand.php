@@ -28,42 +28,44 @@ class PHPDocServeCommand extends Command
     {
         $port = $this->option('port');
         $host = $this->option('host');
-        
+
         $htmlDir = base_path('docs/html');
-        
-        if (!File::isDirectory($htmlDir)) {
+
+        if (! File::isDirectory($htmlDir)) {
             $this->error('❌ Documentation not found. Please generate it first:');
             $this->line('   php artisan docs:generate');
+
             return Command::FAILURE;
         }
 
         // Check if port is available
-        if (!$this->isPortAvailable($host, (int) $port)) {
+        if (! $this->isPortAvailable($host, (int) $port)) {
             $this->error("❌ Port {$port} is already in use. Please choose a different port.");
+
             return Command::FAILURE;
         }
 
-        $this->info("🌐 Starting PHPDoc documentation server...");
+        $this->info('🌐 Starting PHPDoc documentation server...');
         $this->newLine();
-        
+
         $this->line("📂 Serving from: {$htmlDir}");
         $this->line("🔗 URL: http://{$host}:{$port}");
-        $this->line("⏹️  Press Ctrl+C to stop");
+        $this->line('⏹️  Press Ctrl+C to stop');
         $this->newLine();
 
         // Show some documentation stats
         $this->showDocumentationStats($htmlDir);
 
         $this->newLine();
-        $this->info("🚀 Server starting...");
+        $this->info('🚀 Server starting...');
         $this->newLine();
 
         // Start the server
-        $command = "cd " . escapeshellarg($htmlDir) . " && php -S {$host}:{$port}";
-        
+        $command = 'cd '.escapeshellarg($htmlDir)." && php -S {$host}:{$port}";
+
         // Use passthru to show server output
         passthru($command);
-        
+
         return Command::SUCCESS;
     }
 
@@ -73,12 +75,13 @@ class PHPDocServeCommand extends Command
     private function isPortAvailable(string $host, int $port): bool
     {
         $connection = @fsockopen($host, $port, $errno, $errstr, 1);
-        
+
         if ($connection) {
             fclose($connection);
+
             return false; // Port is in use
         }
-        
+
         return true; // Port is available
     }
 
@@ -101,9 +104,9 @@ class PHPDocServeCommand extends Command
             }
         }
 
-        $this->line("📊 Documentation Statistics:");
+        $this->line('📊 Documentation Statistics:');
         $this->line("  • Files: {$fileCount}");
-        $this->line("  • Size: " . $this->formatBytes($totalSize));
+        $this->line('  • Size: '.$this->formatBytes($totalSize));
     }
 
     /**
@@ -117,6 +120,6 @@ class PHPDocServeCommand extends Command
             $bytes /= 1024;
         }
 
-        return round($bytes, $precision) . ' ' . $units[$i];
+        return round($bytes, $precision).' '.$units[$i];
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
@@ -63,22 +65,22 @@ final class VariantBulkPriceUpdate extends Action
                         'increase_by_fixed_amount' => __('product_variants.compare_price_actions.increase_by_fixed_amount'),
                     ])
                     ->default('no_change')
-                    ->visible(fn(callable $get) => $get('update_compare_price')),
+                    ->visible(fn (callable $get) => $get('update_compare_price')),
                 TextInput::make('compare_price_value')
                     ->label(__('product_variants.fields.compare_price_value'))
                     ->numeric()
                     ->step(0.01)
-                    ->visible(fn(callable $get) => $get('update_compare_price') && in_array($get('compare_price_action'), ['increase_by_percentage', 'increase_by_fixed_amount'])),
+                    ->visible(fn (callable $get) => $get('update_compare_price') && in_array($get('compare_price_action'), ['increase_by_percentage', 'increase_by_fixed_amount'])),
                 Toggle::make('set_sale_period')
                     ->label(__('product_variants.fields.set_sale_period'))
                     ->default(false),
                 DateTimePicker::make('sale_start_date')
                     ->label(__('product_variants.fields.sale_start_date'))
-                    ->visible(fn(callable $get) => $get('set_sale_period'))
+                    ->visible(fn (callable $get) => $get('set_sale_period'))
                     ->default(now()),
                 DateTimePicker::make('sale_end_date')
                     ->label(__('product_variants.fields.sale_end_date'))
-                    ->visible(fn(callable $get) => $get('set_sale_period'))
+                    ->visible(fn (callable $get) => $get('set_sale_period'))
                     ->default(now()->addDays(30)),
                 Textarea::make('change_reason')
                     ->label(__('product_variants.fields.change_reason'))
@@ -95,8 +97,9 @@ final class VariantBulkPriceUpdate extends Action
                         /** @var ProductVariant $record */
 
                         // Skip sale items if not applying to them
-                        if (!$data['apply_to_sale_items'] && $record->is_on_sale) {
+                        if (! $data['apply_to_sale_items'] && $record->is_on_sale) {
                             $skippedCount++;
+
                             continue;
                         }
 
@@ -172,7 +175,7 @@ final class VariantBulkPriceUpdate extends Action
                         ->title(__('product_variants.notifications.bulk_update_success'))
                         ->body(__('product_variants.notifications.bulk_update_success_body', [
                             'updated' => $updatedCount,
-                            'skipped' => $skippedCount
+                            'skipped' => $skippedCount,
                         ]))
                         ->success()
                         ->send();

@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
             $table->foreignId('discount_id')->constrained('discounts')->cascadeOnDelete();
             $table->timestamps();
-            
+
             // Add unique constraint to prevent duplicate relationships
             $table->unique(['campaign_id', 'discount_id']);
-            
+
             // Add indexes for better performance
             $table->index(['campaign_id']);
             $table->index(['discount_id']);

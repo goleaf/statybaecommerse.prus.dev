@@ -1,12 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\ProductVariant;
-use App\Models\VariantAnalytics;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Illuminate\Support\Facades\DB;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 final class VariantAnalyticsWidget extends BaseWidget
 {
@@ -52,7 +52,7 @@ final class VariantAnalyticsWidget extends BaseWidget
                 ->description(__('product_variants.stats.variant_selections'))
                 ->descriptionIcon('heroicon-m-cursor-arrow-rays')
                 ->color('info'),
-            Stat::make(__('product_variants.stats.conversion_rate'), number_format($avgConversionRate, 2) . '%')
+            Stat::make(__('product_variants.stats.conversion_rate'), number_format($avgConversionRate, 2).'%')
                 ->description(__('product_variants.stats.views_to_sales'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color($avgConversionRate > 5 ? 'success' : ($avgConversionRate > 2 ? 'warning' : 'danger')),

@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
 use App\Models\Slider;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 final class SliderAnalyticsTest extends TestCase
 {
@@ -190,7 +191,7 @@ final class SliderAnalyticsTest extends TestCase
 
     public function test_slider_analytics_page_has_correct_properties(): void
     {
-        $page = new \App\Filament\Pages\SliderAnalytics();
+        $page = new \App\Filament\Pages\SliderAnalytics;
 
         $this->assertEquals('Slider Analytics', $page->getTitle());
         $this->assertEquals('Slider Performance Analytics', $page->getHeading());

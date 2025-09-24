@@ -30,7 +30,7 @@ final class GenerateReportsCommand extends Command
         $this->info('🚀 Starting report generation with timeout protection...');
 
         // Ensure output directory exists
-        if (!Storage::exists($outputDir)) {
+        if (! Storage::exists($outputDir)) {
             Storage::makeDirectory($outputDir);
         }
 
@@ -58,8 +58,8 @@ final class GenerateReportsCommand extends Command
             $duration = microtime(true) - $startTime;
 
             $this->info('✅ Report generation completed!');
-            $this->info("⏱️  Total time: " . round($duration, 2) . " seconds");
-            $this->info("📊 Generated reports: " . count($generatedReports));
+            $this->info('⏱️  Total time: '.round($duration, 2).' seconds');
+            $this->info('📊 Generated reports: '.count($generatedReports));
 
             foreach ($generatedReports as $report) {
                 $this->line("  📄 {$report['name']} - {$report['size']} bytes");
@@ -68,7 +68,8 @@ final class GenerateReportsCommand extends Command
             return self::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('❌ Report generation failed: ' . $e->getMessage());
+            $this->error('❌ Report generation failed: '.$e->getMessage());
+
             return self::FAILURE;
         }
     }
@@ -81,23 +82,23 @@ final class GenerateReportsCommand extends Command
         array &$generatedReports
     ): void {
         $this->info('📈 Generating sales report...');
-        
+
         $data = $reportService->generateSalesReport($filters);
-        $filename = 'sales_report_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
-        $filepath = $outputDir . '/' . $filename;
-        
-        $content = $format === 'json' 
+        $filename = 'sales_report_'.now()->format('Y-m-d_H-i-s').'.'.$format;
+        $filepath = $outputDir.'/'.$filename;
+
+        $content = $format === 'json'
             ? json_encode($data, JSON_PRETTY_PRINT)
             : $this->arrayToCsv($data['daily_data']);
-            
+
         Storage::put($filepath, $content);
-        
+
         $generatedReports[] = [
             'name' => $filename,
             'size' => strlen($content),
             'type' => 'sales',
         ];
-        
+
         $this->info("✅ Sales report generated: {$filename}");
     }
 
@@ -109,23 +110,23 @@ final class GenerateReportsCommand extends Command
         array &$generatedReports
     ): void {
         $this->info('📦 Generating product analytics report...');
-        
+
         $data = $reportService->generateProductAnalyticsReport($filters);
-        $filename = 'product_analytics_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
-        $filepath = $outputDir . '/' . $filename;
-        
-        $content = $format === 'json' 
+        $filename = 'product_analytics_'.now()->format('Y-m-d_H-i-s').'.'.$format;
+        $filepath = $outputDir.'/'.$filename;
+
+        $content = $format === 'json'
             ? json_encode($data, JSON_PRETTY_PRINT)
             : $this->arrayToCsv($data['products']);
-            
+
         Storage::put($filepath, $content);
-        
+
         $generatedReports[] = [
             'name' => $filename,
             'size' => strlen($content),
             'type' => 'products',
         ];
-        
+
         $this->info("✅ Product analytics report generated: {$filename}");
     }
 
@@ -137,23 +138,23 @@ final class GenerateReportsCommand extends Command
         array &$generatedReports
     ): void {
         $this->info('👥 Generating user activity report...');
-        
+
         $data = $reportService->generateUserActivityReport($filters);
-        $filename = 'user_activity_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
-        $filepath = $outputDir . '/' . $filename;
-        
-        $content = $format === 'json' 
+        $filename = 'user_activity_'.now()->format('Y-m-d_H-i-s').'.'.$format;
+        $filepath = $outputDir.'/'.$filename;
+
+        $content = $format === 'json'
             ? json_encode($data, JSON_PRETTY_PRINT)
             : $this->arrayToCsv($data['user_activity']);
-            
+
         Storage::put($filepath, $content);
-        
+
         $generatedReports[] = [
             'name' => $filename,
             'size' => strlen($content),
             'type' => 'users',
         ];
-        
+
         $this->info("✅ User activity report generated: {$filename}");
     }
 
@@ -164,23 +165,23 @@ final class GenerateReportsCommand extends Command
         array &$generatedReports
     ): void {
         $this->info('🔧 Generating system report...');
-        
+
         $data = $reportService->generateSystemReport();
-        $filename = 'system_report_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
-        $filepath = $outputDir . '/' . $filename;
-        
-        $content = $format === 'json' 
+        $filename = 'system_report_'.now()->format('Y-m-d_H-i-s').'.'.$format;
+        $filepath = $outputDir.'/'.$filename;
+
+        $content = $format === 'json'
             ? json_encode($data, JSON_PRETTY_PRINT)
             : $this->arrayToCsv($this->flattenSystemReport($data));
-            
+
         Storage::put($filepath, $content);
-        
+
         $generatedReports[] = [
             'name' => $filename,
             'size' => strlen($content),
             'type' => 'system',
         ];
-        
+
         $this->info("✅ System report generated: {$filename}");
     }
 
@@ -204,26 +205,26 @@ final class GenerateReportsCommand extends Command
         }
 
         $output = fopen('php://temp', 'r+');
-        
+
         // Add headers
         fputcsv($output, array_keys($data[0]));
-        
+
         // Add data rows
         foreach ($data as $row) {
             fputcsv($output, $row);
         }
-        
+
         rewind($output);
         $csv = stream_get_contents($output);
         fclose($output);
-        
+
         return $csv;
     }
 
     private function flattenSystemReport(array $data): array
     {
         $flattened = [];
-        
+
         foreach ($data['sections'] as $sectionName => $sectionData) {
             if (is_array($sectionData)) {
                 foreach ($sectionData as $key => $value) {
@@ -235,7 +236,7 @@ final class GenerateReportsCommand extends Command
                 }
             }
         }
-        
+
         return $flattened;
     }
 }

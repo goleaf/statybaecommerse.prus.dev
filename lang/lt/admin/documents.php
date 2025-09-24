@@ -72,5 +72,3 @@ return [
     'published_successfully' => 'Dokumentas sėkmingai paskelbtas',
     'archived_successfully' => 'Dokumentas sėkmingai archyvuotas',
 ];
-
-

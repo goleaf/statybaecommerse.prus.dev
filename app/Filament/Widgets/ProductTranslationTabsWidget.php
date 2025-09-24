@@ -1,12 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Services\MultiLanguageTabService;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Widgets\TabsWidget as BaseWidget;
-use Filament\Forms;
 
 final class ProductTranslationTabsWidget extends BaseWidget
 {
@@ -54,8 +54,8 @@ final class ProductTranslationTabsWidget extends BaseWidget
                     'type' => 'rich_editor',
                     'label' => __('translations.description'),
                     'toolbar' => [
-                        'bold', 'italic', 'link', 'bulletList', 'orderedList', 
-                        'h2', 'h3', 'blockquote', 'codeBlock', 'table'
+                        'bold', 'italic', 'link', 'bulletList', 'orderedList',
+                        'h2', 'h3', 'blockquote', 'codeBlock', 'table',
                     ],
                 ],
             ],

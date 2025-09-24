@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignProductTargetResource\Pages;
 
 use App\Filament\Resources\CampaignProductTargetResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
 class EditCampaignProductTarget extends EditRecord
 {
@@ -17,4 +19,3 @@ class EditCampaignProductTarget extends EditRecord
         ];
     }
 }
-

@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\ProductVariant;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
 final class VariantStockWidget extends BaseWidget
@@ -53,7 +55,7 @@ final class VariantStockWidget extends BaseWidget
                 ->description(__('product_variants.stats.unavailable_variants'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            Stat::make(__('product_variants.stats.stock_value'), '€' . number_format($stockValue, 2))
+            Stat::make(__('product_variants.stats.stock_value'), '€'.number_format($stockValue, 2))
                 ->description(__('product_variants.stats.total_inventory_value'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('primary'),

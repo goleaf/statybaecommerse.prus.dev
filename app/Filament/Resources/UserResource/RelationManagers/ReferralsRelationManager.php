@@ -1,35 +1,36 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 final class ReferralsRelationManager extends RelationManager
 {
     protected static string $relationship = 'referrals';
+
     protected static ?string $title = 'admin.sections.referrals';
 
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Forms\Components\Select::make('referred_id')
                     ->relationship('referred', 'name')
-                    ->required(),
-                    ->searchable(),
+                    ->required()
+                    ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('reward_amount')
-                    ->numeric(),
-                    ->prefix('€'),
+                    ->numeric()
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\Select::make('status')
                     ->options([
@@ -48,17 +49,18 @@ final class ReferralsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('referred.name')
                     ->label(__('admin.fields.referred_user'))
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('referred.email')
                     ->label(__('admin.fields.referred_email'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('reward_amount')
                     ->label(__('admin.fields.reward_amount'))
-                    ->money('EUR'),
+                    ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('admin.fields.status'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'completed' => 'success',
@@ -67,7 +69,7 @@ final class ReferralsRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))
-                    ->dateTime(),
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([

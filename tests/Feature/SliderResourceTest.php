@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -6,7 +8,6 @@ use App\Models\Slider;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 final class SliderResourceTest extends TestCase
 {
@@ -212,7 +213,7 @@ final class SliderResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('sliders', [
-            'title' => $slider->title . ' (Copy)',
+            'title' => $slider->title.' (Copy)',
         ]);
     }
 

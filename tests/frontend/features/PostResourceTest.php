@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use App\Filament\Resources\PostResource;
 use App\Filament\Resources\PostResource\Pages\CreatePost;
 use App\Filament\Resources\PostResource\Pages\EditPost;
 use App\Filament\Resources\PostResource\Pages\ListPosts;
 use App\Filament\Resources\PostResource\Pages\ViewPost;
-use App\Filament\Resources\PostResource;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -282,4 +284,3 @@ it('can access post resource pages with record', function () {
     $this->get(PostResource::getUrl('view', ['record' => $post]))->assertOk();
     $this->get(PostResource::getUrl('edit', ['record' => $post]))->assertOk();
 });
-

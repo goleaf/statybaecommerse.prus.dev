@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class Slider extends Model implements HasMedia
 {
@@ -47,7 +49,7 @@ final class Slider extends Model implements HasMedia
             ->useDisk('public');
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this
             ->addMediaConversion('thumb')
@@ -93,39 +95,45 @@ final class Slider extends Model implements HasMedia
         return $this->hasMany(SliderTranslation::class);
     }
 
-    public function translation(string $locale = null): ?SliderTranslation
+    public function translation(?string $locale = null): ?SliderTranslation
     {
         $locale = $locale ?: app()->getLocale();
+
         return $this->translations()->where('locale', $locale)->first();
     }
 
-    public function getTranslatedTitle(string $locale = null): string
+    public function getTranslatedTitle(?string $locale = null): string
     {
         $translation = $this->translation($locale);
+
         return $translation?->title ?? $this->title;
     }
 
-    public function getTranslatedDescription(string $locale = null): ?string
+    public function getTranslatedDescription(?string $locale = null): ?string
     {
         $translation = $this->translation($locale);
+
         return $translation?->description ?? $this->description;
     }
 
-    public function getTranslatedButtonText(string $locale = null): ?string
+    public function getTranslatedButtonText(?string $locale = null): ?string
     {
         $translation = $this->translation($locale);
+
         return $translation?->button_text ?? $this->button_text;
     }
 
     public function getImageUrl(string $conversion = 'slider'): ?string
     {
         $media = $this->getFirstMedia('slider_images');
+
         return $media ? $media->getUrl($conversion) : null;
     }
 
     public function getBackgroundImageUrl(string $conversion = 'slider'): ?string
     {
         $media = $this->getFirstMedia('slider_backgrounds');
+
         return $media ? $media->getUrl($conversion) : null;
     }
 
@@ -139,17 +147,17 @@ final class Slider extends Model implements HasMedia
         return $this->getFirstMedia('slider_backgrounds') !== null;
     }
 
-    public function getDisplayTitle(string $locale = null): string
+    public function getDisplayTitle(?string $locale = null): string
     {
         return $this->getTranslatedTitle($locale) ?: 'Untitled Slider';
     }
 
-    public function getDisplayDescription(string $locale = null): ?string
+    public function getDisplayDescription(?string $locale = null): ?string
     {
         return $this->getTranslatedDescription($locale);
     }
 
-    public function getDisplayButtonText(string $locale = null): ?string
+    public function getDisplayButtonText(?string $locale = null): ?string
     {
         return $this->getTranslatedButtonText($locale);
     }

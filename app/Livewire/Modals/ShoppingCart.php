@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Modals;
 
 use Darryldecode\Cart\CartCollection;
@@ -8,11 +9,12 @@ use Darryldecode\Cart\Facades\CartFacade;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Laravelcm\LivewireSlideOvers\SlideOverComponent;
+
 /**
  * ShoppingCart
- * 
+ *
  * Livewire component for ShoppingCart with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property float $subtotal
  * @property CartCollection $items
  * @property string|null $sessionKey
@@ -20,19 +22,21 @@ use Laravelcm\LivewireSlideOvers\SlideOverComponent;
 class ShoppingCart extends SlideOverComponent
 {
     public float $subtotal = 0;
+
     public CartCollection $items;
+
     public ?string $sessionKey = null;
+
     /**
      * Handle panelMaxWidth functionality with proper error handling.
-     * @return string
      */
     public static function panelMaxWidth(): string
     {
         return 'lg';
     }
+
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -41,19 +45,18 @@ class ShoppingCart extends SlideOverComponent
         $this->items = CartFacade::session($sessionKey)->getContent();
         $this->subtotal = CartFacade::session($sessionKey)->getSubTotal();
     }
+
     /**
      * Handle cartUpdated functionality with proper error handling.
-     * @return void
      */
     public function cartUpdated(): void
     {
         $this->items = CartFacade::session($this->sessionKey)->getContent();
         $this->subtotal = CartFacade::session($this->sessionKey)->getSubTotal();
     }
+
     /**
      * Handle removeToCart functionality with proper error handling.
-     * @param int $id
-     * @return void
      */
     public function removeToCart(int $id): void
     {
@@ -62,9 +65,9 @@ class ShoppingCart extends SlideOverComponent
         $this->dispatch('cartUpdated');
         $this->dispatch('closePanel');
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

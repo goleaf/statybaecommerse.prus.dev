@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class OrdersChartWidget extends ChartWidget
 {
@@ -12,13 +13,19 @@ final class OrdersChartWidget extends ChartWidget
 
     public function getHeading(): ?string
     {
-        return 'Orders Overview';
+        return __('analytics.orders_overview');
+    }
+
+    public function getDescription(): ?string
+    {
+        return __('analytics.orders_and_revenue_trends');
     }
 
     public function getData(): array
     {
         $data = collect(range(0, 11))->map(function ($month) {
             $date = now()->subMonths($month);
+
             return [
                 'month' => $date->format('M Y'),
                 'orders' => Order::whereMonth('created_at', $date->month)

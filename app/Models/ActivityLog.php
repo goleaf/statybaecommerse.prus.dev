@@ -1,13 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 /**
  * ActivityLog
@@ -18,9 +18,11 @@ use Spatie\Activitylog\LogOptions;
  * @property mixed $casts
  * @property mixed $appends
  * @property mixed $table
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ActivityLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ActivityLog newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ActivityLog query()
+ *
  * @mixin \Eloquent
  */
 final class ActivityLog extends Model

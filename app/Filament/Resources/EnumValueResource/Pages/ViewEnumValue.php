@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\EnumValueResource\Pages;
 
 use App\Filament\Resources\EnumValueResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewEnumValue extends ViewRecord
 {
@@ -14,6 +16,7 @@ class ViewEnumValue extends ViewRecord
     {
         return [
             Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }

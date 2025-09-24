@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
 use Filament\Forms\Components\DatePicker;
@@ -11,6 +12,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -21,15 +23,17 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use UnitEnum;
 
 final class VariantStockHistoryResource extends Resource
 {
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'System';
+    }
+
     protected static ?string $model = VariantStockHistory::class;
-    // protected static $navigationIcon = 'heroicon-o-archive-box';
-    // protected static $navigationGroup = NavigationGroup::System;
+
     protected static ?int $navigationSort = 3;
 
     public static function getNavigationLabel(): string
@@ -49,78 +53,77 @@ final class VariantStockHistoryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $form
-            ->components([
-                Section::make(__('admin.variant_stock_histories.sections.basic_info'))
-                    ->description(__('admin.variant_stock_histories.sections.basic_info_description'))
-                    ->schema([
-                        Select::make('variant_id')
-                            ->label(__('admin.variant_stock_histories.fields.variant'))
-                            ->relationship('variant', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('old_quantity')
-                                    ->label(__('admin.variant_stock_histories.fields.old_quantity'))
-                                    ->numeric()
-                                    ->minValue(0),
-                                TextInput::make('new_quantity')
-                                    ->label(__('admin.variant_stock_histories.fields.new_quantity'))
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->required(),
-                            ]),
-                        TextInput::make('quantity_change')
-                            ->label(__('admin.variant_stock_histories.fields.quantity_change'))
-                            ->disabled(),
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('change_type')
-                                    ->label(__('admin.variant_stock_histories.fields.change_type'))
-                                    ->options([
-                                        'increase' => __('admin.variant_stock_histories.change_types.increase'),
-                                        'decrease' => __('admin.variant_stock_histories.change_types.decrease'),
-                                        'adjustment' => __('admin.variant_stock_histories.change_types.adjustment'),
-                                        'reserve' => __('admin.variant_stock_histories.change_types.reserve'),
-                                        'unreserve' => __('admin.variant_stock_histories.change_types.unreserve'),
-                                    ])
-                                    ->required(),
-                                Select::make('change_reason')
-                                    ->label(__('admin.variant_stock_histories.fields.change_reason'))
-                                    ->options([
-                                        'sale' => __('admin.variant_stock_histories.change_reasons.sale'),
-                                        'return' => __('admin.variant_stock_histories.change_reasons.return'),
-                                        'adjustment' => __('admin.variant_stock_histories.change_reasons.adjustment'),
-                                        'reserve' => __('admin.variant_stock_histories.change_reasons.reserve'),
-                                        'unreserve' => __('admin.variant_stock_histories.change_reasons.unreserve'),
-                                        'damage' => __('admin.variant_stock_histories.change_reasons.damage'),
-                                        'theft' => __('admin.variant_stock_histories.change_reasons.theft'),
-                                        'expired' => __('admin.variant_stock_histories.change_reasons.expired'),
-                                        'manual' => __('admin.variant_stock_histories.change_reasons.manual'),
-                                    ])
-                                    ->required(),
-                            ]),
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('changed_by')
-                                    ->label(__('admin.variant_stock_histories.fields.changed_by'))
-                                    ->relationship('changedBy', 'name')
-                                    ->searchable()
-                                    ->preload(),
-                                Select::make('reference_type')
-                                    ->label(__('admin.variant_stock_histories.fields.reference_type'))
-                                    ->options([
-                                        'order' => 'Order',
-                                        'reservation' => 'Reservation',
-                                    ]),
-                            ]),
-                        TextInput::make('reference_id')
-                            ->label(__('admin.variant_stock_histories.fields.reference_id'))
-                            ->numeric(),
-                    ]),
-            ]);
+        return $schema->schema([
+            Section::make(__('admin.variant_stock_histories.sections.basic_info'))
+                ->description(__('admin.variant_stock_histories.sections.basic_info_description'))
+                ->schema([
+                    Select::make('variant_id')
+                        ->label(__('admin.variant_stock_histories.fields.variant'))
+                        ->relationship('variant', 'name')
+                        ->required()
+                        ->searchable()
+                        ->preload(),
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('old_quantity')
+                                ->label(__('admin.variant_stock_histories.fields.old_quantity'))
+                                ->numeric()
+                                ->minValue(0),
+                            TextInput::make('new_quantity')
+                                ->label(__('admin.variant_stock_histories.fields.new_quantity'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->required(),
+                        ]),
+                    TextInput::make('quantity_change')
+                        ->label(__('admin.variant_stock_histories.fields.quantity_change'))
+                        ->disabled(),
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('change_type')
+                                ->label(__('admin.variant_stock_histories.fields.change_type'))
+                                ->options([
+                                    'increase' => __('admin.variant_stock_histories.change_types.increase'),
+                                    'decrease' => __('admin.variant_stock_histories.change_types.decrease'),
+                                    'adjustment' => __('admin.variant_stock_histories.change_types.adjustment'),
+                                    'reserve' => __('admin.variant_stock_histories.change_types.reserve'),
+                                    'unreserve' => __('admin.variant_stock_histories.change_types.unreserve'),
+                                ])
+                                ->required(),
+                            Select::make('change_reason')
+                                ->label(__('admin.variant_stock_histories.fields.change_reason'))
+                                ->options([
+                                    'sale' => __('admin.variant_stock_histories.change_reasons.sale'),
+                                    'return' => __('admin.variant_stock_histories.change_reasons.return'),
+                                    'adjustment' => __('admin.variant_stock_histories.change_reasons.adjustment'),
+                                    'reserve' => __('admin.variant_stock_histories.change_reasons.reserve'),
+                                    'unreserve' => __('admin.variant_stock_histories.change_reasons.unreserve'),
+                                    'damage' => __('admin.variant_stock_histories.change_reasons.damage'),
+                                    'theft' => __('admin.variant_stock_histories.change_reasons.theft'),
+                                    'expired' => __('admin.variant_stock_histories.change_reasons.expired'),
+                                    'manual' => __('admin.variant_stock_histories.change_reasons.manual'),
+                                ])
+                                ->required(),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('changed_by')
+                                ->label(__('admin.variant_stock_histories.fields.changed_by'))
+                                ->relationship('changedBy', 'name')
+                                ->searchable()
+                                ->preload(),
+                            Select::make('reference_type')
+                                ->label(__('admin.variant_stock_histories.fields.reference_type'))
+                                ->options([
+                                    'order' => 'Order',
+                                    'reservation' => 'Reservation',
+                                ]),
+                        ]),
+                    TextInput::make('reference_id')
+                        ->label(__('admin.variant_stock_histories.fields.reference_id'))
+                        ->numeric(),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -142,9 +145,10 @@ final class VariantStockHistoryResource extends Resource
                     ->getStateUsing(function ($record) {
                         $change = $record->new_quantity - $record->old_quantity;
                         $sign = $change >= 0 ? '+' : '';
-                        return $sign . $change;
+
+                        return $sign.$change;
                     })
-                    ->color(fn($state) => $state >= 0 ? 'success' : 'danger'),
+                    ->color(fn ($state) => $state >= 0 ? 'success' : 'danger'),
                 BadgeColumn::make('change_type')
                     ->label(__('admin.variant_stock_histories.fields.change_type'))
                     ->colors([
@@ -220,11 +224,11 @@ final class VariantStockHistoryResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn($query, $date) => $query->whereDate('created_at', '>=', $date),
+                                fn ($query, $date) => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn($query, $date) => $query->whereDate('created_at', '<=', $date),
+                                fn ($query, $date) => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])

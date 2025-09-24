@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemResource\Widgets;
 
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 final class SystemSettingStatsWidget extends BaseWidget
 {
@@ -48,7 +49,7 @@ final class SystemSettingStatsWidget extends BaseWidget
                 ->description('Security protected settings')
                 ->descriptionIcon('heroicon-m-shield-check')
                 ->color('danger'),
-            Stat::make('Cache Hit Rate', $cacheHitRate . '%')
+            Stat::make('Cache Hit Rate', $cacheHitRate.'%')
                 ->description('Cache performance')
                 ->descriptionIcon('heroicon-m-bolt')
                 ->color($cacheHitRate > 80 ? 'success' : ($cacheHitRate > 60 ? 'warning' : 'danger')),
@@ -66,6 +67,7 @@ final class SystemSettingStatsWidget extends BaseWidget
                 $cacheStats = $store->getStats();
                 if (isset($cacheStats['hits']) && isset($cacheStats['misses'])) {
                     $total = $cacheStats['hits'] + $cacheStats['misses'];
+
                     return $total > 0 ? round(($cacheStats['hits'] / $total) * 100) : 0;
                 }
             }

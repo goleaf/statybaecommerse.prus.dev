@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\EnumValueResource\Pages;
 
@@ -8,4 +10,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateEnumValue extends CreateRecord
 {
     protected static string $resource = EnumValueResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

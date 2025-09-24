@@ -1,26 +1,28 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class DiscountsRelationManager extends RelationManager
 {
     protected static string $relationship = 'discounts';
+
     protected static ?string $title = 'customer_groups.relation_discounts';
 
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required()\n                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('code')
                     ->maxLength(50),
             ]);
@@ -33,10 +35,13 @@ final class DiscountsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('discounts.name'))
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('code')
                     ->label(__('discounts.code'))
-                    ->sortable()\n                    ->badge()\n                    ->color('primary'),
+                    ->sortable()
+                    ->badge()
+                    ->color('primary'),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('discounts.type'))
                     ->color(fn (string $state): string => match ($state) {
@@ -47,7 +52,7 @@ final class DiscountsRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('discounts.value'))
-                    ->numeric(),
+                    ->numeric()
                     ->suffix(fn ($record) => $record->type === 'percentage' ? '%' : '€'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('discounts.is_active'))

@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -23,7 +22,7 @@ class CityFactory extends Factory
     public function definition(): array
     {
         $name = fake()->city();
-        
+
         return [
             'name' => $name,
             'slug' => Str::slug($name),
@@ -34,7 +33,6 @@ class CityFactory extends Factory
             'is_capital' => fake()->boolean(5),
             'is_active' => fake()->boolean(95),
             'country_id' => Country::factory(),
-            'zone_id' => Zone::factory(),
             'level' => fake()->numberBetween(0, 3),
             'latitude' => fake()->optional(0.8)->latitude(),
             'longitude' => fake()->optional(0.8)->longitude(),

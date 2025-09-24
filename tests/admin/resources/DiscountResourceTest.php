@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\DiscountResource\Pages\CreateDiscount;
 use App\Filament\Resources\DiscountResource\Pages\EditDiscount;
@@ -7,10 +9,7 @@ use App\Filament\Resources\DiscountResource\Pages\ViewDiscount;
 use App\Filament\Resources\DiscountResource\Widgets\DiscountChartWidget;
 use App\Filament\Resources\DiscountResource\Widgets\DiscountStatsWidget;
 use App\Filament\Resources\DiscountResource\Widgets\RecentRedemptionsWidget;
-use App\Filament\Resources\DiscountResource;
 use App\Models\Discount;
-use App\Models\DiscountCode;
-use App\Models\DiscountCondition;
 use App\Models\DiscountRedemption;
 use App\Models\User;
 use Livewire\Livewire;
@@ -288,7 +287,7 @@ it('can duplicate a discount', function () {
 
     $this->assertDatabaseHas('discounts', [
         'name' => 'Original Discount (Copy)',
-        'slug' => $discount->slug . '-copy',
+        'slug' => $discount->slug.'-copy',
         'status' => 'draft',
         'usage_count' => 0,
     ]);

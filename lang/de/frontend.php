@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'navigation' => [
@@ -11,19 +13,17 @@ return [
         'about' => 'Über uns',
         'contact' => 'Kontakt',
     ],
-    
     // Direct keys for tests
     'home' => 'Startseite',
     'about' => 'Über uns',
     'contact' => 'Kontakt',
     'products' => 'Produkte',
-        'cart' => 'Warenkorb',
-        'account' => 'Konto',
-        'login' => 'Anmelden',
-        'register' => 'Registrieren',
-        'logout' => 'Abmelden',
-        'search' => 'Suchen',
-    ],
+    'cart' => 'Warenkorb',
+    'account' => 'Konto',
+    'login' => 'Anmelden',
+    'register' => 'Registrieren',
+    'logout' => 'Abmelden',
+    'search' => 'Suchen',
     'products' => [
         'name' => 'Name',
         'price' => 'Preis',
@@ -282,7 +282,6 @@ return [
     'home_shop_by_collection' => 'Nach Kollektion einkaufen',
     'home_collections_desc' => 'Entdecken Sie unsere sorgfältig kuratierten Kollektionen von Premium-Produkten',
     'home_trending_products' => 'Beliebte Produkte',
-    
     // Additional translations from page content
     'free_shipping_from' => 'Kostenloser Versand ab',
     'items_in_cart' => 'Artikel im Warenkorb, Warenkorb anzeigen',
@@ -290,7 +289,6 @@ return [
     'search_products' => 'Produkte suchen...',
     'nav_account' => 'Konto',
     'cart_items_count' => 'Artikel im Warenkorb',
-    
     // Category names from page
     'categories' => [
         'sealing_films_tapes' => 'Dichtungsfolien und -bänder',
@@ -303,7 +301,6 @@ return [
         'electrical_products' => 'Elektroprodukte',
         'workwear_safety' => 'Arbeitskleidung, Sicherheitsmaßnahmen',
     ],
-    
     // Product details
     'product' => [
         'high_quality_product' => 'Hochwertiges Produkt für Profis und Enthusiasten.',
@@ -330,7 +327,6 @@ return [
         'loyalty_points' => 'Treuepunkte',
         'loyalty_points_desc' => 'Punkte sammeln und Rabatte erhalten',
     ],
-    
     // Footer translations
     'footer' => [
         'heading' => 'Über uns',
@@ -357,7 +353,6 @@ return [
         'all_rights_reserved' => 'Alle Rechte vorbehalten',
         'powered_by_filament' => 'Erstellt mit Filament',
     ],
-    
     // Language codes
     'languages' => [
         'lt' => 'LT',
@@ -365,7 +360,6 @@ return [
         'ru' => 'RU',
         'de' => 'DE',
     ],
-    
     // Exports
     'exports' => 'Exporte',
 ];

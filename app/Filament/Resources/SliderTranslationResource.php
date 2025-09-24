@@ -1,19 +1,17 @@
 <?php
 
 declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\SliderTranslationResource\Pages;
-use App\Models\SliderTranslation;
 use App\Models\Slider;
+use App\Models\SliderTranslation;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -24,7 +22,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -35,12 +32,14 @@ use UnitEnum;
 final class SliderTranslationResource extends Resource
 {
     protected static ?string $model = SliderTranslation::class;
-    protected static ?int $navigationSort = 17;
-    protected static ?string $recordTitleAttribute = 'title';
-    protected static ?string $navigationGroup = NavigationGroup::Content;
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Content;
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?int $navigationSort = 17;
+
+    protected static ?string $recordTitleAttribute = 'title';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
 
     public static function getNavigationLabel(): string
     {
@@ -57,48 +56,43 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function schema(Schema $schema): Schema
+    public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->schema([
-                SchemaSection::make(__('admin.slider_translations.basic_information'))
-                    ->schema([
-                        SchemaGrid::make(2)
-                            ->schema([
-                                Select::make('slider_id')
-                                    ->label(__('admin.slider_translations.slider'))
-                                    ->options(Slider::pluck('name', 'id'))
-                                    ->required()
-                                    ->searchable(),
-
-                                Select::make('locale')
-                                    ->label(__('admin.slider_translations.locale'))
-                                    ->options([
-                                        'en' => 'English',
-                                        'lt' => 'Lithuanian',
-                                        'de' => 'German',
-                                        'fr' => 'French',
-                                        'es' => 'Spanish',
-                                    ])
-                                    ->required()
-                                    ->default('en'),
-                            ]),
-
-                        TextInput::make('title')
-                            ->label(__('admin.slider_translations.title'))
-                            ->required()
-                            ->maxLength(255),
-
-                        Textarea::make('description')
-                            ->label(__('admin.slider_translations.description'))
-                            ->maxLength(1000)
-                            ->rows(3),
-
-                        TextInput::make('button_text')
-                            ->label(__('admin.slider_translations.button_text'))
-                            ->maxLength(255),
-                    ]),
-            ]);
+        return $schema->schema([
+            SchemaSection::make(__('admin.slider_translations.basic_information'))
+                ->components([
+                    SchemaGrid::make(2)
+                        ->components([
+                            Select::make('slider_id')
+                                ->label(__('admin.slider_translations.slider'))
+                                ->options(Slider::pluck('name', 'id'))
+                                ->required()
+                                ->searchable(),
+                            Select::make('locale')
+                                ->label(__('admin.slider_translations.locale'))
+                                ->options([
+                                    'en' => 'English',
+                                    'lt' => 'Lithuanian',
+                                    'de' => 'German',
+                                    'fr' => 'French',
+                                    'es' => 'Spanish',
+                                ])
+                                ->required()
+                                ->default('lt'),
+                        ]),
+                    TextInput::make('title')
+                        ->label(__('admin.slider_translations.title'))
+                        ->required()
+                        ->maxLength(255),
+                    Textarea::make('description')
+                        ->label(__('admin.slider_translations.description'))
+                        ->maxLength(1000)
+                        ->rows(3),
+                    TextInput::make('button_text')
+                        ->label(__('admin.slider_translations.button_text'))
+                        ->maxLength(255),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -110,7 +104,6 @@ final class SliderTranslationResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-
                 TextColumn::make('locale')
                     ->label(__('admin.slider_translations.locale'))
                     ->badge()
@@ -122,7 +115,6 @@ final class SliderTranslationResource extends Resource
                         'es' => 'primary',
                         default => 'gray',
                     }),
-
                 TextColumn::make('title')
                     ->label(__('admin.slider_translations.title'))
                     ->searchable()
@@ -130,25 +122,25 @@ final class SliderTranslationResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
-
                 TextColumn::make('description')
                     ->label(__('admin.slider_translations.description'))
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
-
                 TextColumn::make('button_text')
                     ->label(__('admin.slider_translations.button_text'))
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 30 ? $state : null;
                     }),
-
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->dateTime()
@@ -160,7 +152,6 @@ final class SliderTranslationResource extends Resource
                     ->label(__('admin.slider_translations.slider'))
                     ->options(Slider::pluck('name', 'id'))
                     ->searchable(),
-
                 SelectFilter::make('locale')
                     ->label(__('admin.slider_translations.locale'))
                     ->options([

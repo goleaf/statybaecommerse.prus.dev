@@ -1,8 +1,7 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\OrderController;
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 
 it('health route responds', function (): void {

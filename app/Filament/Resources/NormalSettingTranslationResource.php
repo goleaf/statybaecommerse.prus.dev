@@ -4,27 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\NormalSettingTranslationResource\Pages;
-use App\Models\NormalSettingTranslation;
 use App\Models\NormalSetting;
+use App\Models\NormalSettingTranslation;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -34,13 +29,16 @@ use UnitEnum;
  */
 final class NormalSettingTranslationResource extends Resource
 {
-    protected static ?string $model = NormalSettingTranslation::class;
-    protected static ?int $navigationSort = 16;
-    protected static ?string $recordTitleAttribute = 'display_name';
-    protected static ?string $navigationGroup = NavigationGroup::Content;
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Content';
+    }
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Content;
+    protected static ?string $model = NormalSettingTranslation::class;
+
+    protected static ?int $navigationSort = 16;
+
+    protected static ?string $recordTitleAttribute = 'display_name';
 
     public static function getNavigationLabel(): string
     {
@@ -132,6 +130,7 @@ final class NormalSettingTranslationResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
 
@@ -140,6 +139,7 @@ final class NormalSettingTranslationResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
 
@@ -148,6 +148,7 @@ final class NormalSettingTranslationResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
 

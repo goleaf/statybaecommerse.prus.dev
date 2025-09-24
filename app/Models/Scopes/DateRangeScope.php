@@ -1,41 +1,40 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+
 /**
  * DateRangeScope
- * 
+ *
  * Eloquent model representing the DateRangeScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|DateRangeScope newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DateRangeScope newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DateRangeScope query()
+ *
  * @mixin \Eloquent
  */
 final class DateRangeScope implements Scope
 {
     /**
      * Handle apply functionality with proper error handling.
-     * @param Builder $builder
-     * @param Model $model
-     * @return void
      */
     public function apply(Builder $builder, Model $model): void
     {
         // Check if the model has date-related columns
         $dateColumns = $this->getDateColumns($model);
-        if (!empty($dateColumns)) {
+        if (! empty($dateColumns)) {
             $this->applyDateFilters($builder, $dateColumns);
         }
     }
+
     /**
      * Handle getDateColumns functionality with proper error handling.
-     * @param Model $model
-     * @return array
      */
     private function getDateColumns(Model $model): array
     {
@@ -49,13 +48,12 @@ final class DateRangeScope implements Scope
                 $dateColumns[] = $column;
             }
         }
+
         return $dateColumns;
     }
+
     /**
      * Handle applyDateFilters functionality with proper error handling.
-     * @param Builder $builder
-     * @param array $dateColumns
-     * @return void
      */
     private function applyDateFilters(Builder $builder, array $dateColumns): void
     {
@@ -63,11 +61,9 @@ final class DateRangeScope implements Scope
             $this->applyColumnSpecificFilter($builder, $column);
         }
     }
+
     /**
      * Handle applyColumnSpecificFilter functionality with proper error handling.
-     * @param Builder $builder
-     * @param string $column
-     * @return void
      */
     private function applyColumnSpecificFilter(Builder $builder, string $column): void
     {

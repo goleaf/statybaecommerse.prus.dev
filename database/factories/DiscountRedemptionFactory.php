@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -37,51 +39,50 @@ final class DiscountRedemptionFactory extends Factory
 
     public function pending(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'pending',
         ]);
     }
 
     public function redeemed(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'redeemed',
         ]);
     }
 
     public function expired(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'expired',
         ]);
     }
 
     public function cancelled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'cancelled',
         ]);
     }
 
     public function recent(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'redeemed_at' => $this->faker->dateTimeBetween('-7 days', 'now'),
         ]);
     }
 
     public function highValue(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'amount_saved' => $this->faker->randomFloat(2, 50, 500),
         ]);
     }
 
     public function eur(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'currency_code' => 'EUR',
         ]);
     }
 }
-

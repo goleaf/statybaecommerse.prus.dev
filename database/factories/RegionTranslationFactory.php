@@ -17,7 +17,7 @@ final class RegionTranslationFactory extends Factory
         return [
             'region_id' => Region::factory(),
             'locale' => $this->faker->randomElement(['en', 'lt']),
-            'name' => $this->faker->city() . ' Region',
+            'name' => $this->faker->city().' Region',
             'description' => $this->faker->paragraph(),
         ];
     }
@@ -26,7 +26,7 @@ final class RegionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'name' => $this->faker->city() . ' Region',
+            'name' => $this->faker->city().' Region',
             'description' => $this->faker->paragraph(),
         ]);
     }
@@ -35,7 +35,7 @@ final class RegionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'name' => $this->faker->city() . ' Regionas',
+            'name' => $this->faker->city().' Regionas',
             'description' => $this->faker->paragraph(),
         ]);
     }

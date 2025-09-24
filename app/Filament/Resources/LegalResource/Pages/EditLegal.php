@@ -6,8 +6,8 @@ namespace App\Filament\Resources\LegalResource\Pages;
 
 use App\Filament\Resources\LegalResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
 
 class EditLegal extends EditRecord
 {
@@ -22,7 +22,7 @@ class EditLegal extends EditRecord
                 ->label('Publish')
                 ->icon('heroicon-o-eye')
                 ->color('success')
-                ->visible(fn () => !$this->record->published_at)
+                ->visible(fn () => ! $this->record->published_at)
                 ->action(function () {
                     $this->record->publish();
                     Notification::make()
@@ -48,22 +48,22 @@ class EditLegal extends EditRecord
                 ->color('gray')
                 ->action(function () {
                     $newRecord = $this->record->replicate();
-                    $newRecord->key = $this->record->key . '-copy';
+                    $newRecord->key = $this->record->key.'-copy';
                     $newRecord->published_at = null;
                     $newRecord->save();
-                    
+
                     // Duplicate translations
                     foreach ($this->record->translations as $translation) {
                         $newTranslation = $translation->replicate();
                         $newTranslation->legal_id = $newRecord->id;
                         $newTranslation->save();
                     }
-                    
+
                     Notification::make()
                         ->title('Document duplicated successfully')
                         ->success()
                         ->send();
-                        
+
                     $this->redirect($this->getResource()::getUrl('edit', ['record' => $newRecord]));
                 }),
         ];
@@ -77,10 +77,10 @@ class EditLegal extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         // Auto-publish if not set and enabled
-        if ($data['is_enabled'] && !$data['published_at']) {
+        if ($data['is_enabled'] && ! $data['published_at']) {
             $data['published_at'] = now();
         }
-        
+
         return $data;
     }
 }

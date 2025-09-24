@@ -25,9 +25,9 @@ final class CurrencyFactory extends Factory
         ];
 
         $currency = fake()->randomElement($currencies);
-        
+
         // Add a random suffix to make the code unique for testing
-        $uniqueCode = $currency['code'] . '_' . fake()->unique()->randomNumber(3);
+        $uniqueCode = $currency['code'].'_'.fake()->unique()->randomNumber(3);
 
         return [
             'name' => $currency['name'],

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -16,6 +18,7 @@ class VariantStockHistorySeeder extends Seeder
 
         if ($variants->isEmpty() || $users->isEmpty()) {
             $this->command->warn('No variants or users found. Please run ProductVariantSeeder and UserSeeder first.');
+
             return;
         }
 
@@ -26,7 +29,7 @@ class VariantStockHistorySeeder extends Seeder
         foreach ($variants as $variant) {
             // Create some initial stock history
             $initialQuantity = rand(50, 200);
-            
+
             VariantStockHistory::create([
                 'variant_id' => $variant->id,
                 'old_quantity' => 0,
@@ -45,7 +48,7 @@ class VariantStockHistorySeeder extends Seeder
                 $changeType = $changeTypes[array_rand($changeTypes)];
                 $changeReason = $changeReasons[array_rand($changeReasons)];
                 $referenceType = $referenceTypes[array_rand($referenceTypes)];
-                
+
                 $quantityChange = match ($changeType) {
                     'increase' => rand(1, 20),
                     'decrease' => -rand(1, min(10, $currentQuantity)),
@@ -56,7 +59,7 @@ class VariantStockHistorySeeder extends Seeder
                 };
 
                 $newQuantity = max(0, $currentQuantity + $quantityChange);
-                
+
                 VariantStockHistory::create([
                     'variant_id' => $variant->id,
                     'old_quantity' => $currentQuantity,

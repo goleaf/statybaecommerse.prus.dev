@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <!-- Merged content from varztupasaulis.products.xml should be placed as additional <product> nodes below. -->
+  <product>
+    <id>1001</id>
+    <sku>SKU-1001</sku>
+    <slug>cementas-42-5r</slug>
+
+    <categories>
+      <category_slug>statybine-medziaga</category_slug>
+      <category_slug>cementas</category_slug>
+    </categories>
+    <category_ids>
+      <category_id>1</category_id>
+      <category_id>2</category_id>
+    </category_ids>
+
+    <brand>
+      <brand_slug>generic</brand_slug>
+    </brand>
+
+    <base>
+      <price>4.99</price>
+      <sale_price>4.49</sale_price>
+      <compare_price>5.49</compare_price>
+      <cost_price>3.10</cost_price>
+      <currency>EUR</currency>
+      <status>active</status>
+      <brand_id>1</brand_id>
+      <tax_class>standard</tax_class>
+      <shipping_class>default</shipping_class>
+      <manage_stock>true</manage_stock>
+      <track_stock>true</track_stock>
+      <allow_backorder>false</allow_backorder>
+      <stock_quantity>120</stock_quantity>
+      <low_stock_threshold>10</low_stock_threshold>
+      <minimum_quantity>1</minimum_quantity>
+      <is_visible>true</is_visible>
+      <is_featured>false</is_featured>
+      <is_requestable>false</is_requestable>
+    </base>
+
+    <dimensions>
+      <weight>25.0</weight>
+      <length>0.40</length>
+      <width>0.25</width>
+      <height>0.10</height>
+    </dimensions>
+
+    <inventory>
+      <barcode>LT-CEM-425R</barcode>
+      <sku_supplier>CEM-425R-LT</sku_supplier>
+      <warehouses>
+        <warehouse code="default">
+          <stock_quantity>120</stock_quantity>
+        </warehouse>
+      </warehouses>
+    </inventory>
+
+    <translations>
+      <translation locale="lt">
+        <name>Cementas 42.5R</name>
+        <slug>cementas-42-5r</slug>
+        <description>Aukštos klasės cementas 42.5R.</description>
+        <short_description>42.5R klasė</short_description>
+        <seo_title>Cementas 42.5R</seo_title>
+        <seo_description>Kokybiškas cementas 42.5R klasės statyboms</seo_description>
+      </translation>
+      <translation locale="en">
+        <name>Cement 42.5R</name>
+        <slug>cement-42-5r</slug>
+        <description>High-grade cement 42.5R.</description>
+        <short_description>Class 42.5R</short_description>
+        <seo_title>Cement 42.5R</seo_title>
+        <seo_description>Quality 42.5R cement for construction</seo_description>
+      </translation>
+    </translations>
+
+    <seo>
+      <canonical_url>https://example.com/p/cementas-42-5r</canonical_url>
+      <meta>
+        <key>og:type</key>
+        <value>product</value>
+      </meta>
+    </seo>
+
+    <images>
+      <image src="https://example.com/images/cementas-42-5r.jpg" alt="Cementas 42.5R" is_primary="true" sort_order="1" />
+      <image src="https://example.com/images/cementas-42-5r-2.jpg" alt="Cementas 42.5R pakuotė" sort_order="2" />
+    </images>
+
+    <files>
+      <file url="https://example.com/files/cementas-42-5r-spec.pdf" label="spec" />
+    </files>
+
+    <videos>
+      <video url="https://example.com/videos/cementas-42-5r.mp4" label="demo" />
+    </videos>
+
+    <attributes>
+      <attribute id="10" code="stiprumo_klase">
+        <name locale="lt">Stiprumo klasė</name>
+        <value id="101" locale="lt">42.5R</value>
+      </attribute>
+      <attribute id="11" code="pakuote">
+        <name locale="lt">Pakuotė</name>
+        <value id="111" locale="lt">25 kg</value>
+      </attribute>
+    </attributes>
+
+    <options>
+      <option name="pakuote">
+        <value locale="lt">25 kg</value>
+        <value locale="lt">35 kg</value>
+      </option>
+    </options>
+
+    <variants>
+      <variant>
+        <sku>SKU-1001-25KG</sku>
+        <option_values>
+          <option name="pakuote" locale="lt">25 kg</option>
+        </option_values>
+        <price>4.99</price>
+        <stock_quantity>120</stock_quantity>
+        <images>
+          <image src="https://example.com/images/cementas-42-5r.jpg" alt="25 kg" sort_order="1" />
+        </images>
+      </variant>
+      <variant>
+        <sku>SKU-1001-35KG</sku>
+        <option_values>
+          <option name="pakuote" locale="lt">35 kg</option>
+        </option_values>
+        <price>6.45</price>
+        <stock_quantity>60</stock_quantity>
+        <images>
+          <image src="https://example.com/images/cementas-42-5r-35.jpg" alt="35 kg" sort_order="1" />
+        </images>
+      </variant>
+    </variants>
+
+    <relations>
+      <related_skus>
+        <sku>SKU-1002</sku>
+      </related_skus>
+      <upsell_skus>
+        <sku>SKU-1001-35KG</sku>
+      </upsell_skus>
+      <cross_sell_skus>
+        <sku>SKU-TOOLS-001</sku>
+      </cross_sell_skus>
+    </relations>
+
+    <price_lists>
+      <price_list code="retail">
+        <currency>EUR</currency>
+        <price>4.99</price>
+      </price_list>
+      <price_list code="wholesale">
+        <currency>EUR</currency>
+        <price>4.20</price>
+      </price_list>
+    </price_lists>
+
+    <tags>
+      <tag>statyba</tag>
+      <tag>cementas</tag>
+    </tags>
+
+    <custom>
+      <field key="warranty_months">12</field>
+    </custom>
+  </product>
+
+  <product>
+    <id>1002</id>
+    <sku>SKU-1002</sku>
+    <slug>betono-maisykle-140l</slug>
+
+    <categories>
+      <category_slug>statybine-medziaga</category_slug>
+    </categories>
+    <category_ids>
+      <category_id>1</category_id>
+    </category_ids>
+
+    <brand>
+      <brand_slug>generic</brand_slug>
+    </brand>
+
+    <base>
+      <price>229.00</price>
+      <status>active</status>
+      <currency>EUR</currency>
+      
+      <brand_id>1</brand_id>
+      <weight>45.0</weight>
+      <manage_stock>true</manage_stock>
+      <stock_quantity>15</stock_quantity>
+      <is_visible>true</is_visible>
+    </base>
+
+    <dimensions>
+      <length>0.80</length>
+      <width>0.50</width>
+      <height>0.60</height>
+    </dimensions>
+
+    <inventory>
+      <barcode>LT-MIX-140</barcode>
+      <warehouses>
+        <warehouse code="default">
+          <stock_quantity>15</stock_quantity>
+        </warehouse>
+      </warehouses>
+    </inventory>
+
+    <translations>
+      <translation locale="lt">
+        <name>Betono maišyklė 140 l</name>
+        <slug>betono-maisykle-140l</slug>
+        <description>Tvirta 140 litrų talpos betono maišyklė.</description>
+        <short_description>140 l talpa</short_description>
+      </translation>
+      <translation locale="en">
+        <name>Concrete mixer 140 l</name>
+        <slug>concrete-mixer-140l</slug>
+        <description>Durable 140 liter concrete mixer.</description>
+        <short_description>140 l capacity</short_description>
+      </translation>
+    </translations>
+
+    <seo>
+      <canonical_url>https://example.com/p/betono-maisykle-140l</canonical_url>
+    </seo>
+
+    <images>
+      <image src="https://example.com/images/maisykle-140l.jpg" alt="Betono maišyklė 140 l" is_primary="true" sort_order="1" />
+    </images>
+
+    <attributes>
+      <attribute id="12" code="talpa">
+        <name locale="lt">Talpa</name>
+        <value id="121" locale="lt">140 l</value>
+      </attribute>
+      <attribute id="13" code="galia">
+        <name locale="lt">Galia</name>
+        <value id="131" locale="lt">550 W</value>
+      </attribute>
+    </attributes>
+
+    <options>
+      <option name="galia">
+        <value locale="lt">550 W</value>
+      </option>
+    </options>
+
+    <variants>
+      <variant>
+        <sku>SKU-1002-STD</sku>
+        <option_values>
+          <option name="galia" locale="lt">550 W</option>
+        </option_values>
+        <price>229.00</price>
+        <stock_quantity>15</stock_quantity>
+      </variant>
+    </variants>
+
+    <relations>
+      <related_skus>
+        <sku>SKU-1001</sku>
+      </related_skus>
+    </relations>
+
+    <price_lists>
+      <price_list code="retail">
+        <currency>EUR</currency>
+        <price>229.00</price>
+      </price_list>
+    </price_lists>
+
+    <tags>
+      <tag>iranga</tag>
+      <tag>betonas</tag>
+    </tags>
+
+    <custom>
+      <field key="warranty_months">24</field>
+    </custom>
+  </product>
+</products>
+
+

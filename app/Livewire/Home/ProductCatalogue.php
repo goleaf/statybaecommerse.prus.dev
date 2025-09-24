@@ -81,8 +81,8 @@ final class ProductCatalogue extends Component implements HasSchemas
         if (filled($this->search)) {
             $query->where(function ($builder): void {
                 $builder
-                    ->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('sku', 'like', '%' . $this->search . '%');
+                    ->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('sku', 'like', '%'.$this->search.'%');
             });
         }
 

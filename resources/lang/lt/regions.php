@@ -4,13 +4,13 @@ return [
     'navigation_label' => 'Regionai',
     'model_label' => 'Regionas',
     'plural_model_label' => 'Regionai',
-    
+
     // Page titles
     'title' => 'Regionai',
     'subtitle' => 'Naršykite regionus ir administracinius padalinius',
     'page_title' => 'Regionų katalogas',
     'page_description' => 'Naršykite visus prieinamus regionus ir administracinius padalinius',
-    
+
     // Fields
     'fields' => [
         'name' => 'Pavadinimas',
@@ -20,7 +20,6 @@ return [
         'is_enabled' => 'Įjungtas',
         'is_default' => 'Numatytasis',
         'country' => 'Šalis',
-        'zone' => 'Zona',
         'parent' => 'Tėvinis regionas',
         'level' => 'Lygis',
         'sort_order' => 'Rūšiavimo tvarka',
@@ -32,13 +31,13 @@ return [
         'no' => 'Ne',
         'capital' => 'Sostinė',
     ],
-    
+
     // Form sections
     'basic_information' => 'Pagrindinė informacija',
     'hierarchy_settings' => 'Hierarchijos nustatymai',
     'status_settings' => 'Būsenos nustatymai',
     'additional_data' => 'Papildomi duomenys',
-    
+
     // Placeholders
     'placeholders' => [
         'name' => 'Įveskite regiono pavadinimą',
@@ -46,7 +45,7 @@ return [
         'description' => 'Įveskite regiono aprašymą',
         'sort_order' => 'Įveskite rūšiavimo tvarką',
     ],
-    
+
     // Help text
     'help' => [
         'name' => 'Regiono pavadinimas',
@@ -56,7 +55,7 @@ return [
         'level' => 'Šio regiono administracinis lygis',
         'sort_order' => 'Tvarka, kuria šis regionas turėtų būti rodomas',
     ],
-    
+
     // Actions
     'actions' => [
         'create' => 'Sukurti regioną',
@@ -67,17 +66,15 @@ return [
         'view_details' => 'Peržiūrėti detales',
         'show_on_map' => 'Rodyti žemėlapyje',
     ],
-    
+
     // Filters
     'filters' => [
         'search' => 'Paieška',
         'search_placeholder' => 'Ieškoti regionų...',
         'by_country' => 'Filtruoti pagal šalį',
-        'by_zone' => 'Filtruoti pagal zoną',
         'by_level' => 'Filtruoti pagal lygį',
         'by_parent' => 'Filtruoti pagal tėvinį regioną',
         'all_countries' => 'Visos šalys',
-        'all_zones' => 'Visos zonos',
         'all_levels' => 'Visi lygiai',
         'all_parents' => 'Visi tėviniai regionai',
         'enabled_only' => 'Tik įjungti',
@@ -91,7 +88,7 @@ return [
         'apply_filters' => 'Taikyti filtrus',
         'clear_filters' => 'Išvalyti filtrus',
     ],
-    
+
     // Status
     'status' => [
         'enabled' => 'Įjungtas',
@@ -100,7 +97,7 @@ return [
         'active' => 'Aktyvus',
         'inactive' => 'Neaktyvus',
     ],
-    
+
     // Levels
     'levels' => [
         0 => 'Šaknis',
@@ -110,7 +107,7 @@ return [
         4 => 'Savivaldybė',
         5 => 'Kaimas',
     ],
-    
+
     // Statistics
     'statistics' => [
         'total_regions' => 'Iš viso regionų',
@@ -125,7 +122,7 @@ return [
         'regions_by_level' => 'Regionai pagal lygį',
         'recent_regions' => 'Naujausi regionai',
     ],
-    
+
     // Widgets
     'widgets' => [
         'overview' => 'Regionų apžvalga',
@@ -135,7 +132,7 @@ return [
         'hierarchy_tree' => 'Regionų hierarchija',
         'geographic_distribution' => 'Geografinis pasiskirstymas',
     ],
-    
+
     // Messages
     'messages' => [
         'created' => 'Regionas sėkmingai sukurtas',
@@ -148,7 +145,7 @@ return [
         'cannot_delete_with_children' => 'Negalima ištrinti regiono su vaikais',
         'cannot_delete_with_cities' => 'Negalima ištrinti regiono su miestais',
     ],
-    
+
     // Confirmations
     'confirmations' => [
         'delete' => 'Ar tikrai norite ištrinti šį regioną?',
@@ -156,7 +153,7 @@ return [
         'delete_with_cities' => 'Šis regionas turi miestų. Ar tikrai norite jį ištrinti?',
         'bulk_delete' => 'Ar tikrai norite ištrinti pasirinktus regionus?',
     ],
-    
+
     // Empty states
     'empty_states' => [
         'no_regions' => 'Regionų nerasta',
@@ -164,7 +161,7 @@ return [
         'no_regions_found' => 'Jūsų paieškos kriterijams atitinkančių regionų nerasta',
         'no_regions_found_description' => 'Pabandykite pakeisti paiešką ar filtrus',
     ],
-    
+
     // Validation
     'validation' => [
         'name_required' => 'Regiono pavadinimas yra privalomas',
@@ -174,7 +171,7 @@ return [
         'country_required' => 'Šalis yra privaloma',
         'level_invalid' => 'Neteisingas regiono lygis',
     ],
-    
+
     // Details sections
     'details' => [
         'basic_info' => 'Pagrindinė informacija',
@@ -188,7 +185,7 @@ return [
         'major_cities' => 'Pagrindiniai miestai',
         'and_more' => 'ir dar :count',
     ],
-    
+
     // API responses
     'api' => [
         'success' => 'Sėkmė',

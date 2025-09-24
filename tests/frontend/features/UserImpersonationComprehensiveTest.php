@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\User;
-use App\Models\Order;
+declare(strict_types=1);
+
 use App\Models\Address;
-use App\Models\Review;
-use App\Models\Product;
 use App\Models\CustomerGroup;
 use App\Models\Document;
+use App\Models\Order;
 use App\Models\Partner;
+use App\Models\Product;
+use App\Models\Review;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 uses(RefreshDatabase::class);
 
@@ -22,10 +24,10 @@ describe('User Impersonation Comprehensive Tests', function () {
     beforeEach(function () {
         $this->admin = User::factory()->create();
         $this->admin->assignRole('administrator');
-        
+
         $this->regularUser = User::factory()->create(['is_admin' => false]);
         $this->anotherAdmin = User::factory()->create(['is_admin' => true]);
-        
+
         $this->actingAs($this->admin);
     });
 
@@ -38,7 +40,7 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('allows super_admin to access user impersonation', function () {
             $superAdmin = User::factory()->create();
             $superAdmin->assignRole('super_admin');
-            
+
             $this->actingAs($superAdmin)
                 ->get('/admin/user-impersonation')
                 ->assertOk();
@@ -46,7 +48,7 @@ describe('User Impersonation Comprehensive Tests', function () {
 
         it('allows users with is_admin flag to access user impersonation', function () {
             $adminUser = User::factory()->create(['is_admin' => true]);
-            
+
             $this->actingAs($adminUser)
                 ->get('/admin/user-impersonation')
                 ->assertOk();
@@ -60,7 +62,7 @@ describe('User Impersonation Comprehensive Tests', function () {
 
         it('denies access to unauthenticated users', function () {
             Auth::logout();
-            
+
             $this->get('/admin/user-impersonation')
                 ->assertRedirect('/admin/login');
         });
@@ -95,7 +97,7 @@ describe('User Impersonation Comprehensive Tests', function () {
             // Stop impersonation
             $originalUserId = Session::get('impersonate.original_user_id');
             $originalUser = User::find($originalUserId);
-            
+
             if ($originalUser) {
                 Auth::login($originalUser);
                 Session::forget('impersonate');
@@ -108,8 +110,8 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('prevents impersonating admin users', function () {
             // Admin users should not be impersonatable
             expect($this->anotherAdmin->is_admin)->toBeTrue();
-            
-            $canImpersonate = !$this->anotherAdmin->is_admin;
+
+            $canImpersonate = ! $this->anotherAdmin->is_admin;
             expect($canImpersonate)->toBeFalse();
         });
 
@@ -132,27 +134,27 @@ describe('User Impersonation Comprehensive Tests', function () {
     describe('User Data and Relationships', function () {
         it('can access impersonated user orders', function () {
             $order = Order::factory()->create(['user_id' => $this->regularUser->id]);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->orders()->count())->toBe(1);
             expect($this->regularUser->orders->first()->id)->toBe($order->id);
         });
 
         it('can access impersonated user addresses', function () {
             $address = Address::factory()->create(['user_id' => $this->regularUser->id]);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->addresses()->count())->toBe(1);
             expect($this->regularUser->addresses->first()->id)->toBe($address->id);
         });
 
         it('can access impersonated user reviews', function () {
             $review = Review::factory()->create(['user_id' => $this->regularUser->id]);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->reviews()->count())->toBe(1);
             expect($this->regularUser->reviews->first()->id)->toBe($review->id);
         });
@@ -160,9 +162,9 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('can access impersonated user wishlist', function () {
             $product = Product::factory()->create();
             $this->regularUser->wishlist()->attach($product->id);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->wishlist()->count())->toBe(1);
             expect($this->regularUser->wishlist->first()->id)->toBe($product->id);
         });
@@ -170,9 +172,9 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('can access impersonated user customer groups', function () {
             $customerGroup = CustomerGroup::factory()->create();
             $this->regularUser->customerGroups()->attach($customerGroup->id);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->customerGroups()->count())->toBe(1);
             expect($this->regularUser->customerGroups->first()->id)->toBe($customerGroup->id);
         });
@@ -182,9 +184,9 @@ describe('User Impersonation Comprehensive Tests', function () {
                 'documentable_type' => User::class,
                 'documentable_id' => $this->regularUser->id,
             ]);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->documents()->count())->toBe(1);
             expect($this->regularUser->documents->first()->id)->toBe($document->id);
         });
@@ -192,9 +194,9 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('can access impersonated user partners', function () {
             $partner = Partner::factory()->create();
             $this->regularUser->partners()->attach($partner->id);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->partners()->count())->toBe(1);
             expect($this->regularUser->partners->first()->id)->toBe($partner->id);
         });
@@ -203,7 +205,7 @@ describe('User Impersonation Comprehensive Tests', function () {
     describe('User Attributes and Methods', function () {
         it('can access impersonated user attributes', function () {
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->name)->not()->toBeNull();
             expect($this->regularUser->email)->not()->toBeNull();
             expect($this->regularUser->is_active)->toBeTrue();
@@ -215,9 +217,9 @@ describe('User Impersonation Comprehensive Tests', function () {
                 'user_id' => $this->regularUser->id,
                 'is_default' => true,
             ]);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->default_address)->not()->toBeNull();
             expect($this->regularUser->default_address->id)->toBe($address->id);
         });
@@ -228,9 +230,9 @@ describe('User Impersonation Comprehensive Tests', function () {
                 'type' => 'billing',
                 'is_default' => true,
             ]);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->billing_address)->not()->toBeNull();
             expect($this->regularUser->billing_address->id)->toBe($address->id);
         });
@@ -241,9 +243,9 @@ describe('User Impersonation Comprehensive Tests', function () {
                 'type' => 'shipping',
                 'is_default' => true,
             ]);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->shipping_address)->not()->toBeNull();
             expect($this->regularUser->shipping_address->id)->toBe($address->id);
         });
@@ -251,9 +253,9 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('can check if impersonated user is partner', function () {
             $partner = Partner::factory()->create(['is_enabled' => true]);
             $this->regularUser->partners()->attach($partner->id);
-            
+
             Auth::login($this->regularUser);
-            
+
             expect($this->regularUser->isPartner())->toBeTrue();
             expect($this->regularUser->active_partner)->not()->toBeNull();
             expect($this->regularUser->partner_discount_rate)->toBeGreaterThan(0);
@@ -282,7 +284,7 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('validates user exists before impersonation', function () {
             $nonExistentUserId = 99999;
             $user = User::find($nonExistentUserId);
-            
+
             expect($user)->toBeNull();
         });
 
@@ -295,7 +297,7 @@ describe('User Impersonation Comprehensive Tests', function () {
 
             $originalUserId = Session::get('impersonate.original_user_id');
             $originalUser = User::find($originalUserId);
-            
+
             expect($originalUser)->toBeNull();
         });
     });
@@ -303,7 +305,7 @@ describe('User Impersonation Comprehensive Tests', function () {
     describe('Edge Cases and Error Handling', function () {
         it('handles missing impersonation session gracefully', function () {
             expect(Session::has('impersonate'))->toBeFalse();
-            
+
             $originalUserId = Session::get('impersonate.original_user_id');
             expect($originalUserId)->toBeNull();
         });
@@ -317,7 +319,7 @@ describe('User Impersonation Comprehensive Tests', function () {
 
             $originalUserId = Session::get('impersonate.original_user_id');
             $originalUser = User::find($originalUserId);
-            
+
             expect($originalUser)->toBeNull();
         });
 

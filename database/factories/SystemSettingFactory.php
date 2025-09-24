@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -7,164 +9,207 @@ use App\Models\SystemSettingCategory;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SystemSetting>
+ */
 final class SystemSettingFactory extends Factory
 {
     protected $model = SystemSetting::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
-        $types = ['string', 'text', 'number', 'boolean', 'array', 'json', 'file', 'image', 'select', 'color', 'date', 'datetime'];
-        $groups = ['general', 'ecommerce', 'email', 'payment', 'shipping', 'seo', 'security', 'api', 'appearance', 'notifications'];
+        $types = ['string', 'integer', 'boolean', 'json', 'array', 'file', 'color', 'date', 'datetime', 'email', 'url', 'password'];
+        $type = $this->faker->randomElement($types);
 
         return [
             'category_id' => SystemSettingCategory::factory(),
             'key' => $this->faker->unique()->slug(2),
             'name' => $this->faker->sentence(3),
-            'value' => $this->faker->sentence(),
-            'type' => $this->faker->randomElement($types),
-            'group' => $this->faker->randomElement($groups),
             'description' => $this->faker->paragraph(),
             'help_text' => $this->faker->sentence(),
-            'is_public' => $this->faker->boolean(30),  // 30% chance of being public
-            'is_required' => $this->faker->boolean(20),  // 20% chance of being required
-            'is_encrypted' => $this->faker->boolean(10),  // 10% chance of being encrypted
-            'is_readonly' => $this->faker->boolean(15),  // 15% chance of being readonly
-            'validation_rules' => $this->faker->boolean(40) ? json_encode(['min' => 1, 'max' => 255]) : null,
-            'options' => $this->faker->boolean(30) ? json_encode(['option1' => 'Value 1', 'option2' => 'Value 2']) : null,
-            'default_value' => $this->faker->boolean(50) ? $this->faker->sentence() : null,
+            'type' => $type,
+            'value' => $this->getValueForType($type),
+            'group' => $this->faker->randomElement(['general', 'security', 'performance', 'ui_ux', 'api']),
             'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_active' => $this->faker->boolean(90),  // 90% chance of being active
+            'is_active' => $this->faker->boolean(80),
+            'is_public' => $this->faker->boolean(20),
+            'is_required' => $this->faker->boolean(10),
+            'is_readonly' => $this->faker->boolean(5),
+            'is_encrypted' => $this->faker->boolean(5),
+            'is_cacheable' => $this->faker->boolean(70),
+            'validation_rules' => json_encode(['max:255']),
+            'default_value' => $this->getDefaultValueForType($type),
+            'placeholder' => $this->faker->sentence(2),
+            'tooltip' => $this->faker->sentence(),
+            'metadata' => json_encode(['created_by' => 'factory']),
+            'tags' => json_encode($this->faker->words(3)),
+            'version' => '1.0.0',
+            'environment' => $this->faker->randomElement(['local', 'staging', 'production']),
+            'cache_key' => $this->faker->slug(),
+            'cache_ttl' => $this->faker->randomElement([0, 60, 300, 900, 3600, 86400]),
             'updated_by' => User::factory(),
-            'placeholder' => $this->faker->boolean(40) ? $this->faker->sentence() : null,
-            'tooltip' => $this->faker->boolean(30) ? $this->faker->sentence() : null,
-            'metadata' => $this->faker->boolean(20) ? json_encode(['custom_field' => $this->faker->word()]) : null,
-            'validation_message' => $this->faker->boolean(25) ? $this->faker->sentence() : null,
-            'is_cacheable' => $this->faker->boolean(80),  // 80% chance of being cacheable
-            'cache_ttl' => $this->faker->numberBetween(300, 86400),  // 5 minutes to 24 hours
-            'environment' => $this->faker->randomElement(['all', 'production', 'staging', 'development']),
-            'tags' => $this->faker->boolean(50) ? implode(',', $this->faker->words(3)) : null,
-            'version' => $this->faker->numerify('#.#.#'),
-            'access_count' => $this->faker->numberBetween(0, 1000),
-            'last_accessed_at' => $this->faker->boolean(60) ? $this->faker->dateTimeBetween('-30 days') : null,
         ];
     }
 
+    /**
+     * Get appropriate value for the given type
+     */
+    private function getValueForType(string $type): mixed
+    {
+        return match ($type) {
+            'string', 'text' => $this->faker->sentence(),
+            'integer' => $this->faker->numberBetween(1, 1000),
+            'boolean' => $this->faker->boolean(),
+            'json' => json_encode(['key' => $this->faker->word(), 'value' => $this->faker->sentence()]),
+            'array' => json_encode($this->faker->words(3)),
+            'file' => $this->faker->filePath(),
+            'color' => $this->faker->hexColor(),
+            'date' => $this->faker->date(),
+            'datetime' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
+            'email' => $this->faker->email(),
+            'url' => $this->faker->url(),
+            'password' => $this->faker->password(),
+            'float' => $this->faker->randomFloat(2, 0, 100),
+            default => $this->faker->sentence(),
+        };
+    }
+
+    /**
+     * Get appropriate default value for the given type
+     */
+    private function getDefaultValueForType(string $type): mixed
+    {
+        return match ($type) {
+            'string', 'text' => $this->faker->word(),
+            'integer' => $this->faker->numberBetween(1, 100),
+            'boolean' => false,
+            'json' => json_encode([]),
+            'array' => json_encode([]),
+            'file' => null,
+            'color' => '#000000',
+            'date' => null,
+            'datetime' => null,
+            'email' => $this->faker->email(),
+            'url' => $this->faker->url(),
+            'password' => null,
+            'float' => 0.0,
+            default => null,
+        };
+    }
+
+    /**
+     * Indicate that the setting is active
+     */
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
         ]);
     }
 
+    /**
+     * Indicate that the setting is inactive
+     */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
         ]);
     }
 
+    /**
+     * Indicate that the setting is public
+     */
     public function public(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_public' => true,
         ]);
     }
 
+    /**
+     * Indicate that the setting is private
+     */
     public function private(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_public' => false,
         ]);
     }
 
+    /**
+     * Indicate that the setting is required
+     */
     public function required(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_required' => true,
         ]);
     }
 
+    /**
+     * Indicate that the setting is optional
+     */
+    public function optional(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_required' => false,
+        ]);
+    }
+
+    /**
+     * Indicate that the setting is read-only
+     */
     public function readonly(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_readonly' => true,
         ]);
     }
 
+    /**
+     * Indicate that the setting is encrypted
+     */
     public function encrypted(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_encrypted' => true,
         ]);
     }
 
-    public function string(): static
+    /**
+     * Create a setting with a specific type
+     */
+    public function ofType(string $type): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'string',
-            'value' => $this->faker->sentence(),
+        return $this->state(fn (array $attributes) => [
+            'type' => $type,
+            'value' => $this->getValueForType($type),
+            'default_value' => $this->getDefaultValueForType($type),
         ]);
     }
 
-    public function boolean(): static
+    /**
+     * Create a setting in a specific group
+     */
+    public function inGroup(string $group): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'boolean',
-            'value' => $this->faker->boolean(),
-        ]);
-    }
-
-    public function number(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'number',
-            'value' => $this->faker->numberBetween(1, 1000),
-        ]);
-    }
-
-    public function array(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'array',
-            'value' => $this->faker->words(5),
-        ]);
-    }
-
-    public function json(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'json',
-            'value' => ['key1' => 'value1', 'key2' => 'value2'],
-        ]);
-    }
-
-    public function select(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'select',
-            'value' => 'option1',
-            'options' => ['option1' => 'Option 1', 'option2' => 'Option 2', 'option3' => 'Option 3'],
-        ]);
-    }
-
-    public function color(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'color',
-            'value' => $this->faker->hexColor(),
-        ]);
-    }
-
-    public function group(string $group): static
-    {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'group' => $group,
         ]);
     }
 
-    public function category(SystemSettingCategory $category): static
+    /**
+     * Create a setting with a specific category
+     */
+    public function inCategory(SystemSettingCategory $category): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'category_id' => $category->id,
         ]);
     }

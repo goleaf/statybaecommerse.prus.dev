@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Attribute;
@@ -8,18 +9,16 @@ use App\Models\AttributeValue;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 /**
  * AttributeValueController
- * 
+ *
  * HTTP controller handling AttributeValueController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class AttributeValueController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -51,38 +50,38 @@ final class AttributeValueController extends Controller
         }
         $attributeValues = $query->get()->skipWhile(function ($attributeValue) {
             // Skip attribute values that are not properly configured for display
-            return empty($attributeValue->value) || !$attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
+            return empty($attributeValue->value) || ! $attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
         })->paginate(20);
         $attributes = Attribute::enabled()->ordered()->get();
+
         return view('attribute-values.index', compact('attributeValues', 'attributes'));
     }
+
     /**
      * Display the specified resource with related data.
-     * @param AttributeValue $attributeValue
-     * @return View
      */
     public function show(AttributeValue $attributeValue): View
     {
         $attributeValue->load(['attribute', 'products', 'variants', 'translations']);
+
         return view('attribute-values.show', compact('attributeValue'));
     }
+
     /**
      * Handle byAttribute functionality with proper error handling.
-     * @param Attribute $attribute
-     * @return View
      */
     public function byAttribute(Attribute $attribute): View
     {
         $attributeValues = $attribute->values()->enabled()->ordered()->with('translations')->get()->skipWhile(function ($attributeValue) {
             // Skip attribute values that are not properly configured for display
-            return empty($attributeValue->value) || !$attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
+            return empty($attributeValue->value) || ! $attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
         })->paginate(20);
+
         return view('attribute-values.by-attribute', compact('attribute', 'attributeValues'));
     }
+
     /**
      * Handle api functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function api(Request $request): JsonResponse
     {
@@ -102,16 +101,16 @@ final class AttributeValueController extends Controller
         }
         $attributeValues = $query->get()->skipWhile(function ($attributeValue) {
             // Skip attribute values that are not properly configured for API response
-            return empty($attributeValue->value) || !$attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
+            return empty($attributeValue->value) || ! $attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
         })->map(function ($attributeValue) {
             return ['id' => $attributeValue->id, 'value' => $attributeValue->getDisplayValue(), 'description' => $attributeValue->getDisplayDescription(), 'color_code' => $attributeValue->color_code, 'attribute' => ['id' => $attributeValue->attribute->id, 'name' => $attributeValue->attribute->getDisplayName()], 'products_count' => $attributeValue->products()->count(), 'variants_count' => $attributeValue->variants()->count()];
         });
+
         return response()->json(['data' => $attributeValues, 'meta' => ['total' => $attributeValues->count()]]);
     }
+
     /**
      * Handle search functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function search(Request $request): JsonResponse
     {
@@ -125,6 +124,7 @@ final class AttributeValueController extends Controller
         })->limit(10)->get()->map(function ($attributeValue) {
             return ['id' => $attributeValue->id, 'value' => $attributeValue->getDisplayValue(), 'attribute_name' => $attributeValue->attribute->getDisplayName()];
         });
+
         return response()->json(['data' => $attributeValues]);
     }
 }

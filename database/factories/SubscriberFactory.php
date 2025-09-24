@@ -19,7 +19,7 @@ final class SubscriberFactory extends Factory
     {
         $firstName = fake('lt_LT')->firstName();
         $lastName = fake('lt_LT')->lastName();
-        $email = strtolower($firstName . '.' . $lastName . '@' . fake()->domainName());
+        $email = strtolower($firstName.'.'.$lastName.'@'.fake()->domainName());
 
         return [
             'email' => $email,
@@ -29,11 +29,11 @@ final class SubscriberFactory extends Factory
             'company' => fake()->optional(0.6)->company(),
             'job_title' => fake()->optional(0.5)->jobTitle(),
             'interests' => fake()->randomElements([
-                'products', 'news', 'promotions', 'events', 
-                'blog', 'technical', 'business', 'support'
+                'products', 'news', 'promotions', 'events',
+                'blog', 'technical', 'business', 'support',
             ], fake()->numberBetween(1, 4)),
             'source' => fake()->randomElement([
-                'website', 'admin', 'import', 'api', 'social', 'referral', 'event', 'other'
+                'website', 'admin', 'import', 'api', 'social', 'referral', 'event', 'other',
             ]),
             'status' => fake()->randomElement(['active', 'inactive', 'unsubscribed']),
             'subscribed_at' => fake()->dateTimeBetween('-2 years', 'now'),
@@ -45,10 +45,10 @@ final class SubscriberFactory extends Factory
                 'user_agent' => fake()->userAgent(),
                 'referrer' => fake()->optional(0.3)->url(),
                 'utm_source' => fake()->optional(0.4)->randomElement([
-                    'google', 'facebook', 'linkedin', 'direct'
+                    'google', 'facebook', 'linkedin', 'direct',
                 ]),
                 'utm_campaign' => fake()->optional(0.3)->randomElement([
-                    'summer_sale', 'newsletter_signup', 'product_launch'
+                    'summer_sale', 'newsletter_signup', 'product_launch',
                 ]),
             ],
         ];
@@ -83,7 +83,7 @@ final class SubscriberFactory extends Factory
         return $this->state(function (array $attributes) {
             $user = User::factory()->create([
                 'email' => $attributes['email'],
-                'name' => $attributes['first_name'] . ' ' . $attributes['last_name'],
+                'name' => $attributes['first_name'].' '.$attributes['last_name'],
             ]);
 
             return [

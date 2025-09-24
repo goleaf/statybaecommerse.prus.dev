@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         $activityLogStatus = app(ActivityLogStatus::class);
         $wasLoggingDisabled = $activityLogStatus->disabled();
 
-        if (!$wasLoggingDisabled) {
+        if (! $wasLoggingDisabled) {
             activity()->disableLogging();
         }
 
@@ -62,6 +62,7 @@ class DatabaseSeeder extends Seeder
             BulkCustomerSeeder::class,
             // Normal settings for /admin/normal-settings CRUD
             NormalSettingSeeder::class,
+            NormalSettingTranslationSeeder::class,
             // Comprehensive orders for analytics (current and previous month, with paid statuses)
             // ComprehensiveOrderSeeder::class, // Temporarily disabled due to memory issues
             // Collections for admin/collections CRUD
@@ -82,6 +83,13 @@ class DatabaseSeeder extends Seeder
             SeoDataSeeder::class,
             // News demo content
             NewsSeeder::class,
+            NewsTagSeeder::class,
+            NewsImageSeeder::class,
+            NewsCommentSeeder::class,
+            // News translations
+            NewsTranslationSeeder::class,
+            NewsTagTranslationSeeder::class,
+            NewsImageTranslationSeeder::class,
             // Legal pages
             LegalSeeder::class,
             // Build header menu from categories
@@ -92,9 +100,14 @@ class DatabaseSeeder extends Seeder
             CampaignScheduleSeeder::class,
             DocumentTemplateSeeder::class,
             EnumValueSeeder::class,
+            // Variant combinations for admin/variant-combinations CRUD
+            VariantCombinationSeeder::class,
+            // System settings
+            SystemSettingCategorySeeder::class,
+            SystemSettingSeeder::class,
         ]);
 
-        if (!$wasLoggingDisabled) {
+        if (! $wasLoggingDisabled) {
             activity()->enableLogging();
         }
     }

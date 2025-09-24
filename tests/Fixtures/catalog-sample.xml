@@ -1,0 +1,24 @@
+<catalog>
+  <categories>
+    <category>
+      <slug>fixtures-cat</slug>
+      <translations>
+        <translation locale="lt"><name>Įranga</name></translation>
+        <translation locale="en"><name>Equipment</name></translation>
+      </translations>
+    </category>
+  </categories>
+  <products>
+    <product>
+      <sku>FX-001</sku>
+      <translations>
+        <translation locale="lt"><name>Fikstu produktas</name></translation>
+        <translation locale="en"><name>Fixture Product</name></translation>
+      </translations>
+      <categories>
+        <category_slug>fixtures-cat</category_slug>
+      </categories>
+    </product>
+  </products>
+</catalog>
+

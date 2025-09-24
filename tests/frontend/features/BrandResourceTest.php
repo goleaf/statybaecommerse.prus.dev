@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\BrandResource;
-use App\Models\Translations\BrandTranslation;
 use App\Models\Brand;
 use App\Models\Product;
+use App\Models\Translations\BrandTranslation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

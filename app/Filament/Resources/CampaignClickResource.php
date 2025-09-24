@@ -1,21 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignClickResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\User;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\DateTimePicker;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Select;
@@ -28,14 +31,26 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+
+final class CampaignClickResource extends Resource
+{
+    protected static ?string $model = CampaignClick::class;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Marketing';
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -44,7 +59,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -53,12 +67,13 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Forms\Form $schema
+     *
+     * @param  Forms\Form  $schema
      * @return Forms\Form
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -186,8 +201,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -282,7 +295,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('campaign_clicks.mark_conversion'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(CampaignClick $record): bool => !$record->is_converted)
+                    ->visible(fn (CampaignClick $record): bool => ! $record->is_converted)
                     ->action(function (CampaignClick $record): void {
                         $record->update(['is_converted' => true]);
 
@@ -296,7 +309,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('campaign_clicks.unmark_conversion'))
                     ->icon('heroicon-o-x-circle')
                     ->color('warning')
-                    ->visible(fn(CampaignClick $record): bool => $record->is_converted)
+                    ->visible(fn (CampaignClick $record): bool => $record->is_converted)
                     ->action(function (CampaignClick $record): void {
                         $record->update(['is_converted' => false]);
 
@@ -341,7 +354,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -352,7 +364,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

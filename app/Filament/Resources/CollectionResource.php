@@ -1,17 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -21,19 +24,34 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use UnitEnum;
+
+final class CollectionResource extends Resource
+{
+    protected static ?string $model = Collection::class;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-folder';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
+    }
+
+    protected static ?int $navigationSort = 2;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -42,7 +60,6 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -51,23 +68,20 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make(__('collections.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('name')
                                 ->label(__('collections.name'))
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
-                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
                             TextInput::make('slug')
                                 ->label(__('collections.slug'))
                                 ->unique(ignoreRecord: true)
@@ -79,7 +93,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
                         ->columnSpanFull(),
                 ]),
             Section::make(__('collections.media'))
-                ->components([
+                ->schema([
                     FileUpload::make('image')
                         ->label(__('collections.image'))
                         ->image()
@@ -102,7 +116,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
                         ->visibility('public'),
                 ]),
             Section::make(__('collections.products'))
-                ->components([
+                ->schema([
                     Select::make('products')
                         ->label(__('collections.products'))
                         ->relationship('products', 'name')
@@ -111,7 +125,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
                         ->preload(),
                 ]),
             Section::make(__('collections.seo'))
-                ->components([
+                ->schema([
                     TextInput::make('seo_title')
                         ->label(__('collections.seo_title'))
                         ->maxLength(255),
@@ -121,7 +135,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
                         ->maxLength(500),
                 ]),
             Section::make(__('collections.settings'))
-                ->components([
+                ->schema([
                     Toggle::make('is_active')
                         ->label(__('collections.is_active'))
                         ->default(true),
@@ -148,8 +162,6 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -174,7 +186,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
                     ->sortable(),
                 TextColumn::make('sort_order')
                     ->label(__('collections.sort_order'))
-                    ->formatStateUsing(fn(string $state): string => __("collections.sort_orders.{$state}")),
+                    ->formatStateUsing(fn (string $state): string => __("collections.sort_orders.{$state}")),
                 IconColumn::make('is_active')
                     ->label(__('collections.is_active'))
                     ->boolean(),
@@ -209,11 +221,11 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(Collection $record): string => $record->is_active ? __('collections.deactivate') : __('collections.activate'))
-                    ->icon(fn(Collection $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Collection $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (Collection $record): string => $record->is_active ? __('collections.deactivate') : __('collections.activate'))
+                    ->icon(fn (Collection $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Collection $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Collection $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('collections.activated_successfully') : __('collections.deactivated_successfully'))
                             ->success()
@@ -224,7 +236,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
                     ->label(__('collections.update_products'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('info')
-                    ->visible(fn(Collection $record): bool => $record->auto_update)
+                    ->visible(fn (Collection $record): bool => $record->auto_update)
                     ->action(function (Collection $record): void {
                         // Auto-update products based on collection settings
                         Notification::make()
@@ -267,7 +279,6 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -278,7 +289,6 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

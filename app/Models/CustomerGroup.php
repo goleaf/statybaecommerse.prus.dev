@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,8 +8,8 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -18,9 +20,11 @@ use Spatie\Translatable\HasTranslations;
  * @property mixed $table
  * @property array $translatable
  * @property mixed $fillable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|CustomerGroup newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CustomerGroup newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CustomerGroup query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -29,54 +33,35 @@ final class CustomerGroup extends Model
     use HasFactory, HasTranslations;
 
     protected $table = 'customer_groups';
+
     public array $translatable = ['name', 'description'];
 
     protected $fillable = [
         'name',
         'code',
         'description',
+        'slug',
         'discount_percentage',
-        'discount_fixed',
-        'has_special_pricing',
-        'has_volume_discounts',
-        'can_view_prices',
-        'can_place_orders',
-        'can_view_catalog',
-        'can_use_coupons',
-        'is_active',
-        'is_default',
-        'sort_order',
-        'type',
         'is_enabled',
-        'conditions'
+        'metadata',
+        'conditions',
     ];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
         return [
             'discount_percentage' => 'decimal:2',
-            'discount_fixed' => 'decimal:2',
-            'has_special_pricing' => 'boolean',
-            'has_volume_discounts' => 'boolean',
-            'can_view_prices' => 'boolean',
-            'can_place_orders' => 'boolean',
-            'can_view_catalog' => 'boolean',
-            'can_use_coupons' => 'boolean',
-            'is_active' => 'boolean',
-            'is_default' => 'boolean',
-            'sort_order' => 'integer',
             'is_enabled' => 'boolean',
-            'conditions' => 'array'
+            'metadata' => 'array',
+            'conditions' => 'array',
         ];
     }
 
     /**
      * Handle users functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function users(): BelongsToMany
     {
@@ -85,7 +70,6 @@ final class CustomerGroup extends Model
 
     /**
      * Handle customers functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function customers(): BelongsToMany
     {
@@ -94,7 +78,6 @@ final class CustomerGroup extends Model
 
     /**
      * Handle discounts functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function discounts(): BelongsToMany
     {
@@ -103,7 +86,6 @@ final class CustomerGroup extends Model
 
     /**
      * Handle priceLists functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function priceLists(): BelongsToMany
     {
@@ -112,7 +94,8 @@ final class CustomerGroup extends Model
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEnabled($query)
     {
@@ -121,7 +104,8 @@ final class CustomerGroup extends Model
 
     /**
      * Handle scopeWithDiscount functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithDiscount($query)
     {
@@ -130,7 +114,6 @@ final class CustomerGroup extends Model
 
     /**
      * Handle getUsersCountAttribute functionality with proper error handling.
-     * @return int
      */
     public function getUsersCountAttribute(): int
     {
@@ -139,7 +122,6 @@ final class CustomerGroup extends Model
 
     /**
      * Handle hasDiscountRate functionality with proper error handling.
-     * @return bool
      */
     public function hasDiscountRate(): bool
     {
@@ -148,7 +130,6 @@ final class CustomerGroup extends Model
 
     /**
      * Handle getIsActiveAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getIsActiveAttribute(): bool
     {
@@ -157,11 +138,32 @@ final class CustomerGroup extends Model
 
     /**
      * Handle setIsActiveAttribute functionality with proper error handling.
-     * @param bool $value
-     * @return void
      */
     public function setIsActiveAttribute(bool $value): void
     {
         $this->attributes['is_enabled'] = $value;
+    }
+
+    /**
+     * Get metadata field value
+     *
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function getMetadata(string $key, $default = null)
+    {
+        return $this->metadata[$key] ?? $default;
+    }
+
+    /**
+     * Set metadata field value
+     *
+     * @param  mixed  $value
+     */
+    public function setMetadata(string $key, $value): void
+    {
+        $metadata = $this->metadata ?? [];
+        $metadata[$key] = $value;
+        $this->metadata = $metadata;
     }
 }

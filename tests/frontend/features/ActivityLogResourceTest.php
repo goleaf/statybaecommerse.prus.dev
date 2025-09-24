@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\ActivityLogResource;
 use App\Models\Order;
@@ -180,7 +182,7 @@ it('displays activity properties in modal', function () {
         ->performedOn($product)
         ->withProperties([
             'attributes' => ['name' => 'New Name'],
-            'old' => ['name' => 'Old Name']
+            'old' => ['name' => 'Old Name'],
         ])
         ->log('Product updated');
 

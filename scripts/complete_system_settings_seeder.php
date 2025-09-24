@@ -2,15 +2,15 @@
 
 require_once 'vendor/autoload.php';
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
 
 $capsule = new Capsule;
 
 $capsule->addConnection([
     'driver' => 'sqlite',
-    'database' => __DIR__ . '/database/database.sqlite',
+    'database' => __DIR__.'/database/database.sqlite',
     'prefix' => '',
 ]);
 
@@ -847,7 +847,7 @@ foreach ($settings as $setting) {
     Capsule::table('system_settings')->insert($setting);
 }
 
-echo "✅ Added " . count($settings) . " additional settings\n";
+echo '✅ Added '.count($settings)." additional settings\n";
 
 // Show final statistics
 $totalSettings = Capsule::table('system_settings')->count();

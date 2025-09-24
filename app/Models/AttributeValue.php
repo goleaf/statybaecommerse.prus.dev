@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -7,9 +9,9 @@ use App\Models\Scopes\EnabledScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -20,9 +22,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property mixed $table
  * @property mixed $fillable
  * @property string $translationModel
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|AttributeValue newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AttributeValue newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AttributeValue query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -31,11 +35,11 @@ final class AttributeValue extends Model
     use HasFactory, HasTranslations, SoftDeletes;
 
     protected $table = 'attribute_values';
+
     protected $fillable = ['attribute_id', 'value', 'slug', 'color_code', 'sort_order', 'is_enabled', 'description', 'hex_color', 'image', 'metadata', 'display_value', 'is_active'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -46,7 +50,6 @@ final class AttributeValue extends Model
 
     /**
      * Handle attribute functionality with proper error handling.
-     * @return BelongsTo
      */
     public function attribute(): BelongsTo
     {
@@ -55,7 +58,6 @@ final class AttributeValue extends Model
 
     /**
      * Handle products functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function products(): BelongsToMany
     {
@@ -64,7 +66,6 @@ final class AttributeValue extends Model
 
     /**
      * Handle variants functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function variants(): BelongsToMany
     {
@@ -73,7 +74,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEnabled($query)
     {
@@ -82,7 +84,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeOrdered($query)
     {
@@ -91,8 +94,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeForAttribute functionality with proper error handling.
-     * @param mixed $query
-     * @param int $attributeId
+     *
+     * @param  mixed  $query
      */
     public function scopeForAttribute($query, int $attributeId)
     {
@@ -101,8 +104,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeByAttribute functionality with proper error handling.
-     * @param mixed $query
-     * @param int $attributeId
+     *
+     * @param  mixed  $query
      */
     public function scopeByAttribute($query, int $attributeId)
     {
@@ -111,8 +114,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeByValue functionality with proper error handling.
-     * @param mixed $query
-     * @param string $value
+     *
+     * @param  mixed  $query
      */
     public function scopeByValue($query, string $value)
     {
@@ -121,8 +124,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeByDisplayValue functionality with proper error handling.
-     * @param mixed $query
-     * @param string $displayValue
+     *
+     * @param  mixed  $query
      */
     public function scopeByDisplayValue($query, string $displayValue)
     {
@@ -131,8 +134,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeByHexColor functionality with proper error handling.
-     * @param mixed $query
-     * @param string $hexColor
+     *
+     * @param  mixed  $query
      */
     public function scopeByHexColor($query, string $hexColor)
     {
@@ -141,8 +144,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeByImage functionality with proper error handling.
-     * @param mixed $query
-     * @param string $image
+     *
+     * @param  mixed  $query
      */
     public function scopeByImage($query, string $image)
     {
@@ -151,7 +154,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {

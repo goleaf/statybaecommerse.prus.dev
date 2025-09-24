@@ -18,7 +18,7 @@ final class NetherlandsCitiesSeeder extends Seeder
         $euZone = Zone::where('code', 'EU')->first();
 
         // Regions are no longer used in the database schema
-        
+
         $cities = [
             // North Holland
             [
@@ -32,8 +32,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['1000', '1001', '1002'],
                 'translations' => [
                     'lt' => ['name' => 'Amsterdamas', 'description' => 'Nyderlandų sostinė'],
-                    'en' => ['name' => 'Amsterdam', 'description' => 'Capital of Netherlands']
-            ],
+                    'en' => ['name' => 'Amsterdam', 'description' => 'Capital of Netherlands'],
+                ],
             ],
             [
                 'name' => 'Haarlem',
@@ -44,8 +44,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['2000'],
                 'translations' => [
                     'lt' => ['name' => 'Harlemas', 'description' => 'Šiaurės Olandijos sostinė'],
-                    'en' => ['name' => 'Haarlem', 'description' => 'Capital of North Holland']
-            ],
+                    'en' => ['name' => 'Haarlem', 'description' => 'Capital of North Holland'],
+                ],
             ],
             [
                 'name' => 'Zaanstad',
@@ -56,8 +56,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['1500'],
                 'translations' => [
                     'lt' => ['name' => 'Zaanstadas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Zaanstad', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Zaanstad', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Haarlemmermeer',
@@ -68,8 +68,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['2130'],
                 'translations' => [
                     'lt' => ['name' => 'Harlemmermeras', 'description' => 'Oro uosto miestas'],
-                    'en' => ['name' => 'Haarlemmermeer', 'description' => 'Airport city']
-            ],
+                    'en' => ['name' => 'Haarlemmermeer', 'description' => 'Airport city'],
+                ],
             ],
             // South Holland
             [
@@ -81,8 +81,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['3000', '3001', '3002'],
                 'translations' => [
                     'lt' => ['name' => 'Roterdamas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Rotterdam', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Rotterdam', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'The Hague',
@@ -93,8 +93,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['2500'],
                 'translations' => [
                     'lt' => ['name' => 'Haga', 'description' => 'Vyriausybės miestas'],
-                    'en' => ['name' => 'The Hague', 'description' => 'Government city']
-            ],
+                    'en' => ['name' => 'The Hague', 'description' => 'Government city'],
+                ],
             ],
             [
                 'name' => 'Leiden',
@@ -105,8 +105,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['2300'],
                 'translations' => [
                     'lt' => ['name' => 'Leidenas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Leiden', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Leiden', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Dordrecht',
@@ -117,8 +117,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['3300'],
                 'translations' => [
                     'lt' => ['name' => 'Dordrechtas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Dordrecht', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Dordrecht', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Delft',
@@ -129,8 +129,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['2600'],
                 'translations' => [
                     'lt' => ['name' => 'Delfas', 'description' => 'Technologijų miestas'],
-                    'en' => ['name' => 'Delft', 'description' => 'Technology city']
-            ],
+                    'en' => ['name' => 'Delft', 'description' => 'Technology city'],
+                ],
             ],
             // Utrecht
             [
@@ -142,8 +142,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['3500'],
                 'translations' => [
                     'lt' => ['name' => 'Utrechto', 'description' => 'Utrechto provincijos sostinė'],
-                    'en' => ['name' => 'Utrecht', 'description' => 'Capital of Utrecht province']
-            ],
+                    'en' => ['name' => 'Utrecht', 'description' => 'Capital of Utrecht province'],
+                ],
             ],
             [
                 'name' => 'Amersfoort',
@@ -154,8 +154,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['3800'],
                 'translations' => [
                     'lt' => ['name' => 'Amersfortas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Amersfoort', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Amersfoort', 'description' => 'Historic city'],
+                ],
             ],
             // North Brabant
             [
@@ -167,8 +167,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['5600'],
                 'translations' => [
                     'lt' => ['name' => 'Eindhovenas', 'description' => 'Technologijų centras'],
-                    'en' => ['name' => 'Eindhoven', 'description' => 'Technology center']
-            ],
+                    'en' => ['name' => 'Eindhoven', 'description' => 'Technology center'],
+                ],
             ],
             [
                 'name' => 'Tilburg',
@@ -179,8 +179,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['5000'],
                 'translations' => [
                     'lt' => ['name' => 'Tilburgas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Tilburg', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Tilburg', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Breda',
@@ -191,8 +191,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['4800'],
                 'translations' => [
                     'lt' => ['name' => 'Breda', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Breda', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Breda', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 's-Hertogenbosch',
@@ -203,8 +203,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['5200'],
                 'translations' => [
                     'lt' => ['name' => 's-Hertogenboschas', 'description' => 'Šiaurės Brabanto sostinė'],
-                    'en' => ['name' => 's-Hertogenbosch', 'description' => 'Capital of North Brabant']
-            ],
+                    'en' => ['name' => 's-Hertogenbosch', 'description' => 'Capital of North Brabant'],
+                ],
             ],
             // Gelderland
             [
@@ -216,8 +216,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['6500'],
                 'translations' => [
                     'lt' => ['name' => 'Nijmegenas', 'description' => 'Senovinis miestas'],
-                    'en' => ['name' => 'Nijmegen', 'description' => 'Ancient city']
-            ],
+                    'en' => ['name' => 'Nijmegen', 'description' => 'Ancient city'],
+                ],
             ],
             [
                 'name' => 'Arnhem',
@@ -228,8 +228,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['6800'],
                 'translations' => [
                     'lt' => ['name' => 'Arnhemas', 'description' => 'Gelderlando sostinė'],
-                    'en' => ['name' => 'Arnhem', 'description' => 'Capital of Gelderland']
-            ],
+                    'en' => ['name' => 'Arnhem', 'description' => 'Capital of Gelderland'],
+                ],
             ],
             [
                 'name' => 'Apeldoorn',
@@ -240,8 +240,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['7300'],
                 'translations' => [
                     'lt' => ['name' => 'Apeldoornas', 'description' => 'Karališkojo rūmo miestas'],
-                    'en' => ['name' => 'Apeldoorn', 'description' => 'Royal palace city']
-            ],
+                    'en' => ['name' => 'Apeldoorn', 'description' => 'Royal palace city'],
+                ],
             ],
             // Overijssel
             [
@@ -253,8 +253,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['7500'],
                 'translations' => [
                     'lt' => ['name' => 'Enschede', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Enschede', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Enschede', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Zwolle',
@@ -265,8 +265,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['8000'],
                 'translations' => [
                     'lt' => ['name' => 'Zvolė', 'description' => 'Overijselo sostinė'],
-                    'en' => ['name' => 'Zwolle', 'description' => 'Capital of Overijssel']
-            ],
+                    'en' => ['name' => 'Zwolle', 'description' => 'Capital of Overijssel'],
+                ],
             ],
             // Limburg
             [
@@ -278,8 +278,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['6200'],
                 'translations' => [
                     'lt' => ['name' => 'Maastrichtas', 'description' => 'Limburgo sostinė'],
-                    'en' => ['name' => 'Maastricht', 'description' => 'Capital of Limburg']
-            ],
+                    'en' => ['name' => 'Maastricht', 'description' => 'Capital of Limburg'],
+                ],
             ],
             // Friesland
             [
@@ -291,8 +291,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['8900'],
                 'translations' => [
                     'lt' => ['name' => 'Leuwardenas', 'description' => 'Fryzų sostinė'],
-                    'en' => ['name' => 'Leeuwarden', 'description' => 'Capital of Friesland']
-            ],
+                    'en' => ['name' => 'Leeuwarden', 'description' => 'Capital of Friesland'],
+                ],
             ],
             // Groningen
             [
@@ -304,8 +304,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['9700'],
                 'translations' => [
                     'lt' => ['name' => 'Groningenas', 'description' => 'Groningeno sostinė'],
-                    'en' => ['name' => 'Groningen', 'description' => 'Capital of Groningen']
-            ],
+                    'en' => ['name' => 'Groningen', 'description' => 'Capital of Groningen'],
+                ],
             ],
             // Drenthe
             [
@@ -317,8 +317,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['9400'],
                 'translations' => [
                     'lt' => ['name' => 'Asenas', 'description' => 'Drentės sostinė'],
-                    'en' => ['name' => 'Assen', 'description' => 'Capital of Drenthe']
-            ],
+                    'en' => ['name' => 'Assen', 'description' => 'Capital of Drenthe'],
+                ],
             ],
             // Flevoland
             [
@@ -330,8 +330,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['1300'],
                 'translations' => [
                     'lt' => ['name' => 'Almerė', 'description' => 'Naujasis miestas'],
-                    'en' => ['name' => 'Almere', 'description' => 'New city']
-            ],
+                    'en' => ['name' => 'Almere', 'description' => 'New city'],
+                ],
             ],
             [
                 'name' => 'Lelystad',
@@ -342,8 +342,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['8200'],
                 'translations' => [
                     'lt' => ['name' => 'Lelystadas', 'description' => 'Flevolando sostinė'],
-                    'en' => ['name' => 'Lelystad', 'description' => 'Capital of Flevoland']
-            ],
+                    'en' => ['name' => 'Lelystad', 'description' => 'Capital of Flevoland'],
+                ],
             ],
             // Zeeland
             [
@@ -355,8 +355,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 'postal_codes' => ['4330'],
                 'translations' => [
                     'lt' => ['name' => 'Midelburgas', 'description' => 'Zelandos sostinė'],
-                    'en' => ['name' => 'Middelburg', 'description' => 'Capital of Zeeland']
-            ],
+                    'en' => ['name' => 'Middelburg', 'description' => 'Capital of Zeeland'],
+                ],
             ],
         ];
 
@@ -365,7 +365,7 @@ final class NetherlandsCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -385,8 +385,8 @@ final class NetherlandsCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

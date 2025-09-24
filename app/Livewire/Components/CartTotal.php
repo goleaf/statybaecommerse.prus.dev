@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -20,13 +22,15 @@ use Livewire\Component;
 class CartTotal extends Component
 {
     public float $subtotal = 0.0;
+
     public float $discount = 0.0;
+
     public float $shippingDiscount = 0.0;
+
     public float $total = 0.0;
 
     /**
      * Handle cartSubtotal functionality with proper error handling.
-     * @return float
      */
     #[Computed]
     public function cartSubtotal(): float
@@ -40,12 +44,12 @@ class CartTotal extends Component
                 return 0.0;
             }
         }
+
         return 0.0;
     }
 
     /**
      * Handle discountCalculation functionality with proper error handling.
-     * @return array
      */
     #[Computed]
     public function discountCalculation(): array
@@ -55,7 +59,6 @@ class CartTotal extends Component
 
     /**
      * Handle finalTotal functionality with proper error handling.
-     * @return float
      */
     #[Computed]
     public function finalTotal(): float
@@ -65,12 +68,12 @@ class CartTotal extends Component
         $discount = (float) ($result['discount_total_amount'] ?? 0.0);
         $shippingDiscount = (float) data_get($result, 'shipping.discount_amount', 0.0);
         $shipping = (float) data_get(session()->get('checkout'), 'shipping_option.0.price', 0.0);
+
         return max(0, $subtotal - $discount + max(0, $shipping - $shippingDiscount));
     }
 
     /**
      * Handle updateTotals functionality with proper error handling.
-     * @return void
      */
     #[On('cartUpdated')]
     #[On('coupon-updated')]
@@ -81,7 +84,6 @@ class CartTotal extends Component
 
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -90,7 +92,6 @@ class CartTotal extends Component
 
     /**
      * Handle compute functionality with proper error handling.
-     * @return void
      */
     protected function compute(): void
     {
@@ -114,8 +115,6 @@ class CartTotal extends Component
 
     /**
      * Handle calculateDiscountsAndShipping functionality with proper error handling.
-     * @param float $amount
-     * @return array
      */
     protected function calculateDiscountsAndShipping(float $amount): array
     {
@@ -155,7 +154,6 @@ class CartTotal extends Component
 
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

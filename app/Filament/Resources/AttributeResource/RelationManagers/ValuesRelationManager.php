@@ -1,18 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\RelationManagers;
 
-use App\Models\AttributeValue;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 final class ValuesRelationManager extends RelationManager
 {
@@ -20,10 +19,10 @@ final class ValuesRelationManager extends RelationManager
 
     protected static ?string $title = 'Attribute Values';
 
-    public function form(Schema $schemaSchema): Schema
+    public function form(Schema $schema): Schema
     {
-        return $schemaSchema
-            ->components([
+        return $schema
+            ->schema([
                 Forms\Components\TextInput::make('value')
                     ->label(__('translations.value'))
                     ->required()

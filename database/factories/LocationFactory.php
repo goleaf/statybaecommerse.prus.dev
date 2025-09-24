@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Country;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +21,7 @@ final class LocationFactory extends Factory
 
         return [
             'code' => strtoupper($this->faker->unique()->lexify('???###')),
-            'name' => $this->faker->company() . ' ' . ucfirst($type),
+            'name' => $this->faker->company().' '.ucfirst($type),
             'slug' => $this->faker->slug(),
             'description' => $this->faker->paragraph(),
             'type' => $type,
@@ -46,7 +45,7 @@ final class LocationFactory extends Factory
                     ['day' => 'friday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
                     ['day' => 'saturday', 'open_time' => '10:00', 'close_time' => '15:00', 'is_closed' => false],
                     ['day' => 'sunday', 'open_time' => null, 'close_time' => null, 'is_closed' => true],
-                ]
+                ],
             ]),
             'contact_info' => $this->faker->optional()->randomElement([
                 null,
@@ -54,7 +53,7 @@ final class LocationFactory extends Factory
                     'manager' => $this->faker->name(),
                     'department' => $this->faker->randomElement(['Warehouse', 'Sales', 'Customer Service']),
                     'emergency_contact' => $this->faker->phoneNumber(),
-                ]
+                ],
             ]),
             'is_enabled' => $this->faker->boolean(80), // 80% chance of being enabled
             'is_default' => $this->faker->boolean(10), // 10% chance of being default
@@ -66,7 +65,7 @@ final class LocationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'warehouse',
-            'name' => $this->faker->company() . ' Warehouse',
+            'name' => $this->faker->company().' Warehouse',
         ]);
     }
 
@@ -74,7 +73,7 @@ final class LocationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'store',
-            'name' => $this->faker->company() . ' Store',
+            'name' => $this->faker->company().' Store',
         ]);
     }
 
@@ -82,10 +81,9 @@ final class LocationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'office',
-            'name' => $this->faker->company() . ' Office',
+            'name' => $this->faker->company().' Office',
         ]);
     }
-
 
     public function enabled(): static
     {

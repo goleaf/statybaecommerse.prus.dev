@@ -14,16 +14,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * VariantCombination
- * 
+ *
  * Eloquent model representing the VariantCombination entity for managing variant combinations.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @property mixed $casts
  * @property mixed $appends
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|VariantCombination newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantCombination newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantCombination query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -32,7 +34,7 @@ final class VariantCombination extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'variant_combinations';
-    
+
     protected $fillable = [
         'product_id',
         'attribute_combinations',
@@ -55,7 +57,6 @@ final class VariantCombination extends Model
 
     /**
      * Handle product functionality with proper error handling.
-     * @return BelongsTo
      */
     public function product(): BelongsTo
     {
@@ -64,61 +65,60 @@ final class VariantCombination extends Model
 
     /**
      * Handle getFormattedCombinationsAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedCombinationsAttribute(): string
     {
-        if (!$this->attribute_combinations) {
+        if (! $this->attribute_combinations) {
             return 'No combinations';
         }
-        
+
         $formatted = [];
         foreach ($this->attribute_combinations as $attribute => $value) {
-            $formatted[] = ucfirst($attribute) . ': ' . $value;
+            $formatted[] = ucfirst($attribute).': '.$value;
         }
-        
+
         return implode(', ', $formatted);
     }
 
     /**
      * Handle getCombinationHashAttribute functionality with proper error handling.
-     * @return string
      */
     public function getCombinationHashAttribute(): string
     {
-        if (!$this->attribute_combinations) {
+        if (! $this->attribute_combinations) {
             return '';
         }
-        
+
         ksort($this->attribute_combinations);
+
         return md5(json_encode($this->attribute_combinations));
     }
 
     /**
      * Handle getIsValidCombinationAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getIsValidCombinationAttribute(): bool
     {
-        if (!$this->attribute_combinations || !$this->product) {
+        if (! $this->attribute_combinations || ! $this->product) {
             return false;
         }
-        
+
         // Check if all attributes exist for this product
         $productAttributes = $this->product->attributes()->pluck('name', 'id')->toArray();
-        
+
         foreach ($this->attribute_combinations as $attributeName => $value) {
-            if (!in_array($attributeName, $productAttributes)) {
+            if (! in_array($attributeName, $productAttributes)) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
     /**
      * Handle scopeAvailable functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeAvailable($query)
     {
@@ -127,8 +127,8 @@ final class VariantCombination extends Model
 
     /**
      * Handle scopeByProduct functionality with proper error handling.
-     * @param mixed $query
-     * @param int $productId
+     *
+     * @param  mixed  $query
      */
     public function scopeByProduct($query, int $productId)
     {
@@ -137,96 +137,87 @@ final class VariantCombination extends Model
 
     /**
      * Handle scopeByAttributeValue functionality with proper error handling.
-     * @param mixed $query
-     * @param string $attribute
-     * @param string $value
+     *
+     * @param  mixed  $query
      */
     public function scopeByAttributeValue($query, string $attribute, string $value)
     {
-        return $query->whereJsonContains('attribute_combinations->' . $attribute, $value);
+        return $query->whereJsonContains('attribute_combinations->'.$attribute, $value);
     }
 
     /**
      * Handle scopeByCombination functionality with proper error handling.
-     * @param mixed $query
-     * @param array $combinations
+     *
+     * @param  mixed  $query
      */
     public function scopeByCombination($query, array $combinations)
     {
         foreach ($combinations as $attribute => $value) {
-            $query->whereJsonContains('attribute_combinations->' . $attribute, $value);
+            $query->whereJsonContains('attribute_combinations->'.$attribute, $value);
         }
-        
+
         return $query;
     }
 
     /**
      * Generate all possible combinations for a product.
-     * @param Product $product
-     * @return array
      */
     public static function generateCombinations(Product $product): array
     {
         $attributes = $product->attributes()->with('values')->get();
         $combinations = [];
-        
+
         if ($attributes->isEmpty()) {
             return $combinations;
         }
-        
+
         $attributeValues = [];
         foreach ($attributes as $attribute) {
             $attributeValues[$attribute->name] = $attribute->values->pluck('value')->toArray();
         }
-        
+
         $combinations = self::generateCombinationsRecursive($attributeValues);
-        
+
         return $combinations;
     }
 
     /**
      * Generate combinations recursively.
-     * @param array $attributeValues
-     * @param array $currentCombination
-     * @param int $depth
-     * @return array
      */
     private static function generateCombinationsRecursive(array $attributeValues, array $currentCombination = [], int $depth = 0): array
     {
         $keys = array_keys($attributeValues);
-        
+
         if ($depth >= count($keys)) {
             return [$currentCombination];
         }
-        
+
         $currentKey = $keys[$depth];
         $combinations = [];
-        
+
         foreach ($attributeValues[$currentKey] as $value) {
             $newCombination = $currentCombination;
             $newCombination[$currentKey] = $value;
-            
+
             $combinations = array_merge(
                 $combinations,
                 self::generateCombinationsRecursive($attributeValues, $newCombination, $depth + 1)
             );
         }
-        
+
         return $combinations;
     }
 
     /**
      * Create or update combinations for a product.
-     * @param Product $product
-     * @return void
      */
     public static function createCombinationsForProduct(Product $product): void
     {
         $combinations = self::generateCombinations($product);
-        
+
         foreach ($combinations as $combination) {
             $hash = md5(json_encode($combination));
-            
+
             self::updateOrCreate(
                 [
                     'product_id' => $product->id,
@@ -242,22 +233,19 @@ final class VariantCombination extends Model
 
     /**
      * Find variant by combination.
-     * @param Product $product
-     * @param array $combination
-     * @return ProductVariant|null
      */
     public static function findVariantByCombination(Product $product, array $combination): ?ProductVariant
     {
         $hash = md5(json_encode($combination));
-        
+
         $variantCombination = self::where('product_id', $product->id)
             ->where('combination_hash', $hash)
             ->first();
-        
-        if (!$variantCombination) {
+
+        if (! $variantCombination) {
             return null;
         }
-        
+
         // Find the actual variant that matches this combination
         return $product->variants()
             ->whereHas('attributes', function ($query) use ($combination) {
@@ -272,8 +260,6 @@ final class VariantCombination extends Model
 
     /**
      * Get available combinations for a product.
-     * @param Product $product
-     * @return array
      */
     public static function getAvailableCombinations(Product $product): array
     {
@@ -286,14 +272,11 @@ final class VariantCombination extends Model
 
     /**
      * Check if a combination is available.
-     * @param Product $product
-     * @param array $combination
-     * @return bool
      */
     public static function isCombinationAvailable(Product $product, array $combination): bool
     {
         $hash = md5(json_encode($combination));
-        
+
         return self::where('product_id', $product->id)
             ->where('combination_hash', $hash)
             ->where('is_available', true)

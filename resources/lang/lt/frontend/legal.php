@@ -6,7 +6,7 @@ return [
     'legal_information' => 'Teisinė informacija',
     'legal_document' => 'Teisinis dokumentas',
     'all_legal_documents' => 'Visi teisiniai dokumentai',
-    
+
     // Navigation
     'privacy_policy' => 'Privatumo politika',
     'terms_of_use' => 'Naudojimosi sąlygos',
@@ -16,7 +16,7 @@ return [
     'gdpr_policy' => 'GDPR politika',
     'legal_notice' => 'Teisinė informacija',
     'imprint' => 'Imprint',
-    
+
     // Document info
     'last_updated' => 'Paskutinį kartą atnaujinta',
     'reading_time' => 'Skaitymo laikas',
@@ -27,56 +27,56 @@ return [
     'effective_date' => 'Įsigaliojimo data',
     'review_date' => 'Peržiūros data',
     'document_type' => 'Dokumento tipas',
-    
+
     // Status
     'published' => 'Paskelbtas',
     'draft' => 'Juodraštis',
     'disabled' => 'Išjungtas',
     'required' => 'Privalomas',
-    
+
     // Actions
     'read_more' => 'Skaityti daugiau',
     'download_pdf' => 'Atsisiųsti PDF',
     'print_document' => 'Spausdinti dokumentą',
     'share_document' => 'Dalintis dokumentu',
-    
+
     // Messages
     'document_not_found' => 'Dokumentas nerastas',
     'document_not_available' => 'Dokumentas šiuo metu nepasiekiamas',
     'document_under_review' => 'Dokumentas peržiūrimas',
     'document_coming_soon' => 'Dokumentas bus paskelbtas netrukus',
-    
+
     // SEO
     'meta_title' => 'Teisiniai dokumentai - {site_name}',
     'meta_description' => 'Peržiūrėkite mūsų teisinius dokumentus: privatumo politiką, naudojimosi sąlygas, grąžinimo politiką ir kitus svarbius dokumentus.',
     'meta_keywords' => 'teisiniai dokumentai, privatumo politika, naudojimosi sąlygos, grąžinimo politika, pristatymo politika',
-    
+
     // Breadcrumbs
     'home' => 'Pagrindinis',
     'legal' => 'Teisinė informacija',
-    
+
     // Related documents
     'related_documents' => 'Susiję dokumentai',
     'other_documents' => 'Kiti dokumentai',
     'recommended_reading' => 'Rekomenduojama skaityti',
-    
+
     // Contact
     'questions_about_legal' => 'Turite klausimų apie teisinius dokumentus?',
     'contact_us' => 'Susisiekite su mumis',
     'legal_team' => 'Teisinis skyrius',
-    
+
     // Updates
     'document_updated' => 'Dokumentas atnaujintas',
     'what_changed' => 'Kas pasikeitė',
     'changelog' => 'Pakeitimų sąrašas',
     'update_notification' => 'Šis dokumentas buvo neseniai atnaujintas',
-    
+
     // Accessibility
     'table_of_contents' => 'Turinys',
     'jump_to_section' => 'Pereiti prie skyriaus',
     'back_to_top' => 'Grįžti į viršų',
     'print_friendly' => 'Spausdinimui tinkama versija',
-    
+
     // Legal types descriptions
     'privacy_policy_description' => 'Mūsų privatumo politika paaiškina, kaip renkame, naudojame ir saugome jūsų asmeninę informaciją.',
     'terms_of_use_description' => 'Naudojimosi sąlygos nustato taisykles ir sąlygas, pagal kurias galite naudotis mūsų paslaugomis.',

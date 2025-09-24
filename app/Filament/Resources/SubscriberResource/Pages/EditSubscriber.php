@@ -7,9 +7,8 @@ namespace App\Filament\Resources\SubscriberResource\Pages;
 use App\Filament\Resources\SubscriberResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions\DeleteAction;
 
-final class EditSubscriber extends EditRecord
+class EditSubscriber extends EditRecord
 {
     protected static string $resource = SubscriberResource::class;
 
@@ -19,10 +18,5 @@ final class EditSubscriber extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
     }
 }

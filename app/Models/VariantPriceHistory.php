@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * VariantPriceHistory
- * 
+ *
  * Model for tracking price changes of product variants with comprehensive history and analytics.
  */
 final class VariantPriceHistory extends Model
@@ -72,7 +72,7 @@ final class VariantPriceHistory extends Model
         if ($this->old_price <= 0) {
             return 0;
         }
-        
+
         return (($this->new_price - $this->old_price) / $this->old_price) * 100;
     }
 
@@ -145,7 +145,7 @@ final class VariantPriceHistory extends Model
         ?\DateTime $effectiveFrom = null,
         ?\DateTime $effectiveUntil = null
     ): self {
-        return static::create([
+        return self::create([
             'variant_id' => $variantId,
             'old_price' => $oldPrice,
             'new_price' => $newPrice,

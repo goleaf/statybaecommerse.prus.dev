@@ -1,17 +1,19 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use App\Services\AutocompleteService;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+
 /**
  * AdvancedSearch
- * 
+ *
  * Livewire component for AdvancedSearch with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string $query
  * @property array $results
  * @property bool $showResults
@@ -34,35 +36,51 @@ final class AdvancedSearch extends Component
 {
     #[Validate('nullable|string|max:255')]
     public string $query = '';
+
     public array $results = [];
+
     public bool $showResults = false;
+
     public bool $showFilters = false;
+
     public int $maxResults = 20;
+
     public int $minQueryLength = 2;
+
     public bool $isSearching = false;
+
     // Filter properties
     public array $selectedCategories = [];
+
     public array $selectedBrands = [];
+
     public array $selectedCollections = [];
+
     public ?float $minPrice = null;
+
     public ?float $maxPrice = null;
+
     public bool $inStockOnly = false;
+
     public string $sortBy = 'relevance';
+
     // Available options for filters
     public array $availableCategories = [];
+
     public array $availableBrands = [];
+
     public array $availableCollections = [];
+
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
         $this->loadFilterOptions();
     }
+
     /**
      * Handle updatedQuery functionality with proper error handling.
-     * @return void
      */
     public function updatedQuery(): void
     {
@@ -74,9 +92,9 @@ final class AdvancedSearch extends Component
             $this->clearResults();
         }
     }
+
     /**
      * Handle performSearch functionality with proper error handling.
-     * @return void
      */
     public function performSearch(): void
     {
@@ -91,9 +109,9 @@ final class AdvancedSearch extends Component
         $this->results = array_slice($this->results, 0, $this->maxResults);
         $this->isSearching = false;
     }
+
     /**
      * Handle clearResults functionality with proper error handling.
-     * @return void
      */
     public function clearResults(): void
     {
@@ -101,17 +119,17 @@ final class AdvancedSearch extends Component
         $this->showResults = false;
         $this->isSearching = false;
     }
+
     /**
      * Handle toggleFilters functionality with proper error handling.
-     * @return void
      */
     public function toggleFilters(): void
     {
-        $this->showFilters = !$this->showFilters;
+        $this->showFilters = ! $this->showFilters;
     }
+
     /**
      * Handle clearFilters functionality with proper error handling.
-     * @return void
      */
     public function clearFilters(): void
     {
@@ -126,29 +144,28 @@ final class AdvancedSearch extends Component
             $this->performSearch();
         }
     }
+
     /**
      * Handle applyFilters functionality with proper error handling.
-     * @param array $results
-     * @return array
      */
     public function applyFilters(array $results): array
     {
         return array_filter($results, function ($result) {
             // Category filter
-            if (!empty($this->selectedCategories) && $result['type'] === 'product') {
-                if (!isset($result['categories']) || !array_intersect($result['categories'], $this->selectedCategories)) {
+            if (! empty($this->selectedCategories) && $result['type'] === 'product') {
+                if (! isset($result['categories']) || ! array_intersect($result['categories'], $this->selectedCategories)) {
                     return false;
                 }
             }
             // Brand filter
-            if (!empty($this->selectedBrands) && $result['type'] === 'product') {
-                if (!isset($result['brand_id']) || !in_array($result['brand_id'], $this->selectedBrands)) {
+            if (! empty($this->selectedBrands) && $result['type'] === 'product') {
+                if (! isset($result['brand_id']) || ! in_array($result['brand_id'], $this->selectedBrands)) {
                     return false;
                 }
             }
             // Collection filter
-            if (!empty($this->selectedCollections) && $result['type'] === 'product') {
-                if (!isset($result['collections']) || !array_intersect($result['collections'], $this->selectedCollections)) {
+            if (! empty($this->selectedCollections) && $result['type'] === 'product') {
+                if (! isset($result['collections']) || ! array_intersect($result['collections'], $this->selectedCollections)) {
                     return false;
                 }
             }
@@ -163,17 +180,17 @@ final class AdvancedSearch extends Component
             }
             // Stock filter
             if ($this->inStockOnly && $result['type'] === 'product') {
-                if (!isset($result['in_stock']) || !$result['in_stock']) {
+                if (! isset($result['in_stock']) || ! $result['in_stock']) {
                     return false;
                 }
             }
+
             return true;
         });
     }
+
     /**
      * Handle sortResults functionality with proper error handling.
-     * @param array $results
-     * @return array
      */
     public function sortResults(array $results): array
     {
@@ -185,50 +202,51 @@ final class AdvancedSearch extends Component
             default => $results,
         };
     }
+
     /**
      * Handle sortByPrice functionality with proper error handling.
-     * @param array $results
-     * @param string $direction
-     * @return array
      */
     private function sortByPrice(array $results, string $direction): array
     {
         usort($results, function ($a, $b) use ($direction) {
             $priceA = $a['price'] ?? 0;
             $priceB = $b['price'] ?? 0;
+
             return $direction === 'asc' ? $priceA <=> $priceB : $priceB <=> $priceA;
         });
+
         return $results;
     }
+
     /**
      * Handle sortByName functionality with proper error handling.
-     * @param array $results
-     * @return array
      */
     private function sortByName(array $results): array
     {
         usort($results, function ($a, $b) {
             return strcasecmp($a['title'], $b['title']);
         });
+
         return $results;
     }
+
     /**
      * Handle sortByRelevance functionality with proper error handling.
-     * @param array $results
-     * @return array
      */
     private function sortByRelevance(array $results): array
     {
         usort($results, function ($a, $b) {
             $scoreA = $a['relevance_score'] ?? 0;
             $scoreB = $b['relevance_score'] ?? 0;
+
             return $scoreB <=> $scoreA;
         });
+
         return $results;
     }
+
     /**
      * Handle loadFilterOptions functionality with proper error handling.
-     * @return void
      */
     private function loadFilterOptions(): void
     {
@@ -249,9 +267,9 @@ final class AdvancedSearch extends Component
             return ['id' => $collection['id'], 'name' => $collection['title']];
         }, $collections);
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

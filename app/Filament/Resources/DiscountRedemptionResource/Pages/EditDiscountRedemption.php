@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\Pages;
 
 use App\Filament\Resources\DiscountRedemptionResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
 final class EditDiscountRedemption extends EditRecord
 {
@@ -13,8 +15,8 @@ final class EditDiscountRedemption extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
     }
 }
-

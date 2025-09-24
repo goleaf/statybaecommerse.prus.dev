@@ -12,17 +12,19 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use BackedEnum;
-use App\Enums\NavigationGroup;
+use UnitEnum;
 
 final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
-    /** @var string|\BackedEnum|null */
-    /** @var BackedEnum|string|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
-    // protected static $navigationGroup = NavigationGroup::Content;
+
+    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static ?int $navigationSort = 1;
+
     protected static ?string $recordTitleAttribute = 'title';
 
     public static function form(Schema $schema): Schema

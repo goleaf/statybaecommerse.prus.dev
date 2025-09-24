@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
+
 /**
  * Controller
- * 
+ *
  * HTTP controller handling Controller related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 abstract class Controller
 {
@@ -19,35 +19,32 @@ abstract class Controller
     {
         $this->applyPreferredLocale();
     }
+
     /**
      * Handle applyPreferredLocale functionality with proper error handling.
-     * @return void
      */
     protected function applyPreferredLocale(): void
     {
-        $supported = collect(is_array(config('app.supported_locales')) ? config('app.supported_locales') : explode(',', (string) config('app.supported_locales', 'en')))->map(fn($l) => trim((string) $l))->filter()->values();
+        $supported = collect(is_array(config('app.supported_locales')) ? config('app.supported_locales') : explode(',', (string) config('app.supported_locales', 'en')))->map(fn ($l) => trim((string) $l))->filter()->values();
         $preferred = ((Request::user()?->preferred_locale ?: Request::route('locale')) ?: Request::get('locale')) ?: substr((string) Request::header('Accept-Language', ''), 0, 2);
         if (is_string($preferred) && $preferred !== '' && $supported->contains($preferred)) {
             App::setLocale($preferred);
         }
     }
+
     /**
      * Handle t functionality with proper error handling.
-     * @param string $key
-     * @param array $params
-     * @param int|null $count
-     * @return string
      */
     protected function t(string $key, array $params = [], ?int $count = null): string
     {
         // Use the new unified translation files (lt.php, en.php)
         $translationKey = $this->normalizeTranslationKey($key);
+
         return $count === null ? __($translationKey, $params) : trans_choice($translationKey, $count, $params);
     }
+
     /**
      * Handle normalizeTranslationKey functionality with proper error handling.
-     * @param string $key
-     * @return string
      */
     protected function normalizeTranslationKey(string $key): string
     {
@@ -56,12 +53,12 @@ abstract class Controller
         if (str_contains($key, '.')) {
             return str_replace('.', '_', $key);
         }
+
         return $key;
     }
+
     /**
      * Handle tArray functionality with proper error handling.
-     * @param array $data
-     * @return array
      */
     protected function tArray(array $data): array
     {
@@ -75,15 +72,19 @@ abstract class Controller
                     $normalizedKey = $this->normalizeTranslationKey($key);
                     $params = (array) ($node['params'] ?? []);
                     $count = $node['count'] ?? null;
+
                     return $count === null ? __($normalizedKey, $params) : trans_choice($normalizedKey, (int) $count, $params);
                 }
                 foreach ($node as $k => $v) {
                     $node[$k] = $translateNode($v);
                 }
+
                 return $node;
             }
+
             return $node;
         };
+
         return $translateNode($data);
     }
 }

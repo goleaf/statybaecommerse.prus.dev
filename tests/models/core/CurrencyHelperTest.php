@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\App;
 
@@ -36,7 +38,7 @@ it('app_money_format uses current currency when none provided', function () {
 it('formats price with default currency and locale', function () {
     App::setLocale('lt');
     $formatted = format_price(123.45);
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('€')
@@ -45,7 +47,7 @@ it('formats price with default currency and locale', function () {
 
 it('formats price with custom currency and locale', function () {
     $formatted = format_price(123.45, 'USD', 'en');
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('$')
@@ -54,20 +56,20 @@ it('formats price with custom currency and locale', function () {
 
 it('handles null values gracefully', function () {
     $formatted = format_price(null);
-    
+
     expect($formatted)->toBe('');
 });
 
 it('handles empty string values gracefully', function () {
     $formatted = format_price('');
-    
+
     expect($formatted)->toBe('');
 });
 
 it('handles zero values correctly', function () {
     App::setLocale('lt');
     $formatted = format_price(0);
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('€')
@@ -77,7 +79,7 @@ it('handles zero values correctly', function () {
 it('handles string numeric values', function () {
     App::setLocale('lt');
     $formatted = format_price('123.45');
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('€')
@@ -87,7 +89,7 @@ it('handles string numeric values', function () {
 it('handles integer values', function () {
     App::setLocale('lt');
     $formatted = format_price(123);
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('€')
@@ -97,11 +99,11 @@ it('handles integer values', function () {
 it('uses current locale when none provided', function () {
     App::setLocale('en');
     $formatted = format_price(123.45);
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('€');
-    
+
     // Should use English formatting (dot as decimal separator)
     expect(str_contains($formatted, '.'))->toBeTrue();
 });
@@ -109,7 +111,7 @@ it('uses current locale when none provided', function () {
 it('uses current currency when none provided', function () {
     App::setLocale('lt');
     $formatted = format_price(123.45);
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('€');
@@ -118,7 +120,7 @@ it('uses current currency when none provided', function () {
 it('formats large amounts correctly', function () {
     App::setLocale('lt');
     $formatted = format_price(1234567.89);
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('€')
@@ -130,10 +132,9 @@ it('formats large amounts correctly', function () {
 it('formats small decimal amounts correctly', function () {
     App::setLocale('lt');
     $formatted = format_price(0.01);
-    
+
     expect($formatted)
         ->toBeString()
         ->toContain('€')
         ->toContain('0,01');
 });
-

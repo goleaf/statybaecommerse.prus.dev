@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -7,15 +9,15 @@ use App\Models\Scopes\EnabledScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Brand
@@ -27,9 +29,11 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property mixed $table
  * @property string $translationModel
  * @property mixed $translatable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Brand newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Brand newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Brand query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -44,7 +48,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -52,7 +55,7 @@ final class Brand extends Model implements HasMedia
             'is_enabled' => 'boolean',
             'is_active' => 'boolean',
             'is_visible' => 'boolean',
-            'is_featured' => 'boolean'
+            'is_featured' => 'boolean',
         ];
     }
 
@@ -64,12 +67,13 @@ final class Brand extends Model implements HasMedia
     protected $appends = ['products_count', 'logo', 'canonical_url', 'meta_tags', 'total_revenue', 'average_product_price', 'website_domain'];
 
     protected $table = 'brands';
+
     protected string $translationModel = \App\Models\Translations\BrandTranslation::class;
+
     protected $translatable = ['name', 'slug', 'description', 'seo_title', 'seo_description'];
 
     /**
      * Handle booted functionality with proper error handling.
-     * @return void
      */
     protected static function booted(): void
     {
@@ -83,7 +87,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getRouteKeyName functionality with proper error handling.
-     * @return string
      */
     public function getRouteKeyName(): string
     {
@@ -92,20 +95,18 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
-     * @return LogOptions
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'website', 'is_enabled', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "Brand {$eventName}")->useLogName('brand');
+        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'website', 'is_enabled', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Brand {$eventName}")->useLogName('brand');
     }
 
     /**
      * Handle flushCaches functionality with proper error handling.
-     * @return void
      */
     public static function flushCaches(): void
     {
-        $locales = collect(config('app.supported_locales', 'en'))->when(fn($v) => is_string($v), fn($c) => collect(explode(',', (string) $c)))->map(fn($v) => trim((string) $v))->filter()->values();
+        $locales = collect(config('app.supported_locales', 'en'))->when(fn ($v) => is_string($v), fn ($c) => collect(explode(',', (string) $c)))->map(fn ($v) => trim((string) $v))->filter()->values();
         foreach ($locales as $loc) {
             Cache::forget("sitemap:urls:{$loc}");
         }
@@ -113,7 +114,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle products functionality with proper error handling.
-     * @return HasMany
      */
     public function products(): HasMany
     {
@@ -122,7 +122,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEnabled($query)
     {
@@ -131,7 +132,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeVisible functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeVisible($query)
     {
@@ -140,7 +142,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeWithProducts functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithProducts($query)
     {
@@ -149,7 +152,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getProductsCountAttribute functionality with proper error handling.
-     * @return int
      */
     public function getProductsCountAttribute(): int
     {
@@ -158,7 +160,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getLogoAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getLogoAttribute(): ?string
     {
@@ -167,34 +168,30 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getLogoUrl functionality with proper error handling.
-     * @param string|null $size
-     * @return string|null
      */
     public function getLogoUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             return $this->getFirstMediaUrl('logo') ?: null;
         }
+
         return ($this->getFirstMediaUrl('logo', "logo-{$size}") ?: $this->getFirstMediaUrl('logo')) ?: null;
     }
 
     /**
      * Handle getBannerUrl functionality with proper error handling.
-     * @param string|null $size
-     * @return string|null
      */
     public function getBannerUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             return $this->getFirstMediaUrl('banner') ?: null;
         }
+
         return ($this->getFirstMediaUrl('banner', "banner-{$size}") ?: $this->getFirstMediaUrl('banner')) ?: null;
     }
 
     /**
      * Handle getTranslatedName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string
      */
     public function getTranslatedName(?string $locale = null): string
     {
@@ -203,8 +200,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getTranslatedSlug functionality with proper error handling.
-     * @param string|null $locale
-     * @return string
      */
     public function getTranslatedSlug(?string $locale = null): string
     {
@@ -213,8 +208,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedDescription(?string $locale = null): ?string
     {
@@ -223,8 +216,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getTranslatedSeoTitle functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedSeoTitle(?string $locale = null): ?string
     {
@@ -233,8 +224,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getTranslatedSeoDescription functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedSeoDescription(?string $locale = null): ?string
     {
@@ -243,8 +232,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle hasTranslation functionality with proper error handling.
-     * @param string $locale
-     * @return bool
      */
     public function hasTranslation(string $locale): bool
     {
@@ -253,7 +240,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getAvailableLocales functionality with proper error handling.
-     * @return array
      */
     public function getAvailableLocales(): array
     {
@@ -264,12 +250,13 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
-     * @param mixed $query
-     * @param string|null $locale
+     *
+     * @param  mixed  $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
+
         return $query->with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }]);
@@ -277,8 +264,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle hasTranslationFor functionality with proper error handling.
-     * @param string $locale
-     * @return bool
      */
     public function hasTranslationFor(string $locale): bool
     {
@@ -287,7 +272,7 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     * @param string $locale
+     *
      * @return App\Models\Translations\BrandTranslation
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\BrandTranslation
@@ -297,26 +282,23 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle updateTranslation functionality with proper error handling.
-     * @param string $locale
-     * @param array $data
-     * @return bool
      */
     public function updateTranslation(string $locale, array $data): bool
     {
         $translation = $this->getOrCreateTranslation($locale);
+
         return $translation->update($data);
     }
 
     /**
      * Handle updateTranslations functionality with proper error handling.
-     * @param array $translations
-     * @return bool
      */
     public function updateTranslations(array $translations): bool
     {
         foreach ($translations as $locale => $data) {
             $this->updateTranslation($locale, $data);
         }
+
         return true;
     }
 
@@ -324,7 +306,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getBrandInfo functionality with proper error handling.
-     * @return array
      */
     public function getBrandInfo(): array
     {
@@ -333,7 +314,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getMediaInfo functionality with proper error handling.
-     * @return array
      */
     public function getMediaInfo(): array
     {
@@ -342,7 +322,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getSeoInfo functionality with proper error handling.
-     * @return array
      */
     public function getSeoInfo(): array
     {
@@ -351,17 +330,14 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getBusinessInfo functionality with proper error handling.
-     * @return array
      */
     public function getBusinessInfo(): array
     {
-        return ['products_count' => $this->products()->count(), 'published_products_count' => $this->products()->published()->count(), 'total_revenue' => $this->getTotalRevenue(), 'average_product_price' => $this->getAverageProductPrice(), 'is_active' => $this->is_enabled, 'has_products' => $this->products()->exists(), 'has_website' => !empty($this->website), 'has_media' => $this->hasAnyMedia()];
+        return ['products_count' => $this->products()->count(), 'published_products_count' => $this->products()->published()->count(), 'total_revenue' => $this->getTotalRevenue(), 'average_product_price' => $this->getAverageProductPrice(), 'is_active' => $this->is_enabled, 'has_products' => $this->products()->exists(), 'has_website' => ! empty($this->website), 'has_media' => $this->hasAnyMedia()];
     }
 
     /**
      * Handle getCompleteInfo functionality with proper error handling.
-     * @param string|null $locale
-     * @return array
      */
     public function getCompleteInfo(?string $locale = null): array
     {
@@ -372,7 +348,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getCanonicalUrl functionality with proper error handling.
-     * @return string
      */
     public function getCanonicalUrl(): string
     {
@@ -380,8 +355,15 @@ final class Brand extends Model implements HasMedia
     }
 
     /**
+     * Handle getCanonicalUrlAttribute functionality with proper error handling.
+     */
+    public function getCanonicalUrlAttribute(): string
+    {
+        return $this->getCanonicalUrl();
+    }
+
+    /**
      * Handle getMetaTags functionality with proper error handling.
-     * @return array
      */
     public function getMetaTags(): array
     {
@@ -390,7 +372,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getTotalRevenue functionality with proper error handling.
-     * @return float
      */
     public function getTotalRevenue(): float
     {
@@ -399,7 +380,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getAverageProductPrice functionality with proper error handling.
-     * @return float|null
      */
     public function getAverageProductPrice(): ?float
     {
@@ -408,19 +388,38 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getFullDisplayName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string
      */
     public function getFullDisplayName(?string $locale = null): string
     {
         $name = $this->getTranslatedName($locale);
         $status = $this->is_enabled ? 'Enabled' : 'Disabled';
+
         return "{$name} ({$status})";
+    }
+
+    // Eloquent attribute accessors for appended attributes
+    public function getMetaTagsAttribute(): array
+    {
+        return $this->getMetaTags();
+    }
+
+    public function getTotalRevenueAttribute(): float
+    {
+        return $this->getTotalRevenue();
+    }
+
+    public function getAverageProductPriceAttribute(): ?float
+    {
+        return $this->getAverageProductPrice();
+    }
+
+    public function getWebsiteDomainAttribute(): ?string
+    {
+        return $this->getWebsiteDomain();
     }
 
     /**
      * Handle isActive functionality with proper error handling.
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -429,7 +428,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle hasProducts functionality with proper error handling.
-     * @return bool
      */
     public function hasProducts(): bool
     {
@@ -438,7 +436,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle hasPublishedProducts functionality with proper error handling.
-     * @return bool
      */
     public function hasPublishedProducts(): bool
     {
@@ -447,16 +444,14 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle hasWebsite functionality with proper error handling.
-     * @return bool
      */
     public function hasWebsite(): bool
     {
-        return !empty($this->website);
+        return ! empty($this->website);
     }
 
     /**
      * Handle hasAnyMedia functionality with proper error handling.
-     * @return bool
      */
     public function hasAnyMedia(): bool
     {
@@ -465,19 +460,20 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle getWebsiteDomain functionality with proper error handling.
-     * @return string|null
      */
     public function getWebsiteDomain(): ?string
     {
-        if (!$this->website) {
+        if (! $this->website) {
             return null;
         }
+
         return parse_url($this->website, PHP_URL_HOST);
     }
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -486,7 +482,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeInactive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeInactive($query)
     {
@@ -495,7 +492,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeWithWebsite functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithWebsite($query)
     {
@@ -504,7 +502,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeWithoutWebsite functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithoutWebsite($query)
     {
@@ -515,7 +514,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeWithMedia functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithMedia($query)
     {
@@ -524,7 +524,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeWithoutMedia functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithoutMedia($query)
     {
@@ -533,8 +534,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopePopular functionality with proper error handling.
-     * @param mixed $query
-     * @param int $minProducts
+     *
+     * @param  mixed  $query
      */
     public function scopePopular($query, int $minProducts = 5)
     {
@@ -543,8 +544,8 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle scopeRecent functionality with proper error handling.
-     * @param mixed $query
-     * @param int $days
+     *
+     * @param  mixed  $query
      */
     public function scopeRecent($query, int $days = 30)
     {
@@ -553,7 +554,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle registerMediaCollections functionality with proper error handling.
-     * @return void
      */
     public function registerMediaCollections(): void
     {
@@ -563,8 +563,6 @@ final class Brand extends Model implements HasMedia
 
     /**
      * Handle registerMediaConversions functionality with proper error handling.
-     * @param Media|null $media
-     * @return void
      */
     public function registerMediaConversions(?Media $media = null): void
     {

@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategoryResource\Pages;
 
 use App\Filament\Resources\NewsCategoryResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 
 class ListNewsCategories extends ListRecords
 {
@@ -17,4 +19,3 @@ class ListNewsCategories extends ListRecords
         ];
     }
 }
-

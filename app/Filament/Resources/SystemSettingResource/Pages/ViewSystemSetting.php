@@ -7,7 +7,6 @@ namespace App\Filament\Resources\SystemSettingResource\Pages;
 use App\Filament\Resources\SystemSettingResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Actions\EditAction;
 
 final class ViewSystemSetting extends ViewRecord
 {

@@ -43,4 +43,3 @@ return [
         'verifications_sent_successfully' => 'Verifications sent successfully',
     ],
 ];
-

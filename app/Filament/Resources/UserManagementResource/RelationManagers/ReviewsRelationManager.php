@@ -1,32 +1,37 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
-use App\Models\Review;
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
+
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 final class ReviewsRelationManager extends RelationManager
 {
     protected static string $relationship = 'reviews';
+
     protected static ?string $title = 'Reviews';
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
-                    ->required(),
-                    ->searchable(),
+                    ->required()
+                    ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('rating')
-                    ->numeric(),
+                    ->numeric()
                     ->minValue(1)
                     ->maxValue(5)
                     ->required(),
@@ -36,9 +41,10 @@ final class ReviewsRelationManager extends RelationManager
                     ->maxLength(1000),
                 Forms\Components\Toggle::make('is_approved')
                     ->default(false),
-                Forms\Components\Toggle::make('is_featured')
+                Forms\Components\Toggle::make('is_featured'),
             ]);
     }
+
     public function table(Table $table): Table
     {
         return $table
@@ -47,7 +53,7 @@ final class ReviewsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('product.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rating')
-                    ->badge(),
+                    ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state >= 4 => 'success',
                         $state >= 3 => 'warning',
@@ -60,6 +66,7 @@ final class ReviewsRelationManager extends RelationManager
                 Tables\Columns\IconColumn::make('is_approved')
                     ->boolean(),
                 Tables\Columns\IconColumn::make('is_featured')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(),
             ])
@@ -77,14 +84,17 @@ final class ReviewsRelationManager extends RelationManager
                 Tables\Filters\TernaryFilter::make('is_featured')
                     ->label('Featured'),
                 Tables\Filters\TrashedFilter::make(),
+            ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
+            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     DeleteBulkAction::make(),
@@ -100,9 +110,11 @@ final class ReviewsRelationManager extends RelationManager
                         ->label('Disapprove')
                         ->icon('heroicon-m-x-circle')
                         ->color('danger')
-                        ->action(fn ($records) => $records->each(fn ($record) => $record->update(['is_approved' => false])))
+                        ->action(fn ($records) => $records->each(fn ($record) => $record->update(['is_approved' => false]))),
                 ]),
+            ])
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
+    }
 }

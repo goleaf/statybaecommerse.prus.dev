@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -88,12 +90,12 @@ final class DiscountRedemptionController extends Controller
 
         $discountCode = \App\Models\DiscountCode::where('code', $request->discount_code)->first();
 
-        if (!$discountCode) {
+        if (! $discountCode) {
             return back()->withErrors(['discount_code' => __('Invalid discount code.')]);
         }
 
         // Check if code is active and not expired
-        if (!$discountCode->is_active || $discountCode->expires_at < now()) {
+        if (! $discountCode->is_active || $discountCode->expires_at < now()) {
             return back()->withErrors(['discount_code' => __('This discount code is no longer valid.')]);
         }
 

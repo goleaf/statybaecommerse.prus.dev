@@ -4,21 +4,26 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Models\Attribute;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Attribute;
-use App\Models\AttributeValue;
-use Livewire\Component;
 use Illuminate\Support\Collection;
+use Livewire\Component;
 
 final class ProductVariantSelector extends Component
 {
     public Product $product;
+
     public Collection $variants;
-    public Collection $attributes;
+
+    public Collection $variantAttributes;
+
     public array $selectedAttributes = [];
+
     public ?ProductVariant $selectedVariant = null;
+
     public int $quantity = 1;
+
     public bool $showVariantDetails = false;
 
     protected $listeners = ['variantSelected' => 'onVariantSelected'];
@@ -42,26 +47,26 @@ final class ProductVariantSelector extends Component
 
     public function loadAttributes(): void
     {
-        $this->attributes = Attribute::whereHas('values', function ($query) {
+        $this->variantAttributes = Attribute::whereHas('values', function ($query) {
             $query->whereHas('variants', function ($subQuery) {
                 $subQuery->where('product_id', $this->product->id);
             });
         })
-        ->with(['values' => function ($query) {
-            $query->whereHas('variants', function ($subQuery) {
-                $subQuery->where('product_id', $this->product->id);
-            });
-        }])
-        ->enabled()
-        ->orderBy('sort_order')
-        ->get();
+            ->with(['values' => function ($query) {
+                $query->whereHas('variants', function ($subQuery) {
+                    $subQuery->where('product_id', $this->product->id);
+                });
+            }])
+            ->enabled()
+            ->orderBy('sort_order')
+            ->get();
     }
 
     public function selectDefaultVariant(): void
     {
         $defaultVariant = $this->variants->where('is_default_variant', true)->first();
-        
-        if (!$defaultVariant && $this->variants->isNotEmpty()) {
+
+        if (! $defaultVariant && $this->variants->isNotEmpty()) {
             $defaultVariant = $this->variants->first();
         }
 
@@ -82,19 +87,20 @@ final class ProductVariantSelector extends Component
     {
         if (empty($this->selectedAttributes)) {
             $this->selectDefaultVariant();
+
             return;
         }
 
         $matchingVariant = $this->variants->first(function (ProductVariant $variant) {
             $variantAttributes = $this->getVariantAttributes($variant);
-            
+
             foreach ($this->selectedAttributes as $attributeSlug => $selectedValue) {
-                if (!isset($variantAttributes[$attributeSlug]) || 
+                if (! isset($variantAttributes[$attributeSlug]) ||
                     $variantAttributes[$attributeSlug] !== $selectedValue) {
                     return false;
                 }
             }
-            
+
             return true;
         });
 
@@ -105,19 +111,19 @@ final class ProductVariantSelector extends Component
     public function getVariantAttributes(ProductVariant $variant): array
     {
         $attributes = [];
-        
+
         foreach ($variant->attributes as $attributeValue) {
             $attributes[$attributeValue->attribute->slug] = $attributeValue->value;
         }
-        
+
         return $attributes;
     }
 
     public function getAvailableValues(string $attributeSlug): Collection
     {
-        $attribute = $this->attributes->where('slug', $attributeSlug)->first();
-        
-        if (!$attribute) {
+        $attribute = $this->variantAttributes->where('slug', $attributeSlug)->first();
+
+        if (! $attribute) {
             return collect();
         }
 
@@ -127,26 +133,26 @@ final class ProductVariantSelector extends Component
 
         $matchingVariants = $this->variants->filter(function (ProductVariant $variant) use ($currentSelections) {
             $variantAttributes = $this->getVariantAttributes($variant);
-            
+
             foreach ($currentSelections as $attrSlug => $selectedValue) {
-                if (!isset($variantAttributes[$attrSlug]) || 
+                if (! isset($variantAttributes[$attrSlug]) ||
                     $variantAttributes[$attrSlug] !== $selectedValue) {
                     return false;
                 }
             }
-            
+
             return true;
         });
 
         // Get unique values for this attribute from matching variants
         $availableValues = collect();
-        
+
         foreach ($matchingVariants as $variant) {
             $variantAttributes = $this->getVariantAttributes($variant);
             if (isset($variantAttributes[$attributeSlug])) {
                 $value = $variantAttributes[$attributeSlug];
                 $attributeValue = $attribute->values->where('value', $value)->first();
-                if ($attributeValue && !$availableValues->contains('value', $value)) {
+                if ($attributeValue && ! $availableValues->contains('value', $value)) {
                     $availableValues->push($attributeValue);
                 }
             }
@@ -162,7 +168,7 @@ final class ProductVariantSelector extends Component
 
     public function isValueSelected(string $attributeSlug, string $value): bool
     {
-        return isset($this->selectedAttributes[$attributeSlug]) && 
+        return isset($this->selectedAttributes[$attributeSlug]) &&
                $this->selectedAttributes[$attributeSlug] === $value;
     }
 
@@ -182,18 +188,21 @@ final class ProductVariantSelector extends Component
 
     public function addToCart(): void
     {
-        if (!$this->selectedVariant) {
+        if (! $this->selectedVariant) {
             $this->dispatch('show-error', message: __('product_variants.messages.no_variant_selected'));
+
             return;
         }
 
-        if (!$this->selectedVariant->isAvailableForPurchase()) {
+        if (! $this->selectedVariant->isAvailableForPurchase()) {
             $this->dispatch('show-error', message: __('product_variants.messages.variant_not_available'));
+
             return;
         }
 
         if ($this->quantity > $this->selectedVariant->availableQuantity()) {
             $this->dispatch('show-error', message: __('product_variants.messages.insufficient_stock'));
+
             return;
         }
 
@@ -221,8 +230,8 @@ final class ProductVariantSelector extends Component
 
     public function getVariantPromotionalPrice(): ?float
     {
-        return $this->selectedVariant && $this->selectedVariant->isCurrentlyOnSale() 
-            ? $this->selectedVariant->promotional_price 
+        return $this->selectedVariant && $this->selectedVariant->isCurrentlyOnSale()
+            ? $this->selectedVariant->promotional_price
             : null;
     }
 
@@ -243,7 +252,7 @@ final class ProductVariantSelector extends Component
 
     public function getVariantStockStatus(): string
     {
-        if (!$this->selectedVariant) {
+        if (! $this->selectedVariant) {
             return 'unavailable';
         }
 
@@ -252,20 +261,20 @@ final class ProductVariantSelector extends Component
 
     public function getVariantStockMessage(): string
     {
-        if (!$this->selectedVariant) {
+        if (! $this->selectedVariant) {
             return __('product_variants.messages.select_variant');
         }
 
         $available = $this->selectedVariant->availableQuantity();
-        
+
         if ($available <= 0) {
             return __('product_variants.messages.out_of_stock');
         }
-        
+
         if ($available <= $this->selectedVariant->low_stock_threshold) {
             return __('product_variants.messages.low_stock', ['quantity' => $available]);
         }
-        
+
         return __('product_variants.messages.in_stock', ['quantity' => $available]);
     }
 
@@ -276,7 +285,7 @@ final class ProductVariantSelector extends Component
     {
         // Record view for the product
         $this->product->increment('views_count');
-        
+
         // Record view for the default variant if available
         if ($this->selectedVariant) {
             $this->selectedVariant->recordView();
@@ -308,7 +317,7 @@ final class ProductVariantSelector extends Component
      */
     public function getVariantBadges(): array
     {
-        if (!$this->selectedVariant) {
+        if (! $this->selectedVariant) {
             return [];
         }
 
@@ -338,7 +347,7 @@ final class ProductVariantSelector extends Component
      */
     public function getVariantDiscountPercentage(): ?float
     {
-        if (!$this->selectedVariant || !$this->isVariantOnSale()) {
+        if (! $this->selectedVariant || ! $this->isVariantOnSale()) {
             return null;
         }
 

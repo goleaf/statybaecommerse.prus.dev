@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'navigation' => [
@@ -11,19 +13,17 @@ return [
         'about' => 'О нас',
         'contact' => 'Контакты',
     ],
-    
     // Direct keys for tests
     'home' => 'Главная',
     'about' => 'О нас',
     'contact' => 'Контакты',
     'products' => 'Продукты',
-        'cart' => 'Корзина',
-        'account' => 'Аккаунт',
-        'login' => 'Войти',
-        'register' => 'Регистрация',
-        'logout' => 'Выйти',
-        'search' => 'Поиск',
-    ],
+    'cart' => 'Корзина',
+    'account' => 'Аккаунт',
+    'login' => 'Войти',
+    'register' => 'Регистрация',
+    'logout' => 'Выйти',
+    'search' => 'Поиск',
     'products' => [
         'name' => 'Название',
         'price' => 'Цена',
@@ -282,7 +282,6 @@ return [
     'home_shop_by_collection' => 'Покупки по коллекции',
     'home_collections_desc' => 'Изучите наши тщательно отобранные коллекции продуктов высочайшего качества',
     'home_trending_products' => 'Популярные продукты',
-    
     // Additional translations from page content
     'free_shipping_from' => 'Бесплатная доставка от',
     'items_in_cart' => 'товаров в корзине, просмотреть корзину',
@@ -290,7 +289,6 @@ return [
     'search_products' => 'Поиск продуктов...',
     'nav_account' => 'Аккаунт',
     'cart_items_count' => 'товаров в корзине',
-    
     // Category names from page
     'categories' => [
         'sealing_films_tapes' => 'Герметизирующие пленки и ленты',
@@ -303,7 +301,6 @@ return [
         'electrical_products' => 'Электротовары',
         'workwear_safety' => 'Рабочая одежда, меры безопасности',
     ],
-    
     // Product details
     'product' => [
         'high_quality_product' => 'Высококачественный продукт для профессионалов и энтузиастов.',
@@ -330,7 +327,6 @@ return [
         'loyalty_points' => 'Бонусы лояльности',
         'loyalty_points_desc' => 'Зарабатывайте баллы и получайте скидки',
     ],
-    
     // Footer translations
     'footer' => [
         'heading' => 'О нас',
@@ -357,7 +353,6 @@ return [
         'all_rights_reserved' => 'Все права защищены',
         'powered_by_filament' => 'Создано с Filament',
     ],
-    
     // Language codes
     'languages' => [
         'lt' => 'LT',
@@ -365,7 +360,6 @@ return [
         'ru' => 'RU',
         'de' => 'DE',
     ],
-    
     // Exports
     'exports' => 'Экспорт',
 ];

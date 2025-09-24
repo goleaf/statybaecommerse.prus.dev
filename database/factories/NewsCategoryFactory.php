@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -31,30 +33,29 @@ final class NewsCategoryFactory extends Factory
 
     public function visible(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_visible' => true,
         ]);
     }
 
     public function hidden(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_visible' => false,
         ]);
     }
 
     public function withParent(NewsCategory $parent): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'parent_id' => $parent->id,
         ]);
     }
 
     public function ordered(int $sortOrder): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'sort_order' => $sortOrder,
         ]);
     }
 }
-

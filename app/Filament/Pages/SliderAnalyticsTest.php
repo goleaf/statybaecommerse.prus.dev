@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
@@ -10,7 +12,13 @@ final class SliderAnalyticsTest extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Slider Analytics Test';
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar';
+    }
 
     protected static ?int $navigationSort = 3;
 

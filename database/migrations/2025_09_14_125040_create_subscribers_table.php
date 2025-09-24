@@ -28,7 +28,7 @@ return new class extends Migration
             $table->integer('email_count')->default(0);
             $table->json('metadata')->nullable(); // Additional data
             $table->timestamps();
-            
+
             // Indexes
             $table->index(['status', 'subscribed_at']);
             $table->index('email');

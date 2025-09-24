@@ -9,7 +9,7 @@ use Illuminate\Contracts\View\View;
 
 /**
  * LocalizationCreator
- * 
+ *
  * View Creator that provides localization data to views.
  * This includes translations, locale-specific formatting, and regional settings.
  */
@@ -26,29 +26,29 @@ final class LocalizationCreator
     {
         $locale = app()->getLocale();
         $currency = current_currency();
-        
+
         $view->with([
             // Locale information
             'locale' => $locale,
             'currency' => $currency,
             'localeName' => $this->getLocaleName($locale),
             'currencySymbol' => $this->getCurrencySymbol($currency),
-            
+
             // Translation helpers
             'trans' => fn (string $key, array $replace = []) => $this->translationService->getTranslation($key, $locale, $replace),
             'transChoice' => fn (string $key, int $number, array $replace = []) => $this->translationService->getTranslationChoice($key, $number, $locale, $replace),
-            
+
             // Formatting helpers
             'formatPrice' => fn (float $amount) => $this->formatPrice($amount, $currency),
-            'formatDate' => fn ($date, string $format = null) => $this->formatDate($date, $format, $locale),
+            'formatDate' => fn ($date, ?string $format = null) => $this->formatDate($date, $format, $locale),
             'formatNumber' => fn (float $number, int $decimals = 2) => $this->formatNumber($number, $decimals, $locale),
-            
+
             // Regional settings
             'dateFormat' => $this->getDateFormat($locale),
             'timeFormat' => $this->getTimeFormat($locale),
             'numberFormat' => $this->getNumberFormat($locale),
             'currencyFormat' => $this->getCurrencyFormat($currency),
-            
+
             // Language direction
             'isRTL' => $this->isRightToLeft($locale),
             'textDirection' => $this->getTextDirection($locale),
@@ -90,7 +90,7 @@ final class LocalizationCreator
     {
         $symbol = $this->getCurrencySymbol($currency);
         $formatted = number_format($amount, 2, ',', ' ');
-        
+
         return match ($currency) {
             'EUR' => "{$formatted} {$symbol}",
             'USD' => "{$symbol}{$formatted}",
@@ -104,13 +104,13 @@ final class LocalizationCreator
      */
     private function formatDate($date, ?string $format, string $locale): string
     {
-        if (!$date) {
+        if (! $date) {
             return '';
         }
 
         $date = is_string($date) ? \Carbon\Carbon::parse($date) : $date;
-        
-        if (!$format) {
+
+        if (! $format) {
             $format = $this->getDateFormat($locale);
         }
 

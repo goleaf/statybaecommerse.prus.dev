@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Discount;
 use App\Models\DiscountRedemption;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Illuminate\Support\Facades\DB;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class DiscountRedemptionStatsWidget extends BaseWidget
 {
@@ -37,7 +38,7 @@ class DiscountRedemptionStatsWidget extends BaseWidget
                 ->description('Successfully redeemed')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make('Total Amount Saved', '€' . number_format($totalAmountSaved, 2))
+            Stat::make('Total Amount Saved', '€'.number_format($totalAmountSaved, 2))
                 ->description('Customer savings')
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),
@@ -45,7 +46,7 @@ class DiscountRedemptionStatsWidget extends BaseWidget
                 ->description('Last 7 days')
                 ->descriptionIcon('heroicon-m-calendar')
                 ->color('info'),
-            Stat::make('Average Amount', '€' . number_format($averageAmountSaved, 2))
+            Stat::make('Average Amount', '€'.number_format($averageAmountSaved, 2))
                 ->description('Per redemption')
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
@@ -57,4 +58,3 @@ class DiscountRedemptionStatsWidget extends BaseWidget
         return 3;
     }
 }
-

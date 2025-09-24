@@ -1,21 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralCampaignResource\Pages;
 use App\Models\ReferralCampaign;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -25,77 +28,112 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
+use UnitEnum;
 
 final class ReferralCampaignResource extends Resource
 {
     protected static ?string $model = ReferralCampaign::class;
-    protected static ?string $navigationIcon = 'heroicon-o-megaphone';
-    protected static ?int $navigationSort = 18;
+
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-megaphone';
+
+    protected static ?int $navigationSort = 14;
+
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): string
+    protected static UnitEnum|string|null $navigationGroup = 'System';
+
+    public static function getNavigationLabel(): string
     {
-        return NavigationGroup::Referrals->getLabel();
+        return __('admin.referral_campaigns.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.referral_campaigns.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.referral_campaigns.model_label');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->columns(3)
             ->schema([
-                Section::make('Campaign Details')
-                    ->columns(2)
+                Section::make(__('admin.referral_campaigns.basic_information'))
                     ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Textarea::make('description')
-                            ->maxLength(65535)
-                            ->nullable(),
-                        Toggle::make('is_active')
-                            ->label('Active')
-                            ->inline(false)
-                            ->default(true),
-                        DatePicker::make('start_date')
-                            ->required(),
-                        DatePicker::make('end_date')
-                            ->required(),
-                        TextInput::make('reward_amount')
-                            ->numeric()
-                            ->required()
-                            ->default(0.00),
-                        Select::make('reward_type')
-                            ->options([
-                                'discount' => 'Discount',
-                                'credit' => 'Credit',
-                                'points' => 'Points',
-                                'gift' => 'Gift',
-                            ])
-                            ->required(),
-                        TextInput::make('max_referrals_per_user')
-                            ->numeric()
-                            ->integer()
-                            ->nullable(),
-                        TextInput::make('max_total_referrals')
-                            ->numeric()
-                            ->integer()
-                            ->nullable(),
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label(__('admin.referral_campaigns.name'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->translatable(),
+                                Textarea::make('description')
+                                    ->label(__('admin.referral_campaigns.description'))
+                                    ->maxLength(65535)
+                                    ->nullable()
+                                    ->translatable(),
+                                Toggle::make('is_active')
+                                    ->label(__('admin.referral_campaigns.is_active'))
+                                    ->inline(false)
+                                    ->default(true),
+                                DatePicker::make('start_date')
+                                    ->label(__('admin.referral_campaigns.start_date'))
+                                    ->nullable(),
+                                DatePicker::make('end_date')
+                                    ->label(__('admin.referral_campaigns.end_date'))
+                                    ->nullable(),
+                            ]),
+                    ]),
+                Section::make(__('admin.referral_campaigns.reward_settings'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('reward_amount')
+                                    ->label(__('admin.referral_campaigns.reward_amount'))
+                                    ->numeric()
+                                    ->default(0.0)
+                                    ->prefix('€'),
+                                Select::make('reward_type')
+                                    ->label(__('admin.referral_campaigns.reward_type'))
+                                    ->options([
+                                        'discount' => __('admin.referral_campaigns.reward_types.discount'),
+                                        'credit' => __('admin.referral_campaigns.reward_types.credit'),
+                                        'points' => __('admin.referral_campaigns.reward_types.points'),
+                                        'gift' => __('admin.referral_campaigns.reward_types.gift'),
+                                    ])
+                                    ->nullable(),
+                                TextInput::make('max_referrals_per_user')
+                                    ->label(__('admin.referral_campaigns.max_referrals_per_user'))
+                                    ->numeric()
+                                    ->integer()
+                                    ->nullable()
+                                    ->helperText(__('admin.referral_campaigns.max_referrals_per_user_help')),
+                                TextInput::make('max_total_referrals')
+                                    ->label(__('admin.referral_campaigns.max_total_referrals'))
+                                    ->numeric()
+                                    ->integer()
+                                    ->nullable()
+                                    ->helperText(__('admin.referral_campaigns.max_total_referrals_help')),
+                            ]),
+                    ]),
+                Section::make(__('admin.referral_campaigns.advanced_settings'))
+                    ->schema([
                         KeyValue::make('conditions')
-                            ->label('Conditions (JSON)')
-                            ->keyLabel('Key')
-                            ->valueLabel('Value')
+                            ->label(__('admin.referral_campaigns.conditions'))
+                            ->keyLabel(__('admin.referral_campaigns.condition_key'))
+                            ->valueLabel(__('admin.referral_campaigns.condition_value'))
                             ->reorderable()
-                            ->addActionLabel('Add Condition')
+                            ->addActionLabel(__('admin.referral_campaigns.add_condition'))
                             ->columnSpanFull(),
                         KeyValue::make('metadata')
-                            ->label('Metadata (JSON)')
-                            ->keyLabel('Key')
-                            ->valueLabel('Value')
+                            ->label(__('admin.referral_campaigns.metadata'))
+                            ->keyLabel(__('admin.referral_campaigns.metadata_key'))
+                            ->valueLabel(__('admin.referral_campaigns.metadata_value'))
                             ->reorderable()
-                            ->addActionLabel('Add Metadata Item')
+                            ->addActionLabel(__('admin.referral_campaigns.add_metadata'))
                             ->columnSpanFull(),
                     ]),
             ]);
@@ -106,59 +144,86 @@ final class ReferralCampaignResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('admin.referral_campaigns.name'))
                     ->searchable()
-                    ->sortable(),
-                TextColumn::make('start_date')
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('end_date')
-                    ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30),
+                TextColumn::make('description')
+                    ->label(__('admin.referral_campaigns.description'))
+                    ->searchable()
+                    ->limit(50),
                 TextColumn::make('reward_amount')
+                    ->label(__('admin.referral_campaigns.reward_amount'))
                     ->money('EUR')
                     ->sortable(),
                 TextColumn::make('reward_type')
+                    ->label(__('admin.referral_campaigns.reward_type'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'discount' => 'success',
+                        'credit' => 'info',
+                        'points' => 'warning',
+                        'gift' => 'primary',
+                        default => 'gray',
+                    }),
                 TextColumn::make('max_referrals_per_user')
+                    ->label(__('admin.referral_campaigns.max_referrals_per_user'))
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => $state ?: __('admin.common.unlimited')),
                 TextColumn::make('max_total_referrals')
+                    ->label(__('admin.referral_campaigns.max_total_referrals'))
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => $state ?: __('admin.common.unlimited')),
                 IconColumn::make('is_active')
+                    ->label(__('admin.referral_campaigns.is_active'))
                     ->boolean()
-                    ->label('Active'),
+                    ->sortable(),
+                TextColumn::make('start_date')
+                    ->label(__('admin.referral_campaigns.start_date'))
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('end_date')
+                    ->label(__('admin.referral_campaigns.end_date'))
+                    ->dateTime()
+                    ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('admin.common.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label(__('admin.common.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active')
+                    ->label(__('admin.referral_campaigns.is_active'))
                     ->boolean(),
                 SelectFilter::make('reward_type')
+                    ->label(__('admin.referral_campaigns.reward_type'))
                     ->options([
-                        'discount' => 'Discount',
-                        'credit' => 'Credit',
-                        'points' => 'Points',
-                        'gift' => 'Gift',
+                        'discount' => __('admin.referral_campaigns.reward_types.discount'),
+                        'credit' => __('admin.referral_campaigns.reward_types.credit'),
+                        'points' => __('admin.referral_campaigns.reward_types.points'),
+                        'gift' => __('admin.referral_campaigns.reward_types.gift'),
                     ]),
             ])
-            ->actions([
+            ->recordActions([
+                ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
@@ -180,11 +245,11 @@ final class ReferralCampaignResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['name', 'description', 'reward_type'];
+        return ['name', 'description'];
     }
 
     public static function getNavigationBadge(): ?string
     {
-        return static::$model::count();
+        return self::$model::count();
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignCustomerSegmentResource\Pages;
 
@@ -9,4 +11,3 @@ class CreateCampaignCustomerSegment extends CreateRecord
 {
     protected static string $resource = CampaignCustomerSegmentResource::class;
 }
-

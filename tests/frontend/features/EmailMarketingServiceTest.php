@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Services\EmailMarketingService;
 use App\Models\Subscriber;
-use App\Models\User;
+use App\Services\EmailMarketingService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -31,8 +30,8 @@ test('email marketing service can sync subscriber to mailchimp', function () {
         'interests' => ['products', 'news'],
     ]);
 
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     // Mock the HTTP response for subscriber sync
     Http::fake([
         'mailchimp.com/3.0/lists/*/members' => Http::response([
@@ -43,13 +42,13 @@ test('email marketing service can sync subscriber to mailchimp', function () {
     ]);
 
     $result = $emailService->syncSubscriberToMailchimp($subscriber);
-    
+
     expect($result)->toBeTrue();
 });
 
 test('email marketing service can create campaign', function () {
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     $campaignData = [
         'subject' => 'Test Campaign',
         'title' => 'Test Campaign Title',
@@ -70,16 +69,16 @@ test('email marketing service can create campaign', function () {
     ]);
 
     $campaignId = $emailService->createCampaign($campaignData);
-    
+
     // Campaign creation should return a campaign ID or null
     expect($campaignId)->toBeNull();
 });
 
 test('email marketing service can get mailchimp stats', function () {
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     $stats = $emailService->getMailchimpStats();
-    
+
     expect($stats)->toBeArray()
         ->and($stats['total_subscribers'])->toBe(150)
         ->and($stats['unsubscribed'])->toBe(5)
@@ -92,8 +91,8 @@ test('email marketing service can bulk sync subscribers', function () {
     Subscriber::factory()->count(3)->create(['status' => 'active']);
     Subscriber::factory()->create(['status' => 'inactive']); // Should not be synced
 
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     // Mock successful HTTP responses for all sync requests
     Http::fake([
         'mailchimp.com/3.0/lists/*/members' => Http::response([
@@ -104,7 +103,7 @@ test('email marketing service can bulk sync subscribers', function () {
     ]);
 
     $results = $emailService->bulkSyncSubscribers();
-    
+
     expect($results)->toBeArray()
         ->and($results['success'])->toBe(3)
         ->and($results['failed'])->toBe(0)
@@ -112,8 +111,8 @@ test('email marketing service can bulk sync subscribers', function () {
 });
 
 test('email marketing service can create interest segment', function () {
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     // Mock the HTTP response for segment creation
     Http::fake([
         'mailchimp.com/3.0/lists/*/segments' => Http::response([
@@ -124,15 +123,15 @@ test('email marketing service can create interest segment', function () {
     ]);
 
     $segmentId = $emailService->createInterestSegment('products');
-    
+
     // Segment creation should return a segment ID or null
     expect($segmentId)->toBeNull();
 });
 
 test('email marketing service handles api errors gracefully', function () {
     $subscriber = Subscriber::factory()->create();
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     // Mock HTTP error response
     Http::fake([
         'mailchimp.com/*' => Http::response([
@@ -144,37 +143,37 @@ test('email marketing service handles api errors gracefully', function () {
     ]);
 
     $result = $emailService->syncSubscriberToMailchimp($subscriber);
-    
+
     // The method should handle errors gracefully (return false or true depending on implementation)
     expect($result)->toBeBool();
 });
 
 test('email marketing service logs errors appropriately', function () {
     // Note: Log::fake() is not available in this Laravel version, so we'll test the functionality differently
-    
+
     $subscriber = Subscriber::factory()->create();
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     // Mock HTTP error response
     Http::fake([
         'mailchimp.com/*' => Http::response([], 500),
     ]);
 
     $result = $emailService->syncSubscriberToMailchimp($subscriber);
-    
+
     // Just verify that the method returns false when there's an error
     // The method should handle errors gracefully (return false or true depending on implementation)
     expect($result)->toBeBool();
 });
 
 test('email marketing service maps status correctly', function () {
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     // Test status mapping through reflection
     $reflection = new ReflectionClass($emailService);
     $method = $reflection->getMethod('mapStatusToMailchimp');
     $method->setAccessible(true);
-    
+
     expect($method->invoke($emailService, 'active'))->toBe('subscribed')
         ->and($method->invoke($emailService, 'inactive'))->toBe('unsubscribed')
         ->and($method->invoke($emailService, 'unsubscribed'))->toBe('unsubscribed');
@@ -182,8 +181,8 @@ test('email marketing service maps status correctly', function () {
 
 test('email marketing service handles network exceptions', function () {
     $subscriber = Subscriber::factory()->create();
-    $emailService = new EmailMarketingService();
-    
+    $emailService = new EmailMarketingService;
+
     // Mock network exception
     Http::fake([
         'mailchimp.com/*' => function () {
@@ -192,15 +191,15 @@ test('email marketing service handles network exceptions', function () {
     ]);
 
     $result = $emailService->syncSubscriberToMailchimp($subscriber);
-    
+
     // The method should handle errors gracefully (return false or true depending on implementation)
     expect($result)->toBeBool();
 });
 
 test('email marketing service can get campaign analytics', function () {
-    $emailService = new EmailMarketingService();
+    $emailService = new EmailMarketingService;
     $campaignId = 'test-campaign-id';
-    
+
     // Mock the HTTP response for campaign analytics
     Http::fake([
         "mailchimp.com/3.0/campaigns/{$campaignId}" => Http::response([
@@ -220,7 +219,7 @@ test('email marketing service can get campaign analytics', function () {
     ]);
 
     $analytics = $emailService->getCampaignAnalytics($campaignId);
-    
+
     // Analytics should return an array with campaign data
     expect($analytics)->toBeArray()
         ->and($analytics)->toHaveKey('stats');

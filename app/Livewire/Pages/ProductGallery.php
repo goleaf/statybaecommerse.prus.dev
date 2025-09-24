@@ -1,18 +1,19 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Pages;
 
 use App\Models\Product;
-use Illuminate\Support\LazyCollection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+
 /**
  * ProductGallery
- * 
+ *
  * Livewire component for ProductGallery with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string $search
  * @property string $filter
  * @property mixed $queryString
@@ -20,26 +21,30 @@ use Livewire\WithPagination;
 final class ProductGallery extends Component
 {
     use WithPagination;
+
     public string $search = '';
+
     public string $filter = 'all';
+
     // all, with_images, generated_only
     protected $queryString = ['search' => ['except' => ''], 'filter' => ['except' => 'all']];
+
     /**
      * Handle updatingSearch functionality with proper error handling.
-     * @return void
      */
     public function updatingSearch(): void
     {
         $this->resetPage();
     }
+
     /**
      * Handle updatingFilter functionality with proper error handling.
-     * @return void
      */
     public function updatingFilter(): void
     {
         $this->resetPage();
     }
+
     /**
      * Handle products functionality with proper error handling.
      */
@@ -47,7 +52,7 @@ final class ProductGallery extends Component
     public function products()
     {
         return Product::query()->with(['media', 'brand'])->where('is_visible', true)->when($this->search, function ($query) {
-            $query->where('name', 'like', '%' . $this->search . '%');
+            $query->where('name', 'like', '%'.$this->search.'%');
         })->when($this->filter === 'with_images', function ($query) {
             $query->whereHas('media', function ($q) {
                 $q->where('collection_name', 'images');
@@ -58,9 +63,9 @@ final class ProductGallery extends Component
             });
         })->orderBy('created_at', 'desc')->paginate(12);
     }
+
     /**
      * Handle totalImages functionality with proper error handling.
-     * @return int
      */
     #[Computed]
     public function totalImages(): int
@@ -71,18 +76,19 @@ final class ProductGallery extends Component
             $q->where('collection_name', 'images');
         }])->cursor()->takeUntilTimeout(now()->addSeconds(15))->collect()->skipWhile(function ($product) {
             // Skip products that are not properly configured for media counting
-            return empty($product->name) || !$product->is_visible || $product->media_count < 0;
+            return empty($product->name) || ! $product->is_visible || $product->media_count < 0;
         })->sum('media_count');
     }
+
     /**
      * Handle generatedImages functionality with proper error handling.
-     * @return int
      */
     #[Computed]
     public function generatedImages(): int
     {
         return \Spatie\MediaLibrary\MediaCollections\Models\Media::query()->where('collection_name', 'images')->whereJsonContains('custom_properties->generated', true)->count();
     }
+
     /**
      * Render the Livewire component view with current state.
      */

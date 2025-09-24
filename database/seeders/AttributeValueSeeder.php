@@ -4,107 +4,139 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Attribute;
+use App\Models\AttributeValue;
+use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 final class AttributeValueSeeder extends Seeder
 {
     public function run(): void
     {
-        $map = [
-            'color' => [
-                ['slug' => 'black', 'lt' => 'Juoda', 'en' => 'Black'],
-                ['slug' => 'white', 'lt' => 'Balta', 'en' => 'White'],
-                ['slug' => 'red', 'lt' => 'Raudona', 'en' => 'Red'],
-                ['slug' => 'blue', 'lt' => 'Mėlyna', 'en' => 'Blue'],
-                ['slug' => 'green', 'lt' => 'Žalia', 'en' => 'Green'],
-                ['slug' => 'yellow', 'lt' => 'Geltona', 'en' => 'Yellow'],
-                ['slug' => 'orange', 'lt' => 'Oranžinė', 'en' => 'Orange'],
-                ['slug' => 'purple', 'lt' => 'Violetinė', 'en' => 'Purple'],
-            ],
-            'size' => [
-                ['slug' => 's', 'lt' => 'Mažas', 'en' => 'Small'],
-                ['slug' => 'm', 'lt' => 'Vidutinis', 'en' => 'Medium'],
-                ['slug' => 'l', 'lt' => 'Didelis', 'en' => 'Large'],
-                ['slug' => 'xl', 'lt' => 'Ypač didelis', 'en' => 'Extra Large'],
-                ['slug' => 'xxl', 'lt' => 'Dvigubai ypač didelis', 'en' => 'Double Extra Large'],
-            ],
-            'material' => [
-                ['slug' => 'steel', 'lt' => 'Plienas', 'en' => 'Steel'],
-                ['slug' => 'aluminium', 'lt' => 'Aliuminis', 'en' => 'Aluminium'],
-                ['slug' => 'plastic', 'lt' => 'Plastikas', 'en' => 'Plastic'],
-                ['slug' => 'wood', 'lt' => 'Medis', 'en' => 'Wood'],
-                ['slug' => 'rubber', 'lt' => 'Guma', 'en' => 'Rubber'],
-            ],
-            'color-palette' => [
-                ['slug' => 'basic', 'lt' => 'Bazinis', 'en' => 'Basic'],
-                ['slug' => 'pastel', 'lt' => 'Pastelinis', 'en' => 'Pastel'],
-                ['slug' => 'vivid', 'lt' => 'Ryškus', 'en' => 'Vivid'],
-            ],
-        ];
+        $this->createColorValues();
+        $this->createSizeValues();
+        $this->createMaterialValues();
+        $this->createBrandValues();
 
-        $locales = $this->supportedLocales();
-        $now = now();
-
-        foreach ($map as $attrSlug => $values) {
-            $attributeId = (int) DB::table('attributes')->where('slug', $attrSlug)->value('id');
-            if (! $attributeId) {
-                $this->command?->warn("AttributeValueSeeder: attribute '{$attrSlug}' not found, skipping.");
-
-                continue;
-            }
-
-            $order = 1;
-            foreach ($values as $v) {
-                // Upsert base value row
-                DB::table('attribute_values')->upsert([
-                    [
-                        'attribute_id' => $attributeId,
-                        'slug' => $v['slug'],
-                        'value' => $v['lt'], // base in default locale
-                        'sort_order' => $order,
-                        'is_enabled' => true,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ],
-                ], ['attribute_id', 'slug'], ['value', 'sort_order', 'is_enabled', 'updated_at']);
-
-                $valueId = (int) DB::table('attribute_values')->where('attribute_id', $attributeId)->where('slug', $v['slug'])->value('id');
-                if (! $valueId) {
-                    $order++;
-
-                    continue;
-                }
-
-                // Translations per locale
-                $trRows = [];
-                foreach ($locales as $loc) {
-                    $trRows[] = [
-                        'attribute_value_id' => $valueId,
-                        'locale' => $loc,
-                        'value' => $v[$loc] ?? $v['lt'],
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                }
-                DB::table('attribute_value_translations')->upsert(
-                    $trRows,
-                    ['attribute_value_id', 'locale'],
-                    ['value', 'updated_at']
-                );
-
-                $order++;
-            }
-        }
-
-        $this->command?->info('AttributeValueSeeder: seeded values with translations.');
+        $this->command->info('Attribute values seeded successfully!');
     }
 
-    private function supportedLocales(): array
+    private function createColorValues(): void
     {
-        return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn ($v) => trim((string) $v))
-            ->filter()
-            ->unique()->values()->all();
+        $colorAttribute = Attribute::where('slug', 'color')->first();
+        $product = Product::first();
+
+        if (! $colorAttribute || ! $product) {
+            return;
+        }
+
+        $colors = [
+            ['value' => 'Red', 'display_value' => 'R', 'color_code' => '#FF0000'],
+            ['value' => 'Blue', 'display_value' => 'B', 'color_code' => '#0000FF'],
+            ['value' => 'Green', 'display_value' => 'G', 'color_code' => '#00FF00'],
+            ['value' => 'Black', 'display_value' => 'Bl', 'color_code' => '#000000'],
+            ['value' => 'White', 'display_value' => 'W', 'color_code' => '#FFFFFF'],
+        ];
+
+        foreach ($colors as $index => $color) {
+            AttributeValue::firstOrCreate([
+                'attribute_id' => $colorAttribute->id,
+                'value' => $color['value'],
+            ], [
+                'slug' => \Illuminate\Support\Str::slug($color['value']),
+                'display_value' => $color['display_value'],
+                'color_code' => $color['color_code'],
+                'is_active' => true,
+                'sort_order' => $index + 1,
+            ]);
+        }
+    }
+
+    private function createSizeValues(): void
+    {
+        $sizeAttribute = Attribute::where('slug', 'size')->first();
+        $product = Product::first();
+
+        if (! $sizeAttribute || ! $product) {
+            return;
+        }
+
+        $sizes = [
+            ['value' => 'XS', 'display_value' => 'Extra Small'],
+            ['value' => 'S', 'display_value' => 'Small'],
+            ['value' => 'M', 'display_value' => 'Medium'],
+            ['value' => 'L', 'display_value' => 'Large'],
+            ['value' => 'XL', 'display_value' => 'Extra Large'],
+        ];
+
+        foreach ($sizes as $index => $size) {
+            AttributeValue::firstOrCreate([
+                'attribute_id' => $sizeAttribute->id,
+                'value' => $size['value'],
+            ], [
+                'slug' => \Illuminate\Support\Str::slug($size['value']),
+                'display_value' => $size['display_value'],
+                'is_active' => true,
+                'sort_order' => $index + 1,
+            ]);
+        }
+    }
+
+    private function createMaterialValues(): void
+    {
+        $materialAttribute = Attribute::where('slug', 'material')->first();
+        $product = Product::first();
+
+        if (! $materialAttribute || ! $product) {
+            return;
+        }
+
+        $materials = [
+            ['value' => 'Cotton', 'display_value' => 'Cot'],
+            ['value' => 'Polyester', 'display_value' => 'Poly'],
+            ['value' => 'Wool', 'display_value' => 'Wool'],
+            ['value' => 'Silk', 'display_value' => 'Silk'],
+        ];
+
+        foreach ($materials as $index => $material) {
+            AttributeValue::firstOrCreate([
+                'attribute_id' => $materialAttribute->id,
+                'value' => $material['value'],
+            ], [
+                'slug' => \Illuminate\Support\Str::slug($material['value']),
+                'display_value' => $material['display_value'],
+                'is_active' => true,
+                'sort_order' => $index + 1,
+            ]);
+        }
+    }
+
+    private function createBrandValues(): void
+    {
+        $brandAttribute = Attribute::where('slug', 'brand')->first();
+        $product = Product::first();
+
+        if (! $brandAttribute || ! $product) {
+            return;
+        }
+
+        $brands = [
+            ['value' => 'Nike', 'display_value' => 'Nike'],
+            ['value' => 'Adidas', 'display_value' => 'Adidas'],
+            ['value' => 'Puma', 'display_value' => 'Puma'],
+            ['value' => 'Reebok', 'display_value' => 'Reebok'],
+        ];
+
+        foreach ($brands as $index => $brand) {
+            AttributeValue::firstOrCreate([
+                'attribute_id' => $brandAttribute->id,
+                'value' => $brand['value'],
+            ], [
+                'slug' => \Illuminate\Support\Str::slug($brand['value']),
+                'display_value' => $brand['display_value'],
+                'is_active' => true,
+                'sort_order' => $index + 1,
+            ]);
+        }
     }
 }

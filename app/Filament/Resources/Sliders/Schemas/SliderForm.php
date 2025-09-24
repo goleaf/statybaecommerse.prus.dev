@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
@@ -31,13 +33,13 @@ final class SliderForm
                                     ->required()
                                     ->numeric()
                                     ->default(0)
-                                    ->columnSpan(1)
+                                    ->columnSpan(1),
                             ]),
                         Textarea::make('description')
                             ->label(__('admin.sliders.description'))
                             ->maxLength(2000)
                             ->rows(3)
-                            ->columnSpanFull()
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
                 Section::make(__('admin.sliders.media'))
@@ -55,7 +57,7 @@ final class SliderForm
                             ->directory('sliders/images')
                             ->visibility('public')
                             ->maxSize(5120)  // 5MB
-                            ->columnSpanFull()
+                            ->columnSpanFull(),
                     ])
                     ->collapsible(),
                 Section::make(__('admin.sliders.call_to_action'))
@@ -71,8 +73,8 @@ final class SliderForm
                                     ->label(__('admin.sliders.button_url'))
                                     ->url()
                                     ->maxLength(255)
-                                    ->columnSpan(1)
-                            ])
+                                    ->columnSpan(1),
+                            ]),
                     ])
                     ->collapsible(),
                 Section::make(__('admin.sliders.design'))
@@ -89,8 +91,8 @@ final class SliderForm
                                     ->label(__('admin.sliders.text_color'))
                                     ->required()
                                     ->default('#000000')
-                                    ->columnSpan(1)
-                            ])
+                                    ->columnSpan(1),
+                            ]),
                     ])
                     ->collapsible(),
                 Section::make(__('admin.sliders.status'))
@@ -99,9 +101,9 @@ final class SliderForm
                         Toggle::make('is_active')
                             ->label(__('admin.sliders.is_active'))
                             ->default(true)
-                            ->columnSpanFull()
+                            ->columnSpanFull(),
                     ])
-                    ->collapsible()
+                    ->collapsible(),
             ]);
     }
 }

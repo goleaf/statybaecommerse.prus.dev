@@ -1,40 +1,36 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services\Recommendations;
 
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserProductInteraction;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
+
 /**
  * CollaborativeFilteringRecommendation
- * 
+ *
  * Service class containing CollaborativeFilteringRecommendation business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class CollaborativeFilteringRecommendation extends BaseRecommendation
 {
     /**
      * Handle getDefaultConfig functionality with proper error handling.
-     * @return array
      */
     protected function getDefaultConfig(): array
     {
         return ['max_results' => 10, 'min_score' => 0.1, 'interaction_weights' => ['view' => 0.1, 'click' => 0.3, 'cart' => 0.5, 'purchase' => 1.0, 'wishlist' => 0.4, 'review' => 0.6], 'min_interactions' => 2, 'neighbor_threshold' => 0.3, 'max_neighbors' => 50];
     }
+
     /**
      * Handle getRecommendations functionality with proper error handling.
-     * @param User|null $user
-     * @param Product|null $product
-     * @param array $context
-     * @return Collection
      */
     public function getRecommendations(?User $user = null, ?Product $product = null, array $context = []): Collection
     {
         $startTime = microtime(true);
-        if (!$user) {
+        if (! $user) {
             return collect();
         }
         $cacheKey = $this->generateCacheKey('collaborative', $user, $product, $context);
@@ -45,13 +41,12 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
         $recommendations = $this->calculateCollaborativeRecommendations($user, $product);
         $this->logPerformance('collaborative', microtime(true) - $startTime, $recommendations->count());
         $this->trackRecommendation('collaborative', $user, $product, $recommendations->toArray());
+
         return $this->cacheResult($cacheKey, $recommendations, $this->config['cache_ttl'] ?? 3600);
     }
+
     /**
      * Handle calculateCollaborativeRecommendations functionality with proper error handling.
-     * @param User $user
-     * @param Product|null $product
-     * @return Collection
      */
     private function calculateCollaborativeRecommendations(User $user, ?Product $product = null): Collection
     {
@@ -65,23 +60,21 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
         if ($neighbors->isEmpty()) {
             return collect();
         }
+
         // Generate recommendations based on neighbors' preferences
         return $this->generateRecommendationsFromNeighbors($user, $neighbors, $userInteractions);
     }
+
     /**
      * Handle getUserInteractions functionality with proper error handling.
-     * @param User $user
-     * @return Collection
      */
     private function getUserInteractions(User $user): Collection
     {
         return UserProductInteraction::where('user_id', $user->id)->withMinCount($this->config['min_interactions'])->with('product')->get()->keyBy('product_id');
     }
+
     /**
      * Handle findSimilarUsers functionality with proper error handling.
-     * @param User $user
-     * @param Collection $userInteractions
-     * @return Collection
      */
     private function findSimilarUsers(User $user, Collection $userInteractions): Collection
     {
@@ -96,13 +89,12 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
                 $neighbors->push(['user' => $interactions->first()->user, 'similarity' => $similarity, 'interactions' => $interactions->keyBy('product_id')]);
             }
         }
+
         return $neighbors->sortByDesc('similarity')->take($this->config['max_neighbors']);
     }
+
     /**
      * Handle calculateUserSimilarity functionality with proper error handling.
-     * @param array $userRatings
-     * @param Collection $neighborInteractions
-     * @return float
      */
     private function calculateUserSimilarity(array $userRatings, Collection $neighborInteractions): float
     {
@@ -127,14 +119,12 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
         if ($userSumSquares == 0 || $neighborSumSquares == 0) {
             return 0;
         }
+
         return $numerator / (sqrt($userSumSquares) * sqrt($neighborSumSquares));
     }
+
     /**
      * Handle generateRecommendationsFromNeighbors functionality with proper error handling.
-     * @param User $user
-     * @param Collection $neighbors
-     * @param Collection $userInteractions
-     * @return Collection
      */
     private function generateRecommendationsFromNeighbors(User $user, Collection $neighbors, Collection $userInteractions): Collection
     {
@@ -160,6 +150,7 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
             $totalScore = $group->sum('score');
             $maxSimilarity = $group->max('similarity');
             $interactionCount = $group->count();
+
             return [
                 'product_id' => $group->first()['product_id'],
                 'score' => $totalScore / $interactionCount,
@@ -173,18 +164,15 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
         $query = Product::query()->with(['media', 'brand', 'categories'])->where('is_visible', true)->whereIn('id', $productIds);
         $query = $this->applyFilters($query);
         $products = $query->get()->keyBy('id');
+
         // Sort by score and return
         return $productScores->sortByDesc('score')->take($this->maxResults)->map(function ($item) use ($products) {
             return $products->get($item['product_id']);
         })->filter()->values();
     }
+
     /**
      * Handle updateUserInteraction functionality with proper error handling.
-     * @param User $user
-     * @param Product $product
-     * @param string $interactionType
-     * @param float|null $rating
-     * @return void
      */
     public function updateUserInteraction(User $user, Product $product, string $interactionType, ?float $rating = null): void
     {
@@ -201,10 +189,9 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
             // Table might not exist yet, ignore
         }
     }
+
     /**
      * Handle getDefaultRating functionality with proper error handling.
-     * @param string $interactionType
-     * @return float
      */
     private function getDefaultRating(string $interactionType): float
     {

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 /**
  * Simple PHPDoc Addition Script
- * 
+ *
  * Adds comprehensive PHPDoc documentation to PHP classes
  * following PSR-5 standards and Laravel conventions.
  */
-
 class PHPDocAdder
 {
     private array $processedFiles = [];
+
     private array $errors = [];
 
     public function run(): void
@@ -68,15 +68,16 @@ class PHPDocAdder
 
     private function processDirectory(string $directory, string $type): void
     {
-        $fullPath = __DIR__ . '/../' . $directory;
-        
-        if (!is_dir($fullPath)) {
+        $fullPath = __DIR__.'/../'.$directory;
+
+        if (! is_dir($fullPath)) {
             echo "⚠️  Directory not found: {$directory}\n";
+
             return;
         }
 
         $files = $this->getPhpFiles($fullPath);
-        
+
         foreach ($files as $file) {
             $this->processFile($file, $directory, $type);
         }
@@ -100,8 +101,8 @@ class PHPDocAdder
 
     private function processFile(string $filePath, string $relativeDirectory, string $type): void
     {
-        $relativePath = str_replace(__DIR__ . '/../', '', $filePath);
-        
+        $relativePath = str_replace(__DIR__.'/../', '', $filePath);
+
         try {
             $content = file_get_contents($filePath);
             if ($content === false) {
@@ -111,11 +112,12 @@ class PHPDocAdder
             // Skip files that already have comprehensive PHPDoc
             if ($this->hasComprehensivePHPDoc($content)) {
                 echo "  ✅ {$relativePath} - Already has comprehensive PHPDoc\n";
+
                 return;
             }
 
             $newContent = $this->addPHPDocToFile($content, $type);
-            
+
             if ($newContent !== $content) {
                 file_put_contents($filePath, $newContent);
                 echo "  📝 {$relativePath} - Added PHPDoc\n";
@@ -125,8 +127,8 @@ class PHPDocAdder
             }
 
         } catch (Exception $e) {
-            $this->errors[] = "Error processing {$relativePath}: " . $e->getMessage();
-            echo "  ❌ {$relativePath} - Error: " . $e->getMessage() . "\n";
+            $this->errors[] = "Error processing {$relativePath}: ".$e->getMessage();
+            echo "  ❌ {$relativePath} - Error: ".$e->getMessage()."\n";
         }
     }
 
@@ -141,24 +143,24 @@ class PHPDocAdder
     private function addPHPDocToFile(string $content, string $type): string
     {
         // Find class declaration
-        if (!preg_match('/class\s+(\w+)/', $content, $matches)) {
+        if (! preg_match('/class\s+(\w+)/', $content, $matches)) {
             return $content;
         }
 
         $className = $matches[1];
-        
+
         // Check if class already has PHPDoc
-        if (preg_match('/\/\*\*[\s\S]*?\*\/\s*class\s+' . preg_quote($className) . '/', $content)) {
+        if (preg_match('/\/\*\*[\s\S]*?\*\/\s*class\s+'.preg_quote($className).'/', $content)) {
             return $content;
         }
 
         // Generate PHPDoc based on type
         $phpdoc = $this->generatePHPDoc($className, $type);
-        
+
         // Insert PHPDoc before class declaration
         $content = preg_replace(
-            '/(class\s+' . preg_quote($className) . ')/',
-            $phpdoc . "\n$1",
+            '/(class\s+'.preg_quote($className).')/',
+            $phpdoc."\n$1",
             $content
         );
 
@@ -168,12 +170,12 @@ class PHPDocAdder
     private function generatePHPDoc(string $className, string $type): string
     {
         $description = $this->getTypeDescription($type);
-        
+
         $phpdoc = "/**\n";
         $phpdoc .= " * {$className}\n";
         $phpdoc .= " * \n";
         $phpdoc .= " * {$description}\n";
-        $phpdoc .= " */";
+        $phpdoc .= ' */';
 
         return $phpdoc;
     }
@@ -195,14 +197,14 @@ class PHPDocAdder
 
     private function generateReport(): void
     {
-        echo "\n" . str_repeat("=", 60) . "\n";
+        echo "\n".str_repeat('=', 60)."\n";
         echo "📊 PHPDoc Addition Report\n";
-        echo str_repeat("=", 60) . "\n\n";
+        echo str_repeat('=', 60)."\n\n";
 
-        echo "✅ Files Processed: " . count($this->processedFiles) . "\n";
-        echo "❌ Errors: " . count($this->errors) . "\n\n";
+        echo '✅ Files Processed: '.count($this->processedFiles)."\n";
+        echo '❌ Errors: '.count($this->errors)."\n\n";
 
-        if (!empty($this->processedFiles)) {
+        if (! empty($this->processedFiles)) {
             echo "📝 Modified Files:\n";
             foreach ($this->processedFiles as $file) {
                 echo "  - {$file}\n";
@@ -210,7 +212,7 @@ class PHPDocAdder
             echo "\n";
         }
 
-        if (!empty($this->errors)) {
+        if (! empty($this->errors)) {
             echo "❌ Errors:\n";
             foreach ($this->errors as $error) {
                 echo "  - {$error}\n";
@@ -224,6 +226,6 @@ class PHPDocAdder
 
 // Run the script
 if (php_sapi_name() === 'cli') {
-    $adder = new PHPDocAdder();
+    $adder = new PHPDocAdder;
     $adder->run();
 }

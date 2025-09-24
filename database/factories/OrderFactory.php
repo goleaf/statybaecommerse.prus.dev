@@ -63,7 +63,7 @@ class OrderFactory extends Factory
             'shipped_at' => $this->faker->optional(0.4)->dateTimeBetween('-30 days', 'now'),
             'delivered_at' => $this->faker->optional(0.2)->dateTimeBetween('-30 days', 'now'),
             'channel_id' => $this->faker->optional(0.7)->randomElement(Channel::pluck('id')->toArray()),
-            'zone_id' => $this->faker->optional(0.8)->randomElement(Zone::pluck('id')->toArray()),
+            'zone_id' => null, // Zone model removed
             'partner_id' => $this->faker->optional(0.3)->randomElement(Partner::pluck('id')->toArray()),
             'payment_status' => $this->faker->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
             'payment_method' => $this->faker->randomElement(['credit_card', 'bank_transfer', 'paypal', 'cash_on_delivery']),

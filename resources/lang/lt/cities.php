@@ -17,7 +17,6 @@ return [
     // Location
     'location' => 'Vietovė',
     'country' => 'Šalis',
-    'zone' => 'Zona',
     'region' => 'Regionas',
     'parent_city' => 'Tėvinis miestas',
     'level' => 'Lygis',

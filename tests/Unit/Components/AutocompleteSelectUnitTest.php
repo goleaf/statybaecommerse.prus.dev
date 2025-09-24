@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Components\AutocompleteSelect;
 use App\Models\Product;
@@ -152,4 +154,3 @@ it('can chain configuration methods', function (): void {
     expect($component->getLabelField())->toBe('title');
     expect($component->getModelClass())->toBe(Product::class);
 });
-

@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
 use App\Models\Product;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class ProductsRelationManager extends RelationManager
 {
@@ -23,26 +25,28 @@ final class ProductsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Forms\Components\TextInput::make('name')
                     ->label(__('admin.products.fields.name'))
-                    ->required()\n                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('sku')
                     ->label(__('admin.products.fields.sku'))
-                    ->required()\n                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255)
                     ->unique(Product::class, 'sku', ignoreRecord: true),
                 Forms\Components\Textarea::make('description')
                     ->label(__('admin.products.fields.description'))
-                    ->rows(3),
+                    ->rows(3)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('price')
                     ->label(__('admin.products.fields.price'))
-                    ->numeric(),
-                    ->prefix('€'),
+                    ->numeric()
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\TextInput::make('stock_quantity')
                     ->label(__('admin.products.fields.stock_quantity'))
-                    ->numeric(),
+                    ->numeric()
                     ->default(0),
                 Forms\Components\Toggle::make('is_published')
                     ->label(__('admin.products.fields.is_published'))
@@ -60,20 +64,24 @@ final class ProductsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('admin.products.fields.name'))
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('sku')
                     ->label(__('admin.products.fields.sku'))
-                    ->searchable()\n                    ->sortable(),
-                    ->copyable(),
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
                     ->copyMessage(__('admin.common.copied')),
                 Tables\Columns\TextColumn::make('price')
                     ->label(__('admin.products.fields.price'))
-                    ->money('EUR'),
+                    ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->label(__('admin.products.fields.stock_quantity'))
-                    ->numeric(),
-                    ->sortable()\n                    ->badge()\n                    ->color(fn($state) => match (true) {
+                    ->numeric()
+                    ->sortable()
+                    ->badge()
+                    ->color(fn ($state) => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 5 => 'warning',
                         default => 'success',
@@ -86,8 +94,8 @@ final class ProductsRelationManager extends RelationManager
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.products.fields.created_at'))
-                    ->dateTime(),
-                    ->sortable(),
+                    ->dateTime()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -97,10 +105,10 @@ final class ProductsRelationManager extends RelationManager
                     ->label(__('admin.products.fields.is_featured')),
                 Tables\Filters\Filter::make('low_stock')
                     ->label(__('admin.products.filters.low_stock'))
-                    ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '<=', 5)),
+                    ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 5)),
                 Tables\Filters\Filter::make('out_of_stock')
                     ->label(__('admin.products.filters.out_of_stock'))
-                    ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
+                    ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
@@ -117,18 +125,13 @@ final class ProductsRelationManager extends RelationManager
                         ->label(__('admin.products.actions.publish'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
-                        ->action(fn($records) => $records->each->update(['is_published' => true]))
-                        ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('unpublish')
-                        ->label(__('admin.products.actions.unpublish'))
-                        ->icon('heroicon-o-eye-slash')
-                        ->color('warning')
-                        ->action(fn($records) => $records->each->update(['is_published' => false]))
-                        ->requiresConfirmation(),
+                        ->action(fn ($records) => $records->each->update(['is_published' => true])),
                 ]),
             ])
-            ->defaultSort("created_at", "desc");
-    }
-}
+            ->modifyQueryUsing(function (Builder $query): void {
+                if (in_array(SoftDeletingScope::class, class_uses_recursive($query->getModel()), true)) {
+                    $query->withoutGlobalScopes([SoftDeletingScope::class]);
+                }
+            });
     }
 }

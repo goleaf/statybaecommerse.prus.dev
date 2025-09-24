@@ -1,30 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Models\Country;
-use App\Models\Currency;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Placeholder;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema as FormSchema;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
@@ -38,27 +31,14 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-/**
- * CountryResource
- *
- * Filament v4 resource for Country management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
 final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    // protected static $navigationGroup = NavigationGroup::Locations;
-
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * @var string|\BackedEnum|null
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-globe-alt';
 
     protected static ?string $navigationLabel = 'countries.navigation.countries';
 
@@ -66,39 +46,22 @@ final class CountryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'countries.models.countries';
 
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
-     */
     public static function getNavigationLabel(): string
     {
         return __('countries.navigation.countries');
     }
 
-    /**
-     * Handle getModelLabel functionality with proper error handling.
-     * @return string
-     */
     public static function getModelLabel(): string
     {
         return __('countries.models.country');
     }
 
-    /**
-     * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
-     */
     public static function getPluralModelLabel(): string
     {
         return __('countries.models.countries');
     }
 
-    /**
-     * Handle form functionality with proper error handling.
-     * @param Schema $schema
-     * @return Schema
-     */
-    public static function form(FormSchema $schema): FormSchema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -263,11 +226,6 @@ final class CountryResource extends Resource
             ]);
     }
 
-    /**
-     * Handle table functionality with proper error handling.
-     * @param Table $table
-     * @return Table
-     */
     public static function table(Table $table): Table
     {
         return $table
@@ -313,10 +271,10 @@ final class CountryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 BadgeColumn::make('is_active')
                     ->label(__('countries.fields.is_active'))
-                    ->getStateUsing(fn($record) => $record->is_active ? __('countries.statuses.active') : __('countries.statuses.inactive'))
+                    ->getStateUsing(fn ($record) => $record->is_active ? __('countries.statuses.active') : __('countries.statuses.inactive'))
                     ->colors([
-                        'success' => fn($state) => $state === __('countries.statuses.active'),
-                        'danger' => fn($state) => $state === __('countries.statuses.inactive'),
+                        'success' => fn ($state) => $state === __('countries.statuses.active'),
+                        'danger' => fn ($state) => $state === __('countries.statuses.inactive'),
                     ])
                     ->toggleable(),
                 TextColumn::make('cities_count')
@@ -338,11 +296,11 @@ final class CountryResource extends Resource
             ->filters([
                 SelectFilter::make('region')
                     ->label(__('countries.filters.region'))
-                    ->options(fn() => Country::distinct()->pluck('region', 'region')->filter())
+                    ->options(fn () => Country::distinct()->pluck('region', 'region')->filter())
                     ->searchable(),
                 SelectFilter::make('subregion')
                     ->label(__('countries.filters.subregion'))
-                    ->options(fn() => Country::distinct()->pluck('subregion', 'subregion')->filter())
+                    ->options(fn () => Country::distinct()->pluck('subregion', 'subregion')->filter())
                     ->searchable(),
                 TernaryFilter::make('is_eu_member')
                     ->label(__('countries.filters.eu_member'))
@@ -355,7 +313,7 @@ final class CountryResource extends Resource
                     ->boolean(),
                 SelectFilter::make('currency_code')
                     ->label(__('countries.filters.currency_code'))
-                    ->options(fn() => Country::distinct()->pluck('currency_code', 'currency_code')->filter())
+                    ->options(fn () => Country::distinct()->pluck('currency_code', 'currency_code')->filter())
                     ->searchable(),
                 Filter::make('created_at')
                     ->form([
@@ -368,11 +326,11 @@ final class CountryResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -391,7 +349,7 @@ final class CountryResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn(Country $record) => !$record->is_active),
+                        ->visible(fn (Country $record) => ! $record->is_active),
                     Action::make('deactivate')
                         ->label(__('countries.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
@@ -403,7 +361,7 @@ final class CountryResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn(Country $record) => $record->is_active),
+                        ->visible(fn (Country $record) => $record->is_active),
                 ]),
             ])
             ->bulkActions([
@@ -440,7 +398,6 @@ final class CountryResource extends Resource
 
     /**
      * Handle getRelations functionality with proper error handling.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -451,7 +408,6 @@ final class CountryResource extends Resource
 
     /**
      * Handle getPages functionality with proper error handling.
-     * @return array
      */
     public static function getPages(): array
     {
@@ -465,8 +421,8 @@ final class CountryResource extends Resource
 
     /**
      * Handle getGlobalSearchResultDetails functionality with proper error handling.
-     * @param mixed $record
-     * @return array
+     *
+     * @param  mixed  $record
      */
     public static function getGlobalSearchResultDetails($record): array
     {
@@ -489,7 +445,7 @@ final class CountryResource extends Resource
             $actions[] = Action::make('view')
                 ->label(__('countries.actions.view'))
                 ->icon('heroicon-o-eye')
-                ->url(static::getUrl('view', ['record' => $record]));
+                ->url(self::getUrl('view', ['record' => $record]));
         } catch (\Exception $e) {
             // Route might not exist, skip this action
         }
@@ -498,7 +454,7 @@ final class CountryResource extends Resource
             $actions[] = Action::make('edit')
                 ->label(__('countries.actions.edit'))
                 ->icon('heroicon-o-pencil')
-                ->url(static::getUrl('edit', ['record' => $record]));
+                ->url(self::getUrl('edit', ['record' => $record]));
         } catch (\Exception $e) {
             // Route might not exist, skip this action
         }

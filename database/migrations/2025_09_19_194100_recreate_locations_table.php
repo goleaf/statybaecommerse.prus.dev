@@ -2,12 +2,19 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void
     {
         // Drop and recreate the locations table without the restrictive CHECK constraint
+        try {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        } catch (\Throwable $e) {
+            // ignore if not MySQL
+        }
+
         Schema::dropIfExists('locations');
 
         Schema::create('locations', function (Blueprint $table) {
@@ -40,6 +47,11 @@ return new class extends Migration {
             $table->index(['country_code', 'city']);
             $table->index('sort_order');
         });
+        try {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        } catch (\Throwable $e) {
+            // ignore if not MySQL
+        }
     }
 
     public function down(): void
@@ -47,4 +59,3 @@ return new class extends Migration {
         Schema::dropIfExists('locations');
     }
 };
-

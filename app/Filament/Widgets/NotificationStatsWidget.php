@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Notification;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 final class NotificationStatsWidget extends BaseWidget
 {
@@ -31,4 +32,3 @@ final class NotificationStatsWidget extends BaseWidget
         ];
     }
 }
-

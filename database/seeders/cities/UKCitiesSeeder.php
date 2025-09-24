@@ -19,7 +19,7 @@ final class UKCitiesSeeder extends Seeder
         $euZone = Zone::where('code', 'EU')->first();
 
         // Regions are no longer used in the database schema
-        
+
         $cities = [
             // England
             [
@@ -33,8 +33,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['SW1A 1AA', 'EC1A 1BB', 'W1A 0AX'],
                 'translations' => [
                     'lt' => ['name' => 'Londonas', 'description' => 'Didžiosios Britanijos sostinė'],
-                    'en' => ['name' => 'London', 'description' => 'Capital of United Kingdom']
-            ],
+                    'en' => ['name' => 'London', 'description' => 'Capital of United Kingdom'],
+                ],
             ],
             [
                 'name' => 'Birmingham',
@@ -45,8 +45,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['B1 1AA', 'B2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Birmingamas', 'description' => 'Antrasis didžiausias Anglijos miestas'],
-                    'en' => ['name' => 'Birmingham', 'description' => 'Second largest city in England']
-            ],
+                    'en' => ['name' => 'Birmingham', 'description' => 'Second largest city in England'],
+                ],
             ],
             [
                 'name' => 'Manchester',
@@ -57,8 +57,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['M1 1AA', 'M2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Mančesteris', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Manchester', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Manchester', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Liverpool',
@@ -69,8 +69,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['L1 1AA', 'L2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Liverpulis', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Liverpool', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Liverpool', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Leeds',
@@ -81,8 +81,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['LS1 1AA', 'LS2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Lidsas', 'description' => 'Pramonės centras'],
-                    'en' => ['name' => 'Leeds', 'description' => 'Industrial center']
-            ],
+                    'en' => ['name' => 'Leeds', 'description' => 'Industrial center'],
+                ],
             ],
             [
                 'name' => 'Sheffield',
@@ -93,8 +93,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['S1 1AA', 'S2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Šefildas', 'description' => 'Plieno pramonės centras'],
-                    'en' => ['name' => 'Sheffield', 'description' => 'Steel industry center']
-            ],
+                    'en' => ['name' => 'Sheffield', 'description' => 'Steel industry center'],
+                ],
             ],
             [
                 'name' => 'Bristol',
@@ -105,8 +105,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BS1 1AA', 'BS2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Bristolis', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Bristol', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Bristol', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Newcastle',
@@ -117,8 +117,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['NE1 1AA', 'NE2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Niukaslas', 'description' => 'Šiaurės Anglijos centras'],
-                    'en' => ['name' => 'Newcastle', 'description' => 'Center of Northern England']
-            ],
+                    'en' => ['name' => 'Newcastle', 'description' => 'Center of Northern England'],
+                ],
             ],
             [
                 'name' => 'Nottingham',
@@ -129,8 +129,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['NG1 1AA', 'NG2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Notingamas', 'description' => 'Robin Gudas miestas'],
-                    'en' => ['name' => 'Nottingham', 'description' => 'Robin Hood city']
-            ],
+                    'en' => ['name' => 'Nottingham', 'description' => 'Robin Hood city'],
+                ],
             ],
             [
                 'name' => 'Leicester',
@@ -141,8 +141,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['LE1 1AA', 'LE2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Lečesteris', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Leicester', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Leicester', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Coventry',
@@ -153,8 +153,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['CV1 1AA', 'CV2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Koventris', 'description' => 'Automobilių pramonės centras'],
-                    'en' => ['name' => 'Coventry', 'description' => 'Automotive industry center']
-            ],
+                    'en' => ['name' => 'Coventry', 'description' => 'Automotive industry center'],
+                ],
             ],
             [
                 'name' => 'Bradford',
@@ -165,8 +165,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BD1 1AA', 'BD2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Bredfordas', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Bradford', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Bradford', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Plymouth',
@@ -177,8 +177,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['PL1 1AA', 'PL2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Plimutas', 'description' => 'Karinis uostas'],
-                    'en' => ['name' => 'Plymouth', 'description' => 'Naval port']
-            ],
+                    'en' => ['name' => 'Plymouth', 'description' => 'Naval port'],
+                ],
             ],
             [
                 'name' => 'Southampton',
@@ -189,8 +189,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['SO14 1AA', 'SO15 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Sautamtonas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Southampton', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Southampton', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Portsmouth',
@@ -201,8 +201,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['PO1 1AA', 'PO2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Portsmutas', 'description' => 'Karinis uostas'],
-                    'en' => ['name' => 'Portsmouth', 'description' => 'Naval port']
-            ],
+                    'en' => ['name' => 'Portsmouth', 'description' => 'Naval port'],
+                ],
             ],
             [
                 'name' => 'Brighton',
@@ -213,8 +213,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BN1 1AA', 'BN2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Braitonas', 'description' => 'Kurortinis miestas'],
-                    'en' => ['name' => 'Brighton', 'description' => 'Resort city']
-            ],
+                    'en' => ['name' => 'Brighton', 'description' => 'Resort city'],
+                ],
             ],
             [
                 'name' => 'Oxford',
@@ -225,8 +225,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['OX1 1AA', 'OX2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Oksfordas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Oxford', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Oxford', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Cambridge',
@@ -237,8 +237,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['CB1 1AA', 'CB2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Kembridžas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Cambridge', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Cambridge', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'York',
@@ -249,8 +249,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['YO1 1AA', 'YO2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Jorkas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'York', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'York', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Bath',
@@ -261,8 +261,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BA1 1AA', 'BA2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Batas', 'description' => 'UNESCO miestas'],
-                    'en' => ['name' => 'Bath', 'description' => 'UNESCO city']
-            ],
+                    'en' => ['name' => 'Bath', 'description' => 'UNESCO city'],
+                ],
             ],
             [
                 'name' => 'Canterbury',
@@ -273,8 +273,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['CT1 1AA', 'CT2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Kenterberis', 'description' => 'Arkivyskupijos miestas'],
-                    'en' => ['name' => 'Canterbury', 'description' => 'Archbishopric city']
-            ],
+                    'en' => ['name' => 'Canterbury', 'description' => 'Archbishopric city'],
+                ],
             ],
             [
                 'name' => 'Norwich',
@@ -285,8 +285,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['NR1 1AA', 'NR2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Norvičas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Norwich', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Norwich', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Exeter',
@@ -297,8 +297,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['EX1 1AA', 'EX2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Ekseteris', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Exeter', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Exeter', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Gloucester',
@@ -309,8 +309,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['GL1 1AA', 'GL2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Glosteris', 'description' => 'Katedros miestas'],
-                    'en' => ['name' => 'Gloucester', 'description' => 'Cathedral city']
-            ],
+                    'en' => ['name' => 'Gloucester', 'description' => 'Cathedral city'],
+                ],
             ],
             // Scotland
             [
@@ -322,8 +322,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['EH1 1AA', 'EH2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Edinburgas', 'description' => 'Škotijos sostinė'],
-                    'en' => ['name' => 'Edinburgh', 'description' => 'Capital of Scotland']
-            ],
+                    'en' => ['name' => 'Edinburgh', 'description' => 'Capital of Scotland'],
+                ],
             ],
             [
                 'name' => 'Glasgow',
@@ -334,8 +334,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['G1 1AA', 'G2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Glazgas', 'description' => 'Didžiausias Škotijos miestas'],
-                    'en' => ['name' => 'Glasgow', 'description' => 'Largest city in Scotland']
-            ],
+                    'en' => ['name' => 'Glasgow', 'description' => 'Largest city in Scotland'],
+                ],
             ],
             [
                 'name' => 'Aberdeen',
@@ -346,8 +346,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['AB10 1AA', 'AB11 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Aberdynas', 'description' => 'Naftos pramonės centras'],
-                    'en' => ['name' => 'Aberdeen', 'description' => 'Oil industry center']
-            ],
+                    'en' => ['name' => 'Aberdeen', 'description' => 'Oil industry center'],
+                ],
             ],
             [
                 'name' => 'Dundee',
@@ -358,8 +358,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['DD1 1AA', 'DD2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Dandis', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Dundee', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Dundee', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Stirling',
@@ -370,8 +370,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['FK7 1AA', 'FK8 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Sterlingas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Stirling', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Stirling', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Inverness',
@@ -382,8 +382,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['IV1 1AA', 'IV2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Invernesas', 'description' => 'Šiaurės Škotijos centras'],
-                    'en' => ['name' => 'Inverness', 'description' => 'Center of Northern Scotland']
-            ],
+                    'en' => ['name' => 'Inverness', 'description' => 'Center of Northern Scotland'],
+                ],
             ],
             // Wales
             [
@@ -395,8 +395,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['CF10 1AA', 'CF11 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Kardifas', 'description' => 'Velso sostinė'],
-                    'en' => ['name' => 'Cardiff', 'description' => 'Capital of Wales']
-            ],
+                    'en' => ['name' => 'Cardiff', 'description' => 'Capital of Wales'],
+                ],
             ],
             [
                 'name' => 'Swansea',
@@ -407,8 +407,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['SA1 1AA', 'SA2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Svonsis', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Swansea', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Swansea', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Newport',
@@ -419,8 +419,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['NP19 1AA', 'NP20 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Niuportas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Newport', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Newport', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Wrexham',
@@ -431,8 +431,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['LL11 1AA', 'LL12 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Reksamas', 'description' => 'Šiaurės Velso centras'],
-                    'en' => ['name' => 'Wrexham', 'description' => 'Center of Northern Wales']
-            ],
+                    'en' => ['name' => 'Wrexham', 'description' => 'Center of Northern Wales'],
+                ],
             ],
             // Northern Ireland
             [
@@ -444,8 +444,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BT1 1AA', 'BT2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Belfastas', 'description' => 'Šiaurės Airijos sostinė'],
-                    'en' => ['name' => 'Belfast', 'description' => 'Capital of Northern Ireland']
-            ],
+                    'en' => ['name' => 'Belfast', 'description' => 'Capital of Northern Ireland'],
+                ],
             ],
             [
                 'name' => 'Derry',
@@ -456,8 +456,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BT47 1AA', 'BT48 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Deris', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Derry', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Derry', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Lisburn',
@@ -468,8 +468,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BT27 1AA', 'BT28 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Lisburnas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Lisburn', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Lisburn', 'description' => 'Industrial city'],
+                ],
             ],
             // Additional England cities
             [
@@ -481,8 +481,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['DE1 1AA', 'DE2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Derbis', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Derby', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Derby', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Wolverhampton',
@@ -493,8 +493,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['WV1 1AA', 'WV2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Vulverhamptonas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Wolverhampton', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Wolverhampton', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Stoke-on-Trent',
@@ -505,8 +505,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['ST1 1AA', 'ST2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Stoke-on-Trent', 'description' => 'Keramikos miestas'],
-                    'en' => ['name' => 'Stoke-on-Trent', 'description' => 'Pottery city']
-            ],
+                    'en' => ['name' => 'Stoke-on-Trent', 'description' => 'Pottery city'],
+                ],
             ],
             [
                 'name' => 'Southampton',
@@ -517,8 +517,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['SO14 1AA', 'SO15 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Sautamtonas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Southampton', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Southampton', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Portsmouth',
@@ -529,8 +529,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['PO1 1AA', 'PO2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Portsmutas', 'description' => 'Karinis uostas'],
-                    'en' => ['name' => 'Portsmouth', 'description' => 'Naval port']
-            ],
+                    'en' => ['name' => 'Portsmouth', 'description' => 'Naval port'],
+                ],
             ],
             [
                 'name' => 'Brighton',
@@ -541,8 +541,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BN1 1AA', 'BN2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Braitonas', 'description' => 'Kurortinis miestas'],
-                    'en' => ['name' => 'Brighton', 'description' => 'Resort city']
-            ],
+                    'en' => ['name' => 'Brighton', 'description' => 'Resort city'],
+                ],
             ],
             [
                 'name' => 'Oxford',
@@ -553,8 +553,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['OX1 1AA', 'OX2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Oksfordas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Oxford', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Oxford', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Cambridge',
@@ -565,8 +565,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['CB1 1AA', 'CB2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Kembridžas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Cambridge', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Cambridge', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'York',
@@ -577,8 +577,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['YO1 1AA', 'YO2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Jorkas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'York', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'York', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Bath',
@@ -589,8 +589,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['BA1 1AA', 'BA2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Batas', 'description' => 'UNESCO miestas'],
-                    'en' => ['name' => 'Bath', 'description' => 'UNESCO city']
-            ],
+                    'en' => ['name' => 'Bath', 'description' => 'UNESCO city'],
+                ],
             ],
             [
                 'name' => 'Canterbury',
@@ -601,8 +601,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['CT1 1AA', 'CT2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Kenterberis', 'description' => 'Arkivyskupijos miestas'],
-                    'en' => ['name' => 'Canterbury', 'description' => 'Archbishopric city']
-            ],
+                    'en' => ['name' => 'Canterbury', 'description' => 'Archbishopric city'],
+                ],
             ],
             [
                 'name' => 'Norwich',
@@ -613,8 +613,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['NR1 1AA', 'NR2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Norvičas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Norwich', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Norwich', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Exeter',
@@ -625,8 +625,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['EX1 1AA', 'EX2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Ekseteris', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Exeter', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Exeter', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Gloucester',
@@ -637,8 +637,8 @@ final class UKCitiesSeeder extends Seeder
                 'postal_codes' => ['GL1 1AA', 'GL2 2BB'],
                 'translations' => [
                     'lt' => ['name' => 'Glosteris', 'description' => 'Katedros miestas'],
-                    'en' => ['name' => 'Gloucester', 'description' => 'Cathedral city']
-            ],
+                    'en' => ['name' => 'Gloucester', 'description' => 'Cathedral city'],
+                ],
             ],
         ];
 
@@ -647,7 +647,7 @@ final class UKCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -667,8 +667,8 @@ final class UKCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

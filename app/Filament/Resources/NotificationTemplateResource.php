@@ -1,18 +1,16 @@
 <?php
 
 declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\NotificationTemplateResource\Pages;
 use App\Models\NotificationTemplate;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,13 +18,11 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -37,12 +33,12 @@ use UnitEnum;
 final class NotificationTemplateResource extends Resource
 {
     protected static ?string $model = NotificationTemplate::class;
+
     protected static ?int $navigationSort = 6;
+
     protected static ?string $recordTitleAttribute = 'name';
-    protected static ?string $navigationGroup = NavigationGroup::Content;
 
-
-    protected static $navigationGroup = NavigationGroup::Content;
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     public static function getNavigationLabel(): string
     {
@@ -72,8 +68,7 @@ final class NotificationTemplateResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => 
-                                        $context === 'create' ? $set('slug', \Str::slug($state)) : null
+                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null
                                     ),
 
                                 TextInput::make('slug')
@@ -171,6 +166,7 @@ final class NotificationTemplateResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
 

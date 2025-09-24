@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use App\Livewire\Concerns\WithCart;
@@ -10,11 +11,12 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+
 /**
  * ProductQuickView
- * 
+ *
  * Livewire component for ProductQuickView with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property Product|null $product
  * @property bool $showModal
  * @property int $quantity
@@ -24,15 +26,19 @@ use Livewire\Component;
 final class ProductQuickView extends Component
 {
     use WithCart, WithNotifications;
+
     public ?Product $product = null;
+
     public bool $showModal = false;
+
     public int $quantity = 1;
+
     public ?int $selectedVariantId = null;
+
     public array $selectedAttributes = [];
+
     /**
      * Handle showProduct functionality with proper error handling.
-     * @param int $productId
-     * @return void
      */
     #[On('product-quick-view')]
     public function showProduct(int $productId): void
@@ -43,22 +49,22 @@ final class ProductQuickView extends Component
         $this->selectedAttributes = [];
         $this->showModal = true;
     }
+
     /**
      * Handle closeModal functionality with proper error handling.
-     * @return void
      */
     public function closeModal(): void
     {
         $this->showModal = false;
         $this->product = null;
     }
+
     /**
      * Handle updatedSelectedAttributes functionality with proper error handling.
-     * @return void
      */
     public function updatedSelectedAttributes(): void
     {
-        if (!$this->product) {
+        if (! $this->product) {
             return;
         }
         // Find matching variant based on selected attributes
@@ -67,14 +73,15 @@ final class ProductQuickView extends Component
         }, '=', count($this->selectedAttributes))->first();
         $this->selectedVariantId = $variant?->id;
     }
+
     /**
      * Handle addToCart functionality with proper error handling.
-     * @return void
      */
     public function addToCart(): void
     {
-        if (!$this->product) {
+        if (! $this->product) {
             $this->notifyError(__('ecommerce.product_not_found'));
+
             return;
         }
         $success = $this->addProductToCart($this->product->id, $this->quantity, $this->selectedVariantId);
@@ -86,61 +93,65 @@ final class ProductQuickView extends Component
             $this->notifyError(__('ecommerce.failed_to_add_to_cart'));
         }
     }
+
     /**
      * Handle addToWishlist functionality with proper error handling.
-     * @return void
      */
     public function addToWishlist(): void
     {
-        if (!$this->product) {
+        if (! $this->product) {
             return;
         }
         $this->dispatch('wishlist-toggle', productId: $this->product->id);
         $this->notifySuccess(__('ecommerce.added_to_wishlist'));
     }
+
     /**
      * Handle averageRating functionality with proper error handling.
-     * @return float
      */
     #[Computed]
     public function averageRating(): float
     {
-        if (!$this->product) {
+        if (! $this->product) {
             return 0;
         }
+
         return $this->product->reviews()->where('is_approved', true)->avg('rating') ?? 0;
     }
+
     /**
      * Handle reviewsCount functionality with proper error handling.
-     * @return int
      */
     #[Computed]
     public function reviewsCount(): int
     {
-        if (!$this->product) {
+        if (! $this->product) {
             return 0;
         }
+
         return $this->product->reviews()->where('is_approved', true)->count();
     }
+
     /**
      * Handle currentPrice functionality with proper error handling.
-     * @return float
      */
     #[Computed]
     public function currentPrice(): float
     {
-        if (!$this->product) {
+        if (! $this->product) {
             return 0;
         }
         if ($this->selectedVariantId) {
             $variant = $this->product->variants->find($this->selectedVariantId);
+
             return $variant?->price ?? $this->product->price;
         }
+
         return $this->product->price;
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

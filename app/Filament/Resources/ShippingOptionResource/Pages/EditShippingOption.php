@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ShippingOptionResource\Pages;
 
 use App\Filament\Resources\ShippingOptionResource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 final class EditShippingOption extends EditRecord
@@ -16,8 +15,8 @@ final class EditShippingOption extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            Actions\ViewAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }

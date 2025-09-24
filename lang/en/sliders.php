@@ -4,12 +4,12 @@ return [
     'title' => 'Sliders',
     'plural' => 'Sliders',
     'single' => 'Slider',
-    
+
     'basic_information' => 'Basic Information',
     'media' => 'Media',
     'appearance' => 'Appearance',
     'settings' => 'Settings',
-    
+
     'title' => 'Title',
     'description' => 'Description',
     'button_text' => 'Button Text',

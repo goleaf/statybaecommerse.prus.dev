@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\Widgets;
 
 use App\Models\Discount;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 final class DiscountStatsWidget extends BaseWidget
 {
@@ -29,12 +30,10 @@ final class DiscountStatsWidget extends BaseWidget
                 ->description('Times discounts have been used')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('info'),
-            Stat::make('Total Value', '€' . number_format($totalSavings, 2))
+            Stat::make('Total Value', '€'.number_format($totalSavings, 2))
                 ->description('Combined discount value')
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('warning'),
         ];
     }
 }
-
-

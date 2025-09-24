@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Product;
-use Illuminate\Support\Carbon;
 
 it('determines published state correctly', function () {
-    $p = new Product();
+    $p = new Product;
     $p->is_visible = true;
     $p->published_at = null;
     expect($p->isPublished())->toBeFalse();

@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NormalSettingResource\Pages;
 
 use App\Filament\Resources\NormalSettingResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
 class EditNormalSetting extends EditRecord
 {
@@ -17,4 +19,3 @@ class EditNormalSetting extends EditRecord
         ];
     }
 }
-

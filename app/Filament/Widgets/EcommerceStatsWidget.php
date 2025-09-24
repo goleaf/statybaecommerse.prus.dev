@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -6,8 +8,8 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
 
 final class EcommerceStatsWidget extends BaseWidget
@@ -51,13 +53,14 @@ final class EcommerceStatsWidget extends BaseWidget
             ->where('status', '!=', 'cancelled')
             ->sum('total') ?? 0);
 
-        return '€' . number_format($revenue, 2);
+        return '€'.number_format($revenue, 2);
     }
 
     private function getAverageRating(): string
     {
         $average = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
-        return number_format($average, 1) . '/5';
+
+        return number_format($average, 1).'/5';
     }
 
     private function getOrdersChart(): array

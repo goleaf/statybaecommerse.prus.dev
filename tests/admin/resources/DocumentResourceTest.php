@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use App\Filament\Resources\DocumentResource;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\User;
-use App\Filament\Resources\DocumentResource;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     // Create administrator role and permissions
@@ -16,26 +18,26 @@ beforeEach(function () {
         'create documents',
         'update documents',
         'delete documents',
-        'browse_documents'
+        'browse_documents',
     ];
-    
+
     foreach ($permissions as $permission) {
         Permission::create(['name' => $permission]);
     }
-    
+
     $role->givePermissionTo($permissions);
-    
+
     // Create admin user
     $this->adminUser = User::factory()->create();
     $this->adminUser->assignRole('administrator');
-    
+
     // Create test data
     $this->testTemplate = DocumentTemplate::factory()->create([
         'name' => 'Test Template',
         'slug' => 'test-template',
         'type' => 'invoice',
     ]);
-    
+
     $this->testDocument = Document::factory()->create([
         'document_template_id' => $this->testTemplate->id,
         'title' => 'Test Document',
@@ -54,7 +56,7 @@ it('can list documents in admin panel', function () {
 
 it('can create a new document', function () {
     $template = DocumentTemplate::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(DocumentResource\Pages\CreateDocument::class)
         ->fillForm([
@@ -68,7 +70,7 @@ it('can create a new document', function () {
         ])
         ->call('create')
         ->assertHasNoFormErrors();
-    
+
     $this->assertDatabaseHas('documents', [
         'document_template_id' => $template->id,
         'title' => 'New Document',
@@ -95,7 +97,7 @@ it('can edit a document', function () {
         ])
         ->call('save')
         ->assertHasNoFormErrors();
-    
+
     $this->assertDatabaseHas('documents', [
         'id' => $this->testDocument->id,
         'title' => 'Updated Document',
@@ -106,12 +108,12 @@ it('can edit a document', function () {
 
 it('can delete a document', function () {
     $document = Document::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(DocumentResource\Pages\EditDocument::class, ['record' => $document->id])
         ->callAction('delete')
         ->assertOk();
-    
+
     $this->assertDatabaseMissing('documents', [
         'id' => $document->id,
     ]);
@@ -134,7 +136,7 @@ it('validates required fields when creating document', function () {
 
 it('validates document status values', function () {
     $template = DocumentTemplate::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(DocumentResource\Pages\CreateDocument::class)
         ->fillForm([
@@ -151,7 +153,7 @@ it('validates document status values', function () {
 
 it('validates document format values', function () {
     $template = DocumentTemplate::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(DocumentResource\Pages\CreateDocument::class)
         ->fillForm([
@@ -198,13 +200,13 @@ it('handles document generation workflow', function () {
         'status' => 'draft',
         'file_path' => null,
     ]);
-    
+
     // Simulate document generation
     $document->update([
         'status' => 'generating',
         'generated_at' => now(),
     ]);
-    
+
     expect($document->status)->toBe('generating');
     expect($document->generated_at)->not->toBeNull();
 });
@@ -212,16 +214,16 @@ it('handles document generation workflow', function () {
 it('handles bulk actions on documents', function () {
     $document1 = Document::factory()->create();
     $document2 = Document::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(DocumentResource\Pages\ListDocuments::class)
         ->callTableBulkAction('delete', [$document1->id, $document2->id])
         ->assertOk();
-    
+
     $this->assertDatabaseMissing('documents', [
         'id' => $document1->id,
     ]);
-    
+
     $this->assertDatabaseMissing('documents', [
         'id' => $document2->id,
     ]);
@@ -232,9 +234,8 @@ it('can download completed documents', function () {
         'status' => 'completed',
         'file_path' => 'documents/test-document.pdf',
     ]);
-    
+
     $this->actingAs($this->adminUser)
         ->get(DocumentResource::getUrl('index'))
         ->assertSee('Download');
 });
-

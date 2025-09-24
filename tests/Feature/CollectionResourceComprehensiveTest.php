@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -7,8 +9,6 @@ use App\Models\Collection;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
-use Tests\TestCase;
 
 class CollectionResourceComprehensiveTest extends TestCase
 {
@@ -27,7 +27,7 @@ class CollectionResourceComprehensiveTest extends TestCase
 
     public function test_collection_resource_can_be_instantiated(): void
     {
-        $this->assertInstanceOf(CollectionResource::class, new CollectionResource());
+        $this->assertInstanceOf(CollectionResource::class, new CollectionResource);
     }
 
     public function test_collection_resource_has_correct_model(): void
@@ -211,7 +211,7 @@ class CollectionResourceComprehensiveTest extends TestCase
 
     public function test_collection_model_fillable_attributes(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
         $fillable = $collection->getFillable();
 
         $this->assertIsArray($fillable);
@@ -261,7 +261,7 @@ class CollectionResourceComprehensiveTest extends TestCase
 
     public function test_collection_model_translatable_attributes(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         // Test that the model has translatable attributes defined
         $this->assertIsArray($collection::$translatable);
@@ -271,35 +271,35 @@ class CollectionResourceComprehensiveTest extends TestCase
 
     public function test_collection_model_route_key_name(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertEquals('slug', $collection->getRouteKeyName());
     }
 
     public function test_collection_model_table_name(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertEquals('collections', $collection->getTable());
     }
 
     public function test_collection_model_primary_key(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertEquals('id', $collection->getKeyName());
     }
 
     public function test_collection_model_timestamps(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertTrue($collection->usesTimestamps());
     }
 
     public function test_collection_model_soft_deletes_trait(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertTrue(method_exists($collection, 'trashed'));
         $this->assertTrue(method_exists($collection, 'restore'));
@@ -308,14 +308,14 @@ class CollectionResourceComprehensiveTest extends TestCase
 
     public function test_collection_model_factory_trait(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertTrue(method_exists($collection, 'factory'));
     }
 
     public function test_collection_model_media_trait(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertTrue(method_exists($collection, 'addMedia'));
         $this->assertTrue(method_exists($collection, 'getFirstMediaUrl'));
@@ -323,7 +323,7 @@ class CollectionResourceComprehensiveTest extends TestCase
 
     public function test_collection_model_translations_trait(): void
     {
-        $collection = new Collection();
+        $collection = new Collection;
 
         $this->assertTrue(method_exists($collection, 'trans'));
         $this->assertTrue(method_exists($collection, 'translations'));

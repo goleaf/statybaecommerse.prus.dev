@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\CampaignTranslation;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
@@ -14,24 +15,24 @@ use App\Models\Category;
 use App\Models\Channel;
 use App\Models\CustomerGroup;
 use App\Models\Product;
-use App\Models\Zone;
+use App\Models\Translations\CampaignTranslation;
 use Faker\Factory as FakerFactory;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 final class CampaignSeeder extends Seeder
 {
     private bool $skipCampaignClickSeeding = false;
+
     private bool $skipCampaignConversionSeeding = false;
 
     public function run(): void
     {
-        // Create channels and zones if they don't exist
+        // Create channels if they don't exist
         $channelIds = $this->ensureRecords(Channel::class, 3);
-        $zoneIds = $this->ensureRecords(Zone::class, 5);
         $categoryIds = $this->ensureRecords(Category::class, 10);
         $productIds = $this->ensureRecords(Product::class, 20);
         $customerGroupIds = $this->ensureRecords(CustomerGroup::class, 5);
@@ -46,7 +47,7 @@ final class CampaignSeeder extends Seeder
             ->highPerformance()
             ->create([
                 'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
+                'zone_id' => null,
             ]);
 
         // Create regular active campaigns
@@ -55,7 +56,7 @@ final class CampaignSeeder extends Seeder
             ->active()
             ->create([
                 'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
+                'zone_id' => null,
             ]);
 
         // Create scheduled campaigns
@@ -64,7 +65,7 @@ final class CampaignSeeder extends Seeder
             ->scheduled()
             ->create([
                 'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
+                'zone_id' => null,
             ]);
 
         // Create expired campaigns
@@ -73,7 +74,7 @@ final class CampaignSeeder extends Seeder
             ->expired()
             ->create([
                 'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
+                'zone_id' => null,
             ]);
 
         // Create draft campaigns
@@ -82,7 +83,7 @@ final class CampaignSeeder extends Seeder
             ->create([
                 'status' => 'draft',
                 'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
+                'zone_id' => null,
             ]);
 
         $allCampaigns = $featuredCampaigns
@@ -266,7 +267,7 @@ final class CampaignSeeder extends Seeder
 
             $campaign = Campaign::factory()->create(array_merge($campaignData, [
                 'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => $zoneIds->isEmpty() ? null : $zoneIds->random(),
+                'zone_id' => null,
             ]));
 
             $this->syncTranslations($campaign, $locales, $translations);
@@ -329,8 +330,8 @@ final class CampaignSeeder extends Seeder
         $metaTitle = $isDefaultLocale ? $baseMetaTitle : sprintf('%s - %s', $faker->sentence(3), $faker->words(2, true));
         $metaDescription = $isDefaultLocale ? $baseMetaDescription : $faker->sentence(16);
 
-        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-' . $campaign->id);
-        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase . '-' . $locale);
+        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-'.$campaign->id);
+        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase.'-'.$locale);
 
         return [
             'name' => $name,
@@ -359,11 +360,11 @@ final class CampaignSeeder extends Seeder
     private function localizedBannerAltText(string $locale, string $campaignName): string
     {
         return match ($locale) {
-            'lt' => $campaignName . ' kampanijos baneris',
-            'en' => $campaignName . ' campaign banner',
-            'de' => 'Kampagnenbanner ' . $campaignName,
-            'ru' => 'Баннер кампании ' . $campaignName,
-            default => $campaignName . ' banner',
+            'lt' => $campaignName.' kampanijos baneris',
+            'en' => $campaignName.' campaign banner',
+            'de' => 'Kampagnenbanner '.$campaignName,
+            'ru' => 'Баннер кампании '.$campaignName,
+            default => $campaignName.' banner',
         };
     }
 
@@ -381,7 +382,7 @@ final class CampaignSeeder extends Seeder
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -422,7 +423,7 @@ final class CampaignSeeder extends Seeder
         } catch (QueryException $exception) {
             if ($this->isMissingTableException($exception, 'campaign_clicks')) {
                 $this->skipCampaignClickSeeding = true;
-                $this->command?->warn('Skipping campaign click seeding: ' . $exception->getMessage());
+                $this->command?->warn('Skipping campaign click seeding: '.$exception->getMessage());
 
                 return;
             }
@@ -442,7 +443,7 @@ final class CampaignSeeder extends Seeder
         } catch (QueryException $exception) {
             if ($this->isMissingTableException($exception, 'campaign_conversions')) {
                 $this->skipCampaignConversionSeeding = true;
-                $this->command?->warn('Skipping campaign conversion seeding: ' . $exception->getMessage());
+                $this->command?->warn('Skipping campaign conversion seeding: '.$exception->getMessage());
 
                 return;
             }

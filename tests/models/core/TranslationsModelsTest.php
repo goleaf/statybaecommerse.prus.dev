@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Translations\AttributeTranslation;
 use App\Models\Translations\AttributeValueTranslation;
@@ -9,18 +11,18 @@ use App\Models\Translations\LegalTranslation;
 use App\Models\Translations\ProductTranslation;
 
 it('instantiates translation models', function (): void {
-    expect(new LegalTranslation())
+    expect(new LegalTranslation)
         ->toBeInstanceOf(LegalTranslation::class)
-        ->and(new AttributeValueTranslation())
+        ->and(new AttributeValueTranslation)
         ->toBeInstanceOf(AttributeValueTranslation::class)
-        ->and(new AttributeTranslation())
+        ->and(new AttributeTranslation)
         ->toBeInstanceOf(AttributeTranslation::class)
-        ->and(new BrandTranslation())
+        ->and(new BrandTranslation)
         ->toBeInstanceOf(BrandTranslation::class)
-        ->and(new CollectionTranslation())
+        ->and(new CollectionTranslation)
         ->toBeInstanceOf(CollectionTranslation::class)
-        ->and(new CategoryTranslation())
+        ->and(new CategoryTranslation)
         ->toBeInstanceOf(CategoryTranslation::class)
-        ->and(new ProductTranslation())
+        ->and(new ProductTranslation)
         ->toBeInstanceOf(ProductTranslation::class);
 });

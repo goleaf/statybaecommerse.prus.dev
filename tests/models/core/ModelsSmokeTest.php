@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\QueryException;
@@ -31,10 +33,10 @@ $allModelClasses = [
     App\Models\Category::class,
 ];
 
-dataset('model_classes', fn() => $allModelClasses);
+dataset('model_classes', fn () => $allModelClasses);
 
 // Subset that have factories available
-dataset('factory_models', fn() => [
+dataset('factory_models', fn () => [
     App\Models\Brand::class,
     App\Models\Category::class,
     App\Models\Collection::class,
@@ -48,19 +50,19 @@ dataset('factory_models', fn() => [
 
 it('model class exists and is an Eloquent model', function (string $className): void {
     expect(class_exists($className))->toBeTrue();
-    $instance = new $className();
+    $instance = new $className;
     expect($instance)->toBeInstanceOf(EloquentModel::class);
 })->with('model_classes');
 
 it('can create records using model factories', function (string $className): void {
     /** @var \Illuminate\Database\Eloquent\Model $instance */
-    $instance = new $className();
+    $instance = new $className;
     $table = method_exists($instance, 'getTable') ? $instance->getTable() : null;
-    if ($table === null || !Schema::hasTable($table)) {
+    if ($table === null || ! Schema::hasTable($table)) {
         $this->markTestSkipped("Skipping factory test for {$className}: table not present");
     }
 
-    if (!method_exists($className, 'factory')) {
+    if (! method_exists($className, 'factory')) {
         $this->markTestSkipped("Skipping factory test for {$className}: static factory() not available");
     }
 
@@ -69,14 +71,14 @@ it('can create records using model factories', function (string $className): voi
         $model = $className::factory()->create();
         expect($model->exists)->toBeTrue();
     } catch (QueryException $e) {
-        $this->markTestSkipped("Factory for {$className} requires schema not present: " . $e->getMessage());
+        $this->markTestSkipped("Factory for {$className} requires schema not present: ".$e->getMessage());
     }
 })->with('factory_models');
 
 it('product isPublished reflects visibility and published_at correctly', function (): void {
-    $instance = new App\Models\Product();
+    $instance = new App\Models\Product;
     $table = method_exists($instance, 'getTable') ? $instance->getTable() : null;
-    if ($table === null || !Schema::hasTable($table)) {
+    if ($table === null || ! Schema::hasTable($table)) {
         $this->markTestSkipped('Skipping: products table not present');
     }
     /** @var App\Models\Product $product */

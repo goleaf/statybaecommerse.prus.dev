@@ -35,13 +35,13 @@ final class SubscriberSeeder extends Seeder
         for ($i = 1; $i <= 50; $i++) {
             $firstName = fake('lt_LT')->firstName();
             $lastName = fake('lt_LT')->lastName();
-            $email = strtolower($firstName . '.' . $lastName . '@' . fake()->domainName());
-            
+            $email = strtolower($firstName.'.'.$lastName.'@'.fake()->domainName());
+
             // Sometimes create a user account for the subscriber
             $user = null;
             if (fake()->boolean(30)) { // 30% chance to have a user account
                 $user = User::create([
-                    'name' => $firstName . ' ' . $lastName,
+                    'name' => $firstName.' '.$lastName,
                     'email' => $email,
                     'password' => Hash::make('password'),
                     'email_verified_at' => now(),

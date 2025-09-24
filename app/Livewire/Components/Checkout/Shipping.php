@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components\Checkout;
 
@@ -31,7 +33,6 @@ class Shipping extends StepComponent
 
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -43,7 +44,6 @@ class Shipping extends StepComponent
 
     /**
      * Handle save functionality with proper error handling.
-     * @return void
      */
     public function save(): void
     {
@@ -57,7 +57,6 @@ class Shipping extends StepComponent
 
     /**
      * Handle stepInfo functionality with proper error handling.
-     * @return array
      */
     public function stepInfo(): array
     {
@@ -66,12 +65,12 @@ class Shipping extends StepComponent
 
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     #[On('addresses-updated')]
     public function render(): View
     {
         $addresses = Auth::user()->addresses()->get()->groupBy('type');
+
         return view('livewire.components.checkout.shipping', ['addresses' => $addresses]);
     }
 }

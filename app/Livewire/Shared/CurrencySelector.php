@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
 use App\Models\Country;
 use App\Models\Currency;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
 /**
@@ -19,11 +21,11 @@ use Livewire\Component;
 class CurrencySelector extends Component
 {
     public array $currencies = [];
+
     public ?string $activeCurrencyCode = null;
 
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -31,11 +33,12 @@ class CurrencySelector extends Component
         $this->currencies = app()->environment('testing') ? [['id' => 1, 'code' => (string) config('app.currency', 'EUR'), 'symbol' => '€']] : \Cache::remember('currencies:enabled:list', now()->addHours(6), function () {
             try {
                 if (Schema::hasTable('currencies')) {
-                    return Arr::from(Currency::query()->where('is_enabled', true)->orderBy('code')->get(['id', 'code', 'symbol'])->map(fn($c) => ['id' => (int) $c->id, 'code' => (string) $c->code, 'symbol' => (string) $c->symbol]));
+                    return Arr::from(Currency::query()->where('is_enabled', true)->orderBy('code')->get(['id', 'code', 'symbol'])->map(fn ($c) => ['id' => (int) $c->id, 'code' => (string) $c->code, 'symbol' => (string) $c->symbol]));
                 }
             } catch (\Throwable $e) {
                 // ignore and fallback
             }
+
             return [['id' => 1, 'code' => (string) config('app.currency', 'EUR'), 'symbol' => '€']];
         });
         // Determine active from settings if available
@@ -50,6 +53,7 @@ class CurrencySelector extends Component
             } catch (\Throwable $e) {
                 // ignore
             }
+
             return (string) config('app.currency', 'EUR');
         });
         $this->activeCurrencyCode = $defaultCurrencyCode ?: $this->currencies[0]['code'] ?? null;
@@ -65,14 +69,13 @@ class CurrencySelector extends Component
 
     /**
      * Handle getCountryFlagProperty functionality with proper error handling.
-     * @return string|null
      */
     public function getCountryFlagProperty(): ?string
     {
         try {
             try {
                 $countryId = \App\Models\Setting::where('key', 'country_id')->value('value');
-                if (!empty($countryId)) {
+                if (! empty($countryId)) {
                     return Country::query()->find($countryId)?->svg_flag;
                 }
             } catch (\Throwable $e) {
@@ -82,6 +85,7 @@ class CurrencySelector extends Component
         } catch (\Throwable $e) {
             return null;
         }
+
         return null;
     }
 }

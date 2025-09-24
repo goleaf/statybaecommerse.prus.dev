@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -8,9 +10,9 @@ use App\Models\Translations\CityTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -21,9 +23,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $translationModel
  * @property mixed $table
  * @property mixed $fillable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|City newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|City newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|City query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -32,12 +36,13 @@ final class City extends Model
     use HasFactory, HasTranslations, SoftDeletes;
 
     protected string $translationModel = CityTranslation::class;
+
     protected $table = 'cities';
+
     protected $fillable = ['name', 'slug', 'code', 'description', 'is_enabled', 'is_default', 'is_capital', 'country_id', 'parent_id', 'level', 'latitude', 'longitude', 'population', 'postal_codes', 'sort_order', 'metadata', 'type', 'area', 'density', 'elevation', 'timezone', 'currency_code', 'currency_symbol', 'language_code', 'language_name', 'phone_code', 'postal_code', 'is_active'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -46,7 +51,6 @@ final class City extends Model
 
     /**
      * Handle country functionality with proper error handling.
-     * @return BelongsTo
      */
     public function country(): BelongsTo
     {
@@ -55,7 +59,6 @@ final class City extends Model
 
     /**
      * Handle parent functionality with proper error handling.
-     * @return BelongsTo
      */
     public function parent(): BelongsTo
     {
@@ -64,7 +67,6 @@ final class City extends Model
 
     /**
      * Handle children functionality with proper error handling.
-     * @return HasMany
      */
     public function children(): HasMany
     {
@@ -73,7 +75,6 @@ final class City extends Model
 
     /**
      * Handle addresses functionality with proper error handling.
-     * @return HasMany
      */
     public function addresses(): HasMany
     {
@@ -84,7 +85,6 @@ final class City extends Model
 
     /**
      * Handle users functionality with proper error handling.
-     * @return HasMany
      */
     public function users(): HasMany
     {
@@ -93,7 +93,6 @@ final class City extends Model
 
     /**
      * Handle orders functionality with proper error handling.
-     * @return HasMany
      */
     public function orders(): HasMany
     {
@@ -102,7 +101,6 @@ final class City extends Model
 
     /**
      * Handle customers functionality with proper error handling.
-     * @return HasMany
      */
     public function customers(): HasMany
     {
@@ -111,7 +109,6 @@ final class City extends Model
 
     /**
      * Handle locations functionality with proper error handling.
-     * @return HasMany
      */
     public function locations(): HasMany
     {
@@ -120,7 +117,8 @@ final class City extends Model
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEnabled($query)
     {
@@ -129,7 +127,8 @@ final class City extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -138,7 +137,8 @@ final class City extends Model
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeOrdered($query)
     {
@@ -147,7 +147,8 @@ final class City extends Model
 
     /**
      * Handle scopeDefault functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeDefault($query)
     {
@@ -156,7 +157,8 @@ final class City extends Model
 
     /**
      * Handle scopeCapital functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeCapital($query)
     {
@@ -165,8 +167,8 @@ final class City extends Model
 
     /**
      * Handle scopeByLevel functionality with proper error handling.
-     * @param mixed $query
-     * @param int $level
+     *
+     * @param  mixed  $query
      */
     public function scopeByLevel($query, int $level)
     {
@@ -175,8 +177,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountry functionality with proper error handling.
-     * @param mixed $query
-     * @param string $countryId
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountry($query, string $countryId)
     {
@@ -185,7 +187,8 @@ final class City extends Model
 
     /**
      * Handle scopeRoot functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeRoot($query)
     {
@@ -194,8 +197,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $code
+     *
+     * @param  mixed  $query
      */
     public function scopeByCode($query, string $code)
     {
@@ -204,8 +207,8 @@ final class City extends Model
 
     /**
      * Handle scopeByType functionality with proper error handling.
-     * @param mixed $query
-     * @param string $type
+     *
+     * @param  mixed  $query
      */
     public function scopeByType($query, string $type)
     {
@@ -214,8 +217,8 @@ final class City extends Model
 
     /**
      * Handle scopeByPopulation functionality with proper error handling.
-     * @param mixed $query
-     * @param int $minPopulation
+     *
+     * @param  mixed  $query
      */
     public function scopeByPopulation($query, int $minPopulation)
     {
@@ -224,8 +227,8 @@ final class City extends Model
 
     /**
      * Handle scopeByArea functionality with proper error handling.
-     * @param mixed $query
-     * @param float $minArea
+     *
+     * @param  mixed  $query
      */
     public function scopeByArea($query, float $minArea)
     {
@@ -234,8 +237,8 @@ final class City extends Model
 
     /**
      * Handle scopeByDensity functionality with proper error handling.
-     * @param mixed $query
-     * @param float $minDensity
+     *
+     * @param  mixed  $query
      */
     public function scopeByDensity($query, float $minDensity)
     {
@@ -244,8 +247,8 @@ final class City extends Model
 
     /**
      * Handle scopeByElevation functionality with proper error handling.
-     * @param mixed $query
-     * @param float $minElevation
+     *
+     * @param  mixed  $query
      */
     public function scopeByElevation($query, float $minElevation)
     {
@@ -254,8 +257,8 @@ final class City extends Model
 
     /**
      * Handle scopeByTimezone functionality with proper error handling.
-     * @param mixed $query
-     * @param string $timezone
+     *
+     * @param  mixed  $query
      */
     public function scopeByTimezone($query, string $timezone)
     {
@@ -264,8 +267,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCurrency functionality with proper error handling.
-     * @param mixed $query
-     * @param string $currencyCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByCurrency($query, string $currencyCode)
     {
@@ -274,8 +277,8 @@ final class City extends Model
 
     /**
      * Handle scopeByLanguage functionality with proper error handling.
-     * @param mixed $query
-     * @param string $languageCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByLanguage($query, string $languageCode)
     {
@@ -284,8 +287,8 @@ final class City extends Model
 
     /**
      * Handle scopeByPhoneCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $phoneCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByPhoneCode($query, string $phoneCode)
     {
@@ -294,8 +297,8 @@ final class City extends Model
 
     /**
      * Handle scopeByPostalCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $postalCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByPostalCode($query, string $postalCode)
     {
@@ -304,8 +307,8 @@ final class City extends Model
 
     /**
      * Handle scopeByLatitude functionality with proper error handling.
-     * @param mixed $query
-     * @param float $latitude
+     *
+     * @param  mixed  $query
      */
     public function scopeByLatitude($query, float $latitude)
     {
@@ -314,8 +317,8 @@ final class City extends Model
 
     /**
      * Handle scopeByLongitude functionality with proper error handling.
-     * @param mixed $query
-     * @param float $longitude
+     *
+     * @param  mixed  $query
      */
     public function scopeByLongitude($query, float $longitude)
     {
@@ -324,9 +327,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCoordinates functionality with proper error handling.
-     * @param mixed $query
-     * @param float $latitude
-     * @param float $longitude
+     *
+     * @param  mixed  $query
      */
     public function scopeByCoordinates($query, float $latitude, float $longitude)
     {
@@ -335,8 +337,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountryCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $code
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountryCode($query, string $code)
     {
@@ -347,8 +349,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountryIsoCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $isoCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountryIsoCode($query, string $isoCode)
     {
@@ -359,8 +361,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountryContinent functionality with proper error handling.
-     * @param mixed $query
-     * @param string $continent
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountryContinent($query, string $continent)
     {
@@ -371,8 +373,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountryCapital functionality with proper error handling.
-     * @param mixed $query
-     * @param string $capital
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountryCapital($query, string $capital)
     {
@@ -383,8 +385,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountryCurrency functionality with proper error handling.
-     * @param mixed $query
-     * @param string $currencyCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountryCurrency($query, string $currencyCode)
     {
@@ -395,8 +397,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountryLanguage functionality with proper error handling.
-     * @param mixed $query
-     * @param string $languageCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountryLanguage($query, string $languageCode)
     {
@@ -407,8 +409,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountryTimezone functionality with proper error handling.
-     * @param mixed $query
-     * @param string $timezone
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountryTimezone($query, string $timezone)
     {
@@ -419,8 +421,8 @@ final class City extends Model
 
     /**
      * Handle scopeByCountryPhoneCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $phoneCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountryPhoneCode($query, string $phoneCode)
     {
@@ -431,7 +433,6 @@ final class City extends Model
 
     /**
      * Handle getTranslatedNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTranslatedNameAttribute(): string
     {
@@ -440,7 +441,6 @@ final class City extends Model
 
     /**
      * Handle getTranslatedDescriptionAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTranslatedDescriptionAttribute(): string
     {
@@ -451,8 +451,6 @@ final class City extends Model
 
     /**
      * Handle getTranslatedName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedName(?string $locale = null): ?string
     {
@@ -461,8 +459,6 @@ final class City extends Model
 
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedDescription(?string $locale = null): ?string
     {
@@ -473,12 +469,13 @@ final class City extends Model
 
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
-     * @param mixed $query
-     * @param string|null $locale
+     *
+     * @param  mixed  $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
+
         return $query->with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }]);
@@ -488,7 +485,6 @@ final class City extends Model
 
     /**
      * Handle getAvailableLocales functionality with proper error handling.
-     * @return array
      */
     public function getAvailableLocales(): array
     {
@@ -499,8 +495,6 @@ final class City extends Model
 
     /**
      * Handle hasTranslationFor functionality with proper error handling.
-     * @param string $locale
-     * @return bool
      */
     public function hasTranslationFor(string $locale): bool
     {
@@ -511,8 +505,6 @@ final class City extends Model
 
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     * @param string $locale
-     * @return CityTranslation
      */
     public function getOrCreateTranslation(string $locale): CityTranslation
     {
@@ -523,9 +515,6 @@ final class City extends Model
 
     /**
      * Handle updateTranslation functionality with proper error handling.
-     * @param string $locale
-     * @param array $data
-     * @return bool
      */
     public function updateTranslation(string $locale, array $data): bool
     {
@@ -533,6 +522,7 @@ final class City extends Model
         if ($translation) {
             return $translation->update($data);
         }
+
         return $this->translations()->create(array_merge(['locale' => $locale], $data)) !== null;
     }
 
@@ -540,20 +530,18 @@ final class City extends Model
 
     /**
      * Handle updateTranslations functionality with proper error handling.
-     * @param array $translations
-     * @return bool
      */
     public function updateTranslations(array $translations): bool
     {
         foreach ($translations as $locale => $data) {
             $this->updateTranslation($locale, $data);
         }
+
         return true;
     }
 
     /**
      * Handle getFullPathAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFullPathAttribute(): string
     {
@@ -561,6 +549,7 @@ final class City extends Model
         if ($this->country) {
             $path->prepend($this->country->translated_name);
         }
+
         return $path->implode(' > ');
     }
 
@@ -575,6 +564,7 @@ final class City extends Model
             $ancestors->prepend($parent);
             $parent = $parent->parent;
         }
+
         return $ancestors;
     }
 
@@ -588,12 +578,12 @@ final class City extends Model
             $descendants->push($child);
             $descendants = $descendants->merge($child->descendants);
         }
+
         return $descendants;
     }
 
     /**
      * Handle getCoordinatesAttribute functionality with proper error handling.
-     * @return array
      */
     public function getCoordinatesAttribute(): array
     {

@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\DiscountCode;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 it('has discount and redemptions relations', function (): void {
-    $m = new DiscountCode();
+    $m = new DiscountCode;
     expect($m->discount())->toBeInstanceOf(BelongsTo::class);
     expect($m->redemptions())->toBeInstanceOf(HasMany::class);
 });

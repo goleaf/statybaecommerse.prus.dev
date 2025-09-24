@@ -8,260 +8,326 @@ use App\Models\Product;
 use App\Models\ProductHistory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 
 final class ProductHistorySeeder extends Seeder
 {
-    private const CHUNK_SIZE = 200;
-
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        if (! Schema::hasTable('product_histories')) {
-            $this->command?->warn('ProductHistorySeeder skipped: `product_histories` table not found. Run the product history migration first.');
+        $products = Product::limit(20)->get();
+        $users = User::limit(10)->get();
+
+        if ($products->isEmpty() || $users->isEmpty()) {
+            $this->command->warn('No products or users found. Please run ProductSeeder and UserSeeder first.');
 
             return;
         }
 
-        $query = Product::query()
-            ->with(['brand:id,name', 'categories:id,name'])
-            ->orderBy('id');
-
-        $userIds = User::query()->pluck('id')->all();
-
-        if ($query->doesntExist()) {
-            $this->command?->warn('ProductHistorySeeder skipped: no products found.');
-            return;
-        }
-
-        if (empty($userIds)) {
-            $this->command?->warn('ProductHistorySeeder skipped: no users found. Seed users before seeding histories.');
-            return;
-        }
-
-        $this->command?->info('Seeding product history entries...');
-
-        $query->chunkById(self::CHUNK_SIZE, function (Collection $products) use ($userIds): void {
-            foreach ($products as $product) {
-                if (ProductHistory::query()->where('product_id', $product->id)->exists()) {
-                    // Skip products that already have history to keep seeding idempotent.
-                    continue;
-                }
-
-                $this->createHistoryForProduct($product, $userIds);
-            }
-        });
-
-        $this->command?->info('Product history seeding completed.');
+        // Create different types of product history entries
+        $this->createProductLifecycleHistories($products, $users);
+        $this->createPriceChangeHistories($products, $users);
+        $this->createStockUpdateHistories($products, $users);
+        $this->createStatusChangeHistories($products, $users);
+        $this->createCategoryChangeHistories($products, $users);
+        $this->createImageChangeHistories($products, $users);
+        $this->createCustomHistories($products, $users);
     }
 
     /**
-     * Create sample history timeline for a given product.
-     *
-     * @param array<int, int> $userIds
+     * Create product lifecycle histories (created, updated, deleted, restored)
      */
-    private function createHistoryForProduct(Product $product, array $userIds): void
+    private function createProductLifecycleHistories($products, $users): void
     {
-        $faker = fake();
-        $createdAt = $product->created_at ? Carbon::parse($product->created_at) : Carbon::now()->subMonths(6);
-        $baseMetadata = [
-            'product_name' => $product->name,
-            'product_sku' => $product->sku,
-            'brand' => $product->brand?->name,
-            'categories' => $product->categories->pluck('name')->toArray(),
+        foreach ($products->take(10) as $product) {
+            $user = $users->random();
+
+            // Product creation
+            ProductHistory::create([
+                'product_id' => $product->id,
+                'user_id' => $user->id,
+                'causer_type' => 'App\\Models\\User',
+                'causer_id' => $user->id,
+                'action' => 'created',
+                'field_name' => 'name',
+                'old_value' => null,
+                'new_value' => $product->name,
+                'description' => 'Product was created in the system',
+                'ip_address' => $this->generateIpAddress(),
+                'user_agent' => $this->generateUserAgent(),
+                'metadata' => [
+                    'source' => 'admin_panel',
+                    'version' => '1.0',
+                ],
+                'created_at' => now()->subDays(rand(1, 30)),
+            ]);
+
+            // Product updates
+            $this->createUpdateHistories($product, $user);
+        }
+    }
+
+    /**
+     * Create update histories for products
+     */
+    private function createUpdateHistories($product, $user): void
+    {
+        $updateFields = [
+            'name' => ['Updated Product Name', 'New Product Name', 'Revised Name'],
+            'description' => ['Updated description', 'Enhanced description', 'Revised description'],
+            'short_description' => ['Updated short description', 'New short description'],
+            'meta_title' => ['Updated meta title', 'New meta title'],
+            'meta_description' => ['Updated meta description', 'New meta description'],
         ];
 
-        $pickUserId = fn (): int => Arr::random($userIds);
+        $updateCount = rand(2, 5);
 
-        $entries = [];
-        $initialUserId = $pickUserId();
+        for ($i = 0; $i < $updateCount; $i++) {
+            $field = array_rand($updateFields);
+            $values = $updateFields[$field];
+            $newValue = $values[array_rand($values)];
 
-        $entries[] = [
-            'action' => 'created',
-            'field_name' => 'product',
-            'old_value' => null,
-            'new_value' => [
-                'name' => $product->name,
-                'sku' => $product->sku,
-                'price' => (float) ($product->price ?? 0),
-                'status' => $product->status,
-            ],
-            'description' => "Product '{$product->name}' was created",
-            'user_id' => $initialUserId,
-            'metadata' => array_merge($baseMetadata, [
-                'timestamp' => $createdAt->format('Y-m-d H:i:s'),
-                'source' => 'initial_import',
-            ]),
-            'created_at' => $createdAt,
-            'updated_at' => $createdAt,
-        ];
+            ProductHistory::create([
+                'product_id' => $product->id,
+                'user_id' => $user->id,
+                'causer_type' => 'App\\Models\\User',
+                'causer_id' => $user->id,
+                'action' => 'updated',
+                'field_name' => $field,
+                'old_value' => $product->{$field} ?? 'Original value',
+                'new_value' => $newValue,
+                'description' => ucfirst($field).' was updated',
+                'ip_address' => $this->generateIpAddress(),
+                'user_agent' => $this->generateUserAgent(),
+                'metadata' => [
+                    'source' => 'admin_panel',
+                    'change_reason' => 'Content improvement',
+                ],
+                'created_at' => now()->subDays(rand(1, 20)),
+            ]);
+        }
+    }
 
-        $price = (float) ($product->price ?? $faker->randomFloat(2, 5, 100));
-        $priceChangeCount = $faker->numberBetween(2, 4);
+    /**
+     * Create price change histories
+     */
+    private function createPriceChangeHistories($products, $users): void
+    {
+        foreach ($products->take(8) as $product) {
+            $user = $users->random();
+            $originalPrice = rand(1000, 5000) / 100; // $10.00 - $50.00
+            $newPrice = $originalPrice + rand(-500, 1000) / 100; // Price change
 
-        for ($i = 0; $i < $priceChangeCount; $i++) {
-            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
-            $oldPrice = $price;
-            $multiplier = $faker->randomFloat(2, 0.85, 1.25);
-            $price = round(max(0.5, $oldPrice * $multiplier), 2);
-
-            $entries[] = [
+            ProductHistory::create([
+                'product_id' => $product->id,
+                'user_id' => $user->id,
+                'causer_type' => 'App\\Models\\User',
+                'causer_id' => $user->id,
                 'action' => 'price_changed',
                 'field_name' => 'price',
-                'old_value' => $oldPrice,
-                'new_value' => $price,
-                'description' => "Price changed from {$oldPrice}€ to {$price}€",
-                'user_id' => $pickUserId(),
-                'metadata' => array_merge($baseMetadata, [
-                    'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                    'price_change_percentage' => $oldPrice > 0 ? round((($price - $oldPrice) / $oldPrice) * 100, 2) : null,
-                    'reason' => $faker->randomElement(['market_adjustment', 'supplier_update', 'promotion', 'competitor_move']),
-                ]),
-                'created_at' => $changeDate,
-                'updated_at' => $changeDate,
-            ];
+                'old_value' => $originalPrice,
+                'new_value' => $newPrice,
+                'description' => 'Product price was updated',
+                'ip_address' => $this->generateIpAddress(),
+                'user_agent' => $this->generateUserAgent(),
+                'metadata' => [
+                    'price_change_percentage' => round((($newPrice - $originalPrice) / $originalPrice) * 100, 2),
+                    'reason' => 'Market adjustment',
+                ],
+                'created_at' => now()->subDays(rand(1, 15)),
+            ]);
         }
+    }
 
-        $stock = $product->stock_quantity ?? $faker->numberBetween(0, 250);
-        $stockChanges = $faker->numberBetween(3, 6);
+    /**
+     * Create stock update histories
+     */
+    private function createStockUpdateHistories($products, $users): void
+    {
+        foreach ($products->take(12) as $product) {
+            $user = $users->random();
+            $oldStock = rand(0, 50);
+            $newStock = $oldStock + rand(-20, 100);
 
-        for ($i = 0; $i < $stockChanges; $i++) {
-            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
-            $delta = $faker->numberBetween(-60, 120);
-            $newStock = max(0, $stock + $delta);
-
-            $entries[] = [
+            ProductHistory::create([
+                'product_id' => $product->id,
+                'user_id' => $user->id,
+                'causer_type' => 'App\\Models\\User',
+                'causer_id' => $user->id,
                 'action' => 'stock_updated',
                 'field_name' => 'stock_quantity',
-                'old_value' => $stock,
+                'old_value' => $oldStock,
                 'new_value' => $newStock,
-                'description' => "Stock updated from {$stock} to {$newStock} units",
-                'user_id' => $pickUserId(),
-                'metadata' => array_merge($baseMetadata, [
-                    'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                    'stock_change' => $delta,
-                    'reason' => $faker->randomElement(['restock', 'inventory_adjustment', 'customer_return', 'bulk_order']),
-                ]),
-                'created_at' => $changeDate,
-                'updated_at' => $changeDate,
-            ];
-
-            $stock = $newStock;
+                'description' => 'Stock quantity was updated',
+                'ip_address' => $this->generateIpAddress(),
+                'user_agent' => $this->generateUserAgent(),
+                'metadata' => [
+                    'stock_change' => $newStock - $oldStock,
+                    'reason' => $newStock > $oldStock ? 'Restock' : 'Sale',
+                ],
+                'created_at' => now()->subDays(rand(1, 10)),
+            ]);
         }
+    }
 
-        $statuses = ['draft', 'published', 'archived'];
-        $status = $product->status ?? 'published';
-        $statusChanges = $faker->numberBetween(1, 3);
+    /**
+     * Create status change histories
+     */
+    private function createStatusChangeHistories($products, $users): void
+    {
+        $statuses = ['draft', 'published', 'archived', 'pending'];
 
-        for ($i = 0; $i < $statusChanges; $i++) {
-            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
-            $newStatus = $faker->randomElement(array_values(array_diff($statuses, [$status])));
+        foreach ($products->take(6) as $product) {
+            $user = $users->random();
+            $oldStatus = $statuses[array_rand($statuses)];
+            $newStatus = $statuses[array_rand($statuses)];
 
-            $entries[] = [
-                'action' => 'status_changed',
-                'field_name' => 'status',
-                'old_value' => $status,
-                'new_value' => $newStatus,
-                'description' => "Status changed from {$status} to {$newStatus}",
-                'user_id' => $pickUserId(),
-                'metadata' => array_merge($baseMetadata, [
-                    'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                    'reason' => $faker->randomElement(['assortment_review', 'seasonal_adjustment', 'quality_check']),
-                ]),
-                'created_at' => $changeDate,
-                'updated_at' => $changeDate,
-            ];
-
-            $status = $newStatus;
+            if ($oldStatus !== $newStatus) {
+                ProductHistory::create([
+                    'product_id' => $product->id,
+                    'user_id' => $user->id,
+                    'causer_type' => 'App\\Models\\User',
+                    'causer_id' => $user->id,
+                    'action' => 'status_changed',
+                    'field_name' => 'status',
+                    'old_value' => $oldStatus,
+                    'new_value' => $newStatus,
+                    'description' => 'Product status was changed',
+                    'ip_address' => $this->generateIpAddress(),
+                    'user_agent' => $this->generateUserAgent(),
+                    'metadata' => [
+                        'status_change_reason' => 'Administrative action',
+                    ],
+                    'created_at' => now()->subDays(rand(1, 25)),
+                ]);
+            }
         }
+    }
 
-        $visibility = (bool) ($product->is_visible ?? true);
-        $visibilityChanges = $faker->numberBetween(1, 2);
+    /**
+     * Create category change histories
+     */
+    private function createCategoryChangeHistories($products, $users): void
+    {
+        $categories = ['Electronics', 'Clothing', 'Home & Garden', 'Sports', 'Books'];
 
-        for ($i = 0; $i < $visibilityChanges; $i++) {
-            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
-            $newVisibility = ! $visibility;
+        foreach ($products->take(5) as $product) {
+            $user = $users->random();
+            $oldCategory = $categories[array_rand($categories)];
+            $newCategory = $categories[array_rand($categories)];
 
-            $entries[] = [
-                'action' => 'updated',
-                'field_name' => 'is_visible',
-                'old_value' => $visibility,
-                'new_value' => $newVisibility,
-                'description' => sprintf('Visibility changed from %s to %s', $visibility ? 'visible' : 'hidden', $newVisibility ? 'visible' : 'hidden'),
-                'user_id' => $pickUserId(),
-                'metadata' => array_merge($baseMetadata, [
-                    'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                    'reason' => $faker->randomElement(['maintenance', 'seasonal_visibility', 'content_review']),
-                ]),
-                'created_at' => $changeDate,
-                'updated_at' => $changeDate,
-            ];
-
-            $visibility = $newVisibility;
+            if ($oldCategory !== $newCategory) {
+                ProductHistory::create([
+                    'product_id' => $product->id,
+                    'user_id' => $user->id,
+                    'causer_type' => 'App\\Models\\User',
+                    'causer_id' => $user->id,
+                    'action' => 'category_changed',
+                    'field_name' => 'category_id',
+                    'old_value' => $oldCategory,
+                    'new_value' => $newCategory,
+                    'description' => 'Product category was changed',
+                    'ip_address' => $this->generateIpAddress(),
+                    'user_agent' => $this->generateUserAgent(),
+                    'metadata' => [
+                        'category_change_reason' => 'Better categorization',
+                    ],
+                    'created_at' => now()->subDays(rand(1, 20)),
+                ]);
+            }
         }
+    }
 
-        $description = (string) ($product->description ?? '');
-        $descriptionUpdates = $faker->numberBetween(1, 2);
+    /**
+     * Create image change histories
+     */
+    private function createImageChangeHistories($products, $users): void
+    {
+        foreach ($products->take(7) as $product) {
+            $user = $users->random();
+            $oldImage = 'old-image-'.rand(1, 100).'.jpg';
+            $newImage = 'new-image-'.rand(1, 100).'.jpg';
 
-        for ($i = 0; $i < $descriptionUpdates; $i++) {
-            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
-            $oldDescription = $description;
-            $description = trim($oldDescription . ' ' . $faker->sentence());
-
-            $entries[] = [
-                'action' => 'updated',
-                'field_name' => 'description',
-                'old_value' => $oldDescription,
-                'new_value' => $description,
-                'description' => 'Product description updated',
-                'user_id' => $pickUserId(),
-                'metadata' => array_merge($baseMetadata, [
-                    'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                    'reason' => $faker->randomElement(['seo_optimization', 'content_refresh', 'supplier_information']),
-                ]),
-                'created_at' => $changeDate,
-                'updated_at' => $changeDate,
-            ];
+            ProductHistory::create([
+                'product_id' => $product->id,
+                'user_id' => $user->id,
+                'causer_type' => 'App\\Models\\User',
+                'causer_id' => $user->id,
+                'action' => 'image_changed',
+                'field_name' => 'image',
+                'old_value' => $oldImage,
+                'new_value' => $newImage,
+                'description' => 'Product image was updated',
+                'ip_address' => $this->generateIpAddress(),
+                'user_agent' => $this->generateUserAgent(),
+                'metadata' => [
+                    'image_change_reason' => 'Better quality image',
+                ],
+                'created_at' => now()->subDays(rand(1, 15)),
+            ]);
         }
+    }
 
-        $categoryChanges = $faker->numberBetween(0, 2);
-        $currentCategories = $product->categories->pluck('name')->toArray();
+    /**
+     * Create custom histories
+     */
+    private function createCustomHistories($products, $users): void
+    {
+        $customActions = [
+            'bulk_import' => 'Product was imported via bulk import',
+            'api_update' => 'Product was updated via API',
+            'migration' => 'Product data was migrated',
+            'sync' => 'Product was synchronized with external system',
+        ];
 
-        for ($i = 0; $i < $categoryChanges; $i++) {
-            $changeDate = Carbon::instance($faker->dateTimeBetween($createdAt, 'now'));
-            $newCategory = $faker->sentence(2);
-            $newCategories = array_values(array_unique(array_merge($currentCategories, [$newCategory])));
+        foreach ($products->take(4) as $product) {
+            $user = $users->random();
+            $action = array_rand($customActions);
+            $description = $customActions[$action];
 
-            $entries[] = [
-                'action' => 'updated',
-                'field_name' => 'categories',
-                'old_value' => $currentCategories,
-                'new_value' => $newCategories,
-                'description' => 'Product categories updated',
-                'user_id' => $pickUserId(),
-                'metadata' => array_merge($baseMetadata, [
-                    'timestamp' => $changeDate->format('Y-m-d H:i:s'),
-                    'reason' => $faker->randomElement(['navigation_update', 'cross_sell', 'merchandising']),
-                ]),
-                'created_at' => $changeDate,
-                'updated_at' => $changeDate,
-            ];
-
-            $currentCategories = $newCategories;
+            ProductHistory::create([
+                'product_id' => $product->id,
+                'user_id' => $user->id,
+                'causer_type' => 'App\\Models\\User',
+                'causer_id' => $user->id,
+                'action' => 'custom',
+                'field_name' => 'system',
+                'old_value' => null,
+                'new_value' => $action,
+                'description' => $description,
+                'ip_address' => $this->generateIpAddress(),
+                'user_agent' => $this->generateUserAgent(),
+                'metadata' => [
+                    'custom_action' => $action,
+                    'system_source' => 'automated',
+                ],
+                'created_at' => now()->subDays(rand(1, 30)),
+            ]);
         }
+    }
 
-        foreach ($entries as $entry) {
-            $entry['product_id'] = $product->id;
-            $entry['causer_type'] = User::class;
-            $entry['causer_id'] = $entry['user_id'];
-            $entry['ip_address'] = $entry['ip_address'] ?? $faker->ipv4();
-            $entry['user_agent'] = $entry['user_agent'] ?? $faker->userAgent();
+    /**
+     * Generate random IP address
+     */
+    private function generateIpAddress(): string
+    {
+        return rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255);
+    }
 
-            ProductHistory::create($entry);
-        }
+    /**
+     * Generate random user agent
+     */
+    private function generateUserAgent(): string
+    {
+        $userAgents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15',
+            'Mozilla/5.0 (Android 10; Mobile; rv:68.0) Gecko/68.0 Firefox/68.0',
+        ];
 
-        $this->command?->info(sprintf('Seeded %d history entries for product: %s', count($entries), $product->sku));
+        return $userAgents[array_rand($userAgents)];
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Navigation
@@ -54,4 +56,3 @@ return [
         'recent_items' => 'Recent Items',
     ],
 ];
-

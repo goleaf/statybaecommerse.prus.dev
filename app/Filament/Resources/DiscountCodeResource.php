@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\DiscountCodeResource\Pages;
-use App\Models\CustomerGroup;
 use App\Models\DiscountCode;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -21,15 +23,29 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+
+final class DiscountCodeResource extends Resource
+{
+    protected static ?string $model = DiscountCode::class;
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Marketing';
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-tag';
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -49,16 +65,14 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $schema
-     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make(__('discount_codes.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('code')
                                 ->label(__('discount_codes.code'))
                                 ->required()
@@ -77,9 +91,9 @@ use Illuminate\Database\Eloquent\Collection;
                         ->columnSpanFull(),
                 ]),
             Section::make(__('discount_codes.discount_settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('type')
                                 ->label(__('discount_codes.type'))
                                 ->options([
@@ -98,7 +112,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->helperText(__('discount_codes.value_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('minimum_amount')
                                 ->label(__('discount_codes.minimum_amount'))
                                 ->prefix('€')
@@ -110,9 +124,9 @@ use Illuminate\Database\Eloquent\Collection;
                         ]),
                 ]),
             Section::make(__('discount_codes.usage_limits'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('usage_limit')
                                 ->label(__('discount_codes.usage_limit'))
                                 ->numeric()
@@ -125,7 +139,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->helperText(__('discount_codes.usage_limit_per_user_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('used_count')
                                 ->label(__('discount_codes.used_count'))
                                 ->numeric()
@@ -138,9 +152,9 @@ use Illuminate\Database\Eloquent\Collection;
                         ]),
                 ]),
             Section::make(__('discount_codes.validity'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             DateTimePicker::make('valid_from')
                                 ->label(__('discount_codes.valid_from'))
                                 ->default(now())
@@ -151,7 +165,7 @@ use Illuminate\Database\Eloquent\Collection;
                         ]),
                 ]),
             Section::make(__('discount_codes.targeting'))
-                ->components([
+                ->schema([
                     Select::make('customer_group_id')
                         ->label(__('discount_codes.customer_group'))
                         ->relationship('customerGroup', 'name')
@@ -169,9 +183,9 @@ use Illuminate\Database\Eloquent\Collection;
                         ->default(false),
                 ]),
             Section::make(__('discount_codes.settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('is_active')
                                 ->label(__('discount_codes.is_active'))
                                 ->default(true),
@@ -180,7 +194,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('is_auto_apply')
                                 ->label(__('discount_codes.is_auto_apply'))
                                 ->default(false),
@@ -194,8 +208,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -215,8 +227,8 @@ use Illuminate\Database\Eloquent\Collection;
                     ->searchable(),
                 TextColumn::make('type')
                     ->label(__('discount_codes.type'))
-                    ->formatStateUsing(fn(string $state): string => __("discount_codes.types.{$state}"))
-                    ->color(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => __("discount_codes.types.{$state}"))
+                    ->color(fn (string $state): string => match ($state) {
                         'percentage' => 'green',
                         'fixed' => 'blue',
                         'free_shipping' => 'purple',
@@ -227,11 +239,12 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('discount_codes.value'))
                     ->formatStateUsing(function ($state, $record): string {
                         if ($record->type === 'percentage') {
-                            return $state . '%';
+                            return $state.'%';
                         } elseif ($record->type === 'free_shipping') {
                             return __('discount_codes.free_shipping');
                         }
-                        return '€' . number_format($state, 2);
+
+                        return '€'.number_format($state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -242,21 +255,20 @@ use Illuminate\Database\Eloquent\Collection;
                 TextColumn::make('used_count')
                     ->label(__('discount_codes.used_count'))
                     ->numeric()
-                    ->color(fn($state, $record): string =>
-                        $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
+                    ->color(fn ($state, $record): string => $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
                 TextColumn::make('remaining_uses')
                     ->label(__('discount_codes.remaining_uses'))
                     ->numeric()
-                    ->color(fn($state): string => $state <= 0 ? 'danger' : 'success'),
+                    ->color(fn ($state): string => $state <= 0 ? 'danger' : 'success'),
                 TextColumn::make('customerGroup.name')
                     ->label(__('discount_codes.customer_group'))
                     ->color('gray')
                     ->searchable(),
                 TextColumn::make('is_active')
                     ->label(__('discount_codes.status'))
-                    ->formatStateUsing(fn(bool $state): string => $state ? __('discount_codes.active') : __('discount_codes.inactive'))
+                    ->formatStateUsing(fn (bool $state): string => $state ? __('discount_codes.active') : __('discount_codes.inactive'))
                     ->badge()
-                    ->color(fn(bool $state): string => $state ? 'success' : 'danger'),
+                    ->color(fn (bool $state): string => $state ? 'success' : 'danger'),
                 IconColumn::make('is_public')
                     ->label(__('discount_codes.is_public'))
                     ->boolean(),
@@ -316,11 +328,11 @@ use Illuminate\Database\Eloquent\Collection;
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(DiscountCode $record): string => $record->is_active ? __('discount_codes.deactivate') : __('discount_codes.activate'))
-                    ->icon(fn(DiscountCode $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(DiscountCode $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (DiscountCode $record): string => $record->is_active ? __('discount_codes.deactivate') : __('discount_codes.activate'))
+                    ->icon(fn (DiscountCode $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (DiscountCode $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (DiscountCode $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('discount_codes.activated_successfully') : __('discount_codes.deactivated_successfully'))
                             ->success()
@@ -333,8 +345,8 @@ use Illuminate\Database\Eloquent\Collection;
                     ->color('info')
                     ->action(function (DiscountCode $record): void {
                         $newDiscountCode = $record->replicate();
-                        $newDiscountCode->code = $record->code . '_copy_' . time();
-                        $newDiscountCode->name = $record->name . ' (Copy)';
+                        $newDiscountCode->code = $record->code.'_copy_'.time();
+                        $newDiscountCode->name = $record->name.' (Copy)';
                         $newDiscountCode->used_count = 0;
                         $newDiscountCode->save();
 
@@ -379,7 +391,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {

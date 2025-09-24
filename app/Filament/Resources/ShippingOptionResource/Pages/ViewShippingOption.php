@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ShippingOptionResource\Pages;
 
 use App\Filament\Resources\ShippingOptionResource;
-use Filament\Actions\EditAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
 final class ViewShippingOption extends ViewRecord
@@ -15,7 +15,7 @@ final class ViewShippingOption extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
+            Actions\EditAction::make(),
         ];
     }
 }

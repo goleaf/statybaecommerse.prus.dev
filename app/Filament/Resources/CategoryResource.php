@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -21,6 +24,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -28,34 +32,37 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
-    /**
-     * Handle getPluralModelLabel functionality with proper error handling.
-     */
+final class CategoryResource extends Resource
+{
+    protected static ?string $model = Category::class;
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'System';
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-tag';
+    }
+
     public static function getPluralModelLabel(): string
     {
         return __('categories.plural');
     }
 
-    /**
-     * Handle getModelLabel functionality with proper error handling.
-     */
     public static function getModelLabel(): string
     {
         return __('categories.single');
     }
 
-    /**
-     * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
-     */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $form->schema([
             Section::make(__('categories.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -65,8 +72,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) =>
-                                    $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
                             TextInput::make('slug')
                                 ->label(__('categories.slug'))
                                 ->unique(ignoreRecord: true)
@@ -89,7 +95,7 @@ use Illuminate\Database\Eloquent\Collection;
                         ->columnSpanFull(),
                 ]),
             Section::make(__('categories.media'))
-                ->components([
+                ->schema([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
                         ->image()
@@ -149,11 +155,6 @@ use Illuminate\Database\Eloquent\Collection;
         ]);
     }
 
-    /**
-     * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
-     */
     public static function table(Table $table): Table
     {
         return $table
@@ -173,6 +174,7 @@ use Illuminate\Database\Eloquent\Collection;
                         if ($record->parent) {
                             return "{$record->parent->name} → {$state}";
                         }
+
                         return $state;
                     }),
                 TextColumn::make('slug')
@@ -205,7 +207,7 @@ use Illuminate\Database\Eloquent\Collection;
                 TextColumn::make('updated_at')
                     ->label(__('categories.updated_at'))
                     ->dateTime()
-                    ->sortable()
+                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('parent_id')
@@ -225,11 +227,11 @@ use Illuminate\Database\Eloquent\Collection;
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
-                    ->icon(fn(Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Category $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
+                    ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Category $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Category $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('categories.activated_successfully') : __('categories.deactivated_successfully'))
                             ->success()
@@ -269,10 +271,6 @@ use Illuminate\Database\Eloquent\Collection;
             ->defaultSort('sort_order');
     }
 
-    /**
-     * Get the relations for this resource.
-     * @return array
-     */
     public static function getRelations(): array
     {
         return [
@@ -280,10 +278,6 @@ use Illuminate\Database\Eloquent\Collection;
         ];
     }
 
-    /**
-     * Get the pages for this resource.
-     * @return array
-     */
     public static function getPages(): array
     {
         return [

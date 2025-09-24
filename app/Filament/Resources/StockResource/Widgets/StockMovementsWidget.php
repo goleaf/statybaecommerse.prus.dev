@@ -15,9 +15,9 @@ final class StockMovementsWidget extends ChartWidget
     protected function getData(): array
     {
         $data = Stock::select(
-                DB::raw('DATE(updated_at) as date'),
-                DB::raw('COUNT(*) as movements')
-            )
+            DB::raw('DATE(updated_at) as date'),
+            DB::raw('COUNT(*) as movements')
+        )
             ->where('updated_at', '>=', now()->subDays(30))
             ->groupBy('date')
             ->orderBy('date')

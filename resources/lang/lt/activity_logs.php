@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'title' => 'Veiklos žurnalai',
@@ -125,4 +127,3 @@ return [
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
 ];
-

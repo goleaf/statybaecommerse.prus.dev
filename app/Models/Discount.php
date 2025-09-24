@@ -1,16 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -20,9 +21,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property mixed $table
  * @property mixed $fillable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -31,11 +34,11 @@ final class Discount extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'discounts';
+
     protected $fillable = ['name', 'slug', 'description', 'type', 'value', 'is_active', 'is_enabled', 'starts_at', 'ends_at', 'usage_limit', 'usage_count', 'minimum_amount', 'maximum_amount', 'status', 'scope', 'stacking_policy', 'metadata', 'priority', 'exclusive', 'applies_to_shipping', 'free_shipping', 'first_order_only', 'per_customer_limit', 'per_code_limit', 'per_day_limit', 'channel_restrictions', 'currency_restrictions', 'weekday_mask', 'time_window'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -44,8 +47,6 @@ final class Discount extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -58,8 +59,6 @@ final class Discount extends Model
 
     /**
      * Handle scopeScheduled functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeScheduled(Builder $query): Builder
     {
@@ -68,8 +67,6 @@ final class Discount extends Model
 
     /**
      * Handle scopeExpired functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeExpired(Builder $query): Builder
     {
@@ -80,19 +77,18 @@ final class Discount extends Model
 
     /**
      * Handle hasReachedLimit functionality with proper error handling.
-     * @return bool
      */
     public function hasReachedLimit(): bool
     {
         if ($this->usage_limit !== null) {
             return $this->usage_count >= $this->usage_limit;
         }
+
         return false;
     }
 
     /**
      * Handle isValid functionality with proper error handling.
-     * @return bool
      */
     public function isValid(): bool
     {
@@ -109,12 +105,12 @@ final class Discount extends Model
         if ($this->ends_at && $this->ends_at->lt($now)) {
             return false;
         }
+
         return true;
     }
 
     /**
      * Handle conditions functionality with proper error handling.
-     * @return HasMany
      */
     public function conditions(): HasMany
     {
@@ -123,7 +119,6 @@ final class Discount extends Model
 
     /**
      * Handle codes functionality with proper error handling.
-     * @return HasMany
      */
     public function codes(): HasMany
     {
@@ -132,7 +127,6 @@ final class Discount extends Model
 
     /**
      * Handle redemptions functionality with proper error handling.
-     * @return HasMany
      */
     public function redemptions(): HasMany
     {
@@ -141,7 +135,6 @@ final class Discount extends Model
 
     /**
      * Handle brands functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function brands(): BelongsToMany
     {
@@ -150,7 +143,6 @@ final class Discount extends Model
 
     /**
      * Handle categories functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function categories(): BelongsToMany
     {
@@ -159,7 +151,6 @@ final class Discount extends Model
 
     /**
      * Handle collections functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function collections(): BelongsToMany
     {
@@ -168,7 +159,6 @@ final class Discount extends Model
 
     /**
      * Handle customers functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function customers(): BelongsToMany
     {
@@ -177,7 +167,6 @@ final class Discount extends Model
 
     /**
      * Handle campaigns functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function campaigns(): BelongsToMany
     {
@@ -186,7 +175,6 @@ final class Discount extends Model
 
     /**
      * Handle products functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function products(): BelongsToMany
     {
@@ -195,7 +183,6 @@ final class Discount extends Model
 
     /**
      * Handle customerGroups functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function customerGroups(): BelongsToMany
     {
@@ -204,9 +191,6 @@ final class Discount extends Model
 
     /**
      * Handle scopeByType functionality with proper error handling.
-     * @param Builder $query
-     * @param string $type
-     * @return Builder
      */
     public function scopeByType(Builder $query, string $type): Builder
     {
@@ -215,8 +199,6 @@ final class Discount extends Model
 
     /**
      * Handle scopeExclusive functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeExclusive(Builder $query): Builder
     {
@@ -225,8 +207,6 @@ final class Discount extends Model
 
     /**
      * Handle scopeStackable functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeStackable(Builder $query): Builder
     {
@@ -235,9 +215,6 @@ final class Discount extends Model
 
     /**
      * Handle scopeByPriority functionality with proper error handling.
-     * @param Builder $query
-     * @param string $direction
-     * @return Builder
      */
     public function scopeByPriority(Builder $query, string $direction = 'asc'): Builder
     {
@@ -246,7 +223,6 @@ final class Discount extends Model
 
     /**
      * Handle getDiscountAmountAttribute functionality with proper error handling.
-     * @return float
      */
     public function getDiscountAmountAttribute(): float
     {
@@ -260,7 +236,6 @@ final class Discount extends Model
 
     /**
      * Handle isExclusive functionality with proper error handling.
-     * @return bool
      */
     public function isExclusive(): bool
     {
@@ -269,21 +244,18 @@ final class Discount extends Model
 
     /**
      * Handle canStackWith functionality with proper error handling.
-     * @param Discount $other
-     * @return bool
      */
     public function canStackWith(Discount $other): bool
     {
-        return !$this->isExclusive() && !$other->isExclusive();
+        return ! $this->isExclusive() && ! $other->isExclusive();
     }
 
     /**
      * Handle isCurrentlyActive functionality with proper error handling.
-     * @return bool
      */
     public function isCurrentlyActive(): bool
     {
-        if (!(bool) ($this->is_active ?? false)) {
+        if (! (bool) ($this->is_active ?? false)) {
             return false;
         }
         $now = now();
@@ -293,13 +265,12 @@ final class Discount extends Model
         if ($this->ends_at && $this->ends_at->lt($now)) {
             return false;
         }
+
         return true;
     }
 
     /**
      * Handle calculateDiscountAmount functionality with proper error handling.
-     * @param float $amount
-     * @return float
      */
     public function calculateDiscountAmount(float $amount): float
     {
@@ -312,7 +283,6 @@ final class Discount extends Model
 
     /**
      * Handle incrementUsage functionality with proper error handling.
-     * @return void
      */
     public function incrementUsage(): void
     {
@@ -321,13 +291,13 @@ final class Discount extends Model
 
     /**
      * Handle isUsageLimitReached functionality with proper error handling.
-     * @return bool
      */
     public function isUsageLimitReached(): bool
     {
         if ($this->usage_limit === null) {
             return false;
         }
+
         return (int) $this->usage_count >= (int) $this->usage_limit;
     }
 }

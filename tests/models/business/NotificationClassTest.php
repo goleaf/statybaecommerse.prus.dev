@@ -1,15 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Notifications\TestNotification;
 use App\Notifications\AdminNotification;
-use App\Notifications\LowStockAlert;
 use App\Notifications\OrderNotification;
-use App\Notifications\SystemNotification;
-use App\Notifications\UserNotification;
 use App\Notifications\ProductNotification;
-use App\Models\Product;
+use App\Notifications\SystemNotification;
+use App\Notifications\TestNotification;
+use App\Notifications\UserNotification;
 use PHPUnit\Framework\TestCase;
 
 final class NotificationClassTest extends TestCase

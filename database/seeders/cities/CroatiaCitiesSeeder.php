@@ -14,8 +14,9 @@ final class CroatiaCitiesSeeder extends Seeder
     public function run(): void
     {
         $country = Country::where('cca2', 'HR')->first();
-        if (!$country) {
+        if (! $country) {
             $this->command->warn('Croatia country not found. Please run CountrySeeder first.');
+
             return;
         }
 

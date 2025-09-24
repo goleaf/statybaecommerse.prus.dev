@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
 use App\Models\Slider;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Builder;
 
 final class SliderClickThroughRates extends BaseWidget
@@ -29,10 +31,10 @@ final class SliderClickThroughRates extends BaseWidget
         $status = $this->pageFilters['status'] ?? 'all';
 
         $query = Slider::query()
-            ->when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate))
-            ->when($sliderId, fn(Builder $query) => $query->where('id', $sliderId))
-            ->when($status !== 'all', fn(Builder $query) => $query->where('is_active', $status === 'active'));
+            ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+            ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
+            ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
         $totalSliders = $query->count();
         $slidersWithButtons = $query
@@ -58,16 +60,16 @@ final class SliderClickThroughRates extends BaseWidget
         $internalCTR = $slidersWithInternalLinks > 0 ? round(($slidersWithInternalLinks / $totalSliders) * 100, 1) : 0;
 
         return [
-            Stat::make('Average CTR', $avgCTR . '%')
+            Stat::make('Average CTR', $avgCTR.'%')
                 ->description('Overall click-through rate')
                 ->descriptionIcon('heroicon-m-cursor-arrow-rays')
                 ->color('primary'),
             Stat::make('External Links', $slidersWithExternalLinks)
-                ->description($externalCTR . '% of sliders')
+                ->description($externalCTR.'% of sliders')
                 ->descriptionIcon('heroicon-m-arrow-top-right-on-square')
                 ->color('success'),
             Stat::make('Internal Links', $slidersWithInternalLinks)
-                ->description($internalCTR . '% of sliders')
+                ->description($internalCTR.'% of sliders')
                 ->descriptionIcon('heroicon-m-arrow-right')
                 ->color('info'),
             Stat::make('No Buttons', $totalSliders - $slidersWithButtons)

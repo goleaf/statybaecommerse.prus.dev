@@ -7,7 +7,6 @@ namespace App\Filament\Resources\SeoDataResource\Pages;
 use App\Filament\Resources\SeoDataResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions\DeleteAction;
 
 final class EditSeoData extends EditRecord
 {

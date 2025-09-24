@@ -18,7 +18,7 @@ class UserResource extends JsonResource
     {
         // Use the except() method to exclude sensitive fields
         $safeAttributes = $this->resource->toApiSafeArray();
-        
+
         return array_merge($safeAttributes, [
             // Add computed fields that are safe for API
             'full_name' => $this->resource->full_name,
@@ -36,20 +36,20 @@ class UserResource extends JsonResource
             'gender_text' => $this->resource->gender_text,
             'locale_text' => $this->resource->locale_text,
             'roles_label' => $this->resource->roles_label,
-            
+
             // Add relationships if loaded
             'addresses' => $this->whenLoaded('addresses', function () {
                 return $this->resource->addresses->map(function ($address) {
                     return $address->except(['user_id', 'created_at', 'updated_at'])->toArray();
                 });
             }),
-            
+
             'orders' => $this->whenLoaded('orders', function () {
                 return $this->resource->orders->map(function ($order) {
                     return $order->except(['user_id', 'created_at', 'updated_at'])->toArray();
                 });
             }),
-            
+
             'wishlist' => $this->whenLoaded('wishlist', function () {
                 return $this->resource->wishlist->map(function ($product) {
                     return $product->except(['created_at', 'updated_at'])->toArray();

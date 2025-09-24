@@ -34,7 +34,7 @@ foreach ($resourceFiles as $file) {
 
     if ($content !== $originalContent) {
         file_put_contents($file, $content);
-        echo 'Fixed: ' . basename($file) . "\n";
+        echo 'Fixed: '.basename($file)."\n";
     }
 }
 

@@ -17,7 +17,6 @@ return [
     // Location
     'location' => 'Location',
     'country' => 'Country',
-    'zone' => 'Zone',
     'region' => 'Region',
     'parent_city' => 'Parent City',
     'level' => 'Level',

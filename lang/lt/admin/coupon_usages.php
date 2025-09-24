@@ -54,4 +54,3 @@ return [
         'bulk_report_exported_successfully' => 'Masinė ataskaita sėkmingai eksportuota',
     ],
 ];
-

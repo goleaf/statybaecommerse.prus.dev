@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Channel;
 use App\Models\Currency;
@@ -23,19 +25,19 @@ it('seeds at least one order with items', function () {
 
     // Ensure the seeder has the required data by creating them if they don't exist
     // The seeder looks for existing data, so we need to make sure it exists
-    if (!\App\Models\Channel::query()->exists()) {
+    if (! \App\Models\Channel::query()->exists()) {
         Channel::factory()->create();
     }
-    if (!\App\Models\Zone::query()->exists()) {
+    if (! \App\Models\Zone::query()->exists()) {
         Zone::factory()->create(['currency_id' => $currency->id]);
     }
-    if (!\App\Models\Currency::query()->where('code', 'EUR')->exists()) {
+    if (! \App\Models\Currency::query()->where('code', 'EUR')->exists()) {
         Currency::factory()->create(['code' => 'EUR', 'is_default' => true]);
     }
 
     // The orders table has a foreign key constraint to sh_zones table, not zones table
     // We need to create a zone in the sh_zones table for the foreign key constraint
-    if (!\Illuminate\Support\Facades\DB::table('sh_zones')->exists()) {
+    if (! \Illuminate\Support\Facades\DB::table('sh_zones')->exists()) {
         \Illuminate\Support\Facades\DB::table('sh_zones')->insert([
             'id' => 1,
             'name' => 'Default Zone',

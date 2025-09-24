@@ -1,16 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
-use App\Models\DiscountRedemption;
-use App\Models\User;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class RedemptionsRelationManager extends RelationManager
 {
@@ -22,7 +21,7 @@ final class RedemptionsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Redemptions';
 
-    public function form(Form $schema): Form
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -98,10 +97,10 @@ final class RedemptionsRelationManager extends RelationManager
             ])
             ->filters([
                 Tables\Filters\Filter::make('recent')
-                    ->query(fn(Builder $query): Builder => $query->where('redeemed_at', '>=', now()->subDays(7)))
+                    ->query(fn (Builder $query): Builder => $query->where('redeemed_at', '>=', now()->subDays(7)))
                     ->label('Last 7 Days'),
                 Tables\Filters\Filter::make('this_month')
-                    ->query(fn(Builder $query): Builder => $query->whereMonth('redeemed_at', now()->month))
+                    ->query(fn (Builder $query): Builder => $query->whereMonth('redeemed_at', now()->month))
                     ->label('This Month'),
             ])
             ->actions([
@@ -116,5 +115,3 @@ final class RedemptionsRelationManager extends RelationManager
             ->defaultSort('redeemed_at', 'desc');
     }
 }
-
-

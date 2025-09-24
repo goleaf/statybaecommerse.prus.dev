@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'title' => 'Activity Logs',
@@ -125,4 +127,3 @@ return [
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
 ];
-

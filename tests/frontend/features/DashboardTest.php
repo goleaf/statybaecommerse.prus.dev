@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Pages\Dashboard;
 use App\Models\User;
@@ -15,7 +17,7 @@ beforeEach(function () {
         'view_admin_panel',
         'view_any_product',
         'view_any_user',
-        'view_any_order'
+        'view_any_order',
     ];
 
     foreach ($permissions as $permission) {
@@ -58,14 +60,14 @@ it('dashboard class can check access permissions', function () {
 });
 
 it('dashboard returns correct title and navigation label', function () {
-    $dashboard = new Dashboard();
+    $dashboard = new Dashboard;
 
     expect($dashboard->getTitle())->toBe(__('Valdymo skydas'));
     expect(Dashboard::getNavigationLabel())->toBe(__('Valdymo skydas'));
 });
 
 it('dashboard has correct widget configuration', function () {
-    $dashboard = new Dashboard();
+    $dashboard = new Dashboard;
     $widgets = $dashboard->getWidgets();
 
     expect($widgets)->toContain('App\Filament\Widgets\EcommerceOverview');
@@ -74,7 +76,7 @@ it('dashboard has correct widget configuration', function () {
 });
 
 it('dashboard has correct column configuration', function () {
-    $dashboard = new Dashboard();
+    $dashboard = new Dashboard;
     $columns = $dashboard->getColumns();
 
     expect($columns)->toBeArray();

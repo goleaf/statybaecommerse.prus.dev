@@ -14,6 +14,7 @@ final class Reviews extends Component
     use WithPagination;
 
     public Product $product;
+
     public int $productId;
 
     public function mount(int $productId): void
@@ -33,7 +34,7 @@ final class Reviews extends Component
     public function render()
     {
         return view('livewire.components.product.reviews', [
-            'reviews' => $this->reviews
+            'reviews' => $this->reviews,
         ]);
     }
 }

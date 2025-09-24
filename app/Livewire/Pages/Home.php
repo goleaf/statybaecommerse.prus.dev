@@ -30,7 +30,7 @@ final class Home extends Component
         return view('livewire.pages.home', [
             'stats' => $this->stats,
         ])->layout('components.layouts.base', [
-            'title' => __('Home') . ' - ' . config('app.name'),
+            'title' => __('Home').' - '.config('app.name'),
         ]);
     }
 }

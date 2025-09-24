@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
-use App\Models\VariantPricingRule;
-use App\Models\VariantInventory;
-use App\Models\VariantImage;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\VariantInventory;
+use App\Models\VariantPricingRule;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -253,7 +252,7 @@ final class ProductVariantSeeder extends Seeder
                 'slug' => Str::slug($productData['name']),
                 'description' => $productData['description'],
                 'short_description' => substr($productData['description'], 0, 100),
-                'sku' => 'PROD-' . strtoupper(Str::random(8)),
+                'sku' => 'PROD-'.strtoupper(Str::random(8)),
                 'price' => $productData['base_price'],
                 'compare_price' => $productData['base_price'] * 1.2,
                 'cost_price' => $productData['base_price'] * 0.6,
@@ -275,8 +274,8 @@ final class ProductVariantSeeder extends Seeder
             foreach ($productData['variants'] as $index => $variantData) {
                 $variant = ProductVariant::create([
                     'product_id' => $product->id,
-                    'name' => $productData['name'] . ' - ' . $variantData['size'],
-                    'sku' => $product->sku . '-' . $variantData['size'],
+                    'name' => $productData['name'].' - '.$variantData['size'],
+                    'sku' => $product->sku.'-'.$variantData['size'],
                     'price' => $productData['base_price'] + $variantData['price_modifier'],
                     'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
                     'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,

@@ -1,22 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CollectionRuleResource\Pages;
-use App\Models\Collection;
 use App\Models\CollectionRule;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -24,20 +25,34 @@ use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use BackedEnum;
+use UnitEnum;
+
+final class CollectionRuleResource extends Resource
+{
+    protected static ?string $model = CollectionRule::class;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-cog-6-tooth';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
+    }
+
+    protected static ?int $navigationSort = 3;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -46,7 +61,6 @@ use BackedEnum;
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -55,12 +69,10 @@ use BackedEnum;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
                     Tab::make(__('admin.collection_rules.form.tabs.basic_information'))
@@ -76,7 +88,7 @@ use BackedEnum;
                                                 ->searchable()
                                                 ->preload()
                                                 ->required()
-                                                ->getOptionLabelFromRecordUsing(fn($record) => "{$record->name}")
+                                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name}")
                                                 ->columnSpan(1),
                                             TextInput::make('field')
                                                 ->label(__('admin.collection_rules.form.fields.field'))
@@ -112,7 +124,7 @@ use BackedEnum;
                                                 ->numeric()
                                                 ->default(0)
                                                 ->columnSpan(1),
-                                        ])
+                                        ]),
                                 ])
                                 ->columns(1),
                         ]),
@@ -123,10 +135,10 @@ use BackedEnum;
                                 ->schema([
                                     Placeholder::make('collection_name')
                                         ->label(__('admin.collection_rules.form.fields.collection_name'))
-                                        ->content(fn($record) => $record?->collection?->name ?? '-'),
+                                        ->content(fn ($record) => $record?->collection?->name ?? '-'),
                                     Placeholder::make('rule_description')
                                         ->label(__('admin.collection_rules.form.fields.rule_description'))
-                                        ->content(fn($record) => $record
+                                        ->content(fn ($record) => $record
                                             ? "{$record->field} {$record->operator} {$record->value}"
                                             : '-'),
                                 ])
@@ -139,8 +151,6 @@ use BackedEnum;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -156,20 +166,19 @@ use BackedEnum;
                     ->sortable(),
                 BadgeColumn::make('operator')
                     ->label(__('admin.collection_rules.form.fields.operator'))
-                    ->formatStateUsing(fn(string $state): string =>
-                        match ($state) {
-                            'equals' => __('admin.collection_rules.operators.equals'),
-                            'not_equals' => __('admin.collection_rules.operators.not_equals'),
-                            'contains' => __('admin.collection_rules.operators.contains'),
-                            'not_contains' => __('admin.collection_rules.operators.not_contains'),
-                            'starts_with' => __('admin.collection_rules.operators.starts_with'),
-                            'ends_with' => __('admin.collection_rules.operators.ends_with'),
-                            'greater_than' => __('admin.collection_rules.operators.greater_than'),
-                            'less_than' => __('admin.collection_rules.operators.less_than'),
-                            'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
-                            'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
-                            default => $state,
-                        })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'equals' => __('admin.collection_rules.operators.equals'),
+                        'not_equals' => __('admin.collection_rules.operators.not_equals'),
+                        'contains' => __('admin.collection_rules.operators.contains'),
+                        'not_contains' => __('admin.collection_rules.operators.not_contains'),
+                        'starts_with' => __('admin.collection_rules.operators.starts_with'),
+                        'ends_with' => __('admin.collection_rules.operators.ends_with'),
+                        'greater_than' => __('admin.collection_rules.operators.greater_than'),
+                        'less_than' => __('admin.collection_rules.operators.less_than'),
+                        'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
+                        'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
+                        default => $state,
+                    })
                     ->colors([
                         'primary' => 'equals',
                         'success' => 'contains',
@@ -212,7 +221,7 @@ use BackedEnum;
                     ->label(__('admin.collection_rules.filters.created_at')),
                 Filter::make('recent')
                     ->label(__('admin.collection_rules.filters.recent'))
-                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
+                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
             ])
             ->actions([
                 ViewAction::make(),

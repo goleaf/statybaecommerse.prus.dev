@@ -26,9 +26,13 @@ class PHPDocGenerateCommand extends Command
     protected $description = 'Generate HTML documentation from PHPDoc comments';
 
     private array $classes = [];
+
     private array $interfaces = [];
+
     private array $traits = [];
+
     private array $enums = [];
+
     private int $totalFiles = 0;
 
     /**
@@ -43,7 +47,7 @@ class PHPDocGenerateCommand extends Command
         $template = $this->option('template');
 
         // Create output directory
-        if (!File::isDirectory($outputDir)) {
+        if (! File::isDirectory($outputDir)) {
             File::makeDirectory($outputDir, 0755, true);
             $this->line("📁 Created output directory: {$outputDir}");
         }
@@ -58,11 +62,11 @@ class PHPDocGenerateCommand extends Command
         $this->info('🎉 Documentation generated successfully!');
         $this->line("📂 Location: {$outputDir}");
         $this->line("📊 Processed {$this->totalFiles} files");
-        $this->line("📋 Generated documentation for:");
-        $this->line("  • " . count($this->classes) . " classes");
-        $this->line("  • " . count($this->interfaces) . " interfaces");
-        $this->line("  • " . count($this->traits) . " traits");
-        $this->line("  • " . count($this->enums) . " enums");
+        $this->line('📋 Generated documentation for:');
+        $this->line('  • '.count($this->classes).' classes');
+        $this->line('  • '.count($this->interfaces).' interfaces');
+        $this->line('  • '.count($this->traits).' traits');
+        $this->line('  • '.count($this->enums).' enums');
 
         return Command::SUCCESS;
     }
@@ -115,14 +119,14 @@ class PHPDocGenerateCommand extends Command
     private function processDirectory(string $directory): void
     {
         $fullPath = base_path($directory);
-        
-        if (!File::isDirectory($fullPath)) {
+
+        if (! File::isDirectory($fullPath)) {
             return;
         }
 
         $files = $this->getPhpFiles($fullPath);
         $this->totalFiles += count($files);
-        
+
         foreach ($files as $file) {
             $this->processFile($file);
         }
@@ -154,16 +158,16 @@ class PHPDocGenerateCommand extends Command
     {
         try {
             $content = File::get($filePath);
-            $relativePath = str_replace(base_path() . '/', '', $filePath);
+            $relativePath = str_replace(base_path().'/', '', $filePath);
 
-            $parser = (new ParserFactory())->createForNewestSupportedVersion();
+            $parser = (new ParserFactory)->createForNewestSupportedVersion();
             $ast = $parser->parse($content);
 
             if ($ast === null) {
                 return;
             }
 
-            $traverser = new NodeTraverser();
+            $traverser = new NodeTraverser;
             $visitor = new DocumentationVisitor($relativePath);
             $traverser->addVisitor($visitor);
             $traverser->traverse($ast);
@@ -230,7 +234,7 @@ class PHPDocGenerateCommand extends Command
             'totalFiles' => $this->totalFiles,
         ]);
 
-        File::put($outputDir . '/index.html', $html);
+        File::put($outputDir.'/index.html', $html);
     }
 
     /**
@@ -238,13 +242,13 @@ class PHPDocGenerateCommand extends Command
      */
     private function generateClassPage(string $outputDir, array $class): void
     {
-        $filename = str_replace('\\', '_', $class['name']) . '.html';
+        $filename = str_replace('\\', '_', $class['name']).'.html';
         $html = $this->getHtmlTemplate('class', [
             'class' => $class,
-            'title' => $class['name'] . ' - Class Documentation',
+            'title' => $class['name'].' - Class Documentation',
         ]);
 
-        File::put($outputDir . '/' . $filename, $html);
+        File::put($outputDir.'/'.$filename, $html);
     }
 
     /**
@@ -252,13 +256,13 @@ class PHPDocGenerateCommand extends Command
      */
     private function generateInterfacePage(string $outputDir, array $interface): void
     {
-        $filename = str_replace('\\', '_', $interface['name']) . '.html';
+        $filename = str_replace('\\', '_', $interface['name']).'.html';
         $html = $this->getHtmlTemplate('interface', [
             'interface' => $interface,
-            'title' => $interface['name'] . ' - Interface Documentation',
+            'title' => $interface['name'].' - Interface Documentation',
         ]);
 
-        File::put($outputDir . '/' . $filename, $html);
+        File::put($outputDir.'/'.$filename, $html);
     }
 
     /**
@@ -266,13 +270,13 @@ class PHPDocGenerateCommand extends Command
      */
     private function generateTraitPage(string $outputDir, array $trait): void
     {
-        $filename = str_replace('\\', '_', $trait['name']) . '.html';
+        $filename = str_replace('\\', '_', $trait['name']).'.html';
         $html = $this->getHtmlTemplate('trait', [
             'trait' => $trait,
-            'title' => $trait['name'] . ' - Trait Documentation',
+            'title' => $trait['name'].' - Trait Documentation',
         ]);
 
-        File::put($outputDir . '/' . $filename, $html);
+        File::put($outputDir.'/'.$filename, $html);
     }
 
     /**
@@ -280,13 +284,13 @@ class PHPDocGenerateCommand extends Command
      */
     private function generateEnumPage(string $outputDir, array $enum): void
     {
-        $filename = str_replace('\\', '_', $enum['name']) . '.html';
+        $filename = str_replace('\\', '_', $enum['name']).'.html';
         $html = $this->getHtmlTemplate('enum', [
             'enum' => $enum,
-            'title' => $enum['name'] . ' - Enum Documentation',
+            'title' => $enum['name'].' - Enum Documentation',
         ]);
 
-        File::put($outputDir . '/' . $filename, $html);
+        File::put($outputDir.'/'.$filename, $html);
     }
 
     /**
@@ -295,7 +299,7 @@ class PHPDocGenerateCommand extends Command
     private function generateCss(string $outputDir): void
     {
         $css = $this->getCssTemplate();
-        File::put($outputDir . '/style.css', $css);
+        File::put($outputDir.'/style.css', $css);
     }
 
     /**
@@ -304,7 +308,7 @@ class PHPDocGenerateCommand extends Command
     private function generateJs(string $outputDir): void
     {
         $js = $this->getJsTemplate();
-        File::put($outputDir . '/script.js', $js);
+        File::put($outputDir.'/script.js', $js);
     }
 
     /**
@@ -313,7 +317,7 @@ class PHPDocGenerateCommand extends Command
     private function getHtmlTemplate(string $template, array $data): string
     {
         $title = $data['title'] ?? 'Documentation';
-        
+
         switch ($template) {
             case 'index':
                 return $this->getIndexTemplate($data);
@@ -337,22 +341,22 @@ class PHPDocGenerateCommand extends Command
     {
         $classesHtml = '';
         foreach ($data['classes'] as $class) {
-            $classesHtml .= "<li><a href='" . str_replace('\\', '_', $class['name']) . ".html'>{$class['name']}</a> - {$class['description']}</li>";
+            $classesHtml .= "<li><a href='".str_replace('\\', '_', $class['name']).".html'>{$class['name']}</a> - {$class['description']}</li>";
         }
 
         $interfacesHtml = '';
         foreach ($data['interfaces'] as $interface) {
-            $interfacesHtml .= "<li><a href='" . str_replace('\\', '_', $interface['name']) . ".html'>{$interface['name']}</a> - {$interface['description']}</li>";
+            $interfacesHtml .= "<li><a href='".str_replace('\\', '_', $interface['name']).".html'>{$interface['name']}</a> - {$interface['description']}</li>";
         }
 
         $traitsHtml = '';
         foreach ($data['traits'] as $trait) {
-            $traitsHtml .= "<li><a href='" . str_replace('\\', '_', $trait['name']) . ".html'>{$trait['name']}</a> - {$trait['description']}</li>";
+            $traitsHtml .= "<li><a href='".str_replace('\\', '_', $trait['name']).".html'>{$trait['name']}</a> - {$trait['description']}</li>";
         }
 
         $enumsHtml = '';
         foreach ($data['enums'] as $enum) {
-            $enumsHtml .= "<li><a href='" . str_replace('\\', '_', $enum['name']) . ".html'>{$enum['name']}</a> - {$enum['description']}</li>";
+            $enumsHtml .= "<li><a href='".str_replace('\\', '_', $enum['name']).".html'>{$enum['name']}</a> - {$enum['description']}</li>";
         }
 
         $content = "
@@ -366,19 +370,19 @@ class PHPDocGenerateCommand extends Command
                     <p>Files Processed</p>
                 </div>
                 <div class='stat'>
-                    <h3>" . count($data['classes']) . "</h3>
+                    <h3>".count($data['classes'])."</h3>
                     <p>Classes</p>
                 </div>
                 <div class='stat'>
-                    <h3>" . count($data['interfaces']) . "</h3>
+                    <h3>".count($data['interfaces'])."</h3>
                     <p>Interfaces</p>
                 </div>
                 <div class='stat'>
-                    <h3>" . count($data['traits']) . "</h3>
+                    <h3>".count($data['traits'])."</h3>
                     <p>Traits</p>
                 </div>
                 <div class='stat'>
-                    <h3>" . count($data['enums']) . "</h3>
+                    <h3>".count($data['enums'])."</h3>
                     <p>Enums</p>
                 </div>
             </div>
@@ -415,7 +419,7 @@ class PHPDocGenerateCommand extends Command
     private function getClassTemplate(array $data): string
     {
         $class = $data['class'];
-        
+
         $propertiesHtml = '';
         foreach ($class['properties'] as $property) {
             $propertiesHtml .= "<tr><td>\${$property['name']}</td><td>{$property['type']}</td><td>{$property['description']}</td></tr>";
@@ -466,7 +470,7 @@ class PHPDocGenerateCommand extends Command
     private function getInterfaceTemplate(array $data): string
     {
         $interface = $data['interface'];
-        
+
         $content = "
         <div class='container'>
             <h1>{$interface['name']}</h1>
@@ -487,7 +491,7 @@ class PHPDocGenerateCommand extends Command
     private function getTraitTemplate(array $data): string
     {
         $trait = $data['trait'];
-        
+
         $content = "
         <div class='container'>
             <h1>{$trait['name']}</h1>
@@ -508,7 +512,7 @@ class PHPDocGenerateCommand extends Command
     private function getEnumTemplate(array $data): string
     {
         $enum = $data['enum'];
-        
+
         $content = "
         <div class='container'>
             <h1>{$enum['name']}</h1>
@@ -890,9 +894,13 @@ document.addEventListener('DOMContentLoaded', function() {
 class DocumentationVisitor extends NodeVisitorAbstract
 {
     private string $file;
+
     private array $classes = [];
+
     private array $interfaces = [];
+
     private array $traits = [];
+
     private array $enums = [];
 
     public function __construct(string $file)
@@ -920,7 +928,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
         $className = $node->name->name ?? 'Unknown';
         $namespace = $this->getNamespace($node);
         $description = $this->getDescription($node);
-        
+
         $properties = [];
         $methods = [];
 
@@ -943,7 +951,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
         }
 
         $this->classes[] = [
-            'name' => $namespace ? $namespace . '\\' . $className : $className,
+            'name' => $namespace ? $namespace.'\\'.$className : $className,
             'namespace' => $namespace,
             'file' => $this->file,
             'description' => $description,
@@ -959,7 +967,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
         $description = $this->getDescription($node);
 
         $this->interfaces[] = [
-            'name' => $namespace ? $namespace . '\\' . $interfaceName : $interfaceName,
+            'name' => $namespace ? $namespace.'\\'.$interfaceName : $interfaceName,
             'namespace' => $namespace,
             'file' => $this->file,
             'description' => $description,
@@ -973,7 +981,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
         $description = $this->getDescription($node);
 
         $this->traits[] = [
-            'name' => $namespace ? $namespace . '\\' . $traitName : $traitName,
+            'name' => $namespace ? $namespace.'\\'.$traitName : $traitName,
             'namespace' => $namespace,
             'file' => $this->file,
             'description' => $description,
@@ -987,7 +995,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
         $description = $this->getDescription($node);
 
         $this->enums[] = [
-            'name' => $namespace ? $namespace . '\\' . $enumName : $enumName,
+            'name' => $namespace ? $namespace.'\\'.$enumName : $enumName,
             'namespace' => $namespace,
             'file' => $this->file,
             'description' => $description,
@@ -1003,6 +1011,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
                 return $current->name ? $current->name->toString() : '';
             }
         }
+
         return '';
     }
 
@@ -1018,6 +1027,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
                 }
             }
         }
+
         return 'No description available';
     }
 
@@ -1026,6 +1036,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
         if ($property->type) {
             return $this->getTypeString($property->type);
         }
+
         return 'mixed';
     }
 
@@ -1034,6 +1045,7 @@ class DocumentationVisitor extends NodeVisitorAbstract
         if ($method->returnType) {
             return $this->getTypeString($method->returnType);
         }
+
         return 'void';
     }
 
@@ -1044,11 +1056,11 @@ class DocumentationVisitor extends NodeVisitorAbstract
         } elseif ($type instanceof Node\Identifier) {
             return $type->name;
         } elseif ($type instanceof Node\NullableType) {
-            return $this->getTypeString($type->type) . '|null';
+            return $this->getTypeString($type->type).'|null';
         } elseif ($type instanceof Node\UnionType) {
             return implode('|', array_map([$this, 'getTypeString'], $type->types));
         }
-        
+
         return 'mixed';
     }
 

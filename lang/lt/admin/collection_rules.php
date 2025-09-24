@@ -52,4 +52,3 @@ return [
         'bulk_reordered_successfully' => 'Sėkmingai pertvarkyta masiniškai',
     ],
 ];
-

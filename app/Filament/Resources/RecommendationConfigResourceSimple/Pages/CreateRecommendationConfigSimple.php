@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 
@@ -8,5 +10,4 @@ use Filament\Resources\Pages\CreateRecord;
 final class CreateRecommendationConfigSimple extends CreateRecord
 {
     protected static string $resource = RecommendationConfigResourceSimple::class;
-
 }

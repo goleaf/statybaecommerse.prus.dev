@@ -802,7 +802,7 @@ final class EstoniaCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     // Home page translations
@@ -176,6 +178,7 @@ return [
     'nav_group_settings' => 'Nustatymai',
     'nav_group_analytics' => 'Analitika',
     'nav_group_content' => 'Turinys',
+    'nav_group_content_management' => 'Turinio valdymas',
     'nav_group_system' => 'Sistema',
     'nav_group_marketing' => 'Rinkodara',
     'nav_group_inventory' => 'Atsargos',
@@ -187,6 +190,7 @@ return [
     'nav_group_settings_description' => 'Sistemos nustatymai',
     'nav_group_analytics_description' => 'Analitikos peržiūra',
     'nav_group_content_description' => 'Turinio valdymas',
+    'nav_group_content_management_description' => 'Turinio kategorijų ir naujienų valdymas',
     'nav_group_system_description' => 'Sistemos valdymas',
     'nav_group_marketing_description' => 'Rinkodaros valdymas',
     'nav_group_inventory_description' => 'Atsargų valdymas',

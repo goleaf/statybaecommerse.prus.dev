@@ -1,6 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Services\MultiLanguageTabService;
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 it('returns available languages with codes and flags', function (): void {
     config()->set('app.supported_locales', ['lt', 'en']);

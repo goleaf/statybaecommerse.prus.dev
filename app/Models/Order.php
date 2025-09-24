@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,14 +8,14 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -24,9 +26,11 @@ use Spatie\Translatable\HasTranslations;
  * @property array $translatable
  * @property mixed $fillable
  * @property mixed $appends
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, StatusScope::class])]
@@ -35,11 +39,11 @@ final class Order extends Model
     use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
+
     protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'payment_status', 'payment_method', 'payment_reference'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -55,16 +59,14 @@ final class Order extends Model
 
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
-     * @return LogOptions
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['number', 'status', 'total', 'notes', 'tracking_number', 'fulfillment_status'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "Order {$eventName}")->useLogName('order');
+        return LogOptions::defaults()->logOnly(['number', 'status', 'total', 'notes', 'tracking_number', 'fulfillment_status'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Order {$eventName}")->useLogName('order');
     }
 
     /**
      * Handle user functionality with proper error handling.
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -73,7 +75,6 @@ final class Order extends Model
 
     /**
      * Handle items functionality with proper error handling.
-     * @return HasMany
      */
     public function items(): HasMany
     {
@@ -82,7 +83,6 @@ final class Order extends Model
 
     /**
      * Handle latestItem functionality with proper error handling.
-     * @return HasOne
      */
     public function latestItem(): HasOne
     {
@@ -91,7 +91,6 @@ final class Order extends Model
 
     /**
      * Handle oldestItem functionality with proper error handling.
-     * @return HasOne
      */
     public function oldestItem(): HasOne
     {
@@ -100,7 +99,6 @@ final class Order extends Model
 
     /**
      * Handle highestValueItem functionality with proper error handling.
-     * @return HasOne
      */
     public function highestValueItem(): HasOne
     {
@@ -109,7 +107,6 @@ final class Order extends Model
 
     /**
      * Handle lowestValueItem functionality with proper error handling.
-     * @return HasOne
      */
     public function lowestValueItem(): HasOne
     {
@@ -118,7 +115,6 @@ final class Order extends Model
 
     /**
      * Handle shipping functionality with proper error handling.
-     * @return HasOne
      */
     public function shipping(): HasOne
     {
@@ -127,7 +123,6 @@ final class Order extends Model
 
     /**
      * Handle discountRedemptions functionality with proper error handling.
-     * @return HasMany
      */
     public function discountRedemptions(): HasMany
     {
@@ -136,7 +131,6 @@ final class Order extends Model
 
     /**
      * Handle latestDiscountRedemption functionality with proper error handling.
-     * @return HasOne
      */
     public function latestDiscountRedemption(): HasOne
     {
@@ -145,7 +139,6 @@ final class Order extends Model
 
     /**
      * Handle highestValueDiscountRedemption functionality with proper error handling.
-     * @return HasOne
      */
     public function highestValueDiscountRedemption(): HasOne
     {
@@ -154,7 +147,6 @@ final class Order extends Model
 
     /**
      * Handle shippingOption functionality with proper error handling.
-     * @return BelongsTo
      */
     public function shippingOption(): BelongsTo
     {
@@ -163,7 +155,6 @@ final class Order extends Model
 
     /**
      * Handle channel functionality with proper error handling.
-     * @return BelongsTo
      */
     public function channel(): BelongsTo
     {
@@ -172,7 +163,6 @@ final class Order extends Model
 
     /**
      * Handle partner functionality with proper error handling.
-     * @return BelongsTo
      */
     public function partner(): BelongsTo
     {
@@ -181,7 +171,6 @@ final class Order extends Model
 
     /**
      * Handle documents functionality with proper error handling.
-     * @return MorphMany
      */
     public function documents(): MorphMany
     {
@@ -190,7 +179,6 @@ final class Order extends Model
 
     /**
      * Handle translations functionality with proper error handling.
-     * @return HasMany
      */
     public function translations(): HasMany
     {
@@ -199,7 +187,6 @@ final class Order extends Model
 
     /**
      * Handle latestTranslation functionality with proper error handling.
-     * @return HasOne
      */
     public function latestTranslation(): HasOne
     {
@@ -208,8 +195,8 @@ final class Order extends Model
 
     /**
      * Handle scopeByStatus functionality with proper error handling.
-     * @param mixed $query
-     * @param string $status
+     *
+     * @param  mixed  $query
      */
     public function scopeByStatus($query, string $status)
     {
@@ -218,7 +205,8 @@ final class Order extends Model
 
     /**
      * Handle scopeRecent functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeRecent($query)
     {
@@ -227,7 +215,8 @@ final class Order extends Model
 
     /**
      * Handle scopeCompleted functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeCompleted($query)
     {
@@ -238,7 +227,8 @@ final class Order extends Model
 
     /**
      * Handle scopePaid functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopePaid($query)
     {
@@ -248,13 +238,13 @@ final class Order extends Model
                 $q->whereNotNull('payment_status')->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']);
             });
         }
+
         // Also include lifecycle statuses that imply payment captured
         return $query->orWhereIn('status', ['processing', 'confirmed', 'shipped', 'delivered', 'completed']);
     }
 
     /**
      * Handle isPaid functionality with proper error handling.
-     * @return bool
      */
     public function isPaid(): bool
     {
@@ -263,7 +253,6 @@ final class Order extends Model
 
     /**
      * Handle isShippable functionality with proper error handling.
-     * @return bool
      */
     public function isShippable(): bool
     {
@@ -272,7 +261,6 @@ final class Order extends Model
 
     /**
      * Handle canBeCancelled functionality with proper error handling.
-     * @return bool
      */
     public function canBeCancelled(): bool
     {
@@ -281,7 +269,6 @@ final class Order extends Model
 
     /**
      * Handle getTotalItemsCountAttribute functionality with proper error handling.
-     * @return int
      */
     public function getTotalItemsCountAttribute(): int
     {
@@ -290,10 +277,9 @@ final class Order extends Model
 
     /**
      * Handle getFormattedTotalAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedTotalAttribute(): string
     {
-        return number_format((float) $this->total, 2) . ' ' . $this->currency;
+        return number_format((float) $this->total, 2).' '.$this->currency;
     }
 }

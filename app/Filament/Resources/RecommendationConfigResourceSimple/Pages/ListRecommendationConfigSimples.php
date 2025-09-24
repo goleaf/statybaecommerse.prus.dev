@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 
 use App\Filament\Resources\RecommendationConfigResourceSimple;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 
 final class ListRecommendationConfigSimples extends ListRecords
 {

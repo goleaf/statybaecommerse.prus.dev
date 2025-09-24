@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 it('has valid PHP syntax for AutocompleteSelect component', function (): void {
     $file = app_path('Filament/Components/AutocompleteSelect.php');
@@ -43,7 +45,7 @@ it('can instantiate AutocompleteSelect component', function (): void {
 });
 
 it('can instantiate TopNavigation component', function (): void {
-    $component = new \App\Filament\Components\TopNavigation();
+    $component = new \App\Filament\Components\TopNavigation;
 
     expect($component)->toBeInstanceOf(\App\Filament\Components\TopNavigation::class);
 });
@@ -81,4 +83,3 @@ it('NavigationGroup enum can get ordered cases', function (): void {
     expect($ordered)->toBeInstanceOf(\Illuminate\Support\Collection::class);
     expect($ordered)->not->toBeEmpty();
 });
-

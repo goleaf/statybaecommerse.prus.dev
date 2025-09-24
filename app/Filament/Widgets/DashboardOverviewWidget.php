@@ -1,43 +1,36 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Address;
 use App\Models\AnalyticsEvent;
-use App\Models\Brand;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
 use App\Models\CampaignView;
-use App\Models\CartItem;
-use App\Models\Category;
 use App\Models\Country;
-use App\Models\Coupon;
-use App\Models\Currency;
-use App\Models\Discount;
-use App\Models\DiscountRedemption;
 use App\Models\Inventory;
-use App\Models\Legal;
 use App\Models\Location;
-use App\Models\News;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\RecommendationAnalytics;
 use App\Models\Review;
-use App\Models\StockMovement;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\UserBehavior;
 use App\Models\VariantAnalytics;
 use App\Models\WishlistItem;
 use Carbon\Carbon;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
 class DashboardOverviewWidget extends BaseWidget
 {
     protected static ?int $sort = 0;
+
     protected int|string|array $columnSpan = 'full';
 
     public function getStats(): array
@@ -95,21 +88,21 @@ class DashboardOverviewWidget extends BaseWidget
         return [
             // Primary Business Metrics
             Stat::make(__('translations.total_revenue'), \Illuminate\Support\Number::currency($totalRevenue, 'EUR'))
-                ->description(__('translations.from_last_month') . ': ' . \Illuminate\Support\Number::currency($lastMonthRevenue, 'EUR'))
+                ->description(__('translations.from_last_month').': '.\Illuminate\Support\Number::currency($lastMonthRevenue, 'EUR'))
                 ->descriptionIcon($revenueGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueGrowth >= 0 ? 'success' : 'danger')
                 ->chart($this->getRevenueChart()),
             Stat::make(__('translations.total_orders'), \Illuminate\Support\Number::format($totalOrders))
-                ->description(__('translations.from_last_month') . ': ' . \Illuminate\Support\Number::format($lastMonthOrders))
+                ->description(__('translations.from_last_month').': '.\Illuminate\Support\Number::format($lastMonthOrders))
                 ->descriptionIcon($orderGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($orderGrowth >= 0 ? 'success' : 'danger')
                 ->chart($this->getOrdersChart()),
             Stat::make(__('translations.total_customers'), \Illuminate\Support\Number::format($totalUsers))
-                ->description(__('translations.new_customers_today') . ': ' . \Illuminate\Support\Number::format($newUsersThisMonth))
+                ->description(__('translations.new_customers_today').': '.\Illuminate\Support\Number::format($newUsersThisMonth))
                 ->descriptionIcon($userGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($userGrowth >= 0 ? 'success' : 'danger'),
             Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts))
-                ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
+                ->description(__('translations.active_products').': '.\Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
             // Performance Metrics
@@ -117,7 +110,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.per_order'))
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('info'),
-            Stat::make(__('translations.average_rating'), number_format($avgRating, 1) . '/5')
+            Stat::make(__('translations.average_rating'), number_format($avgRating, 1).'/5')
                 ->description(__('translations.customer_satisfaction'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
@@ -189,6 +182,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->sum('total_amount');
             $data[] = $revenue;
         }
+
         return $data;
     }
 
@@ -200,6 +194,7 @@ class DashboardOverviewWidget extends BaseWidget
             $orders = Order::whereDate('created_at', $date)->count();
             $data[] = $orders;
         }
+
         return $data;
     }
 }

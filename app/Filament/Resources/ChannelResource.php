@@ -1,17 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ChannelResource\Pages;
 use App\Models\Channel;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -19,14 +19,12 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
 
 /**
@@ -37,11 +35,20 @@ use UnitEnum;
 final class ChannelResource extends Resource
 {
     protected static ?string $model = Channel::class;
-    protected static ?int $navigationSort = 2;
-    protected static ?string $recordTitleAttribute = 'name';
-    protected static ?string $navigationGroup = NavigationGroup::Settings;
 
-    protected static $navigationGroup = NavigationGroup::Settings;
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Settings';
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-rectangle-stack';
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -71,8 +78,7 @@ final class ChannelResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn(string $context, $state, callable $set) =>
-                                        $context === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.channels.slug'))
                                     ->required()
@@ -176,7 +182,7 @@ final class ChannelResource extends Resource
                 TextColumn::make('type')
                     ->label(__('admin.channels.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'web' => 'success',
                         'mobile' => 'info',
                         'api' => 'warning',
@@ -188,6 +194,7 @@ final class ChannelResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 30 ? $state : null;
                     }),
                 IconColumn::make('is_enabled')

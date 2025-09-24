@@ -30,7 +30,7 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['10000', '10001', '10002'],
                 'translations' => [
                     'lt' => ['name' => 'Stokholmas', 'description' => 'Švedijos sostinė'],
-                    'en' => ['name' => 'Stockholm', 'description' => 'Capital of Sweden']
+                    'en' => ['name' => 'Stockholm', 'description' => 'Capital of Sweden'],
                 ],
             ],
             [
@@ -42,8 +42,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['15100'],
                 'translations' => [
                     'lt' => ['name' => 'Soderteljė', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Södertälje', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Södertälje', 'description' => 'Industrial city'],
+                ],
             ],
             // Västra Götaland
             [
@@ -55,8 +55,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['40000'],
                 'translations' => [
                     'lt' => ['name' => 'Geteborgas', 'description' => 'Antrasis didžiausias Švedijos miestas'],
-                    'en' => ['name' => 'Gothenburg', 'description' => 'Second largest city in Sweden']
-            ],
+                    'en' => ['name' => 'Gothenburg', 'description' => 'Second largest city in Sweden'],
+                ],
             ],
             [
                 'name' => 'Malmö',
@@ -67,8 +67,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['20000'],
                 'translations' => [
                     'lt' => ['name' => 'Malmiu', 'description' => 'Pietų Švedijos centras'],
-                    'en' => ['name' => 'Malmö', 'description' => 'Center of Southern Sweden']
-            ],
+                    'en' => ['name' => 'Malmö', 'description' => 'Center of Southern Sweden'],
+                ],
             ],
             [
                 'name' => 'Västerås',
@@ -79,8 +79,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['72000'],
                 'translations' => [
                     'lt' => ['name' => 'Vesterosas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Västerås', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Västerås', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Örebro',
@@ -91,8 +91,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['70000'],
                 'translations' => [
                     'lt' => ['name' => 'Orebro', 'description' => 'Centrinės Švedijos miestas'],
-                    'en' => ['name' => 'Örebro', 'description' => 'Central Swedish city']
-            ],
+                    'en' => ['name' => 'Örebro', 'description' => 'Central Swedish city'],
+                ],
             ],
             // Skåne
             [
@@ -104,8 +104,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['22000'],
                 'translations' => [
                     'lt' => ['name' => 'Lundas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Lund', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Lund', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Helsingborg',
@@ -116,8 +116,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['25000'],
                 'translations' => [
                     'lt' => ['name' => 'Helsingborgas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Helsingborg', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Helsingborg', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Kristianstad',
@@ -128,8 +128,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['29000'],
                 'translations' => [
                     'lt' => ['name' => 'Kristianstadas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Kristianstad', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Kristianstad', 'description' => 'Historic city'],
+                ],
             ],
             // Uppsala
             [
@@ -141,8 +141,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['75000'],
                 'translations' => [
                     'lt' => ['name' => 'Upsala', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Uppsala', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Uppsala', 'description' => 'University city'],
+                ],
             ],
             // Östergötland
             [
@@ -154,8 +154,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['58000'],
                 'translations' => [
                     'lt' => ['name' => 'Linkiopingas', 'description' => 'Technologijų centras'],
-                    'en' => ['name' => 'Linköping', 'description' => 'Technology center']
-            ],
+                    'en' => ['name' => 'Linköping', 'description' => 'Technology center'],
+                ],
             ],
             [
                 'name' => 'Norrköping',
@@ -166,8 +166,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['60000'],
                 'translations' => [
                     'lt' => ['name' => 'Norkiopingas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Norrköping', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Norrköping', 'description' => 'Industrial city'],
+                ],
             ],
             // Jönköping
             [
@@ -179,8 +179,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['55000'],
                 'translations' => [
                     'lt' => ['name' => 'Jonkiopingas', 'description' => 'Junkopingo sostinė'],
-                    'en' => ['name' => 'Jönköping', 'description' => 'Capital of Jönköping']
-            ],
+                    'en' => ['name' => 'Jönköping', 'description' => 'Capital of Jönköping'],
+                ],
             ],
             // Kronoberg
             [
@@ -192,8 +192,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['35000'],
                 'translations' => [
                     'lt' => ['name' => 'Veksio', 'description' => 'Kronobergo sostinė'],
-                    'en' => ['name' => 'Växjö', 'description' => 'Capital of Kronoberg']
-            ],
+                    'en' => ['name' => 'Växjö', 'description' => 'Capital of Kronoberg'],
+                ],
             ],
             // Kalmar
             [
@@ -205,8 +205,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['39000'],
                 'translations' => [
                     'lt' => ['name' => 'Kalmaras', 'description' => 'Kalmaro sostinė'],
-                    'en' => ['name' => 'Kalmar', 'description' => 'Capital of Kalmar']
-            ],
+                    'en' => ['name' => 'Kalmar', 'description' => 'Capital of Kalmar'],
+                ],
             ],
             // Gotland
             [
@@ -218,8 +218,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['62000'],
                 'translations' => [
                     'lt' => ['name' => 'Visbis', 'description' => 'Gotlando sostinė'],
-                    'en' => ['name' => 'Visby', 'description' => 'Capital of Gotland']
-            ],
+                    'en' => ['name' => 'Visby', 'description' => 'Capital of Gotland'],
+                ],
             ],
             // Blekinge
             [
@@ -231,8 +231,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['37000'],
                 'translations' => [
                     'lt' => ['name' => 'Karlskrona', 'description' => 'Blekingės sostinė'],
-                    'en' => ['name' => 'Karlskrona', 'description' => 'Capital of Blekinge']
-            ],
+                    'en' => ['name' => 'Karlskrona', 'description' => 'Capital of Blekinge'],
+                ],
             ],
             // Halland
             [
@@ -244,8 +244,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['30000'],
                 'translations' => [
                     'lt' => ['name' => 'Halmstadas', 'description' => 'Hallando sostinė'],
-                    'en' => ['name' => 'Halmstad', 'description' => 'Capital of Halland']
-            ],
+                    'en' => ['name' => 'Halmstad', 'description' => 'Capital of Halland'],
+                ],
             ],
             // Värmland
             [
@@ -257,8 +257,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['65000'],
                 'translations' => [
                     'lt' => ['name' => 'Karlstadas', 'description' => 'Vermlando sostinė'],
-                    'en' => ['name' => 'Karlstad', 'description' => 'Capital of Värmland']
-            ],
+                    'en' => ['name' => 'Karlstad', 'description' => 'Capital of Värmland'],
+                ],
             ],
             // Örebro
             [
@@ -270,8 +270,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['70000'],
                 'translations' => [
                     'lt' => ['name' => 'Orebro', 'description' => 'Orebro sostinė'],
-                    'en' => ['name' => 'Örebro', 'description' => 'Capital of Örebro']
-            ],
+                    'en' => ['name' => 'Örebro', 'description' => 'Capital of Örebro'],
+                ],
             ],
             // Västmanland
             [
@@ -283,8 +283,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['72000'],
                 'translations' => [
                     'lt' => ['name' => 'Vesterosas', 'description' => 'Vestmanlando sostinė'],
-                    'en' => ['name' => 'Västerås', 'description' => 'Capital of Västmanland']
-            ],
+                    'en' => ['name' => 'Västerås', 'description' => 'Capital of Västmanland'],
+                ],
             ],
             // Dalarna
             [
@@ -296,8 +296,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['79000'],
                 'translations' => [
                     'lt' => ['name' => 'Falunas', 'description' => 'Dalarnos sostinė'],
-                    'en' => ['name' => 'Falun', 'description' => 'Capital of Dalarna']
-            ],
+                    'en' => ['name' => 'Falun', 'description' => 'Capital of Dalarna'],
+                ],
             ],
             // Gävleborg
             [
@@ -309,8 +309,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['80000'],
                 'translations' => [
                     'lt' => ['name' => 'Gevlė', 'description' => 'Gevleborgo sostinė'],
-                    'en' => ['name' => 'Gävle', 'description' => 'Capital of Gävleborg']
-            ],
+                    'en' => ['name' => 'Gävle', 'description' => 'Capital of Gävleborg'],
+                ],
             ],
             // Västernorrland
             [
@@ -322,8 +322,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['85000'],
                 'translations' => [
                     'lt' => ['name' => 'Sundsvallas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Sundsvall', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Sundsvall', 'description' => 'Industrial city'],
+                ],
             ],
             // Jämtland
             [
@@ -335,8 +335,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['83000'],
                 'translations' => [
                     'lt' => ['name' => 'Osterstundas', 'description' => 'Jemtlando sostinė'],
-                    'en' => ['name' => 'Östersund', 'description' => 'Capital of Jämtland']
-            ],
+                    'en' => ['name' => 'Östersund', 'description' => 'Capital of Jämtland'],
+                ],
             ],
             // Västerbotten
             [
@@ -348,8 +348,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['90000'],
                 'translations' => [
                     'lt' => ['name' => 'Umeo', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Umeå', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Umeå', 'description' => 'University city'],
+                ],
             ],
             // Norrbotten
             [
@@ -361,8 +361,8 @@ final class SwedenCitiesSeeder extends Seeder
                 'postal_codes' => ['95000'],
                 'translations' => [
                     'lt' => ['name' => 'Luleo', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Luleå', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Luleå', 'description' => 'Industrial city'],
+                ],
             ],
         ];
 
@@ -371,7 +371,7 @@ final class SwedenCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -391,8 +391,8 @@ final class SwedenCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

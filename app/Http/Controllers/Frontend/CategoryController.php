@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -19,4 +21,3 @@ final class CategoryController extends Controller
         return response()->json(['message' => 'Category details not implemented yet', 'id' => $id]);
     }
 }
-

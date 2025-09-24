@@ -6,9 +6,8 @@ namespace App\Filament\Resources\ProductVariantResource\Pages;
 
 use App\Filament\Resources\ProductVariantResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
-use Filament\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
 
 final class EditProductVariant extends EditRecord
 {
@@ -28,7 +27,7 @@ final class EditProductVariant extends EditRecord
                         ->success()
                         ->send();
                 })
-                ->visible(fn (): bool => !$this->record->is_default_variant),
+                ->visible(fn (): bool => ! $this->record->is_default_variant),
         ];
     }
 
@@ -61,23 +60,23 @@ final class EditProductVariant extends EditRecord
         $baseSku = $product ? $product->sku : 'VAR';
         $size = $data['size'] ?? $this->record->size ?? '';
         $suffix = $data['variant_sku_suffix'] ?? $this->record->variant_sku_suffix ?? '';
-        
+
         $sku = $baseSku;
         if ($size) {
-            $sku .= '-' . strtoupper($size);
+            $sku .= '-'.strtoupper($size);
         }
         if ($suffix) {
-            $sku .= '-' . strtoupper($suffix);
+            $sku .= '-'.strtoupper($suffix);
         }
-        
+
         // Ensure uniqueness (excluding current record)
         $originalSku = $sku;
         $counter = 1;
         while (\App\Models\ProductVariant::where('sku', $sku)->where('id', '!=', $this->record->id)->exists()) {
-            $sku = $originalSku . '-' . $counter;
+            $sku = $originalSku.'-'.$counter;
             $counter++;
         }
-        
+
         return $sku;
     }
 }

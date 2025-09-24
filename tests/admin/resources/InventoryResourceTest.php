@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\InventoryResource;
 use App\Models\Brand;
@@ -19,7 +21,7 @@ beforeEach(function () {
         'create inventories',
         'update inventories',
         'delete inventories',
-        'browse_inventories'
+        'browse_inventories',
     ];
 
     foreach ($permissions as $permission) {
@@ -434,7 +436,7 @@ it('can search inventories by product name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(InventoryResource::getUrl('index') . '?search=Special')
+        ->get(InventoryResource::getUrl('index').'?search=Special')
         ->assertOk();
 });
 
@@ -444,7 +446,7 @@ it('can search inventories by location name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(InventoryResource::getUrl('index') . '?search=Special')
+        ->get(InventoryResource::getUrl('index').'?search=Special')
         ->assertOk();
 });
 
@@ -454,14 +456,14 @@ it('can sort inventories by quantity', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(InventoryResource::getUrl('index') . '?sort=quantity&direction=asc')
+        ->get(InventoryResource::getUrl('index').'?sort=quantity&direction=asc')
         ->assertOk();
 });
 
 it('can sort inventories by created date', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(InventoryResource::getUrl('index') . '?sort=created_at&direction=desc')
+        ->get(InventoryResource::getUrl('index').'?sort=created_at&direction=desc')
         ->assertOk();
 });
 

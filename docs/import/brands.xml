@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<brands>
+  <brand>
+    <id>1</id>
+    <slug>generic</slug>
+    <translations>
+      <translation locale="lt">
+        <name>Bendras</name>
+      </translation>
+      <translation locale="en">
+        <name>Generic</name>
+      </translation>
+    </translations>
+  </brand>
+  <brand>
+    <id>2</id>
+    <slug>proline</slug>
+    <translations>
+      <translation locale="lt">
+        <name>ProLine</name>
+      </translation>
+      <translation locale="en">
+        <name>ProLine</name>
+      </translation>
+    </translations>
+  </brand>
+</brands>

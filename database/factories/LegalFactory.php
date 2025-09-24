@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Models\Legal;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends Factory<\App\Models\Legal>

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
@@ -25,10 +27,10 @@ final class SliderRecommendations extends Widget
         $status = $this->pageFilters['status'] ?? 'all';
 
         $query = Slider::query()
-            ->when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate))
-            ->when($sliderId, fn(Builder $query) => $query->where('id', $sliderId))
-            ->when($status !== 'all', fn(Builder $query) => $query->where('is_active', $status === 'active'));
+            ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+            ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
+            ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
         $sliders = $query->get();
 
@@ -44,7 +46,7 @@ final class SliderRecommendations extends Widget
         $recommendations = [];
 
         // Check for sliders without images
-        $slidersWithoutImages = $sliders->filter(fn($slider) => !$slider->hasMedia('slider_images'));
+        $slidersWithoutImages = $sliders->filter(fn ($slider) => ! $slider->hasMedia('slider_images'));
         if ($slidersWithoutImages->count() > 0) {
             $recommendations[] = [
                 'type' => 'warning',
@@ -57,7 +59,7 @@ final class SliderRecommendations extends Widget
         }
 
         // Check for sliders without buttons
-        $slidersWithoutButtons = $sliders->filter(fn($slider) => empty($slider->button_text) || empty($slider->button_url));
+        $slidersWithoutButtons = $sliders->filter(fn ($slider) => empty($slider->button_text) || empty($slider->button_url));
         if ($slidersWithoutButtons->count() > 0) {
             $recommendations[] = [
                 'type' => 'info',
@@ -70,7 +72,7 @@ final class SliderRecommendations extends Widget
         }
 
         // Check for sliders without descriptions
-        $slidersWithoutDescriptions = $sliders->filter(fn($slider) => empty($slider->description));
+        $slidersWithoutDescriptions = $sliders->filter(fn ($slider) => empty($slider->description));
         if ($slidersWithoutDescriptions->count() > 0) {
             $recommendations[] = [
                 'type' => 'info',
@@ -96,7 +98,7 @@ final class SliderRecommendations extends Widget
         }
 
         // Check for sliders without custom styling
-        $slidersWithoutStyling = $sliders->filter(fn($slider) => empty($slider->background_color) && empty($slider->text_color));
+        $slidersWithoutStyling = $sliders->filter(fn ($slider) => empty($slider->background_color) && empty($slider->text_color));
         if ($slidersWithoutStyling->count() > 0) {
             $recommendations[] = [
                 'type' => 'info',
@@ -109,7 +111,7 @@ final class SliderRecommendations extends Widget
         }
 
         // Check for old sliders
-        $oldSliders = $sliders->filter(fn($slider) => $slider->created_at->diffInDays(now()) > 90);
+        $oldSliders = $sliders->filter(fn ($slider) => $slider->created_at->diffInDays(now()) > 90);
         if ($oldSliders->count() > 0) {
             $recommendations[] = [
                 'type' => 'warning',
@@ -124,9 +126,9 @@ final class SliderRecommendations extends Widget
         // Positive recommendations
         $slidersWithAllFeatures = $sliders->filter(function ($slider) {
             return $slider->hasMedia('slider_images') &&
-                !empty($slider->button_text) &&
-                !empty($slider->button_url) &&
-                !empty($slider->description) &&
+                ! empty($slider->button_text) &&
+                ! empty($slider->button_url) &&
+                ! empty($slider->description) &&
                 $slider->is_active;
         });
 

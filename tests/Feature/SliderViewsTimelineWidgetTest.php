@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -7,7 +9,6 @@ use App\Models\Slider;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 final class SliderViewsTimelineWidgetTest extends TestCase
 {
@@ -49,13 +50,13 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_can_be_instantiated(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $this->assertInstanceOf(SliderViewsTimeline::class, $widget);
     }
 
     public function test_slider_views_timeline_widget_has_correct_heading(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $reflection = new \ReflectionClass($widget);
         $headingProperty = $reflection->getProperty('heading');
         $headingProperty->setAccessible(true);
@@ -72,7 +73,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_has_correct_column_span(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $reflection = new \ReflectionClass($widget);
         $columnSpanProperty = $reflection->getProperty('columnSpan');
         $columnSpanProperty->setAccessible(true);
@@ -96,7 +97,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_has_chart_data(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $data = $widget->getData();
 
         $this->assertIsArray($data);
@@ -108,13 +109,13 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_has_correct_chart_type(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $this->assertEquals('line', $widget->getType());
     }
 
     public function test_slider_views_timeline_widget_has_chart_options(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $options = $widget->getOptions();
 
         $this->assertIsArray($options);
@@ -126,7 +127,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_datasets_have_correct_structure(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $data = $widget->getData();
 
         $datasets = $data['datasets'];
@@ -154,7 +155,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_handles_page_filters(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
 
         // Test with start date filter
         $widget->pageFilters = ['startDate' => now()->subDays(7)];
@@ -180,7 +181,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_data_consistency(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $data = $widget->getData();
 
         // Check that all datasets have the same number of data points
@@ -199,7 +200,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_chart_colors(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $data = $widget->getData();
 
         $viewsDataset = $data['datasets'][0];
@@ -216,12 +217,12 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_extends_chart_widget(): void
     {
-        $this->assertInstanceOf(\Filament\Widgets\ChartWidget::class, new SliderViewsTimeline());
+        $this->assertInstanceOf(\Filament\Widgets\ChartWidget::class, new SliderViewsTimeline);
     }
 
     public function test_slider_views_timeline_widget_uses_page_filters_trait(): void
     {
-        $widget = new SliderViewsTimeline();
+        $widget = new SliderViewsTimeline;
         $this->assertTrue(method_exists($widget, 'getPageFilters') || in_array(\Filament\Widgets\Concerns\InteractsWithPageFilters::class, class_uses($widget)));
     }
 }

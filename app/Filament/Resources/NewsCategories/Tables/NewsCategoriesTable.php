@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategories\Tables;
 
-use App\Models\NewsCategory;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -40,10 +41,10 @@ final class NewsCategoriesTable
                 TextColumn::make('color')
                     ->label('Color')
                     ->badge()
-                    ->color(fn(string $state): string => $state),
+                    ->color(fn (string $state): string => $state),
                 TextColumn::make('icon')
                     ->label('Icon')
-                    ->icon(fn(string $state): string => $state),
+                    ->icon(fn (string $state): string => $state),
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()

@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Notification;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 final class NotificationTypesWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Notification Types Distribution';
+    protected ?string $heading = 'Notification Types Distribution';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -34,7 +35,7 @@ final class NotificationTypesWidget extends ChartWidget
             $count = Notification::where('type', $type)->count();
             if ($count > 0) {
                 $data[] = $count;
-                $labels[] = __('notifications.types.' . $type);
+                $labels[] = __('notifications.types.'.$type);
             }
         }
 
@@ -55,4 +56,3 @@ final class NotificationTypesWidget extends ChartWidget
         return 'doughnut';
     }
 }
-

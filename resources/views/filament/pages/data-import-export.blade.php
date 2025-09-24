@@ -1,3 +1,19 @@
+@php(/** @var \App\Filament\Pages\DataImportExport $this */ null)
+
+<x-filament::page>
+    <div class="space-y-6">
+        {{ $this->form }}
+        <div class="flex gap-3">
+            <x-filament::button wire:click="callAction('import')">
+                {{ __('translations.import') }}
+            </x-filament::button>
+            <x-filament::button color="gray" wire:click="callAction('export')">
+                {{ __('translations.export') }}
+            </x-filament::button>
+        </div>
+    </div>
+</x-filament::page>
+
 <x-filament-panels::page>
     <div class="space-y-6">
         <!-- Quick Stats -->

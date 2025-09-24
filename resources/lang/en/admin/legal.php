@@ -6,7 +6,7 @@ return [
     'legal_document' => 'Legal Document',
     'all_documents' => 'All Documents',
     'untitled_document' => 'Untitled Document',
-    
+
     // Fields
     'key' => 'Key',
     'key_help' => 'Unique document key (e.g., privacy-policy)',
@@ -30,13 +30,13 @@ return [
     'meta_key' => 'Key Name',
     'meta_value' => 'Value',
     'meta_data_help' => 'Additional data in JSON format (version, review frequency, etc.)',
-    
+
     // Status
     'status' => 'Status',
     'status_published' => 'Published',
     'status_draft' => 'Draft',
     'status_disabled' => 'Disabled',
-    
+
     // Types
     'privacy_policy' => 'Privacy Policy',
     'terms_of_use' => 'Terms of Use',
@@ -47,7 +47,7 @@ return [
     'legal_notice' => 'Legal Notice',
     'imprint' => 'Imprint',
     'legal_document' => 'Legal Document',
-    
+
     // Actions
     'view' => 'View',
     'publish' => 'Publish',
@@ -58,7 +58,7 @@ return [
     'unpublish_selected' => 'Unpublish Selected',
     'enable_selected' => 'Enable Selected',
     'disable_selected' => 'Disable Selected',
-    
+
     // Messages
     'created_successfully' => 'Legal document created successfully',
     'updated_successfully' => 'Legal document updated successfully',
@@ -71,7 +71,7 @@ return [
     'unpublished_selected_successfully' => 'Selected documents unpublished successfully',
     'enabled_selected_successfully' => 'Selected documents enabled successfully',
     'disabled_selected_successfully' => 'Selected documents disabled successfully',
-    
+
     // Statistics
     'total_documents' => 'Total Documents',
     'total_documents_description' => 'Total number of documents in the system',
@@ -86,13 +86,13 @@ return [
     'completion_rate' => 'Completion Rate',
     'completion_rate_description' => 'Percentage of published documents',
     'documents_count' => 'Documents Count',
-    
+
     // Tabs
     'published' => 'Published',
     'draft' => 'Draft',
     'disabled' => 'Disabled',
     'required' => 'Required',
-    
+
     // Validation
     'key_required' => 'Document key is required',
     'key_unique' => 'Document key already exists',
@@ -101,7 +101,7 @@ return [
     'slug_required' => 'URL slug is required',
     'slug_unique' => 'URL slug already exists',
     'content_required' => 'Content is required',
-    
+
     // Frontend
     'last_updated' => 'Last Updated',
     'reading_time' => 'Reading Time',
@@ -111,7 +111,7 @@ return [
     'version' => 'Version',
     'effective_date' => 'Effective Date',
     'review_date' => 'Review Date',
-    
+
     // Navigation
     'legal_information' => 'Legal Information',
     'privacy_policy_title' => 'Privacy Policy',

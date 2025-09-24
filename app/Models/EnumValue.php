@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -44,13 +46,13 @@ final class EnumValue extends Model
     {
         parent::boot();
 
-        static::creating(function (EnumValue $enumValue): void {
-            if (!$enumValue->sort_order) {
+        self::creating(function (EnumValue $enumValue): void {
+            if (! $enumValue->sort_order) {
                 $enumValue->sort_order = static::where('type', $enumValue->type)->max('sort_order') + 1;
             }
         });
 
-        static::saving(function (EnumValue $enumValue): void {
+        self::saving(function (EnumValue $enumValue): void {
             if ($enumValue->is_default) {
                 static::where('type', $enumValue->type)
                     ->where('id', '!=', $enumValue->id)
@@ -84,14 +86,14 @@ final class EnumValue extends Model
     protected function usageCount(): Attribute
     {
         return Attribute::make(
-            get: fn(): int => $this->getUsageCount()
+            get: fn (): int => $this->getUsageCount()
         );
     }
 
     protected function formattedValue(): Attribute
     {
         return Attribute::make(
-            get: fn(): string => "{$this->type}::{$this->key} => {$this->value}"
+            get: fn (): string => "{$this->type}::{$this->key} => {$this->value}"
         );
     }
 
@@ -115,7 +117,7 @@ final class EnumValue extends Model
 
     public function setAsDefault(): bool
     {
-        static::where('type', $this->type)
+        self::where('type', $this->type)
             ->where('id', '!=', $this->id)
             ->update(['is_default' => false]);
 
@@ -125,7 +127,7 @@ final class EnumValue extends Model
     public function duplicate(): self
     {
         $newEnumValue = $this->replicate();
-        $newEnumValue->key = $this->key . '_copy';
+        $newEnumValue->key = $this->key.'_copy';
         $newEnumValue->is_default = false;
         $newEnumValue->save();
 
@@ -154,7 +156,7 @@ final class EnumValue extends Model
 
     public static function getValuesByType(string $type): array
     {
-        return static::where('type', $type)
+        return self::where('type', $type)
             ->active()
             ->ordered()
             ->pluck('value', 'key')
@@ -163,7 +165,7 @@ final class EnumValue extends Model
 
     public static function getDefaultValue(string $type): ?string
     {
-        $default = static::where('type', $type)
+        $default = self::where('type', $type)
             ->where('is_default', true)
             ->first();
 
@@ -172,7 +174,7 @@ final class EnumValue extends Model
 
     public static function cleanupUnused(): int
     {
-        return static::where('usage_count', 0)
+        return self::where('usage_count', 0)
             ->where('created_at', '<', now()->subMonths(6))
             ->delete();
     }

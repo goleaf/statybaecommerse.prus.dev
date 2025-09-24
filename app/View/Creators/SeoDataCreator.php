@@ -9,7 +9,7 @@ use Illuminate\Contracts\View\View;
 
 /**
  * SeoDataCreator
- * 
+ *
  * View Creator that provides SEO data to views.
  * This includes meta tags, structured data, and SEO-related information.
  */
@@ -26,9 +26,9 @@ final class SeoDataCreator
     {
         $viewName = $view->getName();
         $viewData = $view->getData();
-        
+
         $seoData = $this->generateSeoData($viewName, $viewData);
-        
+
         $view->with([
             'seo' => $seoData,
             'metaTitle' => $seoData['title'],
@@ -82,13 +82,13 @@ final class SeoDataCreator
     private function getProductSeoData(array $viewData): array
     {
         $product = $viewData['product'] ?? null;
-        
-        if (!$product) {
+
+        if (! $product) {
             return [];
         }
 
         return [
-            'title' => $product->getTranslatedName() . ' - ' . config('app.name'),
+            'title' => $product->getTranslatedName().' - '.config('app.name'),
             'description' => $product->getTranslatedDescription() ?: __('seo.product_default_description', ['name' => $product->getTranslatedName()]),
             'keywords' => $this->generateProductKeywords($product),
             'og_title' => $product->getTranslatedName(),
@@ -105,13 +105,13 @@ final class SeoDataCreator
     private function getCategorySeoData(array $viewData): array
     {
         $category = $viewData['category'] ?? null;
-        
-        if (!$category) {
+
+        if (! $category) {
             return [];
         }
 
         return [
-            'title' => $category->getTranslatedName() . ' - ' . config('app.name'),
+            'title' => $category->getTranslatedName().' - '.config('app.name'),
             'description' => $category->getTranslatedDescription() ?: __('seo.category_default_description', ['name' => $category->getTranslatedName()]),
             'keywords' => $this->generateCategoryKeywords($category),
             'og_title' => $category->getTranslatedName(),
@@ -127,13 +127,13 @@ final class SeoDataCreator
     private function getBrandSeoData(array $viewData): array
     {
         $brand = $viewData['brand'] ?? null;
-        
-        if (!$brand) {
+
+        if (! $brand) {
             return [];
         }
 
         return [
-            'title' => $brand->getTranslatedName() . ' - ' . config('app.name'),
+            'title' => $brand->getTranslatedName().' - '.config('app.name'),
             'description' => $brand->getTranslatedDescription() ?: __('seo.brand_default_description', ['name' => $brand->getTranslatedName()]),
             'keywords' => $this->generateBrandKeywords($brand),
             'og_title' => $brand->getTranslatedName(),
@@ -149,7 +149,7 @@ final class SeoDataCreator
     private function getShopSeoData(array $viewData): array
     {
         return [
-            'title' => __('seo.shop_title') . ' - ' . config('app.name'),
+            'title' => __('seo.shop_title').' - '.config('app.name'),
             'description' => __('seo.shop_description'),
             'keywords' => __('seo.shop_keywords'),
             'og_title' => __('seo.shop_title'),
@@ -164,7 +164,7 @@ final class SeoDataCreator
     private function getUserDashboardSeoData(array $viewData): array
     {
         return [
-            'title' => __('seo.dashboard_title') . ' - ' . config('app.name'),
+            'title' => __('seo.dashboard_title').' - '.config('app.name'),
             'description' => __('seo.dashboard_description'),
             'robots' => 'noindex, nofollow', // Don't index user dashboards
         ];

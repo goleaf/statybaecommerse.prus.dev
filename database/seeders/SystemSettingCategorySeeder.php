@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -16,99 +18,89 @@ final class SystemSettingCategorySeeder extends Seeder
             [
                 'name' => 'General',
                 'slug' => 'general',
-                'description' => 'General system settings',
+                'description' => 'General system settings and configurations',
                 'icon' => 'heroicon-o-cog-6-tooth',
-                'color' => '#3B82F6',
+                'color' => 'primary',
                 'sort_order' => 1,
                 'is_active' => true,
+                'parent_id' => null,
             ],
             [
                 'name' => 'Security',
                 'slug' => 'security',
-                'description' => 'Security related settings',
+                'description' => 'Security-related settings and configurations',
                 'icon' => 'heroicon-o-shield-check',
-                'color' => '#EF4444',
+                'color' => 'danger',
                 'sort_order' => 2,
                 'is_active' => true,
+                'parent_id' => null,
             ],
             [
-                'name' => 'Email',
-                'slug' => 'email',
-                'description' => 'Email configuration settings',
-                'icon' => 'heroicon-o-envelope',
-                'color' => '#10B981',
+                'name' => 'Performance',
+                'slug' => 'performance',
+                'description' => 'Performance optimization settings',
+                'icon' => 'heroicon-o-bolt',
+                'color' => 'warning',
                 'sort_order' => 3,
                 'is_active' => true,
+                'parent_id' => null,
             ],
             [
-                'name' => 'Database',
-                'slug' => 'database',
-                'description' => 'Database configuration settings',
-                'icon' => 'heroicon-o-circle-stack',
-                'color' => '#8B5CF6',
+                'name' => 'UI/UX',
+                'slug' => 'ui-ux',
+                'description' => 'User interface and user experience settings',
+                'icon' => 'heroicon-o-paint-brush',
+                'color' => 'info',
                 'sort_order' => 4,
                 'is_active' => true,
-            ],
-            [
-                'name' => 'Cache',
-                'slug' => 'cache',
-                'description' => 'Cache configuration settings',
-                'icon' => 'heroicon-o-bolt',
-                'color' => '#F59E0B',
-                'sort_order' => 5,
-                'is_active' => true,
+                'parent_id' => null,
             ],
             [
                 'name' => 'API',
                 'slug' => 'api',
-                'description' => 'API configuration settings',
-                'icon' => 'heroicon-o-code-bracket',
-                'color' => '#06B6D4',
+                'description' => 'API configuration and settings',
+                'icon' => 'heroicon-o-globe-alt',
+                'color' => 'success',
+                'sort_order' => 5,
+                'is_active' => true,
+                'parent_id' => null,
+            ],
+            [
+                'name' => 'Database',
+                'slug' => 'database',
+                'description' => 'Database configuration and settings',
+                'icon' => 'heroicon-o-database',
+                'color' => 'secondary',
                 'sort_order' => 6,
                 'is_active' => true,
+                'parent_id' => null,
             ],
             [
-                'name' => 'Payment',
-                'slug' => 'payment',
-                'description' => 'Payment gateway settings',
-                'icon' => 'heroicon-o-credit-card',
-                'color' => '#84CC16',
+                'name' => 'Authentication',
+                'slug' => 'authentication',
+                'description' => 'Authentication and authorization settings',
+                'icon' => 'heroicon-o-key',
+                'color' => 'danger',
                 'sort_order' => 7,
                 'is_active' => true,
-            ],
-            [
-                'name' => 'Notifications',
-                'slug' => 'notifications',
-                'description' => 'Notification settings',
-                'icon' => 'heroicon-o-bell',
-                'color' => '#F97316',
-                'sort_order' => 8,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Storage',
-                'slug' => 'storage',
-                'description' => 'File storage settings',
-                'icon' => 'heroicon-o-server',
-                'color' => '#6366F1',
-                'sort_order' => 9,
-                'is_active' => true,
+                'parent_id' => null,
             ],
             [
                 'name' => 'Analytics',
                 'slug' => 'analytics',
-                'description' => 'Analytics and tracking settings',
+                'description' => 'Analytics and reporting settings',
                 'icon' => 'heroicon-o-chart-bar',
-                'color' => '#EC4899',
-                'sort_order' => 10,
+                'color' => 'info',
+                'sort_order' => 8,
                 'is_active' => true,
+                'parent_id' => null,
             ],
         ];
 
-        foreach ($categories as $category) {
+        foreach ($categories as $categoryData) {
             SystemSettingCategory::updateOrCreate(
-                ['slug' => $category['slug']],
-                $category
+                ['slug' => $categoryData['slug']],
+                $categoryData
             );
         }
     }

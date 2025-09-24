@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Review;
+declare(strict_types=1);
+
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\User;
 
 beforeEach(function () {
@@ -128,7 +130,7 @@ it('can filter reviews by rating', function () {
 });
 
 it('validates rating is between 1 and 5', function () {
-    expect(fn() => Review::create([
+    expect(fn () => Review::create([
         'product_id' => $this->product->id,
         'user_id' => $this->user->id,
         'reviewer_name' => 'Test User',
@@ -138,7 +140,7 @@ it('validates rating is between 1 and 5', function () {
         'rating' => 6, // Invalid
     ]))->toThrow(\InvalidArgumentException::class);
 
-    expect(fn() => Review::create([
+    expect(fn () => Review::create([
         'product_id' => $this->product->id,
         'user_id' => $this->user->id,
         'reviewer_name' => 'Test User',

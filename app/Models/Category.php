@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -8,15 +10,15 @@ use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Category
@@ -27,9 +29,11 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property mixed $casts
  * @property mixed $appends
  * @property string $translationModel
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Category newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Category newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Category query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
@@ -38,6 +42,7 @@ final class Category extends Model implements HasMedia
     use HasFactory, HasTranslations, InteractsWithMedia, SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'seo_title', 'seo_description', 'show_in_menu', 'product_limit'];
+
     protected $casts = ['is_visible' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'show_in_menu' => 'boolean', 'sort_order' => 'integer', 'product_limit' => 'integer'];
 
     /**
@@ -51,7 +56,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle parent functionality with proper error handling.
-     * @return BelongsTo
      */
     public function parent(): BelongsTo
     {
@@ -60,7 +64,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle children functionality with proper error handling.
-     * @return HasMany
      */
     public function children(): HasMany
     {
@@ -69,7 +72,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle latestChild functionality with proper error handling.
-     * @return HasOne
      */
     public function latestChild(): HasOne
     {
@@ -78,7 +80,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle products functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function products(): BelongsToMany
     {
@@ -87,7 +88,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getRouteKeyName functionality with proper error handling.
-     * @return string
      */
     public function getRouteKeyName(): string
     {
@@ -96,7 +96,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -105,7 +106,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeRoot functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeRoot($query)
     {
@@ -114,7 +116,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeOrdered($query)
     {
@@ -123,7 +126,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeWithProductCounts functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithProductCounts($query)
     {
@@ -132,7 +136,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeVisible functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeVisible($query)
     {
@@ -141,7 +146,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeRoots functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeRoots($query)
     {
@@ -150,7 +156,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEnabled($query)
     {
@@ -159,7 +166,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeFeatured functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeFeatured($query)
     {
@@ -170,7 +178,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeWithChildren functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithChildren($query)
     {
@@ -179,7 +188,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeWithParent functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithParent($query)
     {
@@ -188,7 +198,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeWithAllRelations functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithAllRelations($query)
     {
@@ -197,20 +208,19 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getFullNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFullNameAttribute(): string
     {
         $name = $this->trans('name', app()->getLocale());
         if ($this->parent) {
-            return $this->parent->getFullNameAttribute() . ' > ' . $name;
+            return $this->parent->getFullNameAttribute().' > '.$name;
         }
+
         return $name;
     }
 
     /**
      * Handle getBreadcrumbAttribute functionality with proper error handling.
-     * @return array
      */
     public function getBreadcrumbAttribute(): array
     {
@@ -220,12 +230,12 @@ final class Category extends Model implements HasMedia
             array_unshift($breadcrumb, ['id' => $category->id, 'name' => $category->trans('name', app()->getLocale()), 'slug' => $category->slug]);
             $category = $category->parent;
         }
+
         return $breadcrumb;
     }
 
     /**
      * Handle getCanonicalUrlAttribute functionality with proper error handling.
-     * @return string
      */
     public function getCanonicalUrlAttribute(): string
     {
@@ -234,7 +244,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getMetaTagsAttribute functionality with proper error handling.
-     * @return array
      */
     public function getMetaTagsAttribute(): array
     {
@@ -248,7 +257,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getTotalRevenueAttribute functionality with proper error handling.
-     * @return float
      */
     public function getTotalRevenueAttribute(): float
     {
@@ -257,17 +265,16 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getAverageProductPriceAttribute functionality with proper error handling.
-     * @return float
      */
     public function getAverageProductPriceAttribute(): float
     {
         $productCount = $this->products()->count();
+
         return $productCount > 0 ? (float) ($this->total_revenue / $productCount) : 0.0;
     }
 
     /**
      * Handle getIsRootAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getIsRootAttribute(): bool
     {
@@ -276,7 +283,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getIsLeafAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getIsLeafAttribute(): bool
     {
@@ -285,7 +291,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getDepthAttribute functionality with proper error handling.
-     * @return int
      */
     public function getDepthAttribute(): int
     {
@@ -295,12 +300,12 @@ final class Category extends Model implements HasMedia
             $depth++;
             $category = $category->parent;
         }
+
         return $depth;
     }
 
     /**
      * Handle getLevelAttribute functionality with proper error handling.
-     * @return int
      */
     public function getLevelAttribute(): int
     {
@@ -309,7 +314,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getAncestorsCountAttribute functionality with proper error handling.
-     * @return int
      */
     public function getAncestorsCountAttribute(): int
     {
@@ -318,7 +322,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getDescendantsCountAttribute functionality with proper error handling.
-     * @return int
      */
     public function getDescendantsCountAttribute(): int
     {
@@ -326,12 +329,12 @@ final class Category extends Model implements HasMedia
         foreach ($this->children as $child) {
             $count += 1 + $child->descendants_count;
         }
+
         return $count;
     }
 
     /**
      * Handle getFullPathAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFullPathAttribute(): string
     {
@@ -341,6 +344,7 @@ final class Category extends Model implements HasMedia
             array_unshift($path, $category->slug);
             $category = $category->parent;
         }
+
         return implode('/', $path);
     }
 
@@ -348,12 +352,13 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
-     * @param mixed $query
-     * @param string|null $locale
+     *
+     * @param  mixed  $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
+
         return $query->with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }]);
@@ -361,8 +366,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle hasTranslationFor functionality with proper error handling.
-     * @param string $locale
-     * @return bool
      */
     public function hasTranslationFor(string $locale): bool
     {
@@ -371,7 +374,7 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     * @param string $locale
+     *
      * @return App\Models\Translations\CategoryTranslation
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\CategoryTranslation
@@ -381,26 +384,23 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle updateTranslation functionality with proper error handling.
-     * @param string $locale
-     * @param array $data
-     * @return bool
      */
     public function updateTranslation(string $locale, array $data): bool
     {
         $translation = $this->getOrCreateTranslation($locale);
+
         return $translation->update($data);
     }
 
     /**
      * Handle updateTranslations functionality with proper error handling.
-     * @param array $translations
-     * @return bool
      */
     public function updateTranslations(array $translations): bool
     {
         foreach ($translations as $locale => $data) {
             $this->updateTranslation($locale, $data);
         }
+
         return true;
     }
 
@@ -408,7 +408,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getCategoryInfo functionality with proper error handling.
-     * @return array
      */
     public function getCategoryInfo(): array
     {
@@ -417,7 +416,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getHierarchyInfo functionality with proper error handling.
-     * @return array
      */
     public function getHierarchyInfo(): array
     {
@@ -426,7 +424,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getMediaInfo functionality with proper error handling.
-     * @return array
      */
     public function getMediaInfo(): array
     {
@@ -435,7 +432,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getSeoInfo functionality with proper error handling.
-     * @return array
      */
     public function getSeoInfo(): array
     {
@@ -444,7 +440,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getBusinessInfo functionality with proper error handling.
-     * @return array
      */
     public function getBusinessInfo(): array
     {
@@ -453,8 +448,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getCompleteInfo functionality with proper error handling.
-     * @param string|null $locale
-     * @return array
      */
     public function getCompleteInfo(?string $locale = null): array
     {
@@ -463,7 +456,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getAvailableLocales functionality with proper error handling.
-     * @return array
      */
     public function getAvailableLocales(): array
     {
@@ -474,7 +466,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getCanonicalUrl functionality with proper error handling.
-     * @return string
      */
     public function getCanonicalUrl(): string
     {
@@ -483,7 +474,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getMetaTags functionality with proper error handling.
-     * @return array
      */
     public function getMetaTags(): array
     {
@@ -492,7 +482,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getTotalRevenue functionality with proper error handling.
-     * @return float
      */
     public function getTotalRevenue(): float
     {
@@ -501,7 +490,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getAverageProductPrice functionality with proper error handling.
-     * @return float|null
      */
     public function getAverageProductPrice(): ?float
     {
@@ -510,13 +498,12 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getFullDisplayName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string
      */
     public function getFullDisplayName(?string $locale = null): string
     {
         $name = $this->trans('name', $locale) ?: $this->name;
         $status = $this->is_enabled ? 'Enabled' : 'Disabled';
+
         return "{$name} ({$status})";
     }
 
@@ -524,7 +511,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle isRoot functionality with proper error handling.
-     * @return bool
      */
     public function isRoot(): bool
     {
@@ -533,7 +519,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle isLeaf functionality with proper error handling.
-     * @return bool
      */
     public function isLeaf(): bool
     {
@@ -542,7 +527,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getDepth functionality with proper error handling.
-     * @return int
      */
     public function getDepth(): int
     {
@@ -552,12 +536,12 @@ final class Category extends Model implements HasMedia
             $depth++;
             $category = $category->parent;
         }
+
         return $depth;
     }
 
     /**
      * Handle getLevel functionality with proper error handling.
-     * @return int
      */
     public function getLevel(): int
     {
@@ -566,7 +550,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getAncestorsCount functionality with proper error handling.
-     * @return int
      */
     public function getAncestorsCount(): int
     {
@@ -575,7 +558,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getDescendantsCount functionality with proper error handling.
-     * @return int
      */
     public function getDescendantsCount(): int
     {
@@ -583,12 +565,12 @@ final class Category extends Model implements HasMedia
         foreach ($this->children as $child) {
             $count += $child->getDescendantsCount();
         }
+
         return $count;
     }
 
     /**
      * Handle getFullPath functionality with proper error handling.
-     * @return string
      */
     public function getFullPath(): string
     {
@@ -598,6 +580,7 @@ final class Category extends Model implements HasMedia
             array_unshift($path, $category->name);
             $category = $category->parent;
         }
+
         return implode(' > ', $path);
     }
 
@@ -605,33 +588,30 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getImageUrl functionality with proper error handling.
-     * @param string|null $size
-     * @return string|null
      */
     public function getImageUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             return $this->getFirstMediaUrl('images');
         }
+
         return $this->getFirstMediaUrl('images', $size) ?: $this->getFirstMediaUrl('images');
     }
 
     /**
      * Handle getBannerUrl functionality with proper error handling.
-     * @param string|null $size
-     * @return string|null
      */
     public function getBannerUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             return $this->getFirstMediaUrl('banner');
         }
+
         return $this->getFirstMediaUrl('banner', $size) ?: $this->getFirstMediaUrl('banner');
     }
 
     /**
      * Handle getGalleryCount functionality with proper error handling.
-     * @return int
      */
     public function getGalleryCount(): int
     {
@@ -640,7 +620,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getMediaCount functionality with proper error handling.
-     * @return int
      */
     public function getMediaCount(): int
     {
@@ -651,7 +630,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle isActive functionality with proper error handling.
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -660,7 +638,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle isVisible functionality with proper error handling.
-     * @return bool
      */
     public function isVisible(): bool
     {
@@ -669,7 +646,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle isFeatured functionality with proper error handling.
-     * @return bool
      */
     public function isFeatured(): bool
     {
@@ -680,7 +656,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle showInMenu functionality with proper error handling.
-     * @return bool
      */
     public function showInMenu(): bool
     {
@@ -689,7 +664,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle hasProducts functionality with proper error handling.
-     * @return bool
      */
     public function hasProducts(): bool
     {
@@ -698,7 +672,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle hasChildren functionality with proper error handling.
-     * @return bool
      */
     public function hasChildren(): bool
     {
@@ -707,18 +680,18 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle hasParent functionality with proper error handling.
-     * @return bool
      */
     public function hasParent(): bool
     {
-        return !is_null($this->parent_id);
+        return ! is_null($this->parent_id);
     }
 
     // Additional scopes
 
     /**
      * Handle scopeWithoutParent functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithoutParent($query)
     {
@@ -727,7 +700,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeHidden functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeHidden($query)
     {
@@ -736,7 +710,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeInMenu functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeInMenu($query)
     {
@@ -745,7 +720,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeNotInMenu functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeNotInMenu($query)
     {
@@ -754,8 +730,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopePopular functionality with proper error handling.
-     * @param mixed $query
-     * @param int $minProducts
+     *
+     * @param  mixed  $query
      */
     public function scopePopular($query, int $minProducts = 5)
     {
@@ -764,8 +740,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeRecent functionality with proper error handling.
-     * @param mixed $query
-     * @param int $days
+     *
+     * @param  mixed  $query
      */
     public function scopeRecent($query, int $days = 30)
     {
@@ -774,8 +750,8 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle scopeDeep functionality with proper error handling.
-     * @param mixed $query
-     * @param int $minDepth
+     *
+     * @param  mixed  $query
      */
     public function scopeDeep($query, int $minDepth = 2)
     {
@@ -794,7 +770,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle registerMediaCollections functionality with proper error handling.
-     * @return void
      */
     public function registerMediaCollections(): void
     {
@@ -805,8 +780,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle registerMediaConversions functionality with proper error handling.
-     * @param Media|null $media
-     * @return void
      */
     public function registerMediaConversions(?Media $media = null): void
     {

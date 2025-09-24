@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Attribute;
 use App\Models\AttributeValue;
@@ -37,7 +39,7 @@ it('has products relationship through pivot', function () {
     $attribute = Attribute::factory()->create();
     $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
     $product = Product::factory()->create();
-    
+
     $product->attributes()->attach($attribute->id, ['attribute_value_id' => $attributeValue->id]);
 
     expect($attribute->products)->toHaveCount(1);
@@ -90,14 +92,14 @@ it('can be ordered by sort_order', function () {
 });
 
 it('validates required fields', function () {
-    expect(fn() => Attribute::create([]))
+    expect(fn () => Attribute::create([]))
         ->toThrow(\Illuminate\Database\QueryException::class);
 });
 
 it('validates unique slug', function () {
     Attribute::factory()->create(['slug' => 'existing-slug']);
 
-    expect(fn() => Attribute::create([
+    expect(fn () => Attribute::create([
         'name' => 'Test Attribute',
         'slug' => 'existing-slug',
         'type' => 'text',

@@ -1,17 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
-use Filament\Schemas\Schema;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Infolists;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -19,9 +22,10 @@ class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
-
-    protected static ?string $navigationGroup = 'Content Management';
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-newspaper';
+    }
 
     protected static ?int $navigationSort = 1;
 
@@ -31,79 +35,78 @@ class NewsResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Forms\Components\Section::make('Article Information')
-                    ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->label(__('news.fields.title'))
-                            ->required()
-                            ->maxLength(255)
-                            ->live()
-                            ->afterStateUpdated(fn($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
-                        Forms\Components\TextInput::make('slug')
-                            ->label(__('news.fields.slug'))
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(News::class, 'slug', ignoreRecord: true),
-                        Forms\Components\Textarea::make('excerpt')
-                            ->label(__('news.fields.excerpt'))
-                            ->maxLength(500)
-                            ->rows(3),
-                        Forms\Components\RichEditor::make('content')
-                            ->label(__('news.fields.content'))
-                            ->required()
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
-                Forms\Components\Section::make('Publishing')
-                    ->schema([
-                        Forms\Components\DateTimePicker::make('published_at')
-                            ->label(__('news.fields.published_at'))
-                            ->default(now()),
-                        Forms\Components\TextInput::make('author_name')
-                            ->label(__('news.fields.author_name'))
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('author_email')
-                            ->label(__('news.fields.author_email'))
-                            ->email()
-                            ->maxLength(255),
-                        Forms\Components\Toggle::make('is_visible')
-                            ->label(__('news.fields.is_visible'))
-                            ->default(true),
-                        Forms\Components\Toggle::make('is_featured')
-                            ->label(__('news.fields.is_featured')),
-                    ])
-                    ->columns(2),
-                Forms\Components\Section::make('SEO & Metadata')
-                    ->schema([
-                        Forms\Components\TextInput::make('meta_title')
-                            ->label(__('news.fields.meta_title'))
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('meta_description')
-                            ->label(__('news.fields.meta_description'))
-                            ->maxLength(500)
-                            ->rows(3),
-                        Forms\Components\TextInput::make('meta_keywords')
-                            ->label(__('news.fields.meta_keywords'))
-                            ->maxLength(255),
-                    ])
-                    ->columns(1),
-                Forms\Components\Section::make('Categories & Tags')
-                    ->schema([
-                        Forms\Components\Select::make('categories')
-                            ->label(__('news.fields.categories'))
-                            ->relationship('categories', 'name')
-                            ->multiple()
-                            ->preload(),
-                        Forms\Components\Select::make('tags')
-                            ->label(__('news.fields.tags'))
-                            ->relationship('tags', 'name')
-                            ->multiple()
-                            ->preload(),
-                    ])
-                    ->columns(2),
-            ]);
+        return $schema->schema([
+            Forms\Components\Section::make('Article Information')
+                ->schema([
+                    Forms\Components\TextInput::make('title')
+                        ->label(__('news.fields.title'))
+                        ->required()
+                        ->maxLength(255)
+                        ->live()
+                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                    Forms\Components\TextInput::make('slug')
+                        ->label(__('news.fields.slug'))
+                        ->required()
+                        ->maxLength(255)
+                        ->unique(News::class, 'slug', ignoreRecord: true),
+                    Forms\Components\Textarea::make('excerpt')
+                        ->label(__('news.fields.excerpt'))
+                        ->maxLength(500)
+                        ->rows(3),
+                    Forms\Components\RichEditor::make('content')
+                        ->label(__('news.fields.content'))
+                        ->required()
+                        ->columnSpanFull(),
+                ])
+                ->columns(2),
+            Forms\Components\Section::make('Publishing')
+                ->schema([
+                    Forms\Components\DateTimePicker::make('published_at')
+                        ->label(__('news.fields.published_at'))
+                        ->default(now()),
+                    Forms\Components\TextInput::make('author_name')
+                        ->label(__('news.fields.author_name'))
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('author_email')
+                        ->label(__('news.fields.author_email'))
+                        ->email()
+                        ->maxLength(255),
+                    Forms\Components\Toggle::make('is_visible')
+                        ->label(__('news.fields.is_visible'))
+                        ->default(true),
+                    Forms\Components\Toggle::make('is_featured')
+                        ->label(__('news.fields.is_featured')),
+                ])
+                ->columns(2),
+            Forms\Components\Section::make('SEO & Metadata')
+                ->schema([
+                    Forms\Components\TextInput::make('meta_title')
+                        ->label(__('news.fields.meta_title'))
+                        ->maxLength(255),
+                    Forms\Components\Textarea::make('meta_description')
+                        ->label(__('news.fields.meta_description'))
+                        ->maxLength(500)
+                        ->rows(3),
+                    Forms\Components\TextInput::make('meta_keywords')
+                        ->label(__('news.fields.meta_keywords'))
+                        ->maxLength(255),
+                ])
+                ->columns(1),
+            Forms\Components\Section::make('Categories & Tags')
+                ->schema([
+                    Forms\Components\Select::make('categories')
+                        ->label(__('news.fields.categories'))
+                        ->relationship('categories', 'name')
+                        ->multiple()
+                        ->preload(),
+                    Forms\Components\Select::make('tags')
+                        ->label(__('news.fields.tags'))
+                        ->relationship('tags', 'name')
+                        ->multiple()
+                        ->preload(),
+                ])
+                ->columns(2),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -170,11 +173,11 @@ class NewsResource extends Resource
                         return $query
                             ->when(
                                 $data['published_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date),
                             )
                             ->when(
                                 $data['published_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date),
                             );
                     }),
             ])
@@ -195,10 +198,10 @@ class NewsResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 Infolists\Components\Section::make('Article Details')
                     ->schema([
                         Infolists\Components\TextEntry::make('title')

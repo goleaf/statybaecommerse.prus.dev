@@ -30,7 +30,7 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['0001', '0002', '0003'],
                 'translations' => [
                     'lt' => ['name' => 'Oslas', 'description' => 'Norvegijos sostinė'],
-                    'en' => ['name' => 'Oslo', 'description' => 'Capital of Norway']
+                    'en' => ['name' => 'Oslo', 'description' => 'Capital of Norway'],
                 ],
             ],
 
@@ -44,8 +44,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['1300'],
                 'translations' => [
                     'lt' => ['name' => 'Berumas', 'description' => 'Akershuso miestas'],
-                    'en' => ['name' => 'Bærum', 'description' => 'Akershus city']
-            ],
+                    'en' => ['name' => 'Bærum', 'description' => 'Akershus city'],
+                ],
             ],
             [
                 'name' => 'Lillestrøm',
@@ -56,8 +56,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['2000'],
                 'translations' => [
                     'lt' => ['name' => 'Lilestromas', 'description' => 'Akershuso sostinė'],
-                    'en' => ['name' => 'Lillestrøm', 'description' => 'Capital of Akershus']
-            ],
+                    'en' => ['name' => 'Lillestrøm', 'description' => 'Capital of Akershus'],
+                ],
             ],
 
             // Østfold
@@ -70,8 +70,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['1600'],
                 'translations' => [
                     'lt' => ['name' => 'Fredrikstadas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Fredrikstad', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Fredrikstad', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Sarpsborg',
@@ -82,8 +82,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['1700'],
                 'translations' => [
                     'lt' => ['name' => 'Sarpsborgas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Sarpsborg', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Sarpsborg', 'description' => 'Industrial city'],
+                ],
             ],
 
             // Vestfold
@@ -96,8 +96,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['3100'],
                 'translations' => [
                     'lt' => ['name' => 'Tonsbergas', 'description' => 'Vestfoldo sostinė'],
-                    'en' => ['name' => 'Tønsberg', 'description' => 'Capital of Vestfold']
-            ],
+                    'en' => ['name' => 'Tønsberg', 'description' => 'Capital of Vestfold'],
+                ],
             ],
             [
                 'name' => 'Sandefjord',
@@ -108,8 +108,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['3200'],
                 'translations' => [
                     'lt' => ['name' => 'Sandefjordas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Sandefjord', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Sandefjord', 'description' => 'Port city'],
+                ],
             ],
 
             // Telemark
@@ -122,8 +122,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['3700'],
                 'translations' => [
                     'lt' => ['name' => 'Skienas', 'description' => 'Telemarko sostinė'],
-                    'en' => ['name' => 'Skien', 'description' => 'Capital of Telemark']
-            ],
+                    'en' => ['name' => 'Skien', 'description' => 'Capital of Telemark'],
+                ],
             ],
             [
                 'name' => 'Porsgrunn',
@@ -134,8 +134,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['3900'],
                 'translations' => [
                     'lt' => ['name' => 'Porsgrunas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Porsgrunn', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Porsgrunn', 'description' => 'Industrial city'],
+                ],
             ],
 
             // Aust-Agder
@@ -148,8 +148,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['4800'],
                 'translations' => [
                     'lt' => ['name' => 'Arendalas', 'description' => 'Aust-Agderio sostinė'],
-                    'en' => ['name' => 'Arendal', 'description' => 'Capital of Aust-Agder']
-            ],
+                    'en' => ['name' => 'Arendal', 'description' => 'Capital of Aust-Agder'],
+                ],
             ],
 
             // Vest-Agder
@@ -162,8 +162,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['4600'],
                 'translations' => [
                     'lt' => ['name' => 'Kristiansandas', 'description' => 'Vest-Agderio sostinė'],
-                    'en' => ['name' => 'Kristiansand', 'description' => 'Capital of Vest-Agder']
-            ],
+                    'en' => ['name' => 'Kristiansand', 'description' => 'Capital of Vest-Agder'],
+                ],
             ],
 
             // Rogaland
@@ -176,8 +176,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['4000'],
                 'translations' => [
                     'lt' => ['name' => 'Stavangeras', 'description' => 'Rogalando sostinė'],
-                    'en' => ['name' => 'Stavanger', 'description' => 'Capital of Rogaland']
-            ],
+                    'en' => ['name' => 'Stavanger', 'description' => 'Capital of Rogaland'],
+                ],
             ],
             [
                 'name' => 'Sandnes',
@@ -188,8 +188,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['4300'],
                 'translations' => [
                     'lt' => ['name' => 'Sandnesas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Sandnes', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Sandnes', 'description' => 'Industrial city'],
+                ],
             ],
 
             // Hordaland
@@ -202,8 +202,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['5000'],
                 'translations' => [
                     'lt' => ['name' => 'Bergenas', 'description' => 'Hordalando sostinė'],
-                    'en' => ['name' => 'Bergen', 'description' => 'Capital of Hordaland']
-            ],
+                    'en' => ['name' => 'Bergen', 'description' => 'Capital of Hordaland'],
+                ],
             ],
 
             // Sogn og Fjordane
@@ -216,8 +216,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['6800'],
                 'translations' => [
                     'lt' => ['name' => 'Forde', 'description' => 'Sogn og Fjordane sostinė'],
-                    'en' => ['name' => 'Førde', 'description' => 'Capital of Sogn og Fjordane']
-            ],
+                    'en' => ['name' => 'Førde', 'description' => 'Capital of Sogn og Fjordane'],
+                ],
             ],
 
             // Møre og Romsdal
@@ -230,8 +230,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['6000'],
                 'translations' => [
                     'lt' => ['name' => 'Olesundas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Ålesund', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Ålesund', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Molde',
@@ -242,8 +242,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['6400'],
                 'translations' => [
                     'lt' => ['name' => 'Moldė', 'description' => 'Møre og Romsdal sostinė'],
-                    'en' => ['name' => 'Molde', 'description' => 'Capital of Møre og Romsdal']
-            ],
+                    'en' => ['name' => 'Molde', 'description' => 'Capital of Møre og Romsdal'],
+                ],
             ],
 
             // Sør-Trøndelag
@@ -256,8 +256,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['7000'],
                 'translations' => [
                     'lt' => ['name' => 'Trondheimas', 'description' => 'Sør-Trøndelag sostinė'],
-                    'en' => ['name' => 'Trondheim', 'description' => 'Capital of Sør-Trøndelag']
-            ],
+                    'en' => ['name' => 'Trondheim', 'description' => 'Capital of Sør-Trøndelag'],
+                ],
             ],
 
             // Nord-Trøndelag
@@ -270,8 +270,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['7700'],
                 'translations' => [
                     'lt' => ['name' => 'Steinkjeras', 'description' => 'Nord-Trøndelag sostinė'],
-                    'en' => ['name' => 'Steinkjer', 'description' => 'Capital of Nord-Trøndelag']
-            ],
+                    'en' => ['name' => 'Steinkjer', 'description' => 'Capital of Nord-Trøndelag'],
+                ],
             ],
 
             // Nordland
@@ -284,8 +284,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['8000'],
                 'translations' => [
                     'lt' => ['name' => 'Bodė', 'description' => 'Nordlando sostinė'],
-                    'en' => ['name' => 'Bodø', 'description' => 'Capital of Nordland']
-            ],
+                    'en' => ['name' => 'Bodø', 'description' => 'Capital of Nordland'],
+                ],
             ],
             [
                 'name' => 'Narvik',
@@ -296,8 +296,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['8500'],
                 'translations' => [
                     'lt' => ['name' => 'Narvikas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Narvik', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Narvik', 'description' => 'Port city'],
+                ],
             ],
 
             // Troms
@@ -310,8 +310,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['9000'],
                 'translations' => [
                     'lt' => ['name' => 'Tromsė', 'description' => 'Tromso sostinė'],
-                    'en' => ['name' => 'Tromsø', 'description' => 'Capital of Troms']
-            ],
+                    'en' => ['name' => 'Tromsø', 'description' => 'Capital of Troms'],
+                ],
             ],
 
             // Finnmark
@@ -324,8 +324,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['9500'],
                 'translations' => [
                     'lt' => ['name' => 'Alta', 'description' => 'Finnmarko miestas'],
-                    'en' => ['name' => 'Alta', 'description' => 'Finnmark city']
-            ],
+                    'en' => ['name' => 'Alta', 'description' => 'Finnmark city'],
+                ],
             ],
             [
                 'name' => 'Vadsø',
@@ -336,8 +336,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['9800'],
                 'translations' => [
                     'lt' => ['name' => 'Vadsė', 'description' => 'Finnmarko sostinė'],
-                    'en' => ['name' => 'Vadsø', 'description' => 'Capital of Finnmark']
-            ],
+                    'en' => ['name' => 'Vadsø', 'description' => 'Capital of Finnmark'],
+                ],
             ],
 
             // Oppland
@@ -350,8 +350,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['2600'],
                 'translations' => [
                     'lt' => ['name' => 'Lilehameras', 'description' => 'Žiemos sporto miestas'],
-                    'en' => ['name' => 'Lillehammer', 'description' => 'Winter sports city']
-            ],
+                    'en' => ['name' => 'Lillehammer', 'description' => 'Winter sports city'],
+                ],
             ],
             [
                 'name' => 'Gjøvik',
@@ -362,8 +362,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['2800'],
                 'translations' => [
                     'lt' => ['name' => 'Gjovikas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Gjøvik', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Gjøvik', 'description' => 'Industrial city'],
+                ],
             ],
 
             // Hedmark
@@ -376,8 +376,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['2300'],
                 'translations' => [
                     'lt' => ['name' => 'Hamaras', 'description' => 'Hedmarko sostinė'],
-                    'en' => ['name' => 'Hamar', 'description' => 'Capital of Hedmark']
-            ],
+                    'en' => ['name' => 'Hamar', 'description' => 'Capital of Hedmark'],
+                ],
             ],
             [
                 'name' => 'Kongsvinger',
@@ -388,8 +388,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['2200'],
                 'translations' => [
                     'lt' => ['name' => 'Kongsvingeras', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Kongsvinger', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Kongsvinger', 'description' => 'Historic city'],
+                ],
             ],
 
             // Buskerud
@@ -402,8 +402,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['3000'],
                 'translations' => [
                     'lt' => ['name' => 'Dramenas', 'description' => 'Buskerudo sostinė'],
-                    'en' => ['name' => 'Drammen', 'description' => 'Capital of Buskerud']
-            ],
+                    'en' => ['name' => 'Drammen', 'description' => 'Capital of Buskerud'],
+                ],
             ],
             [
                 'name' => 'Kongsberg',
@@ -414,8 +414,8 @@ final class NorwayCitiesSeeder extends Seeder
                 'postal_codes' => ['3600'],
                 'translations' => [
                     'lt' => ['name' => 'Kongsbergas', 'description' => 'Kasybos miestas'],
-                    'en' => ['name' => 'Kongsberg', 'description' => 'Mining city']
-            ],
+                    'en' => ['name' => 'Kongsberg', 'description' => 'Mining city'],
+                ],
             ],
         ];
 
@@ -424,7 +424,7 @@ final class NorwayCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -444,8 +444,8 @@ final class NorwayCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

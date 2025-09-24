@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Livewire\HomeSlider;
 use App\Models\Slider;
 use App\Models\SliderTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use App\Livewire\HomeSlider;
 
 uses(RefreshDatabase::class);
 
@@ -32,7 +32,7 @@ test('slider can have translations', function () {
 
 test('slider returns translated content for current locale', function () {
     app()->setLocale('en');
-    
+
     $slider = Slider::factory()->create([
         'title' => 'Lithuanian Title',
         'description' => 'Lithuanian Description',
@@ -54,7 +54,7 @@ test('slider returns translated content for current locale', function () {
 
 test('slider falls back to original content when translation missing', function () {
     app()->setLocale('en');
-    
+
     $slider = Slider::factory()->create([
         'title' => 'Lithuanian Title',
         'description' => 'Lithuanian Description',
@@ -69,7 +69,7 @@ test('slider falls back to original content when translation missing', function 
 });
 
 test('slider translation model has correct fillable attributes', function () {
-    $translation = new SliderTranslation();
+    $translation = new SliderTranslation;
     $fillable = $translation->getFillable();
 
     expect($fillable)->toContain('slider_id');
@@ -93,7 +93,7 @@ test('slider translation belongs to slider', function () {
 
 test('home slider component loads with translations', function () {
     app()->setLocale('en');
-    
+
     $slider = Slider::factory()->create([
         'title' => 'Lithuanian Title',
         'is_active' => true,

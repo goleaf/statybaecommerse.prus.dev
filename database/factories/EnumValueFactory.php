@@ -55,28 +55,28 @@ class EnumValueFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
         ]);
     }
 
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
         ]);
     }
 
     public function default(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_default' => true,
         ]);
     }
 
     public function navigationGroup(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'navigation_group',
             'key' => fake()->randomElement(['products', 'orders', 'customers', 'marketing', 'reports', 'system']),
             'value' => fake()->words(2, true),
@@ -85,7 +85,7 @@ class EnumValueFactory extends Factory
 
     public function orderStatus(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'order_status',
             'key' => fake()->randomElement(['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']),
             'value' => fake()->words(2, true),
@@ -94,7 +94,7 @@ class EnumValueFactory extends Factory
 
     public function paymentStatus(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'payment_status',
             'key' => fake()->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
             'value' => fake()->words(2, true),

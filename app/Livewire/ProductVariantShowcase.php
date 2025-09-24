@@ -4,22 +4,28 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Models\Attribute;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Attribute;
-use App\Models\AttributeValue;
-use Livewire\Component;
 use Illuminate\Support\Collection;
+use Livewire\Component;
 
 final class ProductVariantShowcase extends Component
 {
     public Collection $products;
+
     public ?Product $selectedProduct = null;
+
     public Collection $productVariants;
+
     public Collection $productAttributes;
+
     public array $selectedAttributes = [];
+
     public ?ProductVariant $selectedVariant = null;
+
     public bool $showComparison = false;
+
     public array $comparisonVariants = [];
 
     public function mount(): void
@@ -44,7 +50,7 @@ final class ProductVariantShowcase extends Component
 
     public function loadProductVariants(): void
     {
-        if (!$this->selectedProduct) {
+        if (! $this->selectedProduct) {
             return;
         }
 
@@ -76,25 +82,26 @@ final class ProductVariantShowcase extends Component
     {
         if (empty($this->selectedAttributes)) {
             $this->selectedVariant = $this->productVariants->where('is_default', true)->first();
+
             return;
         }
 
         $this->selectedVariant = $this->productVariants->first(function ($variant) {
             $variantAttributes = $variant->variantAttributeValues->pluck('attribute_value', 'attribute_name')->toArray();
-            
+
             foreach ($this->selectedAttributes as $attributeSlug => $value) {
-                if (!isset($variantAttributes[$attributeSlug]) || $variantAttributes[$attributeSlug] !== $value) {
+                if (! isset($variantAttributes[$attributeSlug]) || $variantAttributes[$attributeSlug] !== $value) {
                     return false;
                 }
             }
-            
+
             return true;
         });
     }
 
     public function addToComparison(int $variantId): void
     {
-        if (!in_array($variantId, $this->comparisonVariants) && count($this->comparisonVariants) < 4) {
+        if (! in_array($variantId, $this->comparisonVariants) && count($this->comparisonVariants) < 4) {
             $this->comparisonVariants[] = $variantId;
             $this->showComparison = true;
         }
@@ -103,7 +110,7 @@ final class ProductVariantShowcase extends Component
     public function removeFromComparison(int $variantId): void
     {
         $this->comparisonVariants = array_diff($this->comparisonVariants, [$variantId]);
-        
+
         if (empty($this->comparisonVariants)) {
             $this->showComparison = false;
         }
@@ -125,6 +132,7 @@ final class ProductVariantShowcase extends Component
                 'localized' => $attributeValue->getLocalizedDisplayValue(),
             ];
         }
+
         return $attributes;
     }
 
@@ -143,7 +151,7 @@ final class ProductVariantShowcase extends Component
         $originalPrice = $this->getVariantOriginalPrice($variant);
         $currentPrice = $this->getVariantPrice($variant);
 
-        if (!$originalPrice || $originalPrice <= $currentPrice) {
+        if (! $originalPrice || $originalPrice <= $currentPrice) {
             return null;
         }
 
@@ -180,12 +188,12 @@ final class ProductVariantShowcase extends Component
 
     public function getProductStats(): array
     {
-        if (!$this->selectedProduct) {
+        if (! $this->selectedProduct) {
             return [];
         }
 
         $variants = $this->productVariants;
-        
+
         return [
             'total_variants' => $variants->count(),
             'in_stock' => $variants->where('available_quantity', '>', 0)->count(),

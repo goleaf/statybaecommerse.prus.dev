@@ -14,8 +14,9 @@ final class TurkeyCitiesSeeder extends Seeder
     public function run(): void
     {
         $country = Country::where('cca2', 'TR')->first();
-        if (!$country) {
+        if (! $country) {
             $this->command->warn('Turkey country not found. Please run CountrySeeder first.');
+
             return;
         }
 

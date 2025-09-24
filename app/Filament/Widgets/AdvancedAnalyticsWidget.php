@@ -1,26 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\AnalyticsEvent;
-use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
-use App\Models\CampaignView;
 use App\Models\Order;
-use App\Models\Product;
-use App\Models\RecommendationAnalytics;
 use App\Models\User;
-use App\Models\UserBehavior;
-use App\Models\VariantAnalytics;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 class AdvancedAnalyticsWidget extends ChartWidget
 {
     protected ?string $heading = 'Advanced Analytics Dashboard';
+
     protected static ?int $sort = 2;
+
     protected int|string|array $columnSpan = 'full';
+
     protected ?string $maxHeight = '400px';
 
     public function getData(): array

@@ -18,7 +18,7 @@ final class CanadaCitiesSeeder extends Seeder
         $naZone = Zone::where('code', 'NA')->first();
 
         // Regions are no longer used in the database schema
-        
+
         $cities = [
             // Ontario
             [
@@ -32,8 +32,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['M5H 2N2', 'M5B 2C3', 'M5G 1X5'],
                 'translations' => [
                     'lt' => ['name' => 'Torontas', 'description' => 'Kanados sostinė'],
-                    'en' => ['name' => 'Toronto', 'description' => 'Capital of Canada']
-            ],
+                    'en' => ['name' => 'Toronto', 'description' => 'Capital of Canada'],
+                ],
             ],
             [
                 'name' => 'Ottawa',
@@ -44,8 +44,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['K1A 0A6', 'K1P 1J1', 'K2P 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Otava', 'description' => 'Federacinė sostinė'],
-                    'en' => ['name' => 'Ottawa', 'description' => 'Federal capital']
-            ],
+                    'en' => ['name' => 'Ottawa', 'description' => 'Federal capital'],
+                ],
             ],
             [
                 'name' => 'Hamilton',
@@ -56,8 +56,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['L8P 4X3', 'L8L 4X3', 'L8M 1X3'],
                 'translations' => [
                     'lt' => ['name' => 'Hamiltonas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Hamilton', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Hamilton', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'London',
@@ -68,8 +68,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['N6A 3K7', 'N6B 1A1', 'N6C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Londonas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'London', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'London', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Kitchener',
@@ -80,8 +80,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['N2G 1A1', 'N2H 1A1', 'N2K 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Kitcheneris', 'description' => 'Technologijų centras'],
-                    'en' => ['name' => 'Kitchener', 'description' => 'Technology center']
-            ],
+                    'en' => ['name' => 'Kitchener', 'description' => 'Technology center'],
+                ],
             ],
             // Quebec
             [
@@ -93,8 +93,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['H1A 0A1', 'H2A 1A1', 'H3A 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Monrealis', 'description' => 'Kvebeko sostinė'],
-                    'en' => ['name' => 'Montreal', 'description' => 'Capital of Quebec']
-            ],
+                    'en' => ['name' => 'Montreal', 'description' => 'Capital of Quebec'],
+                ],
             ],
             [
                 'name' => 'Quebec City',
@@ -105,8 +105,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['G1A 1A1', 'G1B 1A1', 'G1C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Kvebeko miestas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Quebec City', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Quebec City', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Laval',
@@ -117,8 +117,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['H7A 1A1', 'H7B 1A1', 'H7C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Laval', 'description' => 'Monrealio priemiestis'],
-                    'en' => ['name' => 'Laval', 'description' => 'Montreal suburb']
-            ],
+                    'en' => ['name' => 'Laval', 'description' => 'Montreal suburb'],
+                ],
             ],
             // British Columbia
             [
@@ -130,8 +130,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['V6B 1A1', 'V6C 1A1', 'V6E 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Vankuveris', 'description' => 'Pajūrio miestas'],
-                    'en' => ['name' => 'Vancouver', 'description' => 'Seaside city']
-            ],
+                    'en' => ['name' => 'Vancouver', 'description' => 'Seaside city'],
+                ],
             ],
             [
                 'name' => 'Victoria',
@@ -142,8 +142,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['V8W 1A1', 'V8V 1A1', 'V8T 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Viktorija', 'description' => 'Britų Kolumbijos sostinė'],
-                    'en' => ['name' => 'Victoria', 'description' => 'Capital of British Columbia']
-            ],
+                    'en' => ['name' => 'Victoria', 'description' => 'Capital of British Columbia'],
+                ],
             ],
             [
                 'name' => 'Surrey',
@@ -154,8 +154,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['V3S 1A1', 'V3T 1A1', 'V3V 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Saris', 'description' => 'Vankuverio priemiestis'],
-                    'en' => ['name' => 'Surrey', 'description' => 'Vancouver suburb']
-            ],
+                    'en' => ['name' => 'Surrey', 'description' => 'Vancouver suburb'],
+                ],
             ],
             // Alberta
             [
@@ -167,8 +167,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['T2P 1A1', 'T2R 1A1', 'T2S 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Kalgaris', 'description' => 'Naftos pramonės centras'],
-                    'en' => ['name' => 'Calgary', 'description' => 'Oil industry center']
-            ],
+                    'en' => ['name' => 'Calgary', 'description' => 'Oil industry center'],
+                ],
             ],
             [
                 'name' => 'Edmonton',
@@ -179,8 +179,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['T5J 1A1', 'T5K 1A1', 'T5L 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Edmontonas', 'description' => 'Albertos sostinė'],
-                    'en' => ['name' => 'Edmonton', 'description' => 'Capital of Alberta']
-            ],
+                    'en' => ['name' => 'Edmonton', 'description' => 'Capital of Alberta'],
+                ],
             ],
             // Manitoba
             [
@@ -192,8 +192,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['R3C 1A1', 'R3E 1A1', 'R3G 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Vinipegas', 'description' => 'Manitobos sostinė'],
-                    'en' => ['name' => 'Winnipeg', 'description' => 'Capital of Manitoba']
-            ],
+                    'en' => ['name' => 'Winnipeg', 'description' => 'Capital of Manitoba'],
+                ],
             ],
             // Saskatchewan
             [
@@ -205,8 +205,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['S7K 1A1', 'S7L 1A1', 'S7M 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Saskatonas', 'description' => 'Didžiausias Saskatchevano miestas'],
-                    'en' => ['name' => 'Saskatoon', 'description' => 'Largest city in Saskatchewan']
-            ],
+                    'en' => ['name' => 'Saskatoon', 'description' => 'Largest city in Saskatchewan'],
+                ],
             ],
             [
                 'name' => 'Regina',
@@ -217,8 +217,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['S4P 1A1', 'S4R 1A1', 'S4S 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Regina', 'description' => 'Saskatchevano sostinė'],
-                    'en' => ['name' => 'Regina', 'description' => 'Capital of Saskatchewan']
-            ],
+                    'en' => ['name' => 'Regina', 'description' => 'Capital of Saskatchewan'],
+                ],
             ],
             // Nova Scotia
             [
@@ -230,8 +230,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['B3H 1A1', 'B3J 1A1', 'B3K 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Halifaksas', 'description' => 'Naujosios Škotijos sostinė'],
-                    'en' => ['name' => 'Halifax', 'description' => 'Capital of Nova Scotia']
-            ],
+                    'en' => ['name' => 'Halifax', 'description' => 'Capital of Nova Scotia'],
+                ],
             ],
             // New Brunswick
             [
@@ -243,8 +243,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['E1C 1A1', 'E1E 1A1', 'E1G 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Monktonas', 'description' => 'Naujojo Brunsviko centras'],
-                    'en' => ['name' => 'Moncton', 'description' => 'Center of New Brunswick']
-            ],
+                    'en' => ['name' => 'Moncton', 'description' => 'Center of New Brunswick'],
+                ],
             ],
             [
                 'name' => 'Saint John',
@@ -255,8 +255,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['E2L 1A1', 'E2M 1A1', 'E2N 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Sent Džonas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Saint John', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Saint John', 'description' => 'Port city'],
+                ],
             ],
             // Newfoundland and Labrador
             [
@@ -268,8 +268,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['A1A 1A1', 'A1B 1A1', 'A1C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Sent Džonsas', 'description' => 'Niufaundlando sostinė'],
-                    'en' => ['name' => "St. John's", 'description' => 'Capital of Newfoundland']
-            ],
+                    'en' => ['name' => "St. John's", 'description' => 'Capital of Newfoundland'],
+                ],
             ],
             // Prince Edward Island
             [
@@ -281,8 +281,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['C1A 1A1', 'C1B 1A1', 'C1C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Šarlotetaunas', 'description' => 'Princo Edvardo salos sostinė'],
-                    'en' => ['name' => 'Charlottetown', 'description' => 'Capital of Prince Edward Island']
-            ],
+                    'en' => ['name' => 'Charlottetown', 'description' => 'Capital of Prince Edward Island'],
+                ],
             ],
             // Additional Ontario cities
             [
@@ -294,8 +294,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['L5A 1A1', 'L5B 1A1', 'L5C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Misisauga', 'description' => 'Toronto priemiestis'],
-                    'en' => ['name' => 'Mississauga', 'description' => 'Toronto suburb']
-            ],
+                    'en' => ['name' => 'Mississauga', 'description' => 'Toronto suburb'],
+                ],
             ],
             [
                 'name' => 'Brampton',
@@ -306,8 +306,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['L6T 1A1', 'L6V 1A1', 'L6W 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Bramptonas', 'description' => 'Daugiakultūris miestas'],
-                    'en' => ['name' => 'Brampton', 'description' => 'Multicultural city']
-            ],
+                    'en' => ['name' => 'Brampton', 'description' => 'Multicultural city'],
+                ],
             ],
             [
                 'name' => 'Markham',
@@ -318,8 +318,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['L3R 1A1', 'L3S 1A1', 'L3T 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Markhamas', 'description' => 'Technologijų centras'],
-                    'en' => ['name' => 'Markham', 'description' => 'Technology center']
-            ],
+                    'en' => ['name' => 'Markham', 'description' => 'Technology center'],
+                ],
             ],
             [
                 'name' => 'Vaughan',
@@ -330,8 +330,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['L4J 1A1', 'L4K 1A1', 'L4L 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Vaughanas', 'description' => 'Gyvenamasis rajonas'],
-                    'en' => ['name' => 'Vaughan', 'description' => 'Residential area']
-            ],
+                    'en' => ['name' => 'Vaughan', 'description' => 'Residential area'],
+                ],
             ],
             [
                 'name' => 'Windsor',
@@ -342,8 +342,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['N8X 1A1', 'N8Y 1A1', 'N9A 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Vindsoras', 'description' => 'Automobilių pramonės centras'],
-                    'en' => ['name' => 'Windsor', 'description' => 'Automotive industry center']
-            ],
+                    'en' => ['name' => 'Windsor', 'description' => 'Automotive industry center'],
+                ],
             ],
             [
                 'name' => 'Richmond Hill',
@@ -354,8 +354,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['L4B 1A1', 'L4C 1A1', 'L4E 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Ričmondo kalva', 'description' => 'Prabangus rajonas'],
-                    'en' => ['name' => 'Richmond Hill', 'description' => 'Upscale area']
-            ],
+                    'en' => ['name' => 'Richmond Hill', 'description' => 'Upscale area'],
+                ],
             ],
             [
                 'name' => 'Oakville',
@@ -366,8 +366,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['L6H 1A1', 'L6J 1A1', 'L6K 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Okvilis', 'description' => 'Pajūrio miestas'],
-                    'en' => ['name' => 'Oakville', 'description' => 'Lakeside city']
-            ],
+                    'en' => ['name' => 'Oakville', 'description' => 'Lakeside city'],
+                ],
             ],
             // Additional Quebec cities
             [
@@ -379,8 +379,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['J8P 1A1', 'J8R 1A1', 'J8T 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Gatino', 'description' => 'Otavos priemiestis'],
-                    'en' => ['name' => 'Gatineau', 'description' => 'Ottawa suburb']
-            ],
+                    'en' => ['name' => 'Gatineau', 'description' => 'Ottawa suburb'],
+                ],
             ],
             [
                 'name' => 'Longueuil',
@@ -391,8 +391,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['J4G 1A1', 'J4H 1A1', 'J4J 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Longejilis', 'description' => 'Monrealio priemiestis'],
-                    'en' => ['name' => 'Longueuil', 'description' => 'Montreal suburb']
-            ],
+                    'en' => ['name' => 'Longueuil', 'description' => 'Montreal suburb'],
+                ],
             ],
             [
                 'name' => 'Sherbrooke',
@@ -403,8 +403,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['J1E 1A1', 'J1G 1A1', 'J1H 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Šerbrukas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Sherbrooke', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Sherbrooke', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Saguenay',
@@ -415,8 +415,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['G7B 1A1', 'G7H 1A1', 'G7J 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Saguenė', 'description' => 'Aliuminio pramonės centras'],
-                    'en' => ['name' => 'Saguenay', 'description' => 'Aluminum industry center']
-            ],
+                    'en' => ['name' => 'Saguenay', 'description' => 'Aluminum industry center'],
+                ],
             ],
             // Additional British Columbia cities
             [
@@ -428,8 +428,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['V5A 1A1', 'V5B 1A1', 'V5C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Bernabis', 'description' => 'Vankuverio priemiestis'],
-                    'en' => ['name' => 'Burnaby', 'description' => 'Vancouver suburb']
-            ],
+                    'en' => ['name' => 'Burnaby', 'description' => 'Vancouver suburb'],
+                ],
             ],
             [
                 'name' => 'Richmond',
@@ -440,8 +440,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['V6V 1A1', 'V6W 1A1', 'V6X 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Ričmondas', 'description' => 'Azijiečių bendruomenės centras'],
-                    'en' => ['name' => 'Richmond', 'description' => 'Asian community center']
-            ],
+                    'en' => ['name' => 'Richmond', 'description' => 'Asian community center'],
+                ],
             ],
             [
                 'name' => 'Abbotsford',
@@ -452,8 +452,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['V2S 1A1', 'V2T 1A1', 'V2V 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Abotfordas', 'description' => 'Žemės ūkio centras'],
-                    'en' => ['name' => 'Abbotsford', 'description' => 'Agricultural center']
-            ],
+                    'en' => ['name' => 'Abbotsford', 'description' => 'Agricultural center'],
+                ],
             ],
             [
                 'name' => 'Coquitlam',
@@ -464,8 +464,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['V3B 1A1', 'V3C 1A1', 'V3E 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Kokvitlamas', 'description' => 'Šeimyninis rajonas'],
-                    'en' => ['name' => 'Coquitlam', 'description' => 'Family area']
-            ],
+                    'en' => ['name' => 'Coquitlam', 'description' => 'Family area'],
+                ],
             ],
             // Additional Alberta cities
             [
@@ -477,8 +477,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['T4N 1A1', 'T4P 1A1', 'T4R 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Raudonoji elnia', 'description' => 'Transporto mazgas'],
-                    'en' => ['name' => 'Red Deer', 'description' => 'Transportation hub']
-            ],
+                    'en' => ['name' => 'Red Deer', 'description' => 'Transportation hub'],
+                ],
             ],
             [
                 'name' => 'Lethbridge',
@@ -489,8 +489,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['T1H 1A1', 'T1J 1A1', 'T1K 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Letbridžas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Lethbridge', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Lethbridge', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'St. Albert',
@@ -501,8 +501,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['T8N 1A1', 'T8R 1A1', 'T8S 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Sent Albertas', 'description' => 'Edmonton priemiestis'],
-                    'en' => ['name' => 'St. Albert', 'description' => 'Edmonton suburb']
-            ],
+                    'en' => ['name' => 'St. Albert', 'description' => 'Edmonton suburb'],
+                ],
             ],
             // Additional Manitoba cities
             [
@@ -514,8 +514,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['R7A 1A1', 'R7B 1A1', 'R7C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Brandonas', 'description' => 'Žemės ūkio centras'],
-                    'en' => ['name' => 'Brandon', 'description' => 'Agricultural center']
-            ],
+                    'en' => ['name' => 'Brandon', 'description' => 'Agricultural center'],
+                ],
             ],
             [
                 'name' => 'Steinbach',
@@ -526,8 +526,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['R5G 1A1', 'R5H 1A1', 'R5J 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Šteinbachas', 'description' => 'Mennonitų bendruomenės centras'],
-                    'en' => ['name' => 'Steinbach', 'description' => 'Mennonite community center']
-            ],
+                    'en' => ['name' => 'Steinbach', 'description' => 'Mennonite community center'],
+                ],
             ],
             // Additional Saskatchewan cities
             [
@@ -539,8 +539,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['S6V 1A1', 'S6W 1A1', 'S6X 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Princo Albertas', 'description' => 'Šiaurės centras'],
-                    'en' => ['name' => 'Prince Albert', 'description' => 'Northern center']
-            ],
+                    'en' => ['name' => 'Prince Albert', 'description' => 'Northern center'],
+                ],
             ],
             [
                 'name' => 'Moose Jaw',
@@ -551,8 +551,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['S6H 1A1', 'S6J 1A1', 'S6K 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Muso žandas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Moose Jaw', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Moose Jaw', 'description' => 'Historic city'],
+                ],
             ],
             // Additional Nova Scotia cities
             [
@@ -564,8 +564,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['B2W 1A1', 'B2X 1A1', 'B2Y 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Dartmutas', 'description' => 'Halifakso priemiestis'],
-                    'en' => ['name' => 'Dartmouth', 'description' => 'Halifax suburb']
-            ],
+                    'en' => ['name' => 'Dartmouth', 'description' => 'Halifax suburb'],
+                ],
             ],
             [
                 'name' => 'Sydney',
@@ -576,8 +576,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['B1P 1A1', 'B1R 1A1', 'B1S 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Sidnis', 'description' => 'Kep Bruetono centras'],
-                    'en' => ['name' => 'Sydney', 'description' => 'Cape Breton center']
-            ],
+                    'en' => ['name' => 'Sydney', 'description' => 'Cape Breton center'],
+                ],
             ],
             // Additional New Brunswick cities
             [
@@ -589,8 +589,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['E3A 1A1', 'E3B 1A1', 'E3C 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Frederiktonas', 'description' => 'Naujojo Brunsviko sostinė'],
-                    'en' => ['name' => 'Fredericton', 'description' => 'Capital of New Brunswick']
-            ],
+                    'en' => ['name' => 'Fredericton', 'description' => 'Capital of New Brunswick'],
+                ],
             ],
             [
                 'name' => 'Dieppe',
@@ -601,8 +601,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['E1A 1A1', 'E1B 1A1', 'E1D 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Diepė', 'description' => 'Francų bendruomenės centras'],
-                    'en' => ['name' => 'Dieppe', 'description' => 'French community center']
-            ],
+                    'en' => ['name' => 'Dieppe', 'description' => 'French community center'],
+                ],
             ],
             // Additional Newfoundland cities
             [
@@ -614,8 +614,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['A1N 1A1', 'A1P 1A1', 'A1R 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Perlo kalnas', 'description' => 'Sent Džonso priemiestis'],
-                    'en' => ['name' => 'Mount Pearl', 'description' => 'St. John\'s suburb']
-            ],
+                    'en' => ['name' => 'Mount Pearl', 'description' => 'St. John\'s suburb'],
+                ],
             ],
             [
                 'name' => 'Corner Brook',
@@ -626,8 +626,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['A2H 1A1', 'A2J 1A1', 'A2K 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Korner brukas', 'description' => 'Vakarų Niufaundlando centras'],
-                    'en' => ['name' => 'Corner Brook', 'description' => 'Western Newfoundland center']
-            ],
+                    'en' => ['name' => 'Corner Brook', 'description' => 'Western Newfoundland center'],
+                ],
             ],
             // Additional Prince Edward Island cities
             [
@@ -639,8 +639,8 @@ final class CanadaCitiesSeeder extends Seeder
                 'postal_codes' => ['C1N 1A1', 'C1P 1A1', 'C1R 1A1'],
                 'translations' => [
                     'lt' => ['name' => 'Samersaidis', 'description' => 'Antrasis didžiausias miestas'],
-                    'en' => ['name' => 'Summerside', 'description' => 'Second largest city']
-            ],
+                    'en' => ['name' => 'Summerside', 'description' => 'Second largest city'],
+                ],
             ],
         ];
 
@@ -649,7 +649,7 @@ final class CanadaCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -669,8 +669,8 @@ final class CanadaCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

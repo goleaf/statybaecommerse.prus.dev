@@ -1,17 +1,18 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Pages\Collection;
 
 use App\Models\Collection as CollectionModel;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+
 /**
  * Index
- * 
+ *
  * Livewire component for Index with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
  */
 #[Layout('components.layouts.base')]
 class Index extends Component

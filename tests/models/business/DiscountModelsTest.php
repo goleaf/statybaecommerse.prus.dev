@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Discount;
 use App\Models\DiscountCode;
@@ -8,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 it('discount relations are defined', function () {
-    $d = new Discount();
+    $d = new Discount;
 
     expect($d->conditions())
         ->toBeInstanceOf(HasMany::class)
@@ -70,7 +72,7 @@ it('discount condition operators behave correctly', function () {
 });
 
 it('discount redemption scopes exist', function () {
-    $r = new DiscountRedemption();
+    $r = new DiscountRedemption;
     expect(method_exists($r, 'scopeForDiscount'))
         ->toBeTrue()
         ->and(method_exists($r, 'scopeForUser'))

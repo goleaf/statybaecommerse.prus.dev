@@ -1,7 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\NewsResource;
-use App\Models\News;
 use App\Models\User;
 
 it('can access news resource', function () {
@@ -12,4 +13,3 @@ it('can access news resource', function () {
         ->get(NewsResource::getUrl('index'))
         ->assertStatus(200);
 });
-

@@ -29,28 +29,30 @@ class PHPDocCleanCommand extends Command
         $this->newLine();
 
         $docsDir = base_path('docs');
-        
-        if (!File::exists($docsDir)) {
+
+        if (! File::exists($docsDir)) {
             $this->info('✅ No documentation directory found. Nothing to clean.');
+
             return Command::SUCCESS;
         }
 
         // Show what will be deleted
         $this->showDirectoryContents($docsDir);
 
-        if (!$this->option('force')) {
-            if (!$this->confirm('Are you sure you want to delete all documentation files?')) {
+        if (! $this->option('force')) {
+            if (! $this->confirm('Are you sure you want to delete all documentation files?')) {
                 $this->info('❌ Clean operation cancelled.');
+
                 return Command::SUCCESS;
             }
         }
 
         // Delete the docs directory
         File::deleteDirectory($docsDir);
-        
+
         $this->info('✅ Documentation cleaned successfully!');
         $this->line('📂 Removed: docs/');
-        
+
         return Command::SUCCESS;
     }
 
@@ -60,7 +62,7 @@ class PHPDocCleanCommand extends Command
     private function showDirectoryContents(string $directory): void
     {
         $this->line('📁 Directory contents to be deleted:');
-        
+
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::SELF_FIRST
@@ -70,8 +72,8 @@ class PHPDocCleanCommand extends Command
         $dirCount = 0;
 
         foreach ($iterator as $item) {
-            $relativePath = str_replace($directory . '/', '', $item->getPathname());
-            
+            $relativePath = str_replace($directory.'/', '', $item->getPathname());
+
             if ($item->isDir()) {
                 $this->line("  📁 {$relativePath}/");
                 $dirCount++;

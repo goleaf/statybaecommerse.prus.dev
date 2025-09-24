@@ -13,19 +13,19 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     // Create test data
     $this->brand = Brand::factory()->create(['name' => 'Test Brand', 'is_enabled' => true]);
-    
+
     $this->categoryWithProducts = Category::factory()->create([
         'name' => 'Electronics',
         'description' => 'Electronic devices and gadgets',
         'is_visible' => true,
     ]);
-    
+
     $this->categoryWithoutProducts = Category::factory()->create([
         'name' => 'Books',
         'description' => 'Books and literature',
         'is_visible' => true,
     ]);
-    
+
     // Create products for the first category
     Product::factory()->count(3)->create([
         'brand_id' => $this->brand->id,
@@ -105,15 +105,15 @@ it('sorts categories by product count descending', function () {
 it('resets pagination when filters change', function () {
     // Create many categories to trigger pagination
     Category::factory()->count(15)->create(['is_visible' => true]);
-    
+
     $component = livewire(Index::class);
-    
+
     // Go to page 2
     $component->set('page', 2);
-    
+
     // Change filter - should reset to page 1
     $component->fillForm(['search' => 'test']);
-    
+
     expect($component->get('page'))->toBe(1);
 });
 
@@ -131,7 +131,7 @@ it('persists filters in URL', function () {
 
 it('shows empty state when no categories found', function () {
     Category::query()->delete();
-    
+
     livewire(Index::class)
         ->assertSee(__('No categories available'))
         ->assertSee(__('Categories will appear here once they are added'));
@@ -161,7 +161,7 @@ it('has proper form field attributes', function () {
 
 it('loads brands for filter dropdown', function () {
     $component = livewire(Index::class);
-    
+
     expect($component->get('brands'))->toHaveCount(1);
     expect($component->get('brands')->first()->name)->toBe('Test Brand');
 });

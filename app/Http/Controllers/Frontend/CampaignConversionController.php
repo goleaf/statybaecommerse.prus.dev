@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
@@ -9,18 +10,16 @@ use App\Models\CampaignConversion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 /**
  * CampaignConversionController
- * 
+ *
  * HTTP controller handling CampaignConversionController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class CampaignConversionController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -59,22 +58,22 @@ final class CampaignConversionController extends Controller
         $statuses = CampaignConversion::distinct()->pluck('status');
         $deviceTypes = CampaignConversion::distinct()->pluck('device_type');
         $sources = CampaignConversion::distinct()->pluck('source');
+
         return view('campaign-conversions.index', compact('conversions', 'campaigns', 'conversionTypes', 'statuses', 'deviceTypes', 'sources'));
     }
+
     /**
      * Display the specified resource with related data.
-     * @param CampaignConversion $campaignConversion
-     * @return View
      */
     public function show(CampaignConversion $campaignConversion): View
     {
         $campaignConversion->load(['campaign', 'customer', 'order']);
+
         return view('campaign-conversions.show', compact('campaignConversion'));
     }
+
     /**
      * Handle analytics functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function analytics(Request $request): JsonResponse
     {
@@ -95,11 +94,13 @@ final class CampaignConversionController extends Controller
         })->map(function ($group) {
             return ['count' => $group->count(), 'value' => $group->sum('conversion_value')];
         })];
+
         return response()->json($analytics);
     }
+
     /**
      * Handle export functionality with proper error handling.
-     * @param Request $request
+     *
      * @return Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
@@ -128,7 +129,8 @@ final class CampaignConversionController extends Controller
             $query->where('converted_at', '<=', $request->date_to);
         }
         $conversions = $query->get();
-        $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="campaign_conversions_' . now()->format('Y-m-d_H-i-s') . '.csv"'];
+        $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="campaign_conversions_'.now()->format('Y-m-d_H-i-s').'.csv"'];
+
         return response()->stream(function () use ($conversions) {
             $handle = fopen('php://output', 'w');
             // CSV headers
@@ -140,9 +142,9 @@ final class CampaignConversionController extends Controller
             fclose($handle);
         }, 200, $headers);
     }
+
     /**
      * Show the form for creating a new resource.
-     * @return View
      */
     public function create(): View
     {
@@ -150,23 +152,25 @@ final class CampaignConversionController extends Controller
         $conversionTypes = ['purchase' => __('campaign_conversions.conversion_types.purchase'), 'signup' => __('campaign_conversions.conversion_types.signup'), 'download' => __('campaign_conversions.conversion_types.download'), 'lead' => __('campaign_conversions.conversion_types.lead'), 'subscription' => __('campaign_conversions.conversion_types.subscription'), 'trial' => __('campaign_conversions.conversion_types.trial'), 'custom' => __('campaign_conversions.conversion_types.custom')];
         $statuses = ['pending' => __('campaign_conversions.statuses.pending'), 'completed' => __('campaign_conversions.statuses.completed'), 'cancelled' => __('campaign_conversions.statuses.cancelled'), 'refunded' => __('campaign_conversions.statuses.refunded')];
         $deviceTypes = ['mobile' => __('campaign_conversions.device_types.mobile'), 'tablet' => __('campaign_conversions.device_types.tablet'), 'desktop' => __('campaign_conversions.device_types.desktop')];
+
         return view('campaign-conversions.create', compact('campaigns', 'conversionTypes', 'statuses', 'deviceTypes'));
     }
+
     /**
      * Store a newly created resource in storage with validation.
-     * @param Request $request
+     *
      * @return Illuminate\Http\RedirectResponse
      */
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate(['campaign_id' => 'required|exists:discount_campaigns,id', 'conversion_type' => 'required|string|max:255', 'conversion_value' => 'required|numeric|min:0', 'status' => 'required|string|max:255', 'converted_at' => 'required|date', 'source' => 'nullable|string|max:255', 'medium' => 'nullable|string|max:255', 'device_type' => 'nullable|string|max:255', 'country' => 'nullable|string|max:255', 'city' => 'nullable|string|max:255', 'notes' => 'nullable|string', 'tags' => 'nullable|array', 'custom_attributes' => 'nullable|array']);
         $conversion = CampaignConversion::create($validated);
+
         return redirect()->route('frontend.campaign-conversions.show', $conversion)->with('success', __('campaign_conversions.messages.created_successfully'));
     }
+
     /**
      * Show the form for editing the specified resource.
-     * @param CampaignConversion $campaignConversion
-     * @return View
      */
     public function edit(CampaignConversion $campaignConversion): View
     {
@@ -174,28 +178,32 @@ final class CampaignConversionController extends Controller
         $conversionTypes = ['purchase' => __('campaign_conversions.conversion_types.purchase'), 'signup' => __('campaign_conversions.conversion_types.signup'), 'download' => __('campaign_conversions.conversion_types.download'), 'lead' => __('campaign_conversions.conversion_types.lead'), 'subscription' => __('campaign_conversions.conversion_types.subscription'), 'trial' => __('campaign_conversions.conversion_types.trial'), 'custom' => __('campaign_conversions.conversion_types.custom')];
         $statuses = ['pending' => __('campaign_conversions.statuses.pending'), 'completed' => __('campaign_conversions.statuses.completed'), 'cancelled' => __('campaign_conversions.statuses.cancelled'), 'refunded' => __('campaign_conversions.statuses.refunded')];
         $deviceTypes = ['mobile' => __('campaign_conversions.device_types.mobile'), 'tablet' => __('campaign_conversions.device_types.tablet'), 'desktop' => __('campaign_conversions.device_types.desktop')];
+
         return view('campaign-conversions.edit', compact('campaignConversion', 'campaigns', 'conversionTypes', 'statuses', 'deviceTypes'));
     }
+
     /**
      * Update the specified resource in storage with validation.
-     * @param Request $request
-     * @param CampaignConversion $campaignConversion
+     *
      * @return Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, CampaignConversion $campaignConversion): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate(['campaign_id' => 'required|exists:discount_campaigns,id', 'conversion_type' => 'required|string|max:255', 'conversion_value' => 'required|numeric|min:0', 'status' => 'required|string|max:255', 'converted_at' => 'required|date', 'source' => 'nullable|string|max:255', 'medium' => 'nullable|string|max:255', 'device_type' => 'nullable|string|max:255', 'country' => 'nullable|string|max:255', 'city' => 'nullable|string|max:255', 'notes' => 'nullable|string', 'tags' => 'nullable|array', 'custom_attributes' => 'nullable|array']);
         $campaignConversion->update($validated);
+
         return redirect()->route('frontend.campaign-conversions.show', $campaignConversion)->with('success', __('campaign_conversions.messages.updated_successfully'));
     }
+
     /**
      * Remove the specified resource from storage.
-     * @param CampaignConversion $campaignConversion
+     *
      * @return Illuminate\Http\RedirectResponse
      */
     public function destroy(CampaignConversion $campaignConversion): \Illuminate\Http\RedirectResponse
     {
         $campaignConversion->delete();
+
         return redirect()->route('frontend.campaign-conversions.index')->with('success', __('campaign_conversions.messages.deleted_successfully'));
     }
 }

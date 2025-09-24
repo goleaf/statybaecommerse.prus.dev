@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers;
 
@@ -13,26 +15,26 @@ final class ExistsOrServiceProvider extends ServiceProvider
         // Register existsOr macro for Builder
         Builder::macro('existsOr', function (callable $existsCallback, ?callable $notExistsCallback = null): bool {
             $exists = $this->exists();
-            
+
             if ($exists) {
                 $existsCallback();
             } elseif ($notExistsCallback) {
                 $notExistsCallback();
             }
-            
+
             return $exists;
         });
 
         // Register existsOr macro for Relation
         Relation::macro('existsOr', function (callable $existsCallback, ?callable $notExistsCallback = null): bool {
             $exists = $this->exists();
-            
+
             if ($exists) {
                 $existsCallback();
             } elseif ($notExistsCallback) {
                 $notExistsCallback();
             }
-            
+
             return $exists;
         });
     }

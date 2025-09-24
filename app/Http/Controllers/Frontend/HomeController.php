@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -13,4 +15,3 @@ final class HomeController extends Controller
         return response()->json(['message' => 'Homepage not implemented yet']);
     }
 }
-

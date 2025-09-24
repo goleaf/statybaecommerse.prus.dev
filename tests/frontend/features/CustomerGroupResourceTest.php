@@ -1,10 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\CustomerGroupResource;
 use App\Models\CustomerGroup;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
-use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing};
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
     Role::findOrCreate('admin', 'web');
@@ -106,7 +111,7 @@ it('can filter active customer groups', function () {
     $inactiveGroup = CustomerGroup::factory()->create(['is_active' => false]);
 
     actingAs($this->admin)
-        ->get(CustomerGroupResource::getUrl('index') . '?filter[active]=1')
+        ->get(CustomerGroupResource::getUrl('index').'?filter[active]=1')
         ->assertSuccessful()
         ->assertSeeText($activeGroup->name)
         ->assertDontSeeText($inactiveGroup->name);

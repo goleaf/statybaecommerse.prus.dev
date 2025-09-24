@@ -14,8 +14,9 @@ final class AustraliaCitiesSeeder extends Seeder
     public function run(): void
     {
         $country = Country::where('cca2', 'AU')->first();
-        if (!$country) {
+        if (! $country) {
             $this->command->warn('Australia country not found. Please run CountrySeeder first.');
+
             return;
         }
 

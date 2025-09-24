@@ -4,12 +4,12 @@ return [
     'title' => 'Skaidrių valdymas',
     'plural' => 'Skaidrės',
     'single' => 'Skaidrė',
-    
+
     'basic_information' => 'Pagrindinė informacija',
     'media' => 'Medija',
     'appearance' => 'Išvaizda',
     'settings' => 'Nustatymai',
-    
+
     'title' => 'Pavadinimas',
     'description' => 'Aprašymas',
     'button_text' => 'Mygtuko tekstas',

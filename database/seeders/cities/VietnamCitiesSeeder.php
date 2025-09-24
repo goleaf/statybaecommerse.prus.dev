@@ -14,8 +14,9 @@ final class VietnamCitiesSeeder extends Seeder
     public function run(): void
     {
         $country = Country::where('cca2', 'VN')->first();
-        if (!$country) {
+        if (! $country) {
             $this->command->warn('Vietnam country not found. Please run CountrySeeder first.');
+
             return;
         }
 

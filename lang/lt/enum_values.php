@@ -1,0 +1,57 @@
+<?php
+
+return [
+    'title' => 'Enum Reikšmės',
+    'plural' => 'Enum Reikšmės',
+    'single' => 'Enum Reikšmė',
+    'fields' => [
+        'type' => 'Tipas',
+        'key' => 'Raktas',
+        'value' => 'Reikšmė',
+        'name' => 'Pavadinimas',
+        'description' => 'Aprašymas',
+        'sort_order' => 'Rikiavimo Eiliškumas',
+        'is_active' => 'Ar Aktyvus',
+        'is_default' => 'Ar Pagal nutylėjimą',
+        'metadata' => 'Metaduomenys',
+        'metadata_key' => 'Metaduomenų Raktas',
+        'metadata_value' => 'Metaduomenų Reikšmė',
+        'usage_count' => 'Naudojimų Skaičius',
+        'formatted_value' => 'Suformatuota Reikšmė',
+        'created_at' => 'Sukurta',
+        'updated_at' => 'Atnaujinta',
+    ],
+    'types' => [
+        'product_status' => 'Produkto Būsena',
+        'order_status' => 'Užsakymo Būsena',
+        'payment_status' => 'Mokėjimo Būsena',
+        'shipping_status' => 'Pristatymo Būsena',
+        'user_role' => 'Vartotojo Rolė',
+        'notification_type' => 'Pranešimo Tipas',
+        'campaign_status' => 'Kampanijos Būsena',
+        'discount_type' => 'Nuolaidos Tipas',
+        'inventory_status' => 'Inventoriaus Būsena',
+        'review_status' => 'Atsiliepimo Būsena',
+    ],
+    'filters' => [
+        'type' => 'Tipas',
+        'is_active' => 'Ar Aktyvus',
+        'is_default' => 'Ar Pagal nutylėjimą',
+    ],
+    'actions' => [
+        'activate' => 'Aktyvuoti',
+        'deactivate' => 'Deaktyvuoti',
+        'set_default' => 'Nustatyti pagal nutylėjimą',
+    ],
+    'notifications' => [
+        'activated' => 'Enum reikšmės buvo aktyvuotos.',
+        'deactivated' => 'Enum reikšmės buvo deaktyvuotos.',
+        'default_set' => 'Pagal nutylėjimą enum reikšmės buvo nustatytos.',
+    ],
+    'messages' => [
+        'created' => 'Enum reikšmė buvo sėkmingai sukurta.',
+        'updated' => 'Enum reikšmė buvo sėkmingai atnaujinta.',
+        'deleted' => 'Enum reikšmė buvo sėkmingai ištrinta.',
+        'bulk_deleted' => 'Pasirinktos enum reikšmės buvo sėkmingai ištrintos.',
+    ],
+];

@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 // use App\Models\Scopes\ActiveScope;
 // use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 // use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -106,7 +108,7 @@ final class ShippingOption extends Model
      */
     public function getFormattedPriceAttribute(): string
     {
-        return number_format((float) $this->price, 2) . ' ' . $this->currency_code;
+        return number_format((float) $this->price, 2).' '.$this->currency_code;
     }
 
     /**
@@ -116,10 +118,12 @@ final class ShippingOption extends Model
     {
         if ($this->estimated_days_min && $this->estimated_days_max) {
             if ($this->estimated_days_min === $this->estimated_days_max) {
-                return $this->estimated_days_min . ' ' . __('days');
+                return $this->estimated_days_min.' '.__('days');
             }
-            return $this->estimated_days_min . '-' . $this->estimated_days_max . ' ' . __('days');
+
+            return $this->estimated_days_min.'-'.$this->estimated_days_max.' '.__('days');
         }
+
         return __('Standard delivery');
     }
 
@@ -134,6 +138,7 @@ final class ShippingOption extends Model
         if ($this->max_weight && $weight > $this->max_weight) {
             return false;
         }
+
         return true;
     }
 
@@ -148,6 +153,7 @@ final class ShippingOption extends Model
         if ($this->max_order_amount && $amount > $this->max_order_amount) {
             return false;
         }
+
         return true;
     }
 
@@ -156,9 +162,10 @@ final class ShippingOption extends Model
      */
     public function calculatePriceForOrder(float $weight = 0, float $orderAmount = 0): float
     {
-        if (!$this->isEligibleForWeight($weight) || !$this->isEligibleForOrderAmount($orderAmount)) {
+        if (! $this->isEligibleForWeight($weight) || ! $this->isEligibleForOrderAmount($orderAmount)) {
             return 0.0;
         }
+
         return (float) $this->price;
     }
 }

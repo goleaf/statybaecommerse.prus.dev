@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use App\Filament\Resources\CustomerGroupResource\Pages\CreateCustomerGroup;
+use App\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
+use App\Filament\Resources\CustomerGroupResource\Pages\ListCustomerGroups;
+use App\Filament\Resources\CustomerGroupResource\Pages\ViewCustomerGroup;
 use App\Models\CustomerGroup;
 use App\Models\User;
 use Livewire\Livewire;
-use App\Filament\Resources\CustomerGroupResource;
-use App\Filament\Resources\CustomerGroupResource\Pages\ListCustomerGroups;
-use App\Filament\Resources\CustomerGroupResource\Pages\CreateCustomerGroup;
-use App\Filament\Resources\CustomerGroupResource\Pages\ViewCustomerGroup;
-use App\Filament\Resources\CustomerGroupResource\Pages\EditCustomerGroup;
 
 beforeEach(function () {
     $this->adminUser = User::factory()->create(['is_admin' => true]);
@@ -15,7 +16,7 @@ beforeEach(function () {
 
 it('can list customer groups in admin panel', function () {
     $customerGroup = CustomerGroup::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ListCustomerGroups::class)
         ->assertCanSeeTableRecords([$customerGroup]);
@@ -35,13 +36,13 @@ it('can create a new customer group', function () {
         'is_active' => true,
         'is_default' => false,
     ];
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(CreateCustomerGroup::class)
         ->fillForm($customerGroupData)
         ->call('create')
         ->assertHasNoFormErrors();
-        
+
     $this->assertDatabaseHas('customer_groups', [
         'name' => 'VIP Customers',
         'code' => 'VIP',
@@ -59,7 +60,7 @@ it('can create a new customer group', function () {
 
 it('can view a customer group', function () {
     $customerGroup = CustomerGroup::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ViewCustomerGroup::class, ['record' => $customerGroup->id])
         ->assertOk();
@@ -67,7 +68,7 @@ it('can view a customer group', function () {
 
 it('can edit a customer group', function () {
     $customerGroup = CustomerGroup::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(EditCustomerGroup::class, ['record' => $customerGroup->id])
         ->fillForm([
@@ -76,7 +77,7 @@ it('can edit a customer group', function () {
         ])
         ->call('save')
         ->assertHasNoFormErrors();
-        
+
     $this->assertDatabaseHas('customer_groups', [
         'id' => $customerGroup->id,
         'name' => 'Updated Group',
@@ -86,12 +87,12 @@ it('can edit a customer group', function () {
 
 it('can delete a customer group', function () {
     $customerGroup = CustomerGroup::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ListCustomerGroups::class)
         ->callTableAction('delete', $customerGroup)
         ->assertHasNoTableActionErrors();
-    
+
     $this->assertSoftDeleted('customer_groups', [
         'id' => $customerGroup->id,
     ]);
@@ -110,7 +111,7 @@ it('validates required fields when creating customer group', function () {
 
 it('validates unique customer group code', function () {
     $existingGroup = CustomerGroup::factory()->create(['code' => 'UNIQUE']);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(CreateCustomerGroup::class)
         ->fillForm([
@@ -162,7 +163,7 @@ it('validates discount percentage range', function () {
 it('can filter customer groups by active status', function () {
     $activeGroup = CustomerGroup::factory()->create(['is_active' => true]);
     $inactiveGroup = CustomerGroup::factory()->create(['is_active' => false]);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ListCustomerGroups::class)
         ->filterTable('is_active', true)
@@ -173,7 +174,7 @@ it('can filter customer groups by active status', function () {
 it('can filter customer groups by default status', function () {
     $defaultGroup = CustomerGroup::factory()->create(['is_default' => true]);
     $nonDefaultGroup = CustomerGroup::factory()->create(['is_default' => false]);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ListCustomerGroups::class)
         ->filterTable('is_default', true)
@@ -191,7 +192,7 @@ it('shows correct customer group data in table', function () {
         'is_active' => true,
         'is_default' => false,
     ]);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ListCustomerGroups::class)
         ->assertCanSeeTableRecords([$customerGroup])
@@ -207,32 +208,32 @@ it('shows correct customer group data in table', function () {
 
 it('handles customer group activation and deactivation', function () {
     $customerGroup = CustomerGroup::factory()->create(['is_active' => false]);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(EditCustomerGroup::class, ['record' => $customerGroup->id])
         ->fillForm(['is_active' => true])
         ->call('save')
         ->assertHasNoFormErrors();
-        
+
     expect($customerGroup->fresh()->is_active)->toBeTrue();
 });
 
 it('can set default customer group', function () {
     $customerGroup = CustomerGroup::factory()->create(['is_default' => false]);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(EditCustomerGroup::class, ['record' => $customerGroup->id])
         ->fillForm(['is_default' => true])
         ->call('save')
         ->assertHasNoFormErrors();
-        
+
     expect($customerGroup->fresh()->is_default)->toBeTrue();
 });
 
 it('can search customer groups by name', function () {
     $group1 = CustomerGroup::factory()->create(['name' => 'VIP Customers']);
     $group2 = CustomerGroup::factory()->create(['name' => 'Regular Customers']);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ListCustomerGroups::class)
         ->searchTable('VIP')
@@ -243,7 +244,7 @@ it('can search customer groups by name', function () {
 it('can search customer groups by code', function () {
     $group1 = CustomerGroup::factory()->create(['code' => 'VIP']);
     $group2 = CustomerGroup::factory()->create(['code' => 'REG']);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ListCustomerGroups::class)
         ->searchTable('VIP')
@@ -254,16 +255,16 @@ it('can search customer groups by code', function () {
 it('handles bulk actions on customer groups', function () {
     $group1 = CustomerGroup::factory()->create();
     $group2 = CustomerGroup::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(ListCustomerGroups::class)
         ->callTableBulkAction('delete', [$group1->id, $group2->id])
         ->assertOk();
-    
+
     $this->assertSoftDeleted('customer_groups', [
         'id' => $group1->id,
     ]);
-    
+
     $this->assertSoftDeleted('customer_groups', [
         'id' => $group2->id,
     ]);
@@ -278,7 +279,7 @@ it('can create customer group with minimal required fields', function () {
         ])
         ->call('create')
         ->assertHasNoFormErrors();
-        
+
     $this->assertDatabaseHas('customer_groups', [
         'name' => 'Basic Group',
         'code' => 'BASIC',
@@ -287,7 +288,7 @@ it('can create customer group with minimal required fields', function () {
 
 it('can set color and icon for customer group', function () {
     $customerGroup = CustomerGroup::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(EditCustomerGroup::class, ['record' => $customerGroup->id])
         ->fillForm([
@@ -296,7 +297,7 @@ it('can set color and icon for customer group', function () {
         ])
         ->call('save')
         ->assertHasNoFormErrors();
-        
+
     $this->assertDatabaseHas('customer_groups', [
         'id' => $customerGroup->id,
         'color' => '#00ff00',
@@ -306,13 +307,13 @@ it('can set color and icon for customer group', function () {
 
 it('can set description for customer group', function () {
     $customerGroup = CustomerGroup::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(EditCustomerGroup::class, ['record' => $customerGroup->id])
         ->fillForm(['description' => 'This is a test description'])
         ->call('save')
         ->assertHasNoFormErrors();
-        
+
     $this->assertDatabaseHas('customer_groups', [
         'id' => $customerGroup->id,
         'description' => 'This is a test description',
@@ -342,4 +343,3 @@ it('validates credit limit is not negative', function () {
         ->call('create')
         ->assertHasFormErrors(['credit_limit']);
 });
-

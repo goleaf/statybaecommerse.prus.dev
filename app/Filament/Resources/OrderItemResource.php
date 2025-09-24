@@ -1,35 +1,31 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\OrderItemResource\Pages;
-use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 /**
  * OrderItemResource
@@ -38,9 +34,12 @@ use Illuminate\Database\Eloquent\Collection;
  */
 final class OrderItemResource extends Resource
 {
-    protected static ?string $model = OrderItem::class;
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Orders';
+    }
 
-    // protected static $navigationGroup = NavigationGroup::Orders;
+    protected static ?string $model = OrderItem::class;
 
     protected static ?int $navigationSort = 2;
 
@@ -48,7 +47,6 @@ final class OrderItemResource extends Resource
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
      */
     public static function getNavigationLabel(): string
     {
@@ -73,16 +71,14 @@ final class OrderItemResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make(__('orders.sections.order_items'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('order_id')
                                 ->label(__('order_items.order'))
                                 ->relationship('order', 'number')
@@ -106,7 +102,7 @@ final class OrderItemResource extends Resource
                                 }),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('product_variant_id')
                                 ->label(__('order_items.product_variant'))
                                 ->relationship('productVariant', 'name')
@@ -126,7 +122,7 @@ final class OrderItemResource extends Resource
                                 ->maxLength(255),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('sku')
                                 ->label(__('order_items.product_sku'))
                                 ->maxLength(255),
@@ -145,9 +141,9 @@ final class OrderItemResource extends Resource
                         ]),
                 ]),
             Section::make(__('order_items.pricing'))
-                ->components([
+                ->schema([
                     Grid::make(3)
-                        ->components([
+                        ->schema([
                             TextInput::make('unit_price')
                                 ->label(__('order_items.unit_price'))
                                 ->prefix('€')
@@ -179,7 +175,7 @@ final class OrderItemResource extends Resource
                         ]),
                 ]),
             Section::make(__('order_items.additional_information'))
-                ->components([
+                ->schema([
                     Textarea::make('notes')
                         ->label(__('order_items.notes'))
                         ->rows(3)
@@ -190,8 +186,6 @@ final class OrderItemResource extends Resource
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -260,11 +254,11 @@ final class OrderItemResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -283,7 +277,6 @@ final class OrderItemResource extends Resource
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {

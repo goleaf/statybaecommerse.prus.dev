@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Actions;
 
@@ -9,14 +11,15 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 final class VariantBulkPriceUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $user;
+
     private Product $product;
+
     private Collection $variants;
 
     protected function setUp(): void
@@ -325,4 +328,3 @@ final class VariantBulkPriceUpdateTest extends TestCase
         }
     }
 }
-

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\CollectionRuleResource;
 use App\Models\Collection;
@@ -154,7 +156,7 @@ it('can search collection rules by field', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CollectionRuleResource::getUrl('index') . '?search=special')
+        ->get(CollectionRuleResource::getUrl('index').'?search=special')
         ->assertOk();
 });
 
@@ -163,7 +165,7 @@ it('can search collection rules by value', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CollectionRuleResource::getUrl('index') . '?search=special')
+        ->get(CollectionRuleResource::getUrl('index').'?search=special')
         ->assertOk();
 });
 
@@ -173,14 +175,14 @@ it('can sort collection rules by position', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CollectionRuleResource::getUrl('index') . '?sort=position&direction=asc')
+        ->get(CollectionRuleResource::getUrl('index').'?sort=position&direction=asc')
         ->assertOk();
 });
 
 it('can sort collection rules by created date', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(CollectionRuleResource::getUrl('index') . '?sort=created_at&direction=desc')
+        ->get(CollectionRuleResource::getUrl('index').'?sort=created_at&direction=desc')
         ->assertOk();
 });
 
@@ -302,4 +304,3 @@ it('can filter by recent collection rules', function () {
         ->get(CollectionRuleResource::getUrl('index'))
         ->assertOk();
 });
-

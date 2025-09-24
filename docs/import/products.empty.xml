@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <!-- Example product with extended fields -->
+  <product>
+    <id></id>
+    <sku></sku>
+    <slug></slug>
+
+    <!-- Prefer category slugs; IDs allowed for simple cases -->
+    <categories>
+      <category_slug></category_slug>
+    </categories>
+    <category_ids>
+      <category_id></category_id>
+    </category_ids>
+
+    <brand>
+      <brand_slug></brand_slug>
+    </brand>
+
+    <base>
+      <price></price>
+      <sale_price></sale_price>
+      <compare_price></compare_price>
+      <cost_price></cost_price>
+      <currency>EUR</currency>
+      <status>active</status>
+      <brand_id></brand_id>
+      <tax_class></tax_class>
+      <shipping_class></shipping_class>
+      <manage_stock>true</manage_stock>
+      <track_stock>true</track_stock>
+      <allow_backorder>false</allow_backorder>
+      <stock_quantity></stock_quantity>
+      <low_stock_threshold></low_stock_threshold>
+      <minimum_quantity></minimum_quantity>
+      <is_visible>true</is_visible>
+      <is_featured>false</is_featured>
+      <is_requestable>false</is_requestable>
+    </base>
+
+    <dimensions>
+      <weight></weight>
+      <length></length>
+      <width></width>
+      <height></height>
+    </dimensions>
+
+    <inventory>
+      <barcode></barcode>
+      <sku_supplier></sku_supplier>
+      <warehouses>
+        <warehouse code="default">
+          <stock_quantity></stock_quantity>
+        </warehouse>
+      </warehouses>
+    </inventory>
+
+    <translations>
+      <translation locale="lt">
+        <name></name>
+        <slug></slug>
+        <description></description>
+        <short_description></short_description>
+        <seo_title></seo_title>
+        <seo_description></seo_description>
+      </translation>
+      <translation locale="en">
+        <name></name>
+        <slug></slug>
+        <description></description>
+        <short_description></short_description>
+        <seo_title></seo_title>
+        <seo_description></seo_description>
+      </translation>
+    </translations>
+
+    <seo>
+      <canonical_url></canonical_url>
+      <meta>
+        <key>og:image</key>
+        <value></value>
+      </meta>
+    </seo>
+
+    <images>
+      <image src="" alt="" is_primary="true" sort_order="1" />
+      <image src="" alt="" sort_order="2" />
+    </images>
+
+    <files>
+      <file url="" label="manual" />
+    </files>
+
+    <videos>
+      <video url="" label="demo" />
+    </videos>
+
+    <attributes>
+      <attribute id="" code="">
+        <name locale="lt"></name>
+        <value id="" locale="lt"></value>
+      </attribute>
+    </attributes>
+
+    <options>
+      <option name="spalva">
+        <value locale="lt">raudona</value>
+      </option>
+      <option name="dydis">
+        <value locale="lt">L</value>
+      </option>
+    </options>
+
+    <variants>
+      <variant>
+        <sku></sku>
+        <option_values>
+          <option name="spalva" locale="lt">raudona</option>
+          <option name="dydis" locale="lt">L</option>
+        </option_values>
+        <price></price>
+        <sale_price></sale_price>
+        <stock_quantity></stock_quantity>
+        <images>
+          <image src="" alt="" sort_order="1" />
+        </images>
+      </variant>
+    </variants>
+
+    <relations>
+      <related_skus>
+        <sku></sku>
+      </related_skus>
+      <upsell_skus>
+        <sku></sku>
+      </upsell_skus>
+      <cross_sell_skus>
+        <sku></sku>
+      </cross_sell_skus>
+    </relations>
+
+    <price_lists>
+      <price_list code="retail">
+        <currency>EUR</currency>
+        <price></price>
+      </price_list>
+    </price_lists>
+
+    <tags>
+      <tag>statyba</tag>
+      <tag>cementas</tag>
+    </tags>
+
+    <custom>
+      <field key="warranty_months">24</field>
+    </custom>
+  </product>
+</products>

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Actions;
 
@@ -20,13 +22,13 @@ class CreateOrder
 {
     /**
      * Handle the job, event, or request processing.
-     * @return Order
      */
     public function handle(): Order
     {
         $checkout = session()->get('checkout');
         $sessionId = session()->getId();
         $customer = Auth::user();
+
         return DB::transaction(function () use ($checkout, $sessionId, $customer) {
             /** @var OrderAddress $shippingAddress */
             $shippingAddress = OrderAddress::query()->create([
@@ -42,7 +44,7 @@ class CreateOrder
                 'country_name' => Country::query()->find(data_get($checkout, 'shipping_address.country_id'))->name,
             ]);
             /** @var OrderAddress $billingAddress */
-            $billingAddress = !data_get($checkout, 'same_as_shipping') ? OrderAddress::query()->create([
+            $billingAddress = ! data_get($checkout, 'same_as_shipping') ? OrderAddress::query()->create([
                 'customer_id' => data_get($checkout, 'billing_address.user_id'),
                 'last_name' => data_get($checkout, 'billing_address.last_name'),
                 'first_name' => data_get($checkout, 'billing_address.first_name'),
@@ -123,13 +125,14 @@ class CreateOrder
             // Queue order confirmation email with user's preferred locale
             try {
                 $mailable = new OrderPlaced($order);
-                if (!empty($customer->preferred_locale)) {
+                if (! empty($customer->preferred_locale)) {
                     $mailable->locale($customer->preferred_locale);
                 }
                 Mail::to($customer->email)->queue($mailable);
             } catch (\Throwable $e) {
                 // swallow mail errors to not block checkout
             }
+
             return $order;
         });
     }

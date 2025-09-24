@@ -1,20 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Actions;
 
 use App\Filament\Actions\DocumentAction;
 use App\Models\DocumentTemplate;
 use App\Models\User;
-use App\Services\DocumentService;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 final class DocumentActionTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $user;
+
     private DocumentTemplate $template;
 
     protected function setUp(): void
@@ -75,7 +76,8 @@ final class DocumentActionTest extends TestCase
             'title' => 'Test Document',
         ];
 
-        $model = new class {
+        $model = new class
+        {
             public function getKey()
             {
                 return 1;

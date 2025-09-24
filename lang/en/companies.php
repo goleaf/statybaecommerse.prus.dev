@@ -33,4 +33,3 @@ return [
     'active_only' => 'Active Only',
     'inactive_only' => 'Inactive Only',
 ];
-

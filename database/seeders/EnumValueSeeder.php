@@ -1,150 +1,406 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\EnumValue;
 use Illuminate\Database\Seeder;
 
-class EnumValueSeeder extends Seeder
+final class EnumValueSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Navigation Groups
-        $navigationGroups = [
-            ['type' => 'navigation_group', 'key' => 'products', 'value' => 'Products', 'name' => 'Products', 'sort_order' => 1, 'is_active' => true, 'is_default' => false],
-            ['type' => 'navigation_group', 'key' => 'orders', 'value' => 'Orders', 'name' => 'Orders', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'navigation_group', 'key' => 'customers', 'value' => 'Customers', 'name' => 'Customers', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'navigation_group', 'key' => 'marketing', 'value' => 'Marketing', 'name' => 'Marketing', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-            ['type' => 'navigation_group', 'key' => 'reports', 'value' => 'Reports', 'name' => 'Reports', 'sort_order' => 5, 'is_active' => true, 'is_default' => false],
-            ['type' => 'navigation_group', 'key' => 'system', 'value' => 'System', 'name' => 'System', 'sort_order' => 6, 'is_active' => true, 'is_default' => false],
+        $enumValues = [
+            // Product Status
+            [
+                'type' => 'product_status',
+                'key' => 'active',
+                'name' => 'Active',
+                'value' => 'active',
+                'description' => 'Product is active and available for sale',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'product_status',
+                'key' => 'inactive',
+                'name' => 'Inactive',
+                'value' => 'inactive',
+                'description' => 'Product is inactive and not available for sale',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'product_status',
+                'key' => 'draft',
+                'name' => 'Draft',
+                'value' => 'draft',
+                'description' => 'Product is in draft status',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'product_status',
+                'key' => 'archived',
+                'name' => 'Archived',
+                'value' => 'archived',
+                'description' => 'Product is archived',
+                'sort_order' => 4,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+
+            // Order Status
+            [
+                'type' => 'order_status',
+                'key' => 'pending',
+                'name' => 'Pending',
+                'value' => 'pending',
+                'description' => 'Order is pending processing',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'order_status',
+                'key' => 'processing',
+                'name' => 'Processing',
+                'value' => 'processing',
+                'description' => 'Order is being processed',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'order_status',
+                'key' => 'shipped',
+                'name' => 'Shipped',
+                'value' => 'shipped',
+                'description' => 'Order has been shipped',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'order_status',
+                'key' => 'delivered',
+                'name' => 'Delivered',
+                'value' => 'delivered',
+                'description' => 'Order has been delivered',
+                'sort_order' => 4,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'order_status',
+                'key' => 'cancelled',
+                'name' => 'Cancelled',
+                'value' => 'cancelled',
+                'description' => 'Order has been cancelled',
+                'sort_order' => 5,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+
+            // Payment Status
+            [
+                'type' => 'payment_status',
+                'key' => 'pending',
+                'name' => 'Pending',
+                'value' => 'pending',
+                'description' => 'Payment is pending',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'payment_status',
+                'key' => 'paid',
+                'name' => 'Paid',
+                'value' => 'paid',
+                'description' => 'Payment has been completed',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'payment_status',
+                'key' => 'failed',
+                'name' => 'Failed',
+                'value' => 'failed',
+                'description' => 'Payment has failed',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'payment_status',
+                'key' => 'refunded',
+                'name' => 'Refunded',
+                'value' => 'refunded',
+                'description' => 'Payment has been refunded',
+                'sort_order' => 4,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+
+            // Shipping Status
+            [
+                'type' => 'shipping_status',
+                'key' => 'pending',
+                'name' => 'Pending',
+                'value' => 'pending',
+                'description' => 'Shipping is pending',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'shipping_status',
+                'key' => 'preparing',
+                'name' => 'Preparing',
+                'value' => 'preparing',
+                'description' => 'Order is being prepared for shipping',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'shipping_status',
+                'key' => 'shipped',
+                'name' => 'Shipped',
+                'value' => 'shipped',
+                'description' => 'Order has been shipped',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'shipping_status',
+                'key' => 'delivered',
+                'name' => 'Delivered',
+                'value' => 'delivered',
+                'description' => 'Order has been delivered',
+                'sort_order' => 4,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+
+            // User Roles
+            [
+                'type' => 'user_role',
+                'key' => 'admin',
+                'name' => 'Administrator',
+                'value' => 'admin',
+                'description' => 'System administrator with full access',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'user_role',
+                'key' => 'manager',
+                'name' => 'Manager',
+                'value' => 'manager',
+                'description' => 'Manager with limited administrative access',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'user_role',
+                'key' => 'customer',
+                'name' => 'Customer',
+                'value' => 'customer',
+                'description' => 'Regular customer',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+
+            // Notification Types
+            [
+                'type' => 'notification_type',
+                'key' => 'email',
+                'name' => 'Email',
+                'value' => 'email',
+                'description' => 'Email notification',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'notification_type',
+                'key' => 'sms',
+                'name' => 'SMS',
+                'value' => 'sms',
+                'description' => 'SMS notification',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'notification_type',
+                'key' => 'push',
+                'name' => 'Push',
+                'value' => 'push',
+                'description' => 'Push notification',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+
+            // Campaign Status
+            [
+                'type' => 'campaign_status',
+                'key' => 'draft',
+                'name' => 'Draft',
+                'value' => 'draft',
+                'description' => 'Campaign is in draft status',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'campaign_status',
+                'key' => 'active',
+                'name' => 'Active',
+                'value' => 'active',
+                'description' => 'Campaign is active',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'campaign_status',
+                'key' => 'paused',
+                'name' => 'Paused',
+                'value' => 'paused',
+                'description' => 'Campaign is paused',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'campaign_status',
+                'key' => 'completed',
+                'name' => 'Completed',
+                'value' => 'completed',
+                'description' => 'Campaign is completed',
+                'sort_order' => 4,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+
+            // Discount Types
+            [
+                'type' => 'discount_type',
+                'key' => 'percentage',
+                'name' => 'Percentage',
+                'value' => 'percentage',
+                'description' => 'Percentage discount',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'discount_type',
+                'key' => 'fixed',
+                'name' => 'Fixed Amount',
+                'value' => 'fixed',
+                'description' => 'Fixed amount discount',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'discount_type',
+                'key' => 'free_shipping',
+                'name' => 'Free Shipping',
+                'value' => 'free_shipping',
+                'description' => 'Free shipping discount',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+
+            // Inventory Status
+            [
+                'type' => 'inventory_status',
+                'key' => 'in_stock',
+                'name' => 'In Stock',
+                'value' => 'in_stock',
+                'description' => 'Product is in stock',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'inventory_status',
+                'key' => 'out_of_stock',
+                'name' => 'Out of Stock',
+                'value' => 'out_of_stock',
+                'description' => 'Product is out of stock',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'inventory_status',
+                'key' => 'low_stock',
+                'name' => 'Low Stock',
+                'value' => 'low_stock',
+                'description' => 'Product has low stock',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+
+            // Review Status
+            [
+                'type' => 'review_status',
+                'key' => 'pending',
+                'name' => 'Pending',
+                'value' => 'pending',
+                'description' => 'Review is pending approval',
+                'sort_order' => 1,
+                'is_active' => true,
+                'is_default' => true,
+            ],
+            [
+                'type' => 'review_status',
+                'key' => 'approved',
+                'name' => 'Approved',
+                'value' => 'approved',
+                'description' => 'Review has been approved',
+                'sort_order' => 2,
+                'is_active' => true,
+                'is_default' => false,
+            ],
+            [
+                'type' => 'review_status',
+                'key' => 'rejected',
+                'name' => 'Rejected',
+                'value' => 'rejected',
+                'description' => 'Review has been rejected',
+                'sort_order' => 3,
+                'is_active' => true,
+                'is_default' => false,
+            ],
         ];
 
-        // Order Statuses
-        $orderStatuses = [
-            ['type' => 'order_status', 'key' => 'pending', 'value' => 'Pending', 'name' => 'Pending Order', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'order_status', 'key' => 'processing', 'value' => 'Processing', 'name' => 'Processing Order', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'order_status', 'key' => 'shipped', 'value' => 'Shipped', 'name' => 'Shipped Order', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'order_status', 'key' => 'delivered', 'value' => 'Delivered', 'name' => 'Delivered Order', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-            ['type' => 'order_status', 'key' => 'cancelled', 'value' => 'Cancelled', 'name' => 'Cancelled Order', 'sort_order' => 5, 'is_active' => true, 'is_default' => false],
-            ['type' => 'order_status', 'key' => 'refunded', 'value' => 'Refunded', 'name' => 'Refunded Order', 'sort_order' => 6, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Payment Statuses
-        $paymentStatuses = [
-            ['type' => 'payment_status', 'key' => 'pending', 'value' => 'Pending', 'name' => 'Pending Payment', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'payment_status', 'key' => 'paid', 'value' => 'Paid', 'name' => 'Payment Completed', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'payment_status', 'key' => 'failed', 'value' => 'Failed', 'name' => 'Payment Failed', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'payment_status', 'key' => 'refunded', 'value' => 'Refunded', 'name' => 'Payment Refunded', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-            ['type' => 'payment_status', 'key' => 'partially_refunded', 'value' => 'Partially Refunded', 'name' => 'Partially Refunded', 'sort_order' => 5, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Shipping Statuses
-        $shippingStatuses = [
-            ['type' => 'shipping_status', 'key' => 'pending', 'value' => 'Pending', 'name' => 'Pending Shipping', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'shipping_status', 'key' => 'preparing', 'value' => 'Preparing', 'name' => 'Preparing for Shipment', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'shipping_status', 'key' => 'shipped', 'value' => 'Shipped', 'name' => 'Shipped', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'shipping_status', 'key' => 'in_transit', 'value' => 'In Transit', 'name' => 'In Transit', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-            ['type' => 'shipping_status', 'key' => 'delivered', 'value' => 'Delivered', 'name' => 'Delivered', 'sort_order' => 5, 'is_active' => true, 'is_default' => false],
-            ['type' => 'shipping_status', 'key' => 'returned', 'value' => 'Returned', 'name' => 'Returned', 'sort_order' => 6, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // User Roles
-        $userRoles = [
-            ['type' => 'user_role', 'key' => 'admin', 'value' => 'Administrator', 'name' => 'Administrator', 'sort_order' => 1, 'is_active' => true, 'is_default' => false],
-            ['type' => 'user_role', 'key' => 'manager', 'value' => 'Manager', 'name' => 'Manager', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'user_role', 'key' => 'employee', 'value' => 'Employee', 'name' => 'Employee', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'user_role', 'key' => 'customer', 'value' => 'Customer', 'name' => 'Customer', 'sort_order' => 4, 'is_active' => true, 'is_default' => true],
-        ];
-
-        // Product Statuses
-        $productStatuses = [
-            ['type' => 'product_status', 'key' => 'active', 'value' => 'Active', 'name' => 'Active Product', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'product_status', 'key' => 'inactive', 'value' => 'Inactive', 'name' => 'Inactive Product', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'product_status', 'key' => 'draft', 'value' => 'Draft', 'name' => 'Draft Product', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'product_status', 'key' => 'archived', 'value' => 'Archived', 'name' => 'Archived Product', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Campaign Types
-        $campaignTypes = [
-            ['type' => 'campaign_type', 'key' => 'email', 'value' => 'Email Campaign', 'name' => 'Email Campaign', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'campaign_type', 'key' => 'sms', 'value' => 'SMS Campaign', 'name' => 'SMS Campaign', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'campaign_type', 'key' => 'social', 'value' => 'Social Media', 'name' => 'Social Media Campaign', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'campaign_type', 'key' => 'display', 'value' => 'Display Ads', 'name' => 'Display Advertising', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Discount Types
-        $discountTypes = [
-            ['type' => 'discount_type', 'key' => 'percentage', 'value' => 'Percentage', 'name' => 'Percentage Discount', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'discount_type', 'key' => 'fixed', 'value' => 'Fixed Amount', 'name' => 'Fixed Amount Discount', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'discount_type', 'key' => 'free_shipping', 'value' => 'Free Shipping', 'name' => 'Free Shipping', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'discount_type', 'key' => 'buy_one_get_one', 'value' => 'Buy One Get One', 'name' => 'Buy One Get One', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Notification Types
-        $notificationTypes = [
-            ['type' => 'notification_type', 'key' => 'order', 'value' => 'Order', 'name' => 'Order Notification', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'notification_type', 'key' => 'product', 'value' => 'Product', 'name' => 'Product Notification', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'notification_type', 'key' => 'user', 'value' => 'User', 'name' => 'User Notification', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'notification_type', 'key' => 'system', 'value' => 'System', 'name' => 'System Notification', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-            ['type' => 'notification_type', 'key' => 'payment', 'value' => 'Payment', 'name' => 'Payment Notification', 'sort_order' => 5, 'is_active' => true, 'is_default' => false],
-            ['type' => 'notification_type', 'key' => 'shipping', 'value' => 'Shipping', 'name' => 'Shipping Notification', 'sort_order' => 6, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Document Types
-        $documentTypes = [
-            ['type' => 'document_type', 'key' => 'invoice', 'value' => 'Invoice', 'name' => 'Invoice Document', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'document_type', 'key' => 'receipt', 'value' => 'Receipt', 'name' => 'Receipt Document', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'document_type', 'key' => 'contract', 'value' => 'Contract', 'name' => 'Contract Document', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'document_type', 'key' => 'report', 'value' => 'Report', 'name' => 'Report Document', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Address Types
-        $addressTypes = [
-            ['type' => 'address_type', 'key' => 'billing', 'value' => 'Billing Address', 'name' => 'Billing Address', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'address_type', 'key' => 'shipping', 'value' => 'Shipping Address', 'name' => 'Shipping Address', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'address_type', 'key' => 'home', 'value' => 'Home Address', 'name' => 'Home Address', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'address_type', 'key' => 'work', 'value' => 'Work Address', 'name' => 'Work Address', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Priorities
-        $priorities = [
-            ['type' => 'priority', 'key' => 'low', 'value' => 'Low', 'name' => 'Low Priority', 'sort_order' => 1, 'is_active' => true, 'is_default' => false],
-            ['type' => 'priority', 'key' => 'medium', 'value' => 'Medium', 'name' => 'Medium Priority', 'sort_order' => 2, 'is_active' => true, 'is_default' => true],
-            ['type' => 'priority', 'key' => 'high', 'value' => 'High', 'name' => 'High Priority', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'priority', 'key' => 'urgent', 'value' => 'Urgent', 'name' => 'Urgent Priority', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Statuses
-        $statuses = [
-            ['type' => 'status', 'key' => 'active', 'value' => 'Active', 'name' => 'Active Status', 'sort_order' => 1, 'is_active' => true, 'is_default' => true],
-            ['type' => 'status', 'key' => 'inactive', 'value' => 'Inactive', 'name' => 'Inactive Status', 'sort_order' => 2, 'is_active' => true, 'is_default' => false],
-            ['type' => 'status', 'key' => 'pending', 'value' => 'Pending', 'name' => 'Pending Status', 'sort_order' => 3, 'is_active' => true, 'is_default' => false],
-            ['type' => 'status', 'key' => 'completed', 'value' => 'Completed', 'name' => 'Completed Status', 'sort_order' => 4, 'is_active' => true, 'is_default' => false],
-        ];
-
-        // Combine all enum values
-        $allEnumValues = array_merge(
-            $navigationGroups,
-            $orderStatuses,
-            $paymentStatuses,
-            $shippingStatuses,
-            $userRoles,
-            $productStatuses,
-            $campaignTypes,
-            $discountTypes,
-            $notificationTypes,
-            $documentTypes,
-            $addressTypes,
-            $priorities,
-            $statuses
-        );
-
-        // Create enum values
-        foreach ($allEnumValues as $enumValue) {
-            EnumValue::create($enumValue);
+        foreach ($enumValues as $enumValue) {
+            EnumValue::updateOrCreate(
+                [
+                    'type' => $enumValue['type'],
+                    'key' => $enumValue['key'],
+                ],
+                $enumValue
+            );
         }
     }
 }

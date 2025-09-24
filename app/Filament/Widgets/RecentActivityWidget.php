@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Campaign;
-use App\Models\News;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
@@ -11,14 +12,15 @@ use App\Models\Slider;
 use App\Models\SystemSetting;
 use App\Models\User;
 use Carbon\Carbon;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 
 class RecentActivityWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
+
     protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
@@ -29,7 +31,7 @@ class RecentActivityWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('translations.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'Order' => 'success',
                         'Product' => 'primary',
                         'User' => 'info',
@@ -53,12 +55,13 @@ class RecentActivityWidget extends BaseWidget
                     ->limit(100)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 100 ? $state : null;
                     }),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('translations.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'active', 'completed', 'published', 'approved' => 'success',
                         'pending', 'draft', 'processing' => 'warning',
                         'inactive', 'cancelled', 'rejected' => 'danger',

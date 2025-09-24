@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\DocumentTemplate;
+declare(strict_types=1);
+
 use App\Models\Document;
+use App\Models\DocumentTemplate;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\DocumentService;
@@ -14,7 +16,7 @@ it('can create document template', function () {
         'variables' => ['$PRODUCT_NAME', '$PRODUCT_PRICE'],
         'is_active' => true,
     ]);
-    
+
     expect($template)->toBeInstanceOf(DocumentTemplate::class);
     expect($template->name)->toBe('Product Invoice');
     expect($template->is_active)->toBeTrue();
@@ -27,15 +29,15 @@ it('can generate document from template', function () {
         'variables' => ['$PRODUCT_NAME', '$PRODUCT_SKU'],
         'is_active' => true,
     ]);
-    
+
     $product = Product::factory()->create([
         'name' => 'Test Product',
         'sku' => 'TEST-001',
     ]);
-    
+
     $user = User::factory()->create();
     $this->actingAs($user);
-    
+
     $service = app(DocumentService::class);
     $document = $service->generateDocument(
         $template,
@@ -43,7 +45,7 @@ it('can generate document from template', function () {
         ['$PRODUCT_NAME' => $product->name, '$PRODUCT_SKU' => $product->sku],
         'Test Document'
     );
-    
+
     expect($document)->toBeInstanceOf(Document::class);
     expect($document->title)->toBe('Test Document');
     expect($document->content)->toContain('Test Product');
@@ -55,11 +57,11 @@ it('can process template variables through document generation', function () {
         'content' => 'Hello $CUSTOMER_NAME, your order $ORDER_NUMBER is ready.',
         'variables' => ['$CUSTOMER_NAME', '$ORDER_NUMBER'],
     ]);
-    
+
     $product = Product::factory()->create();
     $user = User::factory()->create();
     $this->actingAs($user);
-    
+
     $service = app(DocumentService::class);
     $document = $service->generateDocument(
         $template,
@@ -67,7 +69,7 @@ it('can process template variables through document generation', function () {
         ['$CUSTOMER_NAME' => 'John Doe', '$ORDER_NUMBER' => 'ORD-001'],
         'Test Document'
     );
-    
+
     expect($document->content)->toContain('John Doe');
     expect($document->content)->toContain('ORD-001');
 });
@@ -75,7 +77,7 @@ it('can process template variables through document generation', function () {
 it('document belongs to template', function () {
     $template = DocumentTemplate::factory()->create();
     $document = Document::factory()->create(['document_template_id' => $template->id]);
-    
+
     expect($document->template)->toBeInstanceOf(DocumentTemplate::class);
     expect($document->template->id)->toBe($template->id);
 });
@@ -86,7 +88,7 @@ it('document has morphed relationship', function () {
         'documentable_type' => Product::class,
         'documentable_id' => $product->id,
     ]);
-    
+
     expect($document->documentable)->toBeInstanceOf(Product::class);
     expect($document->documentable->id)->toBe($product->id);
 });

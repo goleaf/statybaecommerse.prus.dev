@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\EnumValueResource;
 use App\Models\EnumValue;
@@ -155,7 +157,7 @@ it('can search enum values by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index') . '?search=Special')
+        ->get(EnumValueResource::getUrl('index').'?search=Special')
         ->assertOk();
 });
 
@@ -164,7 +166,7 @@ it('can search enum values by key', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index') . '?search=special')
+        ->get(EnumValueResource::getUrl('index').'?search=special')
         ->assertOk();
 });
 
@@ -173,21 +175,21 @@ it('can search enum values by value', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index') . '?search=Special')
+        ->get(EnumValueResource::getUrl('index').'?search=Special')
         ->assertOk();
 });
 
 it('can sort enum values by type', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index') . '?sort=type&direction=asc')
+        ->get(EnumValueResource::getUrl('index').'?sort=type&direction=asc')
         ->assertOk();
 });
 
 it('can sort enum values by sort order', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index') . '?sort=sort_order&direction=asc')
+        ->get(EnumValueResource::getUrl('index').'?sort=sort_order&direction=asc')
         ->assertOk();
 });
 

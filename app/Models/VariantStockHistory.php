@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * VariantStockHistory
- * 
+ *
  * Model for tracking stock changes of product variants with comprehensive history and analytics.
  */
 final class VariantStockHistory extends Model
@@ -135,7 +135,7 @@ final class VariantStockHistory extends Model
     public function scopeByReference($query, string $referenceType, int $referenceId)
     {
         return $query->where('reference_type', $referenceType)
-                    ->where('reference_id', $referenceId);
+            ->where('reference_id', $referenceId);
     }
 
     /**
@@ -151,7 +151,7 @@ final class VariantStockHistory extends Model
         ?string $referenceType = null,
         ?int $referenceId = null
     ): self {
-        return static::create([
+        return self::create([
             'variant_id' => $variantId,
             'old_quantity' => $oldQuantity,
             'new_quantity' => $newQuantity,

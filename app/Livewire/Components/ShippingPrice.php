@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -16,7 +18,6 @@ class ShippingPrice extends Component
 {
     /**
      * Handle shippingAmount functionality with proper error handling.
-     * @return float
      */
     #[Computed]
     public function shippingAmount(): float
@@ -25,12 +26,12 @@ class ShippingPrice extends Component
         if ($selected > 0) {
             return $selected;
         }
+
         return (float) config('shipping.default_rate', 0.0);
     }
 
     /**
      * Handle shippingOptions functionality with proper error handling.
-     * @return array
      */
     #[Computed]
     public function shippingOptions(): array
@@ -40,7 +41,6 @@ class ShippingPrice extends Component
 
     /**
      * Handle updateAmounts functionality with proper error handling.
-     * @return void
      */
     #[On('cartUpdated')]
     public function updateAmounts(): void
@@ -50,7 +50,6 @@ class ShippingPrice extends Component
 
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -59,7 +58,6 @@ class ShippingPrice extends Component
 
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

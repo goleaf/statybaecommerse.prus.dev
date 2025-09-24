@@ -1,27 +1,28 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\Action;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TextInput as FormTextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
 
-final class SliderQuickActionsWidget extends Widget implements HasForms, HasActions
+final class SliderQuickActionsWidget extends Widget implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
     protected string $view = 'filament.widgets.slider-quick-actions';
+
     protected int|string|array $columnSpan = 'full';
 
     public function createSliderAction(): Action

@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -8,25 +9,21 @@ use App\Services\AutocompleteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+
 /**
  * AutocompleteController
- * 
+ *
  * HTTP controller handling AutocompleteController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class AutocompleteController extends Controller
 {
     /**
      * Initialize the class instance with required dependencies.
-     * @param AutocompleteService $autocompleteService
      */
-    public function __construct(private readonly AutocompleteService $autocompleteService)
-    {
-    }
+    public function __construct(private readonly AutocompleteService $autocompleteService) {}
+
     /**
      * Handle search functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function search(Request $request): JsonResponse
     {
@@ -38,6 +35,7 @@ final class AutocompleteController extends Controller
             // Add to recent searches
             $this->autocompleteService->addToRecentSearches($query);
             $results = $this->autocompleteService->search($query, $limit, $types);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'types' => $types]]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -45,10 +43,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle products functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function products(Request $request): JsonResponse
     {
@@ -57,6 +54,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchProducts($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'products']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -64,10 +62,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Product search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle categories functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function categories(Request $request): JsonResponse
     {
@@ -76,6 +73,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchCategories($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'categories']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -83,10 +81,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Category search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle brands functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function brands(Request $request): JsonResponse
     {
@@ -95,6 +92,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchBrands($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'brands']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -102,10 +100,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Brand search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle collections functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function collections(Request $request): JsonResponse
     {
@@ -114,6 +111,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchCollections($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'collections']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -121,10 +119,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Collection search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle attributes functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function attributes(Request $request): JsonResponse
     {
@@ -133,6 +130,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchAttributes($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'attributes']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -140,10 +138,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Attribute search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle popular functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function popular(Request $request): JsonResponse
     {
@@ -151,6 +148,7 @@ final class AutocompleteController extends Controller
             $validated = $request->validate(['limit' => 'integer|min:1|max:20']);
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->getPopularSuggestions($limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['total' => count($results), 'limit' => $limit, 'type' => 'popular']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -158,10 +156,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to get popular suggestions', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle recent functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function recent(Request $request): JsonResponse
     {
@@ -169,6 +166,7 @@ final class AutocompleteController extends Controller
             $validated = $request->validate(['limit' => 'integer|min:1|max:10']);
             $limit = $validated['limit'] ?? 5;
             $results = $this->autocompleteService->getRecentSuggestions($limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['total' => count($results), 'limit' => $limit, 'type' => 'recent']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -176,24 +174,23 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to get recent suggestions', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle clearRecent functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function clearRecent(Request $request): JsonResponse
     {
         try {
             $this->autocompleteService->clearRecentSearches();
+
             return response()->json(['success' => true, 'message' => 'Recent searches cleared successfully']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to clear recent searches', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle suggestions functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function suggestions(Request $request): JsonResponse
     {
@@ -204,6 +201,7 @@ final class AutocompleteController extends Controller
             $recent = $this->autocompleteService->getRecentSuggestions((int) ceil($limit * 0.4));
             $results = array_merge($recent, $popular);
             $results = array_slice($results, 0, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['total' => count($results), 'limit' => $limit, 'type' => 'suggestions', 'popular_count' => count($popular), 'recent_count' => count($recent)]]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -211,10 +209,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to get suggestions', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle fuzzySearch functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function fuzzySearch(Request $request): JsonResponse
     {
@@ -226,6 +223,7 @@ final class AutocompleteController extends Controller
             // Add to recent searches
             $this->autocompleteService->addToRecentSearches($query);
             $results = $this->autocompleteService->searchWithFuzzy($query, $limit, $types);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'types' => $types, 'fuzzy' => true]]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -233,10 +231,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Fuzzy search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle personalized functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function personalized(Request $request): JsonResponse
     {
@@ -244,10 +241,11 @@ final class AutocompleteController extends Controller
             $validated = $request->validate(['limit' => 'integer|min:1|max:20']);
             $limit = $validated['limit'] ?? 5;
             $userId = auth()->id();
-            if (!$userId) {
+            if (! $userId) {
                 return response()->json(['success' => false, 'message' => 'Authentication required'], 401);
             }
             $suggestions = $this->autocompleteService->getPersonalizedSuggestions($userId, $limit);
+
             return response()->json(['success' => true, 'data' => $suggestions, 'meta' => ['total' => count($suggestions), 'limit' => $limit, 'user_id' => $userId]]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -255,10 +253,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to get personalized suggestions', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle customers functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function customers(Request $request): JsonResponse
     {
@@ -267,6 +264,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchCustomers($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'customers']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -274,10 +272,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Customer search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle addresses functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function addresses(Request $request): JsonResponse
     {
@@ -286,6 +283,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchAddresses($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'addresses']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -293,10 +291,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Address search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle locations functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function locations(Request $request): JsonResponse
     {
@@ -305,6 +302,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchLocations($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'locations']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -312,10 +310,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Location search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle countries functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function countries(Request $request): JsonResponse
     {
@@ -324,6 +321,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchCountries($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'countries']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -331,10 +329,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'Country search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle cities functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function cities(Request $request): JsonResponse
     {
@@ -343,6 +340,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchCities($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'cities']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -350,10 +348,9 @@ final class AutocompleteController extends Controller
             return response()->json(['success' => false, 'message' => 'City search failed', 'error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Handle orders functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function orders(Request $request): JsonResponse
     {
@@ -362,6 +359,7 @@ final class AutocompleteController extends Controller
             $query = $validated['q'];
             $limit = $validated['limit'] ?? 10;
             $results = $this->autocompleteService->searchOrders($query, $limit);
+
             return response()->json(['success' => true, 'data' => $results, 'meta' => ['query' => $query, 'total' => count($results), 'limit' => $limit, 'type' => 'orders']]);
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
@@ -372,8 +370,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle paginatedSearch functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function paginatedSearch(Request $request): JsonResponse
     {
@@ -413,8 +409,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle exportSearch functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function exportSearch(Request $request): JsonResponse
     {
@@ -449,7 +443,7 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle downloadExport functionality with proper error handling.
-     * @param string $exportId
+     *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function downloadExport(string $exportId)
@@ -458,11 +452,11 @@ final class AutocompleteController extends Controller
             $exportService = app(\App\Services\SearchExportService::class);
             $exportData = $exportService->getExportData($exportId);
 
-            if (!$exportData) {
+            if (! $exportData) {
                 return response()->json(['success' => false, 'message' => 'Export not found or expired'], 404);
             }
 
-            $filename = "search_results_{$exportData['query']}_{$exportData['format']}_" . now()->format('Y-m-d_H-i-s');
+            $filename = "search_results_{$exportData['query']}_{$exportData['format']}_".now()->format('Y-m-d_H-i-s');
             $mimeType = $this->getMimeType($exportData['format']);
 
             return response()->streamDownload(function () use ($exportData) {
@@ -478,8 +472,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle shareSearch functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function shareSearch(Request $request): JsonResponse
     {
@@ -512,8 +504,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle viewSharedSearch functionality with proper error handling.
-     * @param string $shareId
-     * @return JsonResponse
      */
     public function viewSharedSearch(string $shareId): JsonResponse
     {
@@ -521,7 +511,7 @@ final class AutocompleteController extends Controller
             $exportService = app(\App\Services\SearchExportService::class);
             $shareData = $exportService->getSharedSearch($shareId);
 
-            if (!$shareData) {
+            if (! $shareData) {
                 return response()->json(['success' => false, 'message' => 'Shared search not found or expired'], 404);
             }
 
@@ -536,8 +526,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle getAvailableFilters functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getAvailableFilters(Request $request): JsonResponse
     {
@@ -572,8 +560,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle getMimeType functionality with proper error handling.
-     * @param string $format
-     * @return string
      */
     private function getMimeType(string $format): string
     {
@@ -588,8 +574,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle getSearchInsights functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getSearchInsights(Request $request): JsonResponse
     {
@@ -619,8 +603,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle getSearchRecommendations functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getSearchRecommendations(Request $request): JsonResponse
     {
@@ -650,8 +632,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle getSearchAnalytics functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getSearchAnalytics(Request $request): JsonResponse
     {
@@ -698,9 +678,6 @@ final class AutocompleteController extends Controller
 
     /**
      * Handle getSearchMetrics functionality with proper error handling.
-     * @param SearchAnalyticsService $analyticsService
-     * @param string $period
-     * @return array
      */
     private function getSearchMetrics(SearchAnalyticsService $analyticsService, string $period): array
     {
@@ -723,16 +700,14 @@ final class AutocompleteController extends Controller
                 'search_trends' => $analyticsService->getSearchTrendsForDateRange(30),
             ];
         } catch (\Exception $e) {
-            \Log::warning('Search metrics failed: ' . $e->getMessage());
+            \Log::warning('Search metrics failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getClickMetrics functionality with proper error handling.
-     * @param SearchAnalyticsService $analyticsService
-     * @param string $period
-     * @return array
      */
     private function getClickMetrics(SearchAnalyticsService $analyticsService, string $period): array
     {
@@ -745,16 +720,14 @@ final class AutocompleteController extends Controller
                 'click_trends' => [],
             ];
         } catch (\Exception $e) {
-            \Log::warning('Click metrics failed: ' . $e->getMessage());
+            \Log::warning('Click metrics failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getConversionMetrics functionality with proper error handling.
-     * @param SearchAnalyticsService $analyticsService
-     * @param string $period
-     * @return array
      */
     private function getConversionMetrics(SearchAnalyticsService $analyticsService, string $period): array
     {
@@ -767,16 +740,14 @@ final class AutocompleteController extends Controller
                 'conversion_trends' => [],
             ];
         } catch (\Exception $e) {
-            \Log::warning('Conversion metrics failed: ' . $e->getMessage());
+            \Log::warning('Conversion metrics failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getRevenueMetrics functionality with proper error handling.
-     * @param SearchAnalyticsService $analyticsService
-     * @param string $period
-     * @return array
      */
     private function getRevenueMetrics(SearchAnalyticsService $analyticsService, string $period): array
     {
@@ -789,16 +760,14 @@ final class AutocompleteController extends Controller
                 'revenue_trends' => [],
             ];
         } catch (\Exception $e) {
-            \Log::warning('Revenue metrics failed: ' . $e->getMessage());
+            \Log::warning('Revenue metrics failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getUserMetrics functionality with proper error handling.
-     * @param SearchAnalyticsService $analyticsService
-     * @param string $period
-     * @return array
      */
     private function getUserMetrics(SearchAnalyticsService $analyticsService, string $period): array
     {
@@ -811,7 +780,8 @@ final class AutocompleteController extends Controller
                 'user_engagement' => rand(60, 90) / 100,
             ];
         } catch (\Exception $e) {
-            \Log::warning('User metrics failed: ' . $e->getMessage());
+            \Log::warning('User metrics failed: '.$e->getMessage());
+
             return [];
         }
     }

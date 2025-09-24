@@ -4,10 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        if (!Schema::hasTable('news_categories')) {
+        if (! Schema::hasTable('news_categories')) {
             Schema::create('news_categories', function (Blueprint $table): void {
                 $table->id();
                 $table->boolean('is_visible')->default(true);
@@ -23,7 +24,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('sh_news_category_translations')) {
+        if (! Schema::hasTable('sh_news_category_translations')) {
             Schema::create('sh_news_category_translations', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('news_category_id');
@@ -39,7 +40,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('news_category_pivot')) {
+        if (! Schema::hasTable('news_category_pivot')) {
             Schema::create('news_category_pivot', function (Blueprint $table): void {
                 $table->unsignedBigInteger('news_id');
                 $table->unsignedBigInteger('news_category_id');

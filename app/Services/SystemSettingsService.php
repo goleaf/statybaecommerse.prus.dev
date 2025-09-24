@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\SystemSetting;
@@ -8,33 +9,35 @@ use App\Models\SystemSettingCategory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 /**
  * SystemSettingsService
- * 
+ *
  * Service class containing SystemSettingsService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class SystemSettingsService
 {
     private const CACHE_KEY = 'system_settings';
+
     private const CACHE_TTL = 3600;
+
     // 1 hour
     /**
      * Handle get functionality with proper error handling.
-     * @param string $key
-     * @param mixed $default
+     *
+     * @param  mixed  $default
      */
     public function get(string $key, $default = null)
     {
         $settings = $this->getAllSettings();
+
         return $settings[$key] ?? $default;
     }
+
     /**
      * Handle set functionality with proper error handling.
-     * @param string $key
-     * @param mixed $value
-     * @param array $options
-     * @return void
+     *
+     * @param  mixed  $value
      */
     public function set(string $key, $value, array $options = []): void
     {
@@ -52,19 +55,21 @@ final class SystemSettingsService
             throw $e;
         }
     }
+
     /**
      * Handle getPublic functionality with proper error handling.
-     * @param string $key
-     * @param mixed $default
+     *
+     * @param  mixed  $default
      */
     public function getPublic(string $key, $default = null)
     {
         $publicSettings = $this->getPublicSettings();
+
         return $publicSettings[$key] ?? $default;
     }
+
     /**
      * Handle getAllSettings functionality with proper error handling.
-     * @return array
      */
     public function getAllSettings(): array
     {
@@ -72,42 +77,39 @@ final class SystemSettingsService
             return SystemSetting::active()->get()->pluck('value', 'key')->toArray();
         });
     }
+
     /**
      * Handle getPublicSettings functionality with proper error handling.
-     * @return array
      */
     public function getPublicSettings(): array
     {
-        return Cache::remember(self::CACHE_KEY . '_public', self::CACHE_TTL, function () {
+        return Cache::remember(self::CACHE_KEY.'_public', self::CACHE_TTL, function () {
             return SystemSetting::active()->public()->get()->pluck('value', 'key')->toArray();
         });
     }
+
     /**
      * Handle getSettingsByGroup functionality with proper error handling.
-     * @param string $group
-     * @return array
      */
     public function getSettingsByGroup(string $group): array
     {
-        return Cache::remember(self::CACHE_KEY . "_group_{$group}", self::CACHE_TTL, function () use ($group) {
+        return Cache::remember(self::CACHE_KEY."_group_{$group}", self::CACHE_TTL, function () use ($group) {
             return SystemSetting::active()->byGroup($group)->get()->pluck('value', 'key')->toArray();
         });
     }
+
     /**
      * Handle getSettingsByCategory functionality with proper error handling.
-     * @param string $category
-     * @return array
      */
     public function getSettingsByCategory(string $category): array
     {
-        return Cache::remember(self::CACHE_KEY . "_category_{$category}", self::CACHE_TTL, function () use ($category) {
+        return Cache::remember(self::CACHE_KEY."_category_{$category}", self::CACHE_TTL, function () use ($category) {
             return SystemSetting::active()->byCategory($category)->get()->pluck('value', 'key')->toArray();
         });
     }
+
     /**
      * Handle bulkUpdate functionality with proper error handling.
-     * @param array $settings
-     * @return void
      */
     public function bulkUpdate(array $settings): void
     {
@@ -125,9 +127,9 @@ final class SystemSettingsService
             throw $e;
         }
     }
+
     /**
      * Handle resetToDefaults functionality with proper error handling.
-     * @return void
      */
     public function resetToDefaults(): void
     {
@@ -146,9 +148,9 @@ final class SystemSettingsService
             throw $e;
         }
     }
+
     /**
      * Handle exportSettings functionality with proper error handling.
-     * @return array
      */
     public function exportSettings(): array
     {
@@ -156,10 +158,9 @@ final class SystemSettingsService
             return ['key' => $setting->key, 'name' => $setting->name, 'value' => $setting->value, 'type' => $setting->type, 'group' => $setting->group, 'description' => $setting->description, 'help_text' => $setting->help_text, 'is_public' => $setting->is_public, 'is_required' => $setting->is_required, 'is_encrypted' => $setting->is_encrypted, 'is_readonly' => $setting->is_readonly, 'options' => $setting->options, 'default_value' => $setting->default_value];
         })->toArray();
     }
+
     /**
      * Handle importSettings functionality with proper error handling.
-     * @param array $settings
-     * @return void
      */
     public function importSettings(array $settings): void
     {
@@ -179,16 +180,16 @@ final class SystemSettingsService
             throw $e;
         }
     }
+
     /**
      * Handle validateSetting functionality with proper error handling.
-     * @param string $key
-     * @param mixed $value
-     * @return bool
+     *
+     * @param  mixed  $value
      */
     public function validateSetting(string $key, $value): bool
     {
         $setting = SystemSetting::where('key', $key)->first();
-        if (!$setting) {
+        if (! $setting) {
             return false;
         }
         $rules = $setting->getValidationRulesArray();
@@ -196,56 +197,57 @@ final class SystemSettingsService
             return true;
         }
         $validator = validator([$key => $value], [$key => $rules]);
-        return !$validator->fails();
+
+        return ! $validator->fails();
     }
+
     /**
      * Handle getSettingMetadata functionality with proper error handling.
-     * @param string $key
-     * @return array|null
      */
     public function getSettingMetadata(string $key): ?array
     {
         $setting = SystemSetting::where('key', $key)->first();
-        if (!$setting) {
+        if (! $setting) {
             return null;
         }
+
         return ['key' => $setting->key, 'name' => $setting->name, 'type' => $setting->type, 'group' => $setting->group, 'description' => $setting->description, 'help_text' => $setting->help_text, 'is_public' => $setting->is_public, 'is_required' => $setting->is_required, 'is_encrypted' => $setting->is_encrypted, 'is_readonly' => $setting->is_readonly, 'options' => $setting->getOptionsArray(), 'default_value' => $setting->default_value, 'validation_rules' => $setting->getValidationRulesArray()];
     }
+
     /**
      * Handle getCategoriesWithSettings functionality with proper error handling.
-     * @return array
      */
     public function getCategoriesWithSettings(): array
     {
-        return Cache::remember(self::CACHE_KEY . '_categories', self::CACHE_TTL, function () {
+        return Cache::remember(self::CACHE_KEY.'_categories', self::CACHE_TTL, function () {
             return SystemSettingCategory::with(['settings' => function ($query) {
                 $query->active()->ordered();
             }])->active()->ordered()->get()->toArray();
         });
     }
+
     /**
      * Handle clearCache functionality with proper error handling.
-     * @return void
      */
     public function clearCache(): void
     {
         Cache::forget(self::CACHE_KEY);
-        Cache::forget(self::CACHE_KEY . '_public');
+        Cache::forget(self::CACHE_KEY.'_public');
         // Clear group-specific caches
         $groups = SystemSetting::distinct()->pluck('group');
         foreach ($groups as $group) {
-            Cache::forget(self::CACHE_KEY . "_group_{$group}");
+            Cache::forget(self::CACHE_KEY."_group_{$group}");
         }
         // Clear category-specific caches
         $categories = SystemSettingCategory::pluck('slug');
         foreach ($categories as $category) {
-            Cache::forget(self::CACHE_KEY . "_category_{$category}");
+            Cache::forget(self::CACHE_KEY."_category_{$category}");
         }
-        Cache::forget(self::CACHE_KEY . '_categories');
+        Cache::forget(self::CACHE_KEY.'_categories');
     }
+
     /**
      * Handle getSettingsStats functionality with proper error handling.
-     * @return array
      */
     public function getSettingsStats(): array
     {

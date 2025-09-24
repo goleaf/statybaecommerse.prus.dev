@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Currency;
 use App\Models\Price;
@@ -126,20 +128,20 @@ describe('Currency Model', function () {
             'is_default',
             'is_enabled',
             'sort_order',
-            'auto_update_rate'
+            'auto_update_rate',
         ];
 
-        $currency = new Currency();
+        $currency = new Currency;
         expect($currency->getFillable())->toBe($fillable);
     });
 
     it('has correct table name', function () {
-        $currency = new Currency();
+        $currency = new Currency;
         expect($currency->getTable())->toBe('currencies');
     });
 
     it('has translatable attributes defined', function () {
-        $currency = new Currency();
+        $currency = new Currency;
         expect($currency->translatable)->toBe(['name']);
     });
 

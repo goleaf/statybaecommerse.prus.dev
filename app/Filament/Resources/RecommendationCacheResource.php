@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\RecommendationCacheResource\Pages;
-use App\Models\RecommendationCache;
-use App\Models\RecommendationBlock;
-use App\Models\User;
 use App\Models\Product;
+use App\Models\RecommendationBlock;
+use App\Models\RecommendationCache;
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -26,7 +23,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -36,13 +32,16 @@ use UnitEnum;
  */
 final class RecommendationCacheResource extends Resource
 {
-    protected static ?string $model = RecommendationCache::class;
-    protected static ?int $navigationSort = 20;
-    protected static ?string $recordTitleAttribute = 'cache_key';
-    protected static ?string $navigationGroup = NavigationGroup::Analytics;
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Analytics';
+    }
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Analytics;
+    protected static ?string $model = RecommendationCache::class;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $recordTitleAttribute = 'cache_key';
 
     public static function getNavigationLabel(): string
     {
@@ -59,7 +58,7 @@ final class RecommendationCacheResource extends Resource
         return __('admin.recommendation_caches.model_label');
     }
 
-    public static function schema(Schema $schema): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -72,35 +71,29 @@ final class RecommendationCacheResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->unique(RecommendationCache::class, 'cache_key', ignoreRecord: true),
-
                                 Select::make('block_id')
                                     ->label(__('admin.recommendation_caches.block'))
                                     ->options(RecommendationBlock::pluck('name', 'id'))
                                     ->required()
                                     ->searchable(),
-
                                 Select::make('user_id')
                                     ->label(__('admin.recommendation_caches.user'))
                                     ->options(User::pluck('name', 'id'))
                                     ->required()
                                     ->searchable(),
-
                                 Select::make('product_id')
                                     ->label(__('admin.recommendation_caches.product'))
                                     ->options(Product::pluck('name', 'id'))
                                     ->searchable(),
-
                                 TextInput::make('context_type')
                                     ->label(__('admin.recommendation_caches.context_type'))
                                     ->maxLength(100),
-
                                 TextInput::make('hit_count')
                                     ->label(__('admin.recommendation_caches.hit_count'))
                                     ->numeric()
                                     ->minValue(0)
                                     ->default(0),
                             ]),
-
                         DateTimePicker::make('expires_at')
                             ->label(__('admin.recommendation_caches.expires_at'))
                             ->required()
@@ -121,19 +114,17 @@ final class RecommendationCacheResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 30 ? $state : null;
                     }),
-
                 TextColumn::make('block.name')
                     ->label(__('admin.recommendation_caches.block'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('user.name')
                     ->label(__('admin.recommendation_caches.user'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('product.name')
                     ->label(__('admin.recommendation_caches.product'))
                     ->searchable()
@@ -141,24 +132,21 @@ final class RecommendationCacheResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 30 ? $state : null;
                     }),
-
                 TextColumn::make('context_type')
                     ->label(__('admin.recommendation_caches.context_type'))
                     ->badge()
                     ->color('info'),
-
                 TextColumn::make('hit_count')
                     ->label(__('admin.recommendation_caches.hit_count'))
                     ->numeric()
                     ->sortable(),
-
                 TextColumn::make('expires_at')
                     ->label(__('admin.recommendation_caches.expires_at'))
                     ->dateTime()
                     ->sortable(),
-
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->dateTime()
@@ -170,17 +158,14 @@ final class RecommendationCacheResource extends Resource
                     ->label(__('admin.recommendation_caches.block'))
                     ->options(RecommendationBlock::pluck('name', 'id'))
                     ->searchable(),
-
                 SelectFilter::make('user_id')
                     ->label(__('admin.recommendation_caches.user'))
                     ->options(User::pluck('name', 'id'))
                     ->searchable(),
-
                 SelectFilter::make('product_id')
                     ->label(__('admin.recommendation_caches.product'))
                     ->options(Product::pluck('name', 'id'))
                     ->searchable(),
-
                 SelectFilter::make('context_type')
                     ->label(__('admin.recommendation_caches.context_type'))
                     ->options([

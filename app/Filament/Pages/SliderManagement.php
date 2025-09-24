@@ -1,22 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -24,24 +24,39 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
 use UnitEnum;
 
-class SliderManagement extends Page implements HasForms, HasActions
+class SliderManagement extends Page implements HasActions, HasForms
 {
-    use InteractsWithForms, InteractsWithActions;
+    use InteractsWithActions, InteractsWithForms;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-rectangle-stack';
+    }
+
     protected static ?string $navigationLabel = 'Slider Management';
+
     protected static ?string $title = 'Slider Management';
+
     protected static ?string $slug = 'slider-management';
+
     protected static ?int $navigationSort = 1;
-    protected static string|UnitEnum|null $navigationGroup = 'Content';
+
+    /**
+     * @var UnitEnum|string|null
+     */
+    public static function getNavigationGroup(): \UnitEnum|string|null
+    {
+        return 'Content';
+    }
 
     public Collection $sliders;
 
@@ -73,7 +88,7 @@ class SliderManagement extends Page implements HasForms, HasActions
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn($state, callable $set) => $set('slug', \Str::slug($state))),
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state))),
                             TextInput::make('slug')
                                 ->label(__('translations.slug'))
                                 ->required()
@@ -198,7 +213,7 @@ class SliderManagement extends Page implements HasForms, HasActions
                             Toggle::make('pause_on_hover')
                                 ->label(__('translations.pause_on_hover'))
                                 ->default(true)
-                                ->visible(fn(callable $get) => $get('autoplay')),
+                                ->visible(fn (callable $get) => $get('autoplay')),
                         ]),
                         Select::make('transition_speed')
                             ->label(__('translations.transition_speed'))
@@ -266,7 +281,7 @@ class SliderManagement extends Page implements HasForms, HasActions
                                     ->url(),
                             ])
                             ->collapsible()
-                            ->itemLabel(fn(array $state): ?string => $state['title'] ?? null),
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
                     ])
                     ->collapsible(),
                 Section::make(__('translations.status'))
@@ -404,7 +419,7 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->color('info')
             ->action(function () use ($slider): void {
                 $newSlider = $slider->replicate();
-                $newSlider->title = $slider->title . ' (Copy)';
+                $newSlider->title = $slider->title.' (Copy)';
                 $newSlider->sort_order = Slider::max('sort_order') + 1;
                 $newSlider->save();
 
@@ -437,7 +452,7 @@ class SliderManagement extends Page implements HasForms, HasActions
             ->icon($slider->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
             ->color($slider->is_active ? 'danger' : 'success')
             ->action(function () use ($slider): void {
-                $slider->update(['is_active' => !$slider->is_active]);
+                $slider->update(['is_active' => ! $slider->is_active]);
                 $this->loadSliders();
 
                 Notification::make()

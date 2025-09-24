@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
-use App\Models\VariantAttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\VariantAttributeValue;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -90,7 +90,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     'value' => $size['value'],
                 ],
                 [
-                    'slug' => 'product-size-' . Str::slug($size['value']),
+                    'slug' => 'product-size-'.Str::slug($size['value']),
                     'display_value' => $size['display'],
                     'sort_order' => $size['sort_order'],
                     'is_enabled' => true,
@@ -125,7 +125,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     'value' => $color['value'],
                 ],
                 [
-                    'slug' => 'product-color-' . Str::slug($color['value']),
+                    'slug' => 'product-color-'.Str::slug($color['value']),
                     'display_value' => $color['display'],
                     'sort_order' => $color['sort_order'],
                     'is_enabled' => true,
@@ -159,7 +159,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     'value' => $material['value'],
                 ],
                 [
-                    'slug' => 'product-material-' . Str::slug($material['value']),
+                    'slug' => 'product-material-'.Str::slug($material['value']),
                     'display_value' => $material['display'],
                     'sort_order' => $material['sort_order'],
                     'is_enabled' => true,
@@ -193,7 +193,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 ['slug' => $slug],
                 array_merge($brandData, [
                     'slug' => $slug,
-                    'description' => 'Premium ' . $brandData['name'] . ' products',
+                    'description' => 'Premium '.$brandData['name'].' products',
                     'is_enabled' => true,
                 ])
             );
@@ -212,7 +212,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 ['slug' => $slug],
                 array_merge($categoryData, [
                     'slug' => $slug,
-                    'description' => 'High-quality ' . $categoryData['name'],
+                    'description' => 'High-quality '.$categoryData['name'],
                     'is_enabled' => true,
                     'is_visible' => true,
                 ])
@@ -295,7 +295,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 'slug' => Str::slug($productData['name']),
                 'description' => $productData['description'],
                 'short_description' => substr($productData['description'], 0, 100),
-                'sku' => 'PROD-' . strtoupper(Str::random(8)),
+                'sku' => 'PROD-'.strtoupper(Str::random(8)),
                 'price' => $productData['base_price'],
                 'compare_price' => $productData['base_price'] * 1.2,
                 'cost_price' => $productData['base_price'] * 0.6,
@@ -321,12 +321,12 @@ final class ComprehensiveProductVariantSeeder extends Seeder
 
                 $variant = ProductVariant::create([
                     'product_id' => $product->id,
-                    'name' => $productData['name'] . ' - ' . $variantData['size'] . ' ' . $variantData['color'],
-                    'variant_name_lt' => $productData['name_lt'] . ' - ' . $variantData['size'] . ' ' . $this->getLocalizedValue('color', $variantData['color']),
-                    'variant_name_en' => $productData['name_en'] . ' - ' . $variantData['size'] . ' ' . ucfirst($variantData['color']),
-                    'description_lt' => $productData['description_lt'] . ' Dydis: ' . $variantData['size'] . ', Spalva: ' . $this->getLocalizedValue('color', $variantData['color']),
-                    'description_en' => $productData['description_en'] . ' Size: ' . $variantData['size'] . ', Color: ' . ucfirst($variantData['color']),
-                    'sku' => $product->sku . '-' . strtoupper($variantData['size']) . '-' . strtoupper($variantData['color']),
+                    'name' => $productData['name'].' - '.$variantData['size'].' '.$variantData['color'],
+                    'variant_name_lt' => $productData['name_lt'].' - '.$variantData['size'].' '.$this->getLocalizedValue('color', $variantData['color']),
+                    'variant_name_en' => $productData['name_en'].' - '.$variantData['size'].' '.ucfirst($variantData['color']),
+                    'description_lt' => $productData['description_lt'].' Dydis: '.$variantData['size'].', Spalva: '.$this->getLocalizedValue('color', $variantData['color']),
+                    'description_en' => $productData['description_en'].' Size: '.$variantData['size'].', Color: '.ucfirst($variantData['color']),
+                    'sku' => $product->sku.'-'.strtoupper($variantData['size']).'-'.strtoupper($variantData['color']),
                     'price' => $productData['base_price'] + $variantData['price_modifier'],
                     'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
                     'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
@@ -346,10 +346,10 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     'is_featured' => rand(0, 10) < 3,
                     'is_new' => $isNew,
                     'is_bestseller' => $isBestseller,
-                    'seo_title_lt' => $productData['name_lt'] . ' - ' . $variantData['size'] . ' ' . $this->getLocalizedValue('color', $variantData['color']),
-                    'seo_title_en' => $productData['name_en'] . ' - ' . $variantData['size'] . ' ' . ucfirst($variantData['color']),
-                    'seo_description_lt' => $productData['description_lt'] . ' Aukštos kokybės produktas.',
-                    'seo_description_en' => $productData['description_en'] . ' High-quality product.',
+                    'seo_title_lt' => $productData['name_lt'].' - '.$variantData['size'].' '.$this->getLocalizedValue('color', $variantData['color']),
+                    'seo_title_en' => $productData['name_en'].' - '.$variantData['size'].' '.ucfirst($variantData['color']),
+                    'seo_description_lt' => $productData['description_lt'].' Aukštos kokybės produktas.',
+                    'seo_description_en' => $productData['description_en'].' High-quality product.',
                     'views_count' => rand(10, 500),
                     'clicks_count' => rand(5, 100),
                     'conversion_rate' => rand(1, 15) / 100,

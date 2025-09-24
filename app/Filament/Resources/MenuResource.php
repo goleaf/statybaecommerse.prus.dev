@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Models\Menu;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -20,14 +22,28 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+
+final class MenuResource extends Resource
+{
+    protected static ?string $model = Menu::class;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-rectangle-stack';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Content';
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -47,12 +63,10 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make(__('menus.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -139,8 +153,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -205,11 +217,11 @@ use Illuminate\Database\Eloquent\Collection;
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(Menu $record): string => $record->is_active ? __('menus.deactivate') : __('menus.activate'))
-                    ->icon(fn(Menu $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Menu $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (Menu $record): string => $record->is_active ? __('menus.deactivate') : __('menus.activate'))
+                    ->icon(fn (Menu $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Menu $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Menu $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active ? __('menus.activated_successfully') : __('menus.deactivated_successfully'))
@@ -221,7 +233,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('menus.preview'))
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->url(fn(Menu $record): string => route('menu.preview', $record))
+                    ->url(fn (Menu $record): string => route('menu.preview', $record))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
@@ -258,7 +270,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {

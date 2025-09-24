@@ -33,7 +33,7 @@ Schedule::call(function () {
 // Clear old activity logs (keep 90 days) with timeout protection
 Schedule::call(function () {
     $timeout = now()->addMinutes(5); // 5 minute timeout for log cleanup
-    
+
     \Spatie\Activitylog\Models\Activity::where('created_at', '<', now()->subDays(90))
         ->cursor()
         ->takeUntilTimeout($timeout)

@@ -15,9 +15,9 @@ final class AttributeAnalyticsWidget extends ChartWidget
     protected function getData(): array
     {
         $data = Attribute::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as count')
-            )
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COUNT(*) as count')
+        )
             ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('date')
             ->orderBy('date')

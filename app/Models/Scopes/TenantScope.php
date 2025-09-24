@@ -1,34 +1,34 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+
 /**
  * TenantScope
- * 
+ *
  * Eloquent model representing the TenantScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|TenantScope newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TenantScope newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TenantScope query()
+ *
  * @mixin \Eloquent
  */
 final class TenantScope implements Scope
 {
     /**
      * Handle apply functionality with proper error handling.
-     * @param Builder $builder
-     * @param Model $model
-     * @return void
      */
     public function apply(Builder $builder, Model $model): void
     {
         // Check if the model has tenant-related columns
         $tenantColumns = $this->getTenantColumns($model);
-        if (!empty($tenantColumns) && $this->hasActiveTenant()) {
+        if (! empty($tenantColumns) && $this->hasActiveTenant()) {
             $tenantId = $this->getCurrentTenantId();
             if ($tenantId) {
                 $builder->where(function ($query) use ($tenantColumns, $tenantId) {
@@ -39,10 +39,9 @@ final class TenantScope implements Scope
             }
         }
     }
+
     /**
      * Handle getTenantColumns functionality with proper error handling.
-     * @param Model $model
-     * @return array
      */
     private function getTenantColumns(Model $model): array
     {
@@ -56,19 +55,20 @@ final class TenantScope implements Scope
                 $tenantColumns[] = $column;
             }
         }
+
         return $tenantColumns;
     }
+
     /**
      * Handle hasActiveTenant functionality with proper error handling.
-     * @return bool
      */
     private function hasActiveTenant(): bool
     {
         return auth()->check() || session()->has('tenant_id') || request()->has('tenant_id');
     }
+
     /**
      * Handle getCurrentTenantId functionality with proper error handling.
-     * @return int|null
      */
     private function getCurrentTenantId(): ?int
     {
@@ -84,6 +84,7 @@ final class TenantScope implements Scope
         if (request()->has('tenant_id')) {
             return (int) request('tenant_id');
         }
+
         return null;
     }
 }

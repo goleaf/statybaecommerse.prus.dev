@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Collection;
 use App\Models\Product;
-use Illuminate\Support\Str;
 
 it('instantiates Collection model', function (): void {
-    expect(new Collection())->toBeInstanceOf(Collection::class);
+    expect(new Collection)->toBeInstanceOf(Collection::class);
 });
 
 it('uses slug as route key', function (): void {

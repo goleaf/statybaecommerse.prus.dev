@@ -1,97 +1,83 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Category;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+use Filament\Actions\AttachAction;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DetachAction;
 use Filament\Actions\EditAction;
-final class CategoriesRelationManager extends RelationManager
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+class CategoriesRelationManager extends RelationManager
 {
     protected static string $relationship = 'categories';
+
     protected static ?string $title = 'Categories';
+
+    protected static ?string $modelLabel = 'Category';
+
+    protected static ?string $pluralModelLabel = 'Categories';
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('category_id')
-                    ->label(__('admin.products.fields.categories'))
-                    ->relationship('category', 'name')
-                    ->searchable(),
-                    ->preload(),
-                    ->required(),
-                Forms\Components\TextInput::make('sort_order')
-                    ->label(__('admin.products.fields.sort_order'))
-                    ->numeric(),
-                    ->default(0),
-                Forms\Components\Toggle::make('is_primary')
-                    ->label(__('admin.products.fields.is_primary'))
-                    ->default(false),
+                TextInput::make('name')
+                    ->label(__('categories.fields.name'))
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('slug')
+                    ->label(__('categories.fields.slug'))
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('description')
+                    ->label(__('categories.fields.description'))
+                    ->maxLength(500),
+                Toggle::make('is_active')
+                    ->label(__('categories.fields.is_active'))
+                    ->default(true),
             ]);
     }
+
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label(__('admin.products.fields.category'))
+                TextColumn::make('name')
+                    ->label(__('categories.fields.name'))
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('category.description')
-                    ->label(__('admin.products.fields.description'))
-                    ->limit(50),
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();
-                        if (strlen($state) <= 50) {
-                            return null;
-                        }
-                        return $state;
-                    }),
-                Tables\Columns\TextColumn::make('sort_order')
-                Tables\Columns\IconColumn::make('is_primary')
+                TextColumn::make('slug')
+                    ->label(__('categories.fields.slug'))
+                    ->searchable()
+                    ->copyable(),
+                TextColumn::make('description')
+                    ->label(__('categories.fields.description'))
+                    ->limit(50)
+                    ->toggleable(),
+                IconColumn::make('is_active')
+                    ->label(__('categories.fields.is_active'))
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('admin.products.fields.created_at'))
-                    ->dateTime(),
-                    ->sortable(),
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('category')
-                    ->preload(),
-                Tables\Filters\TernaryFilter::make('is_primary')
-                    ->label(__('admin.products.fields.is_primary')),
             ->headerActions([
-                Tables\Actions\AttachAction::make()
-                    ->preloadRecordSelect()
-                    ->form(fn(Tables\Actions\AttachAction $action): array => [
-                        $action
-                            ->getRecordSelect()
-                            ->searchable(),
-                            ->preload(),
-                        Forms\Components\TextInput::make('sort_order')
-                            ->label(__('admin.products.fields.sort_order'))
-                            ->numeric(),
-                            ->default(0),
-                        Forms\Components\Toggle::make('is_primary')
-                            ->label(__('admin.products.fields.is_primary'))
-                            ->default(false),
-                    ]),
+                AttachAction::make()
+                    ->preloadRecordSelect(),
+                CreateAction::make(),
+            ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
-                Tables\Actions\DetachAction::make(),
+                DetachAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
-                ]),
-            ])
-            ->defaultSort("created_at", "desc");
-    }
-}
+            ->defaultSort('name');
     }
 }

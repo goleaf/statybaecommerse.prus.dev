@@ -11,9 +11,8 @@ use Livewire\Component;
 
 /**
  * InfiniteScrollSearch
- * 
+ *
  * Livewire component for infinite scroll search functionality with proper error handling and logging.
- * 
  */
 final class InfiniteScrollSearch extends Component
 {
@@ -88,7 +87,7 @@ final class InfiniteScrollSearch extends Component
 
     public function loadMore(): void
     {
-        if ($this->hasMore && !$this->isLoading) {
+        if ($this->hasMore && ! $this->isLoading) {
             $this->page++;
             $this->loadResults(true);
         }
@@ -96,8 +95,8 @@ final class InfiniteScrollSearch extends Component
 
     public function toggleFilters(): void
     {
-        $this->showFilters = !$this->showFilters;
-        
+        $this->showFilters = ! $this->showFilters;
+
         if ($this->showFilters && empty($this->availableFilters)) {
             $this->loadAvailableFilters();
         }
@@ -118,7 +117,7 @@ final class InfiniteScrollSearch extends Component
         } else {
             $this->filters[$filterType] = $value;
         }
-        
+
         $this->page = 1;
         $this->results = [];
         $this->loadResults();
@@ -162,7 +161,7 @@ final class InfiniteScrollSearch extends Component
 
         try {
             $paginationService = app(SearchPaginationService::class);
-            
+
             $searchData = $paginationService->getInfiniteScrollData(
                 $this->query,
                 $this->page,
@@ -185,7 +184,7 @@ final class InfiniteScrollSearch extends Component
             }
 
         } catch (\Exception $e) {
-            \Log::warning('Infinite scroll search failed: ' . $e->getMessage());
+            \Log::warning('Infinite scroll search failed: '.$e->getMessage());
             $this->addError('search', 'Search failed. Please try again.');
         } finally {
             $this->isLoading = false;
@@ -198,7 +197,7 @@ final class InfiniteScrollSearch extends Component
             $paginationService = app(SearchPaginationService::class);
             $this->availableFilters = $paginationService->getAvailableFilters($this->results);
         } catch (\Exception $e) {
-            \Log::warning('Available filters loading failed: ' . $e->getMessage());
+            \Log::warning('Available filters loading failed: '.$e->getMessage());
         }
     }
 
@@ -209,7 +208,7 @@ final class InfiniteScrollSearch extends Component
 
     public function getHasResultsProperty(): bool
     {
-        return !empty($this->results);
+        return ! empty($this->results);
     }
 
     public function getIsSearchingProperty(): bool

@@ -1,24 +1,20 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
+
 /**
  * DiscountDebugCollector
- * 
+ *
  * Service class containing DiscountDebugCollector business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 class DiscountDebugCollector
 {
     /**
      * Handle logDiscountApplication functionality with proper error handling.
-     * @param string $code
-     * @param array $context
-     * @param bool $applied
-     * @param float $amount
-     * @return void
      */
     public function logDiscountApplication(string $code, array $context, bool $applied, float $amount): void
     {

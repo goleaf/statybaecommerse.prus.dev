@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Brand;
 use App\Models\Category;
@@ -43,12 +45,11 @@ describe('Product API', function () {
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->has('data', 15)
-                        ->has('meta')
-                        ->has('links')
-                        ->where('meta.total', 16)  // 15 + 1 from beforeEach
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->has('data', 15)
+                    ->has('meta')
+                    ->has('links')
+                    ->where('meta.total', 16)  // 15 + 1 from beforeEach
                 );
         });
 
@@ -57,28 +58,26 @@ describe('Product API', function () {
             $otherProduct = Product::factory()->create(['is_visible' => true]);
             $otherProduct->categories()->attach($otherCategory->id);
 
-            $response = $this->getJson('/api/products?category=' . $this->category->id);
+            $response = $this->getJson('/api/products?category='.$this->category->id);
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->has('data', 1)
-                        ->where('data.0.id', $this->product->id));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->has('data', 1)
+                    ->where('data.0.id', $this->product->id));
         });
 
         it('filters products by brand', function () {
             $otherBrand = Brand::factory()->create(['is_enabled' => true]);
             Product::factory()->create(['is_visible' => true, 'brand_id' => $otherBrand->id]);
 
-            $response = $this->getJson('/api/products?brand=' . $this->brand->id);
+            $response = $this->getJson('/api/products?brand='.$this->brand->id);
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->has('data', 1)
-                        ->where('data.0.id', $this->product->id));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->has('data', 1)
+                    ->where('data.0.id', $this->product->id));
         });
 
         it('searches products by name', function () {
@@ -88,10 +87,9 @@ describe('Product API', function () {
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->has('data', 1)
-                        ->where('data.0.name', 'Test Product'));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->has('data', 1)
+                    ->where('data.0.name', 'Test Product'));
         });
 
         it('sorts products by price', function () {
@@ -105,10 +103,9 @@ describe('Product API', function () {
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->where('data.0.id', $this->product->id)
-                        ->where('data.1.id', $expensiveProduct->id));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->where('data.0.id', $this->product->id)
+                    ->where('data.1.id', $expensiveProduct->id));
         });
 
         it('includes product relationships', function () {
@@ -116,28 +113,26 @@ describe('Product API', function () {
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->has('data.0.brand')
-                        ->has('data.0.categories')
-                        ->has('data.0.variants'));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->has('data.0.brand')
+                    ->has('data.0.categories')
+                    ->has('data.0.variants'));
         });
     });
 
     describe('GET /api/products/{id}', function () {
         it('returns single product with details', function () {
-            $response = $this->getJson('/api/products/' . $this->product->id);
+            $response = $this->getJson('/api/products/'.$this->product->id);
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->where('id', $this->product->id)
-                        ->where('name', 'Test Product')
-                        ->where('description', 'Test Description')
-                        ->has('brand')
-                        ->has('categories')
-                        ->has('variants'));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->where('id', $this->product->id)
+                    ->where('name', 'Test Product')
+                    ->where('description', 'Test Description')
+                    ->has('brand')
+                    ->has('categories')
+                    ->has('variants'));
         });
 
         it('returns 404 for non-existent product', function () {
@@ -149,7 +144,7 @@ describe('Product API', function () {
         it('returns 404 for invisible product', function () {
             $invisibleProduct = Product::factory()->create(['is_visible' => false]);
 
-            $response = $this->getJson('/api/products/' . $invisibleProduct->id);
+            $response = $this->getJson('/api/products/'.$invisibleProduct->id);
 
             $response->assertNotFound();
         });
@@ -178,11 +173,10 @@ describe('Product API', function () {
 
             $response
                 ->assertCreated()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->where('name', 'New Product')
-                        ->where('description', 'New Description')
-                        ->has('id'));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->where('name', 'New Product')
+                    ->where('description', 'New Description')
+                    ->has('id'));
 
             $this->assertDatabaseHas('products', [
                 'name' => 'New Product',
@@ -224,14 +218,13 @@ describe('Product API', function () {
 
             $response = $this
                 ->actingAs($this->admin, 'sanctum')
-                ->putJson('/api/products/' . $this->product->id, $updateData);
+                ->putJson('/api/products/'.$this->product->id, $updateData);
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->where('name', 'Updated Product')
-                        ->where('description', 'Updated Description'));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->where('name', 'Updated Product')
+                    ->where('description', 'Updated Description'));
 
             $this->assertDatabaseHas('products', [
                 'id' => $this->product->id,
@@ -240,7 +233,7 @@ describe('Product API', function () {
         });
 
         it('requires authentication', function () {
-            $response = $this->putJson('/api/products/' . $this->product->id, []);
+            $response = $this->putJson('/api/products/'.$this->product->id, []);
 
             $response->assertUnauthorized();
         });
@@ -248,7 +241,7 @@ describe('Product API', function () {
         it('requires admin privileges', function () {
             $response = $this
                 ->actingAs($this->user, 'sanctum')
-                ->putJson('/api/products/' . $this->product->id, []);
+                ->putJson('/api/products/'.$this->product->id, []);
 
             $response->assertForbidden();
         });
@@ -258,7 +251,7 @@ describe('Product API', function () {
         it('deletes product when authenticated as admin', function () {
             $response = $this
                 ->actingAs($this->admin, 'sanctum')
-                ->deleteJson('/api/products/' . $this->product->id);
+                ->deleteJson('/api/products/'.$this->product->id);
 
             $response->assertNoContent();
 
@@ -266,7 +259,7 @@ describe('Product API', function () {
         });
 
         it('requires authentication', function () {
-            $response = $this->deleteJson('/api/products/' . $this->product->id);
+            $response = $this->deleteJson('/api/products/'.$this->product->id);
 
             $response->assertUnauthorized();
         });
@@ -274,7 +267,7 @@ describe('Product API', function () {
         it('requires admin privileges', function () {
             $response = $this
                 ->actingAs($this->user, 'sanctum')
-                ->deleteJson('/api/products/' . $this->product->id);
+                ->deleteJson('/api/products/'.$this->product->id);
 
             $response->assertForbidden();
         });
@@ -282,42 +275,39 @@ describe('Product API', function () {
 
     describe('Product Stock Management', function () {
         it('can check product availability', function () {
-            $response = $this->getJson('/api/products/' . $this->product->id . '/availability');
+            $response = $this->getJson('/api/products/'.$this->product->id.'/availability');
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->where('available', true)
-                        ->where('stock_quantity', 10)
-                        ->where('in_stock', true));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->where('available', true)
+                    ->where('stock_quantity', 10)
+                    ->where('in_stock', true));
         });
 
         it('shows out of stock when quantity is zero', function () {
             $this->product->variants()->update(['stock_quantity' => 0]);
 
-            $response = $this->getJson('/api/products/' . $this->product->id . '/availability');
+            $response = $this->getJson('/api/products/'.$this->product->id.'/availability');
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->where('available', false)
-                        ->where('stock_quantity', 0)
-                        ->where('in_stock', false));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->where('available', false)
+                    ->where('stock_quantity', 0)
+                    ->where('in_stock', false));
         });
     });
 
     describe('Product Reviews API', function () {
         it('can get product reviews', function () {
-            $response = $this->getJson('/api/products/' . $this->product->id . '/reviews');
+            $response = $this->getJson('/api/products/'.$this->product->id.'/reviews');
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->has('data')
-                        ->has('meta'));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->has('data')
+                    ->has('meta'));
         });
 
         it('can create product review when authenticated', function () {
@@ -329,19 +319,18 @@ describe('Product API', function () {
 
             $response = $this
                 ->actingAs($this->user, 'sanctum')
-                ->postJson('/api/products/' . $this->product->id . '/reviews', $reviewData);
+                ->postJson('/api/products/'.$this->product->id.'/reviews', $reviewData);
 
             $response
                 ->assertCreated()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->where('rating', 5)
-                        ->where('title', 'Great product!')
-                        ->where('comment', 'I love this product.'));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->where('rating', 5)
+                    ->where('title', 'Great product!')
+                    ->where('comment', 'I love this product.'));
         });
 
         it('requires authentication to create review', function () {
-            $response = $this->postJson('/api/products/' . $this->product->id . '/reviews', []);
+            $response = $this->postJson('/api/products/'.$this->product->id.'/reviews', []);
 
             $response->assertUnauthorized();
         });
@@ -349,12 +338,11 @@ describe('Product API', function () {
 
     describe('Product Images API', function () {
         it('can get product images', function () {
-            $response = $this->getJson('/api/products/' . $this->product->id . '/images');
+            $response = $this->getJson('/api/products/'.$this->product->id.'/images');
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json->has('data'));
+                ->assertJson(fn (AssertableJson $json) => $json->has('data'));
         });
     });
 
@@ -364,16 +352,15 @@ describe('Product API', function () {
             Product::factory()
                 ->count(3)
                 ->create(['is_visible' => true])
-                ->each(fn($product) => $product->categories()->attach($this->category->id));
+                ->each(fn ($product) => $product->categories()->attach($this->category->id));
 
-            $response = $this->getJson('/api/products/' . $this->product->id . '/related');
+            $response = $this->getJson('/api/products/'.$this->product->id.'/related');
 
             $response
                 ->assertOk()
-                ->assertJson(fn(AssertableJson $json) =>
-                    $json
-                        ->has('data')
-                        ->whereType('data', 'array'));
+                ->assertJson(fn (AssertableJson $json) => $json
+                    ->has('data')
+                    ->whereType('data', 'array'));
         });
     });
 });

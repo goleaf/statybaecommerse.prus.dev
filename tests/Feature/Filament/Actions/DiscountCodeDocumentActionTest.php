@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Actions;
 
@@ -11,16 +13,17 @@ use App\Services\DocumentService;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Livewire;
-use Tests\TestCase;
 
 final class DiscountCodeDocumentActionTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $user;
+
     private Discount $discount;
+
     private DiscountCode $discountCode;
+
     private DocumentTemplate $template;
 
     protected function setUp(): void
@@ -166,4 +169,3 @@ final class DiscountCodeDocumentActionTest extends TestCase
             ->toBe('Test Discount');
     }
 }
-

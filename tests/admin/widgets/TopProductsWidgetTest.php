@@ -1,9 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Widgets\TopProductsWidget;
 use App\Models\AnalyticsEvent;
-use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->widget = new TopProductsWidget();
+    $this->widget = new TopProductsWidget;
 });
 
 it('can instantiate top products widget', function () {
@@ -39,13 +39,13 @@ it('returns only visible products', function () {
     AnalyticsEvent::factory()->create([
         'event_type' => 'product_view',
         'properties' => ['product_id' => $visibleProduct->id],
-        'created_at' => now()->subDays(3)
+        'created_at' => now()->subDays(3),
     ]);
 
     AnalyticsEvent::factory()->create([
         'event_type' => 'product_view',
         'properties' => ['product_id' => $hiddenProduct->id],
-        'created_at' => now()->subDays(3)
+        'created_at' => now()->subDays(3),
     ]);
 
     $table = $this->widget->table(new Table($this->widget));
@@ -67,14 +67,14 @@ it('counts product views correctly', function () {
     AnalyticsEvent::factory()->count(3)->create([
         'event_type' => 'product_view',
         'properties' => ['product_id' => $product->id],
-        'created_at' => now()->subDays(3)
+        'created_at' => now()->subDays(3),
     ]);
 
     // Create old analytics event (should not count)
     AnalyticsEvent::factory()->create([
         'event_type' => 'product_view',
         'properties' => ['product_id' => $product->id],
-        'created_at' => now()->subDays(10)
+        'created_at' => now()->subDays(10),
     ]);
 
     $table = $this->widget->table(new Table($this->widget));
@@ -91,14 +91,14 @@ it('counts cart adds correctly', function () {
     AnalyticsEvent::factory()->count(2)->create([
         'event_type' => 'add_to_cart',
         'properties' => ['product_id' => $product->id],
-        'created_at' => now()->subDays(2)
+        'created_at' => now()->subDays(2),
     ]);
 
     // Create old analytics event (should not count)
     AnalyticsEvent::factory()->create([
         'event_type' => 'add_to_cart',
         'properties' => ['product_id' => $product->id],
-        'created_at' => now()->subDays(10)
+        'created_at' => now()->subDays(10),
     ]);
 
     $table = $this->widget->table(new Table($this->widget));
@@ -116,7 +116,7 @@ it('calculates total sold correctly', function () {
     OrderItem::factory()->create([
         'order_id' => $completedOrder->id,
         'product_id' => $product->id,
-        'quantity' => 5
+        'quantity' => 5,
     ]);
 
     // Create pending order (should not count)
@@ -124,7 +124,7 @@ it('calculates total sold correctly', function () {
     OrderItem::factory()->create([
         'order_id' => $pendingOrder->id,
         'product_id' => $product->id,
-        'quantity' => 3
+        'quantity' => 3,
     ]);
 
     $table = $this->widget->table(new Table($this->widget));
@@ -143,28 +143,28 @@ it('orders products by combined score', function () {
     AnalyticsEvent::factory()->count(2)->create([
         'event_type' => 'product_view',
         'properties' => ['product_id' => $product1->id],
-        'created_at' => now()->subDays(2)
+        'created_at' => now()->subDays(2),
     ]);
 
     $order1 = Order::factory()->create(['status' => 'completed']);
     OrderItem::factory()->create([
         'order_id' => $order1->id,
         'product_id' => $product1->id,
-        'quantity' => 1
+        'quantity' => 1,
     ]);
 
     // Product 2: 1 view + 3 sales = 4 total score (should be first)
     AnalyticsEvent::factory()->create([
         'event_type' => 'product_view',
         'properties' => ['product_id' => $product2->id],
-        'created_at' => now()->subDays(2)
+        'created_at' => now()->subDays(2),
     ]);
 
     $order2 = Order::factory()->create(['status' => 'completed']);
     OrderItem::factory()->create([
         'order_id' => $order2->id,
         'product_id' => $product2->id,
-        'quantity' => 3
+        'quantity' => 3,
     ]);
 
     $table = $this->widget->table(new Table($this->widget));
@@ -214,7 +214,7 @@ it('includes product view action', function () {
     expect($actions)->not()->toBeEmpty();
 
     // Ensure the Edit action exists
-    $actionNames = array_map(fn($a) => method_exists($a, 'getName') ? $a->getName() : null, $actions);
+    $actionNames = array_map(fn ($a) => method_exists($a, 'getName') ? $a->getName() : null, $actions);
     expect($actionNames)->toContain('edit');
 });
 
@@ -230,6 +230,6 @@ it('uses media library for product images', function () {
     $columns = $table->getColumns();
 
     // Check that SpatieMediaLibraryImageColumn is used
-    $imageColumn = collect($columns)->first(fn($column) => $column->getName() === 'images');
+    $imageColumn = collect($columns)->first(fn ($column) => $column->getName() === 'images');
     expect($imageColumn)->not()->toBeNull();
 });

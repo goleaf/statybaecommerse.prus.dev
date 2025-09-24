@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Http\Middleware\HandleImpersonation;
 use App\Models\User;
@@ -10,7 +12,7 @@ uses(RefreshDatabase::class);
 
 describe('HandleImpersonation Middleware', function () {
     beforeEach(function () {
-        $this->middleware = new HandleImpersonation();
+        $this->middleware = new HandleImpersonation;
         $this->request = Request::create('/test', 'GET');
     });
 

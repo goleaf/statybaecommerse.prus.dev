@@ -15,23 +15,22 @@ final class SystemSettingDependencyFactory extends Factory
     public function definition(): array
     {
         $conditions = [
-            'equals',
-            'not_equals',
-            'greater_than',
-            'less_than',
-            'contains',
-            'not_contains',
-            'is_empty',
-            'is_not_empty',
-            'is_true',
-            'is_false',
+            'setting.value == "enabled"',
+            'setting.value == "disabled"',
+            'setting.value > 0',
+            'setting.value < 100',
+            'setting.value contains "test"',
+            'setting.value not contains "test"',
+            'setting.value is empty',
+            'setting.value is not empty',
+            'setting.value is true',
+            'setting.value is false',
         ];
 
         return [
             'setting_id' => SystemSetting::factory(),
             'depends_on_setting_id' => SystemSetting::factory(),
             'condition' => $this->faker->randomElement($conditions),
-            'condition_value' => $this->faker->boolean(70) ? $this->faker->sentence() : null,
             'is_active' => $this->faker->boolean(90), // 90% chance of being active
         ];
     }
@@ -53,80 +52,70 @@ final class SystemSettingDependencyFactory extends Factory
     public function equals(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'equals',
-            'condition_value' => $value,
+            'condition' => "setting.value == \"{$value}\"",
         ]);
     }
 
     public function notEquals(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'not_equals',
-            'condition_value' => $value,
+            'condition' => "setting.value != \"{$value}\"",
         ]);
     }
 
     public function greaterThan(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'greater_than',
-            'condition_value' => $value,
+            'condition' => "setting.value > \"{$value}\"",
         ]);
     }
 
     public function lessThan(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'less_than',
-            'condition_value' => $value,
+            'condition' => "setting.value < \"{$value}\"",
         ]);
     }
 
     public function contains(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'contains',
-            'condition_value' => $value,
+            'condition' => "setting.value contains \"{$value}\"",
         ]);
     }
 
     public function notContains(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'not_contains',
-            'condition_value' => $value,
+            'condition' => "setting.value not contains \"{$value}\"",
         ]);
     }
 
     public function isEmpty(): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'is_empty',
-            'condition_value' => null,
+            'condition' => 'setting.value is empty',
         ]);
     }
 
     public function isNotEmpty(): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'is_not_empty',
-            'condition_value' => null,
+            'condition' => 'setting.value is not empty',
         ]);
     }
 
     public function isTrue(): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'is_true',
-            'condition_value' => null,
+            'condition' => 'setting.value is true',
         ]);
     }
 
     public function isFalse(): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition' => 'is_false',
-            'condition_value' => null,
+            'condition' => 'setting.value is false',
         ]);
     }
 

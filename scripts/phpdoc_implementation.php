@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 /**
  * PHPDoc Implementation Script
- * 
+ *
  * This script automatically adds comprehensive PHPDoc documentation
  * to all PHP classes in the Laravel application following PSR-5 standards.
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -20,12 +20,14 @@ use PhpParser\PrettyPrinter\Standard;
 class PHPDocImplementation
 {
     private array $processedFiles = [];
+
     private array $errors = [];
+
     private Standard $printer;
 
     public function __construct()
     {
-        $this->printer = new Standard();
+        $this->printer = new Standard;
     }
 
     /**
@@ -72,17 +74,18 @@ class PHPDocImplementation
      */
     private function processDirectory(string $directory): void
     {
-        $fullPath = __DIR__ . '/../' . $directory;
-        
-        if (!is_dir($fullPath)) {
+        $fullPath = __DIR__.'/../'.$directory;
+
+        if (! is_dir($fullPath)) {
             echo "⚠️  Directory not found: {$directory}\n";
+
             return;
         }
 
         echo "📁 Processing directory: {$directory}\n";
 
         $files = $this->getPhpFiles($fullPath);
-        
+
         foreach ($files as $file) {
             $this->processFile($file, $directory);
         }
@@ -112,8 +115,8 @@ class PHPDocImplementation
      */
     private function processFile(string $filePath, string $relativeDirectory): void
     {
-        $relativePath = str_replace(__DIR__ . '/../', '', $filePath);
-        
+        $relativePath = str_replace(__DIR__.'/../', '', $filePath);
+
         try {
             $content = file_get_contents($filePath);
             if ($content === false) {
@@ -123,23 +126,24 @@ class PHPDocImplementation
             // Skip files that already have comprehensive PHPDoc
             if ($this->hasComprehensivePHPDoc($content)) {
                 echo "  ✅ {$relativePath} - Already has comprehensive PHPDoc\n";
+
                 return;
             }
 
-            $parser = (new ParserFactory())->createForNewestSupportedVersion();
+            $parser = (new ParserFactory)->createForNewestSupportedVersion();
             $ast = $parser->parse($content);
 
             if ($ast === null) {
                 throw new Exception("Could not parse file: {$filePath}");
             }
 
-            $traverser = new NodeTraverser();
+            $traverser = new NodeTraverser;
             $visitor = new PHPDocVisitor($relativeDirectory);
             $traverser->addVisitor($visitor);
             $modifiedAst = $traverser->traverse($ast);
 
             $newContent = $this->printer->prettyPrintFile($modifiedAst);
-            
+
             // Only write if content changed
             if ($newContent !== $content) {
                 file_put_contents($filePath, $newContent);
@@ -150,8 +154,8 @@ class PHPDocImplementation
             }
 
         } catch (Exception $e) {
-            $this->errors[] = "Error processing {$relativePath}: " . $e->getMessage();
-            echo "  ❌ {$relativePath} - Error: " . $e->getMessage() . "\n";
+            $this->errors[] = "Error processing {$relativePath}: ".$e->getMessage();
+            echo "  ❌ {$relativePath} - Error: ".$e->getMessage()."\n";
         }
     }
 
@@ -171,14 +175,14 @@ class PHPDocImplementation
      */
     private function generateReport(): void
     {
-        echo "\n" . str_repeat("=", 60) . "\n";
+        echo "\n".str_repeat('=', 60)."\n";
         echo "📊 PHPDoc Implementation Report\n";
-        echo str_repeat("=", 60) . "\n\n";
+        echo str_repeat('=', 60)."\n\n";
 
-        echo "✅ Files Processed: " . count($this->processedFiles) . "\n";
-        echo "❌ Errors: " . count($this->errors) . "\n\n";
+        echo '✅ Files Processed: '.count($this->processedFiles)."\n";
+        echo '❌ Errors: '.count($this->errors)."\n\n";
 
-        if (!empty($this->processedFiles)) {
+        if (! empty($this->processedFiles)) {
             echo "📝 Modified Files:\n";
             foreach ($this->processedFiles as $file) {
                 echo "  - {$file}\n";
@@ -186,7 +190,7 @@ class PHPDocImplementation
             echo "\n";
         }
 
-        if (!empty($this->errors)) {
+        if (! empty($this->errors)) {
             echo "❌ Errors:\n";
             foreach ($this->errors as $error) {
                 echo "  - {$error}\n";
@@ -204,6 +208,7 @@ class PHPDocImplementation
 class PHPDocVisitor extends NodeVisitorAbstract
 {
     private string $directory;
+
     private array $classInfo = [];
 
     public function __construct(string $directory)
@@ -247,7 +252,7 @@ class PHPDocVisitor extends NodeVisitorAbstract
         }
 
         // Generate PHPDoc if not present
-        if (!$this->hasClassPHPDoc($node)) {
+        if (! $this->hasClassPHPDoc($node)) {
             $this->addClassPHPDoc($node);
         }
     }
@@ -296,6 +301,7 @@ class PHPDocVisitor extends NodeVisitorAbstract
                 return strpos($comment->getText(), '/**') === 0;
             }
         }
+
         return false;
     }
 
@@ -309,12 +315,12 @@ class PHPDocVisitor extends NodeVisitorAbstract
     {
         $className = $this->classInfo['name'];
         $description = $this->getClassDescription();
-        
+
         $phpdoc = "/**\n";
         $phpdoc .= " * {$className}\n";
         $phpdoc .= " * \n";
         $phpdoc .= " * {$description}\n";
-        $phpdoc .= " */";
+        $phpdoc .= ' */';
 
         return $phpdoc;
     }
@@ -322,50 +328,50 @@ class PHPDocVisitor extends NodeVisitorAbstract
     private function getClassDescription(): string
     {
         $directory = $this->directory;
-        
+
         if (str_contains($directory, 'Models')) {
-            return "Eloquent model representing a database entity with relationships and business logic.";
+            return 'Eloquent model representing a database entity with relationships and business logic.';
         } elseif (str_contains($directory, 'Controllers')) {
-            return "HTTP controller handling web requests and responses.";
+            return 'HTTP controller handling web requests and responses.';
         } elseif (str_contains($directory, 'Services')) {
-            return "Service class containing business logic and external integrations.";
+            return 'Service class containing business logic and external integrations.';
         } elseif (str_contains($directory, 'Filament')) {
-            return "Filament resource/page/widget for admin panel management.";
+            return 'Filament resource/page/widget for admin panel management.';
         } elseif (str_contains($directory, 'Livewire')) {
-            return "Livewire component for reactive frontend functionality.";
+            return 'Livewire component for reactive frontend functionality.';
         } elseif (str_contains($directory, 'Enums')) {
-            return "Enumeration defining a set of named constants.";
+            return 'Enumeration defining a set of named constants.';
         } elseif (str_contains($directory, 'Traits')) {
-            return "Trait providing reusable functionality across multiple classes.";
+            return 'Trait providing reusable functionality across multiple classes.';
         } elseif (str_contains($directory, 'Jobs')) {
-            return "Job class for queued background processing.";
+            return 'Job class for queued background processing.';
         } elseif (str_contains($directory, 'Events')) {
-            return "Event class for application event handling.";
+            return 'Event class for application event handling.';
         } elseif (str_contains($directory, 'Listeners')) {
-            return "Event listener for handling application events.";
+            return 'Event listener for handling application events.';
         } elseif (str_contains($directory, 'Notifications')) {
-            return "Notification class for user notifications.";
+            return 'Notification class for user notifications.';
         } elseif (str_contains($directory, 'Mail')) {
-            return "Mailable class for email sending.";
+            return 'Mailable class for email sending.';
         } elseif (str_contains($directory, 'Policies')) {
-            return "Authorization policy for access control.";
+            return 'Authorization policy for access control.';
         } elseif (str_contains($directory, 'Observers')) {
-            return "Model observer for Eloquent model events.";
+            return 'Model observer for Eloquent model events.';
         } elseif (str_contains($directory, 'Actions')) {
-            return "Action class for single-purpose operations.";
+            return 'Action class for single-purpose operations.';
         } elseif (str_contains($directory, 'Data')) {
-            return "Data transfer object for structured data handling.";
+            return 'Data transfer object for structured data handling.';
         } elseif (str_contains($directory, 'Collections')) {
-            return "Custom collection class for data manipulation.";
+            return 'Custom collection class for data manipulation.';
         } elseif (str_contains($directory, 'Contracts')) {
-            return "Interface contract defining required methods.";
+            return 'Interface contract defining required methods.';
         } elseif (str_contains($directory, 'Exceptions')) {
-            return "Custom exception class for error handling.";
+            return 'Custom exception class for error handling.';
         } elseif (str_contains($directory, 'Validators')) {
-            return "Validation class for data validation rules.";
+            return 'Validation class for data validation rules.';
         }
 
-        return "PHP class providing application functionality.";
+        return 'PHP class providing application functionality.';
     }
 
     private function getPropertyType(Node\Stmt\Property $property): ?string
@@ -373,6 +379,7 @@ class PHPDocVisitor extends NodeVisitorAbstract
         if ($property->type) {
             return $this->printer->prettyPrint([$property->type]);
         }
+
         return null;
     }
 
@@ -385,6 +392,7 @@ class PHPDocVisitor extends NodeVisitorAbstract
         } elseif ($node->flags & Node\Stmt\Class_::MODIFIER_PRIVATE) {
             return 'private';
         }
+
         return 'public';
     }
 
@@ -397,6 +405,7 @@ class PHPDocVisitor extends NodeVisitorAbstract
                 'type' => $param->type ? $this->printer->prettyPrint([$param->type]) : null,
             ];
         }
+
         return $parameters;
     }
 
@@ -405,12 +414,13 @@ class PHPDocVisitor extends NodeVisitorAbstract
         if ($method->returnType) {
             return $this->printer->prettyPrint([$method->returnType]);
         }
+
         return null;
     }
 }
 
 // Run the implementation
 if (php_sapi_name() === 'cli') {
-    $implementation = new PHPDocImplementation();
+    $implementation = new PHPDocImplementation;
     $implementation->run();
 }

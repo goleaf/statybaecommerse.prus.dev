@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 /**
  * Test Execution Script
- * 
+ *
  * Script for running tests by groups
  */
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
 use Tests\Feature\TestGroups;
 
 class TestRunner
 {
     private array $groups;
+
     private string $basePath;
 
     public function __construct()
@@ -28,14 +29,15 @@ class TestRunner
      */
     public function runGroup(string $groupName): int
     {
-        if (!isset($this->groups[$groupName])) {
+        if (! isset($this->groups[$groupName])) {
             echo "❌ Group '{$groupName}' not found.\n";
-            echo "Available groups: " . implode(', ', array_keys($this->groups)) . "\n";
+            echo 'Available groups: '.implode(', ', array_keys($this->groups))."\n";
+
             return 1;
         }
 
         echo "🚀 Running {$groupName} tests...\n";
-        
+
         $tests = $this->groups[$groupName];
         $success = 0;
         $failed = 0;
@@ -54,7 +56,7 @@ class TestRunner
         echo "\n📊 Results for {$groupName}:\n";
         echo "✅ Passed: {$success}\n";
         echo "❌ Failed: {$failed}\n";
-        echo "📈 Total: " . ($success + $failed) . "\n";
+        echo '📈 Total: '.($success + $failed)."\n";
 
         return $failed > 0 ? 1 : 0;
     }
@@ -65,14 +67,14 @@ class TestRunner
     public function runAll(): int
     {
         echo "🚀 Running all tests...\n";
-        
+
         $totalSuccess = 0;
         $totalFailed = 0;
 
         foreach ($this->groups as $groupName => $tests) {
             echo "\n📁 Running {$groupName} group...\n";
             $result = $this->runGroup($groupName);
-            
+
             if ($result === 0) {
                 $totalSuccess++;
             } else {
@@ -83,7 +85,7 @@ class TestRunner
         echo "\n🎯 Final Results:\n";
         echo "✅ Groups Passed: {$totalSuccess}\n";
         echo "❌ Groups Failed: {$totalFailed}\n";
-        echo "📈 Total Groups: " . ($totalSuccess + $totalFailed) . "\n";
+        echo '📈 Total Groups: '.($totalSuccess + $totalFailed)."\n";
 
         return $totalFailed > 0 ? 1 : 0;
     }
@@ -96,9 +98,9 @@ class TestRunner
         $command = "cd {$this->basePath} && php artisan test tests/Feature/{$testName}.php --stop-on-failure 2>/dev/null";
         $output = [];
         $returnCode = 0;
-        
+
         exec($command, $output, $returnCode);
-        
+
         return $returnCode;
     }
 
@@ -108,9 +110,9 @@ class TestRunner
     public function listGroups(): void
     {
         echo "📋 Available test groups:\n\n";
-        
+
         foreach ($this->groups as $groupName => $tests) {
-            echo "📁 {$groupName} (" . count($tests) . " tests)\n";
+            echo "📁 {$groupName} (".count($tests)." tests)\n";
             foreach ($tests as $test) {
                 echo "  - {$test}\n";
             }
@@ -129,12 +131,12 @@ class TestRunner
         echo "  php run-tests.php all         Run all groups\n";
         echo "  php run-tests.php list        List available groups\n";
         echo "  php run-tests.php help        Show this help\n\n";
-        echo "Available groups: " . implode(', ', array_keys($this->groups)) . "\n";
+        echo 'Available groups: '.implode(', ', array_keys($this->groups))."\n";
     }
 }
 
 // Main execution
-$runner = new TestRunner();
+$runner = new TestRunner;
 
 if ($argc < 2) {
     $runner->showHelp();
@@ -147,14 +149,14 @@ switch ($command) {
     case 'help':
         $runner->showHelp();
         break;
-        
+
     case 'list':
         $runner->listGroups();
         break;
-        
+
     case 'all':
         exit($runner->runAll());
-        
+
     default:
         if (isset($runner->groups[$command])) {
             exit($runner->runGroup($command));
@@ -164,4 +166,3 @@ switch ($command) {
             exit(1);
         }
 }
-

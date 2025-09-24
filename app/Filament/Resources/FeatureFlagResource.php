@@ -1,17 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
-
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -20,6 +15,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
@@ -31,8 +27,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 /**
  * FeatureFlagResource
@@ -41,14 +36,20 @@ use Illuminate\Database\Eloquent\Collection;
  */
 final class FeatureFlagResource extends Resource
 {
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'System';
+    }
+
     protected static ?string $model = FeatureFlag::class;
-    // protected static $navigationGroup = NavigationGroup::System;
+
+    // /** @var UnitEnum|string|null */
     protected static ?int $navigationSort = 5;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
      */
     public static function getNavigationLabel(): string
     {
@@ -57,7 +58,6 @@ final class FeatureFlagResource extends Resource
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -66,7 +66,6 @@ final class FeatureFlagResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -75,12 +74,10 @@ final class FeatureFlagResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $form->schema([
             Section::make(__('feature_flags.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -173,8 +170,6 @@ final class FeatureFlagResource extends Resource
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -275,7 +270,6 @@ final class FeatureFlagResource extends Resource
 
     /**
      * Handle getRelations functionality with proper error handling.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -286,7 +280,6 @@ final class FeatureFlagResource extends Resource
 
     /**
      * Handle getPages functionality with proper error handling.
-     * @return array
      */
     public static function getPages(): array
     {

@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * NewsCategory
@@ -20,9 +22,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed $table
  * @property mixed $fillable
  * @property string $translationModel
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|NewsCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|NewsCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|NewsCategory query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class])]
@@ -32,11 +36,11 @@ final class NewsCategory extends Model
     use HasTranslations;
 
     protected $table = 'news_categories';
+
     protected $fillable = ['is_visible', 'parent_id', 'sort_order', 'color', 'icon'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -47,7 +51,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle parent category functionality with proper error handling.
-     * @return BelongsTo
      */
     public function parent(): BelongsTo
     {
@@ -56,7 +59,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle children categories functionality with proper error handling.
-     * @return HasMany
      */
     public function children(): HasMany
     {
@@ -65,7 +67,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle news functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function news(): BelongsToMany
     {
@@ -74,7 +75,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle isVisible functionality with proper error handling.
-     * @return bool
      */
     public function isVisible(): bool
     {
@@ -83,8 +83,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle scopeVisible functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeVisible(Builder $query): Builder
     {
@@ -93,8 +91,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeOrdered(Builder $query): Builder
     {
@@ -103,7 +99,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle getRouteKeyName functionality with proper error handling.
-     * @return string
      */
     public function getRouteKeyName(): string
     {
@@ -112,7 +107,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle getSlugAttribute functionality with proper error handling.
-     * @return string
      */
     public function getSlugAttribute(): string
     {
@@ -121,7 +115,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle getNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getNameAttribute(): string
     {
@@ -130,7 +123,6 @@ final class NewsCategory extends Model
 
     /**
      * Handle getDescriptionAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getDescriptionAttribute(): ?string
     {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -28,13 +30,13 @@ final class LatestOrdersWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('number')
                     ->searchable()
                     ->sortable()
-                    ->url(fn(Order $record): string => OrderResource::getUrl('view', ['record' => $record])),
+                    ->url(fn (Order $record): string => OrderResource::getUrl('view', ['record' => $record])),
                 Tables\Columns\TextColumn::make('user.email')
                     ->label('Customer')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'processing' => 'info',
                         'shipped' => 'primary',
@@ -54,7 +56,7 @@ final class LatestOrdersWidget extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\Action::make('view')
-                    ->url(fn(Order $record): string => OrderResource::getUrl('view', ['record' => $record]))
+                    ->url(fn (Order $record): string => OrderResource::getUrl('view', ['record' => $record]))
                     ->icon('heroicon-o-eye'),
             ]);
     }

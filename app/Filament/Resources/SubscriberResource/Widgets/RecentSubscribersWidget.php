@@ -15,9 +15,9 @@ final class RecentSubscribersWidget extends ChartWidget
     protected function getData(): array
     {
         $data = Subscriber::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as count')
-            )
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COUNT(*) as count')
+        )
             ->where('created_at', '>=', now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date')

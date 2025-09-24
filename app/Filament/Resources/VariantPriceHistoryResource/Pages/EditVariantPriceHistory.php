@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantPriceHistoryResource\Pages;
 
 use App\Filament\Resources\VariantPriceHistoryResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
 final class EditVariantPriceHistory extends EditRecord
 {
@@ -17,4 +19,3 @@ final class EditVariantPriceHistory extends EditRecord
         ];
     }
 }
-

@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
@@ -20,24 +21,29 @@ use Illuminate\Support\Number;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 /**
  * ProductVariant
- * 
+ *
  * Eloquent model representing the ProductVariant entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- * 
+ *
  * @property mixed $table
  * @property mixed $fillable
  * @property mixed $appends
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class, StatusScope::class])]
 final class ProductVariant extends Model implements HasMedia
 {
     use HasFactory, HasProductPricing, InteractsWithMedia, SoftDeletes;
+
     protected $table = 'product_variants';
+
     protected $fillable = [
         'product_id', 'sku', 'name', 'variant_name_lt', 'variant_name_en',
         'description_lt', 'description_en', 'price', 'compare_price', 'cost_price',
@@ -46,22 +52,22 @@ final class ProductVariant extends Model implements HasMedia
         'weight', 'track_inventory', 'is_default', 'is_enabled', 'barcode', 'attributes',
         'is_on_sale', 'sale_start_date', 'sale_end_date', 'is_featured', 'is_new', 'is_bestseller',
         'seo_title_lt', 'seo_title_en', 'seo_description_lt', 'seo_description_en',
-        'views_count', 'clicks_count', 'conversion_rate', 'variant_combination_hash'
+        'views_count', 'clicks_count', 'conversion_rate', 'variant_combination_hash',
     ];
+
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
         return [
-            'price' => 'decimal:4', 
-            'compare_price' => 'decimal:4', 
+            'price' => 'decimal:4',
+            'compare_price' => 'decimal:4',
             'cost_price' => 'decimal:4',
             'wholesale_price' => 'decimal:4',
             'member_price' => 'decimal:4',
             'promotional_price' => 'decimal:4',
-            'weight' => 'decimal:2', 
+            'weight' => 'decimal:2',
             'stock_quantity' => 'integer',
             'reserved_quantity' => 'integer',
             'available_quantity' => 'integer',
@@ -78,73 +84,76 @@ final class ProductVariant extends Model implements HasMedia
             'views_count' => 'integer',
             'clicks_count' => 'integer',
             'conversion_rate' => 'decimal:4',
-            'attributes' => 'array'
+            'attributes' => 'array',
         ];
     }
+
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
     protected $appends = [
-        'display_name', 'profit_margin', 'stock', 'available_quantity', 
-        'reserved_quantity', 'is_out_of_stock'
+        'display_name', 'profit_margin', 'stock', 'available_quantity',
+        'reserved_quantity', 'is_out_of_stock',
     ];
+
     /**
      * Handle product functionality with proper error handling.
-     * @return BelongsTo
      */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+
     /**
      * Handle reservedQuantity functionality with proper error handling.
-     * @return int
      */
     public function reservedQuantity(): int
     {
         $variantId = Number::parseFloat($this->id);
         $sum = Number::parseFloat(DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum('vi.reserved'));
+
         return max($sum, 0);
     }
+
     /**
      * Handle availableQuantity functionality with proper error handling.
-     * @return int
      */
     public function availableQuantity(): int
     {
         $variantId = Number::parseFloat($this->id);
         $sum = Number::parseFloat(DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END')));
+
         return max($sum, 0);
     }
+
     /**
      * Handle isOutOfStock functionality with proper error handling.
-     * @return bool
      */
     public function isOutOfStock(): bool
     {
         return $this->availableQuantity() < 1;
     }
+
     /**
      * Handle getStockAttribute functionality with proper error handling.
-     * @return int
      */
     public function getStockAttribute(): int
     {
         return (int) ($this->stock_quantity ?? 0);
     }
+
     /**
      * Handle prices functionality with proper error handling.
-     * @return MorphMany
      */
     public function prices(): MorphMany
     {
         return $this->morphMany(Price::class, 'priceable');
     }
+
     /**
      * Handle attributes functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function attributes(): BelongsToMany
     {
@@ -153,7 +162,6 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle variantAttributeValues functionality with proper error handling.
-     * @return HasMany
      */
     public function variantAttributeValues(): HasMany
     {
@@ -162,7 +170,6 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle priceHistory functionality with proper error handling.
-     * @return HasMany
      */
     public function priceHistory(): HasMany
     {
@@ -171,7 +178,6 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle stockHistory functionality with proper error handling.
-     * @return HasMany
      */
     public function stockHistory(): HasMany
     {
@@ -180,92 +186,96 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle analytics functionality with proper error handling.
-     * @return HasMany
      */
     public function analytics(): HasMany
     {
         return $this->hasMany(VariantAnalytics::class, 'variant_id');
     }
+
     /**
      * Handle inventories functionality with proper error handling.
-     * @return HasMany
      */
     public function inventories(): HasMany
     {
         return $this->hasMany(VariantInventory::class, 'variant_id');
     }
+
     /**
      * Handle orderItems functionality with proper error handling.
-     * @return HasMany
      */
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class, 'variant_id');
     }
+
     /**
      * Handle cartItems functionality with proper error handling.
-     * @return HasMany
      */
     public function cartItems(): HasMany
     {
         return $this->hasMany(CartItem::class, 'variant_id');
     }
+
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEnabled($query)
     {
         return $query->where('is_enabled', true);
     }
+
     /**
      * Handle scopeInStock functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeInStock($query)
     {
         return $query->where('quantity', '>', 0);
     }
+
     /**
      * Handle scopeByStatus functionality with proper error handling.
-     * @param mixed $query
-     * @param string $status
+     *
+     * @param  mixed  $query
      */
     public function scopeByStatus($query, string $status)
     {
         return $query->where('status', $status);
     }
+
     /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getDisplayNameAttribute(): string
     {
-        return $this->name ?: $this->product->name . ' - ' . $this->sku;
+        return $this->name ?: $this->product->name.' - '.$this->sku;
     }
+
     /**
      * Handle getProfitMarginAttribute functionality with proper error handling.
-     * @return float|null
      */
     public function getProfitMarginAttribute(): ?float
     {
-        if (!$this->cost_price || $this->cost_price <= 0) {
+        if (! $this->cost_price || $this->cost_price <= 0) {
             return null;
         }
+
         return ($this->price - $this->cost_price) / $this->price * 100;
     }
+
     /**
      * Handle registerMediaCollections functionality with proper error handling.
-     * @return void
      */
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images')->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
+
     /**
      * Handle registerMediaConversions functionality with proper error handling.
-     * @param Media|null $media
-     * @return void
      */
     public function registerMediaConversions(?Media $media = null): void
     {
@@ -275,7 +285,6 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle images functionality with proper error handling.
-     * @return HasMany
      */
     public function images(): HasMany
     {
@@ -284,7 +293,6 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle primaryImage functionality with proper error handling.
-     * @return HasOne
      */
     public function primaryImage(): HasOne
     {
@@ -293,7 +301,6 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle pricingRules functionality with proper error handling.
-     * @return HasMany
      */
     public function pricingRules(): HasMany
     {
@@ -302,109 +309,103 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle getFinalPriceAttribute functionality with proper error handling.
-     * @return float
      */
     public function getFinalPriceAttribute(): float
     {
         $basePrice = $this->price;
         $sizeModifier = $this->size_price_modifier ?? 0;
-        
+
         // Apply size-based pricing modifier
         $finalPrice = $basePrice + $sizeModifier;
-        
+
         // Apply dynamic pricing rules
         $pricingRules = $this->pricingRules()->active()->orderedByPriority()->get();
         foreach ($pricingRules as $rule) {
             $modifier = $rule->calculatePriceModifier($this);
             $finalPrice += $modifier;
         }
-        
+
         return max(0, $finalPrice);
     }
 
     /**
      * Handle getSizeDisplayNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getSizeDisplayNameAttribute(): string
     {
         if ($this->size_display) {
             return $this->size_display;
         }
-        
+
         if ($this->size) {
-            return $this->size . ($this->size_unit ? ' ' . $this->size_unit : '');
+            return $this->size.($this->size_unit ? ' '.$this->size_unit : '');
         }
-        
+
         return '';
     }
 
     /**
      * Handle getVariantSkuAttribute functionality with proper error handling.
-     * @return string
      */
     public function getVariantSkuAttribute(): string
     {
         if ($this->variant_sku_suffix) {
-            return $this->sku . '-' . $this->variant_sku_suffix;
+            return $this->sku.'-'.$this->variant_sku_suffix;
         }
-        
+
         return $this->sku;
     }
 
     /**
      * Handle getIsLowStockAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getIsLowStockAttribute(): bool
     {
-        if (!$this->track_inventory) {
+        if (! $this->track_inventory) {
             return false;
         }
-        
+
         return $this->availableQuantity() <= $this->low_stock_threshold;
     }
 
     /**
      * Handle getNeedsReorderAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getNeedsReorderAttribute(): bool
     {
-        if (!$this->track_inventory) {
+        if (! $this->track_inventory) {
             return false;
         }
-        
+
         return $this->availableQuantity() <= $this->low_stock_threshold;
     }
 
     /**
      * Handle getStockStatusAttribute functionality with proper error handling.
-     * @return string
      */
     public function getStockStatusAttribute(): string
     {
-        if (!$this->track_inventory) {
+        if (! $this->track_inventory) {
             return 'not_tracked';
         }
-        
+
         $available = $this->availableQuantity();
-        
+
         if ($available <= 0) {
             return 'out_of_stock';
         }
-        
+
         if ($available <= $this->low_stock_threshold) {
             return 'low_stock';
         }
-        
+
         return 'in_stock';
     }
 
     /**
      * Handle scopeBySize functionality with proper error handling.
-     * @param mixed $query
-     * @param string $size
+     *
+     * @param  mixed  $query
      */
     public function scopeBySize($query, string $size)
     {
@@ -413,8 +414,8 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle scopeByVariantType functionality with proper error handling.
-     * @param mixed $query
-     * @param string $type
+     *
+     * @param  mixed  $query
      */
     public function scopeByVariantType($query, string $type)
     {
@@ -423,17 +424,18 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle scopeDefaultVariant functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeDefaultVariant($query)
     {
         return $query->where('is_default_variant', true);
     }
 
-
     /**
      * Handle scopeLowStock functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeLowStock($query)
     {
@@ -443,7 +445,8 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Handle scopeOutOfStock functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeOutOfStock($query)
     {
@@ -453,82 +456,77 @@ final class ProductVariant extends Model implements HasMedia
 
     /**
      * Set as default variant for the product.
-     * @return bool
      */
     public function setAsDefault(): bool
     {
         // Remove default status from other variants of the same product
-        static::where('product_id', $this->product_id)
+        self::where('product_id', $this->product_id)
             ->where('id', '!=', $this->id)
             ->update(['is_default_variant' => false]);
-        
+
         // Set this variant as default
         $this->is_default_variant = true;
-        
+
         return $this->save();
     }
 
     /**
      * Get variant attributes as key-value pairs.
-     * @return array
      */
     public function getVariantAttributes(): array
     {
         $attributes = [];
-        
+
         foreach ($this->attributes as $attributeValue) {
             $attributes[$attributeValue->attribute->name] = $attributeValue->value;
         }
-        
+
         return $attributes;
     }
 
     /**
      * Get variant display name with attributes.
-     * @return string
      */
     public function getVariantDisplayName(): string
     {
         $name = $this->product->name;
         $attributes = $this->getVariantAttributes();
-        
-        if (!empty($attributes)) {
+
+        if (! empty($attributes)) {
             $attributeStrings = [];
             foreach ($attributes as $key => $value) {
-                $attributeStrings[] = ucfirst($key) . ': ' . $value;
+                $attributeStrings[] = ucfirst($key).': '.$value;
             }
-            $name .= ' (' . implode(', ', $attributeStrings) . ')';
+            $name .= ' ('.implode(', ', $attributeStrings).')';
         }
-        
+
         return $name;
     }
 
     /**
      * Check if variant is available for purchase.
-     * @return bool
      */
     public function isAvailableForPurchase(): bool
     {
-        if (!$this->is_enabled) {
+        if (! $this->is_enabled) {
             return false;
         }
-        
-        if ($this->track_inventory && $this->availableQuantity() <= 0 && !$this->allow_backorder) {
+
+        if ($this->track_inventory && $this->availableQuantity() <= 0 && ! $this->allow_backorder) {
             return false;
         }
-        
+
         return true;
     }
 
     /**
      * Get variant weight with size modifier.
-     * @return float
      */
     public function getFinalWeight(): float
     {
         $baseWeight = $this->weight ?? 0;
         $sizeModifier = $this->size_weight_modifier ?? 0;
-        
+
         return max(0, $baseWeight + $sizeModifier);
     }
 
@@ -538,7 +536,7 @@ final class ProductVariant extends Model implements HasMedia
     public function getLocalizedName(?string $locale = null): string
     {
         $locale = $locale ?: app()->getLocale();
-        
+
         return match ($locale) {
             'lt' => $this->variant_name_lt ?: $this->name,
             'en' => $this->variant_name_en ?: $this->name,
@@ -552,7 +550,7 @@ final class ProductVariant extends Model implements HasMedia
     public function getLocalizedDescription(?string $locale = null): ?string
     {
         $locale = $locale ?: app()->getLocale();
-        
+
         return match ($locale) {
             'lt' => $this->description_lt,
             'en' => $this->description_en,
@@ -566,7 +564,7 @@ final class ProductVariant extends Model implements HasMedia
     public function getLocalizedSeoTitle(?string $locale = null): ?string
     {
         $locale = $locale ?: app()->getLocale();
-        
+
         return match ($locale) {
             'lt' => $this->seo_title_lt,
             'en' => $this->seo_title_en,
@@ -580,7 +578,7 @@ final class ProductVariant extends Model implements HasMedia
     public function getLocalizedSeoDescription(?string $locale = null): ?string
     {
         $locale = $locale ?: app()->getLocale();
-        
+
         return match ($locale) {
             'lt' => $this->seo_description_lt,
             'en' => $this->seo_description_en,
@@ -598,13 +596,13 @@ final class ProductVariant extends Model implements HasMedia
             if ($this->promotional_price && $this->promotional_price > 0) {
                 return $this->promotional_price;
             }
-            
+
             // Apply sale discount if no promotional price set
             if ($this->compare_price && $this->compare_price > $this->price) {
                 return $this->price;
             }
         }
-        
+
         return $this->price;
     }
 
@@ -613,20 +611,20 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function isCurrentlyOnSale(): bool
     {
-        if (!$this->is_on_sale) {
+        if (! $this->is_on_sale) {
             return false;
         }
-        
+
         $now = now();
-        
+
         if ($this->sale_start_date && $now->isBefore($this->sale_start_date)) {
             return false;
         }
-        
+
         if ($this->sale_end_date && $now->isAfter($this->sale_end_date)) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -648,10 +646,10 @@ final class ProductVariant extends Model implements HasMedia
     public function recordView(): bool
     {
         $this->increment('views_count');
-        
+
         // Record daily analytics
         $this->recordDailyAnalytics('views');
-        
+
         return true;
     }
 
@@ -661,10 +659,10 @@ final class ProductVariant extends Model implements HasMedia
     public function recordClick(): bool
     {
         $this->increment('clicks_count');
-        
+
         // Record daily analytics
         $this->recordDailyAnalytics('clicks');
-        
+
         return true;
     }
 
@@ -674,9 +672,9 @@ final class ProductVariant extends Model implements HasMedia
     public function recordDailyAnalytics(string $metric, int $amount = 1): void
     {
         $today = now()->toDateString();
-        
+
         VariantAnalytics::recordAnalytics($this->id, $today, [
-            $metric => $amount
+            $metric => $amount,
         ]);
     }
 
@@ -687,9 +685,10 @@ final class ProductVariant extends Model implements HasMedia
     {
         if ($this->views_count > 0) {
             $this->conversion_rate = ($this->sold_quantity / $this->views_count) * 100;
+
             return $this->save();
         }
-        
+
         return false;
     }
 
@@ -698,7 +697,7 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function recordPriceChange(
         float $oldPrice,
-        string $changeReason = null,
+        ?string $changeReason = null,
         ?int $changedBy = null
     ): VariantPriceHistory {
         return VariantPriceHistory::recordPriceChange(
@@ -740,6 +739,7 @@ final class ProductVariant extends Model implements HasMedia
     public function updateAvailableQuantity(): bool
     {
         $this->available_quantity = max(0, $this->stock_quantity - $this->reserved_quantity);
+
         return $this->save();
     }
 
@@ -775,17 +775,17 @@ final class ProductVariant extends Model implements HasMedia
         if ($this->variant_combination_hash) {
             return $this->variant_combination_hash;
         }
-        
+
         // Generate hash from attributes
         $attributes = $this->variantAttributeValues()
             ->orderBy('attribute_name')
             ->get()
             ->pluck('attribute_value')
             ->implode('|');
-        
+
         $this->variant_combination_hash = hash('sha256', $attributes);
         $this->save();
-        
+
         return $this->variant_combination_hash;
     }
 
@@ -819,14 +819,14 @@ final class ProductVariant extends Model implements HasMedia
     public function scopeOnSale($query)
     {
         return $query->where('is_on_sale', true)
-                    ->where(function ($q) {
-                        $q->whereNull('sale_start_date')
-                          ->orWhere('sale_start_date', '<=', now());
-                    })
-                    ->where(function ($q) {
-                        $q->whereNull('sale_end_date')
-                          ->orWhere('sale_end_date', '>=', now());
-                    });
+            ->where(function ($q) {
+                $q->whereNull('sale_start_date')
+                    ->orWhere('sale_start_date', '<=', now());
+            })
+            ->where(function ($q) {
+                $q->whereNull('sale_end_date')
+                    ->orWhere('sale_end_date', '>=', now());
+            });
     }
 
     /**

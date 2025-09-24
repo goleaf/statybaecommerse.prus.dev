@@ -206,7 +206,7 @@ class BrandSeeder extends Seeder
         try {
             // Skip image generation to avoid memory issues during seeding
             $this->command->info("⏭ Skipped {$collection} image generation for {$brand->name} (memory optimization)");
-            
+
             // TODO: Re-enable image generation after fixing memory issues
             // Generate local WebP image based on collection type
             // $imagePath = match ($collection) {

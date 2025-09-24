@@ -21,7 +21,7 @@ final class CreateDiscountCondition extends CreateRecord
         // Set default values
         $data['is_active'] = $data['is_active'] ?? true;
         $data['valid_from'] = $data['valid_from'] ?? now();
-        
+
         return $data;
     }
 }

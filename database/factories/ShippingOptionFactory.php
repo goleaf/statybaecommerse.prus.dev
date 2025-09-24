@@ -22,7 +22,7 @@ class ShippingOptionFactory extends Factory
         $service = fake()->randomElement($services);
 
         return [
-            'name' => $carrier . ' ' . $service,
+            'name' => $carrier.' '.$service,
             'slug' => fake()->unique()->slug(2),
             'description' => fake()->sentence(),
             'carrier_name' => $carrier,
@@ -45,21 +45,21 @@ class ShippingOptionFactory extends Factory
 
     public function enabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => true,
         ]);
     }
 
     public function disabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => false,
         ]);
     }
 
     public function default(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_default' => true,
             'sort_order' => 0,
         ]);
@@ -67,7 +67,7 @@ class ShippingOptionFactory extends Factory
 
     public function free(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'price' => 0,
             'name' => 'Free Shipping',
             'carrier_name' => 'Standard',

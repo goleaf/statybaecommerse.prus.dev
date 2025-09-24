@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -6,15 +8,17 @@ use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
 use App\Models\CampaignView;
-use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
 class CampaignPerformanceWidget extends ChartWidget
 {
     protected ?string $heading = 'Campaign Performance Analytics';
+
     protected static ?int $sort = 6;
+
     protected int|string|array $columnSpan = 2;
+
     protected ?string $maxHeight = '300px';
 
     public function getData(): array

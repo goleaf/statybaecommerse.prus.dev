@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentTemplateResource\Pages;
 
 use App\Filament\Resources\DocumentTemplateResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewDocumentTemplate extends ViewRecord
 {

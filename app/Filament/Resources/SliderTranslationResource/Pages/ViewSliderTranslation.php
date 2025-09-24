@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SliderTranslationResource\Pages;
 
 use App\Filament\Resources\SliderTranslationResource;
-use Filament\Actions\EditAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
 final class ViewSliderTranslation extends ViewRecord
@@ -15,7 +15,7 @@ final class ViewSliderTranslation extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
+            Actions\EditAction::make(),
         ];
     }
 }

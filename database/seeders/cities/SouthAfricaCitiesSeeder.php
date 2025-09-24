@@ -14,8 +14,9 @@ final class SouthAfricaCitiesSeeder extends Seeder
     public function run(): void
     {
         $country = Country::where('cca2', 'ZA')->first();
-        if (!$country) {
+        if (! $country) {
             $this->command->warn('South Africa country not found. Please run CountrySeeder first.');
+
             return;
         }
 

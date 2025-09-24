@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\EnhancedSettingResource;
 use App\Models\NormalSetting as EnhancedSetting;
 use App\Models\User;
+
 use function Pest\Laravel\actingAs;
 
 beforeEach(function () {

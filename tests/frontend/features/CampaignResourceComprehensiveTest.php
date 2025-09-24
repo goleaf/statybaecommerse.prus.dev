@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\CampaignResource\Pages\CreateCampaign;
 use App\Filament\Resources\CampaignResource\Pages\EditCampaign;
 use App\Filament\Resources\CampaignResource\Pages\ListCampaigns;
 use App\Filament\Resources\CampaignResource\Pages\ViewCampaign;
-use App\Filament\Resources\CampaignResource;
 use App\Models\Campaign;
 use App\Models\Category;
 use App\Models\Channel;
@@ -645,5 +646,3 @@ it('can handle campaign with all tracking settings', function (): void {
     expect($campaign->max_uses)->toBe(500);
     expect($campaign->social_media_ready)->toBeTrue();
 });
-
-

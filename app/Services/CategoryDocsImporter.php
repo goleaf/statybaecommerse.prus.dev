@@ -1,32 +1,29 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+
 /**
  * CategoryDocsImporter
- * 
+ *
  * Service class containing CategoryDocsImporter business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class CategoryDocsImporter
 {
     /**
      * Handle import functionality with proper error handling.
-     * @param string $basePath
-     * @param bool $includeHeadings
-     * @param bool $importFiles
-     * @return array
      */
     public function import(string $basePath, bool $includeHeadings = false, bool $importFiles = true): array
     {
         $created = 0;
         $updated = 0;
         $normalizedBasePath = rtrim($basePath, DIRECTORY_SEPARATOR);
-        if (!is_dir($normalizedBasePath)) {
+        if (! is_dir($normalizedBasePath)) {
             return ['created' => 0, 'updated' => 0];
         }
         $positionCounterByParent = [];
@@ -36,7 +33,7 @@ final class CategoryDocsImporter
                 if ($item === '.' || $item === '..') {
                     continue;
                 }
-                $fullPath = $path . DIRECTORY_SEPARATOR . $item;
+                $fullPath = $path.DIRECTORY_SEPARATOR.$item;
                 if (is_dir($fullPath)) {
                     $name = Str::of($item)->replace(['_', '-'], ' ')->title()->value();
                     $slug = $this->buildSlugFromPath($fullPath, $normalizedBasePath);
@@ -53,9 +50,10 @@ final class CategoryDocsImporter
                     }
                     $currentParentId = Category::query()->where('slug', $slug)->value('id');
                     $walker($fullPath, is_int($currentParentId) ? $currentParentId : null);
+
                     continue;
                 }
-                if (!$importFiles || !Str::of($item)->lower()->endsWith('.md')) {
+                if (! $importFiles || ! Str::of($item)->lower()->endsWith('.md')) {
                     continue;
                 }
                 $stem = pathinfo($item, PATHINFO_FILENAME);
@@ -79,17 +77,16 @@ final class CategoryDocsImporter
             }
         };
         $walker($normalizedBasePath, null);
+
         return ['created' => $created, 'updated' => $updated];
     }
+
     /**
      * Handle buildSlugFromPath functionality with proper error handling.
-     * @param string $path
-     * @param string $basePath
-     * @return string
      */
     private function buildSlugFromPath(string $path, string $basePath): string
     {
-        $relative = Str::of($path)->replaceFirst(rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR, '')->value();
+        $relative = Str::of($path)->replaceFirst(rtrim($basePath, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR, '')->value();
         $relative = Str::of($relative)->replace(['\\', '/'], '-')->value();
         $relative = Str::of($relative)->replace('.md', '')->value();
         $slug = Str::slug($relative);
@@ -97,23 +94,19 @@ final class CategoryDocsImporter
         $original = $slug;
         $i = 2;
         while (Category::query()->where('slug', $slug)->exists()) {
-            $slug = $original . '-' . $i;
+            $slug = $original.'-'.$i;
             $i++;
         }
+
         return $slug;
     }
+
     /**
      * Handle importHeadingsAsChildren functionality with proper error handling.
-     * @param string $markdownFile
-     * @param int|null $parentId
-     * @param array $positionCounterByParent
-     * @param int $created
-     * @param int $updated
-     * @return void
      */
     private function importHeadingsAsChildren(string $markdownFile, ?int $parentId, array &$positionCounterByParent, int &$created, int &$updated): void
     {
-        if (!is_file($markdownFile)) {
+        if (! is_file($markdownFile)) {
             return;
         }
         $content = file_get_contents($markdownFile);
@@ -125,12 +118,12 @@ final class CategoryDocsImporter
         $lines = explode("\n", $normalizedContent);
         foreach ($lines as $line) {
             $line = trim($line);
-            if ($line === '' || !Str::startsWith($line, ['# ', '## ', '### '])) {
+            if ($line === '' || ! Str::startsWith($line, ['# ', '## ', '### '])) {
                 continue;
             }
             $plain = ltrim($line, '# ');
             $name = Str::of($plain)->trim()->value();
-            $slug = Str::slug(($parentId ?? 0) . '-' . $name);
+            $slug = Str::slug(($parentId ?? 0).'-'.$name);
             $category = Category::query()->where('slug', $slug)->first();
             if ($category) {
                 $payload = ['name' => $name, 'parent_id' => $parentId, 'is_enabled' => true];
@@ -144,24 +137,23 @@ final class CategoryDocsImporter
             }
         }
     }
+
     /**
      * Handle filterExistingColumns functionality with proper error handling.
-     * @param string $table
-     * @param array $payload
-     * @return array
      */
     private function filterExistingColumns(string $table, array $payload): array
     {
         $filtered = [];
         foreach ($payload as $key => $value) {
-            if ($key === 'parent_id' && !Schema::hasColumn($table, 'parent_id')) {
+            if ($key === 'parent_id' && ! Schema::hasColumn($table, 'parent_id')) {
                 continue;
             }
-            if ($key === 'position' && !Schema::hasColumn($table, 'position')) {
+            if ($key === 'position' && ! Schema::hasColumn($table, 'position')) {
                 continue;
             }
             $filtered[$key] = $value;
         }
+
         return $filtered;
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\AdminUserResource;
 use App\Models\AdminUser;
@@ -163,7 +165,7 @@ it('can search admin users by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(AdminUserResource::getUrl('index') . '?search=Special')
+        ->get(AdminUserResource::getUrl('index').'?search=Special')
         ->assertOk();
 });
 
@@ -172,7 +174,7 @@ it('can search admin users by email', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(AdminUserResource::getUrl('index') . '?search=special@example.com')
+        ->get(AdminUserResource::getUrl('index').'?search=special@example.com')
         ->assertOk();
 });
 
@@ -182,14 +184,14 @@ it('can sort admin users by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(AdminUserResource::getUrl('index') . '?sort=name&direction=asc')
+        ->get(AdminUserResource::getUrl('index').'?sort=name&direction=asc')
         ->assertOk();
 });
 
 it('can sort admin users by created date', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(AdminUserResource::getUrl('index') . '?sort=created_at&direction=desc')
+        ->get(AdminUserResource::getUrl('index').'?sort=created_at&direction=desc')
         ->assertOk();
 });
 
@@ -278,4 +280,3 @@ it('can access admin user resource pages', function () {
         ->get(AdminUserResource::getUrl('create'))
         ->assertOk();
 });
-

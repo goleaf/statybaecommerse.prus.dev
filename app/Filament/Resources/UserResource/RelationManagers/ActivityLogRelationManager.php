@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class ActivityLogRelationManager extends RelationManager
 {
     protected static string $relationship = 'activities';
+
     protected static ?string $title = 'admin.sections.activity_log';
 
     public function form(Schema $schema): Schema
@@ -20,9 +21,11 @@ final class ActivityLogRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('log_name')
-                    ->required()\n                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('description')
-                    ->required()\n                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\Textarea::make('properties')
                     ->json(),
             ]);
@@ -35,14 +38,15 @@ final class ActivityLogRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('log_name')
                     ->label(__('admin.fields.log_name'))
-                    ->badge(),
+                    ->badge()
                     ->color('info'),
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('admin.fields.description'))
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('event')
                     ->label(__('admin.fields.event'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'created' => 'success',
                         'updated' => 'warning',
@@ -51,7 +55,7 @@ final class ActivityLogRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))
-                    ->dateTime(),
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([
@@ -71,8 +75,6 @@ final class ActivityLogRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\ViewAction::make(),
             ])
-            ->defaultSort("created_at", "desc");
-    }
-}
+            ->defaultSort('created_at', 'desc');
     }
 }

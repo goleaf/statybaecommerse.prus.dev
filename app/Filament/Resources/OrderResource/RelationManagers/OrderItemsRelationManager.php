@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
@@ -8,26 +10,25 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Forms;
 use Filament\Forms\Components\Hidden;
-use Filament\Schemas\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
 
 /**
  * OrderItemsRelationManager
@@ -55,7 +56,7 @@ final class OrderItemsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Section::make(__('orders.item_information'))
                     ->description(__('orders.item_information_description'))
                     ->icon('heroicon-o-cube')
@@ -129,7 +130,7 @@ final class OrderItemsRelationManager extends RelationManager
 
                                         $total = ($unitPrice * $quantity) - $discount;
 
-                                        return '€' . number_format($total, 2);
+                                        return '€'.number_format($total, 2);
                                     })
                                     ->prefixIcon('heroicon-o-banknotes'),
                             ]),
@@ -171,6 +172,7 @@ final class OrderItemsRelationManager extends RelationManager
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 30 ? $state : null;
                     })
                     ->prefixIcon('heroicon-o-cube'),
@@ -208,7 +210,7 @@ final class OrderItemsRelationManager extends RelationManager
                         'success' => 'completed',
                         'danger' => 'cancelled',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.item_statuses.{$state}") : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.item_statuses.{$state}") : '-'),
                 TextColumn::make('created_at')
                     ->label(__('orders.created_at'))
                     ->dateTime()
@@ -229,8 +231,8 @@ final class OrderItemsRelationManager extends RelationManager
                 TernaryFilter::make('has_discount')
                     ->label(__('orders.has_discount'))
                     ->queries(
-                        true: fn(Builder $query) => $query->where('discount_amount', '>', 0),
-                        false: fn(Builder $query) => $query->where('discount_amount', '=', 0),
+                        true: fn (Builder $query) => $query->where('discount_amount', '>', 0),
+                        false: fn (Builder $query) => $query->where('discount_amount', '=', 0),
                     ),
             ])
             ->headerActions([

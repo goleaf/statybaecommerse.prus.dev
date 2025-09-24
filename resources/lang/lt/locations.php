@@ -4,13 +4,13 @@ return [
     'navigation_label' => 'Vietos',
     'model_label' => 'Vieta',
     'plural_model_label' => 'Vietos',
-    
+
     // Page titles
     'title' => 'Vietos',
     'subtitle' => 'Raskite mūsų parduotuves, sandėlius ir paėmimo punktus',
     'page_title' => 'Vietų katalogas',
     'page_description' => 'Naršykite visas mūsų vietas, įskaitant parduotuves, sandėlius ir paėmimo punktus',
-    
+
     // Fields
     'fields' => [
         'name' => 'Pavadinimas',
@@ -41,7 +41,7 @@ return [
         'coordinates' => 'Koordinatės',
         'full_address' => 'Pilnas adresas',
     ],
-    
+
     // Form sections
     'basic_information' => 'Pagrindinė informacija',
     'address_information' => 'Adreso informacija',
@@ -49,7 +49,7 @@ return [
     'location_details' => 'Vietos detalės',
     'business_settings' => 'Verslo nustatymai',
     'additional_data' => 'Papildomi duomenys',
-    
+
     // Placeholders
     'placeholders' => [
         'name' => 'Įveskite vietos pavadinimą',
@@ -66,7 +66,7 @@ return [
         'longitude' => 'Įveskite ilgumą',
         'sort_order' => 'Įveskite rūšiavimo tvarką',
     ],
-    
+
     // Help text
     'help' => [
         'name' => 'Vietos pavadinimas',
@@ -82,14 +82,14 @@ return [
         'opening_hours' => 'Verslo darbo valandos kiekvienai dienai',
         'sort_order' => 'Tvarka, kuria ši vieta turėtų būti rodoma',
     ],
-    
+
     // Location types
     'type_warehouse' => 'Sandėlis',
     'type_store' => 'Parduotuvė',
     'type_office' => 'Biuras',
     'type_pickup_point' => 'Paėmimo punktas',
     'type_other' => 'Kita',
-    
+
     // Actions
     'actions' => [
         'create' => 'Sukurti vietą',
@@ -102,7 +102,7 @@ return [
         'get_directions' => 'Gauti maršrutą',
         'contact_location' => 'Susisiekti su vieta',
     ],
-    
+
     // Filters
     'filters' => [
         'search' => 'Paieška',
@@ -123,7 +123,7 @@ return [
         'apply_filters' => 'Taikyti filtrus',
         'clear_filters' => 'Išvalyti filtrus',
     ],
-    
+
     // Status
     'status' => [
         'enabled' => 'Įjungtas',
@@ -134,7 +134,7 @@ return [
         'open' => 'Atidaryta',
         'closed' => 'Uždaryta',
     ],
-    
+
     // Days of the week
     'monday' => 'Pirmadienis',
     'tuesday' => 'Antradienis',
@@ -143,7 +143,7 @@ return [
     'friday' => 'Penktadienis',
     'saturday' => 'Šeštadienis',
     'sunday' => 'Sekmadienis',
-    
+
     // Statistics
     'statistics' => [
         'total_locations' => 'Iš viso vietų',
@@ -171,7 +171,7 @@ return [
         'out_of_stock_products' => 'Produktai be atsargų',
         'out_of_stock_products_description' => 'Produktų skaičius be atsargų',
     ],
-    
+
     // Widgets
     'widgets' => [
         'overview' => 'Vietų apžvalga',
@@ -181,7 +181,7 @@ return [
         'geographic_distribution' => 'Geografinis pasiskirstymas',
         'opening_hours_summary' => 'Darbo valandų suvestinė',
     ],
-    
+
     // Messages
     'messages' => [
         'created' => 'Vieta sėkmingai sukurta',
@@ -194,7 +194,7 @@ return [
         'cannot_delete_with_inventory' => 'Negalima ištrinti vietos su inventoriumi',
         'opening_hours_updated' => 'Darbo valandos sėkmingai atnaujintos',
     ],
-    
+
     // Confirmations
     'confirmations' => [
         'delete' => 'Ar tikrai norite ištrinti šią vietą?',
@@ -203,7 +203,7 @@ return [
         'bulk_enable' => 'Ar tikrai norite įjungti pasirinktas vietas?',
         'bulk_disable' => 'Ar tikrai norite išjungti pasirinktas vietas?',
     ],
-    
+
     // Empty states
     'empty_states' => [
         'no_locations' => 'Vietų nerasta',
@@ -211,7 +211,7 @@ return [
         'no_locations_found' => 'Jūsų paieškos kriterijams atitinkančių vietų nerasta',
         'no_locations_found_description' => 'Pabandykite pakeisti paiešką ar filtrus',
     ],
-    
+
     // Validation
     'validation' => [
         'name_required' => 'Vietos pavadinimas yra privalomas',
@@ -225,7 +225,7 @@ return [
         'phone_format' => 'Neteisingas telefono numerio formatas',
         'email_format' => 'Neteisingas el. pašto adreso formatas',
     ],
-    
+
     // Details sections
     'details' => [
         'basic_info' => 'Pagrindinė informacija',
@@ -238,12 +238,12 @@ return [
         'related_locations' => 'Susijusios vietos',
         'nearby_locations' => 'Artimos vietos',
     ],
-    
+
     // Bulk actions
     'bulk_enable' => 'Įjungti pasirinktus',
     'bulk_disable' => 'Išjungti pasirinktus',
     'bulk_delete' => 'Ištrinti pasirinktus',
-    
+
     // API responses
     'api' => [
         'success' => 'Sėkmė',

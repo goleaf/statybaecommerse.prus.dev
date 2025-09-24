@@ -1,27 +1,26 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services\Shared;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+
 /**
  * TranslationService
- * 
+ *
  * Service class containing TranslationService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class TranslationService
 {
     private const CACHE_TTL = 3600;
+
     // 1 hour
     private const SUPPORTED_LOCALES = ['lt', 'en', 'de'];
+
     /**
      * Handle getTranslation functionality with proper error handling.
-     * @param string $key
-     * @param mixed $localeOrReplace
-     * @param array $replace
-     * @return string
      */
     public function getTranslation(string $key, mixed $localeOrReplace = null, array $replace = []): string
     {
@@ -36,22 +35,23 @@ final class TranslationService
         $translation = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($key, $locale) {
             return $this->loadTranslationFromFiles($key, $locale);
         });
-        if (!empty($replace) && is_string($translation)) {
+        if (! empty($replace) && is_string($translation)) {
             foreach ($replace as $search => $replacement) {
                 $translation = str_replace(":{$search}", $replacement, $translation);
             }
         }
+
         return is_string($translation) && $translation !== '' ? $translation : $key;
     }
+
     /**
      * Handle getAllTranslations functionality with proper error handling.
-     * @param string|null $locale
-     * @return array
      */
     public function getAllTranslations(?string $locale = null): array
     {
         $locale = $locale ?? app()->getLocale();
         $cacheKey = "translations.all.{$locale}";
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
             $translations = [];
             // Load from JSON files
@@ -71,13 +71,13 @@ final class TranslationService
                     }
                 }
             }
+
             return $translations;
         });
     }
+
     /**
      * Handle clearTranslationCache functionality with proper error handling.
-     * @param string|null $locale
-     * @return void
      */
     public function clearTranslationCache(?string $locale = null): void
     {
@@ -92,39 +92,39 @@ final class TranslationService
             Cache::flush();
         }
     }
+
     /**
      * Handle getSupportedLocales functionality with proper error handling.
-     * @return array
      */
     public function getSupportedLocales(): array
     {
         return self::SUPPORTED_LOCALES;
     }
+
     /**
      * Handle isLocaleSupported functionality with proper error handling.
-     * @param string $locale
-     * @return bool
      */
     public function isLocaleSupported(string $locale): bool
     {
         return in_array($locale, self::SUPPORTED_LOCALES);
     }
+
     /**
      * Handle getDefaultLocale functionality with proper error handling.
-     * @return string
      */
     public function getDefaultLocale(): string
     {
         return 'lt';
         // Lithuanian as default per rules
     }
+
     /**
      * Handle getCurrentCurrency functionality with proper error handling.
-     * @return string
      */
     public function getCurrentCurrency(): string
     {
         $locale = app()->getLocale();
+
         return match ($locale) {
             'lt' => 'EUR',
             'en' => 'EUR',
@@ -133,11 +133,9 @@ final class TranslationService
             default => 'EUR',
         };
     }
+
     /**
      * Handle loadTranslationFromFiles functionality with proper error handling.
-     * @param string $key
-     * @param string $locale
-     * @return string|array|null
      */
     private function loadTranslationFromFiles(string $key, string $locale): string|array|null
     {
@@ -155,9 +153,11 @@ final class TranslationService
             $phpFile = lang_path("{$locale}/{$group}.php");
             if (File::exists($phpFile)) {
                 $translations = include $phpFile;
+
                 return data_get($translations, $item);
             }
         }
+
         return null;
     }
 }

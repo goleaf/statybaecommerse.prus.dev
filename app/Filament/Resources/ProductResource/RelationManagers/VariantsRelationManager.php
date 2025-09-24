@@ -1,22 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
+
 use App\Models\ProductVariant;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 final class VariantsRelationManager extends RelationManager
 {
     protected static string $relationship = 'variants';
+
     protected static ?string $title = 'Product Variants';
-    
+
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -62,7 +66,7 @@ final class VariantsRelationManager extends RelationManager
                     ->columnSpanFull(),
             ]);
     }
-    
+
     public function table(Table $table): Table
     {
         return $table
@@ -83,7 +87,7 @@ final class VariantsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('cost_price'),
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->badge()
-                    ->color(fn($state) => match (true) {
+                    ->color(fn ($state) => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 5 => 'warning',
                         default => 'success',
@@ -104,10 +108,10 @@ final class VariantsRelationManager extends RelationManager
                     ->label(__('admin.products.fields.is_published')),
                 Tables\Filters\Filter::make('low_stock')
                     ->label(__('admin.products.filters.low_stock'))
-                    ->query(fn(Builder $query): Builder => $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold')),
+                    ->query(fn (Builder $query): Builder => $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold')),
                 Tables\Filters\Filter::make('out_of_stock')
                     ->label(__('admin.products.filters.out_of_stock'))
-                    ->query(fn(Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
+                    ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),

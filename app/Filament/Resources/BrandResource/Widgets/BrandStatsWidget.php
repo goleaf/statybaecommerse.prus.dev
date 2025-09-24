@@ -6,7 +6,6 @@ namespace App\Filament\Resources\BrandResource\Widgets;
 
 use App\Models\Brand;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class BrandStatsWidget extends ChartWidget
 {

@@ -5,31 +5,28 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 /**
  * SearchRecommendationsService
- * 
+ *
  * Service class containing SearchRecommendationsService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class SearchRecommendationsService
 {
     private const CACHE_PREFIX = 'search_recommendations:';
+
     private const CACHE_TTL = 3600; // 1 hour
+
     private const RECOMMENDATIONS_CACHE_TTL = 1800; // 30 minutes
 
     /**
      * Handle getSearchRecommendations functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     public function getSearchRecommendations(string $query, array $context = []): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX . 'recommendations_' . md5($query . serialize($context));
-            
+            $cacheKey = self::CACHE_PREFIX.'recommendations_'.md5($query.serialize($context));
+
             return Cache::remember($cacheKey, self::RECOMMENDATIONS_CACHE_TTL, function () use ($query, $context) {
                 return [
                     'related_products' => $this->getRelatedProducts($query, $context),
@@ -45,7 +42,8 @@ final class SearchRecommendationsService
                 ];
             });
         } catch (\Exception $e) {
-            \Log::warning('Search recommendations generation failed: ' . $e->getMessage());
+            \Log::warning('Search recommendations generation failed: '.$e->getMessage());
+
             return [
                 'related_products' => [],
                 'similar_searches' => [],
@@ -63,16 +61,13 @@ final class SearchRecommendationsService
 
     /**
      * Handle getRelatedProducts functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     private function getRelatedProducts(string $query, array $context): array
     {
         try {
             $autocompleteService = app(AutocompleteService::class);
             $results = $autocompleteService->search($query, 20, ['products']);
-            
+
             $relatedProducts = [];
             foreach ($results as $result) {
                 if ($result['type'] === 'product') {
@@ -87,35 +82,34 @@ final class SearchRecommendationsService
                     ];
                 }
             }
-            
+
             return array_slice($relatedProducts, 0, 10);
         } catch (\Exception $e) {
-            \Log::warning('Related products generation failed: ' . $e->getMessage());
+            \Log::warning('Related products generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getSimilarSearches functionality with proper error handling.
-     * @param string $query
-     * @return array
      */
     private function getSimilarSearches(string $query): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX . 'similar_' . md5($query);
-            
+            $cacheKey = self::CACHE_PREFIX.'similar_'.md5($query);
+
             return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
                 $analyticsService = app(SearchAnalyticsService::class);
                 $popularSearches = $analyticsService->getPopularSearchesForDateRange(50);
-                
+
                 $similarSearches = [];
                 $queryWords = explode(' ', strtolower($query));
-                
+
                 foreach ($popularSearches as $search) {
                     $searchWords = explode(' ', strtolower($search['query']));
                     $similarity = $this->calculateSimilarity($queryWords, $searchWords);
-                    
+
                     if ($similarity > 0.4 && $search['query'] !== $query) {
                         $similarSearches[] = [
                             'query' => $search['query'],
@@ -125,35 +119,34 @@ final class SearchRecommendationsService
                         ];
                     }
                 }
-                
-                usort($similarSearches, fn($a, $b) => $b['similarity_score'] <=> $a['similarity_score']);
-                
+
+                usort($similarSearches, fn ($a, $b) => $b['similarity_score'] <=> $a['similarity_score']);
+
                 return array_slice($similarSearches, 0, 8);
             });
         } catch (\Exception $e) {
-            \Log::warning('Similar searches generation failed: ' . $e->getMessage());
+            \Log::warning('Similar searches generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getTrendingSearches functionality with proper error handling.
-     * @param array $context
-     * @return array
      */
     private function getTrendingSearches(array $context): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX . 'trending_' . md5(serialize($context));
-            
-            return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($context) {
+            $cacheKey = self::CACHE_PREFIX.'trending_'.md5(serialize($context));
+
+            return Cache::remember($cacheKey, self::CACHE_TTL, function () {
                 $analyticsService = app(SearchAnalyticsService::class);
                 $popularSearches = $analyticsService->getPopularSearchesForDateRange(20);
-                
+
                 $trendingSearches = [];
                 foreach ($popularSearches as $search) {
                     $trendDirection = $this->getTrendDirection($search['query']);
-                    
+
                     if ($trendDirection === 'rising') {
                         $trendingSearches[] = [
                             'query' => $search['query'],
@@ -164,39 +157,37 @@ final class SearchRecommendationsService
                         ];
                     }
                 }
-                
-                usort($trendingSearches, fn($a, $b) => $b['growth_rate'] <=> $a['growth_rate']);
-                
+
+                usort($trendingSearches, fn ($a, $b) => $b['growth_rate'] <=> $a['growth_rate']);
+
                 return array_slice($trendingSearches, 0, 6);
             });
         } catch (\Exception $e) {
-            \Log::warning('Trending searches generation failed: ' . $e->getMessage());
+            \Log::warning('Trending searches generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getPersonalizedRecommendations functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     private function getPersonalizedRecommendations(string $query, array $context): array
     {
         try {
             $userId = $context['user_id'] ?? null;
-            
-            if (!$userId) {
+
+            if (! $userId) {
                 return [];
             }
-            
-            $cacheKey = self::CACHE_PREFIX . 'personalized_' . $userId . '_' . md5($query);
-            
+
+            $cacheKey = self::CACHE_PREFIX.'personalized_'.$userId.'_'.md5($query);
+
             return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $userId) {
                 $userPreferences = $this->getUserPreferences($userId);
                 $userHistory = $this->getUserSearchHistory($userId);
                 $userPurchases = $this->getUserPurchaseHistory($userId);
-                
+
                 return [
                     'based_on_history' => $this->getRecommendationsBasedOnHistory($query, $userHistory),
                     'based_on_preferences' => $this->getRecommendationsBasedOnPreferences($query, $userPreferences),
@@ -205,23 +196,21 @@ final class SearchRecommendationsService
                 ];
             });
         } catch (\Exception $e) {
-            \Log::warning('Personalized recommendations generation failed: ' . $e->getMessage());
+            \Log::warning('Personalized recommendations generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getCrossSellSuggestions functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     private function getCrossSellSuggestions(string $query, array $context): array
     {
         try {
             $autocompleteService = app(AutocompleteService::class);
             $results = $autocompleteService->search($query, 10, ['products']);
-            
+
             $crossSellSuggestions = [];
             foreach ($results as $result) {
                 if ($result['type'] === 'product') {
@@ -229,26 +218,24 @@ final class SearchRecommendationsService
                     $crossSellSuggestions = array_merge($crossSellSuggestions, $relatedProducts);
                 }
             }
-            
+
             return array_slice($crossSellSuggestions, 0, 8);
         } catch (\Exception $e) {
-            \Log::warning('Cross-sell suggestions generation failed: ' . $e->getMessage());
+            \Log::warning('Cross-sell suggestions generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getUpsellSuggestions functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     private function getUpsellSuggestions(string $query, array $context): array
     {
         try {
             $autocompleteService = app(AutocompleteService::class);
             $results = $autocompleteService->search($query, 10, ['products']);
-            
+
             $upsellSuggestions = [];
             foreach ($results as $result) {
                 if ($result['type'] === 'product') {
@@ -256,26 +243,24 @@ final class SearchRecommendationsService
                     $upsellSuggestions = array_merge($upsellSuggestions, $upsellProducts);
                 }
             }
-            
+
             return array_slice($upsellSuggestions, 0, 6);
         } catch (\Exception $e) {
-            \Log::warning('Upsell suggestions generation failed: ' . $e->getMessage());
+            \Log::warning('Upsell suggestions generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getCategoryRecommendations functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     private function getCategoryRecommendations(string $query, array $context): array
     {
         try {
             $autocompleteService = app(AutocompleteService::class);
             $results = $autocompleteService->search($query, 20, ['categories']);
-            
+
             $categoryRecommendations = [];
             foreach ($results as $result) {
                 if ($result['type'] === 'category') {
@@ -289,26 +274,24 @@ final class SearchRecommendationsService
                     ];
                 }
             }
-            
+
             return array_slice($categoryRecommendations, 0, 6);
         } catch (\Exception $e) {
-            \Log::warning('Category recommendations generation failed: ' . $e->getMessage());
+            \Log::warning('Category recommendations generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getBrandRecommendations functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     private function getBrandRecommendations(string $query, array $context): array
     {
         try {
             $autocompleteService = app(AutocompleteService::class);
             $results = $autocompleteService->search($query, 15, ['brands']);
-            
+
             $brandRecommendations = [];
             foreach ($results as $result) {
                 if ($result['type'] === 'brand') {
@@ -323,40 +306,38 @@ final class SearchRecommendationsService
                     ];
                 }
             }
-            
+
             return array_slice($brandRecommendations, 0, 8);
         } catch (\Exception $e) {
-            \Log::warning('Brand recommendations generation failed: ' . $e->getMessage());
+            \Log::warning('Brand recommendations generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getPriceRecommendations functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     private function getPriceRecommendations(string $query, array $context): array
     {
         try {
             $autocompleteService = app(AutocompleteService::class);
             $results = $autocompleteService->search($query, 50, ['products']);
-            
+
             $prices = [];
             foreach ($results as $result) {
                 if ($result['type'] === 'product' && isset($result['price'])) {
                     $prices[] = (float) $result['price'];
                 }
             }
-            
+
             if (empty($prices)) {
                 return [];
             }
-            
+
             sort($prices);
             $count = count($prices);
-            
+
             return [
                 'price_range' => [
                     'min' => $prices[0],
@@ -373,23 +354,21 @@ final class SearchRecommendationsService
                 'price_alerts' => $this->getPriceAlerts($query, $prices),
             ];
         } catch (\Exception $e) {
-            \Log::warning('Price recommendations generation failed: ' . $e->getMessage());
+            \Log::warning('Price recommendations generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getSeasonalRecommendations functionality with proper error handling.
-     * @param string $query
-     * @param array $context
-     * @return array
      */
     private function getSeasonalRecommendations(string $query, array $context): array
     {
         try {
             $currentSeason = $this->getCurrentSeason();
             $seasonalKeywords = $this->getSeasonalKeywords($currentSeason);
-            
+
             $seasonalRecommendations = [];
             foreach ($seasonalKeywords as $keyword) {
                 if (stripos($query, $keyword) !== false) {
@@ -402,40 +381,38 @@ final class SearchRecommendationsService
                     ];
                 }
             }
-            
+
             return $seasonalRecommendations;
         } catch (\Exception $e) {
-            \Log::warning('Seasonal recommendations generation failed: ' . $e->getMessage());
+            \Log::warning('Seasonal recommendations generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getSimilarityReason functionality with proper error handling.
-     * @param string $query
-     * @param array $result
-     * @return string
      */
     private function getSimilarityReason(string $query, array $result): string
     {
         try {
             $queryWords = explode(' ', strtolower($query));
             $titleWords = explode(' ', strtolower($result['title']));
-            
+
             $commonWords = array_intersect($queryWords, $titleWords);
-            
-            if (!empty($commonWords)) {
-                return 'Similar keywords: ' . implode(', ', $commonWords);
+
+            if (! empty($commonWords)) {
+                return 'Similar keywords: '.implode(', ', $commonWords);
             }
-            
+
             if (isset($result['subtitle']) && stripos($result['subtitle'], $query) !== false) {
                 return 'Brand match';
             }
-            
+
             if (isset($result['description']) && stripos($result['description'], $query) !== false) {
                 return 'Description match';
             }
-            
+
             return 'Category similarity';
         } catch (\Exception $e) {
             return 'General similarity';
@@ -444,32 +421,28 @@ final class SearchRecommendationsService
 
     /**
      * Handle calculateSimilarity functionality with proper error handling.
-     * @param array $words1
-     * @param array $words2
-     * @return float
      */
     private function calculateSimilarity(array $words1, array $words2): float
     {
         $intersection = array_intersect($words1, $words2);
         $union = array_unique(array_merge($words1, $words2));
-        
+
         if (empty($union)) {
             return 0.0;
         }
-        
+
         return count($intersection) / count($union);
     }
 
     /**
      * Handle getTrendDirection functionality with proper error handling.
-     * @param string $query
-     * @return string
      */
     private function getTrendDirection(string $query): string
     {
         try {
             // This would typically analyze trend data
             $trends = ['rising', 'falling', 'stable'];
+
             return $trends[array_rand($trends)];
         } catch (\Exception $e) {
             return 'stable';
@@ -478,8 +451,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getGrowthRate functionality with proper error handling.
-     * @param string $query
-     * @return float
      */
     private function getGrowthRate(string $query): float
     {
@@ -493,14 +464,12 @@ final class SearchRecommendationsService
 
     /**
      * Handle getSearchCategory functionality with proper error handling.
-     * @param string $query
-     * @return string
      */
     private function getSearchCategory(string $query): string
     {
         try {
             $query = strtolower($query);
-            
+
             if (preg_match('/\b(shirt|dress|pants|shoes|jacket)\b/', $query)) {
                 return 'clothing';
             } elseif (preg_match('/\b(phone|laptop|tablet|computer)\b/', $query)) {
@@ -510,7 +479,7 @@ final class SearchRecommendationsService
             } elseif (preg_match('/\b(furniture|chair|table|sofa)\b/', $query)) {
                 return 'home';
             }
-            
+
             return 'general';
         } catch (\Exception $e) {
             return 'general';
@@ -519,13 +488,12 @@ final class SearchRecommendationsService
 
     /**
      * Handle getUserPreferences functionality with proper error handling.
-     * @param int $userId
-     * @return array
      */
     private function getUserPreferences(int $userId): array
     {
         try {
             $cacheKey = "user_preferences_{$userId}";
+
             return Cache::get($cacheKey, [
                 'preferred_categories' => ['electronics' => 40, 'clothing' => 30, 'books' => 20, 'home' => 10],
                 'preferred_brands' => ['apple' => 30, 'samsung' => 25, 'nike' => 20, 'adidas' => 15],
@@ -539,13 +507,12 @@ final class SearchRecommendationsService
 
     /**
      * Handle getUserSearchHistory functionality with proper error handling.
-     * @param int $userId
-     * @return array
      */
     private function getUserSearchHistory(int $userId): array
     {
         try {
             $cacheKey = "user_search_history_{$userId}";
+
             return Cache::get($cacheKey, []);
         } catch (\Exception $e) {
             return [];
@@ -554,13 +521,12 @@ final class SearchRecommendationsService
 
     /**
      * Handle getUserPurchaseHistory functionality with proper error handling.
-     * @param int $userId
-     * @return array
      */
     private function getUserPurchaseHistory(int $userId): array
     {
         try {
             $cacheKey = "user_purchase_history_{$userId}";
+
             return Cache::get($cacheKey, []);
         } catch (\Exception $e) {
             return [];
@@ -569,9 +535,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getRecommendationsBasedOnHistory functionality with proper error handling.
-     * @param string $query
-     * @param array $userHistory
-     * @return array
      */
     private function getRecommendationsBasedOnHistory(string $query, array $userHistory): array
     {
@@ -589,9 +552,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getRecommendationsBasedOnPreferences functionality with proper error handling.
-     * @param string $query
-     * @param array $userPreferences
-     * @return array
      */
     private function getRecommendationsBasedOnPreferences(string $query, array $userPreferences): array
     {
@@ -609,9 +569,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getRecommendationsBasedOnPurchases functionality with proper error handling.
-     * @param string $query
-     * @param array $userPurchases
-     * @return array
      */
     private function getRecommendationsBasedOnPurchases(string $query, array $userPurchases): array
     {
@@ -629,9 +586,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getCollaborativeFilteringRecommendations functionality with proper error handling.
-     * @param string $query
-     * @param int $userId
-     * @return array
      */
     private function getCollaborativeFilteringRecommendations(string $query, int $userId): array
     {
@@ -649,8 +603,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getCrossSellProducts functionality with proper error handling.
-     * @param int $productId
-     * @return array
      */
     private function getCrossSellProducts(int $productId): array
     {
@@ -681,8 +633,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getUpsellProducts functionality with proper error handling.
-     * @param int $productId
-     * @return array
      */
     private function getUpsellProducts(int $productId): array
     {
@@ -713,8 +663,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getSubcategories functionality with proper error handling.
-     * @param int $categoryId
-     * @return array
      */
     private function getSubcategories(int $categoryId): array
     {
@@ -731,8 +679,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getBrandPopularityScore functionality with proper error handling.
-     * @param int $brandId
-     * @return float
      */
     private function getBrandPopularityScore(int $brandId): float
     {
@@ -746,19 +692,17 @@ final class SearchRecommendationsService
 
     /**
      * Handle getBestValueProducts functionality with proper error handling.
-     * @param array $results
-     * @return array
      */
     private function getBestValueProducts(array $results): array
     {
         try {
             $bestValueProducts = [];
-            
+
             foreach ($results as $result) {
                 if ($result['type'] === 'product' && isset($result['price'])) {
                     $price = (float) $result['price'];
                     $rating = $result['average_rating'] ?? 0;
-                    
+
                     if ($rating > 4.0 && $price < 100) {
                         $bestValueProducts[] = [
                             'id' => $result['id'],
@@ -770,9 +714,9 @@ final class SearchRecommendationsService
                     }
                 }
             }
-            
-            usort($bestValueProducts, fn($a, $b) => $b['value_score'] <=> $a['value_score']);
-            
+
+            usort($bestValueProducts, fn ($a, $b) => $b['value_score'] <=> $a['value_score']);
+
             return array_slice($bestValueProducts, 0, 5);
         } catch (\Exception $e) {
             return [];
@@ -781,9 +725,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getPriceAlerts functionality with proper error handling.
-     * @param string $query
-     * @param array $prices
-     * @return array
      */
     private function getPriceAlerts(string $query, array $prices): array
     {
@@ -791,7 +732,7 @@ final class SearchRecommendationsService
             $minPrice = min($prices);
             $maxPrice = max($prices);
             $avgPrice = array_sum($prices) / count($prices);
-            
+
             return [
                 'price_drop_alert' => $minPrice < $avgPrice * 0.8,
                 'price_increase_alert' => $maxPrice > $avgPrice * 1.2,
@@ -805,12 +746,11 @@ final class SearchRecommendationsService
 
     /**
      * Handle getCurrentSeason functionality with proper error handling.
-     * @return string
      */
     private function getCurrentSeason(): string
     {
         $month = (int) date('n');
-        
+
         return match ($month) {
             12, 1, 2 => 'winter',
             3, 4, 5 => 'spring',
@@ -822,8 +762,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getSeasonalKeywords functionality with proper error handling.
-     * @param string $season
-     * @return array
      */
     private function getSeasonalKeywords(string $season): array
     {
@@ -838,25 +776,22 @@ final class SearchRecommendationsService
 
     /**
      * Handle calculateKeywordRelevance functionality with proper error handling.
-     * @param string $query
-     * @param string $keyword
-     * @return float
      */
     private function calculateKeywordRelevance(string $query, string $keyword): float
     {
         try {
             $query = strtolower($query);
             $keyword = strtolower($keyword);
-            
+
             if (strpos($query, $keyword) !== false) {
                 return 1.0;
             }
-            
+
             $queryWords = explode(' ', $query);
             $keywordWords = explode(' ', $keyword);
-            
+
             $commonWords = array_intersect($queryWords, $keywordWords);
-            
+
             return count($commonWords) / max(count($keywordWords), 1);
         } catch (\Exception $e) {
             return 0.0;
@@ -865,8 +800,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getTrendingProductsForKeyword functionality with proper error handling.
-     * @param string $keyword
-     * @return array
      */
     private function getTrendingProductsForKeyword(string $keyword): array
     {
@@ -893,8 +826,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getSeasonalOffers functionality with proper error handling.
-     * @param string $keyword
-     * @return array
      */
     private function getSeasonalOffers(string $keyword): array
     {
@@ -919,8 +850,6 @@ final class SearchRecommendationsService
 
     /**
      * Handle getPriceTrend functionality with proper error handling.
-     * @param array $prices
-     * @return string
      */
     private function getPriceTrend(array $prices): string
     {
@@ -928,19 +857,19 @@ final class SearchRecommendationsService
             if (count($prices) < 2) {
                 return 'stable';
             }
-            
+
             $firstHalf = array_slice($prices, 0, intval(count($prices) / 2));
             $secondHalf = array_slice($prices, intval(count($prices) / 2));
-            
+
             $firstAvg = array_sum($firstHalf) / count($firstHalf);
             $secondAvg = array_sum($secondHalf) / count($secondHalf);
-            
+
             if ($secondAvg > $firstAvg * 1.1) {
                 return 'rising';
             } elseif ($secondAvg < $firstAvg * 0.9) {
                 return 'falling';
             }
-            
+
             return 'stable';
         } catch (\Exception $e) {
             return 'stable';

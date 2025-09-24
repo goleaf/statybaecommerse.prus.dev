@@ -14,95 +14,95 @@ return new class extends Migration
         if (Schema::hasTable('product_variants')) {
             Schema::table('product_variants', function (Blueprint $table) {
                 // Add comprehensive variant attributes
-                if (!Schema::hasColumn('product_variants', 'variant_name_lt')) {
+                if (! Schema::hasColumn('product_variants', 'variant_name_lt')) {
                     $table->string('variant_name_lt')->nullable()->after('name');
                 }
-                if (!Schema::hasColumn('product_variants', 'variant_name_en')) {
+                if (! Schema::hasColumn('product_variants', 'variant_name_en')) {
                     $table->string('variant_name_en')->nullable()->after('variant_name_lt');
                 }
-                
+
                 // Add multi-language descriptions
-                if (!Schema::hasColumn('product_variants', 'description_lt')) {
+                if (! Schema::hasColumn('product_variants', 'description_lt')) {
                     $table->text('description_lt')->nullable()->after('variant_name_en');
                 }
-                if (!Schema::hasColumn('product_variants', 'description_en')) {
+                if (! Schema::hasColumn('product_variants', 'description_en')) {
                     $table->text('description_en')->nullable()->after('description_lt');
                 }
-                
+
                 // Add advanced pricing
-                if (!Schema::hasColumn('product_variants', 'wholesale_price')) {
+                if (! Schema::hasColumn('product_variants', 'wholesale_price')) {
                     $table->decimal('wholesale_price', 10, 4)->nullable()->after('cost_price');
                 }
-                if (!Schema::hasColumn('product_variants', 'member_price')) {
+                if (! Schema::hasColumn('product_variants', 'member_price')) {
                     $table->decimal('member_price', 10, 4)->nullable()->after('wholesale_price');
                 }
-                if (!Schema::hasColumn('product_variants', 'promotional_price')) {
+                if (! Schema::hasColumn('product_variants', 'promotional_price')) {
                     $table->decimal('promotional_price', 10, 4)->nullable()->after('member_price');
                 }
-                
+
                 // Add promotional settings
-                if (!Schema::hasColumn('product_variants', 'is_on_sale')) {
+                if (! Schema::hasColumn('product_variants', 'is_on_sale')) {
                     $table->boolean('is_on_sale')->default(false)->after('is_enabled');
                 }
-                if (!Schema::hasColumn('product_variants', 'sale_start_date')) {
+                if (! Schema::hasColumn('product_variants', 'sale_start_date')) {
                     $table->timestamp('sale_start_date')->nullable()->after('is_on_sale');
                 }
-                if (!Schema::hasColumn('product_variants', 'sale_end_date')) {
+                if (! Schema::hasColumn('product_variants', 'sale_end_date')) {
                     $table->timestamp('sale_end_date')->nullable()->after('sale_start_date');
                 }
-                
+
                 // Add advanced inventory tracking
-                if (!Schema::hasColumn('product_variants', 'reserved_quantity')) {
+                if (! Schema::hasColumn('product_variants', 'reserved_quantity')) {
                     $table->integer('reserved_quantity')->default(0)->after('stock_quantity');
                 }
-                if (!Schema::hasColumn('product_variants', 'available_quantity')) {
+                if (! Schema::hasColumn('product_variants', 'available_quantity')) {
                     $table->integer('available_quantity')->default(0)->after('reserved_quantity');
                 }
-                if (!Schema::hasColumn('product_variants', 'sold_quantity')) {
+                if (! Schema::hasColumn('product_variants', 'sold_quantity')) {
                     $table->integer('sold_quantity')->default(0)->after('available_quantity');
                 }
-                
+
                 // Add SEO fields
-                if (!Schema::hasColumn('product_variants', 'seo_title_lt')) {
+                if (! Schema::hasColumn('product_variants', 'seo_title_lt')) {
                     $table->string('seo_title_lt')->nullable()->after('variant_metadata');
                 }
-                if (!Schema::hasColumn('product_variants', 'seo_title_en')) {
+                if (! Schema::hasColumn('product_variants', 'seo_title_en')) {
                     $table->string('seo_title_en')->nullable()->after('seo_title_lt');
                 }
-                if (!Schema::hasColumn('product_variants', 'seo_description_lt')) {
+                if (! Schema::hasColumn('product_variants', 'seo_description_lt')) {
                     $table->text('seo_description_lt')->nullable()->after('seo_title_en');
                 }
-                if (!Schema::hasColumn('product_variants', 'seo_description_en')) {
+                if (! Schema::hasColumn('product_variants', 'seo_description_en')) {
                     $table->text('seo_description_en')->nullable()->after('seo_description_lt');
                 }
-                
+
                 // Add performance tracking
-                if (!Schema::hasColumn('product_variants', 'views_count')) {
+                if (! Schema::hasColumn('product_variants', 'views_count')) {
                     $table->integer('views_count')->default(0)->after('sold_quantity');
                 }
-                if (!Schema::hasColumn('product_variants', 'clicks_count')) {
+                if (! Schema::hasColumn('product_variants', 'clicks_count')) {
                     $table->integer('clicks_count')->default(0)->after('views_count');
                 }
-                if (!Schema::hasColumn('product_variants', 'conversion_rate')) {
+                if (! Schema::hasColumn('product_variants', 'conversion_rate')) {
                     $table->decimal('conversion_rate', 5, 4)->default(0)->after('clicks_count');
                 }
-                
+
                 // Add variant-specific features
-                if (!Schema::hasColumn('product_variants', 'is_featured')) {
+                if (! Schema::hasColumn('product_variants', 'is_featured')) {
                     $table->boolean('is_featured')->default(false)->after('is_on_sale');
                 }
-                if (!Schema::hasColumn('product_variants', 'is_new')) {
+                if (! Schema::hasColumn('product_variants', 'is_new')) {
                     $table->boolean('is_new')->default(false)->after('is_featured');
                 }
-                if (!Schema::hasColumn('product_variants', 'is_bestseller')) {
+                if (! Schema::hasColumn('product_variants', 'is_bestseller')) {
                     $table->boolean('is_bestseller')->default(false)->after('is_new');
                 }
-                
+
                 // Add variant combinations
-                if (!Schema::hasColumn('product_variants', 'variant_combination_hash')) {
+                if (! Schema::hasColumn('product_variants', 'variant_combination_hash')) {
                     $table->string('variant_combination_hash', 64)->nullable()->after('variant_metadata');
                 }
-                
+
                 // Add indexes for performance
                 $table->index(['product_id', 'is_enabled', 'is_featured']);
                 $table->index(['product_id', 'variant_type', 'size']);
@@ -114,7 +114,7 @@ return new class extends Migration
         }
 
         // Create variant_attribute_values table for better attribute management
-        if (!Schema::hasTable('variant_attribute_values')) {
+        if (! Schema::hasTable('variant_attribute_values')) {
             Schema::create('variant_attribute_values', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -132,7 +132,7 @@ return new class extends Migration
 
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
-                
+
                 $table->unique(['variant_id', 'attribute_id']);
                 $table->index(['attribute_id', 'attribute_value']);
                 $table->index(['variant_id', 'sort_order']);
@@ -141,7 +141,7 @@ return new class extends Migration
         }
 
         // Create variant_price_history table for price tracking
-        if (!Schema::hasTable('variant_price_history')) {
+        if (! Schema::hasTable('variant_price_history')) {
             Schema::create('variant_price_history', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -156,14 +156,14 @@ return new class extends Migration
 
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->foreign('changed_by')->references('id')->on('users')->onDelete('set null');
-                
+
                 $table->index(['variant_id', 'price_type', 'created_at']);
                 $table->index(['effective_from', 'effective_until']);
             });
         }
 
         // Create variant_stock_history table for stock tracking
-        if (!Schema::hasTable('variant_stock_history')) {
+        if (! Schema::hasTable('variant_stock_history')) {
             Schema::create('variant_stock_history', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -179,14 +179,14 @@ return new class extends Migration
 
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->foreign('changed_by')->references('id')->on('users')->onDelete('set null');
-                
+
                 $table->index(['variant_id', 'change_type', 'created_at']);
                 $table->index(['reference_type', 'reference_id']);
             });
         }
 
         // Create variant_analytics table for performance tracking
-        if (!Schema::hasTable('variant_analytics')) {
+        if (! Schema::hasTable('variant_analytics')) {
             Schema::create('variant_analytics', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -200,7 +200,7 @@ return new class extends Migration
                 $table->timestamps();
 
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
-                
+
                 $table->unique(['variant_id', 'date']);
                 $table->index(['date', 'views', 'clicks']);
                 $table->index(['variant_id', 'conversion_rate']);
@@ -208,7 +208,7 @@ return new class extends Migration
         }
 
         // Create variant_recommendations table for related variants
-        if (!Schema::hasTable('variant_recommendations')) {
+        if (! Schema::hasTable('variant_recommendations')) {
             Schema::create('variant_recommendations', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -221,7 +221,7 @@ return new class extends Migration
 
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->foreign('recommended_variant_id')->references('id')->on('product_variants')->onDelete('cascade');
-                
+
                 $table->unique(['variant_id', 'recommended_variant_id']);
                 $table->index(['recommendation_type', 'confidence_score'], 'variant_recommend_type_idx');
                 $table->index(['is_active', 'sort_order']);
@@ -229,7 +229,7 @@ return new class extends Migration
         }
 
         // Create variant_bundles table for bundle products
-        if (!Schema::hasTable('variant_bundles')) {
+        if (! Schema::hasTable('variant_bundles')) {
             Schema::create('variant_bundles', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -243,7 +243,7 @@ return new class extends Migration
 
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->foreign('bundled_variant_id')->references('id')->on('product_variants')->onDelete('cascade');
-                
+
                 $table->index(['variant_id', 'sort_order']);
                 $table->index(['bundled_variant_id']);
             });
@@ -287,9 +287,9 @@ return new class extends Migration
                     'reserved_quantity', 'available_quantity', 'sold_quantity',
                     'seo_title_lt', 'seo_title_en', 'seo_description_lt', 'seo_description_en',
                     'views_count', 'clicks_count', 'conversion_rate',
-                    'is_featured', 'is_new', 'is_bestseller', 'variant_combination_hash'
+                    'is_featured', 'is_new', 'is_bestseller', 'variant_combination_hash',
                 ];
-                
+
                 foreach ($columns as $column) {
                     if (Schema::hasColumn('product_variants', $column)) {
                         $table->dropColumn($column);

@@ -7,7 +7,6 @@ namespace App\Filament\Resources\AttributeResource\Widgets;
 use App\Models\Attribute;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class AttributeStatsWidget extends BaseWidget
 {

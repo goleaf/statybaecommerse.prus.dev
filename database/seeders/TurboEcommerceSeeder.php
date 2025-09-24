@@ -89,7 +89,7 @@ final class TurboEcommerceSeeder extends Seeder
 
         // Generate products per brand in fast upserted chunks with timeout protection
         $timeout = now()->addMinutes(60); // 60 minute timeout for seeder operations
-        
+
         LazyCollection::make($brandIds->chunk(100))
             ->takeUntilTimeout($timeout)
             ->each(function ($brandChunk) use ($categoryIds, $attributes, $locales) {
@@ -236,7 +236,7 @@ final class TurboEcommerceSeeder extends Seeder
 
         // Use LazyCollection with timeout for bulk category attachments
         $timeout = now()->addMinutes(5); // 5 minute timeout for category attachments
-        
+
         LazyCollection::make(array_chunk($rows, 2000))
             ->takeUntilTimeout($timeout)
             ->each(function ($chunk) {
@@ -274,7 +274,7 @@ final class TurboEcommerceSeeder extends Seeder
 
         // Use LazyCollection with timeout for bulk attribute attachments
         $timeout = now()->addMinutes(5); // 5 minute timeout for attribute attachments
-        
+
         LazyCollection::make(array_chunk($rows, 2000))
             ->takeUntilTimeout($timeout)
             ->each(function ($chunk) {
@@ -311,7 +311,7 @@ final class TurboEcommerceSeeder extends Seeder
 
         // Use LazyCollection with timeout for bulk translation seeding
         $timeout = now()->addMinutes(10); // 10 minute timeout for translation seeding
-        
+
         LazyCollection::make(array_chunk($rows, 2000))
             ->takeUntilTimeout($timeout)
             ->each(function ($chunk) {

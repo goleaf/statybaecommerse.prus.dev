@@ -24,7 +24,7 @@ final class CreateAnalyticsEvent extends CreateRecord
         $data['ip_address'] = $data['ip_address'] ?? request()->ip();
         $data['user_agent'] = $data['user_agent'] ?? request()->userAgent();
         $data['created_at'] = $data['created_at'] ?? now();
-        
+
         return $data;
     }
 }

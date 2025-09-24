@@ -27,7 +27,7 @@ Route::post('/autocomplete-search', function (Request $request) {
         $limit = $validated['limit'] ?? 10;
 
         // Check if the model class exists and is a valid Eloquent model
-        if (!class_exists($modelClass) || !is_subclass_of($modelClass, 'Illuminate\Database\Eloquent\Model')) {
+        if (! class_exists($modelClass) || ! is_subclass_of($modelClass, 'Illuminate\Database\Eloquent\Model')) {
             return response()->json(['results' => []], 400);
         }
 
@@ -35,7 +35,7 @@ Route::post('/autocomplete-search', function (Request $request) {
 
         $query = $model
             ->query()
-            ->where($searchField, 'like', '%' . $searchQuery . '%')
+            ->where($searchField, 'like', '%'.$searchQuery.'%')
             ->limit($limit);
 
         $results = $query->get()->map(function ($item) use ($valueField, $labelField) {

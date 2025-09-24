@@ -1,16 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 final class ImagesRelationManager extends RelationManager
 {
@@ -88,9 +89,9 @@ final class ImagesRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('products.images.type'))
-                    ->formatStateUsing(fn(string $state): string => __("products.images.types.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("products.images.types.{$state}"))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'main' => 'primary',
                         'gallery' => 'success',
                         'thumbnail' => 'warning',

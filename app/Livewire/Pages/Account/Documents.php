@@ -1,23 +1,25 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Pages\Account;
 
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
+
 /**
  * Documents
- * 
+ *
  * Livewire component for Documents with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property array $documents
  */
 final class Documents extends Component
 {
     public array $documents = [];
+
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -28,9 +30,9 @@ final class Documents extends Component
             })->toArray();
         }
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,9 +15,9 @@ describe('User Impersonation Unit Tests', function () {
     it('can create admin and regular users', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
-        
+
         $regularUser = User::factory()->create(['is_admin' => false]);
-        
+
         expect($admin->hasRole('administrator'))->toBeTrue();
         expect($regularUser->is_admin)->toBeFalse();
     });
@@ -23,27 +25,27 @@ describe('User Impersonation Unit Tests', function () {
     it('can validate impersonation permissions', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
-        
+
         $regularUser = User::factory()->create(['is_admin' => false]);
         $anotherAdmin = User::factory()->create(['is_admin' => true]);
-        
+
         // Admin can impersonate regular user
-        expect(!$regularUser->is_admin)->toBeTrue();
-        
+        expect(! $regularUser->is_admin)->toBeTrue();
+
         // Admin cannot impersonate another admin
-        expect(!$anotherAdmin->is_admin)->toBeFalse();
+        expect(! $anotherAdmin->is_admin)->toBeFalse();
     });
 
     it('can handle session data structure', function () {
         $admin = User::factory()->create();
         $regularUser = User::factory()->create(['is_admin' => false]);
-        
+
         $impersonateData = [
             'original_user_id' => $admin->id,
             'impersonated_user_id' => $regularUser->id,
             'started_at' => now()->toISOString(),
         ];
-        
+
         expect($impersonateData)->toHaveKeys(['original_user_id', 'impersonated_user_id', 'started_at']);
         expect($impersonateData['original_user_id'])->toBe($admin->id);
         expect($impersonateData['impersonated_user_id'])->toBe($regularUser->id);
@@ -51,7 +53,7 @@ describe('User Impersonation Unit Tests', function () {
 
     it('can test user model relationships', function () {
         $user = User::factory()->create();
-        
+
         // Test relationships exist
         expect($user->orders())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class);
         expect($user->addresses())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class);
@@ -68,7 +70,7 @@ describe('User Impersonation Unit Tests', function () {
             'is_active' => true,
             'is_admin' => false,
         ]);
-        
+
         expect($user->name)->toBe('Test User');
         expect($user->email)->toBe('test@example.com');
         expect($user->is_active)->toBeTrue();
@@ -78,10 +80,10 @@ describe('User Impersonation Unit Tests', function () {
     it('can test user roles and permissions', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
-        
+
         $user = User::factory()->create();
         $user->assignRole('user');
-        
+
         expect($admin->hasRole('administrator'))->toBeTrue();
         expect($user->hasRole('user'))->toBeTrue();
         expect($admin->hasRole('user'))->toBeFalse();

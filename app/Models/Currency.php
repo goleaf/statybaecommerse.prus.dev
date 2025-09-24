@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,9 +8,9 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
@@ -20,9 +22,11 @@ use Spatie\Translatable\HasTranslations;
  * @property mixed $table
  * @property mixed $fillable
  * @property array $translatable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Currency newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Currency newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Currency query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -48,14 +52,13 @@ final class Currency extends Model
         'is_default',
         'is_enabled',
         'sort_order',
-        'auto_update_rate'
+        'auto_update_rate',
     ];
 
     public array $translatable = ['name'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -74,7 +77,6 @@ final class Currency extends Model
 
     /**
      * Handle prices functionality with proper error handling.
-     * @return HasMany
      */
     public function prices(): HasMany
     {
@@ -83,7 +85,6 @@ final class Currency extends Model
 
     /**
      * Handle orders functionality with proper error handling.
-     * @return HasMany
      */
     public function orders(): HasMany
     {
@@ -92,7 +93,6 @@ final class Currency extends Model
 
     /**
      * Handle countries functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function countries(): BelongsToMany
     {
@@ -101,7 +101,6 @@ final class Currency extends Model
 
     /**
      * Handle priceLists functionality with proper error handling.
-     * @return HasMany
      */
     public function priceLists(): HasMany
     {
@@ -110,7 +109,6 @@ final class Currency extends Model
 
     /**
      * Handle campaigns functionality with proper error handling.
-     * @return HasMany
      */
     public function campaigns(): HasMany
     {
@@ -119,7 +117,6 @@ final class Currency extends Model
 
     /**
      * Handle discounts functionality with proper error handling.
-     * @return HasMany
      */
     public function discounts(): HasMany
     {
@@ -130,7 +127,8 @@ final class Currency extends Model
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEnabled($query)
     {
@@ -139,7 +137,8 @@ final class Currency extends Model
 
     /**
      * Handle scopeDefault functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeDefault($query)
     {
@@ -148,7 +147,8 @@ final class Currency extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -159,7 +159,6 @@ final class Currency extends Model
 
     /**
      * Handle getFormattedSymbolAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedSymbolAttribute(): string
     {
@@ -168,7 +167,6 @@ final class Currency extends Model
 
     /**
      * Handle getFormattedExchangeRateAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedExchangeRateAttribute(): string
     {
@@ -179,7 +177,6 @@ final class Currency extends Model
 
     /**
      * Handle isDefault functionality with proper error handling.
-     * @return bool
      */
     public function isDefault(): bool
     {
@@ -188,7 +185,6 @@ final class Currency extends Model
 
     /**
      * Handle isEnabled functionality with proper error handling.
-     * @return bool
      */
     public function isEnabled(): bool
     {
@@ -197,7 +193,6 @@ final class Currency extends Model
 
     /**
      * Handle isActive functionality with proper error handling.
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -206,15 +201,14 @@ final class Currency extends Model
 
     /**
      * Handle formatAmount functionality with proper error handling.
-     * @param float $amount
-     * @return string
      */
     public function formatAmount(float $amount): string
     {
         $formattedAmount = number_format($amount, $this->decimal_places);
         if ($this->symbol) {
-            return $this->symbol . ' ' . $formattedAmount;
+            return $this->symbol.' '.$formattedAmount;
         }
-        return $formattedAmount . ' ' . $this->code;
+
+        return $formattedAmount.' '.$this->code;
     }
 }

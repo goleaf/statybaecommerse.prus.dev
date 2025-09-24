@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -7,19 +9,15 @@ use App\Filament\Resources\SystemSettingsResource;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\User;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\EditRecord;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 final class SystemSettingsResourceTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $adminUser;
+
     protected SystemSettingCategory $category;
 
     protected function setUp(): void
@@ -28,19 +26,19 @@ final class SystemSettingsResourceTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
-            'name' => 'Admin User'
+            'name' => 'Admin User',
         ]);
 
         $this->category = SystemSettingCategory::factory()->create([
             'name' => 'Test Category',
-            'slug' => 'test-category'
+            'slug' => 'test-category',
         ]);
     }
 
     public function test_can_list_system_settings(): void
     {
         SystemSetting::factory()->count(3)->create([
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -83,13 +81,13 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_can_view_system_setting(): void
     {
         $setting = SystemSetting::factory()->create([
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
 
         Livewire::test(SystemSettingsResource\Pages\ViewSystemSetting::class, [
-            'record' => $setting->getKey()
+            'record' => $setting->getKey(),
         ])
             ->assertFormSet([
                 'key' => $setting->key,
@@ -102,13 +100,13 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'name' => 'Original Name'
+            'name' => 'Original Name',
         ]);
 
         $this->actingAs($this->adminUser);
 
         Livewire::test(SystemSettingsResource\Pages\EditSystemSetting::class, [
-            'record' => $setting->getKey()
+            'record' => $setting->getKey(),
         ])
             ->fillForm([
                 'name' => 'Updated Name',
@@ -127,13 +125,13 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_can_delete_system_setting(): void
     {
         $setting = SystemSetting::factory()->create([
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
 
         Livewire::test(SystemSettingsResource\Pages\EditSystemSetting::class, [
-            'record' => $setting->getKey()
+            'record' => $setting->getKey(),
         ])
             ->callAction('delete')
             ->assertHasNoActionErrors();
@@ -203,7 +201,7 @@ final class SystemSettingsResourceTest extends TestCase
         $setting = SystemSetting::factory()->create([
             'value' => 'current value',
             'default_value' => 'default value',
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -223,7 +221,7 @@ final class SystemSettingsResourceTest extends TestCase
         $setting = SystemSetting::factory()->create([
             'key' => 'original_setting',
             'name' => 'Original Setting',
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -241,7 +239,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_can_export_settings(): void
     {
         SystemSetting::factory()->count(3)->create([
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -254,7 +252,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_can_clear_cache(): void
     {
         SystemSetting::factory()->count(3)->create([
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -414,7 +412,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_table_columns_are_configured(): void
     {
         SystemSetting::factory()->create([
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -453,7 +451,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_table_actions_are_configured(): void
     {
         $setting = SystemSetting::factory()->create([
-            'category_id' => $this->category->id
+            'category_id' => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);

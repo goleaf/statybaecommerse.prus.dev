@@ -38,7 +38,6 @@ return [
         'target_products' => 'Target products',
         'target_customer_groups' => 'Target customer groups',
         'channel' => 'Channel',
-        'zone' => 'Zone',
         'discounts' => 'Discounts',
         'description' => 'Description',
         'cta_text' => 'Call-to-action text',

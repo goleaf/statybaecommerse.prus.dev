@@ -18,7 +18,7 @@ final class DenmarkCitiesSeeder extends Seeder
         $euZone = Zone::where('code', 'EU')->first();
 
         // Regions are no longer used in the database schema
-        
+
         $cities = [
             // Capital Region
             [
@@ -32,8 +32,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['1000', '1001', '1002'],
                 'translations' => [
                     'lt' => ['name' => 'Kopenhaga', 'description' => 'Danijos sostinė'],
-                    'en' => ['name' => 'Copenhagen', 'description' => 'Capital of Denmark']
-            ],
+                    'en' => ['name' => 'Copenhagen', 'description' => 'Capital of Denmark'],
+                ],
             ],
             [
                 'name' => 'Frederiksberg',
@@ -44,8 +44,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['2000'],
                 'translations' => [
                     'lt' => ['name' => 'Frederiksbergas', 'description' => 'Kopenhagos priemiestis'],
-                    'en' => ['name' => 'Frederiksberg', 'description' => 'Copenhagen suburb']
-            ],
+                    'en' => ['name' => 'Frederiksberg', 'description' => 'Copenhagen suburb'],
+                ],
             ],
             [
                 'name' => 'Hillerød',
@@ -56,8 +56,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['3400'],
                 'translations' => [
                     'lt' => ['name' => 'Hilerodas', 'description' => 'Karališkojo rūmo miestas'],
-                    'en' => ['name' => 'Hillerød', 'description' => 'Royal palace city']
-            ],
+                    'en' => ['name' => 'Hillerød', 'description' => 'Royal palace city'],
+                ],
             ],
             [
                 'name' => 'Helsingør',
@@ -68,8 +68,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['3000'],
                 'translations' => [
                     'lt' => ['name' => 'Helsingoras', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Helsingør', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Helsingør', 'description' => 'Port city'],
+                ],
             ],
 
             // Central Jutland
@@ -82,8 +82,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8000'],
                 'translations' => [
                     'lt' => ['name' => 'Orhusas', 'description' => 'Antrasis didžiausias Danijos miestas'],
-                    'en' => ['name' => 'Aarhus', 'description' => 'Second largest city in Denmark']
-            ],
+                    'en' => ['name' => 'Aarhus', 'description' => 'Second largest city in Denmark'],
+                ],
             ],
             [
                 'name' => 'Randers',
@@ -94,8 +94,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8900'],
                 'translations' => [
                     'lt' => ['name' => 'Randersas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Randers', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Randers', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Silkeborg',
@@ -106,8 +106,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8600'],
                 'translations' => [
                     'lt' => ['name' => 'Silkeborgas', 'description' => 'Gamtos miestas'],
-                    'en' => ['name' => 'Silkeborg', 'description' => 'Nature city']
-            ],
+                    'en' => ['name' => 'Silkeborg', 'description' => 'Nature city'],
+                ],
             ],
             [
                 'name' => 'Viborg',
@@ -118,8 +118,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8800'],
                 'translations' => [
                     'lt' => ['name' => 'Viborgas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Viborg', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Viborg', 'description' => 'Historic city'],
+                ],
             ],
 
             // South Denmark
@@ -132,8 +132,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['5000'],
                 'translations' => [
                     'lt' => ['name' => 'Odensė', 'description' => 'Anderseno miestas'],
-                    'en' => ['name' => 'Odense', 'description' => 'Andersen city']
-            ],
+                    'en' => ['name' => 'Odense', 'description' => 'Andersen city'],
+                ],
             ],
             [
                 'name' => 'Esbjerg',
@@ -144,8 +144,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['6700'],
                 'translations' => [
                     'lt' => ['name' => 'Esbjergas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Esbjerg', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Esbjerg', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Kolding',
@@ -156,8 +156,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['6000'],
                 'translations' => [
                     'lt' => ['name' => 'Koldingas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Kolding', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Kolding', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Vejle',
@@ -168,8 +168,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['7100'],
                 'translations' => [
                     'lt' => ['name' => 'Vejlė', 'description' => 'Pramonės centras'],
-                    'en' => ['name' => 'Vejle', 'description' => 'Industrial center']
-            ],
+                    'en' => ['name' => 'Vejle', 'description' => 'Industrial center'],
+                ],
             ],
             [
                 'name' => 'Horsens',
@@ -180,8 +180,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8700'],
                 'translations' => [
                     'lt' => ['name' => 'Horsenas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Horsens', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Horsens', 'description' => 'Industrial city'],
+                ],
             ],
 
             // Zealand
@@ -194,8 +194,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4000'],
                 'translations' => [
                     'lt' => ['name' => 'Roskilė', 'description' => 'Muzikos festivalio miestas'],
-                    'en' => ['name' => 'Roskilde', 'description' => 'Music festival city']
-            ],
+                    'en' => ['name' => 'Roskilde', 'description' => 'Music festival city'],
+                ],
             ],
             [
                 'name' => 'Næstved',
@@ -206,8 +206,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4700'],
                 'translations' => [
                     'lt' => ['name' => 'Nestvedas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Næstved', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Næstved', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Slagelse',
@@ -218,8 +218,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4200'],
                 'translations' => [
                     'lt' => ['name' => 'Slagelsė', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Slagelse', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Slagelse', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Holbæk',
@@ -230,8 +230,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4300'],
                 'translations' => [
                     'lt' => ['name' => 'Holbekas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Holbæk', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Holbæk', 'description' => 'Port city'],
+                ],
             ],
 
             // North Jutland
@@ -244,8 +244,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['9000'],
                 'translations' => [
                     'lt' => ['name' => 'Olborgas', 'description' => 'Šiaurės Jutlandijos sostinė'],
-                    'en' => ['name' => 'Aalborg', 'description' => 'Capital of North Jutland']
-            ],
+                    'en' => ['name' => 'Aalborg', 'description' => 'Capital of North Jutland'],
+                ],
             ],
             [
                 'name' => 'Hjørring',
@@ -256,8 +256,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['9800'],
                 'translations' => [
                     'lt' => ['name' => 'Hjoringas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Hjørring', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Hjørring', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Frederikshavn',
@@ -268,8 +268,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['9900'],
                 'translations' => [
                     'lt' => ['name' => 'Frederikshavnas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Frederikshavn', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Frederikshavn', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Thisted',
@@ -280,8 +280,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['7700'],
                 'translations' => [
                     'lt' => ['name' => 'Tistedas', 'description' => 'Kaimo miestas'],
-                    'en' => ['name' => 'Thisted', 'description' => 'Rural city']
-            ],
+                    'en' => ['name' => 'Thisted', 'description' => 'Rural city'],
+                ],
             ],
 
             // Additional major cities
@@ -294,8 +294,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['7400'],
                 'translations' => [
                     'lt' => ['name' => 'Hernigas', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Herning', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Herning', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Haderslev',
@@ -306,8 +306,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['6100'],
                 'translations' => [
                     'lt' => ['name' => 'Haderslevas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Haderslev', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Haderslev', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Svendborg',
@@ -318,8 +318,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['5700'],
                 'translations' => [
                     'lt' => ['name' => 'Svendborgas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Svendborg', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Svendborg', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Nykøbing Falster',
@@ -330,8 +330,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4800'],
                 'translations' => [
                     'lt' => ['name' => 'Nykøbing Falster', 'description' => 'Falsterio miestas'],
-                    'en' => ['name' => 'Nykøbing Falster', 'description' => 'Falster city']
-            ],
+                    'en' => ['name' => 'Nykøbing Falster', 'description' => 'Falster city'],
+                ],
             ],
             [
                 'name' => 'Ringsted',
@@ -342,8 +342,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4100'],
                 'translations' => [
                     'lt' => ['name' => 'Ringstedas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Ringsted', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Ringsted', 'description' => 'Historic city'],
+                ],
             ],
             // Additional Capital Region cities
             [
@@ -355,8 +355,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['3400'],
                 'translations' => [
                     'lt' => ['name' => 'Hilerodas', 'description' => 'Frederiksborg pilies miestas'],
-                    'en' => ['name' => 'Hillerød', 'description' => 'Frederiksborg Castle city']
-            ],
+                    'en' => ['name' => 'Hillerød', 'description' => 'Frederiksborg Castle city'],
+                ],
             ],
             [
                 'name' => 'Helsingør',
@@ -367,8 +367,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['3000'],
                 'translations' => [
                     'lt' => ['name' => 'Helsingoras', 'description' => 'Hamleto miestas'],
-                    'en' => ['name' => 'Helsingør', 'description' => 'Hamlet city']
-            ],
+                    'en' => ['name' => 'Helsingør', 'description' => 'Hamlet city'],
+                ],
             ],
             [
                 'name' => 'Rødovre',
@@ -379,8 +379,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['2610'],
                 'translations' => [
                     'lt' => ['name' => 'Rødovrė', 'description' => 'Kopenhagos priemiestis'],
-                    'en' => ['name' => 'Rødovre', 'description' => 'Copenhagen suburb']
-            ],
+                    'en' => ['name' => 'Rødovre', 'description' => 'Copenhagen suburb'],
+                ],
             ],
             // Additional Central Jutland cities
             [
@@ -392,8 +392,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8800'],
                 'translations' => [
                     'lt' => ['name' => 'Viborgas', 'description' => 'Vidurio Jutlandijos sostinė'],
-                    'en' => ['name' => 'Viborg', 'description' => 'Central Jutland capital']
-            ],
+                    'en' => ['name' => 'Viborg', 'description' => 'Central Jutland capital'],
+                ],
             ],
             [
                 'name' => 'Holstebro',
@@ -404,8 +404,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['7500'],
                 'translations' => [
                     'lt' => ['name' => 'Holstebras', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Holstebro', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Holstebro', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Herning',
@@ -416,8 +416,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['7400'],
                 'translations' => [
                     'lt' => ['name' => 'Herningas', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Herning', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Herning', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Silkeborg',
@@ -428,8 +428,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8600'],
                 'translations' => [
                     'lt' => ['name' => 'Silkeborgas', 'description' => 'Gamtos miestas'],
-                    'en' => ['name' => 'Silkeborg', 'description' => 'Nature city']
-            ],
+                    'en' => ['name' => 'Silkeborg', 'description' => 'Nature city'],
+                ],
             ],
             [
                 'name' => 'Randers',
@@ -440,8 +440,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8900'],
                 'translations' => [
                     'lt' => ['name' => 'Randersas', 'description' => 'Gudeno miestas'],
-                    'en' => ['name' => 'Randers', 'description' => 'Gudenå city']
-            ],
+                    'en' => ['name' => 'Randers', 'description' => 'Gudenå city'],
+                ],
             ],
             // Additional South Denmark cities
             [
@@ -453,8 +453,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['7100'],
                 'translations' => [
                     'lt' => ['name' => 'Vejlė', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Vejle', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Vejle', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Kolding',
@@ -465,8 +465,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['6000'],
                 'translations' => [
                     'lt' => ['name' => 'Koldingas', 'description' => 'Sienos miestas'],
-                    'en' => ['name' => 'Kolding', 'description' => 'Border city']
-            ],
+                    'en' => ['name' => 'Kolding', 'description' => 'Border city'],
+                ],
             ],
             [
                 'name' => 'Horsens',
@@ -477,8 +477,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['8700'],
                 'translations' => [
                     'lt' => ['name' => 'Horsensas', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Horsens', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Horsens', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Fredericia',
@@ -489,8 +489,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['7000'],
                 'translations' => [
                     'lt' => ['name' => 'Fredericia', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Fredericia', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Fredericia', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Esbjerg',
@@ -501,8 +501,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['6700'],
                 'translations' => [
                     'lt' => ['name' => 'Esbjergas', 'description' => 'Vakarų pajūrio miestas'],
-                    'en' => ['name' => 'Esbjerg', 'description' => 'West coast city']
-            ],
+                    'en' => ['name' => 'Esbjerg', 'description' => 'West coast city'],
+                ],
             ],
             // Additional Zealand cities
             [
@@ -514,8 +514,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4700'],
                 'translations' => [
                     'lt' => ['name' => 'Næstvedas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Næstved', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Næstved', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Køge',
@@ -526,8 +526,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4600'],
                 'translations' => [
                     'lt' => ['name' => 'Køgė', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Køge', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Køge', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Slagelse',
@@ -538,8 +538,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4200'],
                 'translations' => [
                     'lt' => ['name' => 'Slagelsė', 'description' => 'Trelleborg pilies miestas'],
-                    'en' => ['name' => 'Slagelse', 'description' => 'Trelleborg Castle city']
-            ],
+                    'en' => ['name' => 'Slagelse', 'description' => 'Trelleborg Castle city'],
+                ],
             ],
             [
                 'name' => 'Holbæk',
@@ -550,8 +550,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['4300'],
                 'translations' => [
                     'lt' => ['name' => 'Holbækas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Holbæk', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Holbæk', 'description' => 'Port city'],
+                ],
             ],
             // Additional North Jutland cities
             [
@@ -563,8 +563,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['9800'],
                 'translations' => [
                     'lt' => ['name' => 'Hjørringas', 'description' => 'Šiaurės miestas'],
-                    'en' => ['name' => 'Hjørring', 'description' => 'Northern city']
-            ],
+                    'en' => ['name' => 'Hjørring', 'description' => 'Northern city'],
+                ],
             ],
             [
                 'name' => 'Frederikshavn',
@@ -575,8 +575,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['9900'],
                 'translations' => [
                     'lt' => ['name' => 'Frederikshavnas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Frederikshavn', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Frederikshavn', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Brønderslev',
@@ -587,8 +587,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['9700'],
                 'translations' => [
                     'lt' => ['name' => 'Brønderslevas', 'description' => 'Žemės ūkio miestas'],
-                    'en' => ['name' => 'Brønderslev', 'description' => 'Agricultural city']
-            ],
+                    'en' => ['name' => 'Brønderslev', 'description' => 'Agricultural city'],
+                ],
             ],
             [
                 'name' => 'Thisted',
@@ -599,8 +599,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['7700'],
                 'translations' => [
                     'lt' => ['name' => 'Thistedas', 'description' => 'Pajūrio miestas'],
-                    'en' => ['name' => 'Thisted', 'description' => 'Coastal city']
-            ],
+                    'en' => ['name' => 'Thisted', 'description' => 'Coastal city'],
+                ],
             ],
             [
                 'name' => 'Læsø',
@@ -611,8 +611,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 'postal_codes' => ['9940'],
                 'translations' => [
                     'lt' => ['name' => 'Læsø', 'description' => 'Salos miestas'],
-                    'en' => ['name' => 'Læsø', 'description' => 'Island city']
-            ],
+                    'en' => ['name' => 'Læsø', 'description' => 'Island city'],
+                ],
             ],
         ];
 
@@ -621,7 +621,7 @@ final class DenmarkCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -641,8 +641,8 @@ final class DenmarkCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

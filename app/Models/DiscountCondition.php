@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -7,10 +9,10 @@ use App\Models\Translations\DiscountConditionTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * DiscountCondition
@@ -20,9 +22,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $translationModel
  * @property mixed $table
  * @property mixed $fillable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class])]
@@ -31,12 +35,13 @@ final class DiscountCondition extends Model
     use HasFactory, HasTranslations;
 
     protected string $translationModel = DiscountConditionTranslation::class;
+
     protected $table = 'discount_conditions';
+
     protected $fillable = ['discount_id', 'type', 'operator', 'value', 'position', 'is_active', 'priority', 'metadata'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -45,7 +50,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle discount functionality with proper error handling.
-     * @return BelongsTo
      */
     public function discount(): BelongsTo
     {
@@ -54,7 +58,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle translations functionality with proper error handling.
-     * @return HasMany
      */
     public function translations(): HasMany
     {
@@ -63,7 +66,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle products functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function products(): BelongsToMany
     {
@@ -72,7 +74,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle categories functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function categories(): BelongsToMany
     {
@@ -81,7 +82,8 @@ final class DiscountCondition extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -90,8 +92,8 @@ final class DiscountCondition extends Model
 
     /**
      * Handle scopeByType functionality with proper error handling.
-     * @param mixed $query
-     * @param string $type
+     *
+     * @param  mixed  $query
      */
     public function scopeByType($query, string $type)
     {
@@ -100,8 +102,8 @@ final class DiscountCondition extends Model
 
     /**
      * Handle scopeByOperator functionality with proper error handling.
-     * @param mixed $query
-     * @param string $operator
+     *
+     * @param  mixed  $query
      */
     public function scopeByOperator($query, string $operator)
     {
@@ -110,8 +112,8 @@ final class DiscountCondition extends Model
 
     /**
      * Handle scopeByPriority functionality with proper error handling.
-     * @param mixed $query
-     * @param string $direction
+     *
+     * @param  mixed  $query
      */
     public function scopeByPriority($query, string $direction = 'asc')
     {
@@ -120,7 +122,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle getTranslatedNameAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getTranslatedNameAttribute(): ?string
     {
@@ -129,7 +130,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle getTranslatedDescriptionAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getTranslatedDescriptionAttribute(): ?string
     {
@@ -138,15 +138,16 @@ final class DiscountCondition extends Model
 
     /**
      * Handle matches functionality with proper error handling.
-     * @param mixed $testValue
-     * @return bool
+     *
+     * @param  mixed  $testValue
      */
     public function matches($testValue): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
         $conditionValue = $this->value;
+
         return match ($this->operator) {
             'equals_to' => $testValue == $conditionValue,
             'not_equals_to' => $testValue != $conditionValue,
@@ -157,47 +158,45 @@ final class DiscountCondition extends Model
             'starts_with' => str_starts_with((string) $testValue, (string) $conditionValue),
             'ends_with' => str_ends_with((string) $testValue, (string) $conditionValue),
             'contains' => str_contains((string) $testValue, (string) $conditionValue),
-            'not_contains' => !str_contains((string) $testValue, (string) $conditionValue),
+            'not_contains' => ! str_contains((string) $testValue, (string) $conditionValue),
             'in_array' => is_array($conditionValue) && in_array($testValue, $conditionValue),
-            'not_in_array' => is_array($conditionValue) && !in_array($testValue, $conditionValue),
+            'not_in_array' => is_array($conditionValue) && ! in_array($testValue, $conditionValue),
             'regex' => preg_match($conditionValue, (string) $testValue),
-            'not_regex' => !preg_match($conditionValue, (string) $testValue),
+            'not_regex' => ! preg_match($conditionValue, (string) $testValue),
             default => false,
         };
     }
 
     /**
      * Handle isValidForContext functionality with proper error handling.
-     * @param array $context
-     * @return bool
      */
     public function isValidForContext(array $context = []): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
         // Check if condition type is supported in context
-        if (!isset($context[$this->type])) {
+        if (! isset($context[$this->type])) {
             return false;
         }
+
         return $this->matches($context[$this->type]);
     }
 
     /**
      * Handle getHumanReadableConditionAttribute functionality with proper error handling.
-     * @return string
      */
     public function getHumanReadableConditionAttribute(): string
     {
         $typeLabel = $this->getTypeLabel();
         $operatorLabel = $this->getOperatorLabel();
         $value = is_array($this->value) ? implode(', ', $this->value) : $this->value;
+
         return "{$typeLabel} {$operatorLabel} {$value}";
     }
 
     /**
      * Handle getTypeLabel functionality with proper error handling.
-     * @return string
      */
     public function getTypeLabel(): string
     {
@@ -223,7 +222,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle getOperatorLabel functionality with proper error handling.
-     * @return string
      */
     public function getOperatorLabel(): string
     {
@@ -248,7 +246,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle getTypes functionality with proper error handling.
-     * @return array
      */
     public static function getTypes(): array
     {
@@ -257,7 +254,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle getOperators functionality with proper error handling.
-     * @return array
      */
     public static function getOperators(): array
     {
@@ -266,14 +262,13 @@ final class DiscountCondition extends Model
 
     /**
      * Handle getOperatorsForType functionality with proper error handling.
-     * @param string $type
-     * @return array
      */
     public static function getOperatorsForType(string $type): array
     {
         $numericOperators = ['equals_to' => __('discount_conditions.operators.equals_to'), 'not_equals_to' => __('discount_conditions.operators.not_equals_to'), 'less_than' => __('discount_conditions.operators.less_than'), 'greater_than' => __('discount_conditions.operators.greater_than'), 'less_than_or_equal' => __('discount_conditions.operators.less_than_or_equal'), 'greater_than_or_equal' => __('discount_conditions.operators.greater_than_or_equal')];
         $stringOperators = ['equals_to' => __('discount_conditions.operators.equals_to'), 'not_equals_to' => __('discount_conditions.operators.not_equals_to'), 'starts_with' => __('discount_conditions.operators.starts_with'), 'ends_with' => __('discount_conditions.operators.ends_with'), 'contains' => __('discount_conditions.operators.contains'), 'not_contains' => __('discount_conditions.operators.not_contains'), 'regex' => __('discount_conditions.operators.regex'), 'not_regex' => __('discount_conditions.operators.not_regex')];
         $arrayOperators = ['in_array' => __('discount_conditions.operators.in_array'), 'not_in_array' => __('discount_conditions.operators.not_in_array')];
+
         return match ($type) {
             'cart_total', 'item_qty', 'priority' => $numericOperators,
             'product', 'category', 'brand', 'collection', 'attribute_value', 'channel', 'currency', 'customer_group', 'user', 'partner_tier' => $stringOperators,

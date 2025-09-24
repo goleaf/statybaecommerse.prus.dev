@@ -1,21 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 final class DocumentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'documents';
+
     protected static ?string $title = 'admin.sections.documents';
 
     public function form(Schema $schema): Schema
@@ -23,7 +24,8 @@ final class DocumentsRelationManager extends RelationManager
         return $schema
             ->components([
                 Forms\Components\TextInput::make('title')
-                    ->required()\n                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\Select::make('type')
                     ->options([
                         'invoice' => 'Invoice',
@@ -43,7 +45,7 @@ final class DocumentsRelationManager extends RelationManager
                     ->required(),
                 Forms\Components\FileUpload::make('file_path')
                     ->acceptedFileTypes(['application/pdf'])
-                    ->maxSize(10240), // 10MB
+                    ->maxSize(10240),
             ]);
     }
 
@@ -54,10 +56,11 @@ final class DocumentsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('admin.fields.title'))
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('admin.fields.type'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'invoice' => 'primary',
                         'receipt' => 'success',
@@ -68,7 +71,7 @@ final class DocumentsRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('admin.fields.status'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'draft' => 'gray',
                         'generated' => 'info',
@@ -79,11 +82,11 @@ final class DocumentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('file_path')
                     ->label(__('admin.fields.file'))
                     ->formatStateUsing(fn ($state) => $state ? 'Download' : 'No file')
-                    ->url(fn ($record) => $record->file_path ? asset('storage/' . $record->file_path) : null)
+                    ->url(fn ($record) => $record->file_path ? asset('storage/'.$record->file_path) : null)
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))
-                    ->dateTime(),
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * VariantAttributeValue
- * 
+ *
  * Enhanced model for managing variant attribute values with multi-language support and advanced filtering.
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -66,7 +66,7 @@ final class VariantAttributeValue extends Model
     public function getLocalizedValue(?string $locale = null): string
     {
         $locale = $locale ?: app()->getLocale();
-        
+
         return match ($locale) {
             'lt' => $this->attribute_value_lt ?: $this->attribute_value_display ?: $this->attribute_value,
             'en' => $this->attribute_value_en ?: $this->attribute_value_display ?: $this->attribute_value,

@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignSchedule;
@@ -10,15 +11,12 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
@@ -36,11 +34,13 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use BackedEnum;
+
+final class CampaignScheduleResource extends Resource
+{
+    protected static ?string $model = CampaignSchedule::class;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -49,7 +49,6 @@ use BackedEnum;
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -58,8 +57,6 @@ use BackedEnum;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -79,7 +76,7 @@ use BackedEnum;
                                                 ->searchable()
                                                 ->preload()
                                                 ->required()
-                                                ->getOptionLabelFromRecordUsing(fn($record) => "{$record->name}")
+                                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name}")
                                                 ->columnSpan(1),
                                             Select::make('schedule_type')
                                                 ->label(__('admin.campaign_schedules.form.fields.schedule_type'))
@@ -130,16 +127,16 @@ use BackedEnum;
                                 ->schema([
                                     Placeholder::make('campaign_name')
                                         ->label(__('admin.campaign_schedules.form.fields.campaign_name'))
-                                        ->content(fn($record) => $record?->campaign?->name ?? '-'),
+                                        ->content(fn ($record) => $record?->campaign?->name ?? '-'),
                                     Placeholder::make('campaign_status')
                                         ->label(__('admin.campaign_schedules.form.fields.campaign_status'))
-                                        ->content(fn($record) => $record?->campaign?->status ?? '-'),
+                                        ->content(fn ($record) => $record?->campaign?->status ?? '-'),
                                     Placeholder::make('campaign_type')
                                         ->label(__('admin.campaign_schedules.form.fields.campaign_type'))
-                                        ->content(fn($record) => $record?->campaign?->type ?? '-'),
+                                        ->content(fn ($record) => $record?->campaign?->type ?? '-'),
                                     Placeholder::make('schedule_status')
                                         ->label(__('admin.campaign_schedules.form.fields.schedule_status'))
-                                        ->content(fn($record) => $record?->is_active
+                                        ->content(fn ($record) => $record?->is_active
                                             ? __('admin.campaign_schedules.status.active')
                                             : __('admin.campaign_schedules.status.inactive')),
                                 ])
@@ -152,8 +149,6 @@ use BackedEnum;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -165,15 +160,14 @@ use BackedEnum;
                     ->sortable(),
                 BadgeColumn::make('schedule_type')
                     ->label(__('admin.campaign_schedules.form.fields.schedule_type'))
-                    ->formatStateUsing(fn(string $state): string =>
-                        match ($state) {
-                            'once' => __('admin.campaign_schedules.schedule_types.once'),
-                            'daily' => __('admin.campaign_schedules.schedule_types.daily'),
-                            'weekly' => __('admin.campaign_schedules.schedule_types.weekly'),
-                            'monthly' => __('admin.campaign_schedules.schedule_types.monthly'),
-                            'custom' => __('admin.campaign_schedules.schedule_types.custom'),
-                            default => $state,
-                        })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'once' => __('admin.campaign_schedules.schedule_types.once'),
+                        'daily' => __('admin.campaign_schedules.schedule_types.daily'),
+                        'weekly' => __('admin.campaign_schedules.schedule_types.weekly'),
+                        'monthly' => __('admin.campaign_schedules.schedule_types.monthly'),
+                        'custom' => __('admin.campaign_schedules.schedule_types.custom'),
+                        default => $state,
+                    })
                     ->colors([
                         'primary' => 'once',
                         'success' => 'daily',
@@ -199,17 +193,19 @@ use BackedEnum;
                 BadgeColumn::make('status')
                     ->label(__('admin.campaign_schedules.form.fields.status'))
                     ->formatStateUsing(function ($record) {
-                        if (!$record->is_active)
+                        if (! $record->is_active) {
                             return __('admin.campaign_schedules.status.inactive');
+                        }
                         if ($record->next_run_at && $record->next_run_at->isFuture()) {
                             return __('admin.campaign_schedules.status.scheduled');
                         }
+
                         return __('admin.campaign_schedules.status.ready');
                     })
                     ->colors([
-                        'success' => fn($state) => $state === __('admin.campaign_schedules.status.scheduled'),
-                        'warning' => fn($state) => $state === __('admin.campaign_schedules.status.ready'),
-                        'danger' => fn($state) => $state === __('admin.campaign_schedules.status.inactive'),
+                        'success' => fn ($state) => $state === __('admin.campaign_schedules.status.scheduled'),
+                        'warning' => fn ($state) => $state === __('admin.campaign_schedules.status.ready'),
+                        'danger' => fn ($state) => $state === __('admin.campaign_schedules.status.inactive'),
                     ]),
             ])
             ->filters([
@@ -235,8 +231,7 @@ use BackedEnum;
                     ->label(__('admin.campaign_schedules.filters.last_run_at')),
                 Filter::make('overdue')
                     ->label(__('admin.campaign_schedules.filters.overdue'))
-                    ->query(fn(Builder $query): Builder =>
-                        $query->where('next_run_at', '<', now())->where('is_active', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('next_run_at', '<', now())->where('is_active', true)),
             ])
             ->actions([
                 ViewAction::make(),

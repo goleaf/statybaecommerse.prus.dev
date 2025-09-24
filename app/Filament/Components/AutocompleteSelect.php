@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Components;
 
+use Closure;
 use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Component;
-use Closure;
 
 /**
  * AutocompleteSelect Component
@@ -38,7 +40,7 @@ final class AutocompleteSelect extends Select
 
     protected ?string $searchQuery = null;
 
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name);
     }
@@ -46,48 +48,62 @@ final class AutocompleteSelect extends Select
     public function searchable(bool|Closure|array $condition = true): static
     {
         $this->searchable = is_bool($condition) ? $condition : true;
+
         return $this;
     }
 
     public function multiple(bool|Closure $condition = true): static
     {
         $this->multiple = is_bool($condition) ? $condition : true;
+
         return $this;
     }
 
     public function minSearchLength(int $length): static
     {
         $this->minSearchLength = $length;
+
         return $this;
     }
 
     public function maxSearchResults(int $count): static
     {
         $this->maxSearchResults = $count;
+
         return $this;
     }
 
     public function searchField(string $field): static
     {
         $this->searchField = $field;
+
         return $this;
     }
 
     public function valueField(string $field): static
     {
         $this->valueField = $field;
+
         return $this;
     }
 
     public function labelField(string $field): static
     {
         $this->labelField = $field;
+
         return $this;
     }
 
-    public function model(string $modelClass): static
+    public function model(Model|Closure|array|string|null $model = null): static
     {
-        $this->modelClass = $modelClass;
+        parent::model($model);
+
+        if (is_string($model)) {
+            $this->modelClass = $model;
+        } elseif ($model instanceof Model) {
+            $this->modelClass = $model::class;
+        }
+
         return $this;
     }
 
@@ -131,15 +147,27 @@ final class AutocompleteSelect extends Select
         return $this->modelClass;
     }
 
-    public function getSearchResults(): Collection
+    public function getSearchResults(string $search): array
     {
-        return $this->searchResults ?? collect();
+        $this->setSearchQuery($search);
+
+        $results = $this->searchResults ?? collect();
+
+        return $results
+            ->mapWithKeys(function (array $item): array {
+                $value = $item['value'] ?? null;
+                $label = $item['label'] ?? (is_array($item['data'] ?? null) ? ($item['data']['name'] ?? (string) $value) : (string) $value);
+
+                return $value !== null ? [$value => $label] : [];
+            })
+            ->all();
     }
 
     public function setSearchQuery(?string $query): static
     {
         $this->searchQuery = $query;
         $this->performSearch();
+
         return $this;
     }
 
@@ -150,8 +178,9 @@ final class AutocompleteSelect extends Select
 
     protected function performSearch(): void
     {
-        if (!$this->modelClass || !$this->searchQuery || strlen($this->searchQuery) < $this->minSearchLength) {
+        if (! $this->modelClass || ! $this->searchQuery || strlen($this->searchQuery) < $this->minSearchLength) {
             $this->searchResults = collect();
+
             return;
         }
 
@@ -162,7 +191,7 @@ final class AutocompleteSelect extends Select
 
         $query = $model
             ->query()
-            ->where($searchField, 'like', '%' . $this->searchQuery . '%')
+            ->where($searchField, 'like', '%'.$this->searchQuery.'%')
             ->limit($this->maxSearchResults);
 
         $this->searchResults = $query->get()->map(function (Model $item) use ($valueField, $labelField) {
@@ -185,7 +214,7 @@ final class AutocompleteSelect extends Select
             'valueField' => $this->getValueField(),
             'labelField' => $this->getLabelField(),
             'modelClass' => $this->getModelClass(),
-            'searchResults' => $this->getSearchResults(),
+            'searchResults' => $this->searchResults ?? collect(),
             'searchQuery' => $this->getSearchQuery(),
         ];
     }

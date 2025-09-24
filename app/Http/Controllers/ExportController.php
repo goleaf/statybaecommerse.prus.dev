@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -10,17 +11,16 @@ use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+
 /**
  * ExportController
- * 
+ *
  * HTTP controller handling ExportController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 class ExportController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @return ViewContract
      */
     public function index(): ViewContract
     {
@@ -32,18 +32,18 @@ class ExportController extends Controller
                 $files[] = ['name' => basename($path), 'path' => $path, 'size' => $disk->size($path), 'url' => $disk->url($path)];
             }
         }
+
         return view('exports.index', ['files' => collect($files)->sortBy('name')->values()->all()]);
     }
+
     /**
      * Handle download functionality with proper error handling.
-     * @param string $filename
-     * @return HttpResponse|StreamedResponse|RedirectResponse
      */
     public function download(string $filename): HttpResponse|StreamedResponse|RedirectResponse
     {
-        $path = 'exports/' . $filename;
+        $path = 'exports/'.$filename;
         $disk = Storage::disk('public');
-        if (!$disk->exists($path)) {
+        if (! $disk->exists($path)) {
             return redirect()->route('exports.index')->with('error', __('File not found.'));
         }
         try {

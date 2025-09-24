@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use Illuminate\Contracts\View\View;
@@ -8,46 +9,47 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+
 /**
  * CouponForm
- * 
+ *
  * Livewire component for CouponForm with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string|null $code
  */
 class CouponForm extends Component
 {
     #[Validate('nullable|string|max:50')]
     public ?string $code = null;
+
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
         $this->code = session('checkout.coupon.code');
     }
+
     /**
      * Handle isCouponApplied functionality with proper error handling.
-     * @return bool
      */
     #[Computed]
     public function isCouponApplied(): bool
     {
         return session()->has('checkout.coupon');
     }
+
     /**
      * Handle appliedCouponCode functionality with proper error handling.
-     * @return string|null
      */
     #[Computed]
     public function appliedCouponCode(): ?string
     {
         return session('checkout.coupon.code');
     }
+
     /**
      * Handle apply functionality with proper error handling.
-     * @return void
      */
     public function apply(): void
     {
@@ -77,9 +79,9 @@ class CouponForm extends Component
         }
         $this->dispatch('coupon-updated');
     }
+
     /**
      * Handle remove functionality with proper error handling.
-     * @return void
      */
     public function remove(): void
     {
@@ -87,9 +89,9 @@ class CouponForm extends Component
         $this->reset('code');
         $this->dispatch('coupon-updated');
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

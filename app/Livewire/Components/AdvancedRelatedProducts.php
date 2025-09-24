@@ -1,17 +1,19 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+
 /**
  * AdvancedRelatedProducts
- * 
+ *
  * Livewire component for AdvancedRelatedProducts with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property Product $product
  * @property int $limit
  * @property string $type
@@ -22,21 +24,20 @@ use Livewire\Component;
 final class AdvancedRelatedProducts extends Component
 {
     public Product $product;
+
     public int $limit = 4;
+
     public string $type = 'mixed';
+
     // mixed, category, brand, price
     public string $title = '';
+
     public bool $showTitle = true;
+
     public string $class = '';
+
     /**
      * Initialize the Livewire component with parameters.
-     * @param Product $product
-     * @param int $limit
-     * @param string $type
-     * @param string $title
-     * @param bool $showTitle
-     * @param string $class
-     * @return void
      */
     public function mount(Product $product, int $limit = 4, string $type = 'mixed', string $title = '', bool $showTitle = true, string $class = ''): void
     {
@@ -47,9 +48,9 @@ final class AdvancedRelatedProducts extends Component
         $this->showTitle = $showTitle;
         $this->class = $class;
     }
+
     /**
      * Handle relatedProducts functionality with proper error handling.
-     * @return Collection
      */
     #[Computed]
     public function relatedProducts(): Collection
@@ -61,9 +62,9 @@ final class AdvancedRelatedProducts extends Component
             default => $this->product->getRelatedProducts($this->limit),
         };
     }
+
     /**
      * Handle sectionTitle functionality with proper error handling.
-     * @return string
      */
     #[Computed]
     public function sectionTitle(): string
@@ -71,6 +72,7 @@ final class AdvancedRelatedProducts extends Component
         if ($this->title) {
             return $this->title;
         }
+
         return match ($this->type) {
             'category' => __('ecommerce.similar_products'),
             'brand' => __('ecommerce.you_might_also_like'),
@@ -78,6 +80,7 @@ final class AdvancedRelatedProducts extends Component
             default => __('ecommerce.related_products'),
         };
     }
+
     /**
      * Render the Livewire component view with current state.
      */

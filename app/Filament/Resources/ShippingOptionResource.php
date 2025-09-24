@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -26,7 +24,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -36,13 +33,21 @@ use UnitEnum;
  */
 final class ShippingOptionResource extends Resource
 {
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Settings';
+    }
+
+    public static function getNavigationIcon(): BackedEnum|string|null
+    {
+        return 'heroicon-o-truck';
+    }
+
     protected static ?string $model = ShippingOption::class;
+
     protected static ?int $navigationSort = 3;
+
     protected static ?string $recordTitleAttribute = 'name';
-    protected static ?string $navigationGroup = NavigationGroup::Settings;
-
-
-    protected static $navigationGroup = NavigationGroup::Settings;
 
     public static function getNavigationLabel(): string
     {
@@ -59,7 +64,7 @@ final class ShippingOptionResource extends Resource
         return __('admin.shipping_options.model_label');
     }
 
-    public static function schema(Schema $schema): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -72,21 +77,16 @@ final class ShippingOptionResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => 
-                                        $context === 'create' ? $set('slug', \Str::slug($state)) : null
-                                    ),
-
+                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.shipping_options.slug'))
                                     ->required()
                                     ->maxLength(255)
                                     ->unique(ShippingOption::class, 'slug', ignoreRecord: true)
                                     ->rules(['alpha_dash']),
-
                                 TextInput::make('carrier_name')
                                     ->label(__('admin.shipping_options.carrier_name'))
                                     ->maxLength(255),
-
                                 Select::make('service_type')
                                     ->label(__('admin.shipping_options.service_type'))
                                     ->options([
@@ -98,13 +98,11 @@ final class ShippingOptionResource extends Resource
                                     ->required()
                                     ->default('standard'),
                             ]),
-
                         Textarea::make('description')
                             ->label(__('admin.shipping_options.description'))
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
-
                 SchemaSection::make(__('admin.shipping_options.pricing'))
                     ->schema([
                         SchemaGrid::make(2)
@@ -115,7 +113,6 @@ final class ShippingOptionResource extends Resource
                                     ->prefix('€')
                                     ->step(0.01)
                                     ->required(),
-
                                 Select::make('currency_code')
                                     ->label(__('admin.shipping_options.currency_code'))
                                     ->options([
@@ -127,7 +124,6 @@ final class ShippingOptionResource extends Resource
                                     ->required(),
                             ]),
                     ]),
-
                 SchemaSection::make(__('admin.shipping_options.constraints'))
                     ->schema([
                         SchemaGrid::make(2)
@@ -137,19 +133,16 @@ final class ShippingOptionResource extends Resource
                                     ->numeric()
                                     ->suffix('kg')
                                     ->step(0.01),
-
                                 TextInput::make('max_weight')
                                     ->label(__('admin.shipping_options.max_weight'))
                                     ->numeric()
                                     ->suffix('kg')
                                     ->step(0.01),
-
                                 TextInput::make('min_order_amount')
                                     ->label(__('admin.shipping_options.min_order_amount'))
                                     ->numeric()
                                     ->prefix('€')
                                     ->step(0.01),
-
                                 TextInput::make('max_order_amount')
                                     ->label(__('admin.shipping_options.max_order_amount'))
                                     ->numeric()
@@ -157,7 +150,6 @@ final class ShippingOptionResource extends Resource
                                     ->step(0.01),
                             ]),
                     ]),
-
                 SchemaSection::make(__('admin.shipping_options.delivery'))
                     ->schema([
                         SchemaGrid::make(2)
@@ -167,7 +159,6 @@ final class ShippingOptionResource extends Resource
                                     ->numeric()
                                     ->suffix(__('admin.shipping_options.days'))
                                     ->minValue(1),
-
                                 TextInput::make('estimated_days_max')
                                     ->label(__('admin.shipping_options.estimated_days_max'))
                                     ->numeric()
@@ -175,7 +166,6 @@ final class ShippingOptionResource extends Resource
                                     ->minValue(1),
                             ]),
                     ]),
-
                 SchemaSection::make(__('admin.shipping_options.status'))
                     ->schema([
                         SchemaGrid::make(3)
@@ -183,11 +173,9 @@ final class ShippingOptionResource extends Resource
                                 Toggle::make('is_enabled')
                                     ->label(__('admin.shipping_options.is_enabled'))
                                     ->default(true),
-
                                 Toggle::make('is_default')
                                     ->label(__('admin.shipping_options.is_default'))
                                     ->default(false),
-
                                 TextInput::make('sort_order')
                                     ->label(__('admin.shipping_options.sort_order'))
                                     ->numeric()
@@ -205,12 +193,10 @@ final class ShippingOptionResource extends Resource
                     ->label(__('admin.shipping_options.name'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('carrier_name')
                     ->label(__('admin.shipping_options.carrier_name'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('service_type')
                     ->label(__('admin.shipping_options.service_type'))
                     ->badge()
@@ -221,28 +207,21 @@ final class ShippingOptionResource extends Resource
                         'economy' => 'info',
                         default => 'gray',
                     }),
-
                 TextColumn::make('price')
                     ->label(__('admin.shipping_options.price'))
                     ->money('EUR')
                     ->sortable(),
-
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
-                    ->formatStateUsing(fn ($record) => 
-                        $record->estimated_days_min && $record->estimated_days_max 
-                            ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
-                            : '-'
-                    ),
-
+                    ->formatStateUsing(fn ($record) => $record->estimated_days_min && $record->estimated_days_max
+                        ? "{$record->estimated_days_min}-{$record->estimated_days_max} ".__('admin.shipping_options.days')
+                        : '-'),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled'))
                     ->boolean(),
-
                 IconColumn::make('is_default')
                     ->label(__('admin.shipping_options.is_default'))
                     ->boolean(),
-
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->dateTime()
@@ -258,18 +237,16 @@ final class ShippingOptionResource extends Resource
                         'overnight' => __('admin.shipping_options.service_types.overnight'),
                         'economy' => __('admin.shipping_options.service_types.economy'),
                     ]),
-
                 TernaryFilter::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled')),
-
                 TernaryFilter::make('is_default')
                     ->label(__('admin.shipping_options.is_default')),
             ])
-            ->recordActions([
+            ->actions([
                 ViewAction::make(),
                 EditAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,10 +8,10 @@ use App\Enums\AddressType;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
@@ -22,23 +24,26 @@ use Spatie\Translatable\HasTranslations;
  * @property mixed $fillable
  * @property mixed $translatable
  * @property mixed $appends
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([UserOwnedScope::class])]
 final class Address extends Model
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     protected $table = 'addresses';
+
     protected $fillable = ['user_id', 'type', 'first_name', 'last_name', 'company', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code', 'phone', 'email', 'is_default', 'is_billing', 'is_shipping', 'notes', 'apartment', 'floor', 'building', 'landmark', 'instructions', 'company_name', 'company_vat', 'is_active'];
+
     protected $translatable = ['notes', 'instructions'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -54,7 +59,6 @@ final class Address extends Model
 
     /**
      * Handle user functionality with proper error handling.
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -63,7 +67,6 @@ final class Address extends Model
 
     /**
      * Handle country functionality with proper error handling.
-     * @return BelongsTo
      */
     public function country(): BelongsTo
     {
@@ -72,7 +75,6 @@ final class Address extends Model
 
     /**
      * Handle countryById functionality with proper error handling.
-     * @return BelongsTo
      */
     public function countryById(): BelongsTo
     {
@@ -81,7 +83,6 @@ final class Address extends Model
 
     /**
      * Handle cityById functionality with proper error handling.
-     * @return BelongsTo
      */
     public function cityById(): BelongsTo
     {
@@ -90,7 +91,6 @@ final class Address extends Model
 
     /**
      * Handle orders functionality with proper error handling.
-     * @return HasMany
      */
     public function orders(): HasMany
     {
@@ -99,7 +99,6 @@ final class Address extends Model
 
     /**
      * Handle shippingOrders functionality with proper error handling.
-     * @return HasMany
      */
     public function shippingOrders(): HasMany
     {
@@ -108,7 +107,6 @@ final class Address extends Model
 
     /**
      * Handle latestOrder functionality with proper error handling.
-     * @return HasOne
      */
     public function latestOrder(): HasOne
     {
@@ -117,7 +115,6 @@ final class Address extends Model
 
     /**
      * Handle latestShippingOrder functionality with proper error handling.
-     * @return HasOne
      */
     public function latestShippingOrder(): HasOne
     {
@@ -126,7 +123,8 @@ final class Address extends Model
 
     /**
      * Handle scopeDefault functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeDefault($query)
     {
@@ -135,8 +133,8 @@ final class Address extends Model
 
     /**
      * Handle scopeByType functionality with proper error handling.
-     * @param mixed $query
-     * @param string $type
+     *
+     * @param  mixed  $query
      */
     public function scopeByType($query, string $type)
     {
@@ -145,7 +143,8 @@ final class Address extends Model
 
     /**
      * Handle scopeBilling functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeBilling($query)
     {
@@ -154,7 +153,8 @@ final class Address extends Model
 
     /**
      * Handle scopeShipping functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeShipping($query)
     {
@@ -163,7 +163,8 @@ final class Address extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -172,8 +173,8 @@ final class Address extends Model
 
     /**
      * Handle scopeForUser functionality with proper error handling.
-     * @param mixed $query
-     * @param int $userId
+     *
+     * @param  mixed  $query
      */
     public function scopeForUser($query, int $userId)
     {
@@ -182,8 +183,8 @@ final class Address extends Model
 
     /**
      * Handle scopeByCountry functionality with proper error handling.
-     * @param mixed $query
-     * @param string $countryCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByCountry($query, string $countryCode)
     {
@@ -192,8 +193,8 @@ final class Address extends Model
 
     /**
      * Handle scopeByCity functionality with proper error handling.
-     * @param mixed $query
-     * @param string $city
+     *
+     * @param  mixed  $query
      */
     public function scopeByCity($query, string $city)
     {
@@ -202,8 +203,8 @@ final class Address extends Model
 
     /**
      * Handle scopeByPostalCode functionality with proper error handling.
-     * @param mixed $query
-     * @param string $postalCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByPostalCode($query, string $postalCode)
     {
@@ -212,7 +213,6 @@ final class Address extends Model
 
     /**
      * Handle getFullNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFullNameAttribute(): string
     {
@@ -221,17 +221,16 @@ final class Address extends Model
 
     /**
      * Handle getFullAddressAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFullAddressAttribute(): string
     {
         $parts = array_filter([$this->address_line_1, $this->address_line_2, $this->apartment, $this->floor, $this->building, $this->city, $this->state, $this->postal_code]);
+
         return implode(', ', $parts);
     }
 
     /**
      * Handle getFormattedAddressAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedAddressAttribute(): string
     {
@@ -254,18 +253,18 @@ final class Address extends Model
             $lines[] = $this->building;
         }
         $cityStateZip = array_filter([$this->city, $this->state, $this->postal_code]);
-        if (!empty($cityStateZip)) {
+        if (! empty($cityStateZip)) {
             $lines[] = implode(', ', $cityStateZip);
         }
         if ($this->country) {
             $lines[] = $this->country->name;
         }
+
         return implode("\n", $lines);
     }
 
     /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getDisplayNameAttribute(): string
     {
@@ -273,12 +272,12 @@ final class Address extends Model
         if ($this->company_name) {
             $name .= " ({$this->company_name})";
         }
+
         return $name;
     }
 
     /**
      * Handle getTypeLabelAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTypeLabelAttribute(): string
     {
@@ -287,7 +286,6 @@ final class Address extends Model
 
     /**
      * Handle getTypeIconAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTypeIconAttribute(): string
     {
@@ -296,7 +294,6 @@ final class Address extends Model
 
     /**
      * Handle getTypeColorAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTypeColorAttribute(): string
     {
@@ -305,7 +302,6 @@ final class Address extends Model
 
     /**
      * Handle isBilling functionality with proper error handling.
-     * @return bool
      */
     public function isBilling(): bool
     {
@@ -314,7 +310,6 @@ final class Address extends Model
 
     /**
      * Handle isShipping functionality with proper error handling.
-     * @return bool
      */
     public function isShipping(): bool
     {
@@ -323,7 +318,6 @@ final class Address extends Model
 
     /**
      * Handle isDefault functionality with proper error handling.
-     * @return bool
      */
     public function isDefault(): bool
     {
@@ -332,7 +326,6 @@ final class Address extends Model
 
     /**
      * Handle isActive functionality with proper error handling.
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -341,34 +334,30 @@ final class Address extends Model
 
     /**
      * Handle hasCompany functionality with proper error handling.
-     * @return bool
      */
     public function hasCompany(): bool
     {
-        return !empty($this->company_name);
+        return ! empty($this->company_name);
     }
 
     /**
      * Handle hasAdditionalInfo functionality with proper error handling.
-     * @return bool
      */
     public function hasAdditionalInfo(): bool
     {
-        return !empty($this->apartment) || !empty($this->floor) || !empty($this->building) || !empty($this->landmark) || !empty($this->instructions);
+        return ! empty($this->apartment) || ! empty($this->floor) || ! empty($this->building) || ! empty($this->landmark) || ! empty($this->instructions);
     }
 
     /**
      * Handle getValidationRules functionality with proper error handling.
-     * @return array
      */
     public function getValidationRules(): array
     {
-        return ['user_id' => 'required|exists:users,id', 'type' => 'required|in:' . implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255'];
+        return ['user_id' => 'required|exists:users,id', 'type' => 'required|in:'.implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'is_active' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255'];
     }
 
     /**
      * Handle getTypesForSelect functionality with proper error handling.
-     * @return array
      */
     public static function getTypesForSelect(): array
     {
@@ -377,7 +366,6 @@ final class Address extends Model
 
     /**
      * Handle getTypesWithDescriptions functionality with proper error handling.
-     * @return array
      */
     public static function getTypesWithDescriptions(): array
     {
@@ -386,34 +374,28 @@ final class Address extends Model
 
     /**
      * Handle getDefaultAddressForUser functionality with proper error handling.
-     * @param int $userId
-     * @return self|null
      */
     public static function getDefaultAddressForUser(int $userId): ?self
     {
-        return static::where('user_id', $userId)->where('is_default', true)->where('is_active', true)->first();
+        return self::where('user_id', $userId)->where('is_default', true)->where('is_active', true)->first();
     }
 
     /**
      * Handle getBillingAddressForUser functionality with proper error handling.
-     * @param int $userId
-     * @return self|null
      */
     public static function getBillingAddressForUser(int $userId): ?self
     {
-        return static::where('user_id', $userId)->where(function ($query) {
+        return self::where('user_id', $userId)->where(function ($query) {
             $query->where('is_billing', true)->orWhere('type', AddressType::BILLING);
         })->where('is_active', true)->first();
     }
 
     /**
      * Handle getShippingAddressForUser functionality with proper error handling.
-     * @param int $userId
-     * @return self|null
      */
     public static function getShippingAddressForUser(int $userId): ?self
     {
-        return static::where('user_id', $userId)->where('is_active', true)->where(function ($query) {
+        return self::where('user_id', $userId)->where('is_active', true)->where(function ($query) {
             $query->where('is_shipping', true)->orWhere(function ($subQuery) {
                 $subQuery->where('is_shipping', false)->where('type', AddressType::SHIPPING);
             });
@@ -422,30 +404,28 @@ final class Address extends Model
 
     /**
      * Handle getAddressesForUser functionality with proper error handling.
-     * @param int $userId
+     *
      * @return Illuminate\Database\Eloquent\Collection
      */
     public static function getAddressesForUser(int $userId): \Illuminate\Database\Eloquent\Collection
     {
-        return static::where('user_id', $userId)->where('is_active', true)->orderBy('is_default', 'desc')->orderBy('created_at', 'desc')->get();
+        return self::where('user_id', $userId)->where('is_active', true)->orderBy('is_default', 'desc')->orderBy('created_at', 'desc')->get();
     }
 
     /**
      * Handle setAsDefault functionality with proper error handling.
-     * @return bool
      */
     public function setAsDefault(): bool
     {
         // Remove default from other addresses
-        static::where('user_id', $this->user_id)->where('id', '!=', $this->id)->update(['is_default' => false]);
+        self::where('user_id', $this->user_id)->where('id', '!=', $this->id)->update(['is_default' => false]);
+
         // Set this address as default
         return $this->update(['is_default' => true]);
     }
 
     /**
      * Handle duplicateForUser functionality with proper error handling.
-     * @param int $userId
-     * @return self
      */
     public function duplicateForUser(int $userId): self
     {
@@ -453,6 +433,7 @@ final class Address extends Model
         $newAddress->user_id = $userId;
         $newAddress->is_default = false;
         $newAddress->save();
+
         return $newAddress;
     }
 }

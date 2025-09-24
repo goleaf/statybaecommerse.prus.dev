@@ -33,7 +33,6 @@ return [
         'collections_description' => 'Each collection is visually designed: choose mood, season or style and instantly move to products.',
         'all_collections' => 'All Collections',
     ],
-    
     // Category page sidebar & controls
     'advanced_filters' => 'Advanced filters',
     'filters' => 'Filters',
@@ -57,7 +56,6 @@ return [
     'address_type_home_description' => 'Home address',
     'address_type_work_description' => 'Work address',
     'address_type_other_description' => 'Other address',
-
     // Payment Types
     'payment_type_stripe' => 'Stripe',
     'payment_type_notch_pay' => 'NotchPay',
@@ -67,7 +65,6 @@ return [
     'payment_type_cash_description' => 'Cash payment',
     'payment_processing_instant' => 'Instant',
     'payment_processing_immediate' => 'Immediate',
-
     // Order Status
     'order_status_pending' => 'Pending',
     'order_status_confirmed' => 'Confirmed',
@@ -79,7 +76,6 @@ return [
     'order_status_partially_refunded' => 'Partially Refunded',
     'order_status_failed' => 'Failed',
     'order_status_on_hold' => 'On Hold',
-
     // Confirmation Messages
     'confirm_remove_cart_item' => 'Are you sure you want to remove this item from your cart?',
     'confirm_clear_cart' => 'Are you sure you want to clear your entire cart?',
@@ -147,7 +143,6 @@ return [
     'order_status_partially_refunded_description' => 'Order has been partially refunded',
     'order_status_failed_description' => 'Order has failed',
     'order_status_on_hold_description' => 'Order is on hold',
-
     // Product Status
     'product_status_draft' => 'Draft',
     'product_status_active' => 'Active',
@@ -165,7 +160,6 @@ return [
     'product_status_archived_description' => 'Product is archived',
     'product_status_pending_review_description' => 'Product is pending review',
     'product_status_rejected_description' => 'Product has been rejected',
-
     // User Roles
     'user_role_super_admin' => 'Super Administrator',
     'user_role_admin' => 'Administrator',
@@ -179,7 +173,6 @@ return [
     'user_role_editor_description' => 'Content editing privileges',
     'user_role_customer_description' => 'Customer privileges',
     'user_role_guest_description' => 'Guest privileges',
-
     // Navigation Groups
     'nav_group_referral' => 'Referral System',
     'nav_group_products' => 'Products',
@@ -188,6 +181,7 @@ return [
     'nav_group_settings' => 'Settings',
     'nav_group_analytics' => 'Analytics',
     'nav_group_content' => 'Content',
+    'nav_group_content_management' => 'Content Management',
     'nav_group_system' => 'System',
     'nav_group_marketing' => 'Marketing',
     'nav_group_inventory' => 'Inventory',
@@ -199,6 +193,7 @@ return [
     'nav_group_settings_description' => 'System settings',
     'nav_group_analytics_description' => 'Analytics overview',
     'nav_group_content_description' => 'Content management',
+    'nav_group_content_management_description' => 'News categories and content management',
     'nav_group_system_description' => 'System management',
     'nav_group_marketing_description' => 'Marketing management',
     'nav_group_inventory_description' => 'Inventory management',
@@ -369,7 +364,6 @@ return [
     'campaign_description' => 'Campaign Description',
     'campaign_content' => 'Campaign Content',
     'campaign_settings' => 'Campaign Settings',
-
     // Campaign translations
     'campaigns' => [
         'navigation' => [
@@ -508,11 +502,11 @@ return [
             ],
             'campaign_ending_soon' => [
                 'title' => 'Campaign Ending Soon',
-                'description' => 'Your campaign is ending in less than a week. Consider extending it if it\'s performing well.',
+                'description' => "Your campaign is ending in less than a week. Consider extending it if it's performing well.",
             ],
             'missing_cta' => [
                 'title' => 'Missing Call-to-Action',
-                'description' => 'Your campaign doesn\'t have a clear call-to-action. Add one to improve conversions.',
+                'description' => "Your campaign doesn't have a clear call-to-action. Add one to improve conversions.",
             ],
             'short_content' => [
                 'title' => 'Short Content',
@@ -872,10 +866,8 @@ return [
     'this_month' => 'This Month',
     // Brands
     'brands' => 'Brands',
-
     // Additional translations for attributes
     'updated_at' => 'Updated At',
-    
     // Attribute specific translations
     'attributes' => 'Attributes',
     'attribute' => 'Attribute',
@@ -967,7 +959,6 @@ return [
     'searchable_only' => 'Searchable Only',
     'enabled_only' => 'Enabled Only',
     'with_values_only' => 'With Values Only',
-    
     // Address specific translations
     'add_new_address' => 'Add New Address',
     'address_type' => 'Address Type',
@@ -983,7 +974,7 @@ return [
     'use_for_shipping' => 'Use for shipping',
     'save_address' => 'Save Address',
     'no_addresses' => 'No addresses',
-    'no_addresses_description' => 'You don\'t have any saved addresses yet. Add your first address.',
+    'no_addresses_description' => "You don't have any saved addresses yet. Add your first address.",
     'address_created_successfully' => 'Address created successfully',
     'address_updated_successfully' => 'Address updated successfully',
     'address_deleted_successfully' => 'Address deleted successfully',
@@ -1091,7 +1082,6 @@ return [
     'add_metadata' => 'Add Metadata',
     'active_only' => 'Active Only',
     'inactive_only' => 'Inactive Only',
-    
     // Navigation and UI translations
     'logo' => 'Logo',
     'global_search' => 'Global Search',
@@ -1102,7 +1092,6 @@ return [
     'recommendation_system' => 'Recommendation System',
     'recommendation_system_management' => 'Recommendation System Management',
     'content_management' => 'Content Management',
-    
     // System management translations
     'clear_cache' => 'Clear Cache',
     'optimize_system' => 'Optimize System',
@@ -1121,7 +1110,6 @@ return [
     'total_requests' => 'Total Requests',
     'avg_ctr' => 'Avg CTR',
     'avg_conversion' => 'Avg Conversion',
-    
     // Recommendation block names
     'related_products' => 'Related Products',
     'you_might_also_like' => 'You Might Also Like',
@@ -1131,14 +1119,12 @@ return [
     'customers_also_bought' => 'Customers Also Bought',
     'complete_your_purchase' => 'Complete Your Purchase',
     'upgrade_your_choice' => 'Upgrade Your Choice',
-    
     // Quick actions
     'quick_actions' => 'Quick Actions',
     'clear_recommendation_cache' => 'Clear Recommendation Cache',
     'optimize_recommendation_system' => 'Optimize Recommendation System',
     'manage_configurations' => 'Manage Configurations',
     'system_information' => 'System Information',
-    
     // Available algorithms
     'available_algorithms' => 'Available Algorithms',
     'content_based_filtering' => 'Content-Based Filtering',
@@ -1148,7 +1134,6 @@ return [
     'trending_products' => 'Trending Products',
     'cross_sell' => 'Cross-Sell',
     'up_sell' => 'Up-Sell',
-    
     // Features
     'features' => 'Features',
     'realtime_caching' => 'Real-time caching',
@@ -1157,13 +1142,11 @@ return [
     'ab_testing_support' => 'A/B testing support',
     'dynamic_algorithm_weights' => 'Dynamic algorithm weights',
     'multilanguage_support' => 'Multi-language support',
-    
     // System information
     'php_version' => 'PHP Version',
     'response_time' => 'Response Time',
     'memory_usage' => 'Memory Usage',
     'request_method' => 'Request Method',
-    
     // Cache and optimization messages
     'cache_cleared_successfully' => 'Cache cleared successfully',
     'cache_clear_failed' => 'Cache clear failed',

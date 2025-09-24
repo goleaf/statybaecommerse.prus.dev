@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -18,13 +20,13 @@ final class MultiLanguageTabService
 {
     /**
      * Handle getAvailableLanguages functionality with proper error handling.
-     * @return array
      */
     public static function getAvailableLanguages(): array
     {
         $supported = config('app.supported_locales', ['lt', 'en']);
         $locales = is_array($supported) ? $supported : array_filter(array_map('trim', explode(',', (string) $supported)));
         $locales = array_values(array_filter(array_map('trim', $locales)));
+
         return collect($locales)->map(function (string $locale) {
             return ['code' => $locale, 'name' => self::getLanguageName($locale), 'flag' => self::getLanguageFlag($locale)];
         })->toArray();
@@ -32,8 +34,6 @@ final class MultiLanguageTabService
 
     /**
      * Handle getLanguageName functionality with proper error handling.
-     * @param string $locale
-     * @return string
      */
     public static function getLanguageName(string $locale): string
     {
@@ -50,8 +50,6 @@ final class MultiLanguageTabService
 
     /**
      * Handle getLanguageFlag functionality with proper error handling.
-     * @param string $locale
-     * @return string
      */
     public static function getLanguageFlag(string $locale): string
     {
@@ -68,8 +66,6 @@ final class MultiLanguageTabService
 
     /**
      * Handle createSimpleTabs functionality with proper error handling.
-     * @param array $fields
-     * @return array
      */
     public static function createSimpleTabs(array $fields): array
     {
@@ -87,13 +83,12 @@ final class MultiLanguageTabService
             }
             $tabs[] = TabLayoutTab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($tabFields);
         }
+
         return $tabs;
     }
 
     /**
      * Handle createAdvancedTabs functionality with proper error handling.
-     * @param callable $schemaBuilder
-     * @return array
      */
     public static function createAdvancedTabs(callable $schemaBuilder): array
     {
@@ -104,13 +99,12 @@ final class MultiLanguageTabService
             $components = is_array($schema) ? $schema : [$schema];
             $tabs[] = TabLayoutTab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($components);
         }
+
         return $tabs;
     }
 
     /**
      * Handle createSectionedTabs functionality with proper error handling.
-     * @param array $sections
-     * @return array
      */
     public static function createSectionedTabs(array $sections): array
     {
@@ -132,14 +126,12 @@ final class MultiLanguageTabService
             }
             $tabs[] = TabLayoutTab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($sectionComponents);
         }
+
         return $tabs;
     }
 
     /**
      * Handle createSimpleTabSchemas functionality with proper error handling.
-     * @param string $componentClass
-     * @param array $data
-     * @return array
      */
     public static function createSimpleTabSchemas(string $componentClass, array $data = []): array
     {
@@ -148,12 +140,12 @@ final class MultiLanguageTabService
         foreach ($languages as $language) {
             $schemas[] = SimpleTabSchema::make(label: $language['name'], id: "simple-tab-{$language['code']}")->livewireComponent($componentClass, array_merge($data, ['locale' => $language['code']]))->icon('heroicon-o-language')->badge($language['flag']);
         }
+
         return $schemas;
     }
 
     /**
      * Handle getDefaultActiveTab functionality with proper error handling.
-     * @return int
      */
     public static function getDefaultActiveTab(): int
     {
@@ -164,15 +156,13 @@ final class MultiLanguageTabService
                 return $index;
             }
         }
+
         // Fallback to first tab
         return 0;
     }
 
     /**
      * Handle prepareTranslationData functionality with proper error handling.
-     * @param array $formData
-     * @param array $translatableFields
-     * @return array
      */
     public static function prepareTranslationData(array $formData, array $translatableFields): array
     {
@@ -189,18 +179,18 @@ final class MultiLanguageTabService
                 }
             }
         }
+
         return ['main_data' => $formData, 'translations' => $translations];
     }
 
     /**
      * Handle populateFormWithTranslations functionality with proper error handling.
-     * @param mixed $record
-     * @param array $translatableFields
-     * @return array
+     *
+     * @param  mixed  $record
      */
     public static function populateFormWithTranslations($record, array $translatableFields): array
     {
-        if (!$record || !method_exists($record, 'translations')) {
+        if (! $record || ! method_exists($record, 'translations')) {
             return [];
         }
         $languages = collect(self::getAvailableLanguages())->pluck('code');
@@ -213,6 +203,7 @@ final class MultiLanguageTabService
                 }
             }
         }
+
         return $formData;
     }
 }

@@ -7,8 +7,9 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class AdminDashboard extends BaseDashboard
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
-    protected static string $view = 'filament.pages.admin-dashboard';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+
+    protected string $view = 'filament.pages.admin-dashboard';
 
     public function getWidgets(): array
     {
@@ -17,7 +18,7 @@ class AdminDashboard extends BaseDashboard
         ];
     }
 
-    public function getColumns(): int|string|array
+    public function getColumns(): array|int
     {
         return 2;
     }

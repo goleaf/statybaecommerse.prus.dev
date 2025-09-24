@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\NotificationResource;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Notification;
-use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 uses(RefreshDatabase::class);
 

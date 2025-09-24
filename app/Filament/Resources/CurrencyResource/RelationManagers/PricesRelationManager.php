@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
-use App\Models\Price;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class PricesRelationManager extends RelationManager
 {
@@ -35,17 +36,17 @@ final class PricesRelationManager extends RelationManager
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('priceable_id')
-                    ->required(),
+                    ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('amount')
-                    ->required(),
-                    ->numeric(),
+                    ->required()
+                    ->numeric()
                     ->step(0.01),
                 Forms\Components\TextInput::make('compare_amount')
-                    ->numeric(),
+                    ->numeric()
                     ->step(0.01),
                 Forms\Components\TextInput::make('cost_amount')
-                    ->numeric(),
+                    ->numeric()
                     ->step(0.01),
                 Forms\Components\Select::make('type')
                     ->options([
@@ -69,39 +70,39 @@ final class PricesRelationManager extends RelationManager
             ->recordTitleAttribute('amount')
             ->columns([
                 Tables\Columns\TextColumn::make('priceable_type')
-                    ->badge(),
+                    ->badge()
                     ->color('primary'),
                 Tables\Columns\TextColumn::make('priceable_id')
-                    ->numeric(),
+                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->money('EUR'),
+                    ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('compare_amount')
-                    ->money('EUR'),
+                    ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('cost_amount')
-                    ->money('EUR'),
+                    ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
-                    ->badge(),
-                    ->color(fn(string $state): string => match ($state) {
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
                         'regular' => 'gray',
                         'sale' => 'success',
                         'wholesale' => 'warning',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('starts_at')
-                    ->dateTime(),
+                    ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('ends_at')
-                    ->dateTime(),
+                    ->dateTime()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_enabled')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                    ->sortable(),
+                    ->dateTime()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -114,7 +115,7 @@ final class PricesRelationManager extends RelationManager
                     ]),
                 Tables\Filters\TernaryFilter::make('is_enabled'),
                 Tables\Filters\Filter::make('active')
-                    ->query(fn(Builder $query): Builder => $query
+                    ->query(fn (Builder $query): Builder => $query
                         ->where('is_enabled', true)
                         ->where(function ($q) {
                             $q
@@ -144,7 +145,7 @@ final class PricesRelationManager extends RelationManager
                     Tables\Actions\ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

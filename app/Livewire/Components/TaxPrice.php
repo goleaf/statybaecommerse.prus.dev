@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
@@ -16,7 +18,6 @@ class TaxPrice extends Component
 {
     /**
      * Handle taxAmount functionality with proper error handling.
-     * @return float
      */
     #[Computed]
     public function taxAmount(): float
@@ -52,23 +53,23 @@ class TaxPrice extends Component
         } catch (\Throwable $e) {
             $discount = 0.0;
         }
+
         return app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - $discount), null);
     }
 
     /**
      * Handle taxBreakdown functionality with proper error handling.
-     * @return array
      */
     #[Computed]
     public function taxBreakdown(): array
     {
         $taxRate = app(\App\Services\Taxes\TaxCalculator::class)->getTaxRate(null);
+
         return ['tax_rate' => $taxRate, 'tax_amount' => $this->taxAmount, 'taxable_amount' => $this->taxAmount / ($taxRate / 100)];
     }
 
     /**
      * Handle updateAmounts functionality with proper error handling.
-     * @return void
      */
     #[On('cartUpdated')]
     #[On('coupon-updated')]
@@ -79,7 +80,6 @@ class TaxPrice extends Component
 
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -88,7 +88,6 @@ class TaxPrice extends Component
 
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

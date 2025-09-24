@@ -25,7 +25,7 @@ final class CreateSystemSetting extends CreateRecord
         $data['is_required'] = $data['is_required'] ?? false;
         $data['is_encrypted'] = $data['is_encrypted'] ?? false;
         $data['is_readonly'] = $data['is_readonly'] ?? false;
-        
+
         return $data;
     }
 }

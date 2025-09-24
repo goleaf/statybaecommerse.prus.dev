@@ -6,7 +6,7 @@ namespace Tests\Feature;
 
 /**
  * Test Groups Configuration
- * 
+ *
  * Centralized configuration for organizing tests by groups
  */
 class TestGroups

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\UserResource;
 use App\Models\User;
@@ -129,7 +131,7 @@ it('can search users by name and email', function () {
         'last_name' => 'Doe',
         'email' => 'john@example.com',
     ]);
-    
+
     $user2 = User::factory()->create([
         'first_name' => 'Jane',
         'last_name' => 'Smith',

@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\Widgets;
 
 use App\Models\DiscountRedemption;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 
 final class RecentRedemptionsWidget extends BaseWidget
 {
@@ -59,5 +60,3 @@ final class RecentRedemptionsWidget extends BaseWidget
             ->paginated([10, 25, 50]);
     }
 }
-
-

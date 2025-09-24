@@ -16,18 +16,18 @@ beforeEach(function () {
         'description' => 'Technology company',
         'is_enabled' => true,
     ]);
-    
+
     $this->brandWithoutProducts = Brand::factory()->create([
         'name' => 'Samsung',
         'description' => 'Electronics manufacturer',
         'is_enabled' => true,
     ]);
-    
+
     $this->disabledBrand = Brand::factory()->create([
         'name' => 'Disabled Brand',
         'is_enabled' => false,
     ]);
-    
+
     // Create products for the first brand
     Product::factory()->count(5)->create([
         'brand_id' => $this->brandWithProducts->id,
@@ -87,7 +87,7 @@ it('sorts brands by creation date', function () {
         'is_enabled' => true,
         'created_at' => now()->addDay(),
     ]);
-    
+
     livewire(Index::class)
         ->fillForm(['sortBy' => 'created_at'])
         ->assertSeeInOrder(['Newer Brand', 'Samsung']); // Newer first
@@ -96,15 +96,15 @@ it('sorts brands by creation date', function () {
 it('resets pagination when filters change', function () {
     // Create many brands to trigger pagination
     Brand::factory()->count(15)->create(['is_enabled' => true]);
-    
+
     $component = livewire(Index::class);
-    
+
     // Go to page 2
     $component->set('page', 2);
-    
+
     // Change filter - should reset to page 1
     $component->fillForm(['search' => 'test']);
-    
+
     expect($component->get('page'))->toBe(1);
 });
 
@@ -120,7 +120,7 @@ it('persists filters in URL', function () {
 
 it('shows empty state when no brands found', function () {
     Brand::query()->delete();
-    
+
     livewire(Index::class)
         ->assertSee(__('shared.no_results_found'))
         ->assertSee(__('No brands are available at the moment'));
@@ -137,10 +137,10 @@ it('can clear search filters', function () {
     $component = livewire(Index::class)
         ->fillForm(['search' => 'NonexistentBrand'])
         ->assertSee(__('shared.no_results_found'));
-    
+
     // Simulate clicking clear filters
     $component->set('search', '');
-    
+
     $component->assertSee('Apple')
         ->assertSee('Samsung');
 });
@@ -165,7 +165,7 @@ it('has proper form field attributes', function () {
 
 it('shows pagination when there are many brands', function () {
     Brand::factory()->count(15)->create(['is_enabled' => true]);
-    
+
     get(route('brands.index'))
         ->assertSee('Next'); // Pagination link
 });
@@ -185,7 +185,7 @@ it('displays brand logos when available', function () {
 it('handles brands with translations correctly', function () {
     // This test assumes the brand model uses Spatie Translatable
     app()->setLocale('lt');
-    
+
     livewire(Index::class)
         ->assertSee('Apple')
         ->assertSee('Samsung');

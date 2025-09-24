@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
@@ -21,7 +23,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
@@ -109,7 +110,7 @@ class OrdersRelationManager extends RelationManager
                                 TextEntry::make('status')
                                     ->label(__('orders.status'))
                                     ->badge()
-                                    ->color(fn(string $state): string => match ($state) {
+                                    ->color(fn (string $state): string => match ($state) {
                                         'pending' => 'warning',
                                         'confirmed' => 'info',
                                         'processing' => 'primary',
@@ -172,13 +173,13 @@ class OrdersRelationManager extends RelationManager
                 BadgeColumn::make('status')
                     ->label(__('orders.status'))
                     ->colors([
-                        'warning' => fn($state): bool => $state === 'pending',
-                        'info' => fn($state): bool => $state === 'confirmed',
-                        'primary' => fn($state): bool => $state === 'processing',
-                        'success' => fn($state): bool => in_array($state, ['shipped', 'delivered']),
-                        'danger' => fn($state): bool => $state === 'cancelled',
-                        'secondary' => fn($state): bool => $state === 'refunded',
-                        'warning' => fn($state): bool => $state === 'returned',
+                        'warning' => fn ($state): bool => $state === 'pending',
+                        'info' => fn ($state): bool => $state === 'confirmed',
+                        'primary' => fn ($state): bool => $state === 'processing',
+                        'success' => fn ($state): bool => in_array($state, ['shipped', 'delivered']),
+                        'danger' => fn ($state): bool => $state === 'cancelled',
+                        'secondary' => fn ($state): bool => $state === 'refunded',
+                        'warning' => fn ($state): bool => $state === 'returned',
                     ]),
                 TextColumn::make('total_amount')
                     ->label(__('orders.total_amount'))
@@ -243,11 +244,11 @@ class OrdersRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])

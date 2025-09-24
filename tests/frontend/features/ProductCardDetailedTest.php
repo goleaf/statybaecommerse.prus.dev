@@ -1,11 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Livewire\Components\ProductCardDetailed;
 use App\Models\AnalyticsEvent;
 use App\Models\Product;
-use App\Models\ProductComparison;
 use App\Models\User;
-use App\Models\WishlistItem;
 use Livewire\Livewire;
 
 beforeEach(function () {

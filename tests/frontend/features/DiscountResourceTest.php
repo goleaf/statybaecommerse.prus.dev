@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\DiscountResource;
 use App\Models\Discount;
 use App\Models\User;
 
-use function Pest\Laravel\{actingAs, assertDatabaseHas, assertDatabaseMissing};
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(function () {
     $this->admin = User::factory()->create();

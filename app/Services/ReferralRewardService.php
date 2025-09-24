@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Discount;
@@ -8,28 +9,23 @@ use App\Models\Order;
 use App\Models\Referral;
 use App\Models\ReferralReward;
 use Illuminate\Support\Facades\Log;
+
 /**
  * ReferralRewardService
- * 
+ *
  * Service class containing ReferralRewardService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class ReferralRewardService
 {
     /**
      * Handle createReferredDiscount functionality with proper error handling.
-     * @param int $referralId
-     * @param int $userId
-     * @param int $orderId
-     * @param float $percentage
-     * @return ReferralReward|null
      */
     public function createReferredDiscount(int $referralId, int $userId, int $orderId, float $percentage): ?ReferralReward
     {
         try {
             // Create the discount in the system
             $discount = $this->createReferralDiscount($userId, $percentage);
-            if (!$discount) {
+            if (! $discount) {
                 throw new \Exception('Failed to create referral discount');
             }
             // Create the reward record
@@ -47,18 +43,17 @@ final class ReferralRewardService
                 'metadata' => ['discount_id' => $discount->id, 'percentage' => $percentage, 'first_order_only' => true],
             ]);
             Log::info('Referred discount created', ['reward_id' => $reward->id, 'referral_id' => $referralId, 'user_id' => $userId, 'order_id' => $orderId, 'discount_id' => $discount->id, 'percentage' => $percentage]);
+
             return $reward;
         } catch (\Exception $e) {
             Log::error('Failed to create referred discount', ['referral_id' => $referralId, 'user_id' => $userId, 'order_id' => $orderId, 'percentage' => $percentage, 'error' => $e->getMessage()]);
+
             return null;
         }
     }
+
     /**
      * Handle createReferrerBonus functionality with proper error handling.
-     * @param int $referralId
-     * @param int $userId
-     * @param float $amount
-     * @return ReferralReward|null
      */
     public function createReferrerBonus(int $referralId, int $userId, float $amount): ?ReferralReward
     {
@@ -75,24 +70,24 @@ final class ReferralRewardService
                 'metadata' => ['bonus_type' => 'referral_completion', 'amount' => $amount],
             ]);
             Log::info('Referrer bonus created', ['reward_id' => $reward->id, 'referral_id' => $referralId, 'user_id' => $userId, 'amount' => $amount]);
+
             return $reward;
         } catch (\Exception $e) {
             Log::error('Failed to create referrer bonus', ['referral_id' => $referralId, 'user_id' => $userId, 'amount' => $amount, 'error' => $e->getMessage()]);
+
             return null;
         }
     }
+
     /**
      * Handle createReferralDiscount functionality with proper error handling.
-     * @param int $userId
-     * @param float $percentage
-     * @return Discount|null
      */
     private function createReferralDiscount(int $userId, float $percentage): ?Discount
     {
         try {
             $discount = Discount::create([
-                'name' => 'Referral Discount - ' . $percentage . '%',
-                'slug' => 'referral-' . $userId . '-' . now()->format('Ymd'),
+                'name' => 'Referral Discount - '.$percentage.'%',
+                'slug' => 'referral-'.$userId.'-'.now()->format('Ymd'),
                 'type' => 'percentage',
                 'value' => $percentage,
                 'usage_limit' => 1,
@@ -112,23 +107,23 @@ final class ReferralRewardService
                 'first_order_only' => true,
                 'per_customer_limit' => 1,
             ]);
+
             return $discount;
         } catch (\Exception $e) {
             Log::error('Failed to create referral discount', ['user_id' => $userId, 'percentage' => $percentage, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
             return null;
         }
     }
+
     /**
      * Handle applyReward functionality with proper error handling.
-     * @param int $rewardId
-     * @param int|null $orderId
-     * @return bool
      */
     public function applyReward(int $rewardId, ?int $orderId = null): bool
     {
         try {
             $reward = ReferralReward::findOrFail($rewardId);
-            if (!$reward->isValid()) {
+            if (! $reward->isValid()) {
                 throw new \Exception('Reward is not valid or has expired');
             }
             if ($reward->status !== 'pending') {
@@ -136,45 +131,49 @@ final class ReferralRewardService
             }
             $reward->apply($orderId);
             Log::info('Reward applied', ['reward_id' => $rewardId, 'order_id' => $orderId, 'type' => $reward->type, 'amount' => $reward->amount]);
+
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to apply reward', ['reward_id' => $rewardId, 'order_id' => $orderId, 'error' => $e->getMessage()]);
+
             return false;
         }
     }
+
     /**
      * Handle getPendingRewards functionality with proper error handling.
-     * @param int $userId
+     *
      * @return Illuminate\Database\Eloquent\Collection
      */
     public function getPendingRewards(int $userId): \Illuminate\Database\Eloquent\Collection
     {
         return ReferralReward::where('user_id', $userId)->pending()->orderBy('created_at', 'desc')->get();
     }
+
     /**
      * Handle getAppliedRewards functionality with proper error handling.
-     * @param int $userId
+     *
      * @return Illuminate\Database\Eloquent\Collection
      */
     public function getAppliedRewards(int $userId): \Illuminate\Database\Eloquent\Collection
     {
         return ReferralReward::where('user_id', $userId)->applied()->orderBy('applied_at', 'desc')->get();
     }
+
     /**
      * Handle getTotalRewardsValue functionality with proper error handling.
-     * @param int $userId
-     * @return array
      */
     public function getTotalRewardsValue(int $userId): array
     {
         $pending = ReferralReward::where('user_id', $userId)->pending()->sum('amount');
         $applied = ReferralReward::where('user_id', $userId)->applied()->sum('amount');
         $expired = ReferralReward::where('user_id', $userId)->expired()->sum('amount');
+
         return ['pending' => (float) $pending, 'applied' => (float) $applied, 'expired' => (float) $expired, 'total' => (float) ($pending + $applied + $expired)];
     }
+
     /**
      * Handle cleanupExpiredRewards functionality with proper error handling.
-     * @return int
      */
     public function cleanupExpiredRewards(): int
     {
@@ -185,28 +184,28 @@ final class ReferralRewardService
             $count++;
         }
         Log::info('Cleaned up expired rewards', ['count' => $count]);
+
         return $count;
     }
+
     /**
      * Handle canUserUseReferralDiscount functionality with proper error handling.
-     * @param int $userId
-     * @return bool
      */
     public function canUserUseReferralDiscount(int $userId): bool
     {
         // Check if user was referred
         $referral = Referral::where('referred_id', $userId)->where('status', 'completed')->first();
-        if (!$referral) {
+        if (! $referral) {
             return false;
         }
         // Check if user has a referral discount that can be used
         $availableDiscount = ReferralReward::where('user_id', $userId)->where('type', 'referred_discount')->where('status', 'applied')->exists();
+
         return $availableDiscount;
     }
+
     /**
      * Handle getReferralDiscountForUser functionality with proper error handling.
-     * @param int $userId
-     * @return ReferralReward|null
      */
     public function getReferralDiscountForUser(int $userId): ?ReferralReward
     {

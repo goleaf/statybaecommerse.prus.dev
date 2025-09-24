@@ -98,79 +98,79 @@ return new class extends Migration
         // Create product_variants table for enhanced product management
         if (! Schema::hasTable('product_variants')) {
             Schema::create('product_variants', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->string('name');
-            $table->string('sku')->unique();
-            $table->string('barcode')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->decimal('compare_price', 10, 2)->nullable();
-            $table->decimal('cost_price', 10, 2)->nullable();
-            $table->integer('stock_quantity')->default(0);
-            $table->decimal('weight', 8, 2)->nullable();
-            $table->boolean('track_inventory')->default(true);
-            $table->boolean('is_default')->default(false);
-            $table->boolean('is_enabled')->default(true);
-            $table->json('attributes')->nullable(); // Store variant attributes as JSON
-            $table->timestamps();
+                $table->id();
+                $table->unsignedBigInteger('product_id');
+                $table->string('name');
+                $table->string('sku')->unique();
+                $table->string('barcode')->nullable();
+                $table->decimal('price', 10, 2);
+                $table->decimal('compare_price', 10, 2)->nullable();
+                $table->decimal('cost_price', 10, 2)->nullable();
+                $table->integer('stock_quantity')->default(0);
+                $table->decimal('weight', 8, 2)->nullable();
+                $table->boolean('track_inventory')->default(true);
+                $table->boolean('is_default')->default(false);
+                $table->boolean('is_enabled')->default(true);
+                $table->json('attributes')->nullable(); // Store variant attributes as JSON
+                $table->timestamps();
 
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->index(['product_id', 'is_enabled']);
-            $table->index(['sku']);
+                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+                $table->index(['product_id', 'is_enabled']);
+                $table->index(['sku']);
             });
         }
 
         // Create attributes table for product attributes
         if (! Schema::hasTable('attributes')) {
             Schema::create('attributes', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('type')->default('text'); // text, number, select, boolean, color
-            $table->boolean('is_required')->default(false);
-            $table->boolean('is_filterable')->default(false);
-            $table->boolean('is_searchable')->default(false);
-            $table->integer('sort_order')->default(0);
-            $table->boolean('is_enabled')->default(true);
-            $table->json('options')->nullable(); // For select type attributes
-            $table->timestamps();
+                $table->id();
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->string('type')->default('text'); // text, number, select, boolean, color
+                $table->boolean('is_required')->default(false);
+                $table->boolean('is_filterable')->default(false);
+                $table->boolean('is_searchable')->default(false);
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_enabled')->default(true);
+                $table->json('options')->nullable(); // For select type attributes
+                $table->timestamps();
 
-            $table->index(['is_enabled', 'sort_order']);
+                $table->index(['is_enabled', 'sort_order']);
             });
         }
 
         // Create attribute_values table
         if (! Schema::hasTable('attribute_values')) {
             Schema::create('attribute_values', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('attribute_id');
-            $table->string('value');
-            $table->string('slug');
-            $table->string('color_code')->nullable(); // For color attributes
-            $table->integer('sort_order')->default(0);
-            $table->boolean('is_enabled')->default(true);
-            $table->timestamps();
-            $table->softDeletes();
+                $table->id();
+                $table->unsignedBigInteger('attribute_id');
+                $table->string('value');
+                $table->string('slug');
+                $table->string('color_code')->nullable(); // For color attributes
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_enabled')->default(true);
+                $table->timestamps();
+                $table->softDeletes();
 
-            $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
-            $table->unique(['attribute_id', 'slug']);
-            $table->index(['attribute_id', 'is_enabled']);
+                $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
+                $table->unique(['attribute_id', 'slug']);
+                $table->index(['attribute_id', 'is_enabled']);
             });
         }
 
         // Create product_attributes pivot table
         if (! Schema::hasTable('product_attributes')) {
             Schema::create('product_attributes', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('attribute_id');
-            $table->unsignedBigInteger('attribute_value_id');
-            $table->timestamps();
+                $table->id();
+                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('attribute_id');
+                $table->unsignedBigInteger('attribute_value_id');
+                $table->timestamps();
 
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
-            $table->foreign('attribute_value_id')->references('id')->on('attribute_values')->onDelete('cascade');
-            $table->unique(['product_id', 'attribute_id'], 'product_attribute_unique');
+                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+                $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
+                $table->foreign('attribute_value_id')->references('id')->on('attribute_values')->onDelete('cascade');
+                $table->unique(['product_id', 'attribute_id'], 'product_attribute_unique');
             });
         }
 
@@ -279,39 +279,39 @@ return new class extends Migration
             }
         } elseif (! Schema::hasTable('customer_group_user')) {
             Schema::create('customer_group_user', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('customer_group_id');
-            $table->unsignedBigInteger('user_id');
-            $table->timestamp('assigned_at')->useCurrent();
-            $table->timestamps();
+                $table->id();
+                $table->unsignedBigInteger('customer_group_id');
+                $table->unsignedBigInteger('user_id');
+                $table->timestamp('assigned_at')->useCurrent();
+                $table->timestamps();
 
-            $table->foreign('customer_group_id')->references('id')->on('customer_groups')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unique(['customer_group_id', 'user_id']);
+                $table->foreign('customer_group_id')->references('id')->on('customer_groups')->onDelete('cascade');
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->unique(['customer_group_id', 'user_id']);
             });
         }
 
         // Create addresses table for user addresses
         if (! Schema::hasTable('addresses')) {
             Schema::create('addresses', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->string('type')->default('shipping'); // shipping, billing
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('company')->nullable();
-            $table->string('address_line_1');
-            $table->string('address_line_2')->nullable();
-            $table->string('city');
-            $table->string('state')->nullable();
-            $table->string('postal_code');
-            $table->string('country_code', 2);
-            $table->string('phone')->nullable();
-            $table->boolean('is_default')->default(false);
-            $table->timestamps();
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->string('type')->default('shipping'); // shipping, billing
+                $table->string('first_name');
+                $table->string('last_name');
+                $table->string('company')->nullable();
+                $table->string('address_line_1');
+                $table->string('address_line_2')->nullable();
+                $table->string('city');
+                $table->string('state')->nullable();
+                $table->string('postal_code');
+                $table->string('country_code', 2);
+                $table->string('phone')->nullable();
+                $table->boolean('is_default')->default(false);
+                $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->index(['user_id', 'type']);
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->index(['user_id', 'type']);
             });
         }
 

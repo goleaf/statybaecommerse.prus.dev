@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use App\Services\AutocompleteService;
@@ -10,11 +11,12 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+
 /**
  * EnhancedLiveSearch
- * 
+ *
  * Livewire component for EnhancedLiveSearch with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string $query
  * @property array $results
  * @property array $suggestions
@@ -39,28 +41,46 @@ final class EnhancedLiveSearch extends Component
 {
     #[Validate('nullable|string|max:255')]
     public string $query = '';
+
     public array $results = [];
+
     public array $suggestions = [];
+
     public bool $showResults = false;
+
     public bool $showSuggestions = false;
+
     public int $maxResults = 15;
+
     public int $minQueryLength = 2;
+
     public bool $isSearching = false;
+
     public array $searchTypes = ['products', 'categories', 'brands', 'collections'];
+
     public bool $enableSuggestions = true;
+
     public bool $enableRecentSearches = true;
+
     public bool $enablePopularSearches = true;
+
     public bool $enableAnalytics = true;
+
     public string $selectedCategory = '';
+
     public string $selectedBrand = '';
+
     public float $minPrice = 0;
+
     public float $maxPrice = 10000;
+
     public bool $inStockOnly = false;
+
     public string $sortBy = 'relevance';
+
     // relevance, price_asc, price_desc, newest, rating
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -68,9 +88,9 @@ final class EnhancedLiveSearch extends Component
             $this->loadSuggestions();
         }
     }
+
     /**
      * Handle updatedQuery functionality with proper error handling.
-     * @return void
      */
     public function updatedQuery(): void
     {
@@ -92,69 +112,69 @@ final class EnhancedLiveSearch extends Component
             }
         }
     }
+
     /**
      * Handle updatedSelectedCategory functionality with proper error handling.
-     * @return void
      */
     public function updatedSelectedCategory(): void
     {
-        if (!empty($this->query)) {
+        if (! empty($this->query)) {
             $this->performSearch();
         }
     }
+
     /**
      * Handle updatedSelectedBrand functionality with proper error handling.
-     * @return void
      */
     public function updatedSelectedBrand(): void
     {
-        if (!empty($this->query)) {
+        if (! empty($this->query)) {
             $this->performSearch();
         }
     }
+
     /**
      * Handle updatedMinPrice functionality with proper error handling.
-     * @return void
      */
     public function updatedMinPrice(): void
     {
-        if (!empty($this->query)) {
+        if (! empty($this->query)) {
             $this->performSearch();
         }
     }
+
     /**
      * Handle updatedMaxPrice functionality with proper error handling.
-     * @return void
      */
     public function updatedMaxPrice(): void
     {
-        if (!empty($this->query)) {
+        if (! empty($this->query)) {
             $this->performSearch();
         }
     }
+
     /**
      * Handle updatedInStockOnly functionality with proper error handling.
-     * @return void
      */
     public function updatedInStockOnly(): void
     {
-        if (!empty($this->query)) {
+        if (! empty($this->query)) {
             $this->performSearch();
         }
     }
+
     /**
      * Handle updatedSortBy functionality with proper error handling.
-     * @return void
      */
     public function updatedSortBy(): void
     {
-        if (!empty($this->query)) {
+        if (! empty($this->query)) {
             $this->performSearch();
         }
     }
+
     /**
      * Handle searchResults functionality with proper error handling.
-     * @return array
      */
     #[Computed(persist: true, seconds: 300)]
     public function searchResults(): array
@@ -163,31 +183,34 @@ final class EnhancedLiveSearch extends Component
             return [];
         }
         $cacheKey = $this->generateCacheKey();
+
         return Cache::remember($cacheKey, 300, function () {
             $autocompleteService = app(AutocompleteService::class);
             $searchParams = ['query' => $this->query, 'max_results' => $this->maxResults, 'search_types' => $this->searchTypes, 'category' => $this->selectedCategory, 'brand' => $this->selectedBrand, 'min_price' => $this->minPrice, 'max_price' => $this->maxPrice, 'in_stock_only' => $this->inStockOnly, 'sort_by' => $this->sortBy];
+
             return $autocompleteService->advancedSearch($searchParams);
         });
     }
+
     /**
      * Handle performSearch functionality with proper error handling.
-     * @return void
      */
     public function performSearch(): void
     {
         $this->results = $this->searchResults;
         $this->isSearching = false;
     }
+
     /**
      * Handle cachedSuggestions functionality with proper error handling.
-     * @return array
      */
     #[Computed(persist: true, seconds: 600)]
     public function cachedSuggestions(): array
     {
-        if (!$this->enableSuggestions) {
+        if (! $this->enableSuggestions) {
             return [];
         }
+
         return Cache::remember('enhanced_search_suggestions', 600, function () {
             $autocompleteService = app(AutocompleteService::class);
             $suggestions = [];
@@ -199,20 +222,21 @@ final class EnhancedLiveSearch extends Component
                 $popular = $autocompleteService->getPopularSuggestions(10);
                 $suggestions = array_merge($suggestions, $popular);
             }
+
             return array_slice($suggestions, 0, 15);
         });
     }
+
     /**
      * Handle loadSuggestions functionality with proper error handling.
-     * @return void
      */
     public function loadSuggestions(): void
     {
         $this->suggestions = $this->cachedSuggestions;
     }
+
     /**
      * Handle clearResults functionality with proper error handling.
-     * @return void
      */
     public function clearResults(): void
     {
@@ -220,9 +244,9 @@ final class EnhancedLiveSearch extends Component
         $this->showResults = false;
         $this->isSearching = false;
     }
+
     /**
      * Handle clearQuery functionality with proper error handling.
-     * @return void
      */
     public function clearQuery(): void
     {
@@ -234,9 +258,9 @@ final class EnhancedLiveSearch extends Component
             $this->showSuggestions = true;
         }
     }
+
     /**
      * Handle resetFilters functionality with proper error handling.
-     * @return void
      */
     public function resetFilters(): void
     {
@@ -247,10 +271,9 @@ final class EnhancedLiveSearch extends Component
         $this->inStockOnly = false;
         $this->sortBy = 'relevance';
     }
+
     /**
      * Handle selectResult functionality with proper error handling.
-     * @param array $result
-     * @return void
      */
     public function selectResult(array $result): void
     {
@@ -258,10 +281,9 @@ final class EnhancedLiveSearch extends Component
         $this->clearResults();
         $this->redirect($result['url']);
     }
+
     /**
      * Handle selectSuggestion functionality with proper error handling.
-     * @param array $suggestion
-     * @return void
      */
     public function selectSuggestion(array $suggestion): void
     {
@@ -273,9 +295,9 @@ final class EnhancedLiveSearch extends Component
         $this->showSuggestions = false;
         $this->updatedQuery();
     }
+
     /**
      * Handle clearRecentSearches functionality with proper error handling.
-     * @return void
      */
     public function clearRecentSearches(): void
     {
@@ -283,27 +305,26 @@ final class EnhancedLiveSearch extends Component
         $autocompleteService->clearRecentSearches();
         $this->loadSuggestions();
     }
+
     /**
      * Handle toggleSearchType functionality with proper error handling.
-     * @param string $type
-     * @return void
      */
     public function toggleSearchType(string $type): void
     {
         if (in_array($type, $this->searchTypes)) {
-            $this->searchTypes = array_filter($this->searchTypes, fn($t) => $t !== $type);
+            $this->searchTypes = array_filter($this->searchTypes, fn ($t) => $t !== $type);
         } else {
             $this->searchTypes[] = $type;
         }
-        if (!empty($this->query) && strlen($this->query) >= $this->minQueryLength) {
+        if (! empty($this->query) && strlen($this->query) >= $this->minQueryLength) {
             $this->performSearch();
         }
     }
+
     /**
      * Handle quickFilter functionality with proper error handling.
-     * @param string $filter
-     * @param mixed $value
-     * @return void
+     *
+     * @param  mixed  $value
      */
     public function quickFilter(string $filter, $value): void
     {
@@ -315,14 +336,13 @@ final class EnhancedLiveSearch extends Component
             'sort' => $this->sortBy = $value,
             default => null,
         };
-        if (!empty($this->query)) {
+        if (! empty($this->query)) {
             $this->performSearch();
         }
     }
+
     /**
      * Handle setPriceRange functionality with proper error handling.
-     * @param string $range
-     * @return void
      */
     private function setPriceRange(string $range): void
     {
@@ -334,17 +354,17 @@ final class EnhancedLiveSearch extends Component
             default => [$this->minPrice, $this->maxPrice] = [0, 10000],
         };
     }
+
     /**
      * Handle generateCacheKey functionality with proper error handling.
-     * @return string
      */
     private function generateCacheKey(): string
     {
-        return 'enhanced_search_' . md5(json_encode(['query' => $this->query, 'max_results' => $this->maxResults, 'search_types' => $this->searchTypes, 'category' => $this->selectedCategory, 'brand' => $this->selectedBrand, 'min_price' => $this->minPrice, 'max_price' => $this->maxPrice, 'in_stock_only' => $this->inStockOnly, 'sort_by' => $this->sortBy]));
+        return 'enhanced_search_'.md5(json_encode(['query' => $this->query, 'max_results' => $this->maxResults, 'search_types' => $this->searchTypes, 'category' => $this->selectedCategory, 'brand' => $this->selectedBrand, 'min_price' => $this->minPrice, 'max_price' => $this->maxPrice, 'in_stock_only' => $this->inStockOnly, 'sort_by' => $this->sortBy]));
     }
+
     /**
      * Handle trackSearch functionality with proper error handling.
-     * @return void
      */
     private function trackSearch(): void
     {
@@ -352,9 +372,9 @@ final class EnhancedLiveSearch extends Component
         Cache::increment("search_count_{$this->query}", 1);
         Cache::put("last_search_{$this->query}", now(), 3600);
     }
+
     /**
      * Handle clearSearchCache functionality with proper error handling.
-     * @return void
      */
     #[On('clear-search-cache')]
     public function clearSearchCache(): void
@@ -362,9 +382,9 @@ final class EnhancedLiveSearch extends Component
         Cache::forget('enhanced_search_suggestions');
         $this->loadSuggestions();
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

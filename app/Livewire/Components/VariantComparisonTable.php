@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\ProductVariant;
-use Livewire\Component;
 use Illuminate\Support\Collection;
+use Livewire\Component;
 
 final class VariantComparisonTable extends Component
 {
     public array $variantIds = [];
+
     public Collection $variantsToCompare;
+
     public bool $showComparison = false;
 
     protected $listeners = ['addVariantToComparison', 'removeVariantFromComparison', 'clearComparison'];
@@ -26,6 +28,7 @@ final class VariantComparisonTable extends Component
         if (empty($this->variantIds)) {
             $this->variantsToCompare = collect();
             $this->showComparison = false;
+
             return;
         }
 
@@ -33,7 +36,7 @@ final class VariantComparisonTable extends Component
             ->with([
                 'product',
                 'variantAttributeValues.attribute',
-                'variantAttributeValues.attributeValue'
+                'variantAttributeValues.attributeValue',
             ])
             ->get();
 
@@ -42,13 +45,13 @@ final class VariantComparisonTable extends Component
 
     public function addVariantToComparison(int $variantId): void
     {
-        if (!in_array($variantId, $this->variantIds) && count($this->variantIds) < 4) {
+        if (! in_array($variantId, $this->variantIds) && count($this->variantIds) < 4) {
             $this->variantIds[] = $variantId;
             $this->loadVariants();
-            
+
             $this->dispatch('comparisonUpdated', [
                 'variantIds' => $this->variantIds,
-                'count' => count($this->variantIds)
+                'count' => count($this->variantIds),
             ]);
         }
     }
@@ -57,10 +60,10 @@ final class VariantComparisonTable extends Component
     {
         $this->variantIds = array_diff($this->variantIds, [$variantId]);
         $this->loadVariants();
-        
+
         $this->dispatch('comparisonUpdated', [
             'variantIds' => $this->variantIds,
-            'count' => count($this->variantIds)
+            'count' => count($this->variantIds),
         ]);
     }
 
@@ -68,10 +71,10 @@ final class VariantComparisonTable extends Component
     {
         $this->variantIds = [];
         $this->loadVariants();
-        
+
         $this->dispatch('comparisonUpdated', [
             'variantIds' => $this->variantIds,
-            'count' => 0
+            'count' => 0,
         ]);
     }
 
@@ -85,6 +88,7 @@ final class VariantComparisonTable extends Component
                 'localized' => $attributeValue->getLocalizedDisplayValue(),
             ];
         }
+
         return $attributes;
     }
 
@@ -95,6 +99,7 @@ final class VariantComparisonTable extends Component
             $attributes = $this->getVariantAttributes($variant);
             $allAttributes = array_merge($allAttributes, array_keys($attributes));
         }
+
         return array_unique($allAttributes);
     }
 
@@ -113,7 +118,7 @@ final class VariantComparisonTable extends Component
         $originalPrice = $this->getVariantOriginalPrice($variant);
         $currentPrice = $this->getVariantPrice($variant);
 
-        if (!$originalPrice || $originalPrice <= $currentPrice) {
+        if (! $originalPrice || $originalPrice <= $currentPrice) {
             return null;
         }
 

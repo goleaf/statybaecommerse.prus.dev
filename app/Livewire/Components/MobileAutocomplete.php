@@ -1,17 +1,19 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use App\Services\AutocompleteService;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+
 /**
  * MobileAutocomplete
- * 
+ *
  * Livewire component for MobileAutocomplete with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string $query
  * @property array $results
  * @property array $suggestions
@@ -30,21 +32,33 @@ final class MobileAutocomplete extends Component
 {
     #[Validate('nullable|string|max:255')]
     public string $query = '';
+
     public array $results = [];
+
     public array $suggestions = [];
+
     public bool $showResults = false;
+
     public bool $showSuggestions = false;
+
     public int $maxResults = 5;
+
     public int $minQueryLength = 1;
+
     public bool $isSearching = false;
+
     public array $searchTypes = ['products'];
+
     public bool $enableSuggestions = true;
+
     public bool $enableRecentSearches = true;
+
     public bool $enablePopularSearches = true;
+
     public bool $isFullScreen = false;
+
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -52,9 +66,9 @@ final class MobileAutocomplete extends Component
             $this->loadSuggestions();
         }
     }
+
     /**
      * Handle updatedQuery functionality with proper error handling.
-     * @return void
      */
     public function updatedQuery(): void
     {
@@ -73,9 +87,9 @@ final class MobileAutocomplete extends Component
             }
         }
     }
+
     /**
      * Handle performSearch functionality with proper error handling.
-     * @return void
      */
     public function performSearch(): void
     {
@@ -83,9 +97,9 @@ final class MobileAutocomplete extends Component
         $this->results = $autocompleteService->search($this->query, $this->maxResults, $this->searchTypes);
         $this->isSearching = false;
     }
+
     /**
      * Handle loadSuggestions functionality with proper error handling.
-     * @return void
      */
     public function loadSuggestions(): void
     {
@@ -101,9 +115,9 @@ final class MobileAutocomplete extends Component
         }
         $this->suggestions = array_slice($suggestions, 0, 5);
     }
+
     /**
      * Handle clearQuery functionality with proper error handling.
-     * @return void
      */
     public function clearQuery(): void
     {
@@ -114,10 +128,9 @@ final class MobileAutocomplete extends Component
             $this->showSuggestions = true;
         }
     }
+
     /**
      * Handle selectSuggestion functionality with proper error handling.
-     * @param array $suggestion
-     * @return void
      */
     public function selectSuggestion(array $suggestion): void
     {
@@ -129,19 +142,18 @@ final class MobileAutocomplete extends Component
         $this->showSuggestions = false;
         $this->updatedQuery();
     }
+
     /**
      * Handle selectResult functionality with proper error handling.
-     * @param array $result
-     * @return void
      */
     public function selectResult(array $result): void
     {
         $this->dispatch('result-selected', $result);
         $this->clearQuery();
     }
+
     /**
      * Handle clearResults functionality with proper error handling.
-     * @return void
      */
     public function clearResults(): void
     {
@@ -149,17 +161,17 @@ final class MobileAutocomplete extends Component
         $this->showResults = false;
         $this->isSearching = false;
     }
+
     /**
      * Handle toggleFullScreen functionality with proper error handling.
-     * @return void
      */
     public function toggleFullScreen(): void
     {
-        $this->isFullScreen = !$this->isFullScreen;
+        $this->isFullScreen = ! $this->isFullScreen;
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

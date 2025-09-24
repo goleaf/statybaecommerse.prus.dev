@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Brand;
+declare(strict_types=1);
+
 use App\Models\Price;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 it('product has brand and prices relations', function () {
-    $product = new Product();
+    $product = new Product;
 
     expect($product->brand())
         ->toBeInstanceOf(BelongsTo::class)
@@ -16,7 +17,7 @@ it('product has brand and prices relations', function () {
 });
 
 it('price belongs to currency', function () {
-    $price = new Price();
+    $price = new Price;
 
     expect($price->currency())->toBeInstanceOf(BelongsTo::class);
 });

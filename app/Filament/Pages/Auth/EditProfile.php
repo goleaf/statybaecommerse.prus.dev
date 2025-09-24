@@ -1,18 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
-use Filament\Schemas\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
@@ -122,14 +122,14 @@ class EditProfile extends BaseEditProfile
                             ->label(__('admin.profile.new_password'))
                             ->password()
                             ->minLength(8)
-                            ->dehydrated(fn($state) => filled($state))
-                            ->required(fn(string $context): bool => $context === 'create')
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->required(fn (string $context): bool => $context === 'create')
                             ->same('passwordConfirmation')
                             ->validationAttribute(__('admin.profile.new_password')),
                         TextInput::make('passwordConfirmation')
                             ->label(__('admin.profile.confirm_password'))
                             ->password()
-                            ->required(fn(string $context): bool => $context === 'create')
+                            ->required(fn (string $context): bool => $context === 'create')
                             ->dehydrated(false),
                     ])
                     ->columns(2),

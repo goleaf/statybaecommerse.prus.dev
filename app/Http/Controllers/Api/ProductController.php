@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -10,19 +11,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+
 /**
  * ProductController
- * 
+ *
  * HTTP controller handling ProductController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class ProductController extends Controller
 {
     use HandlesContentNegotiation;
+
     /**
      * Handle search functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse|View|Response
      */
     public function search(Request $request): JsonResponse|View|Response
     {
@@ -36,17 +36,17 @@ final class ProductController extends Controller
         })->with(['brand', 'media', 'category'])->cursor()->takeUntilTimeout($timeout)->take($limit)->collect();
         // Apply skipWhile to filter out products that are not properly configured
         $filteredProducts = $products->skipWhile(function (Product $product) {
-            return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug);
+            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
         });
         $data = ['products' => $filteredProducts->map(function (Product $product) {
             return ['id' => $product->id, 'name' => $product->name, 'slug' => $product->slug, 'sku' => $product->sku, 'price' => $product->price, 'sale_price' => $product->sale_price, 'brand' => $product->brand?->name, 'category' => $product->category?->name, 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => route('product.show', $product->slug), 'stock_quantity' => $product->stock_quantity ?? 0];
         })->toArray(), 'query' => $query, 'total' => $filteredProducts->count(), 'limit' => $limit];
+
         return $this->handleContentNegotiation($request, $data);
     }
+
     /**
      * Handle catalog functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse|View|Response
      */
     public function catalog(Request $request): JsonResponse|View|Response
     {
@@ -68,7 +68,7 @@ final class ProductController extends Controller
         }
         $products = $query->orderBy($sortBy, $sortOrder)->get()->skipWhile(function (Product $product) {
             // Skip products that are not properly configured for catalog display
-            return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug);
+            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
         });
         // Apply pagination manually after skipWhile filtering
         $total = $products->count();
@@ -76,13 +76,12 @@ final class ProductController extends Controller
         $offset = ($currentPage - 1) * $perPage;
         $paginatedProducts = $products->slice($offset, $perPage);
         $paginatedData = new \Illuminate\Pagination\LengthAwarePaginator($paginatedProducts, $total, $perPage, $currentPage, ['path' => $request->url(), 'pageName' => 'page']);
+
         return $this->handleProductContentNegotiation($request, $paginatedData);
     }
+
     /**
      * Display the specified resource with related data.
-     * @param Request $request
-     * @param Product $product
-     * @return JsonResponse|View|Response
      */
     public function show(Request $request, Product $product): JsonResponse|View|Response
     {
@@ -92,6 +91,7 @@ final class ProductController extends Controller
         })->toArray(), 'variants' => $product->variants->map(function ($variant) {
             return ['id' => $variant->id, 'name' => $variant->name, 'sku' => $variant->sku, 'price' => $variant->price, 'stock_quantity' => $variant->stock_quantity];
         })->toArray(), 'stock_quantity' => $product->stock_quantity ?? 0, 'is_visible' => $product->is_visible, 'url' => route('product.show', $product->slug)]];
+
         return $this->handleContentNegotiation($request, $data);
     }
 }

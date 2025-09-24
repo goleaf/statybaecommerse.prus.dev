@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Post;
 use App\Models\User;
@@ -238,4 +240,3 @@ it('can toggle comments allowance', function () {
 
     expect($this->post->fresh()->allow_comments)->toBeFalse();
 });
-

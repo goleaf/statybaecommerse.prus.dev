@@ -1,23 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantStockResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class StockMovementsRelationManager extends RelationManager
 {
@@ -35,9 +36,8 @@ class StockMovementsRelationManager extends RelationManager
             ->components([
                 TextInput::make('quantity')
                     ->label(__('inventory.quantity'))
-                    ->numeric(),
+                    ->numeric()
                     ->required(),
-
                 Select::make('type')
                     ->label(__('inventory.type'))
                     ->options([
@@ -45,7 +45,6 @@ class StockMovementsRelationManager extends RelationManager
                         'out' => __('inventory.stock_out'),
                     ])
                     ->required(),
-
                 Select::make('reason')
                     ->label(__('inventory.reason'))
                     ->options([
@@ -59,14 +58,11 @@ class StockMovementsRelationManager extends RelationManager
                         'transfer' => __('inventory.reason_transfer'),
                     ])
                     ->required(),
-
                 TextInput::make('reference')
                     ->label(__('inventory.reference')),
-
                 Textarea::make('notes')
                     ->label(__('inventory.notes'))
                     ->rows(3),
-
                 DateTimePicker::make('moved_at')
                     ->label(__('inventory.moved_at'))
                     ->default(now()),
@@ -80,16 +76,14 @@ class StockMovementsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('quantity')
                     ->label(__('inventory.quantity'))
-                    ->numeric(),
+                    ->numeric()
                     ->sortable(),
-
                 BadgeColumn::make('type')
                     ->label(__('inventory.type'))
                     ->colors([
                         'success' => 'in',
                         'danger' => 'out',
                     ]),
-
                 TextColumn::make('reason')
                     ->label(__('inventory.reason'))
                     ->formatStateUsing(fn (string $state): string => match ($state) {
@@ -103,24 +97,20 @@ class StockMovementsRelationManager extends RelationManager
                         'transfer' => __('inventory.reason_transfer'),
                         default => $state,
                     }),
-
                 TextColumn::make('reference')
                     ->label(__('inventory.reference'))
                     ->searchable(),
-
                 TextColumn::make('user.name')
                     ->label(__('inventory.user'))
                     ->searchable(),
-
                 TextColumn::make('moved_at')
                     ->label(__('inventory.moved_at'))
-                    ->dateTime(),
+                    ->dateTime()
                     ->sortable(),
-
                 TextColumn::make('created_at')
                     ->label(__('inventory.created_at'))
-                    ->dateTime(),
-                    ->sortable(),
+                    ->dateTime()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -130,7 +120,6 @@ class StockMovementsRelationManager extends RelationManager
                         'in' => __('inventory.stock_in'),
                         'out' => __('inventory.stock_out'),
                     ]),
-
                 SelectFilter::make('reason')
                     ->label(__('inventory.reason'))
                     ->options([
@@ -143,7 +132,6 @@ class StockMovementsRelationManager extends RelationManager
                         'theft' => __('inventory.reason_theft'),
                         'transfer' => __('inventory.reason_transfer'),
                     ]),
-
                 Filter::make('recent')
                     ->label(__('inventory.recent_movements'))
                     ->query(fn (Builder $query): Builder => $query->recent()),
@@ -158,8 +146,6 @@ class StockMovementsRelationManager extends RelationManager
             ->bulkActions([
                 Tables\Actions\BulkDeleteAction::make(),
             ])
-            ->defaultSort("created_at", "desc");
-    }
-}
+            ->defaultSort('created_at', 'desc');
     }
 }

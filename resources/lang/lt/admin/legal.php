@@ -6,7 +6,7 @@ return [
     'legal_document' => 'Teisinis dokumentas',
     'all_documents' => 'Visi dokumentai',
     'untitled_document' => 'Be pavadinimo dokumentas',
-    
+
     // Fields
     'key' => 'Raktas',
     'key_help' => 'Unikalus dokumento raktas (pvz., privacy-policy)',
@@ -30,13 +30,13 @@ return [
     'meta_key' => 'Rakto pavadinimas',
     'meta_value' => 'Reikšmė',
     'meta_data_help' => 'Papildomi duomenys JSON formatu (versija, peržiūros dažnis ir kt.)',
-    
+
     // Status
     'status' => 'Būsena',
     'status_published' => 'Paskelbtas',
     'status_draft' => 'Juodraštis',
     'status_disabled' => 'Išjungtas',
-    
+
     // Types
     'privacy_policy' => 'Privatumo politika',
     'terms_of_use' => 'Naudojimosi sąlygos',
@@ -47,7 +47,7 @@ return [
     'legal_notice' => 'Teisinė informacija',
     'imprint' => 'Imprint',
     'legal_document' => 'Teisinis dokumentas',
-    
+
     // Actions
     'view' => 'Peržiūrėti',
     'publish' => 'Paskelbti',
@@ -58,7 +58,7 @@ return [
     'unpublish_selected' => 'Nepaskelbti pasirinktus',
     'enable_selected' => 'Įjungti pasirinktus',
     'disable_selected' => 'Išjungti pasirinktus',
-    
+
     // Messages
     'created_successfully' => 'Teisinis dokumentas sėkmingai sukurtas',
     'updated_successfully' => 'Teisinis dokumentas sėkmingai atnaujintas',
@@ -71,7 +71,7 @@ return [
     'unpublished_selected_successfully' => 'Pasirinkti dokumentai sėkmingai nepaskelbti',
     'enabled_selected_successfully' => 'Pasirinkti dokumentai sėkmingai įjungti',
     'disabled_selected_successfully' => 'Pasirinkti dokumentai sėkmingai išjungti',
-    
+
     // Statistics
     'total_documents' => 'Iš viso dokumentų',
     'total_documents_description' => 'Bendras dokumentų skaičius sistemoje',
@@ -86,13 +86,13 @@ return [
     'completion_rate' => 'Užbaigimo procentas',
     'completion_rate_description' => 'Paskelbtų dokumentų dalis',
     'documents_count' => 'Dokumentų skaičius',
-    
+
     // Tabs
     'published' => 'Paskelbti',
     'draft' => 'Juodraščiai',
     'disabled' => 'Išjungti',
     'required' => 'Privalomi',
-    
+
     // Validation
     'key_required' => 'Dokumento raktas yra privalomas',
     'key_unique' => 'Dokumento raktas jau egzistuoja',
@@ -101,7 +101,7 @@ return [
     'slug_required' => 'URL slug yra privalomas',
     'slug_unique' => 'URL slug jau egzistuoja',
     'content_required' => 'Turinys yra privalomas',
-    
+
     // Frontend
     'last_updated' => 'Paskutinį kartą atnaujinta',
     'reading_time' => 'Skaitymo laikas',
@@ -111,7 +111,7 @@ return [
     'version' => 'Versija',
     'effective_date' => 'Įsigaliojimo data',
     'review_date' => 'Peržiūros data',
-    
+
     // Navigation
     'legal_information' => 'Teisinė informacija',
     'privacy_policy_title' => 'Privatumo politika',

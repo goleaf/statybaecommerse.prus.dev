@@ -1,15 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
-use App\Models\DiscountCondition;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 final class ConditionsRelationManager extends RelationManager
 {
@@ -21,7 +20,7 @@ final class ConditionsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Conditions';
 
-    public function form(Form $schema): Form
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -70,7 +69,7 @@ final class ConditionsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'minimum_amount' => 'primary',
                         'minimum_quantity' => 'success',
                         'customer_group' => 'info',
@@ -78,7 +77,7 @@ final class ConditionsRelationManager extends RelationManager
                         'product_brand' => 'danger',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'minimum_amount' => 'Minimum Amount',
                         'minimum_quantity' => 'Minimum Quantity',
                         'customer_group' => 'Customer Group',

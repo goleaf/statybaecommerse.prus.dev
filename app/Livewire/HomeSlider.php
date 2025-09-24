@@ -13,14 +13,16 @@ use Livewire\Component;
 final class HomeSlider extends Component
 {
     public int $currentSlide = 0;
+
     public bool $autoPlay = true;
+
     public int $autoPlayInterval = 5000;
 
     #[Computed]
     public function sliders(): Collection
     {
         return Slider::query()
-            ->with(['translations' => fn($q) => $q->where('locale', app()->getLocale())])
+            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
             ->active()
             ->ordered()
             ->get();
@@ -45,7 +47,7 @@ final class HomeSlider extends Component
 
     public function toggleAutoPlay(): void
     {
-        $this->autoPlay = !$this->autoPlay;
+        $this->autoPlay = ! $this->autoPlay;
     }
 
     public function render(): View

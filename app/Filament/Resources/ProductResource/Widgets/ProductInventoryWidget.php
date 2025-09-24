@@ -6,7 +6,6 @@ namespace App\Filament\Resources\ProductResource\Widgets;
 
 use App\Models\Product;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class ProductInventoryWidget extends ChartWidget
 {

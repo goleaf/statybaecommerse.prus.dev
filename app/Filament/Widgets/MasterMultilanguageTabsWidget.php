@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Services\MultiLanguageTabService;
 use SolutionForest\TabLayoutPlugin\Components\Tabs;
-use SolutionForest\TabLayoutPlugin\Components\Tabs\Tab as TabLayoutTab;
 use SolutionForest\TabLayoutPlugin\Widgets\TabsWidget as BaseWidget;
-use Filament\Forms;
 
 final class MasterMultilanguageTabsWidget extends BaseWidget
 {
     public $activeTab = '';
+
     public array $fields = [];
+
     public string $tabPrefix = 'master';
 
     public function queryString()
@@ -78,6 +80,7 @@ final class MasterMultilanguageTabsWidget extends BaseWidget
     public function configureFields(array $fields): self
     {
         $this->fields = $fields;
+
         return $this;
     }
 
@@ -87,6 +90,7 @@ final class MasterMultilanguageTabsWidget extends BaseWidget
     public function setTabPrefix(string $prefix): self
     {
         $this->tabPrefix = $prefix;
+
         return $this;
     }
 }

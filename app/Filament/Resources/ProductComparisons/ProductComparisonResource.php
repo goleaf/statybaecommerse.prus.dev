@@ -8,16 +8,21 @@ use App\Filament\Resources\ProductComparisons\Pages\ListProductComparisons;
 use App\Filament\Resources\ProductComparisons\Schemas\ProductComparisonForm;
 use App\Filament\Resources\ProductComparisons\Tables\ProductComparisonsTable;
 use App\Models\ProductComparison;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ProductComparisonResource extends Resource
 {
     protected static ?string $model = ProductComparison::class;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return Heroicon::OutlinedRectangleStack;
+    }
 
     public static function form(Schema $schema): Schema
     {

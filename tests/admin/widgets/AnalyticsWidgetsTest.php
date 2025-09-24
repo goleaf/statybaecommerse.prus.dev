@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Filament\Widgets\StatsWidget as AdvancedStatsWidget; // legacy alias removed
-use App\Filament\Widgets\OrdersChartWidget;
+declare(strict_types=1);
+
+use App\Filament\Widgets\OrdersChartWidget; // legacy alias removed
+use App\Filament\Widgets\StatsWidget as AdvancedStatsWidget;
 use App\Filament\Widgets\TopSellingProductsWidget;
 use App\Models\Brand;
 use App\Models\Category;
@@ -43,7 +45,7 @@ describe('AdvancedStatsWidget', function () {
             'created_at' => now()->subDays(5),
         ]);
 
-        $widget = new AdvancedStatsWidget();
+        $widget = new AdvancedStatsWidget;
         $stats = $widget->getStats();
 
         expect($stats)->toHaveCount(12);
@@ -54,11 +56,11 @@ describe('AdvancedStatsWidget', function () {
         Order::factory()->count(3)->create(['status' => 'pending']);
         Order::factory()->count(2)->create(['status' => 'completed']);
 
-        $widget = new AdvancedStatsWidget();
+        $widget = new AdvancedStatsWidget;
         $stats = $widget->getStats();
 
         // Find the total orders stat
-        $totalOrdersStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.total_orders'));
+        $totalOrdersStat = collect($stats)->first(fn ($stat) => $stat->getLabel() === __('analytics.total_orders'));
         expect($totalOrdersStat)->not->toBeNull();
     });
 
@@ -66,11 +68,11 @@ describe('AdvancedStatsWidget', function () {
         Product::factory()->count(10)->create(['is_visible' => true]);
         Product::factory()->count(3)->create(['is_visible' => true, 'is_featured' => true]);
 
-        $widget = new AdvancedStatsWidget();
+        $widget = new AdvancedStatsWidget;
         $stats = $widget->getStats();
 
         // Find the products stat
-        $productsStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.products'));
+        $productsStat = collect($stats)->first(fn ($stat) => $stat->getLabel() === __('analytics.products'));
         expect($productsStat)->not->toBeNull();
     });
 
@@ -80,11 +82,11 @@ describe('AdvancedStatsWidget', function () {
         // Create orders for some customers to make them active
         Order::factory()->count(2)->create(['user_id' => $customers->first()->id]);
 
-        $widget = new AdvancedStatsWidget();
+        $widget = new AdvancedStatsWidget;
         $stats = $widget->getStats();
 
         // Find the customers stat
-        $customersStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.customers'));
+        $customersStat = collect($stats)->first(fn ($stat) => $stat->getLabel() === __('analytics.customers'));
         expect($customersStat)->not->toBeNull();
     });
 
@@ -93,15 +95,15 @@ describe('AdvancedStatsWidget', function () {
         Brand::factory()->count(3)->create(['is_enabled' => true]);
         Review::factory()->count(10)->create(['is_approved' => true, 'rating' => 4]);
 
-        $widget = new AdvancedStatsWidget();
+        $widget = new AdvancedStatsWidget;
         $stats = $widget->getStats();
 
         // Find the content stat
-        $contentStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.content'));
+        $contentStat = collect($stats)->first(fn ($stat) => $stat->getLabel() === __('analytics.content'));
         expect($contentStat)->not->toBeNull();
 
         // Find the reviews stat
-        $reviewsStat = collect($stats)->first(fn($stat) => $stat->getLabel() === __('analytics.reviews'));
+        $reviewsStat = collect($stats)->first(fn ($stat) => $stat->getLabel() === __('analytics.reviews'));
         expect($reviewsStat)->not->toBeNull();
     });
 
@@ -111,7 +113,7 @@ describe('AdvancedStatsWidget', function () {
             'created_at' => now()->subDays(5),
         ]);
 
-        $widget = new AdvancedStatsWidget();
+        $widget = new AdvancedStatsWidget;
         $chartData = $widget->getRevenueChart();
 
         expect($chartData)->toBeArray();
@@ -123,7 +125,7 @@ describe('AdvancedStatsWidget', function () {
             'created_at' => now()->subDays(3),
         ]);
 
-        $widget = new AdvancedStatsWidget();
+        $widget = new AdvancedStatsWidget;
         $chartData = $widget->getOrdersChart();
 
         expect($chartData)->toBeArray();
@@ -143,7 +145,7 @@ describe('OrdersChartWidget', function () {
             'created_at' => now()->subDays(5),
         ]);
 
-        $widget = new OrdersChartWidget();
+        $widget = new OrdersChartWidget;
         $widget->mount();
         $data = $widget->getData();
 
@@ -153,13 +155,13 @@ describe('OrdersChartWidget', function () {
     });
 
     it('has correct chart type', function () {
-        $widget = new OrdersChartWidget();
+        $widget = new OrdersChartWidget;
         $widget->mount();
         expect($widget->getType())->toBe('line');
     });
 
     it('has correct chart options', function () {
-        $widget = new OrdersChartWidget();
+        $widget = new OrdersChartWidget;
         $widget->mount();
         $options = $widget->getOptions();
 
@@ -169,7 +171,7 @@ describe('OrdersChartWidget', function () {
     });
 
     it('displays correct heading and description', function () {
-        $widget = new OrdersChartWidget();
+        $widget = new OrdersChartWidget;
 
         expect($widget->getHeading())->toBe(__('analytics.orders_overview'));
         expect($widget->getDescription())->toBe(__('analytics.orders_and_revenue_trends'));
@@ -251,7 +253,7 @@ describe('TopSellingProductsWidget', function () {
     });
 
     it('displays correct heading', function () {
-        $widget = new TopSellingProductsWidget();
+        $widget = new TopSellingProductsWidget;
         expect($widget->getHeading())->toBe(__('analytics.top_selling_products'));
     });
 
@@ -268,7 +270,7 @@ describe('TopSellingProductsWidget', function () {
             ]);
         }
 
-        $widget = new TopSellingProductsWidget();
+        $widget = new TopSellingProductsWidget;
         $table = $widget->table(\Filament\Tables\Table::make($widget));
 
         // The query should limit to 10 products

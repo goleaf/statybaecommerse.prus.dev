@@ -7,7 +7,6 @@ namespace App\Filament\Resources\BrandResource\Widgets;
 use App\Models\Brand;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class BrandOverviewWidget extends BaseWidget
 {

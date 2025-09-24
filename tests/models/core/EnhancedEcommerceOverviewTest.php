@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Widgets\EnhancedEcommerceOverview;
 use App\Models\Order;
@@ -10,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->widget = new EnhancedEcommerceOverview();
+    $this->widget = new EnhancedEcommerceOverview;
 });
 
 it('can instantiate enhanced ecommerce overview widget', function () {
@@ -45,10 +47,10 @@ it('calculates total revenue correctly', function () {
     Order::factory()->create(['status' => 'pending', 'total' => 50.00]);  // Should not count
 
     $stats = $this->widget->getStats();
-    
+
     // Check that we have the expected number of stats
     expect($stats)->toHaveCount(6);
-    
+
     // Test the actual calculation method directly
     $totalRevenue = $this->widget->getTotalRevenue();
     expect($totalRevenue)->toBe('€300.00');

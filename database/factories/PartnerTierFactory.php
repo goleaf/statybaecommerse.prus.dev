@@ -21,7 +21,7 @@ final class PartnerTierFactory extends Factory
 
         return [
             'name' => $tierName,
-            'code' => strtoupper($tierName) . '_' . $this->faker->unique()->numerify('###'),
+            'code' => strtoupper($tierName).'_'.$this->faker->unique()->numerify('###'),
             'discount_rate' => $this->faker->randomFloat(4, 0.01, 0.15), // 1% to 15%
             'commission_rate' => $this->faker->randomFloat(4, 0.02, 0.10), // 2% to 10%
             'minimum_order_value' => $this->faker->randomFloat(2, 100, 5000),

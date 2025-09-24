@@ -22,7 +22,7 @@ final class CreateCartItem extends CreateRecord
         $data['quantity'] = $data['quantity'] ?? 1;
         $data['is_active'] = $data['is_active'] ?? true;
         $data['is_saved_for_later'] = $data['is_saved_for_later'] ?? false;
-        
+
         return $data;
     }
 }

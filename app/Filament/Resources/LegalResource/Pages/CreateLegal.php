@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\LegalResource\Pages;
 
 use App\Filament\Resources\LegalResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateLegal extends CreateRecord
 {
@@ -34,7 +34,7 @@ class CreateLegal extends CreateRecord
     {
         // Set default values
         $data['published_at'] = $data['published_at'] ?? now();
-        
+
         return $data;
     }
 }

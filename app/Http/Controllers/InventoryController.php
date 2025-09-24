@@ -1,23 +1,22 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 /**
  * InventoryController
- * 
+ *
  * HTTP controller handling InventoryController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class InventoryController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -58,16 +57,17 @@ final class InventoryController extends Controller
             $query->orderBy('name', 'asc');
         }
         $products = $query->paginate(20)->withQueryString();
+
         return view('inventory', compact('products'));
     }
+
     /**
      * Display the specified resource with related data.
-     * @param Product $product
-     * @return View
      */
     public function show(Product $product): View
     {
         $product->load(['brand', 'categories', 'reviews', 'variants']);
+
         return view('products.show', compact('product'));
     }
 }

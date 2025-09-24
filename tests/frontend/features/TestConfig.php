@@ -6,7 +6,7 @@ namespace Tests\Feature;
 
 /**
  * Test Configuration
- * 
+ *
  * Centralized configuration for test execution
  */
 class TestConfig
@@ -118,7 +118,8 @@ class TestConfig
     public static function getExecutionOrder(): array
     {
         $groups = self::getGroupSettings();
-        uasort($groups, fn($a, $b) => $a['priority'] <=> $b['priority']);
+        uasort($groups, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+
         return array_keys($groups);
     }
 
@@ -128,7 +129,8 @@ class TestConfig
     public static function getEnabledGroups(): array
     {
         $groups = self::getGroupSettings();
-        return array_filter($groups, fn($group) => $group['enabled']);
+
+        return array_filter($groups, fn ($group) => $group['enabled']);
     }
 
     /**
@@ -137,6 +139,7 @@ class TestConfig
     public static function getGroupTimeout(string $group): int
     {
         $settings = self::getGroupSettings();
+
         return $settings[$group]['timeout'] ?? 300;
     }
 
@@ -146,6 +149,7 @@ class TestConfig
     public static function getGroupMemoryLimit(string $group): string
     {
         $settings = self::getGroupSettings();
+
         return $settings[$group]['memory_limit'] ?? '1G';
     }
 }

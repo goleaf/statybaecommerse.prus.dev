@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductRequestResource\Pages;
 
@@ -9,4 +11,3 @@ final class CreateProductRequest extends CreateRecord
 {
     protected static string $resource = ProductRequestResource::class;
 }
-

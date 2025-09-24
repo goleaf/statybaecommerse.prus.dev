@@ -1,16 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
 use App\Models\EnumValue;
 use App\Models\User;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\EditRecord;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
-use Tests\TestCase;
 
 final class EnumResourceTest extends TestCase
 {
@@ -249,7 +245,7 @@ final class EnumResourceTest extends TestCase
         $this
             ->actingAs($this->adminUser)
             ->post('/admin/enum-values/bulk-activate', [
-                'records' => $enumValues->pluck('id')->toArray()
+                'records' => $enumValues->pluck('id')->toArray(),
             ])
             ->assertRedirect();
 
@@ -265,7 +261,7 @@ final class EnumResourceTest extends TestCase
         $this
             ->actingAs($this->adminUser)
             ->post('/admin/enum-values/bulk-deactivate', [
-                'records' => $enumValues->pluck('id')->toArray()
+                'records' => $enumValues->pluck('id')->toArray(),
             ])
             ->assertRedirect();
 

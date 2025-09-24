@@ -7,7 +7,6 @@ namespace App\Filament\Resources\AddressResource\Pages;
 use App\Filament\Resources\AddressResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Actions\EditAction;
 
 final class ViewAddress extends ViewRecord
 {

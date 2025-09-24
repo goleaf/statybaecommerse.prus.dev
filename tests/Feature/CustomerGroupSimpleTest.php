@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\CustomerGroupResource;
 use App\Models\CustomerGroup;
@@ -12,7 +14,7 @@ it('can load CustomerGroup model class', function () {
 });
 
 it('can instantiate CustomerGroupResource', function () {
-    $resource = new CustomerGroupResource();
+    $resource = new CustomerGroupResource;
     expect($resource)->toBeInstanceOf(CustomerGroupResource::class);
 });
 

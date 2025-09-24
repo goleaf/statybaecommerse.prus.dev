@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -16,8 +18,6 @@ final class CityController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -55,22 +55,21 @@ final class CityController extends Controller
         $query->ordered()->orderBy('name');
         $cities = $query->get()->skipWhile(function ($city) {
             // Skip cities that are not properly configured for display
-            return empty($city->name) || !$city->is_enabled || !$city->is_active || empty($city->country_id) || empty($city->code);
+            return empty($city->name) || ! $city->is_enabled || ! $city->is_active || empty($city->country_id) || empty($city->code);
         })->paginate(24);
         // Get countries for filter dropdown
         $countries = Country::withTranslations()->enabled()->active()->ordered()->orderBy('name')->get();
+
         return view('cities.index', compact('cities', 'countries'));
     }
 
     /**
      * Display the specified resource with related data.
-     * @param City $city
-     * @return View
      */
     public function show(City $city): View
     {
         // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
-        if (!$city->relationLoaded('country.translations') || !$city->relationLoaded('region.translations') || !$city->relationLoaded('parent.translations') || !$city->relationLoaded('children.translations') || !$city->relationLoaded('translations')) {
+        if (! $city->relationLoaded('country.translations') || ! $city->relationLoaded('region.translations') || ! $city->relationLoaded('parent.translations') || ! $city->relationLoaded('children.translations') || ! $city->relationLoaded('translations')) {
             $city->load(['country.translations', 'region.translations', 'parent.translations', 'children.translations', 'translations']);
         }
         // Get nearby cities (within 50km radius if coordinates available)
@@ -78,9 +77,10 @@ final class CityController extends Controller
         if ($city->latitude && $city->longitude) {
             $nearbyCities = City::withTranslations()->enabled()->active()->where('id', '!=', $city->id)->whereNotNull('latitude')->whereNotNull('longitude')->get()->skipWhile(function ($nearbyCity) {
                 // Skip nearby cities that are not properly configured for display
-                return empty($nearbyCity->name) || !$nearbyCity->is_enabled || !$nearbyCity->is_active || empty($nearbyCity->country_id) || empty($nearbyCity->code);
+                return empty($nearbyCity->name) || ! $nearbyCity->is_enabled || ! $nearbyCity->is_active || empty($nearbyCity->country_id) || empty($nearbyCity->code);
             })->filter(function ($nearbyCity) use ($city) {
                 $distance = $this->calculateDistance($city->latitude, $city->longitude, $nearbyCity->latitude, $nearbyCity->longitude);
+
                 return $distance <= 50;
                 // Within 50km
             })->sortBy(function ($nearbyCity) use ($city) {
@@ -92,14 +92,14 @@ final class CityController extends Controller
             $q->where('country_id', $city->country_id)->orWhere('region_id', $city->region_id)->orWhere('level', $city->level);
         })->limit(6)->get()->skipWhile(function ($relatedCity) {
             // Skip related cities that are not properly configured for display
-            return empty($relatedCity->name) || !$relatedCity->is_enabled || !$relatedCity->is_active || empty($relatedCity->country_id) || empty($relatedCity->code);
+            return empty($relatedCity->name) || ! $relatedCity->is_enabled || ! $relatedCity->is_active || empty($relatedCity->country_id) || empty($relatedCity->code);
         });
+
         return view('cities.show', compact('city', 'nearbyCities', 'relatedCities'));
     }
 
     /**
      * Handle search functionality with proper error handling.
-     * @param Request $request
      */
     public function search(Request $request)
     {
@@ -115,27 +115,22 @@ final class CityController extends Controller
         })->limit($limit)->get()->map(function ($city) {
             return ['id' => $city->id, 'name' => $city->translated_name, 'code' => $city->code, 'country' => $city->country?->translated_name, 'region' => $city->region?->translated_name, 'url' => route('cities.show', $city)];
         });
+
         return response()->json($cities);
     }
 
     /**
      * Handle byCountry functionality with proper error handling.
-     * @param Country $country
-     * @return View
      */
     public function byCountry(Country $country): View
     {
         $cities = City::withTranslations()->enabled()->active()->byCountry($country->id)->ordered()->orderBy('name')->paginate(24);
+
         return view('cities.by-country', compact('cities', 'country'));
     }
 
     /**
      * Handle calculateDistance functionality with proper error handling.
-     * @param float $lat1
-     * @param float $lon1
-     * @param float $lat2
-     * @param float $lon2
-     * @return float
      */
     private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
@@ -145,6 +140,7 @@ final class CityController extends Controller
         $dLon = deg2rad($lon2 - $lon1);
         $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
         return $earthRadius * $c;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Pages;
 
 use App\Models\Product;
@@ -12,11 +13,12 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+
 /**
  * Search
- * 
+ *
  * Livewire component for Search with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string $q
  * @property string|null $sort
  */
@@ -24,12 +26,15 @@ use Livewire\WithPagination;
 class Search extends Component
 {
     use WithPagination;
+
     #[Url]
     public string $q = '';
+
     #[Url]
     public ?string $sort = null;
-    
+
     private SearchService $searchService;
+
     /**
      * Initialize the class instance with required dependencies.
      */
@@ -37,16 +42,16 @@ class Search extends Component
     {
         $this->searchService = app(SearchService::class);
     }
+
     /**
      * Handle searchResults functionality with proper error handling.
-     * @return LengthAwarePaginator
      */
     #[Computed]
     public function searchResults(): LengthAwarePaginator
     {
         $locale = app()->getLocale();
         $products = Product::query()->select(['id', 'slug', 'name', 'summary', 'brand_id', 'published_at'])->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())->when($this->q !== '', function ($q) use ($locale) {
-            $term = '%' . str_replace(['%', '_'], ['\%', '\_'], $this->q) . '%';
+            $term = '%'.str_replace(['%', '_'], ['\%', '\_'], $this->q).'%';
             $q->where(function ($w) use ($term, $locale) {
                 $w->where('name', 'like', $term)->orWhere('summary', 'like', $term)->orWhereExists(function ($sq) use ($term, $locale) {
                     $sq->selectRaw('1')->from('product_translations as t')->whereColumn('t.product_id', 'products.id')->where('t.locale', $locale)->where(function ($tw) use ($term) {
@@ -67,11 +72,12 @@ class Search extends Component
             default:
                 $products = $products->orderByDesc('published_at');
         }
+
         return $products->paginate(12);
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\Translations\CategoryTranslation;
 use App\Models\Category;
+use App\Models\Translations\CategoryTranslation;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 final class CategorySeederTest extends TestCase
 {
@@ -15,7 +16,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_creates_categories_with_translations(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
 
         // Act
         $seeder->run();
@@ -44,7 +45,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_creates_hierarchical_structure(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
 
         // Act
         $seeder->run();
@@ -66,7 +67,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_creates_multilingual_translations(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
 
         // Act
         $seeder->run();
@@ -99,7 +100,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_creates_subcategory_translations(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
 
         // Act
         $seeder->run();
@@ -127,7 +128,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_creates_deep_hierarchical_structure(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
 
         // Act
         $seeder->run();
@@ -154,7 +155,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_handles_duplicate_categories(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
         $seeder->run();  // First run
 
         $initialCount = Category::count();
@@ -171,7 +172,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_creates_all_required_categories(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
 
         // Act
         $seeder->run();
@@ -202,7 +203,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_creates_categories_with_proper_slugs(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
 
         // Act
         $seeder->run();
@@ -221,7 +222,7 @@ final class CategorySeederTest extends TestCase
     public function test_category_seeder_creates_translations_with_proper_slugs(): void
     {
         // Arrange
-        $seeder = new CategorySeeder();
+        $seeder = new CategorySeeder;
 
         // Act
         $seeder->run();

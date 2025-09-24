@@ -16,19 +16,19 @@ return new class extends Migration
 
         Schema::table('locations', function (Blueprint $table) {
             // Add missing columns if they don't exist
-            if (!Schema::hasColumn('locations', 'latitude')) {
+            if (! Schema::hasColumn('locations', 'latitude')) {
                 $table->decimal('latitude', 10, 8)->nullable();
             }
-            if (!Schema::hasColumn('locations', 'longitude')) {
+            if (! Schema::hasColumn('locations', 'longitude')) {
                 $table->decimal('longitude', 11, 8)->nullable();
             }
-            if (!Schema::hasColumn('locations', 'opening_hours')) {
+            if (! Schema::hasColumn('locations', 'opening_hours')) {
                 $table->json('opening_hours')->nullable();
             }
-            if (!Schema::hasColumn('locations', 'contact_info')) {
+            if (! Schema::hasColumn('locations', 'contact_info')) {
                 $table->json('contact_info')->nullable();
             }
-            if (!Schema::hasColumn('locations', 'sort_order')) {
+            if (! Schema::hasColumn('locations', 'sort_order')) {
                 $table->integer('sort_order')->default(0);
             }
         });

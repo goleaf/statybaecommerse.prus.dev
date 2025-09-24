@@ -1,17 +1,19 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use App\Services\AutocompleteService;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+
 /**
  * ProductAutocomplete
- * 
+ *
  * Livewire component for ProductAutocomplete with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string $query
  * @property array $results
  * @property bool $showResults
@@ -28,24 +30,29 @@ final class ProductAutocomplete extends Component
 {
     #[Validate('nullable|string|max:255')]
     public string $query = '';
+
     public array $results = [];
+
     public bool $showResults = false;
+
     public int $maxResults = 10;
+
     public int $minQueryLength = 2;
+
     public bool $isSearching = false;
+
     public ?int $selectedProductId = null;
+
     public string $selectedProductName = '';
+
     public bool $required = false;
+
     public string $placeholder = '';
+
     public string $name = 'product_id';
+
     /**
      * Initialize the Livewire component with parameters.
-     * @param int|null $selectedProductId
-     * @param string $selectedProductName
-     * @param bool $required
-     * @param string $placeholder
-     * @param string $name
-     * @return void
      */
     public function mount(?int $selectedProductId = null, string $selectedProductName = '', bool $required = false, string $placeholder = '', string $name = 'product_id'): void
     {
@@ -58,9 +65,9 @@ final class ProductAutocomplete extends Component
             $this->query = $selectedProductName;
         }
     }
+
     /**
      * Handle updatedQuery functionality with proper error handling.
-     * @return void
      */
     public function updatedQuery(): void
     {
@@ -72,9 +79,9 @@ final class ProductAutocomplete extends Component
             $this->clearResults();
         }
     }
+
     /**
      * Handle performSearch functionality with proper error handling.
-     * @return void
      */
     public function performSearch(): void
     {
@@ -86,9 +93,9 @@ final class ProductAutocomplete extends Component
         }, $results);
         $this->isSearching = false;
     }
+
     /**
      * Handle clearResults functionality with proper error handling.
-     * @return void
      */
     public function clearResults(): void
     {
@@ -96,10 +103,9 @@ final class ProductAutocomplete extends Component
         $this->showResults = false;
         $this->isSearching = false;
     }
+
     /**
      * Handle selectResult functionality with proper error handling.
-     * @param array $result
-     * @return void
      */
     public function selectResult(array $result): void
     {
@@ -110,9 +116,9 @@ final class ProductAutocomplete extends Component
         // Emit event for parent component
         $this->dispatch('product-selected', ['id' => $result['id'], 'name' => $result['title'], 'sku' => $result['sku'], 'price' => $result['price']]);
     }
+
     /**
      * Handle clearSelection functionality with proper error handling.
-     * @return void
      */
     public function clearSelection(): void
     {
@@ -123,9 +129,9 @@ final class ProductAutocomplete extends Component
         // Emit event for parent component
         $this->dispatch('product-cleared');
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

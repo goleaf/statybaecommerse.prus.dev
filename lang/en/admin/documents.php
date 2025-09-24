@@ -72,5 +72,3 @@ return [
     'published_successfully' => 'Document published successfully',
     'archived_successfully' => 'Document archived successfully',
 ];
-
-

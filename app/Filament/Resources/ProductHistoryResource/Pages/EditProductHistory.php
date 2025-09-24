@@ -7,7 +7,6 @@ namespace App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions\DeleteAction;
 
 final class EditProductHistory extends EditRecord
 {
@@ -19,10 +18,5 @@ final class EditProductHistory extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
     }
 }

@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\VariantAnalytics;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Models\VariantAnalytics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 final class VariantAnalyticsResourceTest extends TestCase
 {
@@ -16,7 +17,7 @@ final class VariantAnalyticsResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create a user for testing
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
@@ -63,7 +64,7 @@ final class VariantAnalyticsResourceTest extends TestCase
         // Arrange
         $variant = ProductVariant::factory()->create();
         $analytics = VariantAnalytics::factory()->withVariant($variant)->create();
-        
+
         $updatedData = [
             'views' => 200,
             'clicks' => 100,
@@ -117,7 +118,7 @@ final class VariantAnalyticsResourceTest extends TestCase
         // Arrange
         $variant1 = ProductVariant::factory()->create();
         $variant2 = ProductVariant::factory()->create();
-        
+
         $analytics1 = VariantAnalytics::factory()->withVariant($variant1)->create();
         $analytics2 = VariantAnalytics::factory()->withVariant($variant2)->create();
 
@@ -132,12 +133,12 @@ final class VariantAnalyticsResourceTest extends TestCase
     {
         // Arrange
         $variant = ProductVariant::factory()->create();
-        
+
         $analytics1 = VariantAnalytics::factory()
             ->withVariant($variant)
             ->forDate(now()->subDays(5)->toDateString())
             ->create();
-            
+
         $analytics2 = VariantAnalytics::factory()
             ->withVariant($variant)
             ->forDate(now()->subDays(15)->toDateString())
@@ -157,12 +158,12 @@ final class VariantAnalyticsResourceTest extends TestCase
     {
         // Arrange
         $variant = ProductVariant::factory()->create();
-        
+
         $highPerforming = VariantAnalytics::factory()
             ->highPerforming()
             ->withVariant($variant)
             ->create();
-            
+
         $lowPerforming = VariantAnalytics::factory()
             ->lowPerforming()
             ->withVariant($variant)
@@ -179,12 +180,12 @@ final class VariantAnalyticsResourceTest extends TestCase
     {
         // Arrange
         $variant = ProductVariant::factory()->create();
-        
+
         $highPerforming = VariantAnalytics::factory()
             ->highPerforming()
             ->withVariant($variant)
             ->create();
-            
+
         $lowPerforming = VariantAnalytics::factory()
             ->lowPerforming()
             ->withVariant($variant)
@@ -277,12 +278,12 @@ final class VariantAnalyticsResourceTest extends TestCase
     {
         // Arrange
         $variant = ProductVariant::factory()->create();
-        
+
         $oldAnalytics = VariantAnalytics::factory()
             ->withVariant($variant)
             ->forDate(now()->subDays(10)->toDateString())
             ->create();
-            
+
         $newAnalytics = VariantAnalytics::factory()
             ->withVariant($variant)
             ->forDate(now()->toDateString())
@@ -290,7 +291,7 @@ final class VariantAnalyticsResourceTest extends TestCase
 
         // Act & Assert
         $component = Livewire::test(\App\Filament\Resources\VariantAnalyticsResource\Pages\ListVariantAnalytics::class);
-        
+
         $records = $component->get('tableRecords');
         $this->assertEquals($newAnalytics->id, $records->first()->id);
         $this->assertEquals($oldAnalytics->id, $records->last()->id);

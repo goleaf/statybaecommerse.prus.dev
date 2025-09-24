@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * OrderItem
@@ -15,9 +17,11 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property mixed $table
  * @property mixed $fillable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([UserOwnedScope::class])]
@@ -26,11 +30,11 @@ final class OrderItem extends Model
     use HasFactory;
 
     protected $table = 'order_items';
+
     protected $fillable = ['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'quantity', 'unit_price', 'price', 'total', 'notes'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -39,7 +43,6 @@ final class OrderItem extends Model
 
     /**
      * Handle order functionality with proper error handling.
-     * @return BelongsTo
      */
     public function order(): BelongsTo
     {
@@ -48,7 +51,6 @@ final class OrderItem extends Model
 
     /**
      * Handle product functionality with proper error handling.
-     * @return BelongsTo
      */
     public function product(): BelongsTo
     {
@@ -57,7 +59,6 @@ final class OrderItem extends Model
 
     /**
      * Handle productVariant functionality with proper error handling.
-     * @return BelongsTo
      */
     public function productVariant(): BelongsTo
     {
@@ -66,7 +67,6 @@ final class OrderItem extends Model
 
     /**
      * Boot the service provider or trait functionality.
-     * @return void
      */
     protected static function boot(): void
     {
@@ -75,7 +75,7 @@ final class OrderItem extends Model
             if (isset($orderItem->price) && empty($orderItem->unit_price)) {
                 $orderItem->unit_price = $orderItem->price;
             }
-            if (!$orderItem->total) {
+            if (! $orderItem->total) {
                 $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
             }
         });
@@ -83,7 +83,7 @@ final class OrderItem extends Model
             if ($orderItem->isDirty(['unit_price', 'quantity'])) {
                 $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
             }
-            if ($orderItem->isDirty('price') && !$orderItem->isDirty('unit_price')) {
+            if ($orderItem->isDirty('price') && ! $orderItem->isDirty('unit_price')) {
                 $orderItem->unit_price = $orderItem->price;
             }
         });

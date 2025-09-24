@@ -4,13 +4,13 @@ return [
     'navigation_label' => 'Locations',
     'model_label' => 'Location',
     'plural_model_label' => 'Locations',
-    
+
     // Page titles
     'title' => 'Locations',
     'subtitle' => 'Find our stores, warehouses, and pickup points',
     'page_title' => 'Locations Directory',
     'page_description' => 'Browse through all our locations including stores, warehouses, and pickup points',
-    
+
     // Fields
     'fields' => [
         'name' => 'Name',
@@ -41,7 +41,7 @@ return [
         'coordinates' => 'Coordinates',
         'full_address' => 'Full Address',
     ],
-    
+
     // Form sections
     'basic_information' => 'Basic Information',
     'address_information' => 'Address Information',
@@ -49,7 +49,7 @@ return [
     'location_details' => 'Location Details',
     'business_settings' => 'Business Settings',
     'additional_data' => 'Additional Data',
-    
+
     // Placeholders
     'placeholders' => [
         'name' => 'Enter location name',
@@ -66,7 +66,7 @@ return [
         'longitude' => 'Enter longitude',
         'sort_order' => 'Enter sort order',
     ],
-    
+
     // Help text
     'help' => [
         'name' => 'The name of the location',
@@ -82,14 +82,14 @@ return [
         'opening_hours' => 'Business opening hours for each day',
         'sort_order' => 'The order in which this location should appear',
     ],
-    
+
     // Location types
     'type_warehouse' => 'Warehouse',
     'type_store' => 'Store',
     'type_office' => 'Office',
     'type_pickup_point' => 'Pickup Point',
     'type_other' => 'Other',
-    
+
     // Actions
     'actions' => [
         'create' => 'Create Location',
@@ -102,7 +102,7 @@ return [
         'get_directions' => 'Get Directions',
         'contact_location' => 'Contact Location',
     ],
-    
+
     // Filters
     'filters' => [
         'search' => 'Search',
@@ -123,7 +123,7 @@ return [
         'apply_filters' => 'Apply Filters',
         'clear_filters' => 'Clear Filters',
     ],
-    
+
     // Status
     'status' => [
         'enabled' => 'Enabled',
@@ -134,7 +134,7 @@ return [
         'open' => 'Open',
         'closed' => 'Closed',
     ],
-    
+
     // Days of the week
     'monday' => 'Monday',
     'tuesday' => 'Tuesday',
@@ -143,7 +143,7 @@ return [
     'friday' => 'Friday',
     'saturday' => 'Saturday',
     'sunday' => 'Sunday',
-    
+
     // Statistics
     'statistics' => [
         'total_locations' => 'Total Locations',
@@ -171,7 +171,7 @@ return [
         'out_of_stock_products' => 'Out of Stock Products',
         'out_of_stock_products_description' => 'Number of products out of stock',
     ],
-    
+
     // Widgets
     'widgets' => [
         'overview' => 'Locations Overview',
@@ -181,7 +181,7 @@ return [
         'geographic_distribution' => 'Geographic Distribution',
         'opening_hours_summary' => 'Opening Hours Summary',
     ],
-    
+
     // Messages
     'messages' => [
         'created' => 'Location created successfully',
@@ -194,7 +194,7 @@ return [
         'cannot_delete_with_inventory' => 'Cannot delete location with inventory',
         'opening_hours_updated' => 'Opening hours updated successfully',
     ],
-    
+
     // Confirmations
     'confirmations' => [
         'delete' => 'Are you sure you want to delete this location?',
@@ -203,7 +203,7 @@ return [
         'bulk_enable' => 'Are you sure you want to enable the selected locations?',
         'bulk_disable' => 'Are you sure you want to disable the selected locations?',
     ],
-    
+
     // Empty states
     'empty_states' => [
         'no_locations' => 'No locations found',
@@ -211,7 +211,7 @@ return [
         'no_locations_found' => 'No locations match your search criteria',
         'no_locations_found_description' => 'Try adjusting your search or filters',
     ],
-    
+
     // Validation
     'validation' => [
         'name_required' => 'Location name is required',
@@ -225,7 +225,7 @@ return [
         'phone_format' => 'Invalid phone number format',
         'email_format' => 'Invalid email format',
     ],
-    
+
     // Details sections
     'details' => [
         'basic_info' => 'Basic Information',
@@ -238,12 +238,12 @@ return [
         'related_locations' => 'Related Locations',
         'nearby_locations' => 'Nearby Locations',
     ],
-    
+
     // Bulk actions
     'bulk_enable' => 'Enable Selected',
     'bulk_disable' => 'Disable Selected',
     'bulk_delete' => 'Delete Selected',
-    
+
     // API responses
     'api' => [
         'success' => 'Success',

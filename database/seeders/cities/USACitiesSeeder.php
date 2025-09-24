@@ -18,7 +18,7 @@ final class USACitiesSeeder extends Seeder
         $naZone = Zone::where('code', 'NA')->first();
 
         // Regions are no longer used in the database schema
-        
+
         $cities = [
             // California
             [
@@ -30,8 +30,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['90001', '90002', '90003'],
                 'translations' => [
                     'lt' => ['name' => 'Los Andželas', 'description' => 'Kino pramonės centras'],
-                    'en' => ['name' => 'Los Angeles', 'description' => 'Entertainment industry center']
-            ],
+                    'en' => ['name' => 'Los Angeles', 'description' => 'Entertainment industry center'],
+                ],
             ],
             [
                 'name' => 'San Diego',
@@ -42,8 +42,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['92101', '92102', '92103'],
                 'translations' => [
                     'lt' => ['name' => 'San Diegas', 'description' => 'Pajūrio miestas'],
-                    'en' => ['name' => 'San Diego', 'description' => 'Seaside city']
-            ],
+                    'en' => ['name' => 'San Diego', 'description' => 'Seaside city'],
+                ],
             ],
             [
                 'name' => 'San Jose',
@@ -54,8 +54,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['95110', '95111', '95112'],
                 'translations' => [
                     'lt' => ['name' => 'San Chosė', 'description' => 'Technologijų centras'],
-                    'en' => ['name' => 'San Jose', 'description' => 'Technology center']
-            ],
+                    'en' => ['name' => 'San Jose', 'description' => 'Technology center'],
+                ],
             ],
             [
                 'name' => 'San Francisco',
@@ -66,8 +66,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['94102', '94103', '94104'],
                 'translations' => [
                     'lt' => ['name' => 'San Franciskas', 'description' => 'Finansų centras'],
-                    'en' => ['name' => 'San Francisco', 'description' => 'Financial center']
-            ],
+                    'en' => ['name' => 'San Francisco', 'description' => 'Financial center'],
+                ],
             ],
             [
                 'name' => 'Fresno',
@@ -78,8 +78,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['93701', '93702', '93703'],
                 'translations' => [
                     'lt' => ['name' => 'Fresnas', 'description' => 'Žemės ūkio centras'],
-                    'en' => ['name' => 'Fresno', 'description' => 'Agricultural center']
-            ],
+                    'en' => ['name' => 'Fresno', 'description' => 'Agricultural center'],
+                ],
             ],
             // Texas
             [
@@ -91,8 +91,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['77001', '77002', '77003'],
                 'translations' => [
                     'lt' => ['name' => 'Hjustonas', 'description' => 'Naftos pramonės centras'],
-                    'en' => ['name' => 'Houston', 'description' => 'Oil industry center']
-            ],
+                    'en' => ['name' => 'Houston', 'description' => 'Oil industry center'],
+                ],
             ],
             [
                 'name' => 'San Antonio',
@@ -103,8 +103,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['78201', '78202', '78203'],
                 'translations' => [
                     'lt' => ['name' => 'San Antonijas', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'San Antonio', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'San Antonio', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Dallas',
@@ -115,8 +115,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['75201', '75202', '75203'],
                 'translations' => [
                     'lt' => ['name' => 'Dalasas', 'description' => 'Finansų centras'],
-                    'en' => ['name' => 'Dallas', 'description' => 'Financial center']
-            ],
+                    'en' => ['name' => 'Dallas', 'description' => 'Financial center'],
+                ],
             ],
             [
                 'name' => 'Austin',
@@ -127,8 +127,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['73301', '73302', '73303'],
                 'translations' => [
                     'lt' => ['name' => 'Ostinas', 'description' => 'Teksto sostinė'],
-                    'en' => ['name' => 'Austin', 'description' => 'Music capital']
-            ],
+                    'en' => ['name' => 'Austin', 'description' => 'Music capital'],
+                ],
             ],
             // Florida
             [
@@ -140,8 +140,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['32099', '32201', '32202'],
                 'translations' => [
                     'lt' => ['name' => 'Džeksonvilis', 'description' => 'Didžiausias Floridos miestas'],
-                    'en' => ['name' => 'Jacksonville', 'description' => 'Largest city in Florida']
-            ],
+                    'en' => ['name' => 'Jacksonville', 'description' => 'Largest city in Florida'],
+                ],
             ],
             [
                 'name' => 'Miami',
@@ -152,8 +152,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['33101', '33102', '33103'],
                 'translations' => [
                     'lt' => ['name' => 'Majamis', 'description' => 'Kurortinis miestas'],
-                    'en' => ['name' => 'Miami', 'description' => 'Resort city']
-            ],
+                    'en' => ['name' => 'Miami', 'description' => 'Resort city'],
+                ],
             ],
             [
                 'name' => 'Tampa',
@@ -164,8 +164,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['33601', '33602', '33603'],
                 'translations' => [
                     'lt' => ['name' => 'Tampa', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Tampa', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Tampa', 'description' => 'Port city'],
+                ],
             ],
             // New York
             [
@@ -179,8 +179,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['10001', '10002', '10003'],
                 'translations' => [
                     'lt' => ['name' => 'Niujorkas', 'description' => 'Didžiausias JAV miestas'],
-                    'en' => ['name' => 'New York City', 'description' => 'Largest city in USA']
-            ],
+                    'en' => ['name' => 'New York City', 'description' => 'Largest city in USA'],
+                ],
             ],
             [
                 'name' => 'Buffalo',
@@ -191,8 +191,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['14201', '14202', '14203'],
                 'translations' => [
                     'lt' => ['name' => 'Bufalas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Buffalo', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Buffalo', 'description' => 'Industrial city'],
+                ],
             ],
             // Illinois
             [
@@ -204,8 +204,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['60601', '60602', '60603'],
                 'translations' => [
                     'lt' => ['name' => 'Čikaga', 'description' => 'Vėjo miestas'],
-                    'en' => ['name' => 'Chicago', 'description' => 'Windy City']
-            ],
+                    'en' => ['name' => 'Chicago', 'description' => 'Windy City'],
+                ],
             ],
             // Pennsylvania
             [
@@ -217,8 +217,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['19101', '19102', '19103'],
                 'translations' => [
                     'lt' => ['name' => 'Filadelfija', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Philadelphia', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Philadelphia', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Pittsburgh',
@@ -229,8 +229,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['15201', '15202', '15203'],
                 'translations' => [
                     'lt' => ['name' => 'Pitsburgas', 'description' => 'Plieno miestas'],
-                    'en' => ['name' => 'Pittsburgh', 'description' => 'Steel city']
-            ],
+                    'en' => ['name' => 'Pittsburgh', 'description' => 'Steel city'],
+                ],
             ],
             // Ohio
             [
@@ -242,8 +242,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['43201', '43202', '43203'],
                 'translations' => [
                     'lt' => ['name' => 'Kolumbas', 'description' => 'Ohajo sostinė'],
-                    'en' => ['name' => 'Columbus', 'description' => 'Capital of Ohio']
-            ],
+                    'en' => ['name' => 'Columbus', 'description' => 'Capital of Ohio'],
+                ],
             ],
             [
                 'name' => 'Cleveland',
@@ -254,8 +254,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['44101', '44102', '44103'],
                 'translations' => [
                     'lt' => ['name' => 'Klivlandas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Cleveland', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Cleveland', 'description' => 'Industrial city'],
+                ],
             ],
             // Georgia
             [
@@ -267,8 +267,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['30301', '30302', '30303'],
                 'translations' => [
                     'lt' => ['name' => 'Atlanta', 'description' => 'Džordžijos sostinė'],
-                    'en' => ['name' => 'Atlanta', 'description' => 'Capital of Georgia']
-            ],
+                    'en' => ['name' => 'Atlanta', 'description' => 'Capital of Georgia'],
+                ],
             ],
             // North Carolina
             [
@@ -280,8 +280,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['28201', '28202', '28203'],
                 'translations' => [
                     'lt' => ['name' => 'Šarlotė', 'description' => 'Finansų centras'],
-                    'en' => ['name' => 'Charlotte', 'description' => 'Financial center']
-            ],
+                    'en' => ['name' => 'Charlotte', 'description' => 'Financial center'],
+                ],
             ],
             // Michigan
             [
@@ -293,8 +293,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['48201', '48202', '48203'],
                 'translations' => [
                     'lt' => ['name' => 'Detroitas', 'description' => 'Automobilių pramonės centras'],
-                    'en' => ['name' => 'Detroit', 'description' => 'Automotive industry center']
-            ],
+                    'en' => ['name' => 'Detroit', 'description' => 'Automotive industry center'],
+                ],
             ],
             // Additional California cities
             [
@@ -306,8 +306,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['95814', '95815', '95816'],
                 'translations' => [
                     'lt' => ['name' => 'Sakramentas', 'description' => 'Kalifornijos sostinė'],
-                    'en' => ['name' => 'Sacramento', 'description' => 'Capital of California']
-            ],
+                    'en' => ['name' => 'Sacramento', 'description' => 'Capital of California'],
+                ],
             ],
             [
                 'name' => 'Long Beach',
@@ -318,8 +318,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['90801', '90802', '90803'],
                 'translations' => [
                     'lt' => ['name' => 'Long Beach', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Long Beach', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Long Beach', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Oakland',
@@ -330,8 +330,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['94601', '94602', '94603'],
                 'translations' => [
                     'lt' => ['name' => 'Oklandas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Oakland', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Oakland', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Bakersfield',
@@ -342,8 +342,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['93301', '93302', '93303'],
                 'translations' => [
                     'lt' => ['name' => 'Bakersfieldas', 'description' => 'Naftos pramonės centras'],
-                    'en' => ['name' => 'Bakersfield', 'description' => 'Oil industry center']
-            ],
+                    'en' => ['name' => 'Bakersfield', 'description' => 'Oil industry center'],
+                ],
             ],
             [
                 'name' => 'Anaheim',
@@ -354,8 +354,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['92801', '92802', '92803'],
                 'translations' => [
                     'lt' => ['name' => 'Anaheimas', 'description' => 'Disneyland miestas'],
-                    'en' => ['name' => 'Anaheim', 'description' => 'Disneyland city']
-            ],
+                    'en' => ['name' => 'Anaheim', 'description' => 'Disneyland city'],
+                ],
             ],
             [
                 'name' => 'Santa Ana',
@@ -366,8 +366,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['92701', '92702', '92703'],
                 'translations' => [
                     'lt' => ['name' => 'Santa Ana', 'description' => 'Pramonės centras'],
-                    'en' => ['name' => 'Santa Ana', 'description' => 'Industrial center']
-            ],
+                    'en' => ['name' => 'Santa Ana', 'description' => 'Industrial center'],
+                ],
             ],
             [
                 'name' => 'Riverside',
@@ -378,8 +378,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['92501', '92502', '92503'],
                 'translations' => [
                     'lt' => ['name' => 'Riversidas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Riverside', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Riverside', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Stockton',
@@ -390,8 +390,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['95201', '95202', '95203'],
                 'translations' => [
                     'lt' => ['name' => 'Stoktonas', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Stockton', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Stockton', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Irvine',
@@ -402,8 +402,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['92602', '92603', '92604'],
                 'translations' => [
                     'lt' => ['name' => 'Irvynas', 'description' => 'Technologijų centras'],
-                    'en' => ['name' => 'Irvine', 'description' => 'Technology center']
-            ],
+                    'en' => ['name' => 'Irvine', 'description' => 'Technology center'],
+                ],
             ],
             [
                 'name' => 'Chula Vista',
@@ -414,8 +414,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['91909', '91910', '91911'],
                 'translations' => [
                     'lt' => ['name' => 'Chula Vista', 'description' => 'Pajūrio miestas'],
-                    'en' => ['name' => 'Chula Vista', 'description' => 'Seaside city']
-            ],
+                    'en' => ['name' => 'Chula Vista', 'description' => 'Seaside city'],
+                ],
             ],
             // Additional Texas cities
             [
@@ -427,8 +427,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['76101', '76102', '76103'],
                 'translations' => [
                     'lt' => ['name' => 'Fort Worth', 'description' => 'Pramonės centras'],
-                    'en' => ['name' => 'Fort Worth', 'description' => 'Industrial center']
-            ],
+                    'en' => ['name' => 'Fort Worth', 'description' => 'Industrial center'],
+                ],
             ],
             [
                 'name' => 'El Paso',
@@ -439,8 +439,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['79901', '79902', '79903'],
                 'translations' => [
                     'lt' => ['name' => 'El Paso', 'description' => 'Sienos miestas'],
-                    'en' => ['name' => 'El Paso', 'description' => 'Border city']
-            ],
+                    'en' => ['name' => 'El Paso', 'description' => 'Border city'],
+                ],
             ],
             [
                 'name' => 'Arlington',
@@ -451,8 +451,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['76001', '76002', '76003'],
                 'translations' => [
                     'lt' => ['name' => 'Arlingtonas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Arlington', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Arlington', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Corpus Christi',
@@ -463,8 +463,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['78401', '78402', '78403'],
                 'translations' => [
                     'lt' => ['name' => 'Corpus Christi', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Corpus Christi', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Corpus Christi', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Plano',
@@ -475,8 +475,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['75023', '75024', '75025'],
                 'translations' => [
                     'lt' => ['name' => 'Plano', 'description' => 'Technologijų centras'],
-                    'en' => ['name' => 'Plano', 'description' => 'Technology center']
-            ],
+                    'en' => ['name' => 'Plano', 'description' => 'Technology center'],
+                ],
             ],
             [
                 'name' => 'Lubbock',
@@ -487,8 +487,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['79401', '79402', '79403'],
                 'translations' => [
                     'lt' => ['name' => 'Lubokas', 'description' => 'Žemės ūkio centras'],
-                    'en' => ['name' => 'Lubbock', 'description' => 'Agricultural center']
-            ],
+                    'en' => ['name' => 'Lubbock', 'description' => 'Agricultural center'],
+                ],
             ],
             [
                 'name' => 'Laredo',
@@ -499,8 +499,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['78040', '78041', '78042'],
                 'translations' => [
                     'lt' => ['name' => 'Laredo', 'description' => 'Sienos miestas'],
-                    'en' => ['name' => 'Laredo', 'description' => 'Border city']
-            ],
+                    'en' => ['name' => 'Laredo', 'description' => 'Border city'],
+                ],
             ],
             [
                 'name' => 'Garland',
@@ -511,8 +511,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['75040', '75041', '75042'],
                 'translations' => [
                     'lt' => ['name' => 'Garlandas', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Garland', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Garland', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Irving',
@@ -523,8 +523,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['75038', '75039', '75040'],
                 'translations' => [
                     'lt' => ['name' => 'Irvingas', 'description' => 'Verslo centras'],
-                    'en' => ['name' => 'Irving', 'description' => 'Business center']
-            ],
+                    'en' => ['name' => 'Irving', 'description' => 'Business center'],
+                ],
             ],
             [
                 'name' => 'Amarillo',
@@ -535,8 +535,8 @@ final class USACitiesSeeder extends Seeder
                 'postal_codes' => ['79101', '79102', '79103'],
                 'translations' => [
                     'lt' => ['name' => 'Amarilas', 'description' => 'Žemės ūkio centras'],
-                    'en' => ['name' => 'Amarillo', 'description' => 'Agricultural center']
-            ],
+                    'en' => ['name' => 'Amarillo', 'description' => 'Agricultural center'],
+                ],
             ],
         ];
 
@@ -545,7 +545,7 @@ final class USACitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -565,8 +565,8 @@ final class USACitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

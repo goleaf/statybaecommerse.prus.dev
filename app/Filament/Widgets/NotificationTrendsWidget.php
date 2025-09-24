@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Notification;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 final class NotificationTrendsWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Notification Trends (Last 30 Days)';
+    protected ?string $heading = 'Notification Trends (Last 30 Days)';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -42,4 +43,3 @@ final class NotificationTrendsWidget extends ChartWidget
         return 'line';
     }
 }
-

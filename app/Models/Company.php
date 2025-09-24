@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Company
@@ -15,9 +17,11 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property mixed $fillable
  * @property mixed $casts
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Company newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Company newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Company query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class])]
@@ -35,7 +39,7 @@ final class Company extends Model
         'size',
         'description',
         'is_active',
-        'metadata'
+        'metadata',
     ];
 
     protected $casts = ['metadata' => 'array', 'is_active' => 'boolean'];
@@ -43,7 +47,6 @@ final class Company extends Model
 
     /**
      * Handle subscribers functionality with proper error handling.
-     * @return HasMany
      */
     public function subscribers(): HasMany
     {
@@ -54,7 +57,8 @@ final class Company extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -63,8 +67,8 @@ final class Company extends Model
 
     /**
      * Handle scopeByIndustry functionality with proper error handling.
-     * @param mixed $query
-     * @param string $industry
+     *
+     * @param  mixed  $query
      */
     public function scopeByIndustry($query, string $industry)
     {
@@ -73,8 +77,8 @@ final class Company extends Model
 
     /**
      * Handle scopeBySize functionality with proper error handling.
-     * @param mixed $query
-     * @param string $size
+     *
+     * @param  mixed  $query
      */
     public function scopeBySize($query, string $size)
     {
@@ -85,7 +89,6 @@ final class Company extends Model
 
     /**
      * Handle getSubscriberCountAttribute functionality with proper error handling.
-     * @return int
      */
     public function getSubscriberCountAttribute(): int
     {
@@ -94,7 +97,6 @@ final class Company extends Model
 
     /**
      * Handle getActiveSubscriberCountAttribute functionality with proper error handling.
-     * @return int
      */
     public function getActiveSubscriberCountAttribute(): int
     {

@@ -21,7 +21,7 @@ final class CreateAttributeValue extends CreateRecord
         // Set default values
         $data['is_active'] = $data['is_active'] ?? true;
         $data['sort_order'] = $data['sort_order'] ?? 0;
-        
+
         return $data;
     }
 }

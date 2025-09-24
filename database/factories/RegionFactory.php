@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Region;
 use App\Models\Country;
+use App\Models\Region;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,7 +19,7 @@ final class RegionFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->city() . ' Region',
+            'name' => $this->faker->city().' Region',
             'code' => $this->faker->unique()->lexify('REG???'),
             'slug' => $this->faker->unique()->slug(2),
             'description' => $this->faker->optional(0.8)->paragraph(),
@@ -100,35 +100,35 @@ final class RegionFactory extends Factory
     public function stateProvince(): static
     {
         return $this->level(1)->state(fn (array $attributes) => [
-            'name' => $this->faker->state() . ' State',
+            'name' => $this->faker->state().' State',
         ]);
     }
 
     public function county(): static
     {
         return $this->level(2)->state(fn (array $attributes) => [
-            'name' => $this->faker->city() . ' County',
+            'name' => $this->faker->city().' County',
         ]);
     }
 
     public function district(): static
     {
         return $this->level(3)->state(fn (array $attributes) => [
-            'name' => $this->faker->city() . ' District',
+            'name' => $this->faker->city().' District',
         ]);
     }
 
     public function municipality(): static
     {
         return $this->level(4)->state(fn (array $attributes) => [
-            'name' => $this->faker->city() . ' Municipality',
+            'name' => $this->faker->city().' Municipality',
         ]);
     }
 
     public function village(): static
     {
         return $this->level(5)->state(fn (array $attributes) => [
-            'name' => $this->faker->city() . ' Village',
+            'name' => $this->faker->city().' Village',
         ]);
     }
 }

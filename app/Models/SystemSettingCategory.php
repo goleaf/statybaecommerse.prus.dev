@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -21,9 +23,11 @@ use Spatie\Sluggable\SlugOptions;
  *
  * @property mixed $fillable
  * @property mixed $casts
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|SystemSettingCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|SystemSettingCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|SystemSettingCategory query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class])]
@@ -32,11 +36,11 @@ final class SystemSettingCategory extends Model
     use HasFactory, HasSlug, LogsActivity, SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'description', 'icon', 'color', 'sort_order', 'is_active', 'parent_id'];
+
     protected $casts = ['is_active' => 'boolean', 'sort_order' => 'integer', 'parent_id' => 'integer'];
 
     /**
      * Handle getSlugOptions functionality with proper error handling.
-     * @return SlugOptions
      */
     public function getSlugOptions(): SlugOptions
     {
@@ -45,16 +49,14 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
-     * @return LogOptions
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'is_active', 'sort_order'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "System Setting Category {$eventName}")->useLogName('system_setting_categories');
+        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'is_active', 'sort_order'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "System Setting Category {$eventName}")->useLogName('system_setting_categories');
     }
 
     /**
      * Handle settings functionality with proper error handling.
-     * @return HasMany
      */
     public function settings(): HasMany
     {
@@ -63,7 +65,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle parent functionality with proper error handling.
-     * @return BelongsTo
      */
     public function parent(): BelongsTo
     {
@@ -72,7 +73,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle children functionality with proper error handling.
-     * @return HasMany
      */
     public function children(): HasMany
     {
@@ -81,7 +81,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle translations functionality with proper error handling.
-     * @return HasMany
      */
     public function translations(): HasMany
     {
@@ -90,7 +89,8 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -99,7 +99,8 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeOrdered($query)
     {
@@ -108,7 +109,8 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle scopeRoot functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeRoot($query)
     {
@@ -117,7 +119,8 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle scopeWithSettings functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeWithSettings($query)
     {
@@ -128,31 +131,28 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getTranslatedName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string
      */
     public function getTranslatedName(?string $locale = null): string
     {
         $locale = $locale ?? app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->name ?? $this->name;
     }
 
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedDescription(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
         $translation = $this->translations()->where('locale', $locale)->first();
+
         return $translation?->description ?? $this->description;
     }
 
     /**
      * Handle getSettingsCount functionality with proper error handling.
-     * @return int
      */
     public function getSettingsCount(): int
     {
@@ -161,7 +161,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle hasActiveSettings functionality with proper error handling.
-     * @return bool
      */
     public function hasActiveSettings(): bool
     {
@@ -170,7 +169,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getIconClass functionality with proper error handling.
-     * @return string
      */
     public function getIconClass(): string
     {
@@ -179,7 +177,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getColorClass functionality with proper error handling.
-     * @return string
      */
     public function getColorClass(): string
     {
@@ -196,7 +193,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getBadgeColorClass functionality with proper error handling.
-     * @return string
      */
     public function getBadgeColorClass(): string
     {
@@ -213,7 +209,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getActiveSettingsCount functionality with proper error handling.
-     * @return int
      */
     public function getActiveSettingsCount(): int
     {
@@ -222,7 +217,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getPublicSettingsCount functionality with proper error handling.
-     * @return int
      */
     public function getPublicSettingsCount(): int
     {
@@ -231,6 +225,7 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getSettingsByGroup functionality with proper error handling.
+     *
      * @return Illuminate\Database\Eloquent\Collection
      */
     public function getSettingsByGroup(): \Illuminate\Database\Eloquent\Collection
@@ -240,7 +235,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle hasPublicSettings functionality with proper error handling.
-     * @return bool
      */
     public function hasPublicSettings(): bool
     {
@@ -249,7 +243,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getParent functionality with proper error handling.
-     * @return self|null
      */
     public function getParent(): ?self
     {
@@ -258,6 +251,7 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getChildren functionality with proper error handling.
+     *
      * @return Illuminate\Database\Eloquent\Collection
      */
     public function getChildren(): \Illuminate\Database\Eloquent\Collection
@@ -267,6 +261,7 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getAllChildren functionality with proper error handling.
+     *
      * @return Illuminate\Database\Eloquent\Collection
      */
     public function getAllChildren(): \Illuminate\Database\Eloquent\Collection
@@ -275,12 +270,12 @@ final class SystemSettingCategory extends Model
         foreach ($this->getChildren() as $child) {
             $children = $children->merge($child->getAllChildren());
         }
+
         return $children;
     }
 
     /**
      * Handle getPath functionality with proper error handling.
-     * @return string
      */
     public function getPath(): string
     {
@@ -290,12 +285,12 @@ final class SystemSettingCategory extends Model
             array_unshift($path, $parent->name);
             $parent = $parent->getParent();
         }
+
         return implode(' > ', $path);
     }
 
     /**
      * Handle getDepth functionality with proper error handling.
-     * @return int
      */
     public function getDepth(): int
     {
@@ -305,12 +300,12 @@ final class SystemSettingCategory extends Model
             $depth++;
             $parent = $parent->getParent();
         }
+
         return $depth;
     }
 
     /**
      * Handle isRoot functionality with proper error handling.
-     * @return bool
      */
     public function isRoot(): bool
     {
@@ -319,7 +314,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle isLeaf functionality with proper error handling.
-     * @return bool
      */
     public function isLeaf(): bool
     {
@@ -328,7 +322,6 @@ final class SystemSettingCategory extends Model
 
     /**
      * Handle getBreadcrumb functionality with proper error handling.
-     * @return array
      */
     public function getBreadcrumb(): array
     {
@@ -338,12 +331,12 @@ final class SystemSettingCategory extends Model
             array_unshift($breadcrumb, ['id' => $current->id, 'name' => $current->getTranslatedName(), 'slug' => $current->slug]);
             $current = $current->getParent();
         }
+
         return $breadcrumb;
     }
 
     /**
      * Handle getTreeStructure functionality with proper error handling.
-     * @return array
      */
     public function getTreeStructure(): array
     {

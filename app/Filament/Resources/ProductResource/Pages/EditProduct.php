@@ -6,10 +6,9 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Str;
-use Filament\Actions\DeleteAction;
 
 final class EditProduct extends EditRecord
 {
@@ -24,9 +23,9 @@ final class EditProduct extends EditRecord
                 ->icon('heroicon-o-document-duplicate')
                 ->action(function () {
                     $product = $this->record->replicate();
-                    $product->name = $product->name . ' (Copy)';
+                    $product->name = $product->name.' (Copy)';
                     $product->slug = Str::slug($product->name);
-                    $product->sku = $product->sku . '-COPY';
+                    $product->sku = $product->sku.'-COPY';
                     $product->is_visible = false;
                     $product->published_at = null;
                     $product->save();

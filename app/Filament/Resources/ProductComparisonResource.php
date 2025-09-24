@@ -1,20 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductComparisonResource\Pages;
-use App\Models\Product;
 use App\Models\ProductComparison;
-use App\Models\User;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
@@ -23,6 +20,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 /**
  * ProductComparisonResource
@@ -31,9 +29,12 @@ use Illuminate\Database\Eloquent\Builder;
  */
 final class ProductComparisonResource extends Resource
 {
-    protected static ?string $model = ProductComparison::class;
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'System';
+    }
 
-    // protected static $navigationGroup = NavigationGroup::System;
+    protected static ?string $model = ProductComparison::class;
 
     protected static ?int $navigationSort = 15;
 
@@ -41,7 +42,6 @@ final class ProductComparisonResource extends Resource
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
-     * @return string
      */
     public static function getNavigationLabel(): string
     {
@@ -50,7 +50,6 @@ final class ProductComparisonResource extends Resource
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -59,7 +58,6 @@ final class ProductComparisonResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -68,12 +66,10 @@ final class ProductComparisonResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             SchemaSection::make(__('product_comparisons.basic_information'))
                 ->components([
                     Grid::make(2)->components([
@@ -100,8 +96,6 @@ final class ProductComparisonResource extends Resource
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -156,11 +150,11 @@ final class ProductComparisonResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -178,7 +172,6 @@ final class ProductComparisonResource extends Resource
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -189,7 +182,6 @@ final class ProductComparisonResource extends Resource
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

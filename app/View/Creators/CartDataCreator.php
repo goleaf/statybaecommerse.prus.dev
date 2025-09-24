@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Session;
 
 /**
  * CartDataCreator
- * 
+ *
  * View Creator that provides cart data to views.
  * This includes cart items, totals, and cart-related information.
  */
@@ -21,7 +21,7 @@ final class CartDataCreator
     public function create(View $view): void
     {
         $cart = $this->getCartData();
-        
+
         $view->with([
             'cart' => $cart,
             'cartCount' => $cart['count'],
@@ -42,7 +42,7 @@ final class CartDataCreator
     private function getCartData(): array
     {
         $cart = Session::get('cart', []);
-        
+
         if (empty($cart)) {
             return [
                 'items' => [],
@@ -63,7 +63,7 @@ final class CartDataCreator
             $itemTotal = ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
             $subtotal += $itemTotal;
             $count += $item['quantity'] ?? 0;
-            
+
             $items[] = [
                 'id' => $item['id'] ?? null,
                 'product_id' => $item['product_id'] ?? null,
@@ -80,13 +80,13 @@ final class CartDataCreator
         // Calculate tax (simplified - in real app this would be more complex)
         $taxRate = config('shared.tax.default_rate', 0.21); // 21% VAT
         $tax = $subtotal * $taxRate;
-        
+
         // Calculate shipping (simplified)
         $shipping = $subtotal > 50 ? 0 : 5.99; // Free shipping over €50
-        
+
         // Get discount from session
         $discount = Session::get('cart_discount', 0);
-        
+
         $total = $subtotal + $tax + $shipping - $discount;
 
         return [

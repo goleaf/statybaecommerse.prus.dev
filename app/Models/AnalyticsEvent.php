@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * AnalyticsEvent
@@ -18,9 +20,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed $fillable
  * @property mixed $casts
  * @property mixed $dates
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|AnalyticsEvent newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AnalyticsEvent newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AnalyticsEvent query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([UserOwnedScope::class])]
@@ -34,7 +38,7 @@ final class AnalyticsEvent extends Model
         'trackable_type', 'trackable_id', 'value', 'currency', 'properties', 'user_agent',
         'is_important', 'is_conversion', 'conversion_value', 'conversion_currency', 'notes',
         'user_name', 'user_email', 'event_data', 'utm_source', 'utm_medium', 'utm_campaign',
-        'utm_term', 'utm_content', 'referrer_url', 'country', 'city', 'created_at', 'updated_at'
+        'utm_term', 'utm_content', 'referrer_url', 'country', 'city', 'created_at', 'updated_at',
     ];
 
     protected $casts = [
@@ -44,7 +48,7 @@ final class AnalyticsEvent extends Model
         'is_conversion' => 'boolean',
         'conversion_value' => 'decimal:2',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     protected $dates = ['created_at', 'updated_at'];
@@ -52,7 +56,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle user functionality with proper error handling.
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -61,7 +64,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle trackable functionality with proper error handling.
-     * @return MorphTo
      */
     public function trackable(): MorphTo
     {
@@ -72,9 +74,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeByEventType functionality with proper error handling.
-     * @param Builder $query
-     * @param string $eventType
-     * @return Builder
      */
     public function scopeByEventType(Builder $query, string $eventType): Builder
     {
@@ -83,9 +82,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeByUser functionality with proper error handling.
-     * @param Builder $query
-     * @param int $userId
-     * @return Builder
      */
     public function scopeByUser(Builder $query, int $userId): Builder
     {
@@ -94,9 +90,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeBySession functionality with proper error handling.
-     * @param Builder $query
-     * @param string $sessionId
-     * @return Builder
      */
     public function scopeBySession(Builder $query, string $sessionId): Builder
     {
@@ -105,8 +98,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeWithValue functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeWithValue(Builder $query): Builder
     {
@@ -115,8 +106,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeRegisteredUsers functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeRegisteredUsers(Builder $query): Builder
     {
@@ -125,8 +114,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeAnonymousUsers functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeAnonymousUsers(Builder $query): Builder
     {
@@ -135,9 +122,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeByDeviceType functionality with proper error handling.
-     * @param Builder $query
-     * @param string $deviceType
-     * @return Builder
      */
     public function scopeByDeviceType(Builder $query, string $deviceType): Builder
     {
@@ -146,9 +130,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeByBrowser functionality with proper error handling.
-     * @param Builder $query
-     * @param string $browser
-     * @return Builder
      */
     public function scopeByBrowser(Builder $query, string $browser): Builder
     {
@@ -157,10 +138,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeByDateRange functionality with proper error handling.
-     * @param Builder $query
-     * @param string $startDate
-     * @param string $endDate
-     * @return Builder
      */
     public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
@@ -169,8 +146,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeToday functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeToday(Builder $query): Builder
     {
@@ -179,8 +154,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeThisWeek functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeThisWeek(Builder $query): Builder
     {
@@ -189,8 +162,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeThisMonth functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeThisMonth(Builder $query): Builder
     {
@@ -199,9 +170,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeOfType functionality with proper error handling.
-     * @param Builder $query
-     * @param string $eventType
-     * @return Builder
      */
     public function scopeOfType(Builder $query, string $eventType): Builder
     {
@@ -210,9 +178,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeForSession functionality with proper error handling.
-     * @param Builder $query
-     * @param string $sessionId
-     * @return Builder
      */
     public function scopeForSession(Builder $query, string $sessionId): Builder
     {
@@ -221,9 +186,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeForUser functionality with proper error handling.
-     * @param Builder $query
-     * @param int $userId
-     * @return Builder
      */
     public function scopeForUser(Builder $query, int $userId): Builder
     {
@@ -232,10 +194,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle scopeInDateRange functionality with proper error handling.
-     * @param Builder $query
-     * @param string $startDate
-     * @param string $endDate
-     * @return Builder
      */
     public function scopeInDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
@@ -246,16 +204,14 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getEventTypeLabelAttribute functionality with proper error handling.
-     * @return string
      */
     public function getEventTypeLabelAttribute(): string
     {
-        return __('admin.analytics.event_types.' . $this->event_type, $this->event_type);
+        return __('admin.analytics.event_types.'.$this->event_type, $this->event_type);
     }
 
     /**
      * Handle getDeviceIconAttribute functionality with proper error handling.
-     * @return string
      */
     public function getDeviceIconAttribute(): string
     {
@@ -269,29 +225,27 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getFormattedValueAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getFormattedValueAttribute(): ?string
     {
-        if (!$this->value) {
+        if (! $this->value) {
             return null;
         }
         $currency = $this->currency ?? 'EUR';
-        return number_format($this->value, 2) . ' ' . $currency;
+
+        return number_format($this->value, 2).' '.$currency;
     }
 
     /**
      * Handle getIsRegisteredUserAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getIsRegisteredUserAttribute(): bool
     {
-        return !is_null($this->user_id);
+        return ! is_null($this->user_id);
     }
 
     /**
      * Handle getIsAnonymousUserAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getIsAnonymousUserAttribute(): bool
     {
@@ -302,7 +256,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getEventTypes functionality with proper error handling.
-     * @return array
      */
     public static function getEventTypes(): array
     {
@@ -311,7 +264,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getDeviceTypes functionality with proper error handling.
-     * @return array
      */
     public static function getDeviceTypes(): array
     {
@@ -320,7 +272,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getBrowsers functionality with proper error handling.
-     * @return array
      */
     public static function getBrowsers(): array
     {
@@ -329,7 +280,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getEventTypeStats functionality with proper error handling.
-     * @return array
      */
     public static function getEventTypeStats(): array
     {
@@ -338,7 +288,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getDeviceTypeStats functionality with proper error handling.
-     * @return array
      */
     public static function getDeviceTypeStats(): array
     {
@@ -347,7 +296,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getBrowserStats functionality with proper error handling.
-     * @return array
      */
     public static function getBrowserStats(): array
     {
@@ -356,7 +304,6 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle getRevenueStats functionality with proper error handling.
-     * @return array
      */
     public static function getRevenueStats(): array
     {
@@ -365,10 +312,8 @@ final class AnalyticsEvent extends Model
 
     /**
      * Handle track functionality with proper error handling.
-     * @param string $eventType
-     * @param array $data
-     * @param mixed $trackable
-     * @return self
+     *
+     * @param  mixed  $trackable
      */
     public static function track(string $eventType, array $data = [], $trackable = null): self
     {
@@ -390,7 +335,7 @@ final class AnalyticsEvent extends Model
             unset($data['properties']);
         } else {
             // Treat the data array as properties if it's not empty
-            if (!empty($data)) {
+            if (! empty($data)) {
                 $eventData['properties'] = $data;
                 $data = [];  // Clear data so it doesn't get merged again
             }

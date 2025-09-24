@@ -35,19 +35,21 @@ class TestRunner
         ],
     ];
 
-    public function runTests(string $category = null, string $subcategory = null, array $options = []): void
+    public function runTests(?string $category = null, ?string $subcategory = null, array $options = []): void
     {
         echo "🧪 Laravel E-commerce Test Runner\n";
         echo "================================\n\n";
 
         if ($category === null) {
             $this->showHelp();
+
             return;
         }
 
-        if (!isset($this->categories[$category])) {
+        if (! isset($this->categories[$category])) {
             echo "❌ Invalid category: $category\n";
             $this->showAvailableCategories();
+
             return;
         }
 
@@ -72,15 +74,17 @@ class TestRunner
 
     private function runSubcategoryTests(string $category, string $subcategory, array $options): void
     {
-        if (!isset($this->categories[$category][$subcategory])) {
+        if (! isset($this->categories[$category][$subcategory])) {
             echo "❌ Invalid subcategory: $subcategory for category: $category\n";
+
             return;
         }
 
         $path = $this->categories[$category][$subcategory];
 
-        if (!is_dir($path)) {
+        if (! is_dir($path)) {
             echo "❌ Directory does not exist: $path\n";
+
             return;
         }
 
@@ -90,14 +94,14 @@ class TestRunner
 
     private function executeTestCommand(string $path, array $options): void
     {
-        $command = 'php artisan test ' . $path;
+        $command = 'php artisan test '.$path;
 
         if (isset($options['stop-on-failure']) && $options['stop-on-failure']) {
             $command .= ' --stop-on-failure';
         }
 
         if (isset($options['filter']) && $options['filter']) {
-            $command .= ' --filter=' . $options['filter'];
+            $command .= ' --filter='.$options['filter'];
         }
 
         if (isset($options['coverage']) && $options['coverage']) {
@@ -113,10 +117,10 @@ class TestRunner
 
         $output = [];
         $returnCode = 0;
-        exec($command . ' 2>&1', $output, $returnCode);
+        exec($command.' 2>&1', $output, $returnCode);
 
         foreach ($output as $line) {
-            echo $line . "\n";
+            echo $line."\n";
         }
 
         echo "----------------------------------------\n";
@@ -170,7 +174,7 @@ class TestRunner
             echo "$category:\n";
             foreach ($subcategories as $subcategory => $path) {
                 if (is_dir($path)) {
-                    $files = glob($path . '*.php');
+                    $files = glob($path.'*.php');
                     $fileCount = count($files);
                     $totalFiles += $fileCount;
                     echo "  $subcategory: $fileCount files\n";
@@ -204,7 +208,7 @@ for ($i = 3; $i < count($argv); $i++) {
     }
 }
 
-$runner = new TestRunner();
+$runner = new TestRunner;
 
 // Handle special commands
 if ($category === 'stats') {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -34,7 +36,6 @@ enum NavigationIcon: string
     case Menu = 'heroicon-o-bars-3';
     case City = 'heroicon-o-building-office-2';
     case Country = 'heroicon-o-flag';
-    case Zone = 'heroicon-o-map';
     case Address = 'heroicon-o-home';
     case Customer = 'heroicon-o-user-group';
     case Cart = 'heroicon-o-shopping-cart';
@@ -83,7 +84,6 @@ enum NavigationIcon: string
             self::Menu => 'Menu',
             self::City => 'City',
             self::Country => 'Country',
-            self::Zone => 'Zone',
             self::Address => 'Address',
             self::Customer => 'Customer',
             self::Cart => 'Cart',

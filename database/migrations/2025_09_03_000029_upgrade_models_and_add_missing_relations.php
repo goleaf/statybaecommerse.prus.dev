@@ -206,7 +206,7 @@ return new class extends Migration
             });
         } elseif (Schema::hasTable('sh_product_variant_attributes') && Schema::hasTable('product_variants') && Schema::hasTable('sh_attribute_values')) {
             // Table exists, check if index exists and add if not
-            if (!Schema::hasIndex('sh_product_variant_attributes', 'variant_attribute_value_unique')) {
+            if (! Schema::hasIndex('sh_product_variant_attributes', 'variant_attribute_value_unique')) {
                 Schema::table('sh_product_variant_attributes', function (Blueprint $table) {
                     $table->unique(['variant_id', 'attribute_value_id'], 'variant_attribute_value_unique');
                 });

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Product;
 use App\Models\User;
@@ -20,7 +22,7 @@ it('can complete advanced checkout flow', function () {
             'price' => $product->price,
             'quantity' => 2,
             'sku' => $product->sku,
-        ]
+        ],
     ]);
 
     Livewire::test(\App\Livewire\Components\AdvancedCheckout::class)
@@ -62,11 +64,11 @@ it('can calculate totals correctly', function () {
             'name' => $product->name,
             'price' => 100.00,
             'quantity' => 2,
-        ]
+        ],
     ]);
 
     $component = Livewire::test(\App\Livewire\Components\AdvancedCheckout::class);
-    
+
     expect($component->get('subtotal'))->toBe(200.0);
     expect($component->get('taxAmount'))->toBe(42.0); // 21% VAT
     expect($component->get('total'))->toBeGreaterThan(200.0);
@@ -83,7 +85,7 @@ it('can handle shipping address toggle', function () {
 
 it('can show customer dashboard with stats', function () {
     $user = User::factory()->create();
-    
+
     // Create some test data
     $order = \App\Models\Order::factory()->create([
         'user_id' => $user->id,
@@ -100,7 +102,7 @@ it('can show customer dashboard with stats', function () {
 it('can manage customer wishlist from dashboard', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create();
-    
+
     $user->wishlist()->attach($product->id);
 
     Livewire::actingAs($user)
@@ -120,6 +122,3 @@ it('can add products to cart from dashboard', function () {
 
     expect(session('cart'))->toHaveCount(1);
 });
-
-
-

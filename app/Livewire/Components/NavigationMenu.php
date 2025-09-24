@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use App\Models\Brand;
@@ -11,11 +12,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Route;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+
 /**
  * NavigationMenu
- * 
+ *
  * Livewire component for NavigationMenu with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property bool $mobileMenuOpen
  * @property bool $searchOpen
  * @property string $searchQuery
@@ -23,30 +25,35 @@ use Livewire\Component;
 final class NavigationMenu extends Component
 {
     public bool $mobileMenuOpen = false;
+
     public bool $searchOpen = false;
+
     public string $searchQuery = '';
+
     /**
      * Handle headerMenu functionality with proper error handling.
      */
     #[Computed]
     public function headerMenu()
     {
-        return \Cache::remember('nav:header_menu:' . app()->getLocale(), now()->addMinutes(30), function () {
+        return \Cache::remember('nav:header_menu:'.app()->getLocale(), now()->addMinutes(30), function () {
             /** @var Menu|null $menu */
             $menu = Menu::query()->where('key', 'main_header')->where('is_active', true)->first();
-            if (!$menu) {
+            if (! $menu) {
                 return collect();
             }
+
             return $menu->items()->with('children')->where('is_visible', true)->get();
         });
     }
+
     /**
      * Handle mainCategories functionality with proper error handling.
      */
     #[Computed]
     public function mainCategories()
     {
-        return \Cache::remember('nav:main_categories:' . app()->getLocale(), now()->addHour(), function () {
+        return \Cache::remember('nav:main_categories:'.app()->getLocale(), now()->addHour(), function () {
             return Category::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }, 'children.translations' => function ($q) {
@@ -54,52 +61,54 @@ final class NavigationMenu extends Component
             }])->where('is_visible', true)->whereNull('parent_id')->orderBy('sort_order')->limit(8)->get();
         });
     }
+
     /**
      * Handle featuredBrands functionality with proper error handling.
      */
     #[Computed]
     public function featuredBrands()
     {
-        return \Cache::remember('nav:featured_brands:' . app()->getLocale(), now()->addHour(), function () {
+        return \Cache::remember('nav:featured_brands:'.app()->getLocale(), now()->addHour(), function () {
             return Brand::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_enabled', true)->where('is_featured', true)->orderBy('sort_order')->limit(6)->get();
         });
     }
+
     /**
      * Handle featuredCollections functionality with proper error handling.
      */
     #[Computed]
     public function featuredCollections()
     {
-        return \Cache::remember('nav:featured_collections:' . app()->getLocale(), now()->addHour(), function () {
+        return \Cache::remember('nav:featured_collections:'.app()->getLocale(), now()->addHour(), function () {
             return Collection::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_enabled', true)->where('is_featured', true)->orderBy('sort_order')->limit(4)->get();
         });
     }
+
     /**
      * Handle toggleMobileMenu functionality with proper error handling.
-     * @return void
      */
     public function toggleMobileMenu(): void
     {
-        $this->mobileMenuOpen = !$this->mobileMenuOpen;
+        $this->mobileMenuOpen = ! $this->mobileMenuOpen;
     }
+
     /**
      * Handle toggleSearch functionality with proper error handling.
-     * @return void
      */
     public function toggleSearch(): void
     {
-        $this->searchOpen = !$this->searchOpen;
+        $this->searchOpen = ! $this->searchOpen;
         if ($this->searchOpen) {
             $this->dispatch('focus-search');
         }
     }
+
     /**
      * Handle search functionality with proper error handling.
-     * @return void
      */
     public function search(): void
     {
@@ -112,9 +121,9 @@ final class NavigationMenu extends Component
                 : route('search', ['q' => $this->searchQuery])
         );
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

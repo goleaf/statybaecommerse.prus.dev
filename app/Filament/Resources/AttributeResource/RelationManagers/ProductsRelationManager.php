@@ -1,18 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\RelationManagers;
 
-use App\Models\Product;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 final class ProductsRelationManager extends RelationManager
 {
@@ -23,7 +22,7 @@ final class ProductsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 Forms\Components\Select::make('product_id')
                     ->label(__('attributes.product'))
                     ->relationship('product', 'name')
@@ -84,7 +83,7 @@ final class ProductsRelationManager extends RelationManager
                     ->label(__('attributes.sort_order'))
                     ->sortable()
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state >= 100 => 'danger',
                         $state >= 50 => 'warning',
                         $state >= 20 => 'info',

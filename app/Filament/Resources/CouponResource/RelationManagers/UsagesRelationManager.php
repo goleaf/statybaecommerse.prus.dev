@@ -1,16 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CouponResource\RelationManagers;
 
-use App\Models\CouponUsage;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 final class UsagesRelationManager extends RelationManager
@@ -23,9 +24,9 @@ final class UsagesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Usages';
 
-    public function form(Form $schema): Form
+    public function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Forms\Components\Select::make('user_id')
                 ->label(__('admin.common.user'))
                 ->relationship('user', 'name')
@@ -62,7 +63,7 @@ final class UsagesRelationManager extends RelationManager
                     ->label(__('admin.orders.title'))
                     ->searchable()
                     ->sortable()
-                    ->url(fn($record) => $record->order ? route('filament.admin.resources.orders.view', $record->order) : null)
+                    ->url(fn ($record) => $record->order ? route('filament.admin.resources.orders.view', $record->order) : null)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('discount_amount')
                     ->label(__('admin.coupons.additional_fields.discount_amount'))
@@ -91,20 +92,20 @@ final class UsagesRelationManager extends RelationManager
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['used_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('used_at', '>=', $date),
+                                $data['used_from'] ?? null,
+                                fn (Builder $query, $date): Builder => $query->whereDate('used_at', '>=', $date),
                             )
                             ->when(
-                                $data['used_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('used_at', '<=', $date),
+                                $data['used_until'] ?? null,
+                                fn (Builder $query, $date): Builder => $query->whereDate('used_at', '<=', $date),
                             );
                     }),
                 Tables\Filters\Filter::make('has_user')
                     ->label(__('admin.coupons.additional_fields.has_user'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('user_id')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('user_id')),
                 Tables\Filters\Filter::make('has_order')
                     ->label(__('admin.coupons.additional_fields.has_order'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('order_id')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('order_id')),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),

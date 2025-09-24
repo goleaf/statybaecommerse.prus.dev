@@ -24,7 +24,7 @@ final class CreateSeoData extends CreateRecord
         $data['is_canonical'] = $data['is_canonical'] ?? false;
         $data['priority'] = $data['priority'] ?? 0.5;
         $data['change_frequency'] = $data['change_frequency'] ?? 'weekly';
-        
+
         return $data;
     }
 }

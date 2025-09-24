@@ -1,31 +1,29 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\LazyCollection;
+
 /**
  * SearchService
- * 
+ *
  * Service class containing SearchService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class SearchService
 {
     /**
      * Handle search functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     public function search(string $query, int $limit = 10): array
     {
-        $cacheKey = "search_results_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "search_results_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, 300, function () use ($query, $limit) {
             $results = [];
             // Search products
@@ -37,22 +35,22 @@ final class SearchService
             // Search brands
             $brands = $this->searchBrands($query, (int) ceil($limit * 0.2));
             $results = array_merge($results, $brands);
+
             // Sort by relevance and limit results
             return array_slice($results, 0, $limit);
         });
     }
+
     /**
      * Handle searchProducts functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     private function searchProducts(string $query, int $limit): array
     {
         $locale = app()->getLocale();
-        $searchTerm = '%' . str_replace(['%', '_'], ['\%', '\_'], $query) . '%';
+        $searchTerm = '%'.str_replace(['%', '_'], ['\%', '\_'], $query).'%';
         // Use LazyCollection with timeout to prevent long-running search operations
         $timeout = now()->addSeconds(10);
+
         // 10 second timeout for product search
         return Product::query()->with(['media', 'brand', 'categories'])->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())->where(function ($q) use ($searchTerm, $locale) {
             $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhere('sku', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
@@ -62,21 +60,20 @@ final class SearchService
             });
         })->orderByRaw("\n                CASE \n                    WHEN name LIKE ? THEN 1\n                    WHEN sku LIKE ? THEN 2\n                    WHEN description LIKE ? THEN 3\n                    ELSE 4\n                END\n            ", ["%{$query}%", "%{$query}%", "%{$query}%"])->cursor()->takeUntilTimeout($timeout)->skipWhile(function (Product $product) {
             // Skip products that are not properly configured for search results
-            return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug);
+            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
         })->take($limit)->map(function (Product $product) use ($query) {
-            return ['id' => $product->id, 'type' => 'product', 'title' => $product->name, 'subtitle' => $product->brand?->name, 'description' => $product->short_description ?: $product->description, 'price' => $product->price, 'formatted_price' => number_format((float) $product->price, 2) . ' €', 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => route('products.show', $product->slug), 'relevance_score' => $this->calculateProductRelevance($product, $query)];
+            return ['id' => $product->id, 'type' => 'product', 'title' => $product->name, 'subtitle' => $product->brand?->name, 'description' => $product->short_description ?: $product->description, 'price' => $product->price, 'formatted_price' => number_format((float) $product->price, 2).' €', 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => route('products.show', $product->slug), 'relevance_score' => $this->calculateProductRelevance($product, $query)];
         })->sortByDesc('relevance_score')->values()->toArray();
     }
+
     /**
      * Handle searchCategories functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     private function searchCategories(string $query, int $limit): array
     {
         $locale = app()->getLocale();
-        $searchTerm = '%' . str_replace(['%', '_'], ['\%', '\_'], $query) . '%';
+        $searchTerm = '%'.str_replace(['%', '_'], ['\%', '\_'], $query).'%';
+
         return Category::query()->with(['media'])->where('is_visible', true)->where(function ($q) use ($searchTerm, $locale) {
             $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
                 $sq->selectRaw('1')->from('category_translations as t')->whereColumn('t.category_id', 'categories.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
@@ -85,21 +82,20 @@ final class SearchService
             });
         })->withCount('products')->groupBy('categories.id')->having('products_count', '>', 0)->limit($limit)->get()->skipWhile(function (Category $category) {
             // Skip categories that are not properly configured for search results
-            return empty($category->name) || !$category->is_visible || empty($category->slug) || $category->products_count <= 0;
+            return empty($category->name) || ! $category->is_visible || empty($category->slug) || $category->products_count <= 0;
         })->map(function (Category $category) use ($query) {
             return ['id' => $category->id, 'type' => 'category', 'title' => $category->name, 'subtitle' => __('frontend.search.category_with_products', ['count' => $category->products_count]), 'description' => $category->description, 'image' => $category->getFirstMediaUrl('images', 'thumb'), 'url' => route('categories.show', $category->slug), 'relevance_score' => $this->calculateCategoryRelevance($category, $query)];
         })->sortByDesc('relevance_score')->values()->toArray();
     }
+
     /**
      * Handle searchBrands functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     private function searchBrands(string $query, int $limit): array
     {
         $locale = app()->getLocale();
-        $searchTerm = '%' . str_replace(['%', '_'], ['\%', '\_'], $query) . '%';
+        $searchTerm = '%'.str_replace(['%', '_'], ['\%', '\_'], $query).'%';
+
         return Brand::query()->with(['media'])->where('is_enabled', true)->where(function ($q) use ($searchTerm, $locale) {
             $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
                 $sq->selectRaw('1')->from('brand_translations as t')->whereColumn('t.brand_id', 'brands.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
@@ -108,16 +104,14 @@ final class SearchService
             });
         })->withCount('products')->groupBy('brands.id')->having('products_count', '>', 0)->limit($limit)->get()->skipWhile(function (Brand $brand) {
             // Skip brands that are not properly configured for search results
-            return empty($brand->name) || !$brand->is_enabled || empty($brand->slug) || $brand->products_count <= 0;
+            return empty($brand->name) || ! $brand->is_enabled || empty($brand->slug) || $brand->products_count <= 0;
         })->map(function (Brand $brand) use ($query) {
             return ['id' => $brand->id, 'type' => 'brand', 'title' => $brand->name, 'subtitle' => __('frontend.search.brand_with_products', ['count' => $brand->products_count]), 'description' => $brand->description, 'image' => $brand->getFirstMediaUrl('logo', 'thumb'), 'url' => route('brands.show', $brand->slug), 'relevance_score' => $this->calculateBrandRelevance($brand, $query)];
         })->sortByDesc('relevance_score')->values()->toArray();
     }
+
     /**
      * Handle calculateProductRelevance functionality with proper error handling.
-     * @param Product $product
-     * @param string $query
-     * @return int
      */
     private function calculateProductRelevance(Product $product, string $query): int
     {
@@ -145,13 +139,12 @@ final class SearchService
         if ($product->hasMedia('images')) {
             $score += 5;
         }
+
         return $score;
     }
+
     /**
      * Handle calculateCategoryRelevance functionality with proper error handling.
-     * @param Category $category
-     * @param string $query
-     * @return int
      */
     private function calculateCategoryRelevance(Category $category, string $query): int
     {
@@ -169,13 +162,12 @@ final class SearchService
         }
         // Categories with more products get bonus
         $score += min($category->products_count, 20);
+
         return $score;
     }
+
     /**
      * Handle calculateBrandRelevance functionality with proper error handling.
-     * @param Brand $brand
-     * @param string $query
-     * @return int
      */
     private function calculateBrandRelevance(Brand $brand, string $query): int
     {
@@ -193,25 +185,25 @@ final class SearchService
         }
         // Brands with more products get bonus
         $score += min($brand->products_count, 20);
+
         return $score;
     }
+
     /**
      * Handle clearCache functionality with proper error handling.
-     * @return void
      */
     public function clearCache(): void
     {
         Cache::flush();
     }
+
     /**
      * Handle clearSearchCache functionality with proper error handling.
-     * @param string $query
-     * @return void
      */
     public function clearSearchCache(string $query): void
     {
         $pattern = "search_results_{$query}_*";
         // Note: This is a simplified cache clearing. In production, you might want to use Redis with pattern matching
-        Cache::forget("search_results_{$query}_10_" . app()->getLocale());
+        Cache::forget("search_results_{$query}_10_".app()->getLocale());
     }
 }

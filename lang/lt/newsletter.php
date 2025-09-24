@@ -28,7 +28,7 @@ return [
     'resubscribed_successfully' => 'Sveiki sugrįžę! Jūs vėl prenumeruojate mūsų naujienlaiškį.',
     'already_subscribed' => 'Šis el. paštas jau prenumeruoja mūsų naujienlaiškį.',
     'subscription_error' => 'Įvyko klaida apdorojant jūsų prenumeratą. Bandykite dar kartą.',
-    
+
     // Additional newsletter translations from user content
     'newsletter_title' => 'Prenumeruokite naujienlaiškį',
     'newsletter_subtitle' => 'Gaukite pranešimus apie naujas prekes ir specialius pasiūlymus',

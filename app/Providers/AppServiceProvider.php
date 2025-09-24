@@ -88,7 +88,7 @@ class AppServiceProvider extends ServiceProvider
                 if ($disk->exists($dir)) {
                     $files = collect($disk->files($dir))
                         ->takeUntilTimeout($timeout);
-                    
+
                     foreach ($files as $path) {
                         $lastModified = $disk->lastModified($path);
                         if ($lastModified && $lastModified < now()->subDays(7)->getTimestamp()) {
@@ -135,19 +135,19 @@ class AppServiceProvider extends ServiceProvider
     {
         // Global data creator - applies to all views
         View::creator('*', GlobalDataCreator::class);
-        
+
         // Localization creator - applies to all views
         View::creator('*', LocalizationCreator::class);
-        
+
         // User data creator - applies to all views
         View::creator('*', UserDataCreator::class);
-        
+
         // Cart data creator - applies to all views
         View::creator('*', CartDataCreator::class);
-        
+
         // Navigation creator - applies to specific views only
         View::creator('*', NavigationCreator::class);
-        
+
         // SEO data creator - applies to all views
         View::creator('*', SeoDataCreator::class);
     }

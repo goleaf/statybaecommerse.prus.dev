@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\City;
 use App\Models\Country;
@@ -12,15 +13,10 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Hidden;
+use Filament\Forms;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
@@ -30,19 +26,21 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
+final class LocationResource extends Resource
+{
+    protected static ?string $model = Location::class;
+
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -51,7 +49,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -60,12 +57,10 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make(__('locations.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -212,13 +207,13 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->live(),
                             TimePicker::make('open_time')
                                 ->label(__('locations.open_time'))
-                                ->visible(fn($get) => !$get('is_closed')),
+                                ->visible(fn ($get) => ! $get('is_closed')),
                             TimePicker::make('close_time')
                                 ->label(__('locations.close_time'))
-                                ->visible(fn($get) => !$get('is_closed')),
+                                ->visible(fn ($get) => ! $get('is_closed')),
                         ])
                         ->collapsible()
-                        ->itemLabel(fn(array $state): ?string => $state['day'] ?? null),
+                        ->itemLabel(fn (array $state): ?string => $state['day'] ?? null),
                 ]),
             Section::make(__('locations.contact_info'))
                 ->components([
@@ -259,8 +254,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -284,8 +277,8 @@ use Illuminate\Database\Eloquent\Collection;
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('type')
                     ->label(__('locations.type'))
-                    ->formatStateUsing(fn(string $state): string => __("locations.types.{$state}"))
-                    ->color(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => __("locations.types.{$state}"))
+                    ->color(fn (string $state): string => match ($state) {
                         'warehouse' => 'blue',
                         'store' => 'green',
                         'office' => 'purple',
@@ -388,11 +381,11 @@ use Illuminate\Database\Eloquent\Collection;
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(Location $record): string => $record->is_active ? __('locations.deactivate') : __('locations.activate'))
-                    ->icon(fn(Location $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Location $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (Location $record): string => $record->is_active ? __('locations.deactivate') : __('locations.activate'))
+                    ->icon(fn (Location $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Location $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Location $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('locations.activated_successfully') : __('locations.deactivated_successfully'))
                             ->success()
@@ -403,7 +396,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('locations.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn(Location $record): bool => !$record->is_default)
+                    ->visible(fn (Location $record): bool => ! $record->is_default)
                     ->action(function (Location $record): void {
                         // Remove default from other locations
                         Location::where('is_default', true)->update(['is_default' => false]);
@@ -419,9 +412,9 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('locations.view_on_map'))
                     ->icon('heroicon-o-map')
                     ->color('info')
-                    ->url(fn(Location $record): string => $record->google_maps_url ?? '#')
+                    ->url(fn (Location $record): string => $record->google_maps_url ?? '#')
                     ->openUrlInNewTab()
-                    ->visible(fn(Location $record): bool => $record->hasCoordinates()),
+                    ->visible(fn (Location $record): bool => $record->hasCoordinates()),
                 Action::make('copy_coordinates')
                     ->label(__('locations.copy_coordinates'))
                     ->icon('heroicon-o-clipboard')
@@ -436,7 +429,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->send();
                         }
                     })
-                    ->visible(fn(Location $record): bool => $record->hasCoordinates()),
+                    ->visible(fn (Location $record): bool => $record->hasCoordinates()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -486,8 +479,8 @@ use Illuminate\Database\Eloquent\Collection;
                         ->color('info')
                         ->action(function (Collection $records): void {
                             $coordinates = $records
-                                ->filter(fn($record) => $record->hasCoordinates())
-                                ->map(fn($record) => [
+                                ->filter(fn ($record) => $record->hasCoordinates())
+                                ->map(fn ($record) => [
                                     'name' => $record->name,
                                     'latitude' => $record->latitude,
                                     'longitude' => $record->longitude,
@@ -501,14 +494,13 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->success()
                                 ->send();
                         }),
-                ])
+                ]),
             ])
             ->defaultSort('sort_order');
     }
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -519,7 +511,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

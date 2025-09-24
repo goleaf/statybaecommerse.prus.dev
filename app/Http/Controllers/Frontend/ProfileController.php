@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
@@ -25,4 +27,3 @@ final class ProfileController extends Controller
         return response()->json(['message' => 'Profile update not implemented yet']);
     }
 }
-

@@ -141,7 +141,7 @@ test('recent scope works', function () {
     $old = Subscriber::factory()->create(['subscribed_at' => now()->subDays(15)]);
 
     $recentSubscribers = Subscriber::recent(10)->get();
-    
+
     // Check that we have the right count and the recent subscriber is included
     expect($recentSubscribers->count())->toBe(1)
         ->and($recentSubscribers->first()->id)->toBe($recent->id);
@@ -185,7 +185,7 @@ test('newsletter subscription handles duplicate email', function () {
 
     // Check that no new subscriber was created
     $this->assertDatabaseCount('subscribers', 1);
-    
+
     // Check that the existing subscriber is still active
     $this->assertDatabaseHas('subscribers', [
         'email' => 'existing@example.com',
@@ -205,7 +205,7 @@ test('newsletter subscription resubscribes unsubscribed', function () {
 
     $subscriber->refresh();
     expect($subscriber->status)->toBe('active');
-    
+
     // Check that the subscriber was resubscribed in the database
     $this->assertDatabaseHas('subscribers', [
         'email' => 'unsubscribed@example.com',

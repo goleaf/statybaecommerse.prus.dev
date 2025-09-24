@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
@@ -44,7 +45,7 @@ describe('User Impersonation Basic Functionality', function () {
                 'original_user_id' => $admin->id,
                 'impersonated_user_id' => $targetUser->id,
                 'started_at' => now()->toISOString(),
-            ]
+            ],
         ]);
 
         auth()->login($targetUser);
@@ -66,14 +67,14 @@ describe('User Impersonation Basic Functionality', function () {
                 'original_user_id' => $admin->id,
                 'impersonated_user_id' => $targetUser->id,
                 'started_at' => now()->toISOString(),
-            ]
+            ],
         ]);
         auth()->login($targetUser);
 
         // Stop impersonation
         $originalUserId = session('impersonate.original_user_id');
         $originalUser = User::find($originalUserId);
-        
+
         if ($originalUser) {
             auth()->login($originalUser);
             session()->forget('impersonate');
@@ -92,9 +93,9 @@ describe('User Impersonation Basic Functionality', function () {
 
         // Admin users should not be impersonatable
         expect($adminUser->is_admin)->toBeTrue();
-        
+
         // The impersonation logic should check for is_admin
-        $canImpersonate = !$adminUser->is_admin;
+        $canImpersonate = ! $adminUser->is_admin;
         expect($canImpersonate)->toBeFalse();
     });
 
@@ -109,7 +110,7 @@ describe('User Impersonation Basic Functionality', function () {
                 'original_user_id' => $admin->id,
                 'impersonated_user_id' => $targetUser->id,
                 'started_at' => now()->toISOString(),
-            ]
+            ],
         ]);
 
         // Login as admin first

@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
-use App\Models\StockMovement;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -20,9 +21,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property mixed $fillable
  * @property mixed $casts
  * @property mixed $appends
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|VariantInventory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantInventory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantInventory query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -77,7 +80,6 @@ final class VariantInventory extends Model
 
     /**
      * Handle variant functionality with proper error handling.
-     * @return BelongsTo
      */
     public function variant(): BelongsTo
     {
@@ -85,8 +87,15 @@ final class VariantInventory extends Model
     }
 
     /**
+     * Handle location functionality with proper error handling.
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
+
+    /**
      * Handle stockMovements functionality with proper error handling.
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function stockMovements(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -95,7 +104,6 @@ final class VariantInventory extends Model
 
     /**
      * Handle isLowStock functionality with proper error handling.
-     * @return bool
      */
     public function getIsLowStockAttribute(): bool
     {
@@ -104,7 +112,6 @@ final class VariantInventory extends Model
 
     /**
      * Handle isOutOfStock functionality with proper error handling.
-     * @return bool
      */
     public function getIsOutOfStockAttribute(): bool
     {
@@ -113,7 +120,6 @@ final class VariantInventory extends Model
 
     /**
      * Handle needsReorder functionality with proper error handling.
-     * @return bool
      */
     public function getNeedsReorderAttribute(): bool
     {
@@ -122,7 +128,6 @@ final class VariantInventory extends Model
 
     /**
      * Handle getStockStatusAttribute functionality with proper error handling.
-     * @return string
      */
     public function getStockStatusAttribute(): string
     {
@@ -139,7 +144,6 @@ final class VariantInventory extends Model
 
     /**
      * Handle getUtilizationPercentageAttribute functionality with proper error handling.
-     * @return float
      */
     public function getUtilizationPercentageAttribute(): float
     {
@@ -152,7 +156,8 @@ final class VariantInventory extends Model
 
     /**
      * Handle scopeInStock functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeInStock($query)
     {
@@ -161,7 +166,8 @@ final class VariantInventory extends Model
 
     /**
      * Handle scopeLowStock functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeLowStock($query)
     {
@@ -170,7 +176,8 @@ final class VariantInventory extends Model
 
     /**
      * Handle scopeOutOfStock functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeOutOfStock($query)
     {
@@ -179,7 +186,8 @@ final class VariantInventory extends Model
 
     /**
      * Handle scopeNeedsReorder functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeNeedsReorder($query)
     {
@@ -188,8 +196,8 @@ final class VariantInventory extends Model
 
     /**
      * Handle scopeByWarehouse functionality with proper error handling.
-     * @param mixed $query
-     * @param string $warehouseCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByWarehouse($query, string $warehouseCode)
     {
@@ -198,8 +206,6 @@ final class VariantInventory extends Model
 
     /**
      * Reserve stock for an order.
-     * @param int $quantity
-     * @return bool
      */
     public function reserveStock(int $quantity): bool
     {
@@ -215,8 +221,6 @@ final class VariantInventory extends Model
 
     /**
      * Release reserved stock.
-     * @param int $quantity
-     * @return bool
      */
     public function releaseStock(int $quantity): bool
     {
@@ -232,8 +236,6 @@ final class VariantInventory extends Model
 
     /**
      * Add stock to inventory.
-     * @param int $quantity
-     * @return bool
      */
     public function addStock(int $quantity): bool
     {
@@ -246,8 +248,6 @@ final class VariantInventory extends Model
 
     /**
      * Remove stock from inventory.
-     * @param int $quantity
-     * @return bool
      */
     public function removeStock(int $quantity): bool
     {
@@ -263,17 +263,16 @@ final class VariantInventory extends Model
 
     /**
      * Update available stock calculation.
-     * @return bool
      */
     public function updateAvailableStock(): bool
     {
         $this->available = max(0, $this->stock - $this->reserved);
+
         return $this->save();
     }
 
     /**
      * Get stock status badge color.
-     * @return string
      */
     public function getStockStatusColor(): string
     {
@@ -287,7 +286,6 @@ final class VariantInventory extends Model
 
     /**
      * Get stock status label.
-     * @return string
      */
     public function getStockStatusLabel(): string
     {

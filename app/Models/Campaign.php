@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -7,15 +9,15 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -27,9 +29,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property mixed $table
  * @property mixed $fillable
  * @property string $translationModel
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Campaign newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Campaign newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Campaign query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, StatusScope::class, ActiveCampaignScope::class])]
@@ -39,11 +43,11 @@ final class Campaign extends Model
     use HasTranslations;
 
     protected $table = 'discount_campaigns';
+
     protected $fillable = ['name', 'slug', 'starts_at', 'ends_at', 'channel_id', 'status', 'is_active', 'metadata', 'is_featured', 'send_notifications', 'track_conversions', 'max_uses', 'budget_limit'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -54,7 +58,6 @@ final class Campaign extends Model
 
     /**
      * Handle getRouteKeyName functionality with proper error handling.
-     * @return string
      */
     public function getRouteKeyName(): string
     {
@@ -63,8 +66,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTranslatedName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string
      */
     public function getTranslatedName(?string $locale = null): string
     {
@@ -72,20 +73,20 @@ final class Campaign extends Model
             return $this->name;
         }
         // Load translations if not already loaded
-        if (!$this->relationLoaded('translations')) {
+        if (! $this->relationLoaded('translations')) {
             $this->load('translations');
         }
         $translation = $this->translations->firstWhere('locale', $locale);
-        if ($translation && !empty($translation->name)) {
+        if ($translation && ! empty($translation->name)) {
             return $translation->name;
         }
+
         // If no translation found for the specific locale, return the model's name
         return $this->name;
     }
 
     /**
      * Handle discounts functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function discounts(): BelongsToMany
     {
@@ -94,7 +95,6 @@ final class Campaign extends Model
 
     /**
      * Handle channel functionality with proper error handling.
-     * @return BelongsTo
      */
     public function channel(): BelongsTo
     {
@@ -103,7 +103,6 @@ final class Campaign extends Model
 
     /**
      * Handle views functionality with proper error handling.
-     * @return HasMany
      */
     public function views(): HasMany
     {
@@ -112,7 +111,6 @@ final class Campaign extends Model
 
     /**
      * Handle clicks functionality with proper error handling.
-     * @return HasMany
      */
     public function clicks(): HasMany
     {
@@ -121,7 +119,6 @@ final class Campaign extends Model
 
     /**
      * Handle conversions functionality with proper error handling.
-     * @return HasMany
      */
     public function conversions(): HasMany
     {
@@ -130,7 +127,6 @@ final class Campaign extends Model
 
     /**
      * Handle customerSegments functionality with proper error handling.
-     * @return HasMany
      */
     public function customerSegments(): HasMany
     {
@@ -139,7 +135,6 @@ final class Campaign extends Model
 
     /**
      * Handle productTargets functionality with proper error handling.
-     * @return HasMany
      */
     public function productTargets(): HasMany
     {
@@ -148,7 +143,6 @@ final class Campaign extends Model
 
     /**
      * Handle schedules functionality with proper error handling.
-     * @return HasMany
      */
     public function schedules(): HasMany
     {
@@ -157,7 +151,6 @@ final class Campaign extends Model
 
     /**
      * Handle latestView functionality with proper error handling.
-     * @return HasOne
      */
     public function latestView(): HasOne
     {
@@ -166,7 +159,6 @@ final class Campaign extends Model
 
     /**
      * Handle latestClick functionality with proper error handling.
-     * @return HasOne
      */
     public function latestClick(): HasOne
     {
@@ -175,7 +167,6 @@ final class Campaign extends Model
 
     /**
      * Handle latestConversion functionality with proper error handling.
-     * @return HasOne
      */
     public function latestConversion(): HasOne
     {
@@ -184,7 +175,6 @@ final class Campaign extends Model
 
     /**
      * Handle highestValueConversion functionality with proper error handling.
-     * @return HasOne
      */
     public function highestValueConversion(): HasOne
     {
@@ -193,7 +183,6 @@ final class Campaign extends Model
 
     /**
      * Handle lowestValueConversion functionality with proper error handling.
-     * @return HasOne
      */
     public function lowestValueConversion(): HasOne
     {
@@ -202,7 +191,6 @@ final class Campaign extends Model
 
     /**
      * Handle latestSchedule functionality with proper error handling.
-     * @return HasOne
      */
     public function latestSchedule(): HasOne
     {
@@ -211,7 +199,6 @@ final class Campaign extends Model
 
     /**
      * Handle orders functionality with proper error handling.
-     * @return HasManyThrough
      */
     public function orders(): HasManyThrough
     {
@@ -220,7 +207,6 @@ final class Campaign extends Model
 
     /**
      * Handle latestOrder functionality with proper error handling.
-     * @return HasOneThrough
      */
     public function latestOrder(): HasOneThrough
     {
@@ -229,7 +215,6 @@ final class Campaign extends Model
 
     /**
      * Handle targetCategories functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function targetCategories(): BelongsToMany
     {
@@ -238,7 +223,6 @@ final class Campaign extends Model
 
     /**
      * Handle targetProducts functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function targetProducts(): BelongsToMany
     {
@@ -247,7 +231,6 @@ final class Campaign extends Model
 
     /**
      * Handle targetCustomerGroups functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function targetCustomerGroups(): BelongsToMany
     {
@@ -256,8 +239,6 @@ final class Campaign extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -270,8 +251,6 @@ final class Campaign extends Model
 
     /**
      * Handle scopeScheduled functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeScheduled(Builder $query): Builder
     {
@@ -280,8 +259,6 @@ final class Campaign extends Model
 
     /**
      * Handle scopeExpired functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeExpired(Builder $query): Builder
     {
@@ -292,8 +269,6 @@ final class Campaign extends Model
 
     /**
      * Handle scopeFeatured functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeFeatured(Builder $query): Builder
     {
@@ -302,8 +277,6 @@ final class Campaign extends Model
 
     /**
      * Handle scopeByPriority functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeByPriority(Builder $query): Builder
     {
@@ -312,9 +285,6 @@ final class Campaign extends Model
 
     /**
      * Handle scopeForChannel functionality with proper error handling.
-     * @param Builder $query
-     * @param int $channelId
-     * @return Builder
      */
     public function scopeForChannel(Builder $query, int $channelId): Builder
     {
@@ -323,8 +293,6 @@ final class Campaign extends Model
 
     /**
      * Handle scopeWithAnalytics functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeWithAnalytics(Builder $query): Builder
     {
@@ -333,8 +301,6 @@ final class Campaign extends Model
 
     /**
      * Handle scopeSocialMediaReady functionality with proper error handling.
-     * @param Builder $query
-     * @return Builder
      */
     public function scopeSocialMediaReady(Builder $query): Builder
     {
@@ -343,7 +309,6 @@ final class Campaign extends Model
 
     /**
      * Handle isActive functionality with proper error handling.
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -357,12 +322,12 @@ final class Campaign extends Model
         if ($this->ends_at && $this->ends_at->lt($now)) {
             return false;
         }
+
         return true;
     }
 
     /**
      * Handle isExpired functionality with proper error handling.
-     * @return bool
      */
     public function isExpired(): bool
     {
@@ -371,7 +336,6 @@ final class Campaign extends Model
 
     /**
      * Handle isScheduled functionality with proper error handling.
-     * @return bool
      */
     public function isScheduled(): bool
     {
@@ -380,16 +344,14 @@ final class Campaign extends Model
 
     /**
      * Handle isInactive functionality with proper error handling.
-     * @return bool
      */
     public function isInactive(): bool
     {
-        return $this->status === 'inactive' || !$this->isActive();
+        return $this->status === 'inactive' || ! $this->isActive();
     }
 
     /**
      * Handle isUpcoming functionality with proper error handling.
-     * @return bool
      */
     public function isUpcoming(): bool
     {
@@ -398,60 +360,54 @@ final class Campaign extends Model
 
     /**
      * Handle isWithinBudget functionality with proper error handling.
-     * @return bool
      */
     public function isWithinBudget(): bool
     {
-        if (!$this->budget_limit) {
+        if (! $this->budget_limit) {
             return true;
         }
+
         return $this->total_revenue < $this->budget_limit;
     }
 
     /**
      * Handle getClickThroughRate functionality with proper error handling.
-     * @return float
      */
     public function getClickThroughRate(): float
     {
         if ($this->total_views === 0) {
             return 0;
         }
+
         return round($this->total_clicks / $this->total_views * 100, 2);
     }
 
     /**
      * Handle getConversionRate functionality with proper error handling.
-     * @return float
      */
     public function getConversionRate(): float
     {
         if ($this->total_clicks === 0) {
             return 0;
         }
+
         return round($this->total_conversions / $this->total_clicks * 100, 2);
     }
 
     /**
      * Handle getROI functionality with proper error handling.
-     * @return float
      */
     public function getROI(): float
     {
         if ($this->budget_limit === 0) {
             return 0;
         }
+
         return round(($this->total_revenue - $this->budget_limit) / $this->budget_limit * 100, 2);
     }
 
     /**
      * Handle recordView functionality with proper error handling.
-     * @param string|null $sessionId
-     * @param string|null $ipAddress
-     * @param string|null $userAgent
-     * @param string|null $referer
-     * @param int|null $customerId
-     * @return void
      */
     public function recordView(?string $sessionId = null, ?string $ipAddress = null, ?string $userAgent = null, ?string $referer = null, ?int $customerId = null): void
     {
@@ -463,13 +419,6 @@ final class Campaign extends Model
 
     /**
      * Handle recordClick functionality with proper error handling.
-     * @param string $clickType
-     * @param string|null $clickedUrl
-     * @param string|null $sessionId
-     * @param string|null $ipAddress
-     * @param string|null $userAgent
-     * @param int|null $customerId
-     * @return void
      */
     public function recordClick(string $clickType = 'cta', ?string $clickedUrl = null, ?string $sessionId = null, ?string $ipAddress = null, ?string $userAgent = null, ?int $customerId = null): void
     {
@@ -481,13 +430,6 @@ final class Campaign extends Model
 
     /**
      * Handle recordConversion functionality with proper error handling.
-     * @param string $conversionType
-     * @param float $conversionValue
-     * @param int|null $orderId
-     * @param int|null $customerId
-     * @param string|null $sessionId
-     * @param array $conversionData
-     * @return void
      */
     public function recordConversion(string $conversionType = 'purchase', float $conversionValue = 0, ?int $orderId = null, ?int $customerId = null, ?string $sessionId = null, array $conversionData = []): void
     {
@@ -501,19 +443,18 @@ final class Campaign extends Model
 
     /**
      * Handle getBannerUrl functionality with proper error handling.
-     * @return string|null
      */
     public function getBannerUrl(): ?string
     {
-        if (!$this->banner_image) {
+        if (! $this->banner_image) {
             return null;
         }
-        return asset('storage/campaigns/' . $this->banner_image);
+
+        return asset('storage/campaigns/'.$this->banner_image);
     }
 
     /**
      * Handle getStatusBadgeColor functionality with proper error handling.
-     * @return string
      */
     public function getStatusBadgeColor(): string
     {
@@ -529,7 +470,6 @@ final class Campaign extends Model
 
     /**
      * Handle getStatusLabel functionality with proper error handling.
-     * @return string
      */
     public function getStatusLabel(): string
     {
@@ -545,7 +485,6 @@ final class Campaign extends Model
 
     /**
      * Handle registerMediaCollections functionality with proper error handling.
-     * @return void
      */
     public function registerMediaCollections(): void
     {
@@ -556,8 +495,6 @@ final class Campaign extends Model
 
     /**
      * Handle registerMediaConversions functionality with proper error handling.
-     * @param Media|null $media
-     * @return void
      */
     public function registerMediaConversions(?Media $media = null): void
     {
@@ -568,12 +505,11 @@ final class Campaign extends Model
 
     /**
      * Handle getImageUrl functionality with proper error handling.
-     * @param string $conversion
-     * @return string|null
      */
     public function getImageUrl(string $conversion = ''): ?string
     {
         $media = $this->getFirstMedia('images');
+
         return $media ? $media->getUrl($conversion) : null;
     }
 
@@ -581,7 +517,6 @@ final class Campaign extends Model
 
     /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getDisplayNameAttribute(): string
     {
@@ -592,7 +527,6 @@ final class Campaign extends Model
 
     /**
      * Handle getDescriptionAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getDescriptionAttribute(): ?string
     {
@@ -601,7 +535,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTypeAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getTypeAttribute(): ?string
     {
@@ -610,7 +543,6 @@ final class Campaign extends Model
 
     /**
      * Handle getSubjectAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getSubjectAttribute(): ?string
     {
@@ -619,7 +551,6 @@ final class Campaign extends Model
 
     /**
      * Handle getContentAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getContentAttribute(): ?string
     {
@@ -628,6 +559,7 @@ final class Campaign extends Model
 
     /**
      * Handle getStartDateAttribute functionality with proper error handling.
+     *
      * @return Carbon\Carbon|null
      */
     public function getStartDateAttribute(): ?\Carbon\Carbon
@@ -637,6 +569,7 @@ final class Campaign extends Model
 
     /**
      * Handle getEndDateAttribute functionality with proper error handling.
+     *
      * @return Carbon\Carbon|null
      */
     public function getEndDateAttribute(): ?\Carbon\Carbon
@@ -646,7 +579,6 @@ final class Campaign extends Model
 
     /**
      * Handle getBudgetAttribute functionality with proper error handling.
-     * @return float|null
      */
     public function getBudgetAttribute(): ?float
     {
@@ -655,7 +587,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTotalViewsAttribute functionality with proper error handling.
-     * @return int
      */
     public function getTotalViewsAttribute(): int
     {
@@ -664,7 +595,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTotalClicksAttribute functionality with proper error handling.
-     * @return int
      */
     public function getTotalClicksAttribute(): int
     {
@@ -673,7 +603,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTotalConversionsAttribute functionality with proper error handling.
-     * @return int
      */
     public function getTotalConversionsAttribute(): int
     {
@@ -682,7 +611,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTotalRevenueAttribute functionality with proper error handling.
-     * @return float
      */
     public function getTotalRevenueAttribute(): float
     {
@@ -691,7 +619,6 @@ final class Campaign extends Model
 
     /**
      * Handle getConversionRateAttribute functionality with proper error handling.
-     * @return float
      */
     public function getConversionRateAttribute(): float
     {
@@ -700,7 +627,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTargetAudienceAttribute functionality with proper error handling.
-     * @return array|null
      */
     public function getTargetAudienceAttribute(): ?array
     {
@@ -709,7 +635,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTargetSegmentsAttribute functionality with proper error handling.
-     * @return array|null
      */
     public function getTargetSegmentsAttribute(): ?array
     {
@@ -718,7 +643,6 @@ final class Campaign extends Model
 
     /**
      * Handle getDisplayPriorityAttribute functionality with proper error handling.
-     * @return int
      */
     public function getDisplayPriorityAttribute(): int
     {
@@ -727,7 +651,6 @@ final class Campaign extends Model
 
     /**
      * Handle getBannerImageAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getBannerImageAttribute(): ?string
     {
@@ -736,7 +659,6 @@ final class Campaign extends Model
 
     /**
      * Handle getBannerAltTextAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getBannerAltTextAttribute(): ?string
     {
@@ -745,7 +667,6 @@ final class Campaign extends Model
 
     /**
      * Handle getCtaTextAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getCtaTextAttribute(): ?string
     {
@@ -754,7 +675,6 @@ final class Campaign extends Model
 
     /**
      * Handle getCtaUrlAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getCtaUrlAttribute(): ?string
     {
@@ -763,7 +683,6 @@ final class Campaign extends Model
 
     /**
      * Handle getAutoStartAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getAutoStartAttribute(): bool
     {
@@ -772,7 +691,6 @@ final class Campaign extends Model
 
     /**
      * Handle getAutoEndAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getAutoEndAttribute(): bool
     {
@@ -781,7 +699,6 @@ final class Campaign extends Model
 
     /**
      * Handle getAutoPauseOnBudgetAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getAutoPauseOnBudgetAttribute(): bool
     {
@@ -790,7 +707,6 @@ final class Campaign extends Model
 
     /**
      * Handle getMetaTitleAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getMetaTitleAttribute(): ?string
     {
@@ -799,7 +715,6 @@ final class Campaign extends Model
 
     /**
      * Handle getMetaDescriptionAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getMetaDescriptionAttribute(): ?string
     {
@@ -808,7 +723,6 @@ final class Campaign extends Model
 
     /**
      * Handle getSocialMediaReadyAttribute functionality with proper error handling.
-     * @return bool
      */
     public function getSocialMediaReadyAttribute(): bool
     {
@@ -817,7 +731,6 @@ final class Campaign extends Model
 
     /**
      * Handle getFormattedDescriptionAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedDescriptionAttribute(): string
     {
@@ -826,7 +739,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTypeIconAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTypeIconAttribute(): string
     {
@@ -843,7 +755,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTypeColorAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTypeColorAttribute(): string
     {
@@ -860,7 +771,6 @@ final class Campaign extends Model
 
     /**
      * Handle getTypeLabelAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTypeLabelAttribute(): string
     {
@@ -877,36 +787,35 @@ final class Campaign extends Model
 
     /**
      * Handle getDurationAttribute functionality with proper error handling.
-     * @return int|null
      */
     public function getDurationAttribute(): ?int
     {
-        if (!$this->start_date || !$this->end_date) {
+        if (! $this->start_date || ! $this->end_date) {
             return null;
         }
+
         return $this->start_date->diffInDays($this->end_date);
     }
 
     /**
      * Handle getDaysRemainingAttribute functionality with proper error handling.
-     * @return int|null
      */
     public function getDaysRemainingAttribute(): ?int
     {
-        if (!$this->end_date) {
+        if (! $this->end_date) {
             return null;
         }
         $remaining = now()->diffInDays($this->end_date, false);
+
         return $remaining > 0 ? $remaining : 0;
     }
 
     /**
      * Handle getProgressPercentageAttribute functionality with proper error handling.
-     * @return float
      */
     public function getProgressPercentageAttribute(): float
     {
-        if (!$this->start_date || !$this->end_date) {
+        if (! $this->start_date || ! $this->end_date) {
             return 0;
         }
         $total = $this->start_date->diffInDays($this->end_date);
@@ -914,24 +823,24 @@ final class Campaign extends Model
         if ($total <= 0) {
             return 100;
         }
+
         return min(100, max(0, $elapsed / $total * 100));
     }
 
     /**
      * Handle getBudgetUtilizationAttribute functionality with proper error handling.
-     * @return float
      */
     public function getBudgetUtilizationAttribute(): float
     {
-        if (!$this->budget_limit || $this->budget_limit <= 0) {
+        if (! $this->budget_limit || $this->budget_limit <= 0) {
             return 0;
         }
+
         return min(100, $this->total_revenue / $this->budget_limit * 100);
     }
 
     /**
      * Handle getPerformanceScoreAttribute functionality with proper error handling.
-     * @return int
      */
     public function getPerformanceScoreAttribute(): int
     {
@@ -948,16 +857,17 @@ final class Campaign extends Model
         // ROI contribution
         $roi = $this->getROI();
         $score += min(10, max(0, $roi * 0.1));
+
         return min(100, max(0, round($score)));
     }
 
     /**
      * Handle getPerformanceGradeAttribute functionality with proper error handling.
-     * @return string
      */
     public function getPerformanceGradeAttribute(): string
     {
         $score = $this->performance_score;
+
         return match (true) {
             $score >= 90 => 'A+',
             $score >= 80 => 'A',
@@ -972,11 +882,11 @@ final class Campaign extends Model
 
     /**
      * Handle getPerformanceColorAttribute functionality with proper error handling.
-     * @return string
      */
     public function getPerformanceColorAttribute(): string
     {
         $score = $this->performance_score;
+
         return match (true) {
             $score >= 80 => 'success',
             $score >= 60 => 'warning',
@@ -987,7 +897,6 @@ final class Campaign extends Model
 
     /**
      * Handle getStatistics functionality with proper error handling.
-     * @return array
      */
     public function getStatistics(): array
     {
@@ -996,79 +905,70 @@ final class Campaign extends Model
 
     /**
      * Handle getFormattedBudgetAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedBudgetAttribute(): string
     {
-        return '€' . number_format($this->budget, 2);
+        return '€'.number_format($this->budget, 2);
     }
 
     /**
      * Handle getFormattedBudgetLimitAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedBudgetLimitAttribute(): string
     {
-        return '€' . number_format($this->budget_limit, 2);
+        return '€'.number_format($this->budget_limit, 2);
     }
 
     /**
      * Handle getFormattedTotalRevenueAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedTotalRevenueAttribute(): string
     {
-        return '€' . number_format($this->total_revenue, 2);
+        return '€'.number_format($this->total_revenue, 2);
     }
 
     /**
      * Handle getFormattedROIAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedROIAttribute(): string
     {
-        return number_format($this->getROI(), 2) . '%';
+        return number_format($this->getROI(), 2).'%';
     }
 
     /**
      * Handle getFormattedConversionRateAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedConversionRateAttribute(): string
     {
-        return number_format($this->getConversionRate(), 2) . '%';
+        return number_format($this->getConversionRate(), 2).'%';
     }
 
     /**
      * Handle getFormattedClickThroughRateAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedClickThroughRateAttribute(): string
     {
-        return number_format($this->getClickThroughRate(), 2) . '%';
+        return number_format($this->getClickThroughRate(), 2).'%';
     }
 
     /**
      * Handle getFormattedBudgetUtilizationAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedBudgetUtilizationAttribute(): string
     {
-        return number_format($this->budget_utilization, 2) . '%';
+        return number_format($this->budget_utilization, 2).'%';
     }
 
     /**
      * Handle getFormattedProgressPercentageAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedProgressPercentageAttribute(): string
     {
-        return number_format($this->progress_percentage, 1) . '%';
+        return number_format($this->progress_percentage, 1).'%';
     }
 
     /**
      * Handle isHighPerforming functionality with proper error handling.
-     * @return bool
      */
     public function isHighPerforming(): bool
     {
@@ -1077,7 +977,6 @@ final class Campaign extends Model
 
     /**
      * Handle isUnderperforming functionality with proper error handling.
-     * @return bool
      */
     public function isUnderperforming(): bool
     {
@@ -1086,7 +985,6 @@ final class Campaign extends Model
 
     /**
      * Handle needsAttention functionality with proper error handling.
-     * @return bool
      */
     public function needsAttention(): bool
     {
@@ -1095,7 +993,6 @@ final class Campaign extends Model
 
     /**
      * Handle canBeActivated functionality with proper error handling.
-     * @return bool
      */
     public function canBeActivated(): bool
     {
@@ -1104,7 +1001,6 @@ final class Campaign extends Model
 
     /**
      * Handle canBePaused functionality with proper error handling.
-     * @return bool
      */
     public function canBePaused(): bool
     {
@@ -1113,7 +1009,6 @@ final class Campaign extends Model
 
     /**
      * Handle canBeResumed functionality with proper error handling.
-     * @return bool
      */
     public function canBeResumed(): bool
     {
@@ -1122,7 +1017,6 @@ final class Campaign extends Model
 
     /**
      * Handle canBeCompleted functionality with proper error handling.
-     * @return bool
      */
     public function canBeCompleted(): bool
     {
@@ -1131,7 +1025,6 @@ final class Campaign extends Model
 
     /**
      * Handle getRecommendedActions functionality with proper error handling.
-     * @return array
      */
     public function getRecommendedActions(): array
     {
@@ -1151,20 +1044,21 @@ final class Campaign extends Model
         if ($this->days_remaining && $this->days_remaining <= 7) {
             $actions[] = 'extend_campaign';
         }
+
         return $actions;
     }
 
     /**
      * Handle duplicateForNewPeriod functionality with proper error handling.
-     * @param Carbon\Carbon $newStartDate
-     * @param Carbon\Carbon $newEndDate
-     * @return self
+     *
+     * @param  Carbon\Carbon  $newStartDate
+     * @param  Carbon\Carbon  $newEndDate
      */
     public function duplicateForNewPeriod(\Carbon\Carbon $newStartDate, \Carbon\Carbon $newEndDate): self
     {
         $duplicate = $this->replicate();
-        $duplicate->name = $this->name . ' (Copy)';
-        $duplicate->slug = $this->slug . '-copy-' . time();
+        $duplicate->name = $this->name.' (Copy)';
+        $duplicate->slug = $this->slug.'-copy-'.time();
         $duplicate->start_date = $newStartDate;
         $duplicate->end_date = $newEndDate;
         $duplicate->status = 'draft';
@@ -1174,30 +1068,28 @@ final class Campaign extends Model
         $duplicate->total_revenue = 0;
         $duplicate->conversion_rate = 0;
         $duplicate->save();
+
         return $duplicate;
     }
 
     /**
      * Handle getTargetingSummary functionality with proper error handling.
-     * @return array
      */
     public function getTargetingSummary(): array
     {
-        return ['categories_count' => $this->targetCategories()->count(), 'products_count' => $this->targetProducts()->count(), 'customer_groups_count' => $this->targetCustomerGroups()->count(), 'has_audience_targeting' => !empty($this->target_audience), 'has_segment_targeting' => !empty($this->target_segments)];
+        return ['categories_count' => $this->targetCategories()->count(), 'products_count' => $this->targetProducts()->count(), 'customer_groups_count' => $this->targetCustomerGroups()->count(), 'has_audience_targeting' => ! empty($this->target_audience), 'has_segment_targeting' => ! empty($this->target_segments)];
     }
 
     /**
      * Handle getContentSummary functionality with proper error handling.
-     * @return array
      */
     public function getContentSummary(): array
     {
-        return ['has_subject' => !empty($this->subject), 'has_content' => !empty($this->content), 'has_cta' => !empty($this->cta_text) && !empty($this->cta_url), 'has_banner' => !empty($this->banner_image), 'content_length' => strlen(strip_tags($this->content ?? '')), 'subject_length' => strlen($this->subject ?? '')];
+        return ['has_subject' => ! empty($this->subject), 'has_content' => ! empty($this->content), 'has_cta' => ! empty($this->cta_text) && ! empty($this->cta_url), 'has_banner' => ! empty($this->banner_image), 'content_length' => strlen(strip_tags($this->content ?? '')), 'subject_length' => strlen($this->subject ?? '')];
     }
 
     /**
      * Handle getAutomationSummary functionality with proper error handling.
-     * @return array
      */
     public function getAutomationSummary(): array
     {

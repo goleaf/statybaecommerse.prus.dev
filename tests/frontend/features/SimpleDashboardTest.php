@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -55,7 +57,7 @@ it('denies access to users without view_dashboard permission', function () {
 it('dashboard class exists and has correct methods', function () {
     expect(class_exists('App\Filament\Pages\Dashboard'))->toBeTrue();
 
-    $dashboard = new \App\Filament\Pages\Dashboard();
+    $dashboard = new \App\Filament\Pages\Dashboard;
     expect(method_exists($dashboard, 'getTitle'))->toBeTrue();
     expect(method_exists($dashboard, 'getWidgets'))->toBeTrue();
     expect(method_exists($dashboard, 'getColumns'))->toBeTrue();
@@ -73,7 +75,7 @@ it('dashboard class can check access permissions', function () {
 });
 
 it('dashboard returns correct title', function () {
-    $dashboard = new \App\Filament\Pages\Dashboard();
+    $dashboard = new \App\Filament\Pages\Dashboard;
     expect($dashboard->getTitle())->toBe(__('admin.navigation.dashboard'));
 });
 
@@ -84,7 +86,7 @@ it('dashboard has navigation properties', function () {
 });
 
 it('dashboard has column configuration', function () {
-    $dashboard = new \App\Filament\Pages\Dashboard();
+    $dashboard = new \App\Filament\Pages\Dashboard;
     $columns = $dashboard->getColumns();
 
     expect($columns)->toBeArray();
@@ -95,7 +97,7 @@ it('dashboard has column configuration', function () {
 });
 
 it('dashboard widgets configuration is accessible', function () {
-    $dashboard = new \App\Filament\Pages\Dashboard();
+    $dashboard = new \App\Filament\Pages\Dashboard;
     $widgets = $dashboard->getWidgets();
 
     expect($widgets)->toBeArray();

@@ -1,8 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\NewsResource;
-use App\Models\Translations\NewsCategoryTranslation;
-use App\Models\Translations\NewsTranslation;
 use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\NewsComment;
@@ -21,7 +21,7 @@ beforeEach(function () {
         'create news',
         'update news',
         'delete news',
-        'browse_news'
+        'browse_news',
     ];
 
     foreach ($permissions as $permission) {

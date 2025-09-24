@@ -1,114 +1,112 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
-final class AddressesRelationManager extends RelationManager
+class AddressesRelationManager extends RelationManager
 {
     protected static string $relationship = 'addresses';
-    protected static ?string $title = 'admin.sections.addresses';
+
+    protected static ?string $title = 'Addresses';
+
+    protected static ?string $modelLabel = 'Address';
+
+    protected static ?string $pluralModelLabel = 'Addresses';
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\TextInput::make('first_name')
-                    ->required()\n                    ->maxLength(255),
-                Forms\Components\TextInput::make('last_name')
-                    ->required()\n                    ->maxLength(255),
-                Forms\Components\TextInput::make('company')
+                TextInput::make('first_name')
+                    ->label(__('addresses.fields.first_name'))
+                    ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('address_line_1')
-                    ->required()\n                    ->maxLength(255),
-                Forms\Components\TextInput::make('address_line_2')
+                TextInput::make('last_name')
+                    ->label(__('addresses.fields.last_name'))
+                    ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('city')
-                    ->required()\n                    ->maxLength(100),
-                Forms\Components\TextInput::make('state')
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('postal_code')
-                    ->required()\n                    ->maxLength(20),
-                Forms\Components\Select::make('country')
-                    ->options([
-                        'LT' => 'Lithuania',
-                        'LV' => 'Latvia',
-                        'EE' => 'Estonia',
-                        'PL' => 'Poland',
-                        'DE' => 'Germany',
-                        'FR' => 'France',
-                        'GB' => 'United Kingdom',
-                        'US' => 'United States',
-                    ])
-                    ->required(),
-                    ->searchable(),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'billing' => 'Billing',
-                        'shipping' => 'Shipping',
-                        'both' => 'Both',
-                    ])
-                    ->required(),
-                Forms\Components\Toggle::make('is_default')
-                    ->default(false),
+                TextInput::make('street_address')
+                    ->label(__('addresses.fields.street_address'))
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('street_address_plus')
+                    ->label(__('addresses.fields.street_address_plus'))
+                    ->maxLength(255),
+                TextInput::make('city')
+                    ->label(__('addresses.fields.city'))
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('postal_code')
+                    ->label(__('addresses.fields.postal_code'))
+                    ->required()
+                    ->maxLength(20),
+                TextInput::make('phone')
+                    ->label(__('addresses.fields.phone'))
+                    ->tel()
+                    ->maxLength(255),
+                Select::make('country_id')
+                    ->label(__('addresses.fields.country'))
+                    ->relationship('country', 'name')
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+                Toggle::make('is_default')
+                    ->label(__('addresses.fields.is_default')),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('full_address')
             ->columns([
-                Tables\Columns\TextColumn::make('full_address')
-                    ->label(__('admin.fields.full_address'))
-                    ->searchable()\n                    ->sortable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->label(__('admin.fields.type'))
-                    ->badge(),
-                    ->color(fn (string $state): string => match ($state) {
-                        'billing' => 'warning',
-                        'shipping' => 'info',
-                        'both' => 'success',
-                        default => 'gray',
-                    }),
-                Tables\Columns\IconColumn::make('is_default')
-                    ->label(__('admin.fields.is_default'))
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('admin.fields.created_at'))
-                    ->dateTime(),
+                TextColumn::make('first_name')
+                    ->label(__('addresses.fields.first_name'))
+                    ->searchable()
                     ->sortable(),
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('type')
-                    ->options([
-                        'billing' => 'Billing',
-                        'shipping' => 'Shipping',
-                        'both' => 'Both',
-                    ]),
+                TextColumn::make('last_name')
+                    ->label(__('addresses.fields.last_name'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('street_address')
+                    ->label(__('addresses.fields.street_address'))
+                    ->searchable()
+                    ->limit(50),
+                TextColumn::make('city')
+                    ->label(__('addresses.fields.city'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('postal_code')
+                    ->label(__('addresses.fields.postal_code'))
+                    ->searchable(),
+                TextColumn::make('country.name')
+                    ->label(__('addresses.fields.country'))
+                    ->sortable(),
+                IconColumn::make('is_default')
+                    ->label(__('addresses.fields.is_default'))
+                    ->boolean(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->defaultSort('created_at', 'desc');
     }
 }

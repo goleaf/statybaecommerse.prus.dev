@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\Pages;
 
+use App\Filament\Resources\DiscountResource;
 use App\Filament\Resources\DiscountResource\Widgets\DiscountChartWidget;
 use App\Filament\Resources\DiscountResource\Widgets\DiscountStatsWidget;
 use App\Filament\Resources\DiscountResource\Widgets\RecentRedemptionsWidget;
-use App\Filament\Resources\DiscountResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 
 final class ListDiscounts extends ListRecords
 {

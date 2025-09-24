@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -9,6 +11,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -28,10 +31,12 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+
+final class CustomerManagementResource extends Resource
+{
+    protected static ?string $model = User::class;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -187,10 +192,10 @@ use Illuminate\Database\Eloquent\Collection;
                     ->sortable(),
                 BadgeColumn::make('email_verified_at')
                     ->label(__('customers.email_status'))
-                    ->formatStateUsing(fn($state): string => $state ? __('customers.verified') : __('customers.unverified'))
+                    ->formatStateUsing(fn ($state): string => $state ? __('customers.verified') : __('customers.unverified'))
                     ->colors([
-                        'success' => fn($state): bool => (bool) $state,
-                        'warning' => fn($state): bool => !$state,
+                        'success' => fn ($state): bool => (bool) $state,
+                        'warning' => fn ($state): bool => ! $state,
                     ]),
                 IconColumn::make('is_active')
                     ->label(__('customers.is_active'))
@@ -237,11 +242,11 @@ use Illuminate\Database\Eloquent\Collection;
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -252,7 +257,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('customers.verify_email'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(User $record): bool => !$record->email_verified_at)
+                    ->visible(fn (User $record): bool => ! $record->email_verified_at)
                     ->action(function (User $record): void {
                         $record->update(['email_verified_at' => now()]);
                         Notification::make()
@@ -262,11 +267,11 @@ use Illuminate\Database\Eloquent\Collection;
                     })
                     ->requiresConfirmation(),
                 Action::make('toggle_active')
-                    ->label(fn(User $record): string => $record->is_active ? __('customers.deactivate') : __('customers.activate'))
-                    ->icon(fn(User $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(User $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (User $record): string => $record->is_active ? __('customers.deactivate') : __('customers.activate'))
+                    ->icon(fn (User $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (User $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (User $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('customers.activated_successfully') : __('customers.deactivated_successfully'))
                             ->success()
@@ -324,11 +329,11 @@ use Illuminate\Database\Eloquent\Collection;
     public static function getRelations(): array
     {
         return [
-            RelationManagers\OrdersRelationManager::class,
-            RelationManagers\AddressesRelationManager::class,
-            RelationManagers\ReviewsRelationManager::class,
-            RelationManagers\CartItemsRelationManager::class,
-            RelationManagers\DiscountRedemptionsRelationManager::class,
+            \App\Filament\Resources\CustomerManagementResource\RelationManagers\OrdersRelationManager::class,
+            \App\Filament\Resources\CustomerManagementResource\RelationManagers\AddressesRelationManager::class,
+            \App\Filament\Resources\CustomerManagementResource\RelationManagers\ReviewsRelationManager::class,
+            \App\Filament\Resources\CustomerManagementResource\RelationManagers\CartItemsRelationManager::class,
+            \App\Filament\Resources\CustomerManagementResource\RelationManagers\DiscountRedemptionsRelationManager::class,
         ];
     }
 

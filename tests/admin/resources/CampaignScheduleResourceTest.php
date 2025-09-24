@@ -1,5 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use App\Enums\ScheduleType;
 use App\Filament\Resources\CampaignScheduleResource;
 use App\Models\Campaign;
 use App\Models\CampaignSchedule;
@@ -36,8 +39,8 @@ beforeEach(function () {
 
     $this->testCampaignSchedule = CampaignSchedule::factory()->create([
         'campaign_id' => $this->testCampaign->id,
-        'schedule_type' => 'daily',
-        'schedule_config' => ['time' => '09:00', 'timezone' => 'UTC'],
+        'schedule_type' => ScheduleType::DAILY->value,
+        'schedule_config' => ['time' => '09:00', 'timezone' => 'Europe/Vilnius', 'frequency' => 'every_day'],
         'next_run_at' => now()->addDay(),
         'is_active' => true,
     ]);
@@ -57,8 +60,8 @@ it('can create a campaign schedule', function () {
         ->test(CampaignScheduleResource\Pages\CreateCampaignSchedule::class)
         ->fillForm([
             'campaign_id' => $campaign->id,
-            'schedule_type' => 'weekly',
-            'schedule_config' => ['day' => 'monday', 'time' => '10:00'],
+            'schedule_type' => ScheduleType::WEEKLY->value,
+            'schedule_config' => ['day' => 'monday', 'time' => '10:00', 'timezone' => 'Europe/Vilnius', 'frequency' => 'every_week'],
             'next_run_at' => now()->addWeek(),
             'is_active' => true,
         ])
@@ -67,7 +70,7 @@ it('can create a campaign schedule', function () {
 
     $this->assertDatabaseHas('campaign_schedules', [
         'campaign_id' => $campaign->id,
-        'schedule_type' => 'weekly',
+        'schedule_type' => ScheduleType::WEEKLY->value,
         'is_active' => true,
     ]);
 });
@@ -83,7 +86,7 @@ it('can edit a campaign schedule record', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CampaignScheduleResource\Pages\EditCampaignSchedule::class, ['record' => $this->testCampaignSchedule->id])
         ->fillForm([
-            'schedule_type' => 'monthly',
+            'schedule_type' => ScheduleType::MONTHLY->value,
             'is_active' => false,
         ])
         ->call('save')
@@ -91,7 +94,7 @@ it('can edit a campaign schedule record', function () {
 
     $this->assertDatabaseHas('campaign_schedules', [
         'id' => $this->testCampaignSchedule->id,
-        'schedule_type' => 'monthly',
+        'schedule_type' => ScheduleType::MONTHLY->value,
         'is_active' => false,
     ]);
 });
@@ -135,8 +138,8 @@ it('can filter campaign schedules by campaign', function () {
 });
 
 it('can filter campaign schedules by schedule type', function () {
-    CampaignSchedule::factory()->create(['schedule_type' => 'daily']);
-    CampaignSchedule::factory()->create(['schedule_type' => 'weekly']);
+    CampaignSchedule::factory()->create(['schedule_type' => ScheduleType::DAILY->value]);
+    CampaignSchedule::factory()->create(['schedule_type' => ScheduleType::WEEKLY->value]);
 
     $this
         ->actingAs($this->adminUser)
@@ -160,7 +163,7 @@ it('can search campaign schedules by campaign name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CampaignScheduleResource::getUrl('index') . '?search=Special')
+        ->get(CampaignScheduleResource::getUrl('index').'?search=Special')
         ->assertOk();
 });
 
@@ -170,7 +173,7 @@ it('can sort campaign schedules by next run date', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CampaignScheduleResource::getUrl('index') . '?sort=next_run_at&direction=asc')
+        ->get(CampaignScheduleResource::getUrl('index').'?sort=next_run_at&direction=asc')
         ->assertOk();
 });
 
@@ -283,8 +286,8 @@ it('shows schedule configuration in form tabs', function () {
 });
 
 it('shows correct schedule type badges', function () {
-    $dailySchedule = CampaignSchedule::factory()->create(['schedule_type' => 'daily']);
-    $weeklySchedule = CampaignSchedule::factory()->create(['schedule_type' => 'weekly']);
+    $dailySchedule = CampaignSchedule::factory()->create(['schedule_type' => ScheduleType::DAILY->value]);
+    $weeklySchedule = CampaignSchedule::factory()->create(['schedule_type' => ScheduleType::WEEKLY->value]);
 
     $this
         ->actingAs($this->adminUser)
@@ -335,7 +338,7 @@ it('validates schedule configuration format', function () {
         ->test(CampaignScheduleResource\Pages\CreateCampaignSchedule::class)
         ->fillForm([
             'campaign_id' => $this->testCampaign->id,
-            'schedule_type' => 'custom',
+            'schedule_type' => ScheduleType::CUSTOM->value,
             'schedule_config' => 'invalid_json',
             'next_run_at' => now()->addDay(),
         ])
@@ -355,7 +358,7 @@ it('handles campaign schedule with complex configuration', function () {
         ->test(CampaignScheduleResource\Pages\CreateCampaignSchedule::class)
         ->fillForm([
             'campaign_id' => $this->testCampaign->id,
-            'schedule_type' => 'custom',
+            'schedule_type' => ScheduleType::CUSTOM->value,
             'schedule_config' => $complexConfig,
             'next_run_at' => now()->addWeek(),
             'is_active' => true,
@@ -365,7 +368,7 @@ it('handles campaign schedule with complex configuration', function () {
 
     $this->assertDatabaseHas('campaign_schedules', [
         'campaign_id' => $this->testCampaign->id,
-        'schedule_type' => 'custom',
+        'schedule_type' => ScheduleType::CUSTOM->value,
         'is_active' => true,
     ]);
 });

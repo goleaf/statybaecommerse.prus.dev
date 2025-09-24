@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Data;
 
 use Spatie\LaravelData\Attributes\Validation\Email;
@@ -12,20 +13,16 @@ use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\ValidationContext;
+
 /**
  * NewsCommentData
- * 
+ *
  * Data transfer object for NewsCommentData structured data handling with validation and type safety.
- * 
  */
 final class NewsCommentData extends Data
 {
     /**
      * Initialize the class instance with required dependencies.
-     * @param int|null $parent_id
-     * @param string $author_name
-     * @param string $author_email
-     * @param string $content
      */
     public function __construct(
         #[Nullable, IntegerType, Exists('news_comments', 'id')]
@@ -36,13 +33,10 @@ final class NewsCommentData extends Data
         public string $author_email,
         #[Required, StringType, Max(2000)]
         public string $content
-    )
-    {
-    }
+    ) {}
+
     /**
      * Handle messages functionality with proper error handling.
-     * @param ValidationContext $context
-     * @return array
      */
     public static function messages(ValidationContext $context): array
     {

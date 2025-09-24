@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\File;
 class FixFilamentV4Command extends Command
 {
     protected $signature = 'filament:fix-v4 {--dry-run : Show what would be changed without making changes}';
+
     protected $description = 'Update all Filament resources to v4 syntax';
 
     private array $changes = [];
+
     private array $errors = [];
 
     public function handle(): int
@@ -31,12 +33,12 @@ class FixFilamentV4Command extends Command
     private function updateResources(): void
     {
         $this->info('📁 Updating Resources...');
-        
+
         $resourcePath = app_path('Filament/Resources');
         $files = File::allFiles($resourcePath);
-        
+
         foreach ($files as $file) {
-            if ($file->getExtension() === 'php' && !str_contains($file->getPathname(), '/Pages/')) {
+            if ($file->getExtension() === 'php' && ! str_contains($file->getPathname(), '/Pages/')) {
                 $this->updateFile($file->getPathname(), 'Resource');
             }
         }
@@ -45,10 +47,10 @@ class FixFilamentV4Command extends Command
     private function updatePages(): void
     {
         $this->info('📄 Updating Pages...');
-        
+
         $pagesPath = app_path('Filament');
         $files = File::allFiles($pagesPath);
-        
+
         foreach ($files as $file) {
             if ($file->getExtension() === 'php' && str_contains($file->getPathname(), '/Pages/')) {
                 $this->updateFile($file->getPathname(), 'Page');
@@ -59,11 +61,11 @@ class FixFilamentV4Command extends Command
     private function updateWidgets(): void
     {
         $this->info('🎛️ Updating Widgets...');
-        
+
         $widgetsPath = app_path('Filament/Widgets');
         if (File::exists($widgetsPath)) {
             $files = File::allFiles($widgetsPath);
-            
+
             foreach ($files as $file) {
                 if ($file->getExtension() === 'php') {
                     $this->updateFile($file->getPathname(), 'Widget');
@@ -76,7 +78,7 @@ class FixFilamentV4Command extends Command
     {
         $content = File::get($filePath);
         $originalContent = $content;
-        
+
         // Skip if already updated
         if (str_contains($content, 'use Filament\Schemas\Schema;')) {
             return;
@@ -84,21 +86,21 @@ class FixFilamentV4Command extends Command
 
         // Update imports
         $content = $this->updateImports($content);
-        
+
         // Update method signatures
         $content = $this->updateMethodSignatures($content);
-        
+
         // Update deprecated components
         $content = $this->updateDeprecatedComponents($content);
-        
+
         // Update navigation properties
         $content = $this->updateNavigationProperties($content);
 
         if ($content !== $originalContent) {
-            if (!$this->option('dry-run')) {
+            if (! $this->option('dry-run')) {
                 File::put($filePath, $content);
             }
-            $this->changes[] = "✅ Updated {$type}: " . basename($filePath);
+            $this->changes[] = "✅ Updated {$type}: ".basename($filePath);
         }
     }
 
@@ -170,7 +172,7 @@ class FixFilamentV4Command extends Command
     private function updateNavigationProperties(string $content): string
     {
         // Add UnitEnum import if needed
-        if (str_contains($content, 'NavigationGroup') && !str_contains($content, 'use UnitEnum;')) {
+        if (str_contains($content, 'NavigationGroup') && ! str_contains($content, 'use UnitEnum;')) {
             $lines = explode("\n", $content);
             $insertIndex = 0;
             foreach ($lines as $index => $line) {
@@ -185,7 +187,7 @@ class FixFilamentV4Command extends Command
         // Update navigation property type hints
         $content = str_replace(
             'protected static ?NavigationGroup $navigationGroup',
-            '/** @var UnitEnum|string|null */' . "\n    protected static \$navigationGroup",
+            '/** @var UnitEnum|string|null */'."\n    protected static \$navigationGroup",
             $content
         );
 
@@ -199,14 +201,14 @@ class FixFilamentV4Command extends Command
         $this->info('📊 MIGRATION RESULTS');
         $this->line(str_repeat('=', 50));
 
-        if (!empty($this->changes)) {
+        if (! empty($this->changes)) {
             $this->info('✅ SUCCESSFULLY UPDATED FILES:');
             foreach ($this->changes as $change) {
                 $this->line("   {$change}");
             }
         }
 
-        if (!empty($this->errors)) {
+        if (! empty($this->errors)) {
             $this->error('❌ ERRORS:');
             foreach ($this->errors as $error) {
                 $this->line("   {$error}");
@@ -215,8 +217,8 @@ class FixFilamentV4Command extends Command
 
         $this->line('');
         $this->info('🎉 Migration completed!');
-        $this->info('📝 Total files updated: ' . count($this->changes));
-        
+        $this->info('📝 Total files updated: '.count($this->changes));
+
         if (empty($this->changes)) {
             $this->info('ℹ️  No files needed updating - all resources are already v4 compatible!');
         }

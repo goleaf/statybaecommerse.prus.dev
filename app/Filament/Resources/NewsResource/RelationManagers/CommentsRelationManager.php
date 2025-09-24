@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
-use App\Models\Comment;
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 final class CommentsRelationManager extends RelationManager
 {
@@ -25,133 +23,107 @@ final class CommentsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('comment_id')
-                    ->label(__('news.comment'))
-                    ->relationship('comment', 'content')
+                Forms\Components\TextInput::make('author_name')
+                    ->label(__('news.fields.author_name'))
                     ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('author_email')
+                    ->label(__('news.fields.author_email'))
+                    ->email()
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('content')
+                    ->label(__('news.fields.content'))
+                    ->required()
+                    ->maxLength(1000)
+                    ->rows(4),
+                Forms\Components\Select::make('parent_id')
+                    ->label(__('news.fields.parent_comment'))
+                    ->relationship('parent', 'content')
                     ->searchable()
                     ->preload()
-                    ->createOptionForm([
-                        Forms\Components\Textarea::make('content')
-                            ->required()
-                            ->maxLength(1000),
-                        Forms\Components\Select::make('status')
-                            ->options([
-                                'pending' => __('comments.statuses.pending'),
-                                'approved' => __('comments.statuses.approved'),
-                                'rejected' => __('comments.statuses.rejected'),
-                                'spam' => __('comments.statuses.spam'),
-                            ])
-                            ->required(),
-                        Forms\Components\Toggle::make('is_approved')
-                            ->default(false),
-                    ]),
-
-                Forms\Components\TextInput::make('sort_order')
-                    ->label(__('news.sort_order'))
-                    ->numeric()
-                    ->default(0)
-                    ->minValue(0),
+                    ->nullable(),
+                Forms\Components\Toggle::make('is_approved')
+                    ->label(__('news.fields.is_approved'))
+                    ->default(false),
+                Forms\Components\Toggle::make('is_visible')
+                    ->label(__('news.fields.is_visible'))
+                    ->default(true),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('comment.content')
+            ->recordTitleAttribute('content')
             ->columns([
-                Tables\Columns\TextColumn::make('comment.content')
-                    ->label(__('news.comment_content'))
+                Tables\Columns\TextColumn::make('content')
+                    ->label(__('news.fields.content'))
                     ->searchable()
-                    ->limit(100),
-
-                Tables\Columns\TextColumn::make('comment.author_name')
-                    ->label(__('news.author'))
+                    ->limit(100)
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('author_name')
+                    ->label(__('news.fields.author_name'))
                     ->searchable()
                     ->sortable()
                     ->limit(30),
-
-                Tables\Columns\TextColumn::make('comment.author_email')
-                    ->label(__('news.author_email'))
+                Tables\Columns\TextColumn::make('author_email')
+                    ->label(__('news.fields.author_email'))
                     ->searchable()
                     ->copyable()
                     ->badge()
                     ->color('gray'),
-
-                Tables\Columns\TextColumn::make('comment.status')
-                    ->label(__('news.status'))
-                    ->formatStateUsing(fn (string $state): string => __("comments.statuses.{$state}"))
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'approved' => 'success',
-                        'rejected' => 'danger',
-                        'spam' => 'gray',
-                        default => 'gray',
-                    })
-                    ->sortable(),
-
-                Tables\Columns\IconColumn::make('comment.is_approved')
-                    ->label(__('news.is_approved'))
+                Tables\Columns\TextColumn::make('parent.content')
+                    ->label(__('news.fields.parent_comment'))
+                    ->limit(50)
+                    ->placeholder(__('news.fields.no_parent'))
+                    ->toggleable(),
+                Tables\Columns\IconColumn::make('is_approved')
+                    ->label(__('news.fields.is_approved'))
                     ->boolean()
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('sort_order')
-                    ->label(__('news.sort_order'))
-                    ->sortable()
-                    ->badge()
-                    ->color(fn (int $state): string => match (true) {
-                        $state >= 100 => 'danger',
-                        $state >= 50 => 'warning',
-                        $state >= 20 => 'info',
-                        $state >= 10 => 'success',
-                        default => 'gray',
-                    }),
-
-                Tables\Columns\TextColumn::make('comment.created_at')
-                    ->label(__('news.created_at'))
+                Tables\Columns\IconColumn::make('is_visible')
+                    ->label(__('news.fields.is_visible'))
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('news.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('comment')
-                    ->label(__('news.comment'))
-                    ->relationship('comment', 'content')
+                Tables\Filters\SelectFilter::make('parent_id')
+                    ->label(__('news.fields.parent_comment'))
+                    ->relationship('parent', 'content')
                     ->searchable()
-                    ->preload(),
-
-                Tables\Filters\SelectFilter::make('status')
-                    ->label(__('news.status'))
-                    ->options([
-                        'pending' => __('comments.statuses.pending'),
-                        'approved' => __('comments.statuses.approved'),
-                        'rejected' => __('comments.statuses.rejected'),
-                        'spam' => __('comments.statuses.spam'),
-                    ]),
-
+                    ->preload()
+                    ->nullable(),
                 Tables\Filters\TernaryFilter::make('is_approved')
-                    ->label(__('news.is_approved'))
+                    ->label(__('news.fields.is_approved'))
                     ->boolean()
                     ->trueLabel(__('news.approved_only'))
                     ->falseLabel(__('news.pending_only'))
                     ->native(false),
+                Tables\Filters\TernaryFilter::make('is_visible')
+                    ->label(__('news.fields.is_visible'))
+                    ->boolean()
+                    ->trueLabel(__('news.visible_only'))
+                    ->falseLabel(__('news.hidden_only'))
+                    ->native(false),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
-                Tables\Actions\AttachAction::make(),
             ])
             ->actions([
                 EditAction::make(),
-                Tables\Actions\DetachAction::make(),
                 DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('sort_order');
+            ->defaultSort('created_at', 'desc');
     }
 }

@@ -237,27 +237,27 @@ return [
     'guest' => 'Guest',
     'order_created_from' => 'Order Created From',
     'order_created_until' => 'Order Created Until',
-    
+
     // Related products and recommendations
     'related_products' => 'Related products',
     'related_products_description' => 'Products you might be interested in',
     'you_might_also_like' => 'You might also like',
     'similar_products' => 'Similar products',
-    
+
     // Product availability
     'in_stock' => 'In stock',
     'out_of_stock' => 'Out of stock',
     'low_stock' => 'Low stock',
     'pre_order' => 'Pre-order',
     'coming_soon' => 'Coming soon',
-    
+
     // Product status messages
     'item_added_to_cart' => 'Item added to cart',
     'item_removed_from_cart' => 'Item removed from cart',
     'cart_updated' => 'Cart updated',
     'quantity_updated' => 'Quantity updated',
     'stock_updated' => 'Stock updated',
-    
+
     // Product features
     'free_shipping' => 'Free shipping',
     'fast_delivery' => 'Fast delivery',
@@ -265,40 +265,40 @@ return [
     'money_back_guarantee' => 'Money back guarantee',
     'warranty' => 'Warranty',
     'support' => 'Support',
-    
+
     // Product actions
     'add_to_wishlist' => 'Add to wishlist',
     'remove_from_wishlist' => 'Remove from wishlist',
     'compare_products' => 'Compare products',
     'share_product' => 'Share product',
     'print_product' => 'Print product',
-    
+
     // Product information
     'product_information' => 'Product information',
     'technical_specifications' => 'Technical specifications',
     'shipping_information' => 'Shipping information',
     'return_policy' => 'Return policy',
     'warranty_information' => 'Warranty information',
-    
+
     // Product reviews and ratings
     'average_rating' => 'Average rating',
     'total_reviews' => 'Total reviews',
     'write_first_review' => 'Write first review',
     'helpful_review' => 'Helpful review',
     'verified_purchase' => 'Verified purchase',
-    
+
     // Product variants
     'select_variant' => 'Select variant',
     'variant_not_available' => 'Variant not available',
     'choose_options' => 'Choose options',
     'selected_options' => 'Selected options',
-    
+
     // Product bundles and packages
     'bundle_products' => 'Bundle products',
     'package_contents' => 'Package contents',
     'save_with_bundle' => 'Save with bundle',
     'bundle_discount' => 'Bundle discount',
-    
+
     // Product recommendations
     'frequently_bought_together' => 'Frequently bought together',
     'customers_who_bought' => 'Customers who bought',

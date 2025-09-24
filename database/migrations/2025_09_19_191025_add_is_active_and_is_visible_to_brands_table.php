@@ -4,17 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::table('brands', function (Blueprint $table) {
-            if (!Schema::hasColumn('brands', 'is_active')) {
+            if (! Schema::hasColumn('brands', 'is_active')) {
                 $table->boolean('is_active')->default(true)->after('is_enabled');
             }
-            if (!Schema::hasColumn('brands', 'is_visible')) {
+            if (! Schema::hasColumn('brands', 'is_visible')) {
                 $table->boolean('is_visible')->default(true)->after('is_active');
             }
         });

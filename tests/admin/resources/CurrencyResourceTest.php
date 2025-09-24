@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use App\Filament\Resources\CurrencyResource;
 use App\Models\Currency;
 use App\Models\User;
-use App\Filament\Resources\CurrencyResource;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     // Create administrator role and permissions
@@ -15,19 +17,19 @@ beforeEach(function () {
         'create currencies',
         'update currencies',
         'delete currencies',
-        'browse_currencies'
+        'browse_currencies',
     ];
-    
+
     foreach ($permissions as $permission) {
         Permission::create(['name' => $permission]);
     }
-    
+
     $role->givePermissionTo($permissions);
-    
+
     // Create admin user
     $this->adminUser = User::factory()->create();
     $this->adminUser->assignRole('administrator');
-    
+
     // Create test data
     $this->testCurrency = Currency::factory()->create([
         'name' => 'US Dollar',
@@ -60,7 +62,7 @@ it('can create a new currency', function () {
         ])
         ->call('create')
         ->assertHasNoFormErrors();
-    
+
     $this->assertDatabaseHas('currencies', [
         'name' => 'Euro',
         'code' => 'EUR',
@@ -89,7 +91,7 @@ it('can edit a currency', function () {
         ])
         ->call('save')
         ->assertHasNoFormErrors();
-    
+
     $this->assertDatabaseHas('currencies', [
         'id' => $this->testCurrency->id,
         'name' => 'Updated US Dollar',
@@ -101,13 +103,13 @@ it('can edit a currency', function () {
 
 it('can delete a currency', function () {
     $currency = Currency::factory()->create();
-    
+
     // Delete action is available on the list page, not edit page
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\ListCurrencies::class)
         ->callTableAction('delete', $currency)
         ->assertHasNoTableActionErrors();
-    
+
     // Currency model uses soft deletes, so check for deleted_at timestamp
     $this->assertSoftDeleted('currencies', [
         'id' => $currency->id,
@@ -128,7 +130,7 @@ it('validates required fields when creating currency', function () {
 
 it('validates unique currency code', function () {
     $existingCurrency = Currency::factory()->create(['code' => 'TEST']);
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\CreateCurrency::class)
         ->fillForm([
@@ -190,11 +192,11 @@ it('shows correct currency data in table', function () {
 
 it('handles currency activation and deactivation', function () {
     $currency = Currency::factory()->create(['is_enabled' => true]);
-    
+
     // Deactivate currency
     $currency->update(['is_enabled' => false]);
     expect($currency->is_enabled)->toBeFalse();
-    
+
     // Reactivate currency
     $currency->update(['is_enabled' => true]);
     expect($currency->is_enabled)->toBeTrue();
@@ -203,11 +205,11 @@ it('handles currency activation and deactivation', function () {
 it('handles default currency setting', function () {
     $currency1 = Currency::factory()->create(['is_default' => true]);
     $currency2 = Currency::factory()->create(['is_default' => false]);
-    
+
     // Set new default currency
     $currency2->update(['is_default' => true]);
     $currency1->update(['is_default' => false]);
-    
+
     expect($currency2->is_default)->toBeTrue();
     expect($currency1->is_default)->toBeFalse();
 });
@@ -215,17 +217,17 @@ it('handles default currency setting', function () {
 it('handles bulk actions on currencies', function () {
     $currency1 = Currency::factory()->create();
     $currency2 = Currency::factory()->create();
-    
+
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\ListCurrencies::class)
         ->callTableBulkAction('delete', [$currency1->id, $currency2->id])
         ->assertOk();
-    
+
     // Currency model uses soft deletes, so check for deleted_at timestamp
     $this->assertSoftDeleted('currencies', [
         'id' => $currency1->id,
     ]);
-    
+
     $this->assertSoftDeleted('currencies', [
         'id' => $currency2->id,
     ]);
@@ -233,10 +235,10 @@ it('handles bulk actions on currencies', function () {
 
 it('can manage exchange rates', function () {
     $currency = Currency::factory()->create(['exchange_rate' => 1.0]);
-    
+
     // Update exchange rate
     $currency->update(['exchange_rate' => 1.25]);
-    
+
     expect($currency->exchange_rate)->toBe(1.25);
 });
 

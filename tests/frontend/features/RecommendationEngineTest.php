@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Product;
-use App\Models\Category;
+declare(strict_types=1);
+
 use App\Models\Brand;
-use App\Models\User;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\User;
 use Livewire\Livewire;
 
 it('can generate related product recommendations', function () {
     $category = Category::factory()->create();
     $brand = Brand::factory()->create();
-    
+
     $mainProduct = Product::factory()->create([
         'name' => 'Main Product',
         'brand_id' => $brand->id,
         'is_visible' => true,
     ]);
     $mainProduct->categories()->attach($category->id);
-    
+
     $relatedProduct = Product::factory()->create([
         'name' => 'Related Product',
         'brand_id' => $brand->id,
@@ -37,14 +39,14 @@ it('can generate personalized recommendations based on purchase history', functi
     $user = User::factory()->create();
     $category1 = Category::factory()->create(['name' => 'Electronics']);
     $category2 = Category::factory()->create(['name' => 'Books']);
-    
+
     // Products in electronics category
     $purchasedProduct = Product::factory()->create(['name' => 'Smartphone']);
     $purchasedProduct->categories()->attach($category1->id);
-    
+
     $recommendedProduct = Product::factory()->create(['name' => 'Laptop']);
     $recommendedProduct->categories()->attach($category1->id);
-    
+
     // Product in different category
     $unrelatedProduct = Product::factory()->create(['name' => 'Book']);
     $unrelatedProduct->categories()->attach($category2->id);
@@ -54,7 +56,7 @@ it('can generate personalized recommendations based on purchase history', functi
         'user_id' => $user->id,
         'status' => 'completed',
     ]);
-    
+
     OrderItem::factory()->create([
         'order_id' => $order->id,
         'product_id' => $purchasedProduct->id,
@@ -94,12 +96,12 @@ it('can generate cross-sell recommendations', function () {
     // Create orders where both products were bought together
     for ($i = 0; $i < 3; $i++) {
         $order = Order::factory()->create(['status' => 'completed']);
-        
+
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $mainProduct->id,
         ]);
-        
+
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $crossSellProduct->id,
@@ -115,13 +117,13 @@ it('can generate cross-sell recommendations', function () {
 
 it('can generate up-sell recommendations', function () {
     $category = Category::factory()->create();
-    
+
     $baseProduct = Product::factory()->create([
         'name' => 'Base Product',
         'price' => 100.00,
     ]);
     $baseProduct->categories()->attach($category->id);
-    
+
     $upSellProduct = Product::factory()->create([
         'name' => 'Premium Product',
         'price' => 130.00, // 30% more expensive
@@ -145,13 +147,13 @@ it('can track recently viewed products', function () {
     ]);
 
     $component->call('trackView');
-    
+
     expect(session('recently_viewed'))->toContain($product1->id);
 
     // Track another product
     $component->set('productId', $product2->id)
-             ->call('trackView');
-    
+        ->call('trackView');
+
     expect(session('recently_viewed'))->toContain($product2->id);
     expect(session('recently_viewed')[0])->toBe($product2->id); // Most recent first
 });
@@ -163,12 +165,12 @@ it('can generate customers also bought recommendations', function () {
     // Create completed orders where both products were bought together
     for ($i = 0; $i < 3; $i++) {
         $order = Order::factory()->create(['status' => 'completed']);
-        
+
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $mainProduct->id,
         ]);
-        
+
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $alsoBoughtProduct->id,
@@ -192,7 +194,7 @@ it('can generate trending product recommendations', function () {
             'status' => 'completed',
             'created_at' => now()->subDays(rand(1, 30)),
         ]);
-        
+
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $trendingProduct->id,
@@ -205,7 +207,7 @@ it('can generate trending product recommendations', function () {
             'status' => 'completed',
             'created_at' => now()->subDays(rand(35, 60)),
         ]);
-        
+
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $oldProduct->id,
@@ -226,7 +228,7 @@ it('can handle recommendation fallbacks', function () {
         'userId' => $user->id,
         'type' => 'personalized',
     ]);
-    
+
     // Should fallback to popular products when no purchase history
     expect(true)->toBeTrue(); // Component should handle gracefully
 });
@@ -256,8 +258,8 @@ it('can calculate customer segments correctly', function () {
 
     // New customer has no orders
 
-    $segmentationPage = new \App\Filament\Pages\CustomerSegmentation();
-    
+    $segmentationPage = new \App\Filament\Pages\CustomerSegmentation;
+
     expect($segmentationPage->calculateCustomerSegment($vipCustomer))->toBe('vip');
     expect($segmentationPage->calculateCustomerSegment($regularCustomer))->toBe('regular');
     expect($segmentationPage->calculateCustomerSegment($newCustomer))->toBe('new');
@@ -280,8 +282,8 @@ it('can perform SEO score calculations', function () {
         'description' => 'Short desc',
     ]);
 
-    $seoPage = new \App\Filament\Pages\SEOAnalytics();
-    
+    $seoPage = new \App\Filament\Pages\SEOAnalytics;
+
     expect($seoPage->calculateSEOScore($goodSEOProduct))->toBeGreaterThan(80);
     expect($seoPage->calculateSEOScore($poorSEOProduct))->toBeLessThan(30);
 });
@@ -298,12 +300,9 @@ it('can track security activities and detect suspicious patterns', function () {
     activity('security')
         ->log('Multiple failed login attempts detected');
 
-    $securityPage = new \App\Filament\Pages\SecurityAudit();
+    $securityPage = new \App\Filament\Pages\SecurityAudit;
     $securityPage->loadSecurityStats();
 
     expect($securityPage->securityStats['total_activities'])->toBeGreaterThan(0);
     expect($securityPage->suspiciousActivities)->not()->toBeEmpty();
 });
-
-
-

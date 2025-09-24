@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -43,7 +44,7 @@ return new class extends Migration {
                 'conversion_value', 'conversion_currency', 'notes', 'user_name',
                 'user_email', 'event_data', 'utm_source', 'utm_medium',
                 'utm_campaign', 'utm_term', 'utm_content', 'referrer_url',
-                'country', 'city'
+                'country', 'city',
             ]);
         });
     }

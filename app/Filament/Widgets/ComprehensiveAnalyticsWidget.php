@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -13,17 +15,18 @@ use App\Models\RecommendationAnalytics;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\UserBehavior;
-use App\Models\VariantAnalytics;
 use App\Models\WishlistItem;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 class ComprehensiveAnalyticsWidget extends ChartWidget
 {
     protected ?string $heading = 'Comprehensive Analytics Dashboard';
+
     protected static ?int $sort = 1;
+
     protected int|string|array $columnSpan = 'full';
+
     protected ?string $maxHeight = '500px';
 
     public function getData(): array

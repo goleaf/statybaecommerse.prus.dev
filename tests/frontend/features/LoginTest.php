@@ -7,7 +7,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 
-use function Pest\Laravel\{assertAuthenticated, assertGuest, get};
+use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\assertGuest;
+use function Pest\Laravel\get;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantStockHistoryResource\Pages;
 
@@ -9,4 +11,3 @@ final class CreateVariantStockHistory extends CreateRecord
 {
     protected static string $resource = VariantStockHistoryResource::class;
 }
-

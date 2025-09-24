@@ -330,7 +330,7 @@ return [
     'key' => 'Key',
     'value' => 'Value',
     'days' => 'days',
-    
+
     // Additional missing translations from frontend
     'items_in_cart' => 'items in cart, view cart',
     'view_cart' => 'view cart',
@@ -375,7 +375,6 @@ return [
     'working_hours' => 'Working hours',
     'monday_friday' => 'Monday - Friday: 9:00 - 17:00',
     'shipping_to' => 'Shipping to',
-    'change_zone' => 'change zone',
     'copyright' => 'All rights reserved',
     'created_with' => 'Created with',
     'filament' => 'Filament',
@@ -399,7 +398,6 @@ return [
     'contact' => 'Contact',
     'country_flag' => 'country flag',
     'change' => 'change',
-    'zone' => 'zone',
     'ltd' => 'Ltd.',
     'inc' => 'Inc.',
     'all_rights_reserved' => 'All rights reserved',

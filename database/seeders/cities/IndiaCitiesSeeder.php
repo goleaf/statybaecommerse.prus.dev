@@ -14,8 +14,9 @@ final class IndiaCitiesSeeder extends Seeder
     public function run(): void
     {
         $country = Country::where('cca2', 'IN')->first();
-        if (!$country) {
+        if (! $country) {
             $this->command->warn('India country not found. Please run CountrySeeder first.');
+
             return;
         }
 

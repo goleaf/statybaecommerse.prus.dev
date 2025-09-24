@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
 use App\Models\Slider;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 
 final class SliderViewsTimeline extends ChartWidget
 {
@@ -29,10 +30,10 @@ final class SliderViewsTimeline extends ChartWidget
         $status = $this->pageFilters['status'] ?? 'all';
 
         $query = Slider::query()
-            ->when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate))
-            ->when($sliderId, fn(Builder $query) => $query->where('id', $sliderId))
-            ->when($status !== 'all', fn(Builder $query) => $query->where('is_active', $status === 'active'));
+            ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+            ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
+            ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
         // Generate timeline data for the last 30 days
         $days = [];

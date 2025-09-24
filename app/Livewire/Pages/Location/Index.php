@@ -1,15 +1,16 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Pages\Location;
 
 use App\Models\Location;
 use Livewire\Component;
+
 /**
  * Index
- * 
+ *
  * Livewire component for Index with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
  */
 final class Index extends Component
 {
@@ -20,6 +21,7 @@ final class Index extends Component
     {
         return Location::where('is_enabled', true)->with(['country'])->orderBy('name')->get();
     }
+
     /**
      * Render the Livewire component view with current state.
      */

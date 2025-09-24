@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -52,7 +54,7 @@ final class DiscountCodeFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
             'status' => 'active',
         ]);
@@ -63,7 +65,7 @@ final class DiscountCodeFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
             'status' => 'inactive',
         ]);
@@ -74,7 +76,7 @@ final class DiscountCodeFactory extends Factory
      */
     public function expired(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
             'status' => 'expired',
             'valid_until' => $this->faker->dateTimeBetween('-1 year', '-1 day'),
@@ -86,7 +88,7 @@ final class DiscountCodeFactory extends Factory
      */
     public function scheduled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
             'status' => 'scheduled',
             'valid_from' => $this->faker->dateTimeBetween('+1 day', '+1 month'),
@@ -98,7 +100,7 @@ final class DiscountCodeFactory extends Factory
      */
     public function usageLimitReached(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'usage_count' => $attributes['usage_limit'] ?? 100,
         ]);
     }
@@ -108,7 +110,7 @@ final class DiscountCodeFactory extends Factory
      */
     public function percentage(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'percentage',
             'value' => $this->faker->numberBetween(1, 50),
         ]);
@@ -119,7 +121,7 @@ final class DiscountCodeFactory extends Factory
      */
     public function fixed(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'fixed',
             'value' => $this->faker->randomFloat(2, 1, 100),
         ]);
@@ -130,7 +132,7 @@ final class DiscountCodeFactory extends Factory
      */
     public function freeShipping(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'free_shipping',
             'value' => 0,
         ]);

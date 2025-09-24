@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
-use App\Models\VariantAttributeValue;
-use App\Models\VariantPricingRule;
-use App\Models\VariantInventory;
-use App\Models\VariantImage;
-use App\Models\VariantPriceHistory;
-use App\Models\VariantStockHistory;
-use App\Models\VariantAnalytics;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\VariantAnalytics;
+use App\Models\VariantAttributeValue;
+use App\Models\VariantInventory;
+use App\Models\VariantPriceHistory;
+use App\Models\VariantPricingRule;
+use App\Models\VariantStockHistory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -384,22 +383,22 @@ final class EnhancedProductVariantSeeder extends Seeder
         foreach ($products as $productData) {
             // Get or create brand
             $brand = Brand::where('slug', Str::slug($productData['brand']))->first();
-            if (!$brand) {
+            if (! $brand) {
                 $brand = Brand::create([
                     'name' => $productData['brand'],
                     'slug' => Str::slug($productData['brand']),
-                    'description' => 'Brand for ' . $productData['name'],
+                    'description' => 'Brand for '.$productData['name'],
                     'is_active' => true,
                 ]);
             }
 
             // Get or create category
             $category = Category::where('slug', Str::slug($productData['category']))->first();
-            if (!$category) {
+            if (! $category) {
                 $category = Category::create([
                     'name' => $productData['category'],
                     'slug' => Str::slug($productData['category']),
-                    'description' => 'Category for ' . $productData['name'],
+                    'description' => 'Category for '.$productData['name'],
                     'is_active' => true,
                     'is_visible' => true,
                 ]);
@@ -410,7 +409,7 @@ final class EnhancedProductVariantSeeder extends Seeder
                 'slug' => Str::slug($productData['name']),
                 'description' => $productData['description'],
                 'short_description' => substr($productData['description'], 0, 100),
-                'sku' => 'PROD-' . strtoupper(Str::random(8)),
+                'sku' => 'PROD-'.strtoupper(Str::random(8)),
                 'price' => $productData['base_price'],
                 'compare_price' => $productData['base_price'] * 1.2,
                 'cost_price' => $productData['base_price'] * 0.6,
@@ -436,12 +435,12 @@ final class EnhancedProductVariantSeeder extends Seeder
 
                 $variant = ProductVariant::create([
                     'product_id' => $product->id,
-                    'name' => $productData['name'] . ' - ' . $variantData['size'] . ' ' . $variantData['color'],
-                    'variant_name_lt' => $productData['name_lt'] . ' - ' . $variantData['size'] . ' ' . $this->getLocalizedValue('color', $variantData['color']),
-                    'variant_name_en' => $productData['name'] . ' - ' . $variantData['size'] . ' ' . $variantData['color'],
-                    'description_lt' => $productData['description_lt'] . ' Dydis: ' . $variantData['size'] . ', Spalva: ' . $this->getLocalizedValue('color', $variantData['color']),
-                    'description_en' => $productData['description'] . ' Size: ' . $variantData['size'] . ', Color: ' . $variantData['color'],
-                    'sku' => $product->sku . '-' . $variantData['size'] . '-' . strtoupper(substr($variantData['color'], 0, 3)),
+                    'name' => $productData['name'].' - '.$variantData['size'].' '.$variantData['color'],
+                    'variant_name_lt' => $productData['name_lt'].' - '.$variantData['size'].' '.$this->getLocalizedValue('color', $variantData['color']),
+                    'variant_name_en' => $productData['name'].' - '.$variantData['size'].' '.$variantData['color'],
+                    'description_lt' => $productData['description_lt'].' Dydis: '.$variantData['size'].', Spalva: '.$this->getLocalizedValue('color', $variantData['color']),
+                    'description_en' => $productData['description'].' Size: '.$variantData['size'].', Color: '.$variantData['color'],
+                    'sku' => $product->sku.'-'.$variantData['size'].'-'.strtoupper(substr($variantData['color'], 0, 3)),
                     'price' => $productData['base_price'] + $variantData['price_modifier'],
                     'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
                     'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
@@ -462,17 +461,17 @@ final class EnhancedProductVariantSeeder extends Seeder
                     'is_featured' => $variantData['featured'],
                     'is_new' => $isNew,
                     'is_bestseller' => $isBestseller,
-                    'seo_title_lt' => $productData['name_lt'] . ' - ' . $variantData['size'] . ' ' . $this->getLocalizedValue('color', $variantData['color']),
-                    'seo_title_en' => $productData['name'] . ' - ' . $variantData['size'] . ' ' . $variantData['color'],
-                    'seo_description_lt' => $productData['description_lt'] . ' Kokybiškas produktas su geru prigludimu.',
-                    'seo_description_en' => $productData['description'] . ' High-quality product with excellent fit.',
+                    'seo_title_lt' => $productData['name_lt'].' - '.$variantData['size'].' '.$this->getLocalizedValue('color', $variantData['color']),
+                    'seo_title_en' => $productData['name'].' - '.$variantData['size'].' '.$variantData['color'],
+                    'seo_description_lt' => $productData['description_lt'].' Kokybiškas produktas su geru prigludimu.',
+                    'seo_description_en' => $productData['description'].' High-quality product with excellent fit.',
                     'views_count' => rand(10, 500),
                     'clicks_count' => rand(5, 100),
                     'conversion_rate' => rand(1, 15) / 100, // 0.01 to 0.15 (1% to 15%)
                     'attributes' => json_encode([
                         'size' => $variantData['size'],
                         'color' => $variantData['color'],
-                        'material' => $variantData['material']
+                        'material' => $variantData['material'],
                     ]),
                 ]);
 
@@ -500,19 +499,19 @@ final class EnhancedProductVariantSeeder extends Seeder
 
         foreach ($variants as $variant) {
             $variantAttributes = json_decode($variant->attributes, true);
-            
-            if (!$variantAttributes) {
+
+            if (! $variantAttributes) {
                 continue;
             }
 
             foreach ($variantAttributes as $attributeName => $attributeValue) {
                 $attribute = $attributes->where('slug', $attributeName)->first();
-                if (!$attribute) {
+                if (! $attribute) {
                     continue;
                 }
 
                 $attributeValueRecord = $attribute->values->where('value', $attributeValue)->first();
-                if (!$attributeValueRecord) {
+                if (! $attributeValueRecord) {
                     continue;
                 }
 
@@ -661,7 +660,7 @@ final class EnhancedProductVariantSeeder extends Seeder
             // Create some price history records
             $basePrice = $variant->cost_price;
             $currentPrice = $variant->price;
-            
+
             // Historical price changes
             $oldPrice = $basePrice * 1.5; // Original higher price
             VariantPriceHistory::create([
@@ -699,7 +698,7 @@ final class EnhancedProductVariantSeeder extends Seeder
             // Create stock history records
             $initialStock = $variant->stock_quantity + rand(20, 100);
             $currentStock = $variant->stock_quantity;
-            
+
             // Initial stock adjustment
             VariantStockHistory::create([
                 'variant_id' => $variant->id,
@@ -752,7 +751,7 @@ final class EnhancedProductVariantSeeder extends Seeder
             // Create analytics for the last 30 days
             for ($i = 0; $i < 30; $i++) {
                 $date = now()->subDays($i)->toDateString();
-                
+
                 $views = rand(0, 20);
                 $clicks = $views > 0 ? rand(0, $views) : 0;
                 $addToCart = $clicks > 0 ? rand(0, $clicks) : 0;

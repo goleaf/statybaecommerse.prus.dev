@@ -20,7 +20,7 @@ class CollectionProductSeeder extends Seeder
 
     public function __construct()
     {
-        $this->imageGenerator = new LocalImageGeneratorService();
+        $this->imageGenerator = new LocalImageGeneratorService;
     }
 
     public function run(): void
@@ -33,7 +33,8 @@ class CollectionProductSeeder extends Seeder
             $collection = Collection::where('slug', $slug)->first();
 
             if (! $collection) {
-                $this->command?->warn('CollectionProductSeeder: missing collection "' . $slug . '".');
+                $this->command?->warn('CollectionProductSeeder: missing collection "'.$slug.'".');
+
                 continue;
             }
 
@@ -47,7 +48,7 @@ class CollectionProductSeeder extends Seeder
             $targetCount = max(count($definition['products'] ?? []), 8);
             $this->topUpCollectionWithExistingProducts($collection, $targetCount);
 
-            $this->command?->info('CollectionProductSeeder: populated "' . $collection->name . '" with curated products.');
+            $this->command?->info('CollectionProductSeeder: populated "'.$collection->name.'" with curated products.');
         }
     }
 
@@ -80,7 +81,7 @@ class CollectionProductSeeder extends Seeder
                 'manage_stock' => true,
                 'status' => 'published',
                 'published_at' => $productDefinition['published_at'] ?? now()->subDays(random_int(5, 45)),
-                'seo_title' => $english['name'] . ' - ' . config('app.name'),
+                'seo_title' => $english['name'].' - '.config('app.name'),
                 'seo_description' => $english['short_description'],
             ],
         );
@@ -102,18 +103,18 @@ class CollectionProductSeeder extends Seeder
                     'product_id' => $product->id,
                     'locale' => $locale,
                 ],
-                    [
-                        'name' => $localeTranslation['name'],
-                        'slug' => Str::slug($localeTranslation['name'] . '-' . $locale),
-                        'summary' => $localeTranslation['short_description'],
-                        'short_description' => $localeTranslation['short_description'],
-                        'description' => $localeTranslation['description'],
-                        'seo_title' => $localeTranslation['name'] . ' - ' . config('app.name'),
-                        'seo_description' => $localeTranslation['short_description'],
-                        'meta_keywords' => [],
-                    ],
-                );
-            }
+                [
+                    'name' => $localeTranslation['name'],
+                    'slug' => Str::slug($localeTranslation['name'].'-'.$locale),
+                    'summary' => $localeTranslation['short_description'],
+                    'short_description' => $localeTranslation['short_description'],
+                    'description' => $localeTranslation['description'],
+                    'seo_title' => $localeTranslation['name'].' - '.config('app.name'),
+                    'seo_description' => $localeTranslation['short_description'],
+                    'meta_keywords' => [],
+                ],
+            );
+        }
 
         $collection->products()->syncWithoutDetaching([$product->id]);
 
@@ -165,14 +166,14 @@ class CollectionProductSeeder extends Seeder
             $product
                 ->addMedia($imagePath)
                 ->withCustomProperties(['source' => 'generated'])
-                ->usingName($label . ' Image')
+                ->usingName($label.' Image')
                 ->toMediaCollection('images');
 
             if (file_exists($imagePath)) {
                 unlink($imagePath);
             }
         } catch (\Throwable $exception) {
-            $this->command?->warn('CollectionProductSeeder: failed to generate product image for ' . $product->slug . ': ' . $exception->getMessage());
+            $this->command?->warn('CollectionProductSeeder: failed to generate product image for '.$product->slug.': '.$exception->getMessage());
         }
     }
 

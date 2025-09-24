@@ -4,11 +4,11 @@ return [
     'title' => 'Dokumentų šablonai',
     'plural' => 'Dokumentų šablonai',
     'single' => 'Dokumentų šablonas',
-    
+
     'basic_information' => 'Pagrindinė informacija',
     'content' => 'Turinys',
     'settings' => 'Nustatymai',
-    
+
     'name' => 'Pavadinimas',
     'slug' => 'URL adresas',
     'description' => 'Aprašymas',
@@ -18,7 +18,7 @@ return [
     'is_active' => 'Aktyvus',
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
-    
+
     'types' => [
         'invoice' => 'Sąskaita faktūra',
         'receipt' => 'Kvitas',
@@ -26,7 +26,7 @@ return [
         'contract' => 'Sutartis',
         'report' => 'Ataskaita',
     ],
-    
+
     'categories' => [
         'financial' => 'Finansinis',
         'legal' => 'Teisinis',
@@ -34,4 +34,3 @@ return [
         'operational' => 'Operacinis',
     ],
 ];
-

@@ -1,22 +1,35 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
+
 use App\Filament\Resources\ProductImageResource\Pages;
 use App\Models\ProductImage;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use BackedEnum;
-use App\Enums\NavigationGroup;
+use Filament\Forms;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use UnitEnum;
+
 final class ProductImageResource extends Resource
 {
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
+    }
+
+    public static function getNavigationIcon(): BackedEnum|string|null
+    {
+        return 'heroicon-o-photo';
+    }
+
     protected static ?string $model = ProductImage::class;
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-photo';
-    // protected static $navigationGroup = NavigationGroup::Products;
+
     protected static ?int $navigationSort = 14;
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -40,7 +53,9 @@ final class ProductImageResource extends Resource
                     ->default(0),
             ]);
     }
+
     public static function table(Table $table): Table
+    {
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('path')
@@ -50,29 +65,41 @@ final class ProductImageResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('alt_text')
                     ->limit(30),
-                Tables\Columns\TextColumn::make('sort_order')
+                Tables\Columns\TextColumn::make('sort_order'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('updated_at'),
             ])
             ->filters([
                 //
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
             ->defaultSort('sort_order');
+    }
+
     public static function getRelations(): array
+    {
         return [
             //
         ];
+    }
+
     public static function getPages(): array
+    {
+        return [
             'index' => Pages\ListProductImages::route('/'),
             'create' => Pages\CreateProductImage::route('/create'),
             'edit' => Pages\EditProductImage::route('/{record}/edit'),
+        ];
+    }
 }

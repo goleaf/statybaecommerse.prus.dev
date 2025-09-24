@@ -1,15 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
 use App\Models\DiscountCode;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class CodesRelationManager extends RelationManager
 {
@@ -21,7 +22,7 @@ final class CodesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Form $schema): Form
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -82,7 +83,7 @@ final class CodesRelationManager extends RelationManager
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active Only'),
                 Tables\Filters\Filter::make('expired')
-                    ->query(fn(Builder $query): Builder => $query->where('expires_at', '<', now()))
+                    ->query(fn (Builder $query): Builder => $query->where('expires_at', '<', now()))
                     ->label('Expired'),
             ])
             ->headerActions([
@@ -100,5 +101,3 @@ final class CodesRelationManager extends RelationManager
             ->defaultSort('created_at', 'desc');
     }
 }
-
-

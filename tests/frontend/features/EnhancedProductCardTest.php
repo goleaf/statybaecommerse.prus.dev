@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Livewire\Components\ProductCard;
 use App\Models\AnalyticsEvent;
@@ -229,7 +231,7 @@ it('shows stock status correctly', function () {
     ]);
 
     Livewire::test(ProductCard::class, ['product' => $lowStockProduct])
-        ->assertSet('stockStatus', '2 ' . __('translations.left'));
+        ->assertSet('stockStatus', '2 '.__('translations.left'));
 });
 
 it('refreshes status on events', function () {

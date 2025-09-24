@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Taxes;
 
@@ -11,8 +13,6 @@ final class TaxCalculator
 {
     /**
      * Handle compute functionality with proper error handling.
-     * @param float $amount
-     * @return float
      */
     public function compute(float $amount): float
     {
@@ -20,6 +20,7 @@ final class TaxCalculator
         if ($rate <= 0 || $amount <= 0) {
             return 0.0;
         }
+
         return round($amount * ($rate / 100), 2);
     }
 }

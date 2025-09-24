@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use App\Filament\Resources\DiscountRedemptionResource;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Support\Enums\FontWeight;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class DiscountRelationManager extends RelationManager
 {
@@ -20,7 +21,7 @@ class DiscountRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Discounts';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         return $form
             ->schema([
@@ -66,7 +67,7 @@ class DiscountRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'percentage' => 'info',
                         'fixed' => 'success',
                         'free_shipping' => 'warning',

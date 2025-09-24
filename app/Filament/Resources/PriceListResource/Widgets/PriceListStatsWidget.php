@@ -7,7 +7,6 @@ namespace App\Filament\Resources\PriceListResource\Widgets;
 use App\Models\PriceList;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class PriceListStatsWidget extends BaseWidget
 {

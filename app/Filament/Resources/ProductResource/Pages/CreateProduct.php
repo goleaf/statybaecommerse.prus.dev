@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Str;
 
 final class CreateProduct extends CreateRecord
@@ -34,7 +34,7 @@ final class CreateProduct extends CreateRecord
         }
 
         // Set published date if not provided and product is visible
-        if (!isset($data['published_at']) && ($data['is_visible'] ?? false)) {
+        if (! isset($data['published_at']) && ($data['is_visible'] ?? false)) {
             $data['published_at'] = now();
         }
 

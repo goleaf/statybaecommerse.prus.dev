@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -20,13 +22,13 @@ final class UsersRelationManager extends RelationManager
             ->components([
                 Forms\Components\TextInput::make('name')
                     ->label(__('Name'))
-                    ->required()\n                    ->maxLength(255),
-                
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->label(__('Email'))
                     ->email()
-                    ->required()\n                    ->maxLength(255),
-                
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\Select::make('type')
                     ->label(__('Type'))
                     ->options([
@@ -44,22 +46,21 @@ final class UsersRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Name'))
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable()
                     ->weight('bold'),
-                
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('Email'))
-                    ->searchable()\n                    ->sortable(),
-                
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('Type'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'customer' => 'success',
                         'admin' => 'primary',
                         default => 'gray',
                     }),
-                
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Created At'))
                     ->dateTime('d/m/Y H:i')
@@ -72,7 +73,6 @@ final class UsersRelationManager extends RelationManager
                         'customer' => __('Customer'),
                         'admin' => __('Admin'),
                     ]),
-                
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
@@ -90,8 +90,6 @@ final class UsersRelationManager extends RelationManager
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]))
-            ->defaultSort("created_at", "desc");
-    }
-}
+            ->defaultSort('created_at', 'desc');
     }
 }

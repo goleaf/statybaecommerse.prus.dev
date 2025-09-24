@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -65,7 +67,7 @@ final class NotificationSeeder extends Seeder
             $this->createSupportNotifications($user);
         }
 
-        $this->command->info('Created ' . Notification::count() . ' notifications for ' . $users->count() . ' users.');
+        $this->command->info('Created '.Notification::count().' notifications for '.$users->count().' users.');
     }
 
     private function createOrderNotifications(User $user): void

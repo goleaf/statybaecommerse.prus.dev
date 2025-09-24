@@ -1,37 +1,40 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
-use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Filament\Resources\CampaignResource\Pages;
+use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 final class CampaignResource extends Resource
 {
     protected static ?string $model = Campaign::class;
+
     protected static ?int $navigationSort = 7;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function getNavigationLabel(): string
@@ -41,7 +44,7 @@ final class CampaignResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return "Marketing"->value;
+        return 'Marketing';
     }
 
     public static function getPluralModelLabel(): string
@@ -56,17 +59,17 @@ final class CampaignResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Section::make(__('campaigns.sections.basic_information'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
+        return $schema->schema([
+            SchemaSection::make(__('campaigns.sections.basic_information'))
+                ->schema([
+                    SchemaGrid::make(2)
+                        ->schema([
                             TextInput::make('name')
                                 ->label(self::label('campaigns.fields.name', 'Name'))
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn(string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
+                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
                             TextInput::make('slug')
                                 ->label(self::label('campaigns.fields.slug', 'Slug'))
                                 ->unique(ignoreRecord: true),
@@ -76,7 +79,6 @@ final class CampaignResource extends Resource
                         ->relationship('channel', 'name')
                         ->searchable()
                         ->preload()
-                        ->nullable(),
                         ->nullable(),
                     Select::make('status')
                         ->label(self::label('campaigns.fields.status', 'Status'))
@@ -100,10 +102,10 @@ final class CampaignResource extends Resource
                         ->label(self::label('campaigns.fields.social_media_ready', 'Social media ready'))
                         ->default(false),
                 ]),
-            Section::make(__('campaigns.sections.campaign_settings'))
-                ->components([
-                    Grid::make(2)
-                        ->components([
+            SchemaSection::make(__('campaigns.sections.campaign_settings'))
+                ->schema([
+                    SchemaGrid::make(2)
+                        ->schema([
                             DateTimePicker::make('starts_at')
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
                                 ->seconds(false),
@@ -120,8 +122,8 @@ final class CampaignResource extends Resource
                                 ->step(0.01)
                                 ->prefix('€'),
                         ]),
-                    Grid::make(3)
-                        ->components([
+                    SchemaGrid::make(3)
+                        ->schema([
                             Toggle::make('send_notifications')
                                 ->label(self::label('campaigns.fields.send_notifications', 'Send notifications'))
                                 ->default(false),
@@ -133,8 +135,8 @@ final class CampaignResource extends Resource
                                 ->default(false),
                         ]),
                 ]),
-            Section::make(__('campaigns.sections.targeting'))
-                ->components([
+            SchemaSection::make(__('campaigns.sections.targeting'))
+                ->schema([
                     Select::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
@@ -164,14 +166,14 @@ final class CampaignResource extends Resource
                         ->preload()
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('campaigns.sections.content'))
-                ->components([
+            SchemaSection::make(__('campaigns.sections.content'))
+                ->schema([
                     Textarea::make('description')
                         ->label(self::label('campaigns.fields.description', 'Description'))
                         ->rows(4)
                         ->columnSpanFull(),
-                    Grid::make(2)
-                        ->components([
+                    SchemaGrid::make(2)
+                        ->schema([
                             TextInput::make('cta_text')
                                 ->label(self::label('campaigns.fields.cta_text', 'CTA text'))
                                 ->maxLength(120),
@@ -190,8 +192,8 @@ final class CampaignResource extends Resource
                                 ->numeric()
                                 ->default(0),
                         ]),
-                    Grid::make(2)
-                        ->components([
+                    SchemaGrid::make(2)
+                        ->schema([
                             Toggle::make('auto_start')
                                 ->label(self::label('campaigns.fields.auto_start', 'Auto start'))
                                 ->default(false),
@@ -200,8 +202,8 @@ final class CampaignResource extends Resource
                                 ->default(false),
                         ]),
                 ]),
-            Section::make(__('campaigns.sections.seo'))
-                ->components([
+            SchemaSection::make(__('campaigns.sections.seo'))
+                ->schema([
                     TextInput::make('meta_title')
                         ->label(self::label('campaigns.fields.meta_title', 'Meta title'))
                         ->maxLength(255),
@@ -224,13 +226,13 @@ final class CampaignResource extends Resource
                 TextColumn::make('status')
                     ->label(self::label('campaigns.fields.status', 'Status'))
                     ->badge()
-                    ->formatStateUsing(fn(string $state): string => self::label('campaigns.status.' . $state, Str::headline($state)))
+                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.'.$state, Str::headline($state)))
                     ->colors([
-                        'primary' => fn(string $state): bool => in_array($state, ['draft', 'scheduled']),
-                        'success' => fn(string $state): bool => $state === 'active',
-                        'warning' => fn(string $state): bool => $state === 'paused',
-                        'info' => fn(string $state): bool => $state === 'completed',
-                        'danger' => fn(string $state): bool => $state === 'cancelled',
+                        'primary' => fn (string $state): bool => in_array($state, ['draft', 'scheduled']),
+                        'success' => fn (string $state): bool => $state === 'active',
+                        'warning' => fn (string $state): bool => $state === 'paused',
+                        'info' => fn (string $state): bool => $state === 'completed',
+                        'danger' => fn (string $state): bool => $state === 'cancelled',
                     ]),
                 IconColumn::make('is_active')
                     ->label(self::label('campaigns.fields.is_active', 'Active'))
@@ -256,7 +258,7 @@ final class CampaignResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('conversion_rate')
                     ->label(self::label('campaigns.fields.conversion_rate', 'Conversion rate'))
-                    ->formatStateUsing(fn($state): string => number_format((float) $state, 2) . '%')
+                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2).'%')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('translations_count')
@@ -326,6 +328,7 @@ final class CampaignResource extends Resource
     private static function label(string $key, string $fallback): string
     {
         $translated = __($key);
+
         return $translated === $key ? $fallback : $translated;
     }
 }

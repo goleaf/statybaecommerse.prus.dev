@@ -128,6 +128,6 @@ final class CompanySeeder extends Seeder
             Company::create($companyData);
         }
 
-        $this->command->info('Created ' . count($companies) . ' construction companies');
+        $this->command->info('Created '.count($companies).' construction companies');
     }
 }

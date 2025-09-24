@@ -7,8 +7,8 @@ namespace Database\Seeders;
 use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Product;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 final class InventorySeeder extends Seeder
 {

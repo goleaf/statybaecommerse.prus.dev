@@ -1,51 +1,47 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
+use UnitEnum;
 
 final class ReferralResource extends Resource
 {
     protected static ?string $model = Referral::class;
-    protected static ?string $navigationIcon = 'heroicon-o-share';
-    protected static ?int $navigationSort = 17;
-    protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function getNavigationGroup(): string
-    {
-        return NavigationGroup::Referrals->getLabel();
-    }
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+
+    protected static ?int $navigationSort = 17;
+
+    protected static ?string $recordTitleAttribute = 'referral_code';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->columns(3)
-            ->schema([
+            ->components([
                 Section::make('Referral Details')
                     ->columns(2)
-                    ->schema([
+                    ->components([
                         Select::make('referrer_id')
                             ->relationship('referrer', 'name')
                             ->required(),
@@ -222,6 +218,6 @@ final class ReferralResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::$model::count();
+        return self::$model::count();
     }
 }

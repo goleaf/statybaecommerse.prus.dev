@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -16,7 +18,6 @@ use App\Models\Collection;
 use App\Models\Country;
 use App\Models\Coupon;
 use App\Models\Currency;
-use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\Inventory;
 use App\Models\Location;
@@ -36,15 +37,15 @@ use App\Models\User;
 use App\Models\UserBehavior;
 use App\Models\VariantAnalytics;
 use App\Models\WishlistItem;
-use App\Models\Zone;
 use Carbon\Carbon;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
 
 class UltimateStatsWidget extends BaseWidget
 {
     protected static ?int $sort = -1;
+
     protected int|string|array $columnSpan = 'full';
 
     public function getStats(): array
@@ -127,7 +128,6 @@ class UltimateStatsWidget extends BaseWidget
 
         // === GEOGRAPHIC & LOCATIONS ===
         $totalCountries = Country::count();
-        $totalZones = Zone::count();
         $totalLocations = Location::count();
         $totalAddresses = Address::count();
         $totalCities = \App\Models\City::count();
@@ -145,17 +145,17 @@ class UltimateStatsWidget extends BaseWidget
         return [
             // === PRIMARY BUSINESS METRICS ===
             Stat::make(__('translations.total_revenue'), \Illuminate\Support\Number::currency($totalRevenue, 'EUR'))
-                ->description(__('translations.from_last_month') . ': ' . \Illuminate\Support\Number::currency($lastMonthRevenue, 'EUR'))
+                ->description(__('translations.from_last_month').': '.\Illuminate\Support\Number::currency($lastMonthRevenue, 'EUR'))
                 ->descriptionIcon($revenueGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueGrowth >= 0 ? 'success' : 'danger')
                 ->chart($this->getRevenueChart()),
             Stat::make(__('translations.total_orders'), \Illuminate\Support\Number::format($totalOrders))
-                ->description(__('translations.from_last_month') . ': ' . \Illuminate\Support\Number::format($lastMonthOrders))
+                ->description(__('translations.from_last_month').': '.\Illuminate\Support\Number::format($lastMonthOrders))
                 ->descriptionIcon($orderGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($orderGrowth >= 0 ? 'success' : 'danger')
                 ->chart($this->getOrdersChart()),
             Stat::make(__('translations.total_customers'), \Illuminate\Support\Number::format($totalUsers))
-                ->description(__('translations.new_customers_this_month') . ': ' . \Illuminate\Support\Number::format($newUsersThisMonth))
+                ->description(__('translations.new_customers_this_month').': '.\Illuminate\Support\Number::format($newUsersThisMonth))
                 ->descriptionIcon($userGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($userGrowth >= 0 ? 'success' : 'danger'),
             Stat::make(__('translations.average_order_value'), \Illuminate\Support\Number::currency($avgOrderValue, 'EUR'))
@@ -164,7 +164,7 @@ class UltimateStatsWidget extends BaseWidget
                 ->color('info'),
             // === PRODUCT ECOSYSTEM ===
             Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts))
-                ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
+                ->description(__('translations.active_products').': '.\Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
             Stat::make(__('translations.product_variants'), \Illuminate\Support\Number::format($totalVariants))
@@ -181,11 +181,11 @@ class UltimateStatsWidget extends BaseWidget
                 ->color($outOfStockProducts > 0 ? 'danger' : 'success'),
             // === CATEGORIES & BRANDS ===
             Stat::make(__('translations.categories'), \Illuminate\Support\Number::format($totalCategories))
-                ->description(__('translations.active_categories') . ': ' . \Illuminate\Support\Number::format($activeCategories))
+                ->description(__('translations.active_categories').': '.\Illuminate\Support\Number::format($activeCategories))
                 ->descriptionIcon('heroicon-m-tag')
                 ->color('info'),
             Stat::make(__('translations.brands'), \Illuminate\Support\Number::format($totalBrands))
-                ->description(__('translations.active_brands') . ': ' . \Illuminate\Support\Number::format($activeBrands))
+                ->description(__('translations.active_brands').': '.\Illuminate\Support\Number::format($activeBrands))
                 ->descriptionIcon('heroicon-m-building-storefront')
                 ->color('primary'),
             Stat::make(__('translations.collections'), \Illuminate\Support\Number::format($totalCollections))
@@ -207,10 +207,10 @@ class UltimateStatsWidget extends BaseWidget
                 ->color('success'),
             // === REVIEWS & RATINGS ===
             Stat::make(__('translations.total_reviews'), \Illuminate\Support\Number::format($totalReviews))
-                ->description(__('translations.approved_reviews') . ': ' . \Illuminate\Support\Number::format($approvedReviews))
+                ->description(__('translations.approved_reviews').': '.\Illuminate\Support\Number::format($approvedReviews))
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
-            Stat::make(__('translations.average_rating'), number_format($avgRating, 1) . '/5')
+            Stat::make(__('translations.average_rating'), number_format($avgRating, 1).'/5')
                 ->description(__('translations.customer_satisfaction'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
@@ -220,7 +220,7 @@ class UltimateStatsWidget extends BaseWidget
                 ->color($pendingReviews > 0 ? 'warning' : 'success'),
             // === CAMPAIGNS & MARKETING ===
             Stat::make(__('translations.total_campaigns'), \Illuminate\Support\Number::format($totalCampaigns))
-                ->description(__('translations.active_campaigns') . ': ' . \Illuminate\Support\Number::format($activeCampaigns))
+                ->description(__('translations.active_campaigns').': '.\Illuminate\Support\Number::format($activeCampaigns))
                 ->descriptionIcon('heroicon-m-megaphone')
                 ->color('primary'),
             Stat::make(__('translations.campaign_views'), \Illuminate\Support\Number::format($totalCampaignViews))
@@ -237,7 +237,7 @@ class UltimateStatsWidget extends BaseWidget
                 ->color('success'),
             // === DISCOUNTS & COUPONS ===
             Stat::make(__('translations.coupons'), \Illuminate\Support\Number::format($totalCoupons))
-                ->description(__('translations.active_coupons') . ': ' . \Illuminate\Support\Number::format($activeCoupons))
+                ->description(__('translations.active_coupons').': '.\Illuminate\Support\Number::format($activeCoupons))
                 ->descriptionIcon('heroicon-m-ticket')
                 ->color('warning'),
             // Stat::make(__('translations.discount_codes'), \Illuminate\Support\Number::format($totalDiscountCodes))
@@ -338,6 +338,7 @@ class UltimateStatsWidget extends BaseWidget
                 ->sum('total');
             $data[] = $revenue;
         }
+
         return $data;
     }
 
@@ -349,6 +350,7 @@ class UltimateStatsWidget extends BaseWidget
             $orders = Order::whereDate('created_at', $date)->count();
             $data[] = $orders;
         }
+
         return $data;
     }
 }

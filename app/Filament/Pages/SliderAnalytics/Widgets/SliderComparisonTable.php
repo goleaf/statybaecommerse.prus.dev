@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
@@ -28,10 +30,10 @@ final class SliderComparisonTable extends BaseWidget
         $status = $this->pageFilters['status'] ?? 'all';
 
         $query = Slider::query()
-            ->when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate))
-            ->when($sliderId, fn(Builder $query) => $query->where('id', $sliderId))
-            ->when($status !== 'all', fn(Builder $query) => $query->where('is_active', $status === 'active'));
+            ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+            ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
+            ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
         return $table
             ->query($query)
@@ -40,6 +42,7 @@ final class SliderComparisonTable extends BaseWidget
                     ->label('Preview')
                     ->getStateUsing(function (Slider $record): ?string {
                         $media = $record->getFirstMedia('slider_images');
+
                         return $media ? $media->getUrl() : null;
                     })
                     ->defaultImageUrl('/images/placeholder-slider.png')
@@ -57,40 +60,48 @@ final class SliderComparisonTable extends BaseWidget
                         $score = 0;
 
                         // Base score for being active
-                        if ($record->is_active)
+                        if ($record->is_active) {
                             $score += 20;
+                        }
 
                         // Media score
-                        if ($record->hasMedia('slider_images'))
+                        if ($record->hasMedia('slider_images')) {
                             $score += 15;
-                        if ($record->hasMedia('slider_backgrounds'))
+                        }
+                        if ($record->hasMedia('slider_backgrounds')) {
                             $score += 10;
+                        }
 
                         // Content score
-                        if (!empty($record->description))
+                        if (! empty($record->description)) {
                             $score += 10;
-                        if (!empty($record->button_text) && !empty($record->button_url))
+                        }
+                        if (! empty($record->button_text) && ! empty($record->button_url)) {
                             $score += 15;
+                        }
 
                         // Design score
-                        if (!empty($record->background_color) || !empty($record->text_color))
+                        if (! empty($record->background_color) || ! empty($record->text_color)) {
                             $score += 10;
+                        }
 
                         // Recency score
                         $daysSinceCreated = $record->created_at->diffInDays(now());
-                        if ($daysSinceCreated <= 7)
+                        if ($daysSinceCreated <= 7) {
                             $score += 10;
-                        elseif ($daysSinceCreated <= 30)
+                        } elseif ($daysSinceCreated <= 30) {
                             $score += 5;
+                        }
 
                         // Settings score
-                        if (!empty($record->settings))
+                        if (! empty($record->settings)) {
                             $score += 5;
+                        }
 
                         return min(100, $score);
                     })
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state >= 80 => 'success',
                         $state >= 60 => 'warning',
                         default => 'danger',
@@ -106,18 +117,25 @@ final class SliderComparisonTable extends BaseWidget
                     ->label('Features')
                     ->getStateUsing(function (Slider $record): int {
                         $count = 0;
-                        if ($record->hasMedia('slider_images'))
+                        if ($record->hasMedia('slider_images')) {
                             $count++;
-                        if ($record->hasMedia('slider_backgrounds'))
+                        }
+                        if ($record->hasMedia('slider_backgrounds')) {
                             $count++;
-                        if (!empty($record->button_text) && !empty($record->button_url))
+                        }
+                        if (! empty($record->button_text) && ! empty($record->button_url)) {
                             $count++;
-                        if (!empty($record->background_color) || !empty($record->text_color))
+                        }
+                        if (! empty($record->background_color) || ! empty($record->text_color)) {
                             $count++;
-                        if (!empty($record->description))
+                        }
+                        if (! empty($record->description)) {
                             $count++;
-                        if (!empty($record->settings))
+                        }
+                        if (! empty($record->settings)) {
                             $count++;
+                        }
+
                         return $count;
                     })
                     ->badge()
@@ -129,18 +147,22 @@ final class SliderComparisonTable extends BaseWidget
                         $baseRate = $record->is_active ? 75 : 25;
                         $featureBonus = 0;
 
-                        if ($record->hasMedia('slider_images'))
+                        if ($record->hasMedia('slider_images')) {
                             $featureBonus += 10;
-                        if (!empty($record->button_text) && !empty($record->button_url))
+                        }
+                        if (! empty($record->button_text) && ! empty($record->button_url)) {
                             $featureBonus += 15;
-                        if (!empty($record->description))
+                        }
+                        if (! empty($record->description)) {
                             $featureBonus += 5;
+                        }
 
                         $rate = min(100, $baseRate + $featureBonus);
-                        return $rate . '%';
+
+                        return $rate.'%';
                     })
                     ->badge()
-                    ->color(fn(string $state): string => match (true) {
+                    ->color(fn (string $state): string => match (true) {
                         (int) str_replace('%', '', $state) >= 80 => 'success',
                         (int) str_replace('%', '', $state) >= 60 => 'warning',
                         default => 'danger',
@@ -161,13 +183,13 @@ final class SliderComparisonTable extends BaseWidget
                     ->label('View')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->url(fn(Slider $record): string => route('filament.admin.pages.slider-management'))
+                    ->url(fn (Slider $record): string => route('filament.admin.pages.slider-management'))
                     ->openUrlInNewTab(),
                 Action::make('edit')
                     ->label('Edit')
                     ->icon('heroicon-o-pencil')
                     ->color('warning')
-                    ->url(fn(Slider $record): string => route('filament.admin.resources.sliders.edit', $record))
+                    ->url(fn (Slider $record): string => route('filament.admin.resources.sliders.edit', $record))
                     ->openUrlInNewTab(),
             ])
             ->defaultSort('performance_score', 'desc')

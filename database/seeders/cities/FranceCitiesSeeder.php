@@ -18,7 +18,7 @@ final class FranceCitiesSeeder extends Seeder
         $euZone = Zone::where('code', 'EU')->first();
 
         // Regions are no longer used in the database schema
-        
+
         $cities = [
             // Île-de-France (Paris region)
             [
@@ -32,7 +32,7 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['75001', '75002', '75003'],
                 'translations' => [
                     'lt' => ['name' => 'Paryžius', 'description' => 'Prancūzijos sostinė'],
-                    'en' => ['name' => 'Paris', 'description' => 'Capital of France']
+                    'en' => ['name' => 'Paris', 'description' => 'Capital of France'],
                 ],
             ],
             [
@@ -44,8 +44,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['92100'],
                 'translations' => [
                     'lt' => ['name' => 'Boulogne-Billancourt', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Boulogne-Billancourt', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Boulogne-Billancourt', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Saint-Denis',
@@ -56,8 +56,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['93200'],
                 'translations' => [
                     'lt' => ['name' => 'Saint-Denis', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Saint-Denis', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Saint-Denis', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Argenteuil',
@@ -68,8 +68,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['95100'],
                 'translations' => [
                     'lt' => ['name' => 'Argenteuil', 'description' => 'Pajūrio miestas'],
-                    'en' => ['name' => 'Argenteuil', 'description' => 'Seaside city']
-            ],
+                    'en' => ['name' => 'Argenteuil', 'description' => 'Seaside city'],
+                ],
             ],
             [
                 'name' => 'Montreuil',
@@ -80,8 +80,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['93100'],
                 'translations' => [
                     'lt' => ['name' => 'Montreuil', 'description' => 'Pramonės centras'],
-                    'en' => ['name' => 'Montreuil', 'description' => 'Industrial center']
-            ],
+                    'en' => ['name' => 'Montreuil', 'description' => 'Industrial center'],
+                ],
             ],
             // Auvergne-Rhône-Alpes
             [
@@ -93,8 +93,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['69001', '69002', '69003'],
                 'translations' => [
                     'lt' => ['name' => 'Lionas', 'description' => 'Antrasis didžiausias Prancūzijos miestas'],
-                    'en' => ['name' => 'Lyon', 'description' => 'Second largest city in France']
-            ],
+                    'en' => ['name' => 'Lyon', 'description' => 'Second largest city in France'],
+                ],
             ],
             [
                 'name' => 'Saint-Étienne',
@@ -105,8 +105,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['42000'],
                 'translations' => [
                     'lt' => ['name' => 'Saint-Étienne', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Saint-Étienne', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Saint-Étienne', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Grenoble',
@@ -117,8 +117,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['38000'],
                 'translations' => [
                     'lt' => ['name' => 'Grenoble', 'description' => 'Mokslo miestas'],
-                    'en' => ['name' => 'Grenoble', 'description' => 'Science city']
-            ],
+                    'en' => ['name' => 'Grenoble', 'description' => 'Science city'],
+                ],
             ],
             [
                 'name' => 'Villeurbanne',
@@ -129,8 +129,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['69100'],
                 'translations' => [
                     'lt' => ['name' => 'Villeurbanne', 'description' => 'Liono priemiestis'],
-                    'en' => ['name' => 'Villeurbanne', 'description' => 'Lyon suburb']
-            ],
+                    'en' => ['name' => 'Villeurbanne', 'description' => 'Lyon suburb'],
+                ],
             ],
             [
                 'name' => 'Clermont-Ferrand',
@@ -141,8 +141,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['63000'],
                 'translations' => [
                     'lt' => ['name' => 'Clermont-Ferrand', 'description' => 'Gumos pramonės centras'],
-                    'en' => ['name' => 'Clermont-Ferrand', 'description' => 'Tire industry center']
-            ],
+                    'en' => ['name' => 'Clermont-Ferrand', 'description' => 'Tire industry center'],
+                ],
             ],
             // Hauts-de-France
             [
@@ -154,8 +154,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['59000'],
                 'translations' => [
                     'lt' => ['name' => 'Lille', 'description' => 'Šiaurės Prancūzijos centras'],
-                    'en' => ['name' => 'Lille', 'description' => 'Center of Northern France']
-            ],
+                    'en' => ['name' => 'Lille', 'description' => 'Center of Northern France'],
+                ],
             ],
             [
                 'name' => 'Amiens',
@@ -166,8 +166,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['80000'],
                 'translations' => [
                     'lt' => ['name' => 'Amiens', 'description' => 'Katedros miestas'],
-                    'en' => ['name' => 'Amiens', 'description' => 'Cathedral city']
-            ],
+                    'en' => ['name' => 'Amiens', 'description' => 'Cathedral city'],
+                ],
             ],
             [
                 'name' => 'Roubaix',
@@ -178,8 +178,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['59100'],
                 'translations' => [
                     'lt' => ['name' => 'Roubaix', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Roubaix', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Roubaix', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Tourcoing',
@@ -190,8 +190,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['59200'],
                 'translations' => [
                     'lt' => ['name' => 'Tourcoing', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Tourcoing', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Tourcoing', 'description' => 'Industrial city'],
+                ],
             ],
             // Occitanie
             [
@@ -203,8 +203,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['31000'],
                 'translations' => [
                     'lt' => ['name' => 'Toulouse', 'description' => 'Aviacijos pramonės centras'],
-                    'en' => ['name' => 'Toulouse', 'description' => 'Aviation industry center']
-            ],
+                    'en' => ['name' => 'Toulouse', 'description' => 'Aviation industry center'],
+                ],
             ],
             [
                 'name' => 'Montpellier',
@@ -215,8 +215,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['34000'],
                 'translations' => [
                     'lt' => ['name' => 'Montpellier', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Montpellier', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Montpellier', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Nîmes',
@@ -227,8 +227,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['30000'],
                 'translations' => [
                     'lt' => ['name' => 'Nîmes', 'description' => 'Romėnų miestas'],
-                    'en' => ['name' => 'Nîmes', 'description' => 'Roman city']
-            ],
+                    'en' => ['name' => 'Nîmes', 'description' => 'Roman city'],
+                ],
             ],
             [
                 'name' => 'Perpignan',
@@ -239,8 +239,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['66000'],
                 'translations' => [
                     'lt' => ['name' => 'Perpignan', 'description' => 'Katalonijos miestas'],
-                    'en' => ['name' => 'Perpignan', 'description' => 'Catalan city']
-            ],
+                    'en' => ['name' => 'Perpignan', 'description' => 'Catalan city'],
+                ],
             ],
             // Nouvelle-Aquitaine
             [
@@ -252,8 +252,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['33000'],
                 'translations' => [
                     'lt' => ['name' => 'Bordeaux', 'description' => 'Vyno miestas'],
-                    'en' => ['name' => 'Bordeaux', 'description' => 'Wine city']
-            ],
+                    'en' => ['name' => 'Bordeaux', 'description' => 'Wine city'],
+                ],
             ],
             [
                 'name' => 'Limoges',
@@ -264,8 +264,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['87000'],
                 'translations' => [
                     'lt' => ['name' => 'Limoges', 'description' => 'Porceliano miestas'],
-                    'en' => ['name' => 'Limoges', 'description' => 'Porcelain city']
-            ],
+                    'en' => ['name' => 'Limoges', 'description' => 'Porcelain city'],
+                ],
             ],
             [
                 'name' => 'Poitiers',
@@ -276,8 +276,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['86000'],
                 'translations' => [
                     'lt' => ['name' => 'Poitiers', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Poitiers', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Poitiers', 'description' => 'Historic city'],
+                ],
             ],
             // Grand Est
             [
@@ -289,8 +289,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['67000'],
                 'translations' => [
                     'lt' => ['name' => 'Strasburgas', 'description' => 'Europos Parlamento miestas'],
-                    'en' => ['name' => 'Strasbourg', 'description' => 'European Parliament city']
-            ],
+                    'en' => ['name' => 'Strasbourg', 'description' => 'European Parliament city'],
+                ],
             ],
             [
                 'name' => 'Reims',
@@ -301,8 +301,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['51100'],
                 'translations' => [
                     'lt' => ['name' => 'Reims', 'description' => 'Šampano miestas'],
-                    'en' => ['name' => 'Reims', 'description' => 'Champagne city']
-            ],
+                    'en' => ['name' => 'Reims', 'description' => 'Champagne city'],
+                ],
             ],
             [
                 'name' => 'Metz',
@@ -313,8 +313,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['57000'],
                 'translations' => [
                     'lt' => ['name' => 'Metz', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Metz', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Metz', 'description' => 'Historic city'],
+                ],
             ],
             [
                 'name' => 'Nancy',
@@ -325,8 +325,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['54000'],
                 'translations' => [
                     'lt' => ['name' => 'Nancy', 'description' => 'Menų miestas'],
-                    'en' => ['name' => 'Nancy', 'description' => 'Arts city']
-            ],
+                    'en' => ['name' => 'Nancy', 'description' => 'Arts city'],
+                ],
             ],
             // Pays de la Loire
             [
@@ -338,8 +338,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['44000'],
                 'translations' => [
                     'lt' => ['name' => 'Nantes', 'description' => 'Pajūrio miestas'],
-                    'en' => ['name' => 'Nantes', 'description' => 'Seaside city']
-            ],
+                    'en' => ['name' => 'Nantes', 'description' => 'Seaside city'],
+                ],
             ],
             [
                 'name' => 'Le Mans',
@@ -350,8 +350,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['72000'],
                 'translations' => [
                     'lt' => ['name' => 'Le Mans', 'description' => 'Automobilių lenktynių miestas'],
-                    'en' => ['name' => 'Le Mans', 'description' => 'Car racing city']
-            ],
+                    'en' => ['name' => 'Le Mans', 'description' => 'Car racing city'],
+                ],
             ],
             [
                 'name' => 'Angers',
@@ -362,8 +362,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['49000'],
                 'translations' => [
                     'lt' => ['name' => 'Angers', 'description' => 'Istorinis miestas'],
-                    'en' => ['name' => 'Angers', 'description' => 'Historic city']
-            ],
+                    'en' => ['name' => 'Angers', 'description' => 'Historic city'],
+                ],
             ],
             // Bretagne
             [
@@ -375,8 +375,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['35000'],
                 'translations' => [
                     'lt' => ['name' => 'Rennes', 'description' => 'Bretanijos sostinė'],
-                    'en' => ['name' => 'Rennes', 'description' => 'Capital of Brittany']
-            ],
+                    'en' => ['name' => 'Rennes', 'description' => 'Capital of Brittany'],
+                ],
             ],
             [
                 'name' => 'Brest',
@@ -387,8 +387,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['29200'],
                 'translations' => [
                     'lt' => ['name' => 'Brest', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Brest', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Brest', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Quimper',
@@ -399,8 +399,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['29000'],
                 'translations' => [
                     'lt' => ['name' => 'Quimper', 'description' => 'Kultūros miestas'],
-                    'en' => ['name' => 'Quimper', 'description' => 'Cultural city']
-            ],
+                    'en' => ['name' => 'Quimper', 'description' => 'Cultural city'],
+                ],
             ],
             // Normandie
             [
@@ -412,8 +412,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['76000'],
                 'translations' => [
                     'lt' => ['name' => 'Rouen', 'description' => 'Normandijos sostinė'],
-                    'en' => ['name' => 'Rouen', 'description' => 'Capital of Normandy']
-            ],
+                    'en' => ['name' => 'Rouen', 'description' => 'Capital of Normandy'],
+                ],
             ],
             [
                 'name' => 'Le Havre',
@@ -424,8 +424,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['76600'],
                 'translations' => [
                     'lt' => ['name' => 'Le Havre', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Le Havre', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Le Havre', 'description' => 'Port city'],
+                ],
             ],
             [
                 'name' => 'Caen',
@@ -436,8 +436,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['14000'],
                 'translations' => [
                     'lt' => ['name' => 'Caen', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Caen', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Caen', 'description' => 'University city'],
+                ],
             ],
             // Provence-Alpes-Côte d'Azur
             [
@@ -449,8 +449,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['13001', '13002', '13003'],
                 'translations' => [
                     'lt' => ['name' => 'Marselis', 'description' => 'Antrasis didžiausias Prancūzijos miestas'],
-                    'en' => ['name' => 'Marseille', 'description' => 'Second largest city in France']
-            ],
+                    'en' => ['name' => 'Marseille', 'description' => 'Second largest city in France'],
+                ],
             ],
             [
                 'name' => 'Nice',
@@ -461,8 +461,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['06000'],
                 'translations' => [
                     'lt' => ['name' => 'Nice', 'description' => 'Kurortinis miestas'],
-                    'en' => ['name' => 'Nice', 'description' => 'Resort city']
-            ],
+                    'en' => ['name' => 'Nice', 'description' => 'Resort city'],
+                ],
             ],
             [
                 'name' => 'Toulon',
@@ -473,8 +473,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['83000'],
                 'translations' => [
                     'lt' => ['name' => 'Toulon', 'description' => 'Karinis uostas'],
-                    'en' => ['name' => 'Toulon', 'description' => 'Naval port']
-            ],
+                    'en' => ['name' => 'Toulon', 'description' => 'Naval port'],
+                ],
             ],
             [
                 'name' => 'Aix-en-Provence',
@@ -485,8 +485,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['13100'],
                 'translations' => [
                     'lt' => ['name' => 'Aix-en-Provence', 'description' => 'Menų miestas'],
-                    'en' => ['name' => 'Aix-en-Provence', 'description' => 'Arts city']
-            ],
+                    'en' => ['name' => 'Aix-en-Provence', 'description' => 'Arts city'],
+                ],
             ],
             [
                 'name' => 'Avignon',
@@ -497,8 +497,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['84000'],
                 'translations' => [
                     'lt' => ['name' => 'Avignon', 'description' => 'Popiežiaus miestas'],
-                    'en' => ['name' => 'Avignon', 'description' => 'Pope city']
-            ],
+                    'en' => ['name' => 'Avignon', 'description' => 'Pope city'],
+                ],
             ],
             // Bourgogne-Franche-Comté
             [
@@ -510,8 +510,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['21000'],
                 'translations' => [
                     'lt' => ['name' => 'Dijon', 'description' => 'Garstyčių miestas'],
-                    'en' => ['name' => 'Dijon', 'description' => 'Mustard city']
-            ],
+                    'en' => ['name' => 'Dijon', 'description' => 'Mustard city'],
+                ],
             ],
             [
                 'name' => 'Besançon',
@@ -522,8 +522,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['25000'],
                 'translations' => [
                     'lt' => ['name' => 'Besançon', 'description' => 'Laikrodžių miestas'],
-                    'en' => ['name' => 'Besançon', 'description' => 'Watch city']
-            ],
+                    'en' => ['name' => 'Besançon', 'description' => 'Watch city'],
+                ],
             ],
             // Centre-Val de Loire
             [
@@ -535,8 +535,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['37000'],
                 'translations' => [
                     'lt' => ['name' => 'Tours', 'description' => 'Luaros slėnio miestas'],
-                    'en' => ['name' => 'Tours', 'description' => 'Loire Valley city']
-            ],
+                    'en' => ['name' => 'Tours', 'description' => 'Loire Valley city'],
+                ],
             ],
             [
                 'name' => 'Orléans',
@@ -547,8 +547,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['45000'],
                 'translations' => [
                     'lt' => ['name' => 'Orléans', 'description' => 'Joanos Arkos miestas'],
-                    'en' => ['name' => 'Orléans', 'description' => 'Joan of Arc city']
-            ],
+                    'en' => ['name' => 'Orléans', 'description' => 'Joan of Arc city'],
+                ],
             ],
             // Corse
             [
@@ -560,8 +560,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['20000'],
                 'translations' => [
                     'lt' => ['name' => 'Ajaccio', 'description' => 'Korsikos sostinė'],
-                    'en' => ['name' => 'Ajaccio', 'description' => 'Capital of Corsica']
-            ],
+                    'en' => ['name' => 'Ajaccio', 'description' => 'Capital of Corsica'],
+                ],
             ],
             [
                 'name' => 'Bastia',
@@ -572,8 +572,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['20200'],
                 'translations' => [
                     'lt' => ['name' => 'Bastia', 'description' => 'Uostamiesčis'],
-                    'en' => ['name' => 'Bastia', 'description' => 'Port city']
-            ],
+                    'en' => ['name' => 'Bastia', 'description' => 'Port city'],
+                ],
             ],
             // Additional Île-de-France cities
             [
@@ -585,8 +585,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['78000'],
                 'translations' => [
                     'lt' => ['name' => 'Versailles', 'description' => 'Karališkoji rezidencija'],
-                    'en' => ['name' => 'Versailles', 'description' => 'Royal residence']
-            ],
+                    'en' => ['name' => 'Versailles', 'description' => 'Royal residence'],
+                ],
             ],
             [
                 'name' => 'Créteil',
@@ -597,8 +597,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['94000'],
                 'translations' => [
                     'lt' => ['name' => 'Créteil', 'description' => 'Universitetų miestas'],
-                    'en' => ['name' => 'Créteil', 'description' => 'University city']
-            ],
+                    'en' => ['name' => 'Créteil', 'description' => 'University city'],
+                ],
             ],
             [
                 'name' => 'Nanterre',
@@ -609,8 +609,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['92000'],
                 'translations' => [
                     'lt' => ['name' => 'Nanterre', 'description' => 'Teismo miestas'],
-                    'en' => ['name' => 'Nanterre', 'description' => 'Court city']
-            ],
+                    'en' => ['name' => 'Nanterre', 'description' => 'Court city'],
+                ],
             ],
             [
                 'name' => 'Vitry-sur-Seine',
@@ -621,8 +621,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['94400'],
                 'translations' => [
                     'lt' => ['name' => 'Vitry-sur-Seine', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Vitry-sur-Seine', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Vitry-sur-Seine', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Antony',
@@ -633,8 +633,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['92160'],
                 'translations' => [
                     'lt' => ['name' => 'Antony', 'description' => 'Pramonės centras'],
-                    'en' => ['name' => 'Antony', 'description' => 'Industrial center']
-            ],
+                    'en' => ['name' => 'Antony', 'description' => 'Industrial center'],
+                ],
             ],
             [
                 'name' => 'Colombes',
@@ -645,8 +645,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['92700'],
                 'translations' => [
                     'lt' => ['name' => 'Colombes', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Colombes', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Colombes', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Asnières-sur-Seine',
@@ -657,8 +657,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['92600'],
                 'translations' => [
                     'lt' => ['name' => 'Asnières-sur-Seine', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Asnières-sur-Seine', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Asnières-sur-Seine', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Courbevoie',
@@ -669,8 +669,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['92400'],
                 'translations' => [
                     'lt' => ['name' => 'Courbevoie', 'description' => 'Verslo centras'],
-                    'en' => ['name' => 'Courbevoie', 'description' => 'Business center']
-            ],
+                    'en' => ['name' => 'Courbevoie', 'description' => 'Business center'],
+                ],
             ],
             [
                 'name' => 'Levallois-Perret',
@@ -681,8 +681,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['92300'],
                 'translations' => [
                     'lt' => ['name' => 'Levallois-Perret', 'description' => 'Verslo centras'],
-                    'en' => ['name' => 'Levallois-Perret', 'description' => 'Business center']
-            ],
+                    'en' => ['name' => 'Levallois-Perret', 'description' => 'Business center'],
+                ],
             ],
             // Additional Auvergne-Rhône-Alpes cities
             [
@@ -694,8 +694,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['74000'],
                 'translations' => [
                     'lt' => ['name' => 'Annecy', 'description' => 'Ežero miestas'],
-                    'en' => ['name' => 'Annecy', 'description' => 'Lake city']
-            ],
+                    'en' => ['name' => 'Annecy', 'description' => 'Lake city'],
+                ],
             ],
             [
                 'name' => 'Chambéry',
@@ -706,8 +706,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['73000'],
                 'translations' => [
                     'lt' => ['name' => 'Chambéry', 'description' => 'Alpų miestas'],
-                    'en' => ['name' => 'Chambéry', 'description' => 'Alpine city']
-            ],
+                    'en' => ['name' => 'Chambéry', 'description' => 'Alpine city'],
+                ],
             ],
             [
                 'name' => 'Valence',
@@ -718,8 +718,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['26000'],
                 'translations' => [
                     'lt' => ['name' => 'Valence', 'description' => 'Ronos slėnio miestas'],
-                    'en' => ['name' => 'Valence', 'description' => 'Rhone Valley city']
-            ],
+                    'en' => ['name' => 'Valence', 'description' => 'Rhone Valley city'],
+                ],
             ],
             [
                 'name' => 'Roanne',
@@ -730,8 +730,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['42300'],
                 'translations' => [
                     'lt' => ['name' => 'Roanne', 'description' => 'Tekstilės pramonės centras'],
-                    'en' => ['name' => 'Roanne', 'description' => 'Textile industry center']
-            ],
+                    'en' => ['name' => 'Roanne', 'description' => 'Textile industry center'],
+                ],
             ],
             [
                 'name' => 'Bourgoin-Jallieu',
@@ -742,8 +742,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['38300'],
                 'translations' => [
                     'lt' => ['name' => 'Bourgoin-Jallieu', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Bourgoin-Jallieu', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Bourgoin-Jallieu', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Vénissieux',
@@ -754,8 +754,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['69200'],
                 'translations' => [
                     'lt' => ['name' => 'Vénissieux', 'description' => 'Liono priemiestis'],
-                    'en' => ['name' => 'Vénissieux', 'description' => 'Lyon suburb']
-            ],
+                    'en' => ['name' => 'Vénissieux', 'description' => 'Lyon suburb'],
+                ],
             ],
             [
                 'name' => 'Saint-Chamond',
@@ -766,8 +766,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['42400'],
                 'translations' => [
                     'lt' => ['name' => 'Saint-Chamond', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Saint-Chamond', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Saint-Chamond', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Rive-de-Gier',
@@ -778,8 +778,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['42800'],
                 'translations' => [
                     'lt' => ['name' => 'Rive-de-Gier', 'description' => 'Pramonės miestas'],
-                    'en' => ['name' => 'Rive-de-Gier', 'description' => 'Industrial city']
-            ],
+                    'en' => ['name' => 'Rive-de-Gier', 'description' => 'Industrial city'],
+                ],
             ],
             [
                 'name' => 'Oullins',
@@ -790,8 +790,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['69600'],
                 'translations' => [
                     'lt' => ['name' => 'Oullins', 'description' => 'Liono priemiestis'],
-                    'en' => ['name' => 'Oullins', 'description' => 'Lyon suburb']
-            ],
+                    'en' => ['name' => 'Oullins', 'description' => 'Lyon suburb'],
+                ],
             ],
             [
                 'name' => 'Bron',
@@ -802,8 +802,8 @@ final class FranceCitiesSeeder extends Seeder
                 'postal_codes' => ['69500'],
                 'translations' => [
                     'lt' => ['name' => 'Bron', 'description' => 'Liono priemiestis'],
-                    'en' => ['name' => 'Bron', 'description' => 'Lyon suburb']
-            ],
+                    'en' => ['name' => 'Bron', 'description' => 'Lyon suburb'],
+                ],
             ],
         ];
 
@@ -812,7 +812,7 @@ final class FranceCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
                     'is_enabled' => true,
                     'is_default' => $cityData['is_default'] ?? false,
                     'is_capital' => $cityData['is_capital'] ?? false,
@@ -832,8 +832,8 @@ final class FranceCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale
-            ],
+                        'locale' => $locale,
+                    ],
                     [
                         'name' => $translation['name'],
                         'description' => $translation['description'],

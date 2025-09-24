@@ -7,7 +7,6 @@ namespace App\Filament\Resources\CampaignResource\Widgets;
 use App\Models\Campaign;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class CampaignPerformanceWidget extends BaseWidget
 {

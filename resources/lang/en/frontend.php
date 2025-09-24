@@ -175,34 +175,34 @@ return [
         'clear_recent' => 'Clear Recent',
         'no_suggestions' => 'No suggestions available',
         'start_typing' => 'Start typing to see suggestions',
-    'tip_1' => 'Use ↑↓ to navigate',
-    'tip_2' => 'Press Enter to select',
-    'voice_placeholder' => 'Search with your voice...',
-    'start_listening' => 'Start voice search',
-    'stop_listening' => 'Stop voice search',
-    'voice_not_supported' => 'Voice search not supported',
-    'voice_tip_1' => 'Click microphone to start',
-    'voice_tip_2' => 'Speak clearly for best results',
-    'mobile_placeholder' => 'Search products...',
-    'view_all_results' => 'View all results',
-    'advanced_placeholder' => 'Advanced search with filters...',
-    'show_filters' => 'Show filters',
-    'hide_filters' => 'Hide filters',
-    'categories' => 'Categories',
-    'brands' => 'Brands',
-    'collections' => 'Collections',
-    'price_range' => 'Price Range',
-    'min_price' => 'Min Price',
-    'max_price' => 'Max Price',
-    'availability' => 'Availability',
-    'in_stock_only' => 'In Stock Only',
-    'sort_by' => 'Sort By',
-    'relevance' => 'Relevance',
-    'name' => 'Name',
-    'price_low_to_high' => 'Price: Low to High',
-    'price_high_to_low' => 'Price: High to Low',
-    'clear_filters' => 'Clear Filters',
-    'results' => 'results',
+        'tip_1' => 'Use ↑↓ to navigate',
+        'tip_2' => 'Press Enter to select',
+        'voice_placeholder' => 'Search with your voice...',
+        'start_listening' => 'Start voice search',
+        'stop_listening' => 'Stop voice search',
+        'voice_not_supported' => 'Voice search not supported',
+        'voice_tip_1' => 'Click microphone to start',
+        'voice_tip_2' => 'Speak clearly for best results',
+        'mobile_placeholder' => 'Search products...',
+        'view_all_results' => 'View all results',
+        'advanced_placeholder' => 'Advanced search with filters...',
+        'show_filters' => 'Show filters',
+        'hide_filters' => 'Hide filters',
+        'categories' => 'Categories',
+        'brands' => 'Brands',
+        'collections' => 'Collections',
+        'price_range' => 'Price Range',
+        'min_price' => 'Min Price',
+        'max_price' => 'Max Price',
+        'availability' => 'Availability',
+        'in_stock_only' => 'In Stock Only',
+        'sort_by' => 'Sort By',
+        'relevance' => 'Relevance',
+        'name' => 'Name',
+        'price_low_to_high' => 'Price: Low to High',
+        'price_high_to_low' => 'Price: High to Low',
+        'clear_filters' => 'Clear Filters',
+        'results' => 'results',
         'live_search_module' => 'Live Search Module',
         'module_description' => 'Type in the search box below to see live results as you type. The search includes products, categories, and brands with intelligent relevance scoring.',
         'features_title' => 'Key Features',
@@ -330,7 +330,7 @@ return [
         'back_to_news' => 'Back to News',
         'back_to_home' => 'Back to Home',
     ],
-    
+
     // Product page specific translations
     'products' => [
         'description' => 'High quality product for professionals and enthusiasts.',
@@ -357,7 +357,7 @@ return [
         'loyalty_rewards' => 'Loyalty rewards',
         'loyalty_rewards_desc' => 'Earn points for every purchase',
     ],
-    
+
     // Image and format translations
     'images' => [
         'random_image' => 'Random image',
@@ -367,7 +367,7 @@ return [
         'image_optimization' => 'Image Optimization',
         'no_image' => 'No Image',
     ],
-    
+
     // Footer translations
     'footer' => [
         'documentation' => 'Documentation',
@@ -387,11 +387,10 @@ return [
         'working_hours' => 'Working hours',
         'monday_friday' => 'Monday - Friday: 9:00 - 17:00',
         'shipping_to' => 'Shipping to',
-        'change_zone' => 'change zone',
         'copyright' => 'All rights reserved',
         'created_with' => 'Created with',
     ],
-    
+
     // Product history translations
     'total_changes' => 'Total Changes',
     'price_changes' => 'Price Changes',

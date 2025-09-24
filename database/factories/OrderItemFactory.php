@@ -13,117 +13,89 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OrderItem>
  */
-class OrderItemFactory extends Factory
+final class OrderItemFactory extends Factory
 {
     protected $model = OrderItem::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         $quantity = $this->faker->numberBetween(1, 10);
-        $unitPrice = $this->faker->randomFloat(2, 5, 500);
-        $total = $unitPrice * $quantity;
+        $unitPrice = $this->faker->randomFloat(2, 1, 100);
+        $total = $quantity * $unitPrice;
+
+        $variant = $this->faker->boolean(30) ? ProductVariant::factory()->create() : null;
 
         return [
             'order_id' => Order::factory(),
             'product_id' => Product::factory(),
-            'product_variant_id' => $this->faker->optional(0.3)->randomElement(ProductVariant::pluck('id')->toArray()),
+            'product_variant_id' => $variant?->id,
             'name' => $this->faker->words(3, true),
-            'sku' => $this->faker->bothify('SKU-####-???'),
+            'sku' => $this->faker->unique()->bothify('SKU-####'),
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
-            'price' => $unitPrice,
+            'price' => $unitPrice, // Same as unit_price for consistency
             'total' => $total,
+            'notes' => $this->faker->optional(0.3)->sentence(),
         ];
     }
 
-    /**
-     * Indicate that the order item has a specific quantity.
-     */
-    public function quantity(int $quantity): static
+    public function forOrder(Order $order): static
     {
-        return $this->state(function (array $attributes) use ($quantity) {
-            $unitPrice = $attributes['unit_price'] ?? $this->faker->randomFloat(2, 5, 500);
-
-            return [
-                'quantity' => $quantity,
-                'total' => $unitPrice * $quantity,
-            ];
-        });
+        return $this->state(fn (array $attributes) => [
+            'order_id' => $order->id,
+        ]);
     }
 
-    /**
-     * Indicate that the order item has a specific unit price.
-     */
-    public function unitPrice(float $unitPrice): static
+    public function forProduct(Product $product): static
     {
-        return $this->state(function (array $attributes) use ($unitPrice) {
-            $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 10);
-
-            return [
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
-                'total' => $unitPrice * $quantity,
-            ];
-        });
+        return $this->state(fn (array $attributes) => [
+            'product_id' => $product->id,
+            'name' => $product->name,
+            'sku' => $product->sku,
+            'unit_price' => $product->price,
+            'price' => $product->price,
+        ]);
     }
 
-    /**
-     * Indicate that the order item has a high value.
-     */
-    public function highValue(): static
+    public function forVariant(ProductVariant $variant): static
     {
-        return $this->state(function (array $attributes) {
-            $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 5);
-            $unitPrice = $this->faker->randomFloat(2, 100, 1000);
-
-            return [
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
-                'total' => $unitPrice * $quantity,
-            ];
-        });
+        return $this->state(fn (array $attributes) => [
+            'product_id' => $variant->product_id,
+            'product_variant_id' => $variant->id,
+            'name' => $variant->name,
+            'sku' => $variant->sku,
+            'unit_price' => $variant->price,
+            'price' => $variant->price,
+        ]);
     }
 
-    /**
-     * Indicate that the order item has a low value.
-     */
-    public function lowValue(): static
+    public function highQuantity(): static
     {
-        return $this->state(function (array $attributes) {
-            $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(1, 10);
-            $unitPrice = $this->faker->randomFloat(2, 1, 20);
-
-            return [
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
-                'total' => $unitPrice * $quantity,
-            ];
-        });
+        return $this->state(fn (array $attributes) => [
+            'quantity' => $this->faker->numberBetween(10, 100),
+        ]);
     }
 
-    /**
-     * Indicate that the order item has a product variant.
-     */
-    public function withVariant(): static
+    public function lowQuantity(): static
     {
-        return $this->state(function (array $attributes) {
-            $product = Product::factory()->create();
-            $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
+        return $this->state(fn (array $attributes) => [
+            'quantity' => $this->faker->numberBetween(1, 3),
+        ]);
+    }
 
-            return [
-                'product_id' => $product->id,
-                'product_variant_id' => $variant->id,
-                'name' => $product->name,
-                'sku' => $variant->sku,
-                'unit_price' => $variant->price,
-                'price' => $variant->price,
-                'total' => $variant->price * ($attributes['quantity'] ?? 1),
-            ];
-        });
+    public function expensive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'unit_price' => $this->faker->randomFloat(2, 100, 1000),
+            'price' => $this->faker->randomFloat(2, 100, 1000),
+        ]);
+    }
+
+    public function cheap(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'unit_price' => $this->faker->randomFloat(2, 0.1, 10),
+            'price' => $this->faker->randomFloat(2, 0.1, 10),
+        ]);
     }
 }

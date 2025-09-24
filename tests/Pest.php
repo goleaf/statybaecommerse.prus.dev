@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(Tests\TestCase::class)->in('Feature', 'Unit');
+uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin');
 
-uses(RefreshDatabase::class)->in('Feature', 'Unit');
+uses(RefreshDatabase::class)->in('Feature', 'Unit', 'admin');
 
 beforeAll(function () {
     config()->set('database.default', 'sqlite');
@@ -26,6 +28,7 @@ beforeEach(function () {
 function login($user = null)
 {
     $user ??= \App\Models\User::factory()->create();
+
     return test()->actingAs($user);
 }
 

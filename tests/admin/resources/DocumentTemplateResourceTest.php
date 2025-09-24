@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\DocumentTemplateResource;
 use App\Models\DocumentTemplate;
@@ -155,7 +157,7 @@ it('can search document templates by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(DocumentTemplateResource::getUrl('index') . '?search=Special')
+        ->get(DocumentTemplateResource::getUrl('index').'?search=Special')
         ->assertOk();
 });
 
@@ -164,7 +166,7 @@ it('can search document templates by slug', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(DocumentTemplateResource::getUrl('index') . '?search=special')
+        ->get(DocumentTemplateResource::getUrl('index').'?search=special')
         ->assertOk();
 });
 
@@ -174,14 +176,14 @@ it('can sort document templates by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(DocumentTemplateResource::getUrl('index') . '?sort=name&direction=asc')
+        ->get(DocumentTemplateResource::getUrl('index').'?sort=name&direction=asc')
         ->assertOk();
 });
 
 it('can sort document templates by created date', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(DocumentTemplateResource::getUrl('index') . '?sort=created_at&direction=desc')
+        ->get(DocumentTemplateResource::getUrl('index').'?sort=created_at&direction=desc')
         ->assertOk();
 });
 
@@ -230,7 +232,7 @@ it('can duplicate a document template', function () {
 
     $this->assertDatabaseHas('document_templates', [
         'name' => 'Original Template (Copy)',
-        'slug' => $template->slug . '-copy',
+        'slug' => $template->slug.'-copy',
     ]);
 });
 
@@ -316,10 +318,10 @@ it('shows correct category badges', function () {
 
 it('can filter templates with variables', function () {
     $templateWithVariables = DocumentTemplate::factory()->create([
-        'variables' => ['var1' => 'Variable 1', 'var2' => 'Variable 2']
+        'variables' => ['var1' => 'Variable 1', 'var2' => 'Variable 2'],
     ]);
     $templateWithoutVariables = DocumentTemplate::factory()->create([
-        'variables' => []
+        'variables' => [],
     ]);
 
     $this

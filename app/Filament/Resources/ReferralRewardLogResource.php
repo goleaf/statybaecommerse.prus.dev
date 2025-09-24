@@ -1,23 +1,21 @@
 <?php
 
 declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralRewardLogResource\Pages;
-use App\Models\ReferralRewardLog;
 use App\Models\ReferralReward;
+use App\Models\ReferralRewardLog;
 use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -25,7 +23,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -36,12 +33,12 @@ use UnitEnum;
 final class ReferralRewardLogResource extends Resource
 {
     protected static ?string $model = ReferralRewardLog::class;
+
     protected static ?int $navigationSort = 10;
+
     protected static ?string $recordTitleAttribute = 'action';
-    protected static ?string $navigationGroup = NavigationGroup::Analytics;
 
-
-    protected static $navigationGroup = NavigationGroup::Analytics;
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -58,7 +55,7 @@ final class ReferralRewardLogResource extends Resource
         return __('admin.referral_reward_logs.model_label');
     }
 
-    public static function schema(Schema $schema): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -142,6 +139,7 @@ final class ReferralRewardLogResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
 

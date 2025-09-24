@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -18,6 +20,7 @@ class ShippingOptionSeeder extends Seeder
 
         if ($zones->isEmpty()) {
             $this->command->warn('No zones found. Please run ZoneSeeder first.');
+
             return;
         }
 
@@ -26,7 +29,7 @@ class ShippingOptionSeeder extends Seeder
             $shippingOptions = [
                 [
                     'name' => 'DHL Express',
-                    'slug' => 'dhl-express-' . $zone->id,
+                    'slug' => 'dhl-express-'.$zone->id,
                     'description' => 'Fast and reliable express delivery',
                     'carrier_name' => 'DHL',
                     'service_type' => 'Express',
@@ -40,7 +43,7 @@ class ShippingOptionSeeder extends Seeder
                 ],
                 [
                     'name' => 'DHL Standard',
-                    'slug' => 'dhl-standard-' . $zone->id,
+                    'slug' => 'dhl-standard-'.$zone->id,
                     'description' => 'Standard delivery service',
                     'carrier_name' => 'DHL',
                     'service_type' => 'Standard',
@@ -54,7 +57,7 @@ class ShippingOptionSeeder extends Seeder
                 ],
                 [
                     'name' => 'UPS Economy',
-                    'slug' => 'ups-economy-' . $zone->id,
+                    'slug' => 'ups-economy-'.$zone->id,
                     'description' => 'Economical delivery option',
                     'carrier_name' => 'UPS',
                     'service_type' => 'Economy',
@@ -68,7 +71,7 @@ class ShippingOptionSeeder extends Seeder
                 ],
                 [
                     'name' => 'Free Shipping',
-                    'slug' => 'free-shipping-' . $zone->id,
+                    'slug' => 'free-shipping-'.$zone->id,
                     'description' => 'Free shipping for orders over €50',
                     'carrier_name' => 'Standard',
                     'service_type' => 'Free',
@@ -94,6 +97,6 @@ class ShippingOptionSeeder extends Seeder
             }
         }
 
-        $this->command->info('Shipping options seeded successfully for ' . $zones->count() . ' zones.');
+        $this->command->info('Shipping options seeded successfully for '.$zones->count().' zones.');
     }
 }

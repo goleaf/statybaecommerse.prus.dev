@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -31,8 +33,8 @@ final class SliderSeeder extends Seeder
                         'title' => 'Welcome to Statybae Commerce',
                         'description' => 'Discover great construction products and services in one place. Quality, reliability and competitive prices.',
                         'button_text' => 'Start Shopping',
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'title' => 'Kokybės garantija',
@@ -53,8 +55,8 @@ final class SliderSeeder extends Seeder
                         'title' => 'Quality Guarantee',
                         'description' => 'All products are tested and certified. We guarantee the highest quality and long-term service.',
                         'button_text' => 'Learn More',
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'title' => 'Specialūs pasiūlymai',
@@ -75,8 +77,8 @@ final class SliderSeeder extends Seeder
                         'title' => 'Special Offers',
                         'description' => "Don't miss the opportunity to save. Up to 50% discount on selected items!",
                         'button_text' => 'View Sales',
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'title' => 'Profesionalūs įrankiai',
@@ -97,8 +99,8 @@ final class SliderSeeder extends Seeder
                         'title' => 'Professional Tools',
                         'description' => 'Highest quality construction tools for professionals and homeowners. Wide range, fast delivery.',
                         'button_text' => 'Browse Tools',
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'title' => 'Nemokamas pristatymas',
@@ -119,8 +121,8 @@ final class SliderSeeder extends Seeder
                         'title' => 'Free Delivery',
                         'description' => 'Free delivery throughout Lithuania for orders over €100. Fast and secure delivery.',
                         'button_text' => 'Learn More',
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'title' => 'Nauji produktai',
@@ -141,9 +143,9 @@ final class SliderSeeder extends Seeder
                         'title' => 'New Products',
                         'description' => 'Discover the latest construction products and technologies. Be the first to try new innovations.',
                         'button_text' => 'Browse New Items',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
 
         foreach ($sliders as $sliderData) {
@@ -157,7 +159,7 @@ final class SliderSeeder extends Seeder
                 SliderTranslation::create([
                     'slider_id' => $slider->id,
                     'locale' => $locale,
-                    ...$translationData
+                    ...$translationData,
                 ]);
             }
 
@@ -219,7 +221,7 @@ final class SliderSeeder extends Seeder
         imagestring($image, $font, $x, $y, $text, $textColor);
 
         // Save to temporary file
-        $tempPath = sys_get_temp_dir() . "/slider-{$sortOrder}.jpg";
+        $tempPath = sys_get_temp_dir()."/slider-{$sortOrder}.jpg";
         imagejpeg($image, $tempPath, 90);
         imagedestroy($image);
 
@@ -239,6 +241,7 @@ final class SliderSeeder extends Seeder
     private function hexToRgb(string $hex): array
     {
         $hex = ltrim($hex, '#');
+
         return [
             'r' => hexdec(substr($hex, 0, 2)),
             'g' => hexdec(substr($hex, 2, 2)),

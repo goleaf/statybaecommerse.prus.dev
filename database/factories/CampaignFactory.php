@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Models\Campaign;
 use App\Models\Channel;
-use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,7 +25,7 @@ final class CampaignFactory extends Factory
             'starts_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'ends_at' => $this->faker->dateTimeBetween('now', '+3 months'),
             'channel_id' => Channel::factory(),
-            'zone_id' => Zone::factory(),
+            'zone_id' => null,
             'status' => 'active',
             'is_active' => true,
             'metadata' => [

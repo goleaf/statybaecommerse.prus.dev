@@ -1,24 +1,23 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\CampaignClick;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 /**
  * CampaignClickController
- * 
+ *
  * HTTP controller handling CampaignClickController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class CampaignClickController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -50,12 +49,12 @@ final class CampaignClickController extends Controller
             $query->where('customer_id', auth()->id());
         }
         $clicks = $query->orderBy('clicked_at', 'desc')->paginate(15);
+
         return view('campaign-clicks.index', compact('clicks'));
     }
+
     /**
      * Display the specified resource with related data.
-     * @param CampaignClick $campaignClick
-     * @return View
      */
     public function show(CampaignClick $campaignClick): View
     {
@@ -64,6 +63,7 @@ final class CampaignClickController extends Controller
             abort(403, __('campaign_clicks.unauthorized'));
         }
         $campaignClick->load(['campaign', 'customer', 'conversions']);
+
         return view('campaign-clicks.show', compact('campaignClick'));
     }
 }

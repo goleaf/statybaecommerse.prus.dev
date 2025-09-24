@@ -1,17 +1,16 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Pages;
 
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+
 /**
  * AbstractPageComponent
- * 
+ *
  * Livewire component for AbstractPageComponent with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
  */
 #[Layout(name: 'components.layouts.base')]
-abstract class AbstractPageComponent extends Component
-{
-}
+abstract class AbstractPageComponent extends Component {}

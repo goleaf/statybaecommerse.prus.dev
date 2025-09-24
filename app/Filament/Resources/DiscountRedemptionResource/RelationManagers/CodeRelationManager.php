@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use App\Filament\Resources\DiscountRedemptionResource;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Support\Enums\FontWeight;
-use Filament\Tables\Table;
 use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class CodeRelationManager extends RelationManager
 {
@@ -20,7 +21,7 @@ class CodeRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         return $form
             ->schema([
@@ -111,7 +112,7 @@ class CodeRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'inactive' => 'gray',
                         'expired' => 'danger',
@@ -145,11 +146,11 @@ class CodeRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['expires_from'],
-                                fn($query, $date) => $query->whereDate('expires_at', '>=', $date),
+                                fn ($query, $date) => $query->whereDate('expires_at', '>=', $date),
                             )
                             ->when(
                                 $data['expires_until'],
-                                fn($query, $date) => $query->whereDate('expires_at', '<=', $date),
+                                fn ($query, $date) => $query->whereDate('expires_at', '<=', $date),
                             );
                     }),
             ])

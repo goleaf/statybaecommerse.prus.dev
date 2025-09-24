@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Document;
 use App\Models\DocumentTemplate;
@@ -41,7 +43,7 @@ describe('Document Model', function () {
     });
 
     it('has correct fillable attributes', function () {
-        $document = new Document();
+        $document = new Document;
 
         expect($document->getFillable())->toBe([
             'document_template_id',
@@ -188,7 +190,7 @@ describe('Document Model', function () {
     });
 
     it('validates required fields', function () {
-        expect(fn() => Document::create([]))
+        expect(fn () => Document::create([]))
             ->toThrow(Illuminate\Database\QueryException::class);
     });
 });

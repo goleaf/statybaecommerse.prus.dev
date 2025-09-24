@@ -202,7 +202,7 @@ final class ProductHistoryExampleSeeder extends Seeder
                 'action' => 'updated',
                 'field_name' => 'description',
                 'old_value' => $product->description,
-                'new_value' => $product->description . ' Papildytas informacija apie dažomumą.',
+                'new_value' => $product->description.' Papildytas informacija apie dažomumą.',
                 'description' => 'Description enriched with paintability details.',
                 'metadata' => ['reason' => 'seo_optimization'],
                 'created_at' => Carbon::create(2024, 12, 5, 10, 5),

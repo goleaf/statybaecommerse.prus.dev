@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -85,4 +87,3 @@ class DiscountRedemptionSeeder extends Seeder
         DiscountRedemption::factory()->cancelled()->count(4)->create();
     }
 }
-

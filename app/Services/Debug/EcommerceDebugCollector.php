@@ -1,22 +1,20 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
+
 /**
  * EcommerceDebugCollector
- * 
+ *
  * Service class containing EcommerceDebugCollector business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 class EcommerceDebugCollector
 {
     /**
      * Handle logCartOperation functionality with proper error handling.
-     * @param string $operation
-     * @param array $data
-     * @return void
      */
     public function logCartOperation(string $operation, array $data = []): void
     {
@@ -30,12 +28,9 @@ class EcommerceDebugCollector
         }
         Log::debug('Cart operation', $payload);
     }
+
     /**
      * Handle logOrder functionality with proper error handling.
-     * @param string $operation
-     * @param string $orderNumber
-     * @param array $data
-     * @return void
      */
     public function logOrder(string $operation, string $orderNumber, array $data = []): void
     {

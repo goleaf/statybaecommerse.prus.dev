@@ -353,7 +353,7 @@ final class ComprehensiveOrderSeeder extends Seeder
     {
         static $counter = 0;
         $counter++;
-        
+
         do {
             $number = 'ORD-'.date('Y').'-'.str_pad((string) (10000 + $counter), 5, '0', STR_PAD_LEFT);
         } while (Order::where('number', $number)->exists());

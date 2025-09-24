@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * VariantAnalytics
- * 
+ *
  * Model for tracking analytics and performance metrics of product variants.
  */
 final class VariantAnalytics extends Model
@@ -57,7 +57,7 @@ final class VariantAnalytics extends Model
         if ($this->views <= 0) {
             return 0;
         }
-        
+
         return ($this->clicks / $this->views) * 100;
     }
 
@@ -69,7 +69,7 @@ final class VariantAnalytics extends Model
         if ($this->clicks <= 0) {
             return 0;
         }
-        
+
         return ($this->add_to_cart / $this->clicks) * 100;
     }
 
@@ -81,7 +81,7 @@ final class VariantAnalytics extends Model
         if ($this->add_to_cart <= 0) {
             return 0;
         }
-        
+
         return ($this->purchases / $this->add_to_cart) * 100;
     }
 
@@ -93,7 +93,7 @@ final class VariantAnalytics extends Model
         if ($this->purchases <= 0) {
             return 0;
         }
-        
+
         return $this->revenue / $this->purchases;
     }
 
@@ -119,8 +119,8 @@ final class VariantAnalytics extends Model
     public function scopeTopPerforming($query, int $limit = 10)
     {
         return $query->orderBy('conversion_rate', 'desc')
-                    ->orderBy('revenue', 'desc')
-                    ->limit($limit);
+            ->orderBy('revenue', 'desc')
+            ->limit($limit);
     }
 
     /**
@@ -150,7 +150,7 @@ final class VariantAnalytics extends Model
             'conversion_rate' => $data['conversion_rate'] ?? 0,
         ];
 
-        return static::updateOrCreate(
+        return self::updateOrCreate(
             ['variant_id' => $variantId, 'date' => $date],
             $defaultData
         );
@@ -170,11 +170,11 @@ final class VariantAnalytics extends Model
     public function updateConversionRate(): bool
     {
         $conversionRate = 0;
-        
+
         if ($this->views > 0) {
             $conversionRate = ($this->purchases / $this->views) * 100;
         }
-        
+
         return $this->update(['conversion_rate' => $conversionRate]);
     }
 }

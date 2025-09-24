@@ -8,7 +8,9 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 
-use function Pest\Laravel\{assertAuthenticated, assertDatabaseHas, get};
+use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\get;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {

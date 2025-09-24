@@ -7,7 +7,6 @@ namespace App\Filament\Resources\ProductResource\Widgets;
 use App\Models\Product;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class ProductPerformanceWidget extends BaseWidget
 {

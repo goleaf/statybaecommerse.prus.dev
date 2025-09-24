@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Components;
 
 use App\Models\Product;
@@ -10,11 +11,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+
 /**
  * EnhancedProductRecommendations
- * 
+ *
  * Livewire component for EnhancedProductRecommendations with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property int|null $productId
  * @property int|null $userId
  * @property string $blockName
@@ -28,25 +30,25 @@ use Livewire\Component;
 final class EnhancedProductRecommendations extends Component
 {
     public ?int $productId = null;
+
     public ?int $userId = null;
+
     public string $blockName = 'related_products';
+
     public int $limit = 4;
+
     public array $context = [];
+
     public bool $showTitle = true;
+
     public string $title = '';
+
     public bool $trackInteractions = true;
+
     protected RecommendationService $recommendationService;
+
     /**
      * Initialize the Livewire component with parameters.
-     * @param int|null $productId
-     * @param int|null $userId
-     * @param string $blockName
-     * @param int $limit
-     * @param array $context
-     * @param bool $showTitle
-     * @param string $title
-     * @param bool $trackInteractions
-     * @return void
      */
     public function mount(?int $productId = null, ?int $userId = null, string $blockName = 'related_products', int $limit = 4, array $context = [], bool $showTitle = true, string $title = '', bool $trackInteractions = true): void
     {
@@ -60,9 +62,9 @@ final class EnhancedProductRecommendations extends Component
         $this->trackInteractions = $trackInteractions;
         $this->recommendationService = app(RecommendationService::class);
     }
+
     /**
      * Handle recommendations functionality with proper error handling.
-     * @return Collection
      */
     #[Computed]
     public function recommendations(): Collection
@@ -71,17 +73,18 @@ final class EnhancedProductRecommendations extends Component
             $user = $this->userId ? User::find($this->userId) : null;
             $product = $this->productId ? Product::find($this->productId) : null;
             $recommendations = $this->recommendationService->getRecommendations($this->blockName, $user, $product, array_merge($this->context, ['limit' => $this->limit, 'component' => 'enhanced_product_recommendations']));
+
             return $recommendations->take($this->limit);
         } catch (\Exception $e) {
             \Log::error('Enhanced Product Recommendations Error', ['block_name' => $this->blockName, 'product_id' => $this->productId, 'user_id' => $this->userId, 'error' => $e->getMessage()]);
+
             // Fallback to basic recommendations
             return $this->getFallbackRecommendations();
         }
     }
+
     /**
      * Handle addToCart functionality with proper error handling.
-     * @param int $productId
-     * @return void
      */
     public function addToCart(int $productId): void
     {
@@ -89,10 +92,12 @@ final class EnhancedProductRecommendations extends Component
             $product = Product::findOrFail($productId);
             if ($product->shouldHideAddToCart()) {
                 $this->addError('cart', __('frontend.product.cannot_add_to_cart'));
+
                 return;
             }
             if ($product->availableQuantity() < 1) {
                 $this->addError('cart', __('frontend.product.not_enough_stock'));
+
                 return;
             }
             // Create or update cart item in database
@@ -111,14 +116,13 @@ final class EnhancedProductRecommendations extends Component
             $this->addError('cart', __('frontend.product.add_to_cart_error'));
         }
     }
+
     /**
      * Handle trackView functionality with proper error handling.
-     * @param int $productId
-     * @return void
      */
     public function trackView(int $productId): void
     {
-        if (!$this->trackInteractions || !$this->userId) {
+        if (! $this->trackInteractions || ! $this->userId) {
             return;
         }
         try {
@@ -131,14 +135,13 @@ final class EnhancedProductRecommendations extends Component
             \Log::error('Failed to track product view', ['user_id' => $this->userId, 'product_id' => $productId, 'error' => $e->getMessage()]);
         }
     }
+
     /**
      * Handle trackClick functionality with proper error handling.
-     * @param int $productId
-     * @return void
      */
     public function trackClick(int $productId): void
     {
-        if (!$this->trackInteractions || !$this->userId) {
+        if (! $this->trackInteractions || ! $this->userId) {
             return;
         }
         try {
@@ -151,9 +154,9 @@ final class EnhancedProductRecommendations extends Component
             \Log::error('Failed to track product click', ['user_id' => $this->userId, 'product_id' => $productId, 'error' => $e->getMessage()]);
         }
     }
+
     /**
      * Handle getDefaultTitle functionality with proper error handling.
-     * @return string
      */
     private function getDefaultTitle(): string
     {
@@ -171,28 +174,29 @@ final class EnhancedProductRecommendations extends Component
             default => __('frontend.recommendations.recommended_products'),
         };
     }
+
     /**
      * Handle getFallbackRecommendations functionality with proper error handling.
-     * @return Collection
      */
     private function getFallbackRecommendations(): Collection
     {
         // Simple fallback to category-based recommendations
-        if (!$this->productId) {
+        if (! $this->productId) {
             return Product::query()->with(['media', 'brand'])->where('is_visible', true)->inRandomOrder()->limit($this->limit)->get();
         }
         $product = Product::find($this->productId);
-        if (!$product) {
+        if (! $product) {
             return collect();
         }
         $categoryIds = $product->categories->pluck('id');
+
         return Product::query()->with(['media', 'brand'])->where('is_visible', true)->where('id', '!=', $this->productId)->whereHas('categories', function ($query) use ($categoryIds) {
             $query->whereIn('categories.id', $categoryIds);
         })->inRandomOrder()->limit($this->limit)->get();
     }
+
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {

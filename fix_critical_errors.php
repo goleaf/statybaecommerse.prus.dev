@@ -52,13 +52,13 @@ foreach ($criticalFiles as $file) {
         // Fix missing method signatures
         $content = preg_replace(
             '/public static function form\([^)]*\)\s*:\s*[^{]*\{/',
-            'public static function form(Schema $schema): Schema' . "\n    {",
+            'public static function form(Schema $schema): Schema'."\n    {",
             $content
         );
 
         $content = preg_replace(
             '/public static function table\([^)]*\)\s*:\s*[^{]*\{/',
-            'public static function table(Table $table): Table' . "\n    {",
+            'public static function table(Table $table): Table'."\n    {",
             $content
         );
 
@@ -77,24 +77,24 @@ foreach ($criticalFiles as $file) {
         // Fix missing return statements
         $content = preg_replace(
             '/public static function getNavigationGroup\(\):\s*\?string\s*\{\s*return\s*"[^"]*"->value;\s*\}/',
-            'public static function getNavigationGroup(): ?string' . "\n    {\n        return 'System';\n    }",
+            'public static function getNavigationGroup(): ?string'."\n    {\n        return 'System';\n    }",
             $content
         );
 
         // Fix missing closing braces
-        $content = preg_replace("/->defaultSort\('[^']*'\);\s*\$/", "->defaultSort('sort_order');" . "\n    }", $content);
+        $content = preg_replace("/->defaultSort\('[^']*'\);\s*\$/", "->defaultSort('sort_order');"."\n    }", $content);
 
         // Fix missing method bodies
         $content = preg_replace(
             '/public static function getRelations\(\): array\s*\{\s*return \[\s*\/\/\s*\];\s*\}/',
-            'public static function getRelations(): array' . "\n    {\n        return [\n            //\n        ];\n    }",
+            'public static function getRelations(): array'."\n    {\n        return [\n            //\n        ];\n    }",
             $content
         );
 
         // Fix missing pages method
         $content = preg_replace(
             "/public static function getPages\(\): array\s*\{\s*return \[\s*'index'\s*=>\s*Pages\\\\[^,]*,\s*'create'\s*=>\s*Pages\\\\[^,]*,\s*'view'\s*=>\s*Pages\\\\[^,]*,\s*'edit'\s*=>\s*Pages\\\\[^,]*,\s*\];\s*\}/",
-            'public static function getPages(): array' . "\n    {\n        return [\n            'index' => Pages\ListRecords::route('/'),\n            'create' => Pages\CreateRecord::route('/create'),\n            'view' => Pages\ViewRecord::route('/{record}'),\n            'edit' => Pages\EditRecord::route('/{record}/edit'),\n        ];\n    }",
+            'public static function getPages(): array'."\n    {\n        return [\n            'index' => Pages\ListRecords::route('/'),\n            'create' => Pages\CreateRecord::route('/create'),\n            'view' => Pages\ViewRecord::route('/{record}'),\n            'edit' => Pages\EditRecord::route('/{record}/edit'),\n        ];\n    }",
             $content
         );
 

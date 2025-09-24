@@ -60,7 +60,6 @@ final class CouponFactory extends Factory
         ]);
     }
 
-
     /**
      * Indicate that the coupon is a percentage discount.
      */
@@ -109,6 +108,7 @@ final class CouponFactory extends Factory
     public function usageLimitReached(): static
     {
         $usageLimit = $this->faker->numberBetween(10, 100);
+
         return $this->state(fn (array $attributes) => [
             'usage_limit' => $usageLimit,
             'used_count' => $usageLimit,

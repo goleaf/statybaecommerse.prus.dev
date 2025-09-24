@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 
 class PHPDocFullCommand extends Command
 {
@@ -46,16 +45,16 @@ class PHPDocFullCommand extends Command
         $this->newLine();
 
         // Step 4: Serve documentation (optional)
-        if (!$this->option('no-serve')) {
+        if (! $this->option('no-serve')) {
             $this->info('Step 4/4: 🌐 Serving documentation...');
             $this->newLine();
-            
+
             $port = $this->option('port');
             $host = $this->option('host');
-            
+
             $this->call('docs:serve', [
                 '--port' => $port,
-                '--host' => $host
+                '--host' => $host,
             ]);
         } else {
             $this->info('Step 4/4: ⏭️  Skipping serve (--no-serve option used)');
@@ -73,12 +72,12 @@ class PHPDocFullCommand extends Command
     {
         $this->info('🎉 Complete PHPDoc workflow finished!');
         $this->newLine();
-        
+
         $this->line('📂 Documentation location: docs/html/');
         $this->line('🌐 To serve documentation: php artisan docs:serve');
         $this->line('🔗 Then open: http://localhost:8080');
         $this->newLine();
-        
+
         $this->line('💡 Available commands:');
         $this->line('  • php artisan docs:generate  - Generate documentation only');
         $this->line('  • php artisan docs:upgrade   - Upgrade PHPDoc comments only');

@@ -70,4 +70,3 @@ return [
         'tracking_updated_successfully' => 'Sekimas sėkmingai atnaujintas',
     ],
 ];
-

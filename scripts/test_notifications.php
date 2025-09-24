@@ -3,12 +3,12 @@
 // Simple test script to verify notification classes work
 require_once 'vendor/autoload.php';
 
-use App\Notifications\TestNotification;
 use App\Notifications\AdminNotification;
 use App\Notifications\OrderNotification;
-use App\Notifications\SystemNotification;
-use App\Notifications\UserNotification;
 use App\Notifications\ProductNotification;
+use App\Notifications\SystemNotification;
+use App\Notifications\TestNotification;
+use App\Notifications\UserNotification;
 
 echo "Testing Notification Classes...\n\n";
 
@@ -16,22 +16,22 @@ echo "Testing Notification Classes...\n\n";
 try {
     $testNotification = new TestNotification('Test Title', 'Test Message', 'info');
     echo "✅ TestNotification: Created successfully\n";
-    echo "   - Title: " . $testNotification->title . "\n";
-    echo "   - Message: " . $testNotification->message . "\n";
-    echo "   - Type: " . $testNotification->type . "\n";
+    echo '   - Title: '.$testNotification->title."\n";
+    echo '   - Message: '.$testNotification->message."\n";
+    echo '   - Type: '.$testNotification->type."\n";
 } catch (Exception $e) {
-    echo "❌ TestNotification: Failed - " . $e->getMessage() . "\n";
+    echo '❌ TestNotification: Failed - '.$e->getMessage()."\n";
 }
 
 // Test AdminNotification
 try {
     $adminNotification = new AdminNotification('Admin Title', 'Admin Message', 'warning');
     echo "✅ AdminNotification: Created successfully\n";
-    echo "   - Title: " . $adminNotification->title . "\n";
-    echo "   - Message: " . $adminNotification->message . "\n";
-    echo "   - Type: " . $adminNotification->type . "\n";
+    echo '   - Title: '.$adminNotification->title."\n";
+    echo '   - Message: '.$adminNotification->message."\n";
+    echo '   - Type: '.$adminNotification->type."\n";
 } catch (Exception $e) {
-    echo "❌ AdminNotification: Failed - " . $e->getMessage() . "\n";
+    echo '❌ AdminNotification: Failed - '.$e->getMessage()."\n";
 }
 
 // Test OrderNotification
@@ -44,11 +44,11 @@ try {
     ];
     $orderNotification = new OrderNotification($orderData);
     echo "✅ OrderNotification: Created successfully\n";
-    echo "   - Order ID: " . $orderData['id'] . "\n";
-    echo "   - Order Number: " . $orderData['order_number'] . "\n";
-    echo "   - Total: " . $orderData['total'] . "\n";
+    echo '   - Order ID: '.$orderData['id']."\n";
+    echo '   - Order Number: '.$orderData['order_number']."\n";
+    echo '   - Total: '.$orderData['total']."\n";
 } catch (Exception $e) {
-    echo "❌ OrderNotification: Failed - " . $e->getMessage() . "\n";
+    echo '❌ OrderNotification: Failed - '.$e->getMessage()."\n";
 }
 
 // Test SystemNotification
@@ -59,10 +59,10 @@ try {
     ];
     $systemNotification = new SystemNotification($systemData);
     echo "✅ SystemNotification: Created successfully\n";
-    echo "   - Maintenance Type: " . $systemData['maintenance_type'] . "\n";
-    echo "   - Duration: " . $systemData['duration'] . "\n";
+    echo '   - Maintenance Type: '.$systemData['maintenance_type']."\n";
+    echo '   - Duration: '.$systemData['duration']."\n";
 } catch (Exception $e) {
-    echo "❌ SystemNotification: Failed - " . $e->getMessage() . "\n";
+    echo '❌ SystemNotification: Failed - '.$e->getMessage()."\n";
 }
 
 // Test UserNotification
@@ -74,11 +74,11 @@ try {
     ];
     $userNotification = new UserNotification('registered', $userData, 'Custom message');
     echo "✅ UserNotification: Created successfully\n";
-    echo "   - Action: " . $userNotification->action . "\n";
-    echo "   - User Name: " . $userData['name'] . "\n";
-    echo "   - Message: " . $userNotification->message . "\n";
+    echo '   - Action: '.$userNotification->action."\n";
+    echo '   - User Name: '.$userData['name']."\n";
+    echo '   - Message: '.$userNotification->message."\n";
 } catch (Exception $e) {
-    echo "❌ UserNotification: Failed - " . $e->getMessage() . "\n";
+    echo '❌ UserNotification: Failed - '.$e->getMessage()."\n";
 }
 
 // Test ProductNotification
@@ -91,11 +91,11 @@ try {
     ];
     $productNotification = new ProductNotification($productData);
     echo "✅ ProductNotification: Created successfully\n";
-    echo "   - Product Name: " . $productData['name'] . "\n";
-    echo "   - SKU: " . $productData['sku'] . "\n";
-    echo "   - Price: " . $productData['price'] . "\n";
+    echo '   - Product Name: '.$productData['name']."\n";
+    echo '   - SKU: '.$productData['sku']."\n";
+    echo '   - Price: '.$productData['price']."\n";
 } catch (Exception $e) {
-    echo "❌ ProductNotification: Failed - " . $e->getMessage() . "\n";
+    echo '❌ ProductNotification: Failed - '.$e->getMessage()."\n";
 }
 
 echo "\n🎉 All notification classes tested successfully!\n";

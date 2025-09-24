@@ -1,58 +1,61 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         // Enhance product_variants table with size-dependent pricing
         if (Schema::hasTable('product_variants')) {
             Schema::table('product_variants', function (Blueprint $table) {
                 // Add size-specific fields
-                if (!Schema::hasColumn('product_variants', 'size')) {
+                if (! Schema::hasColumn('product_variants', 'size')) {
                     $table->string('size')->nullable()->after('name');
                 }
-                if (!Schema::hasColumn('product_variants', 'size_unit')) {
+                if (! Schema::hasColumn('product_variants', 'size_unit')) {
                     $table->string('size_unit', 10)->default('cm')->after('size');
                 }
-                if (!Schema::hasColumn('product_variants', 'size_display')) {
+                if (! Schema::hasColumn('product_variants', 'size_display')) {
                     $table->string('size_display')->nullable()->after('size_unit');
                 }
 
                 // Add pricing modifiers
-                if (!Schema::hasColumn('product_variants', 'size_price_modifier')) {
+                if (! Schema::hasColumn('product_variants', 'size_price_modifier')) {
                     $table->decimal('size_price_modifier', 8, 4)->default(0)->after('cost_price');
                 }
-                if (!Schema::hasColumn('product_variants', 'size_weight_modifier')) {
+                if (! Schema::hasColumn('product_variants', 'size_weight_modifier')) {
                     $table->decimal('size_weight_modifier', 8, 4)->default(0)->after('weight');
                 }
 
                 // Add variant-specific fields
-                if (!Schema::hasColumn('product_variants', 'variant_type')) {
+                if (! Schema::hasColumn('product_variants', 'variant_type')) {
                     $table->enum('variant_type', ['size', 'color', 'material', 'style', 'custom'])->default('size')->after('size_display');
                 }
-                if (!Schema::hasColumn('product_variants', 'is_default_variant')) {
+                if (! Schema::hasColumn('product_variants', 'is_default_variant')) {
                     $table->boolean('is_default_variant')->default(false)->after('is_enabled');
                 }
-                if (!Schema::hasColumn('product_variants', 'variant_sku_suffix')) {
+                if (! Schema::hasColumn('product_variants', 'variant_sku_suffix')) {
                     $table->string('variant_sku_suffix')->nullable()->after('sku');
                 }
 
                 // Add inventory tracking
-                if (!Schema::hasColumn('product_variants', 'track_inventory')) {
+                if (! Schema::hasColumn('product_variants', 'track_inventory')) {
                     $table->boolean('track_inventory')->default(true)->after('quantity');
                 }
-                if (!Schema::hasColumn('product_variants', 'allow_backorder')) {
+                if (! Schema::hasColumn('product_variants', 'allow_backorder')) {
                     $table->boolean('allow_backorder')->default(false)->after('track_inventory');
                 }
-                if (!Schema::hasColumn('product_variants', 'low_stock_threshold')) {
+                if (! Schema::hasColumn('product_variants', 'low_stock_threshold')) {
                     $table->integer('low_stock_threshold')->default(5)->after('allow_backorder');
                 }
 
                 // Add variant metadata
-                if (!Schema::hasColumn('product_variants', 'variant_metadata')) {
+                if (! Schema::hasColumn('product_variants', 'variant_metadata')) {
                     $afterColumn = Schema::hasColumn('product_variants', 'status')
                         ? 'status'
                         : (Schema::hasColumn('product_variants', 'attributes') ? 'attributes' : 'is_enabled');
@@ -69,7 +72,7 @@ return new class extends Migration {
         }
 
         // Create product_variant_attributes table if it doesn't exist
-        if (!Schema::hasTable('product_variant_attributes')) {
+        if (! Schema::hasTable('product_variant_attributes')) {
             Schema::create('product_variant_attributes', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -86,7 +89,7 @@ return new class extends Migration {
         }
 
         // Create variant_pricing_rules table for dynamic pricing
-        if (!Schema::hasTable('variant_pricing_rules')) {
+        if (! Schema::hasTable('variant_pricing_rules')) {
             Schema::create('variant_pricing_rules', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -107,7 +110,7 @@ return new class extends Migration {
         }
 
         // Create variant_inventories table if it doesn't exist
-        if (!Schema::hasTable('variant_inventories')) {
+        if (! Schema::hasTable('variant_inventories')) {
             Schema::create('variant_inventories', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -128,7 +131,7 @@ return new class extends Migration {
         }
 
         // Create variant_images table for variant-specific images
-        if (!Schema::hasTable('variant_images')) {
+        if (! Schema::hasTable('variant_images')) {
             Schema::create('variant_images', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
@@ -146,7 +149,7 @@ return new class extends Migration {
         }
 
         // Create variant_combinations table for managing variant combinations
-        if (!Schema::hasTable('variant_combinations')) {
+        if (! Schema::hasTable('variant_combinations')) {
             Schema::create('variant_combinations', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -193,7 +196,7 @@ return new class extends Migration {
                 $columns = [
                     'size', 'size_unit', 'size_display', 'size_price_modifier', 'size_weight_modifier',
                     'variant_type', 'is_default_variant', 'variant_sku_suffix', 'track_inventory',
-                    'allow_backorder', 'low_stock_threshold', 'variant_metadata'
+                    'allow_backorder', 'low_stock_threshold', 'variant_metadata',
                 ];
 
                 foreach ($columns as $column) {

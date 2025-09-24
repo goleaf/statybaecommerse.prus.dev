@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -172,10 +174,10 @@ describe('Test Configuration', function () {
     });
 
     it('has proper validation rules', function () {
-        expect(fn() => \App\Models\User::create([]))
+        expect(fn () => \App\Models\User::create([]))
             ->toThrow(\Illuminate\Database\QueryException::class);
 
-        expect(fn() => \App\Models\Product::create([]))
+        expect(fn () => \App\Models\Product::create([]))
             ->toThrow(\Illuminate\Database\QueryException::class);
     });
 });

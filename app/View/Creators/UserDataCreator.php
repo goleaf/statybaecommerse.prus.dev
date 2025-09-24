@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * UserDataCreator
- * 
+ *
  * View Creator that provides user-specific data to views.
  * This includes authentication status, user information, and permissions.
  */
@@ -22,7 +22,7 @@ final class UserDataCreator
     public function create(View $view): void
     {
         $user = Auth::user();
-        
+
         $view->with([
             'isAuthenticated' => Auth::check(),
             'user' => $user,
@@ -40,7 +40,7 @@ final class UserDataCreator
      */
     private function getUserNotifications(?User $user): int
     {
-        if (!$user) {
+        if (! $user) {
             return 0;
         }
 
@@ -54,7 +54,7 @@ final class UserDataCreator
      */
     private function getUserPreferences(?User $user): array
     {
-        if (!$user) {
+        if (! $user) {
             return [
                 'locale' => app()->getLocale(),
                 'currency' => current_currency(),

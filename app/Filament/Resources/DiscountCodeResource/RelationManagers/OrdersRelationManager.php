@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -20,8 +22,8 @@ final class OrdersRelationManager extends RelationManager
             ->components([
                 Forms\Components\TextInput::make('order_number')
                     ->label(__('Order Number'))
-                    ->required()\n                    ->maxLength(255),
-                
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options([
@@ -32,11 +34,10 @@ final class OrdersRelationManager extends RelationManager
                         'cancelled' => __('Cancelled'),
                     ])
                     ->required(),
-                
                 Forms\Components\TextInput::make('total')
                     ->label(__('Total'))
-                    ->numeric(),
-                    ->prefix('€'),
+                    ->numeric()
+                    ->prefix('€')
                     ->required(),
             ]);
     }
@@ -48,16 +49,16 @@ final class OrdersRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('order_number')
                     ->label(__('Order Number'))
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable()
                     ->weight('bold'),
-                
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label(__('Customer'))
-                    ->searchable()\n                    ->sortable(),
-                
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'processing' => 'info',
@@ -66,12 +67,10 @@ final class OrdersRelationManager extends RelationManager
                         'cancelled' => 'danger',
                         default => 'gray',
                     }),
-                
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('Total'))
-                    ->money('EUR'),
+                    ->money('EUR')
                     ->sortable(),
-                
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Created At'))
                     ->dateTime('d/m/Y H:i')
@@ -87,7 +86,6 @@ final class OrdersRelationManager extends RelationManager
                         'delivered' => __('Delivered'),
                         'cancelled' => __('Cancelled'),
                     ]),
-                
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
@@ -105,8 +103,6 @@ final class OrdersRelationManager extends RelationManager
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]))
-            ->defaultSort("created_at", "desc");
-    }
-}
+            ->defaultSort('created_at', 'desc');
     }
 }

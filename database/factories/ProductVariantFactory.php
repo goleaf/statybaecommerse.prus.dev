@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -16,7 +18,7 @@ class ProductVariantFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => fn() => \App\Models\Product::factory()->create()->id,
+            'product_id' => fn () => \App\Models\Product::factory()->create()->id,
             'name' => Str::title($this->faker->words(2, true)),
             'sku' => strtoupper(Str::random(12)),
             'barcode' => $this->faker->boolean(40) ? strtoupper(Str::random(12)) : null,

@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
 use Filament\Actions\Action;
@@ -11,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -26,14 +26,14 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+
+final class CustomerGroupResource extends Resource
+{
+    protected static ?string $model = CustomerGroup::class;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -42,7 +42,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -51,16 +50,14 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make(__('customer_groups.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('name')
                                 ->label(__('customer_groups.name'))
                                 ->required()
@@ -78,9 +75,9 @@ use Illuminate\Database\Eloquent\Collection;
                         ->columnSpanFull(),
                 ]),
             Section::make(__('customer_groups.pricing_settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('discount_percentage')
                                 ->label(__('customer_groups.discount_percentage'))
                                 ->numeric()
@@ -95,7 +92,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->helperText(__('customer_groups.discount_fixed_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('has_special_pricing')
                                 ->label(__('customer_groups.has_special_pricing'))
                                 ->default(false),
@@ -105,9 +102,9 @@ use Illuminate\Database\Eloquent\Collection;
                         ]),
                 ]),
             Section::make(__('customer_groups.permissions'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('can_view_prices')
                                 ->label(__('customer_groups.can_view_prices'))
                                 ->default(true),
@@ -123,9 +120,9 @@ use Illuminate\Database\Eloquent\Collection;
                         ]),
                 ]),
             Section::make(__('customer_groups.settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('is_active')
                                 ->label(__('customer_groups.is_active'))
                                 ->default(true),
@@ -134,7 +131,7 @@ use Illuminate\Database\Eloquent\Collection;
                                 ->default(false),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('customer_groups.sort_order'))
                                 ->numeric()
@@ -157,8 +154,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -176,8 +171,8 @@ use Illuminate\Database\Eloquent\Collection;
                     ->color('gray'),
                 TextColumn::make('type')
                     ->label(__('customer_groups.type'))
-                    ->formatStateUsing(fn(string $state): string => __("customer_groups.types.{$state}"))
-                    ->color(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => __("customer_groups.types.{$state}"))
+                    ->color(fn (string $state): string => match ($state) {
                         'regular' => 'blue',
                         'vip' => 'gold',
                         'wholesale' => 'green',
@@ -188,7 +183,7 @@ use Illuminate\Database\Eloquent\Collection;
                 TextColumn::make('discount_percentage')
                     ->label(__('customer_groups.discount_percentage'))
                     ->numeric()
-                    ->formatStateUsing(fn($state): string => $state ? $state . '%' : '-')
+                    ->formatStateUsing(fn ($state): string => $state ? $state.'%' : '-')
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('discount_fixed')
@@ -257,11 +252,11 @@ use Illuminate\Database\Eloquent\Collection;
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(CustomerGroup $record): string => $record->is_active ? __('customer_groups.deactivate') : __('customer_groups.activate'))
-                    ->icon(fn(CustomerGroup $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(CustomerGroup $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (CustomerGroup $record): string => $record->is_active ? __('customer_groups.deactivate') : __('customer_groups.activate'))
+                    ->icon(fn (CustomerGroup $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (CustomerGroup $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (CustomerGroup $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('customer_groups.activated_successfully') : __('customer_groups.deactivated_successfully'))
                             ->success()
@@ -272,7 +267,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('customer_groups.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn(CustomerGroup $record): bool => !$record->is_default)
+                    ->visible(fn (CustomerGroup $record): bool => ! $record->is_default)
                     ->action(function (CustomerGroup $record): void {
                         // Remove default from other customer groups
                         CustomerGroup::where('is_default', true)->update(['is_default' => false]);
@@ -319,7 +314,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -330,7 +324,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

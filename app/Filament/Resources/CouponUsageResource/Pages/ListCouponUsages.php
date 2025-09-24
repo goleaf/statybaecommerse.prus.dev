@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CouponUsageResource\Pages;
 
 use App\Filament\Resources\CouponUsageResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 
 class ListCouponUsages extends ListRecords
 {
@@ -17,4 +19,3 @@ class ListCouponUsages extends ListRecords
         ];
     }
 }
-

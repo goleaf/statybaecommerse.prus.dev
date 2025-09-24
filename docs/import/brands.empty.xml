@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<brands>
+  <!-- Add <brand> entries here. Example:
+  <brand>
+    <id>1</id>
+    <slug>generic</slug>
+    <translations>
+      <translation locale="lt">
+        <name>Bendras</name>
+      </translation>
+      <translation locale="en">
+        <name>Generic</name>
+      </translation>
+    </translations>
+    <!-- Optional extras:
+    <images>
+      <image src="https://example.com/brand-logo.png" alt="Generic" />
+    </images>
+    <seo>
+      <canonical_url>https://example.com/brand/generic</canonical_url>
+    </seo>
+    -->
+  </brand>
+  -->
+</brands>

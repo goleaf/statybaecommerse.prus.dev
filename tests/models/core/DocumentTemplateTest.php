@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
@@ -33,7 +34,7 @@ describe('DocumentTemplate Model', function () {
     });
 
     it('has correct fillable attributes', function () {
-        $template = new DocumentTemplate();
+        $template = new DocumentTemplate;
 
         expect($template->getFillable())->toBe([
             'name',
@@ -251,14 +252,14 @@ describe('DocumentTemplate Model', function () {
     });
 
     it('validates required fields', function () {
-        expect(fn() => DocumentTemplate::create([]))
+        expect(fn () => DocumentTemplate::create([]))
             ->toThrow(Illuminate\Database\QueryException::class);
     });
 
     it('ensures unique slug', function () {
         DocumentTemplate::factory()->create(['slug' => 'unique-template']);
 
-        expect(fn() => DocumentTemplate::create([
+        expect(fn () => DocumentTemplate::create([
             'name' => 'Another Template',
             'slug' => 'unique-template',
             'content' => '<h1>Test</h1>',

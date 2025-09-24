@@ -43,14 +43,12 @@ final class AttributeValueFactory extends Factory
         ]);
     }
 
-
     public function withColor(?string $colorCode = null): static
     {
         return $this->state(fn (array $attributes) => [
             'color_code' => $colorCode ?? $this->faker->hexColor(),
         ]);
     }
-
 
     public function colorValue(): static
     {

@@ -7,7 +7,6 @@ namespace App\Filament\Resources\ReferralRewardResource\Widgets;
 use App\Models\ReferralReward;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class ReferralRewardStatsWidget extends BaseWidget
 {
@@ -34,7 +33,7 @@ final class ReferralRewardStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make(__('referral_rewards.stats.total_paid'), '€' . number_format($totalValue, 2))
+            Stat::make(__('referral_rewards.stats.total_paid'), '€'.number_format($totalValue, 2))
                 ->description(__('referral_rewards.stats.total_paid_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('info'),

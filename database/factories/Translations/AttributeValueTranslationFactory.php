@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories\Translations;
 
-use App\Models\AttributeValue;
 use App\Models\Translations\AttributeValueTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

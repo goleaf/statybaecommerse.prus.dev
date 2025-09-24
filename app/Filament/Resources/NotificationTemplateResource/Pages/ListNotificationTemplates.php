@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NotificationTemplateResource\Pages;
 
 use App\Filament\Resources\NotificationTemplateResource;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 final class ListNotificationTemplates extends ListRecords
@@ -15,7 +15,7 @@ final class ListNotificationTemplates extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            Actions\CreateAction::make(),
         ];
     }
 }

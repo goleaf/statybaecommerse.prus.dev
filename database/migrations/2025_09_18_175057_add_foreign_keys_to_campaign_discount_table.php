@@ -128,7 +128,7 @@ return new class extends Migration
     private function hasConstraint(string $table, string $constraintName, string $type): bool
     {
         $connection = Schema::getConnection();
-        
+
         // SQLite doesn't have information_schema, so we'll check using PRAGMA
         if ($connection->getDriverName() === 'sqlite') {
             try {
@@ -138,12 +138,13 @@ return new class extends Migration
                         return true;
                     }
                 }
+
                 return false;
             } catch (\Exception $e) {
                 return false;
             }
         }
-        
+
         $database = $connection->getDatabaseName();
 
         return DB::table('information_schema.TABLE_CONSTRAINTS')
@@ -157,7 +158,7 @@ return new class extends Migration
     private function hasIndex(string $table, string $indexName): bool
     {
         $connection = Schema::getConnection();
-        
+
         // SQLite doesn't have information_schema, so we'll check using PRAGMA
         if ($connection->getDriverName() === 'sqlite') {
             try {
@@ -167,12 +168,13 @@ return new class extends Migration
                         return true;
                     }
                 }
+
                 return false;
             } catch (\Exception $e) {
                 return false;
             }
         }
-        
+
         $database = $connection->getDatabaseName();
 
         return DB::table('information_schema.STATISTICS')

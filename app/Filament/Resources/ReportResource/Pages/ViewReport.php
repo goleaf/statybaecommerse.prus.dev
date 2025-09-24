@@ -7,7 +7,6 @@ namespace App\Filament\Resources\ReportResource\Pages;
 use App\Filament\Resources\ReportResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Actions\EditAction;
 
 final class ViewReport extends ViewRecord
 {

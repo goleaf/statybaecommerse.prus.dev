@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
@@ -24,7 +26,7 @@ final class DiscountCodeDocumentAction
                     ->searchable()
                     ->preload()
                     ->required(),
-                
+
                 Select::make('format')
                     ->label(__('admin.fields.format'))
                     ->options([
@@ -33,7 +35,7 @@ final class DiscountCodeDocumentAction
                     ])
                     ->default('pdf')
                     ->required(),
-                
+
                 TextInput::make('title')
                     ->label(__('admin.fields.title'))
                     ->default(fn (DiscountCode $record) => "Discount Code - {$record->code}")
@@ -71,7 +73,7 @@ final class DiscountCodeDocumentAction
                         ->send();
 
                     if ($data['format'] === 'pdf') {
-                        return response()->download($document->file_path, $document->title . '.pdf');
+                        return response()->download($document->file_path, $document->title.'.pdf');
                     }
 
                     return response($document->content, 200, [

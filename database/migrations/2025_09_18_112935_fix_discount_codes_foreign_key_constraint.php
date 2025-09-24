@@ -11,7 +11,7 @@ return new class extends Migration
     {
         // Check if we're using SQLite or MySQL
         $isSQLite = DB::getDriverName() === 'sqlite';
-        
+
         if ($isSQLite) {
             // Disable foreign key checks for SQLite
             DB::statement('PRAGMA foreign_keys=OFF');
@@ -19,13 +19,13 @@ return new class extends Migration
             // Disable foreign key checks for MySQL
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
         }
-        
+
         try {
             // Drop the old foreign key constraint
             if (Schema::hasTable('discount_codes')) {
                 // Recreate the table with correct foreign key constraint
                 Schema::dropIfExists('discount_codes');
-                
+
                 Schema::create('discount_codes', function (Blueprint $table) {
                     $table->id();
                     $table->foreignId('discount_id')->constrained('discounts')->cascadeOnDelete();
@@ -44,7 +44,7 @@ return new class extends Migration
                     $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
                     $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
                     $table->softDeletes();
-                    
+
                     $table->index(['is_active', 'status']);
                     $table->index(['starts_at', 'expires_at']);
                     $table->index(['created_by']);

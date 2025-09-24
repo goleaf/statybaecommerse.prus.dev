@@ -1,25 +1,23 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Data\NewsCommentData;
 use App\Models\News;
 use App\Models\NewsComment;
 use Illuminate\Http\RedirectResponse;
+
 /**
  * NewsCommentController
- * 
+ *
  * HTTP controller handling NewsCommentController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class NewsCommentController extends Controller
 {
     /**
      * Store a newly created resource in storage with validation.
-     * @param NewsCommentData $data
-     * @param string $slug
-     * @return RedirectResponse
      */
     public function store(NewsCommentData $data, string $slug): RedirectResponse
     {
@@ -36,6 +34,7 @@ final class NewsCommentController extends Controller
             // Comments need approval
             'is_visible' => true,
         ]);
+
         return redirect()->route('news.show', $slug)->with('success', __('news.comment_success'));
     }
 }

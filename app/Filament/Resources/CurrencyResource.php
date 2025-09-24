@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
 use Filament\Actions\Action;
@@ -19,18 +20,19 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+
+final class CurrencyResource extends Resource
+{
+    protected static ?string $model = Currency::class;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -39,7 +41,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -48,8 +49,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
@@ -160,8 +159,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -187,7 +184,7 @@ use Illuminate\Database\Eloquent\Collection;
                 TextColumn::make('exchange_rate')
                     ->label(__('currencies.exchange_rate'))
                     ->numeric()
-                    ->formatStateUsing(fn($state): string => number_format($state, 6)),
+                    ->formatStateUsing(fn ($state): string => number_format($state, 6)),
                 TextColumn::make('base_currency')
                     ->label(__('currencies.base_currency'))
                     ->color('purple'),
@@ -196,7 +193,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->numeric(),
                 TextColumn::make('symbol_position')
                     ->label(__('currencies.symbol_position'))
-                    ->formatStateUsing(fn(string $state): string => __("currencies.positions.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("currencies.positions.{$state}"))
                     ->color('orange'),
                 IconColumn::make('is_active')
                     ->label(__('currencies.is_active'))
@@ -240,11 +237,11 @@ use Illuminate\Database\Eloquent\Collection;
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(Currency $record): string => $record->is_active ? __('currencies.deactivate') : __('currencies.activate'))
-                    ->icon(fn(Currency $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Currency $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (Currency $record): string => $record->is_active ? __('currencies.deactivate') : __('currencies.activate'))
+                    ->icon(fn (Currency $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Currency $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Currency $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('currencies.activated_successfully') : __('currencies.deactivated_successfully'))
                             ->success()
@@ -255,7 +252,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('currencies.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn(Currency $record): bool => !$record->is_default)
+                    ->visible(fn (Currency $record): bool => ! $record->is_default)
                     ->action(function (Currency $record): void {
                         // Remove default from other currencies
                         Currency::where('is_default', true)->update(['is_default' => false]);
@@ -326,7 +323,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -337,7 +333,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
@@ -9,18 +10,16 @@ use App\Models\VariantInventory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+
 /**
  * VariantStockController
- * 
+ *
  * HTTP controller handling VariantStockController related web requests, responses, and business logic with proper validation and error handling.
- * 
  */
 final class VariantStockController extends Controller
 {
     /**
      * Display a listing of the resource with pagination and filtering.
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -50,22 +49,22 @@ final class VariantStockController extends Controller
         }
         $variantStocks = $query->paginate(20);
         $locations = Location::enabled()->get();
+
         return view('variant-stock.index', compact('variantStocks', 'locations'));
     }
+
     /**
      * Display the specified resource with related data.
-     * @param VariantInventory $variantStock
-     * @return View
      */
     public function show(VariantInventory $variantStock): View
     {
         $variantStock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
+
         return view('variant-stock.show', compact('variantStock'));
     }
+
     /**
      * Handle checkAvailability functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function checkAvailability(Request $request): JsonResponse
     {
@@ -75,16 +74,16 @@ final class VariantStockController extends Controller
             $query->where('location_id', $request->location_id);
         }
         $inventory = $query->first();
-        if (!$inventory) {
+        if (! $inventory) {
             return response()->json(['available' => false, 'message' => __('inventory.not_available_at_location')]);
         }
         $available = $inventory->canReserve((int) $request->quantity);
+
         return response()->json(['available' => $available, 'available_stock' => $inventory->available_stock, 'message' => $available ? __('inventory.available_for_reservation') : __('inventory.insufficient_stock')]);
     }
+
     /**
      * Handle getStockByLocation functionality with proper error handling.
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getStockByLocation(Request $request): JsonResponse
     {
@@ -92,11 +91,12 @@ final class VariantStockController extends Controller
         $stocks = VariantInventory::with('location')->where('variant_id', $request->variant_id)->where('is_tracked', true)->get()->map(function ($inventory) {
             return ['location_id' => $inventory->location_id, 'location_name' => $inventory->location->name, 'available_stock' => $inventory->available_stock, 'stock_status' => $inventory->stock_status, 'stock_status_label' => $inventory->stock_status_label];
         });
+
         return response()->json($stocks);
     }
+
     /**
      * Handle getLowStockAlerts functionality with proper error handling.
-     * @return JsonResponse
      */
     public function getLowStockAlerts(): JsonResponse
     {
@@ -105,6 +105,7 @@ final class VariantStockController extends Controller
         })->limit(10)->get()->map(function ($inventory) {
             return ['id' => $inventory->id, 'product_name' => $inventory->product_name, 'variant_name' => $inventory->variant_name, 'location_name' => $inventory->location_name, 'current_stock' => $inventory->stock, 'threshold' => $inventory->threshold, 'stock_status' => $inventory->stock_status];
         });
+
         return response()->json($lowStockItems);
     }
 }

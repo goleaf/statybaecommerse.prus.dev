@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\User;
 use Database\Seeders\AdminUserSeeder;
@@ -15,4 +17,3 @@ it('seeds a default administrator user', function () {
     expect($admin)->not->toBeNull();
     expect($admin->hasRole('administrator'))->toBeTrue();
 });
-

@@ -29,15 +29,19 @@ class PHPDocCommand extends Command
     protected $description = 'Generate PHPDoc documentation for the Laravel application';
 
     private array $processedFiles = [];
+
     private array $errors = [];
+
     private Standard $printer;
+
     private int $totalFiles = 0;
+
     private int $upgradedFiles = 0;
 
     public function __construct()
     {
         parent::__construct();
-        $this->printer = new Standard();
+        $this->printer = new Standard;
     }
 
     /**
@@ -49,7 +53,7 @@ class PHPDocCommand extends Command
         $this->newLine();
 
         // Check if PHPDoc is installed
-        if (!$this->checkPHPDocInstallation()) {
+        if (! $this->checkPHPDocInstallation()) {
             return Command::FAILURE;
         }
 
@@ -73,7 +77,7 @@ class PHPDocCommand extends Command
 
         $this->newLine();
         $this->info('🎉 PHPDoc documentation generation completed!');
-        
+
         return Command::SUCCESS;
     }
 
@@ -83,14 +87,16 @@ class PHPDocCommand extends Command
     private function checkPHPDocInstallation(): bool
     {
         $phpdocPath = base_path('vendor/bin/phpdoc');
-        
-        if (!File::exists($phpdocPath)) {
+
+        if (! File::exists($phpdocPath)) {
             $this->error('❌ PHPDoc not found. Please install it first:');
             $this->line('   composer require --dev phpdocumentor/phpdocumentor');
+
             return false;
         }
 
         $this->info('✅ PHPDoc found');
+
         return true;
     }
 
@@ -100,7 +106,7 @@ class PHPDocCommand extends Command
     private function cleanDocumentation(): void
     {
         $this->info('🧹 Cleaning existing documentation...');
-        
+
         $docsDir = base_path('docs');
         if (File::exists($docsDir)) {
             File::deleteDirectory($docsDir);
@@ -163,14 +169,14 @@ class PHPDocCommand extends Command
     private function processDirectory(string $directory, string $description): void
     {
         $fullPath = base_path($directory);
-        
-        if (!File::isDirectory($fullPath)) {
+
+        if (! File::isDirectory($fullPath)) {
             return;
         }
 
         $files = $this->getPhpFiles($fullPath);
         $this->totalFiles += count($files);
-        
+
         foreach ($files as $file) {
             $this->processFile($file, $directory);
         }
@@ -200,25 +206,25 @@ class PHPDocCommand extends Command
      */
     private function processFile(string $filePath, string $relativeDirectory): void
     {
-        $relativePath = str_replace(base_path() . '/', '', $filePath);
-        
+        $relativePath = str_replace(base_path().'/', '', $filePath);
+
         try {
             $content = File::get($filePath);
 
-            $parser = (new ParserFactory())->createForNewestSupportedVersion();
+            $parser = (new ParserFactory)->createForNewestSupportedVersion();
             $ast = $parser->parse($content);
 
             if ($ast === null) {
                 throw new \Exception("Could not parse file: {$filePath}");
             }
 
-            $traverser = new NodeTraverser();
+            $traverser = new NodeTraverser;
             $visitor = new PHPDocUpgradeVisitorV2($relativeDirectory);
             $traverser->addVisitor($visitor);
             $modifiedAst = $traverser->traverse($ast);
 
             $newContent = $this->printer->prettyPrintFile($modifiedAst);
-            
+
             // Only write if content changed
             if ($newContent !== $content) {
                 File::put($filePath, $newContent);
@@ -227,7 +233,7 @@ class PHPDocCommand extends Command
             }
 
         } catch (\Exception $e) {
-            $this->errors[] = "Error processing {$relativePath}: " . $e->getMessage();
+            $this->errors[] = "Error processing {$relativePath}: ".$e->getMessage();
         }
     }
 
@@ -238,14 +244,14 @@ class PHPDocCommand extends Command
     {
         $this->info('📊 PHPDoc Upgrade Report');
         $this->line('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        
-        $this->line("📈 Statistics:");
+
+        $this->line('📈 Statistics:');
         $this->line("  • Total Files Scanned: {$this->totalFiles}");
         $this->line("  • Files Upgraded: {$this->upgradedFiles}");
-        $this->line("  • Files Already Current: " . ($this->totalFiles - $this->upgradedFiles - count($this->errors)));
-        $this->line("  • Errors: " . count($this->errors));
+        $this->line('  • Files Already Current: '.($this->totalFiles - $this->upgradedFiles - count($this->errors)));
+        $this->line('  • Errors: '.count($this->errors));
 
-        if (!empty($this->errors)) {
+        if (! empty($this->errors)) {
             $this->newLine();
             $this->error('❌ Errors:');
             foreach ($this->errors as $error) {
@@ -253,13 +259,12 @@ class PHPDocCommand extends Command
             }
         }
 
-        $successRate = $this->totalFiles > 0 ? 
+        $successRate = $this->totalFiles > 0 ?
             round((($this->totalFiles - count($this->errors)) / $this->totalFiles) * 100, 2) : 100;
 
         $this->newLine();
         $this->line("🎯 Success Rate: {$successRate}%");
     }
-
 
     /**
      * Serve documentation.
@@ -267,22 +272,23 @@ class PHPDocCommand extends Command
     private function serveDocumentation(): void
     {
         $htmlDir = base_path('docs/html');
-        
-        if (!File::isDirectory($htmlDir)) {
+
+        if (! File::isDirectory($htmlDir)) {
             $this->error('❌ Documentation not found. Please generate it first.');
+
             return;
         }
 
         $port = $this->option('port');
-        
+
         $this->info("🌐 Starting documentation server on port {$port}...");
         $this->line("📂 Serving from: {$htmlDir}");
         $this->line("🔗 URL: http://localhost:{$port}");
-        $this->line("⏹️  Press Ctrl+C to stop");
+        $this->line('⏹️  Press Ctrl+C to stop');
         $this->newLine();
 
         // Start the server
-        $command = "cd " . escapeshellarg($htmlDir) . " && php -S localhost:{$port}";
+        $command = 'cd '.escapeshellarg($htmlDir)." && php -S localhost:{$port}";
         passthru($command);
     }
 }
@@ -293,6 +299,7 @@ class PHPDocCommand extends Command
 class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
 {
     private string $directory;
+
     private array $classInfo = [];
 
     public function __construct(string $directory)
@@ -318,7 +325,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
     private function upgradeClass(Node\Stmt\Class_ $node): void
     {
         $className = $node->name->name ?? 'Unknown';
-        
+
         // Analyze class structure
         $this->classInfo = [
             'name' => $className,
@@ -327,7 +334,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
             'methods' => [],
             'relationships' => [],
             'extends' => $node->extends ? $node->extends->toString() : null,
-            'implements' => array_map(fn($impl) => $impl->toString(), $node->implements),
+            'implements' => array_map(fn ($impl) => $impl->toString(), $node->implements),
         ];
 
         foreach ($node->stmts as $stmt) {
@@ -396,7 +403,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
     private function upgradeMethodPHPDoc(Node\Stmt\ClassMethod $method): void
     {
         // Only upgrade if method doesn't have comprehensive PHPDoc
-        if (!$this->hasComprehensiveMethodPHPDoc($method)) {
+        if (! $this->hasComprehensiveMethodPHPDoc($method)) {
             $phpdoc = $this->generateMethodPHPDoc($method);
             $method->setDocComment(new \PhpParser\Comment\Doc($phpdoc));
         }
@@ -424,7 +431,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
     {
         $className = $this->classInfo['name'];
         $description = $this->getUpgradedClassDescription();
-        
+
         $phpdoc = "/**\n";
         $phpdoc .= " * {$className}\n";
         $phpdoc .= " * \n";
@@ -451,7 +458,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
             $phpdoc .= " * @method static \\Filament\\Tables\\Table table(\\Filament\\Tables\\Table \$table)\n";
         }
 
-        $phpdoc .= " */";
+        $phpdoc .= ' */';
 
         return $phpdoc;
     }
@@ -460,10 +467,10 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
     {
         $methodName = $method->name->name;
         $description = $this->getMethodDescription($methodName);
-        
+
         $phpdoc = "/**\n";
         $phpdoc .= " * {$description}\n";
-        
+
         // Add parameter documentation
         foreach ($method->params as $param) {
             $type = $param->type ? $this->getTypeString($param->type) : 'mixed';
@@ -477,7 +484,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
             $phpdoc .= " * @return {$returnType}\n";
         }
 
-        $phpdoc .= " */";
+        $phpdoc .= ' */';
 
         return $phpdoc;
     }
@@ -485,21 +492,21 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
     private function generateInterfacePHPDoc(Node\Stmt\Interface_ $node): string
     {
         $interfaceName = $node->name->name;
-        
+
         return "/**\n * {$interfaceName}\n * \n * Interface contract defining required methods and behavior.\n */";
     }
 
     private function generateTraitPHPDoc(Node\Stmt\Trait_ $node): string
     {
         $traitName = $node->name->name;
-        
+
         return "/**\n * {$traitName}\n * \n * Trait providing reusable functionality across multiple classes.\n */";
     }
 
     private function generateEnumPHPDoc(Node\Stmt\Enum_ $node): string
     {
         $enumName = $node->name->name;
-        
+
         return "/**\n * {$enumName}\n * \n * Enumeration defining a set of named constants with type safety.\n */";
     }
 
@@ -507,7 +514,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
     {
         $directory = $this->directory;
         $className = $this->classInfo['name'];
-        
+
         if (str_contains($directory, 'Models')) {
             return "Eloquent model representing the {$className} entity with comprehensive relationships, scopes, and business logic for the e-commerce system.";
         } elseif (str_contains($directory, 'Controllers')) {
@@ -589,10 +596,12 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
         foreach ($comments as $comment) {
             if ($comment instanceof Node\Comment\Doc) {
                 $text = $comment->getText();
-                return strpos($text, '/**') === 0 && 
+
+                return strpos($text, '/**') === 0 &&
                        (strpos($text, '@param') !== false || strpos($text, '@return') !== false);
             }
         }
+
         return false;
     }
 
@@ -601,6 +610,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
         if ($property->type) {
             return $this->getTypeString($property->type);
         }
+
         return null;
     }
 
@@ -611,11 +621,11 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
         } elseif ($type instanceof Node\Identifier) {
             return $type->name;
         } elseif ($type instanceof Node\NullableType) {
-            return $this->getTypeString($type->type) . '|null';
+            return $this->getTypeString($type->type).'|null';
         } elseif ($type instanceof Node\UnionType) {
             return implode('|', array_map([$this, 'getTypeString'], $type->types));
         }
-        
+
         return 'mixed';
     }
 
@@ -628,6 +638,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
         } elseif ($node->flags & Node\Stmt\Class_::MODIFIER_PRIVATE) {
             return 'private';
         }
+
         return 'public';
     }
 
@@ -640,6 +651,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
                 'type' => $param->type ? $this->getTypeString($param->type) : null,
             ];
         }
+
         return $parameters;
     }
 
@@ -648,6 +660,7 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
         if ($method->returnType) {
             return $this->getTypeString($method->returnType);
         }
+
         return null;
     }
 }

@@ -1,23 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Enums\AddressType;
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
-use App\Models\City;
 use App\Models\Country;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ImportAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -26,32 +22,28 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
-use Filament\Tables\Filters\DateFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * AddressResource
  *
  * Filament v4 resource for Address management in the admin panel.
+ * Provides comprehensive CRUD operations with advanced filtering, relations, and multilingual support.
  */
 final class AddressResource extends Resource
 {
     protected static ?string $model = Address::class;
-
-    protected static $navigationGroup = 'Orders';
 
     protected static ?int $navigationSort = 3;
 
@@ -88,7 +80,7 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema
+     * Configure the Filament form schema with Filament v4 Schema class
      */
     public static function form(Schema $schema): Schema
     {
@@ -158,11 +150,19 @@ final class AddressResource extends Resource
                             ->required()
                             ->maxLength(20),
                     ]),
-                    TextInput::make('country_code')
-                        ->label(__('translations.country_code'))
-                        ->maxLength(2)
-                        ->default('LT')
-                        ->required(),
+                    \Filament\Forms\Components\Grid::make(2)->schema([
+                        Select::make('country_code')
+                            ->label(__('translations.country'))
+                            ->options(Country::all()->pluck('name', 'cca2'))
+                            ->searchable()
+                            ->default('LT')
+                            ->required(),
+                        Select::make('city_id')
+                            ->label(__('translations.city_id'))
+                            ->relationship('cityById', 'name')
+                            ->searchable()
+                            ->preload(),
+                    ]),
                 ]),
             \Filament\Forms\Components\Section::make(__('translations.contact_information'))
                 ->schema([
@@ -217,7 +217,7 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table
+     * Configure the Filament table with comprehensive columns, filters, and actions
      */
     public static function table(Table $table): Table
     {
@@ -236,9 +236,9 @@ final class AddressResource extends Resource
                     ->searchable(['first_name', 'last_name', 'company_name']),
                 TextColumn::make('type')
                     ->label(__('translations.type'))
-                    ->formatStateUsing(fn($state) => $state->label())
+                    ->formatStateUsing(fn ($state) => $state->label())
                     ->badge()
-                    ->color(fn($state) => match ($state) {
+                    ->color(fn ($state) => match ($state) {
                         AddressType::SHIPPING => 'primary',
                         AddressType::BILLING => 'success',
                         AddressType::HOME => 'warning',
@@ -251,6 +251,7 @@ final class AddressResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('city')
@@ -265,25 +266,21 @@ final class AddressResource extends Resource
                     ->label(__('translations.phone'))
                     ->searchable()
                     ->toggleable(),
-                TextColumn::make('is_default')
+                IconColumn::make('is_default')
                     ->label(__('translations.is_default'))
-                    ->formatStateUsing(fn($state) => $state ? __('translations.yes') : __('translations.no'))
-                    ->color(fn($state) => $state ? 'success' : 'gray')
+                    ->boolean()
                     ->sortable(),
-                TextColumn::make('is_billing')
+                IconColumn::make('is_billing')
                     ->label(__('translations.is_billing'))
-                    ->formatStateUsing(fn($state) => $state ? __('translations.yes') : __('translations.no'))
-                    ->color(fn($state) => $state ? 'success' : 'gray')
+                    ->boolean()
                     ->sortable(),
-                TextColumn::make('is_shipping')
+                IconColumn::make('is_shipping')
                     ->label(__('translations.is_shipping'))
-                    ->formatStateUsing(fn($state) => $state ? __('translations.yes') : __('translations.no'))
-                    ->color(fn($state) => $state ? 'success' : 'gray')
+                    ->boolean()
                     ->sortable(),
-                TextColumn::make('is_active')
+                IconColumn::make('is_active')
                     ->label(__('translations.is_active'))
-                    ->formatStateUsing(fn($state) => $state ? __('translations.yes') : __('translations.no'))
-                    ->color(fn($state) => $state ? 'success' : 'gray')
+                    ->boolean()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('translations.created_at'))
@@ -300,13 +297,7 @@ final class AddressResource extends Resource
                 SelectFilter::make('type')
                     ->options(AddressType::options()),
                 SelectFilter::make('country_code')
-                    ->options([
-                        'LT' => 'Lithuania',
-                        'US' => 'United States',
-                        'DE' => 'Germany',
-                        'FR' => 'France',
-                        'GB' => 'United Kingdom',
-                    ]),
+                    ->options(Country::all()->pluck('name', 'cca2')),
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
                     ->preload(),
@@ -320,10 +311,21 @@ final class AddressResource extends Resource
                     ->label(__('translations.is_active')),
                 Filter::make('has_company')
                     ->label(__('translations.has_company'))
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('company_name')),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('company_name')),
                 Filter::make('created_this_month')
                     ->label(__('translations.created_this_month'))
-                    ->query(fn(Builder $query): Builder => $query->whereMonth('created_at', now()->month)),
+                    ->query(fn (Builder $query): Builder => $query->whereMonth('created_at', now()->month)),
+                QueryBuilder::make()
+                    ->constraints([
+                        TextConstraint::make('first_name'),
+                        TextConstraint::make('last_name'),
+                        TextConstraint::make('company_name'),
+                        TextConstraint::make('city'),
+                        TextConstraint::make('postal_code'),
+                        NumberConstraint::make('id'),
+                        DateConstraint::make('created_at'),
+                        DateConstraint::make('updated_at'),
+                    ]),
             ])
             ->actions([
                 Action::make('set_default')
@@ -337,7 +339,7 @@ final class AddressResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn(Address $record) => !$record->is_default),
+                    ->visible(fn (Address $record) => ! $record->is_default),
                 Action::make('duplicate')
                     ->label(__('translations.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
@@ -352,11 +354,11 @@ final class AddressResource extends Resource
                             ->send();
                     }),
                 Action::make('toggle_active')
-                    ->label(fn(Address $record) => $record->is_active ? __('translations.deactivate') : __('translations.activate'))
-                    ->icon(fn(Address $record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                    ->color(fn(Address $record) => $record->is_active ? 'danger' : 'success')
+                    ->label(fn (Address $record) => $record->is_active ? __('translations.deactivate') : __('translations.activate'))
+                    ->icon(fn (Address $record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                    ->color(fn (Address $record) => $record->is_active ? 'danger' : 'success')
                     ->action(function (Address $record) {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('translations.address_activated') : __('translations.address_deactivated'))
                             ->success()
@@ -441,15 +443,17 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Get relations
+     * Get relations for this resource
      */
     public static function getRelations(): array
     {
-        return [];
+        return [
+            //
+        ];
     }
 
     /**
-     * Get pages
+     * Get pages for this resource
      */
     public static function getPages(): array
     {
@@ -466,11 +470,12 @@ final class AddressResource extends Resource
      */
     public static function getNavigationBadge(): ?string
     {
-        $count = static::getModel()::count();
-        $activeCount = static::getModel()::where('is_active', true)->count();
+        $count = self::getModel()::count();
+        $activeCount = self::getModel()::where('is_active', true)->count();
         if ($activeCount === 0) {
             return null;
         }
+
         return $activeCount === $count ? (string) $count : "{$activeCount}/{$count}";
     }
 
@@ -479,14 +484,15 @@ final class AddressResource extends Resource
      */
     public static function getNavigationBadgeColor(): ?string
     {
-        $count = static::getModel()::count();
-        $activeCount = static::getModel()::where('is_active', true)->count();
+        $count = self::getModel()::count();
+        $activeCount = self::getModel()::where('is_active', true)->count();
         if ($activeCount === 0) {
             return 'danger';
         }
         if ($activeCount === $count) {
             return 'success';
         }
+
         return 'warning';
     }
 

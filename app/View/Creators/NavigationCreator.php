@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\View\Creators;
 
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
 use App\Services\Shared\CacheService;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\LazyCollection;
 
 /**
  * NavigationCreator
- * 
+ *
  * View Creator that provides navigation data to views that need it.
  * This includes categories, brands, and other navigation elements.
  */
@@ -29,7 +28,7 @@ final class NavigationCreator
     {
         // Only add navigation data to specific views to avoid unnecessary queries
         $viewName = $view->getName();
-        
+
         if ($this->shouldIncludeNavigationData($viewName)) {
             $view->with([
                 'topCategories' => $this->getTopCategories(),
@@ -56,7 +55,7 @@ final class NavigationCreator
             'brands.show',
         ];
 
-        return in_array($viewName, $navigationViews) || 
+        return in_array($viewName, $navigationViews) ||
                str_starts_with($viewName, 'components.layouts.') ||
                str_starts_with($viewName, 'livewire.components.');
     }
@@ -67,7 +66,7 @@ final class NavigationCreator
     private function getTopCategories()
     {
         return $this->cacheService->rememberLong(
-            'navigation.top_categories.' . app()->getLocale(),
+            'navigation.top_categories.'.app()->getLocale(),
             fn () => Category::query()
                 ->with(['translations' => function ($q) {
                     $q->where('locale', app()->getLocale());
@@ -88,7 +87,7 @@ final class NavigationCreator
     private function getFeaturedBrands()
     {
         return $this->cacheService->rememberLong(
-            'navigation.featured_brands.' . app()->getLocale(),
+            'navigation.featured_brands.'.app()->getLocale(),
             fn () => Brand::query()
                 ->with(['translations' => function ($q) {
                     $q->where('locale', app()->getLocale());
@@ -109,7 +108,7 @@ final class NavigationCreator
     private function getNavigationMenu(): array
     {
         return $this->cacheService->rememberLong(
-            'navigation.menu.' . app()->getLocale(),
+            'navigation.menu.'.app()->getLocale(),
             function () {
                 $categories = $this->getTopCategories();
                 $brands = $this->getFeaturedBrands();

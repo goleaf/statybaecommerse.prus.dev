@@ -1,19 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -23,7 +25,7 @@ final class TranslationsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Forms\Components\Select::make('locale')
                 ->label($this->label('Locale'))
                 ->options($this->localeOptions())
@@ -108,7 +110,7 @@ final class TranslationsRelationManager extends RelationManager
         $configured = explode(',', (string) config('app.supported_locales', 'lt,en'));
 
         $locales = collect($configured)
-            ->map(fn($locale) => trim((string) $locale))
+            ->map(fn ($locale) => trim((string) $locale))
             ->filter()
             ->unique()
             ->values();
@@ -121,7 +123,7 @@ final class TranslationsRelationManager extends RelationManager
         ];
 
         return $locales
-            ->mapWithKeys(fn(string $locale) => [$locale => $names[$locale] ?? strtoupper($locale)])
+            ->mapWithKeys(fn (string $locale) => [$locale => $names[$locale] ?? strtoupper($locale)])
             ->toArray();
     }
 

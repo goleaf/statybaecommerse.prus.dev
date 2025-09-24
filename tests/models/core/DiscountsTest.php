@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Discount;
 use App\Models\DiscountCode;
@@ -6,12 +8,12 @@ use App\Models\DiscountCondition;
 use App\Models\DiscountRedemption;
 
 it('instantiates Discount models', function (): void {
-    expect(new Discount())
+    expect(new Discount)
         ->toBeInstanceOf(Discount::class)
-        ->and(new DiscountCode())
+        ->and(new DiscountCode)
         ->toBeInstanceOf(DiscountCode::class)
-        ->and(new DiscountCondition())
+        ->and(new DiscountCondition)
         ->toBeInstanceOf(DiscountCondition::class)
-        ->and(new DiscountRedemption())
+        ->and(new DiscountRedemption)
         ->toBeInstanceOf(DiscountRedemption::class);
 });

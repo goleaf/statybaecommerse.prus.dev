@@ -15,11 +15,11 @@ final class StockDetailsWidget extends ChartWidget
     protected function getData(): array
     {
         $data = Stock::select(
-                'location',
-                DB::raw('SUM(quantity) as total_quantity'),
-                DB::raw('SUM(reserved_quantity) as total_reserved'),
-                DB::raw('COUNT(*) as item_count')
-            )
+            'location',
+            DB::raw('SUM(quantity) as total_quantity'),
+            DB::raw('SUM(reserved_quantity) as total_reserved'),
+            DB::raw('COUNT(*) as item_count')
+        )
             ->groupBy('location')
             ->orderBy('total_quantity', 'desc')
             ->get();

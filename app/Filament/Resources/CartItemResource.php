@@ -1,31 +1,32 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -39,7 +40,6 @@ final class CartItemResource extends Resource
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getPluralModelLabel(): string
     {
@@ -48,7 +48,6 @@ final class CartItemResource extends Resource
 
     /**
      * Handle getModelLabel functionality with proper error handling.
-     * @return string
      */
     public static function getModelLabel(): string
     {
@@ -57,12 +56,10 @@ final class CartItemResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $form->schema([
             Section::make(__('cart_items.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -195,8 +192,6 @@ final class CartItemResource extends Resource
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -274,11 +269,11 @@ final class CartItemResource extends Resource
                         return $query
                             ->when(
                                 $data['quantity_from'],
-                                fn(Builder $query, $quantity): Builder => $query->where('quantity', '>=', $quantity),
+                                fn (Builder $query, $quantity): Builder => $query->where('quantity', '>=', $quantity),
                             )
                             ->when(
                                 $data['quantity_to'],
-                                fn(Builder $query, $quantity): Builder => $query->where('quantity', '<=', $quantity),
+                                fn (Builder $query, $quantity): Builder => $query->where('quantity', '<=', $quantity),
                             );
                     }),
                 Filter::make('created_at')
@@ -292,11 +287,11 @@ final class CartItemResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -341,7 +336,6 @@ final class CartItemResource extends Resource
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -352,7 +346,6 @@ final class CartItemResource extends Resource
 
     /**
      * Get the pages for this resource.
-     * @return array
      */
     public static function getPages(): array
     {

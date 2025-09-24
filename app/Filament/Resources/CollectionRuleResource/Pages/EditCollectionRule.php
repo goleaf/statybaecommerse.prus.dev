@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionRuleResource\Pages;
 
 use App\Filament\Resources\CollectionRuleResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
-class EditCollectionRule extends EditRecord
+final class EditCollectionRule extends EditRecord
 {
     protected static string $resource = CollectionRuleResource::class;
 
@@ -18,4 +20,3 @@ class EditCollectionRule extends EditRecord
         ];
     }
 }
-

@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Enums\NavigationGroup;
 use App\Filament\Components\TopNavigation;
 use App\Models\User;
-use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -66,7 +67,7 @@ it('excludes admin-only groups for non-admin users', function (): void {
     $viewData = $component->instance()->getViewData();
 
     $groups = collect($viewData['navigationGroups']);
-    $adminOnlyGroups = $groups->filter(fn($group) => $group['is_admin_only']);
+    $adminOnlyGroups = $groups->filter(fn ($group) => $group['is_admin_only']);
 
     expect($adminOnlyGroups)->toHaveCount(0);
 });
@@ -80,7 +81,7 @@ it('includes admin-only groups for admin users', function (): void {
     $viewData = $component->instance()->getViewData();
 
     $groups = collect($viewData['navigationGroups']);
-    $adminOnlyGroups = $groups->filter(fn($group) => $group['is_admin_only']);
+    $adminOnlyGroups = $groups->filter(fn ($group) => $group['is_admin_only']);
 
     expect($adminOnlyGroups)->toHaveCount(0);
 });
@@ -114,15 +115,15 @@ it('has correct widget configuration', function (): void {
 
     $viewProperty = $reflection->getProperty('view');
     $viewProperty->setAccessible(true);
-    expect($viewProperty->getValue(new TopNavigation()))->toBe('filament.components.top-navigation');
+    expect($viewProperty->getValue(new TopNavigation))->toBe('filament.components.top-navigation');
 
     $columnSpanProperty = $reflection->getProperty('columnSpan');
     $columnSpanProperty->setAccessible(true);
-    expect($columnSpanProperty->getValue(new TopNavigation()))->toBe('full');
+    expect($columnSpanProperty->getValue(new TopNavigation))->toBe('full');
 
     $sortProperty = $reflection->getProperty('sort');
     $sortProperty->setAccessible(true);
-    expect($sortProperty->getValue(new TopNavigation()))->toBe(-100);
+    expect($sortProperty->getValue(new TopNavigation))->toBe(-100);
 });
 
 it('can access navigation group data correctly', function (): void {
@@ -146,7 +147,7 @@ it('can access navigation group data correctly', function (): void {
         'is_admin_only',
         'is_public',
         'requires_permission',
-        'permission'
+        'permission',
     ]);
 });
 

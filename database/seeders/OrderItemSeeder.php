@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -22,6 +24,7 @@ final class OrderItemSeeder extends Seeder
 
         if ($orders->isEmpty() || $products->isEmpty()) {
             $this->command->warn('No orders or products found. Please seed orders and products first.');
+
             return;
         }
 
@@ -44,7 +47,7 @@ final class OrderItemSeeder extends Seeder
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'product_variant_id' => $variant?->id,
-                    'name' => $product->name . ($variant ? ' - ' . $variant->name : ''),
+                    'name' => $product->name.($variant ? ' - '.$variant->name : ''),
                     'sku' => $variant?->sku ?? $product->sku,
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
@@ -64,4 +67,3 @@ final class OrderItemSeeder extends Seeder
         $this->command->info('OrderItem seeding completed successfully.');
     }
 }
-

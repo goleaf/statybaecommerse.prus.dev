@@ -1,24 +1,30 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services\Images;
 
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+
 /**
  * ProductImageService
- * 
+ *
  * Service class containing ProductImageService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
+ *
  * @property array $backgroundColors
  */
 final class ProductImageService
 {
     private const IMAGE_WIDTH = 800;
+
     private const IMAGE_HEIGHT = 800;
+
     private const FONT_SIZE = 48;
+
     private const FONT_SIZE_SMALL = 32;
+
     private array $backgroundColors = [
         ['#FF6B6B', '#4ECDC4'],
         // Red to Teal
@@ -44,14 +50,13 @@ final class ProductImageService
         // Light Blue to Blue
         ['#A29BFE', '#6C5CE7'],
     ];
+
     /**
      * Handle generateProductImage functionality with proper error handling.
-     * @param Product $product
-     * @return string
      */
     public function generateProductImage(Product $product): string
     {
-        if (!\function_exists('imagecreatetruecolor')) {
+        if (! \function_exists('imagecreatetruecolor')) {
             throw new \RuntimeException('GD extension is required to generate images.');
         }
         // Create canvas
@@ -70,32 +75,31 @@ final class ProductImageService
         $this->addDecorativeElements($image);
         // Save to temporary file in WebP format
         $tmpDir = sys_get_temp_dir();
-        $filename = 'product_' . $product->id . '_' . uniqid('', true) . '.webp';
-        $path = rtrim($tmpDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
-        if (!function_exists('imagewebp')) {
+        $filename = 'product_'.$product->id.'_'.uniqid('', true).'.webp';
+        $path = rtrim($tmpDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename;
+        if (! function_exists('imagewebp')) {
             // Fallback to PNG if WebP not available
-            $filename = 'product_' . $product->id . '_' . uniqid('', true) . '.png';
-            $path = rtrim($tmpDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
-            if (!imagepng($image, $path, 6)) {
+            $filename = 'product_'.$product->id.'_'.uniqid('', true).'.png';
+            $path = rtrim($tmpDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename;
+            if (! imagepng($image, $path, 6)) {
                 imagedestroy($image);
                 throw new \RuntimeException('Failed to save PNG image.');
             }
-        } else if (!imagewebp($image, $path, 90)) {
+        } elseif (! imagewebp($image, $path, 90)) {
             imagedestroy($image);
             throw new \RuntimeException('Failed to save WebP image.');
         }
         imagedestroy($image);
+
         return $path;
     }
+
     /**
      * Handle generateRandomProductImage functionality with proper error handling.
-     * @param string $productName
-     * @param int|null $productId
-     * @return string
      */
     public function generateRandomProductImage(string $productName, ?int $productId = null): string
     {
-        if (!\function_exists('imagecreatetruecolor')) {
+        if (! \function_exists('imagecreatetruecolor')) {
             throw new \RuntimeException('GD extension is required to generate images.');
         }
         // Create canvas
@@ -114,29 +118,29 @@ final class ProductImageService
         $this->addDecorativeElements($image);
         // Save to temporary file in WebP format
         $tmpDir = sys_get_temp_dir();
-        $filename = 'product_' . ($productId ?? 'random') . '_' . uniqid('', true) . '.webp';
-        $path = rtrim($tmpDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
-        if (!function_exists('imagewebp')) {
+        $filename = 'product_'.($productId ?? 'random').'_'.uniqid('', true).'.webp';
+        $path = rtrim($tmpDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename;
+        if (! function_exists('imagewebp')) {
             // Fallback to PNG if WebP not available
-            $filename = 'product_' . ($productId ?? 'random') . '_' . uniqid('', true) . '.png';
-            $path = rtrim($tmpDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
-            if (!imagepng($image, $path, 6)) {
+            $filename = 'product_'.($productId ?? 'random').'_'.uniqid('', true).'.png';
+            $path = rtrim($tmpDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename;
+            if (! imagepng($image, $path, 6)) {
                 imagedestroy($image);
                 throw new \RuntimeException('Failed to save PNG image.');
             }
-        } else if (!imagewebp($image, $path, 90)) {
+        } elseif (! imagewebp($image, $path, 90)) {
             imagedestroy($image);
             throw new \RuntimeException('Failed to save WebP image.');
         }
         imagedestroy($image);
+
         return $path;
     }
+
     /**
      * Handle createGradientBackground functionality with proper error handling.
-     * @param mixed $image
-     * @param string $startHex
-     * @param string $endHex
-     * @return void
+     *
+     * @param  mixed  $image
      */
     private function createGradientBackground($image, string $startHex, string $endHex): void
     {
@@ -157,11 +161,11 @@ final class ProductImageService
             }
         }
     }
+
     /**
      * Handle addProductNameText functionality with proper error handling.
-     * @param mixed $image
-     * @param string $productName
-     * @return void
+     *
+     * @param  mixed  $image
      */
     private function addProductNameText($image, string $productName): void
     {
@@ -180,14 +184,13 @@ final class ProductImageService
             $this->addBuiltInText($image, $words, $white, $shadow);
         }
     }
+
     /**
      * Handle addTTFText functionality with proper error handling.
-     * @param mixed $image
-     * @param string $text
-     * @param string $fontPath
-     * @param mixed $white
-     * @param mixed $shadow
-     * @return void
+     *
+     * @param  mixed  $image
+     * @param  mixed  $white
+     * @param  mixed  $shadow
      */
     private function addTTFText($image, string $text, string $fontPath, $white, $shadow): void
     {
@@ -205,13 +208,13 @@ final class ProductImageService
         // Add main text
         imagettftext($image, $fontSize, $angle, (int) $x, (int) $y, $white, $fontPath, $text);
     }
+
     /**
      * Handle addBuiltInText functionality with proper error handling.
-     * @param mixed $image
-     * @param array $words
-     * @param mixed $white
-     * @param mixed $shadow
-     * @return void
+     *
+     * @param  mixed  $image
+     * @param  mixed  $white
+     * @param  mixed  $shadow
      */
     private function addBuiltInText($image, array $words, $white, $shadow): void
     {
@@ -233,10 +236,11 @@ final class ProductImageService
             imagestring($image, $font, (int) $x, (int) $y, $word, $white);
         }
     }
+
     /**
      * Handle addDecorativeElements functionality with proper error handling.
-     * @param mixed $image
-     * @return void
+     *
+     * @param  mixed  $image
      */
     private function addDecorativeElements($image): void
     {
@@ -250,9 +254,9 @@ final class ProductImageService
             imagefilledellipse($image, $x, $y, $radius, $radius, $decorativeColor);
         }
     }
+
     /**
      * Handle findSystemFont functionality with proper error handling.
-     * @return string|null
      */
     private function findSystemFont(): ?string
     {
@@ -262,34 +266,34 @@ final class ProductImageService
                 return $path;
             }
         }
+
         return null;
     }
+
     /**
      * Handle hexToRgb functionality with proper error handling.
-     * @param string $hex
-     * @return array
      */
     private function hexToRgb(string $hex): array
     {
         $hex = ltrim($hex, '#');
         if (strlen($hex) === 3) {
-            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
         }
         $int = hexdec($hex);
+
         return [$int >> 16 & 255, $int >> 8 & 255, $int & 255];
     }
+
     /**
      * Handle convertToWebP functionality with proper error handling.
-     * @param string $imagePath
-     * @return string
      */
     public function convertToWebP(string $imagePath): string
     {
-        if (!function_exists('imagewebp')) {
+        if (! function_exists('imagewebp')) {
             throw new \RuntimeException('WebP support is not available in GD extension.');
         }
         $info = getimagesize($imagePath);
-        if (!$info) {
+        if (! $info) {
             throw new \RuntimeException('Invalid image file.');
         }
         $image = match ($info[2]) {
@@ -298,22 +302,21 @@ final class ProductImageService
             IMAGETYPE_GIF => imagecreatefromgif($imagePath),
             default => throw new \RuntimeException('Unsupported image format.'),
         };
-        if (!$image) {
+        if (! $image) {
             throw new \RuntimeException('Failed to create image from file.');
         }
         $webpPath = preg_replace('/\.[^.]+$/', '.webp', $imagePath);
-        if (!imagewebp($image, $webpPath, 85)) {
+        if (! imagewebp($image, $webpPath, 85)) {
             imagedestroy($image);
             throw new \RuntimeException('Failed to convert image to WebP.');
         }
         imagedestroy($image);
+
         return $webpPath;
     }
+
     /**
      * Handle generateMultipleImages functionality with proper error handling.
-     * @param Product $product
-     * @param int $count
-     * @return array
      */
     public function generateMultipleImages(Product $product, int $count = 3): array
     {
@@ -326,6 +329,7 @@ final class ProductImageService
                 Log::warning('Failed to generate image for product', ['product_id' => $product->id, 'error' => $e->getMessage()]);
             }
         }
+
         return $images;
     }
 }

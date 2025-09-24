@@ -8,43 +8,39 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * SearchPaginationService
- * 
+ *
  * Service class containing SearchPaginationService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class SearchPaginationService
 {
     private const CACHE_PREFIX = 'search_pagination:';
+
     private const DEFAULT_PAGE_SIZE = 20;
+
     private const MAX_PAGE_SIZE = 100;
+
     private const CACHE_TTL = 1800; // 30 minutes
 
     /**
      * Handle paginateSearchResults functionality with proper error handling.
-     * @param array $results
-     * @param string $query
-     * @param int $page
-     * @param int $pageSize
-     * @param array $filters
-     * @return array
      */
     public function paginateSearchResults(array $results, string $query, int $page = 1, int $pageSize = self::DEFAULT_PAGE_SIZE, array $filters = []): array
     {
         try {
             $pageSize = min($pageSize, self::MAX_PAGE_SIZE);
             $page = max($page, 1);
-            
+
             // Apply filters if provided
-            if (!empty($filters)) {
+            if (! empty($filters)) {
                 $results = $this->applyFilters($results, $filters);
             }
-            
+
             $totalResults = count($results);
             $totalPages = ceil($totalResults / $pageSize);
             $offset = ($page - 1) * $pageSize;
-            
+
             $paginatedResults = array_slice($results, $offset, $pageSize);
-            
+
             return [
                 'data' => $paginatedResults,
                 'pagination' => [
@@ -61,7 +57,8 @@ final class SearchPaginationService
                 'query' => $query,
             ];
         } catch (\Exception $e) {
-            \Log::warning('Search pagination failed: ' . $e->getMessage());
+            \Log::warning('Search pagination failed: '.$e->getMessage());
+
             return [
                 'data' => [],
                 'pagination' => [
@@ -82,38 +79,33 @@ final class SearchPaginationService
 
     /**
      * Handle getInfiniteScrollData functionality with proper error handling.
-     * @param string $query
-     * @param int $page
-     * @param int $pageSize
-     * @param array $filters
-     * @param array $types
-     * @return array
      */
     public function getInfiniteScrollData(string $query, int $page = 1, int $pageSize = self::DEFAULT_PAGE_SIZE, array $filters = [], array $types = []): array
     {
         try {
             $cacheKey = $this->generateCacheKey($query, $page, $pageSize, $filters, $types);
-            
+
             return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $page, $pageSize, $filters, $types) {
                 $autocompleteService = app(AutocompleteService::class);
-                
+
                 // Get all results for the query
                 $allResults = $autocompleteService->search($query, 1000, $types); // Large limit for pagination
-                
+
                 // Paginate the results
                 $paginatedData = $this->paginateSearchResults($allResults, $query, $page, $pageSize, $filters);
-                
+
                 // Add infinite scroll specific data
                 $paginatedData['infinite_scroll'] = [
                     'has_more' => $paginatedData['pagination']['has_next_page'],
                     'next_page_url' => $this->generateNextPageUrl($query, $page + 1, $pageSize, $filters, $types),
                     'load_more_text' => $this->getLoadMoreText($paginatedData['pagination']),
                 ];
-                
+
                 return $paginatedData;
             });
         } catch (\Exception $e) {
-            \Log::warning('Infinite scroll data failed: ' . $e->getMessage());
+            \Log::warning('Infinite scroll data failed: '.$e->getMessage());
+
             return [
                 'data' => [],
                 'pagination' => [
@@ -139,9 +131,6 @@ final class SearchPaginationService
 
     /**
      * Handle applyFilters functionality with proper error handling.
-     * @param array $results
-     * @param array $filters
-     * @return array
      */
     private function applyFilters(array $results, array $filters): array
     {
@@ -150,7 +139,7 @@ final class SearchPaginationService
                 if (empty($filterValue)) {
                     continue;
                 }
-                
+
                 $results = match ($filterType) {
                     'type' => $this->filterByType($results, $filterValue),
                     'price_min' => $this->filterByPriceMin($results, (float) $filterValue),
@@ -165,34 +154,31 @@ final class SearchPaginationService
                     default => $results,
                 };
             }
-            
+
             return $results;
         } catch (\Exception $e) {
-            \Log::warning('Filter application failed: ' . $e->getMessage());
+            \Log::warning('Filter application failed: '.$e->getMessage());
+
             return $results;
         }
     }
 
     /**
      * Handle filterByType functionality with proper error handling.
-     * @param array $results
-     * @param string|array $type
-     * @return array
+     *
+     * @param  string|array  $type
      */
     private function filterByType(array $results, $type): array
     {
         if (is_array($type)) {
-            return array_filter($results, fn($result) => in_array($result['type'] ?? '', $type));
+            return array_filter($results, fn ($result) => in_array($result['type'] ?? '', $type));
         }
-        
-        return array_filter($results, fn($result) => ($result['type'] ?? '') === $type);
+
+        return array_filter($results, fn ($result) => ($result['type'] ?? '') === $type);
     }
 
     /**
      * Handle filterByPriceMin functionality with proper error handling.
-     * @param array $results
-     * @param float $minPrice
-     * @return array
      */
     private function filterByPriceMin(array $results, float $minPrice): array
     {
@@ -201,15 +187,13 @@ final class SearchPaginationService
             if (is_string($price)) {
                 $price = (float) preg_replace('/[^\d.,]/', '', $price);
             }
+
             return $price >= $minPrice;
         });
     }
 
     /**
      * Handle filterByPriceMax functionality with proper error handling.
-     * @param array $results
-     * @param float $maxPrice
-     * @return array
      */
     private function filterByPriceMax(array $results, float $maxPrice): array
     {
@@ -218,138 +202,123 @@ final class SearchPaginationService
             if (is_string($price)) {
                 $price = (float) preg_replace('/[^\d.,]/', '', $price);
             }
+
             return $price <= $maxPrice;
         });
     }
 
     /**
      * Handle filterByInStock functionality with proper error handling.
-     * @param array $results
-     * @param bool $inStock
-     * @return array
      */
     private function filterByInStock(array $results, bool $inStock): array
     {
-        return array_filter($results, fn($result) => ($result['in_stock'] ?? false) === $inStock);
+        return array_filter($results, fn ($result) => ($result['in_stock'] ?? false) === $inStock);
     }
 
     /**
      * Handle filterByFeatured functionality with proper error handling.
-     * @param array $results
-     * @param bool $featured
-     * @return array
      */
     private function filterByFeatured(array $results, bool $featured): array
     {
-        return array_filter($results, fn($result) => ($result['is_featured'] ?? false) === $featured);
+        return array_filter($results, fn ($result) => ($result['is_featured'] ?? false) === $featured);
     }
 
     /**
      * Handle filterByCategory functionality with proper error handling.
-     * @param array $results
-     * @param string|array $category
-     * @return array
+     *
+     * @param  string|array  $category
      */
     private function filterByCategory(array $results, $category): array
     {
         if (is_array($category)) {
             return array_filter($results, function ($result) use ($category) {
                 $resultCategory = $result['category'] ?? $result['category_name'] ?? '';
+
                 return in_array($resultCategory, $category);
             });
         }
-        
+
         return array_filter($results, function ($result) use ($category) {
             $resultCategory = $result['category'] ?? $result['category_name'] ?? '';
+
             return $resultCategory === $category;
         });
     }
 
     /**
      * Handle filterByBrand functionality with proper error handling.
-     * @param array $results
-     * @param string|array $brand
-     * @return array
+     *
+     * @param  string|array  $brand
      */
     private function filterByBrand(array $results, $brand): array
     {
         if (is_array($brand)) {
             return array_filter($results, function ($result) use ($brand) {
                 $resultBrand = $result['brand'] ?? $result['brand_name'] ?? '';
+
                 return in_array($resultBrand, $brand);
             });
         }
-        
+
         return array_filter($results, function ($result) use ($brand) {
             $resultBrand = $result['brand'] ?? $result['brand_name'] ?? '';
+
             return $resultBrand === $brand;
         });
     }
 
     /**
      * Handle filterByRatingMin functionality with proper error handling.
-     * @param array $results
-     * @param float $minRating
-     * @return array
      */
     private function filterByRatingMin(array $results, float $minRating): array
     {
         return array_filter($results, function ($result) use ($minRating) {
             $rating = $result['average_rating'] ?? $result['rating'] ?? 0;
+
             return $rating >= $minRating;
         });
     }
 
     /**
      * Handle filterByDateFrom functionality with proper error handling.
-     * @param array $results
-     * @param string $dateFrom
-     * @return array
      */
     private function filterByDateFrom(array $results, string $dateFrom): array
     {
         $dateFrom = \Carbon\Carbon::parse($dateFrom);
-        
+
         return array_filter($results, function ($result) use ($dateFrom) {
             $date = $result['created_at'] ?? $result['date'] ?? null;
-            if (!$date) {
+            if (! $date) {
                 return false;
             }
-            
+
             $resultDate = \Carbon\Carbon::parse($date);
+
             return $resultDate->gte($dateFrom);
         });
     }
 
     /**
      * Handle filterByDateTo functionality with proper error handling.
-     * @param array $results
-     * @param string $dateTo
-     * @return array
      */
     private function filterByDateTo(array $results, string $dateTo): array
     {
         $dateTo = \Carbon\Carbon::parse($dateTo);
-        
+
         return array_filter($results, function ($result) use ($dateTo) {
             $date = $result['created_at'] ?? $result['date'] ?? null;
-            if (!$date) {
+            if (! $date) {
                 return false;
             }
-            
+
             $resultDate = \Carbon\Carbon::parse($date);
+
             return $resultDate->lte($dateTo);
         });
     }
 
     /**
      * Handle generateCacheKey functionality with proper error handling.
-     * @param string $query
-     * @param int $page
-     * @param int $pageSize
-     * @param array $filters
-     * @param array $types
-     * @return string
      */
     private function generateCacheKey(string $query, int $page, int $pageSize, array $filters, array $types): string
     {
@@ -361,18 +330,12 @@ final class SearchPaginationService
             'types' => $types,
             'locale' => app()->getLocale(),
         ];
-        
-        return self::CACHE_PREFIX . md5(serialize($keyData));
+
+        return self::CACHE_PREFIX.md5(serialize($keyData));
     }
 
     /**
      * Handle generateNextPageUrl functionality with proper error handling.
-     * @param string $query
-     * @param int $nextPage
-     * @param int $pageSize
-     * @param array $filters
-     * @param array $types
-     * @return string
      */
     private function generateNextPageUrl(string $query, int $nextPage, int $pageSize, array $filters, array $types): string
     {
@@ -381,42 +344,38 @@ final class SearchPaginationService
             'page' => $nextPage,
             'per_page' => $pageSize,
         ];
-        
-        if (!empty($filters)) {
+
+        if (! empty($filters)) {
             $params['filters'] = $filters;
         }
-        
-        if (!empty($types)) {
+
+        if (! empty($types)) {
             $params['types'] = $types;
         }
-        
-        return route('api.autocomplete.search') . '?' . http_build_query($params);
+
+        return route('api.autocomplete.search').'?'.http_build_query($params);
     }
 
     /**
      * Handle getLoadMoreText functionality with proper error handling.
-     * @param array $pagination
-     * @return string
      */
     private function getLoadMoreText(array $pagination): string
     {
-        if (!$pagination['has_next_page']) {
+        if (! $pagination['has_next_page']) {
             return __('frontend.no_more_results');
         }
-        
+
         $remaining = $pagination['total'] - ($pagination['current_page'] * $pagination['per_page']);
-        
+
         if ($remaining <= 0) {
             return __('frontend.no_more_results');
         }
-        
+
         return __('frontend.load_more_results', ['count' => min($remaining, $pagination['per_page'])]);
     }
 
     /**
      * Handle getAvailableFilters functionality with proper error handling.
-     * @param array $results
-     * @return array
      */
     public function getAvailableFilters(array $results): array
     {
@@ -428,32 +387,32 @@ final class SearchPaginationService
                 'brands' => [],
                 'ratings' => [],
             ];
-            
+
             foreach ($results as $result) {
                 // Collect types
                 if (isset($result['type'])) {
                     $filters['types'][$result['type']] = ($filters['types'][$result['type']] ?? 0) + 1;
                 }
-                
+
                 // Collect price ranges
                 if (isset($result['price']) && is_numeric($result['price'])) {
                     $price = (float) $result['price'];
                     $range = $this->getPriceRange($price);
                     $filters['price_ranges'][$range] = ($filters['price_ranges'][$range] ?? 0) + 1;
                 }
-                
+
                 // Collect categories
                 if (isset($result['category']) || isset($result['category_name'])) {
                     $category = $result['category'] ?? $result['category_name'];
                     $filters['categories'][$category] = ($filters['categories'][$category] ?? 0) + 1;
                 }
-                
+
                 // Collect brands
                 if (isset($result['brand']) || isset($result['brand_name'])) {
                     $brand = $result['brand'] ?? $result['brand_name'];
                     $filters['brands'][$brand] = ($filters['brands'][$brand] ?? 0) + 1;
                 }
-                
+
                 // Collect ratings
                 if (isset($result['average_rating']) && is_numeric($result['average_rating'])) {
                     $rating = (float) $result['average_rating'];
@@ -461,18 +420,17 @@ final class SearchPaginationService
                     $filters['ratings'][$ratingRange] = ($filters['ratings'][$ratingRange] ?? 0) + 1;
                 }
             }
-            
+
             return $filters;
         } catch (\Exception $e) {
-            \Log::warning('Available filters generation failed: ' . $e->getMessage());
+            \Log::warning('Available filters generation failed: '.$e->getMessage());
+
             return [];
         }
     }
 
     /**
      * Handle getPriceRange functionality with proper error handling.
-     * @param float $price
-     * @return string
      */
     private function getPriceRange(float $price): string
     {
@@ -491,8 +449,6 @@ final class SearchPaginationService
 
     /**
      * Handle getRatingRange functionality with proper error handling.
-     * @param float $rating
-     * @return string
      */
     private function getRatingRange(float $rating): string
     {

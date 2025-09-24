@@ -1,29 +1,30 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+
 /**
  * SearchAnalyticsService
- * 
+ *
  * Service class containing SearchAnalyticsService business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class SearchAnalyticsService
 {
     private const CACHE_TTL = 3600;
+
     // 1 hour
     private const POPULAR_SEARCHES_CACHE_KEY = 'popular_searches';
+
     private const NO_RESULT_SEARCHES_CACHE_KEY = 'no_result_searches';
+
     private const SEARCH_TRENDS_CACHE_KEY = 'search_trends';
+
     /**
      * Handle trackSearch functionality with proper error handling.
-     * @param string $query
-     * @param int $resultCount
-     * @param int|null $userId
-     * @return void
      */
     public function trackSearch(string $query, int $resultCount, ?int $userId = null): void
     {
@@ -37,51 +38,49 @@ final class SearchAnalyticsService
             $this->updateNoResultSearches($query);
         }
     }
+
     /**
      * Handle getPopularSearches functionality with proper error handling.
-     * @param int $limit
-     * @return array
      */
     public function getPopularSearches(int $limit = 10): array
     {
-        return Cache::remember(self::POPULAR_SEARCHES_CACHE_KEY . "_{$limit}", self::CACHE_TTL, function () use ($limit) {
+        return Cache::remember(self::POPULAR_SEARCHES_CACHE_KEY."_{$limit}", self::CACHE_TTL, function () {
             // This would typically come from database
             // For now, return cached popular searches
             return [['query' => 'laptop', 'count' => 150, 'result_count' => 45], ['query' => 'smartphone', 'count' => 120, 'result_count' => 38], ['query' => 'headphones', 'count' => 95, 'result_count' => 22], ['query' => 'camera', 'count' => 80, 'result_count' => 15], ['query' => 'tablet', 'count' => 70, 'result_count' => 18]];
         });
     }
+
     /**
      * Handle getNoResultSearches functionality with proper error handling.
-     * @param int $limit
-     * @return array
      */
     public function getNoResultSearches(int $limit = 10): array
     {
-        return Cache::remember(self::NO_RESULT_SEARCHES_CACHE_KEY . "_{$limit}", self::CACHE_TTL, function () use ($limit) {
+        return Cache::remember(self::NO_RESULT_SEARCHES_CACHE_KEY."_{$limit}", self::CACHE_TTL, function () {
             // This would typically come from database
             return [['query' => 'xyz123', 'count' => 5], ['query' => 'nonexistent', 'count' => 3], ['query' => 'test123', 'count' => 2]];
         });
     }
+
     /**
      * Handle getSearchTrends functionality with proper error handling.
-     * @param int $days
-     * @return array
      */
     public function getSearchTrends(int $days = 7): array
     {
-        return Cache::remember(self::SEARCH_TRENDS_CACHE_KEY . "_{$days}", self::CACHE_TTL, function () use ($days) {
+        return Cache::remember(self::SEARCH_TRENDS_CACHE_KEY."_{$days}", self::CACHE_TTL, function () use ($days) {
             // This would typically come from database
             $trends = [];
             for ($i = $days - 1; $i >= 0; $i--) {
                 $date = now()->subDays($i)->format('Y-m-d');
                 $trends[] = ['date' => $date, 'searches' => rand(50, 200), 'unique_queries' => rand(20, 80), 'no_results' => rand(5, 25)];
             }
+
             return $trends;
         });
     }
+
     /**
      * Handle getSearchMetrics functionality with proper error handling.
-     * @return array
      */
     public function getSearchMetrics(): array
     {
@@ -89,11 +88,9 @@ final class SearchAnalyticsService
             return ['total_searches' => 1250, 'unique_queries' => 450, 'avg_results_per_search' => 12.5, 'no_result_rate' => 0.15, 'top_search_types' => ['products' => 65, 'categories' => 20, 'brands' => 10, 'collections' => 5]];
         });
     }
+
     /**
      * Handle getAnalyticsBasedSuggestions functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     public function getAnalyticsBasedSuggestions(string $query, int $limit = 5): array
     {
@@ -104,13 +101,12 @@ final class SearchAnalyticsService
                 $suggestions[] = ['query' => $search['query'], 'count' => $search['count'], 'type' => 'popular'];
             }
         }
+
         return array_slice($suggestions, 0, $limit);
     }
+
     /**
      * Handle updatePopularSearches functionality with proper error handling.
-     * @param string $query
-     * @param int $resultCount
-     * @return void
      */
     private function updatePopularSearches(string $query, int $resultCount): void
     {
@@ -124,18 +120,17 @@ final class SearchAnalyticsService
                 break;
             }
         }
-        if (!$found) {
+        if (! $found) {
             $popularSearches[] = ['query' => $query, 'count' => 1, 'result_count' => $resultCount];
         }
         // Sort by count and keep top 100
-        usort($popularSearches, fn($a, $b) => $b['count'] <=> $a['count']);
+        usort($popularSearches, fn ($a, $b) => $b['count'] <=> $a['count']);
         $popularSearches = array_slice($popularSearches, 0, 100);
         Cache::put(self::POPULAR_SEARCHES_CACHE_KEY, $popularSearches, self::CACHE_TTL);
     }
+
     /**
      * Handle updateNoResultSearches functionality with proper error handling.
-     * @param string $query
-     * @return void
      */
     private function updateNoResultSearches(string $query): void
     {
@@ -148,18 +143,19 @@ final class SearchAnalyticsService
                 break;
             }
         }
-        if (!$found) {
+        if (! $found) {
             $noResultSearches[] = ['query' => $query, 'count' => 1];
         }
         // Sort by count and keep top 50
-        usort($noResultSearches, fn($a, $b) => $b['count'] <=> $a['count']);
+        usort($noResultSearches, fn ($a, $b) => $b['count'] <=> $a['count']);
         $noResultSearches = array_slice($noResultSearches, 0, 50);
         Cache::put(self::NO_RESULT_SEARCHES_CACHE_KEY, $noResultSearches, self::CACHE_TTL);
     }
+
     /**
      * Handle getTotalSearches functionality with proper error handling.
-     * @param DateTime $since
-     * @return int
+     *
+     * @param  DateTime  $since
      */
     public function getTotalSearches(\DateTime $since): int
     {
@@ -167,10 +163,11 @@ final class SearchAnalyticsService
             return DB::table('search_analytics')->where('created_at', '>=', $since)->count();
         });
     }
+
     /**
      * Handle getUniqueSearches functionality with proper error handling.
-     * @param DateTime $since
-     * @return int
+     *
+     * @param  DateTime  $since
      */
     public function getUniqueSearches(\DateTime $since): int
     {
@@ -178,10 +175,11 @@ final class SearchAnalyticsService
             return DB::table('search_analytics')->where('created_at', '>=', $since)->distinct('query')->count('query');
         });
     }
+
     /**
      * Handle getNoResultSearchesCount functionality with proper error handling.
-     * @param DateTime $since
-     * @return int
+     *
+     * @param  DateTime  $since
      */
     public function getNoResultSearchesCount(\DateTime $since): int
     {
@@ -189,10 +187,11 @@ final class SearchAnalyticsService
             return DB::table('search_analytics')->where('created_at', '>=', $since)->where('result_count', 0)->count();
         });
     }
+
     /**
      * Handle getAverageResultsPerSearch functionality with proper error handling.
-     * @param DateTime $since
-     * @return float
+     *
+     * @param  DateTime  $since
      */
     public function getAverageResultsPerSearch(\DateTime $since): float
     {
@@ -200,31 +199,33 @@ final class SearchAnalyticsService
             return DB::table('search_analytics')->where('created_at', '>=', $since)->avg('result_count') ?? 0;
         });
     }
+
     /**
      * Handle getPopularSearchesForDateRange functionality with proper error handling.
-     * @param int $limit
-     * @param DateTime|null $since
-     * @return array
+     *
+     * @param  DateTime|null  $since
      */
     public function getPopularSearchesForDateRange(int $limit = 10, ?\DateTime $since = null): array
     {
-        $cacheKey = "search_analytics_popular_{$limit}_" . ($since ? $since->format('Y-m-d') : 'all');
+        $cacheKey = "search_analytics_popular_{$limit}_".($since ? $since->format('Y-m-d') : 'all');
+
         return Cache::remember($cacheKey, 1800, function () use ($limit, $since) {
             $query = DB::table('search_analytics')->select('query', DB::raw('COUNT(*) as search_count'), DB::raw('AVG(result_count) as avg_results'))->groupBy('query')->orderBy('search_count', 'desc')->limit($limit);
             if ($since) {
                 $query->where('created_at', '>=', $since);
             }
+
             return $query->get()->toArray();
         });
     }
+
     /**
      * Handle getSearchTrendsForDateRange functionality with proper error handling.
-     * @param int $days
-     * @return array
      */
     public function getSearchTrendsForDateRange(int $days = 30): array
     {
         $cacheKey = "search_analytics_trends_{$days}";
+
         return Cache::remember($cacheKey, 1800, function () use ($days) {
             return DB::table('search_analytics')->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total_searches'), DB::raw('COUNT(DISTINCT query) as unique_searches'), DB::raw('AVG(result_count) as avg_results'))->where('created_at', '>=', now()->subDays($days))->groupBy(DB::raw('DATE(created_at)'))->orderBy('date')->get()->toArray();
         });

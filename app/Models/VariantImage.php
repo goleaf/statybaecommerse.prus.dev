@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,12 +8,12 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * VariantImage
@@ -22,9 +24,11 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property mixed $fillable
  * @property mixed $casts
  * @property mixed $appends
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|VariantImage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantImage newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantImage query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
@@ -58,7 +62,6 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Handle variant functionality with proper error handling.
-     * @return BelongsTo
      */
     public function variant(): BelongsTo
     {
@@ -67,37 +70,34 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Handle getImageUrlAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image_path) {
+        if (! $this->image_path) {
             return null;
         }
 
-        return asset('storage/' . $this->image_path);
+        return asset('storage/'.$this->image_path);
     }
 
     /**
      * Handle getThumbnailUrlAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getThumbnailUrlAttribute(): ?string
     {
-        if (!$this->image_path) {
+        if (! $this->image_path) {
             return null;
         }
 
         $pathInfo = pathinfo($this->image_path);
         $extension = $pathInfo['extension'] ?? 'jpg';
-        $thumbnailPath = $pathInfo['dirname'] . '/thumbnails/' . $pathInfo['filename'] . '_thumb.' . $extension;
+        $thumbnailPath = $pathInfo['dirname'].'/thumbnails/'.$pathInfo['filename'].'_thumb.'.$extension;
 
-        return asset('storage/' . $thumbnailPath);
+        return asset('storage/'.$thumbnailPath);
     }
 
     /**
      * Handle getFormattedAltTextAttribute functionality with proper error handling.
-     * @return string
      */
     public function getFormattedAltTextAttribute(): string
     {
@@ -105,12 +105,13 @@ final class VariantImage extends Model implements HasMedia
             return $this->alt_text;
         }
 
-        return $this->variant ? $this->variant->display_name . ' - Variant Image' : 'Variant Image';
+        return $this->variant ? $this->variant->display_name.' - Variant Image' : 'Variant Image';
     }
 
     /**
      * Handle scopePrimary functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopePrimary($query)
     {
@@ -119,7 +120,8 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeOrdered($query)
     {
@@ -128,8 +130,8 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Handle scopeByVariant functionality with proper error handling.
-     * @param mixed $query
-     * @param int $variantId
+     *
+     * @param  mixed  $query
      */
     public function scopeByVariant($query, int $variantId)
     {
@@ -138,7 +140,6 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Handle registerMediaCollections functionality with proper error handling.
-     * @return void
      */
     public function registerMediaCollections(): void
     {
@@ -150,8 +151,6 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Handle registerMediaConversions functionality with proper error handling.
-     * @param Media|null $media
-     * @return void
      */
     public function registerMediaConversions(?Media $media = null): void
     {
@@ -186,12 +185,11 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Set as primary image for the variant.
-     * @return bool
      */
     public function setAsPrimary(): bool
     {
         // Remove primary status from other images of the same variant
-        static::where('variant_id', $this->variant_id)
+        self::where('variant_id', $this->variant_id)
             ->where('id', '!=', $this->id)
             ->update(['is_primary' => false]);
 
@@ -203,18 +201,17 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Get image dimensions.
-     * @return array|null
      */
     public function getImageDimensions(): ?array
     {
-        if (!$this->image_path || !file_exists(storage_path('app/public/' . $this->image_path))) {
+        if (! $this->image_path || ! file_exists(storage_path('app/public/'.$this->image_path))) {
             return null;
         }
 
-        $imagePath = storage_path('app/public/' . $this->image_path);
+        $imagePath = storage_path('app/public/'.$this->image_path);
         $imageInfo = getimagesize($imagePath);
 
-        if (!$imageInfo) {
+        if (! $imageInfo) {
             return null;
         }
 
@@ -227,26 +224,24 @@ final class VariantImage extends Model implements HasMedia
 
     /**
      * Get image file size.
-     * @return int|null
      */
     public function getImageFileSize(): ?int
     {
-        if (!$this->image_path || !file_exists(storage_path('app/public/' . $this->image_path))) {
+        if (! $this->image_path || ! file_exists(storage_path('app/public/'.$this->image_path))) {
             return null;
         }
 
-        return filesize(storage_path('app/public/' . $this->image_path));
+        return filesize(storage_path('app/public/'.$this->image_path));
     }
 
     /**
      * Get formatted file size.
-     * @return string|null
      */
     public function getFormattedFileSize(): ?string
     {
         $fileSize = $this->getImageFileSize();
 
-        if (!$fileSize) {
+        if (! $fileSize) {
             return null;
         }
 
@@ -258,6 +253,6 @@ final class VariantImage extends Model implements HasMedia
             $unitIndex++;
         }
 
-        return round($fileSize, 2) . ' ' . $units[$unitIndex];
+        return round($fileSize, 2).' '.$units[$unitIndex];
     }
 }

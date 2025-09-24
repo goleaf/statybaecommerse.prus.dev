@@ -1,11 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
-use App\Models\CustomerGroup;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -18,19 +18,21 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+
+final class CouponResource extends Resource
+{
+    protected static ?string $model = Coupon::class;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -50,8 +52,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $schema
-     * @return Form
      */
     public static function form(Schema $schema): Schema
     {
@@ -184,8 +184,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -204,8 +202,8 @@ use Illuminate\Database\Eloquent\Collection;
                     ->limit(50),
                 TextColumn::make('type')
                     ->label(__('coupons.type'))
-                    ->formatStateUsing(fn(string $state): string => __("coupons.types.{$state}"))
-                    ->color(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => __("coupons.types.{$state}"))
+                    ->color(fn (string $state): string => match ($state) {
                         'percentage' => 'green',
                         'fixed' => 'blue',
                         'free_shipping' => 'purple',
@@ -215,11 +213,12 @@ use Illuminate\Database\Eloquent\Collection;
                     ->label(__('coupons.value'))
                     ->formatStateUsing(function ($state, $record): string {
                         if ($record->type === 'percentage') {
-                            return $state . '%';
+                            return $state.'%';
                         } elseif ($record->type === 'free_shipping') {
                             return __('coupons.free_shipping');
                         }
-                        return '€' . number_format($state, 2);
+
+                        return '€'.number_format($state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -229,17 +228,16 @@ use Illuminate\Database\Eloquent\Collection;
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('used_count')
                     ->label(__('coupons.used_count'))
-                    ->color(fn($state, $record): string =>
-                        $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
+                    ->color(fn ($state, $record): string => $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
                 TextColumn::make('remaining_uses')
                     ->label(__('coupons.remaining_uses'))
-                    ->color(fn($state): string => $state <= 0 ? 'danger' : 'success'),
+                    ->color(fn ($state): string => $state <= 0 ? 'danger' : 'success'),
                 TextColumn::make('customerGroup.name')
                     ->label(__('coupons.customer_group'))
                     ->color('gray'),
                 BadgeColumn::make('is_active')
                     ->label(__('coupons.status'))
-                    ->formatStateUsing(fn(bool $state): string => $state ? __('coupons.active') : __('coupons.inactive'))
+                    ->formatStateUsing(fn (bool $state): string => $state ? __('coupons.active') : __('coupons.inactive'))
                     ->colors([
                         'success' => true,
                         'danger' => false,
@@ -300,11 +298,11 @@ use Illuminate\Database\Eloquent\Collection;
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(Coupon $record): string => $record->is_active ? __('coupons.deactivate') : __('coupons.activate'))
-                    ->icon(fn(Coupon $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Coupon $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (Coupon $record): string => $record->is_active ? __('coupons.deactivate') : __('coupons.activate'))
+                    ->icon(fn (Coupon $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Coupon $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Coupon $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active ? __('coupons.activated_successfully') : __('coupons.deactivated_successfully'))
@@ -318,8 +316,8 @@ use Illuminate\Database\Eloquent\Collection;
                     ->color('info')
                     ->action(function (Coupon $record): void {
                         $newCoupon = $record->replicate();
-                        $newCoupon->code = $record->code . '_copy_' . time();
-                        $newCoupon->name = $record->name . ' (Copy)';
+                        $newCoupon->code = $record->code.'_copy_'.time();
+                        $newCoupon->name = $record->name.' (Copy)';
                         $newCoupon->used_count = 0;
                         $newCoupon->save();
 
@@ -365,7 +363,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {

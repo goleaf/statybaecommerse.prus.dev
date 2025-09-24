@@ -80,15 +80,15 @@ return new class extends Migration
         // Create translations table
         if (! Schema::hasTable('campaign_conversion_translations')) {
             Schema::create('campaign_conversion_translations', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('campaign_conversion_id')->constrained('campaign_conversions')->cascadeOnDelete();
-            $table->string('locale', 5);
-            $table->text('notes')->nullable();
-            $table->json('custom_attributes')->nullable();
-            $table->timestamps();
+                $table->id();
+                $table->foreignId('campaign_conversion_id')->constrained('campaign_conversions')->cascadeOnDelete();
+                $table->string('locale', 5);
+                $table->text('notes')->nullable();
+                $table->json('custom_attributes')->nullable();
+                $table->timestamps();
 
-            $table->unique(['campaign_conversion_id', 'locale']);
-            $table->index(['locale']);
+                $table->unique(['campaign_conversion_id', 'locale']);
+                $table->index(['locale']);
             });
         }
 
@@ -110,6 +110,7 @@ return new class extends Migration
     {
         if (! Schema::hasTable('campaign_conversions')) {
             Schema::dropIfExists('campaign_conversion_translations');
+
             return;
         }
 

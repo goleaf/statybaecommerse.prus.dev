@@ -6,7 +6,6 @@ namespace App\Filament\Resources\AttributeResource\Widgets;
 
 use App\Models\Attribute;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class AttributeUsageWidget extends ChartWidget
 {

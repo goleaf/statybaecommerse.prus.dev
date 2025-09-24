@@ -4,27 +4,25 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Countries\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
-use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 
 /**
  * CountriesTable
- * 
+ *
  * Filament table configuration for Country management with comprehensive columns, filters, and actions.
  */
 final class CountriesTable
@@ -39,18 +37,18 @@ final class CountriesTable
                     ->circular()
                     ->size(40)
                     ->defaultImageUrl('/images/default-flag.png'),
-                
+
                 TextColumn::make('name')
                     ->label(__('countries.name'))
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                
+
                 TextColumn::make('name_official')
                     ->label(__('countries.name_official'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 // Country Codes
                 TextColumn::make('cca2')
                     ->label(__('countries.cca2'))
@@ -58,14 +56,14 @@ final class CountriesTable
                     ->sortable()
                     ->badge()
                     ->color('primary'),
-                
+
                 TextColumn::make('cca3')
                     ->label(__('countries.cca3'))
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->color('secondary'),
-                
+
                 // Geographic Info
                 TextColumn::make('region')
                     ->label(__('countries.region'))
@@ -73,12 +71,12 @@ final class CountriesTable
                     ->sortable()
                     ->badge()
                     ->color('info'),
-                
+
                 TextColumn::make('subregion')
                     ->label(__('countries.subregion'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 // Currency Info
                 TextColumn::make('currency_code')
                     ->label(__('countries.currency_code'))
@@ -86,75 +84,75 @@ final class CountriesTable
                     ->sortable()
                     ->badge()
                     ->color('success'),
-                
+
                 TextColumn::make('vat_rate')
                     ->label(__('countries.vat_rate'))
                     ->numeric()
                     ->sortable()
                     ->suffix('%')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 // Status Columns
                 IconColumn::make('is_active')
                     ->label(__('countries.is_active'))
                     ->boolean()
                     ->sortable(),
-                
+
                 IconColumn::make('is_enabled')
                     ->label(__('countries.is_enabled'))
                     ->boolean()
                     ->sortable(),
-                
+
                 IconColumn::make('is_eu_member')
                     ->label(__('countries.is_eu_member'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 IconColumn::make('requires_vat')
                     ->label(__('countries.requires_vat'))
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 // Contact Info
                 TextColumn::make('phone_calling_code')
                     ->label(__('countries.phone_calling_code'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 TextColumn::make('timezone')
                     ->label(__('countries.timezone'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 // Coordinates
                 TextColumn::make('latitude')
                     ->label(__('countries.latitude'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 TextColumn::make('longitude')
                     ->label(__('countries.longitude'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 // Sort Order
                 TextColumn::make('sort_order')
                     ->label(__('countries.sort_order'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 // Timestamps
                 TextColumn::make('created_at')
                     ->label(__('countries.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 TextColumn::make('updated_at')
                     ->label(__('countries.updated_at'))
                     ->dateTime()
@@ -163,23 +161,23 @@ final class CountriesTable
             ])
             ->filters([
                 TrashedFilter::make(),
-                
+
                 TernaryFilter::make('is_active')
                     ->label(__('countries.is_active'))
                     ->boolean(),
-                
+
                 TernaryFilter::make('is_enabled')
                     ->label(__('countries.is_enabled'))
                     ->boolean(),
-                
+
                 TernaryFilter::make('is_eu_member')
                     ->label(__('countries.is_eu_member'))
                     ->boolean(),
-                
+
                 TernaryFilter::make('requires_vat')
                     ->label(__('countries.requires_vat'))
                     ->boolean(),
-                
+
                 SelectFilter::make('region')
                     ->label(__('countries.region'))
                     ->options(function () {
@@ -189,7 +187,7 @@ final class CountriesTable
                             ->sort()
                             ->toArray();
                     }),
-                
+
                 SelectFilter::make('currency_code')
                     ->label(__('countries.currency_code'))
                     ->options(function () {
@@ -217,7 +215,7 @@ final class CountriesTable
                                 ->success()
                                 ->send();
                         }),
-                    
+
                     BulkAction::make('deactivate')
                         ->label(__('countries.deactivate_selected'))
                         ->icon('heroicon-o-x-circle')
@@ -229,7 +227,7 @@ final class CountriesTable
                                 ->success()
                                 ->send();
                         }),
-                    
+
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

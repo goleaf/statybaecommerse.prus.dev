@@ -6,5 +6,4 @@ return [
 
     'default_zone' => env('DEFAULT_ZONE', 'EU'),
 
-
 ];

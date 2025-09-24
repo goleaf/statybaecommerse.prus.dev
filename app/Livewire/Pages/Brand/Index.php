@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire\Pages\Brand;
 
 use App\Livewire\Pages\AbstractPageComponent;
@@ -15,11 +16,12 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+
 /**
  * Index
- * 
+ *
  * Livewire component for Index with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string $search
  * @property string $sortBy
  */
@@ -27,22 +29,23 @@ final class Index extends AbstractPageComponent implements HasSchemas
 {
     use InteractsWithSchemas;
     use WithPagination;
+
     #[Url(except: '')]
     public string $search = '';
+
     #[Url(except: 'name')]
     public string $sortBy = 'name';
+
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
         // Initialize component
     }
+
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Schema $schema
-     * @return Schema
      */
     public function form(Schema $schema): Schema
     {
@@ -51,7 +54,7 @@ final class Index extends AbstractPageComponent implements HasSchemas
                 ->label(__('Search brands'))
                 ->placeholder(__('Search brands...'))
                 ->live(debounce: 300)
-                ->afterStateUpdated(fn() => $this->resetPage())
+                ->afterStateUpdated(fn () => $this->resetPage())
                 ->prefixIcon('heroicon-o-magnifying-glass'),
             Select::make('sortBy')
                 ->label(__('Sort by'))
@@ -60,13 +63,14 @@ final class Index extends AbstractPageComponent implements HasSchemas
                     'name_desc' => __('Name Z-A'),
                     'products_count' => __('Most Products'),
                     'created_at' => __('Newest'),
-                    'featured' => __('Featured First')
+                    'featured' => __('Featured First'),
                 ])
                 ->live()
-                ->afterStateUpdated(fn() => $this->resetPage())
-                ->prefixIcon('heroicon-o-arrows-up-down')
+                ->afterStateUpdated(fn () => $this->resetPage())
+                ->prefixIcon('heroicon-o-arrows-up-down'),
         ]);
     }
+
     /**
      * Handle brands functionality with proper error handling.
      */
@@ -79,9 +83,9 @@ final class Index extends AbstractPageComponent implements HasSchemas
         // Apply search filter
         if ($this->search !== '') {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%')->orWhereHas('translations', function ($translationQuery) {
+                $q->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%')->orWhereHas('translations', function ($translationQuery) {
                     $translationQuery->where('locale', app()->getLocale())->where(function ($tq) {
-                        $tq->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%');
+                        $tq->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%');
                     });
                 });
             });
@@ -95,24 +99,26 @@ final class Index extends AbstractPageComponent implements HasSchemas
             'featured' => $query->orderByDesc('is_featured')->orderBy('name'),
             default => $query->orderBy('name'),
         };
+
         return $query->paginate(12);
     }
+
     /**
      * Handle getPageTitle functionality with proper error handling.
-     * @return string
      */
     protected function getPageTitle(): string
     {
         return __('shared.brands');
     }
+
     /**
      * Handle getPageDescription functionality with proper error handling.
-     * @return string|null
      */
     protected function getPageDescription(): ?string
     {
         return __('Browse all our trusted brand partners and discover quality products');
     }
+
     /**
      * Reset filters to their default state.
      */
@@ -124,10 +130,9 @@ final class Index extends AbstractPageComponent implements HasSchemas
 
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {
-        return view('livewire.pages.brand.index')->title(__('translations.brands') . ' - ' . config('app.name'));
+        return view('livewire.pages.brand.index')->title(__('translations.brands').' - '.config('app.name'));
     }
 }

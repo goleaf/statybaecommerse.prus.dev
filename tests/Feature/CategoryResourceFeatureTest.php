@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -6,7 +8,6 @@ use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 class CategoryResourceFeatureTest extends TestCase
 {
@@ -18,19 +19,19 @@ class CategoryResourceFeatureTest extends TestCase
 
         $this->actingAs(User::factory()->create([
             'email' => 'admin@test.com',
-            'is_active' => true
+            'is_active' => true,
         ]));
     }
 
     public function test_category_resource_can_be_instantiated(): void
     {
-        $resource = new CategoryResource();
+        $resource = new CategoryResource;
         $this->assertInstanceOf(CategoryResource::class, $resource);
     }
 
     public function test_category_resource_has_required_methods(): void
     {
-        $resource = new CategoryResource();
+        $resource = new CategoryResource;
 
         $this->assertTrue(method_exists($resource, 'form'));
         $this->assertTrue(method_exists($resource, 'table'));
@@ -40,7 +41,7 @@ class CategoryResourceFeatureTest extends TestCase
 
     public function test_category_resource_has_valid_model(): void
     {
-        $resource = new CategoryResource();
+        $resource = new CategoryResource;
         $model = $resource->getModel();
 
         $this->assertEquals(Category::class, $model);
@@ -49,7 +50,7 @@ class CategoryResourceFeatureTest extends TestCase
 
     public function test_category_resource_form_method_exists(): void
     {
-        $resource = new CategoryResource();
+        $resource = new CategoryResource;
 
         // Test that form method exists and is callable
         $this->assertTrue(method_exists($resource, 'form'));
@@ -58,7 +59,7 @@ class CategoryResourceFeatureTest extends TestCase
 
     public function test_category_resource_table_method_exists(): void
     {
-        $resource = new CategoryResource();
+        $resource = new CategoryResource;
 
         // Test that table method exists and is callable
         $this->assertTrue(method_exists($resource, 'table'));
@@ -67,7 +68,7 @@ class CategoryResourceFeatureTest extends TestCase
 
     public function test_category_resource_handles_empty_database(): void
     {
-        $resource = new CategoryResource();
+        $resource = new CategoryResource;
 
         // Test that methods exist and are callable
         $this->assertTrue(method_exists($resource, 'form'));
@@ -83,7 +84,7 @@ class CategoryResourceFeatureTest extends TestCase
             'slug' => 'test-category',
         ]);
 
-        $resource = new CategoryResource();
+        $resource = new CategoryResource;
 
         // Test that methods exist and are callable
         $this->assertTrue(method_exists($resource, 'form'));
@@ -105,7 +106,7 @@ class CategoryResourceFeatureTest extends TestCase
         $returnCode = 0;
         exec('php -l app/Filament/Resources/CategoryResource.php 2>&1', $output, $returnCode);
 
-        $this->assertEquals(0, $returnCode, 'CategoryResource.php has syntax errors: ' . implode("\n", $output));
+        $this->assertEquals(0, $returnCode, 'CategoryResource.php has syntax errors: '.implode("\n", $output));
     }
 
     public function test_category_model_syntax_validation(): void
@@ -115,7 +116,7 @@ class CategoryResourceFeatureTest extends TestCase
         $returnCode = 0;
         exec('php -l app/Models/Category.php 2>&1', $output, $returnCode);
 
-        $this->assertEquals(0, $returnCode, 'Category.php has syntax errors: ' . implode("\n", $output));
+        $this->assertEquals(0, $returnCode, 'Category.php has syntax errors: '.implode("\n", $output));
     }
 
     public function test_category_resource_pages_syntax_validation(): void
@@ -124,7 +125,7 @@ class CategoryResourceFeatureTest extends TestCase
             'app/Filament/Resources/CategoryResource/Pages/ListCategories.php',
             'app/Filament/Resources/CategoryResource/Pages/CreateCategory.php',
             'app/Filament/Resources/CategoryResource/Pages/EditCategory.php',
-            'app/Filament/Resources/CategoryResource/Pages/ViewCategory.php'
+            'app/Filament/Resources/CategoryResource/Pages/ViewCategory.php',
         ];
 
         foreach ($pages as $page) {
@@ -132,8 +133,7 @@ class CategoryResourceFeatureTest extends TestCase
             $returnCode = 0;
             exec("php -l $page 2>&1", $output, $returnCode);
 
-            $this->assertEquals(0, $returnCode, "$page has syntax errors: " . implode("\n", $output));
+            $this->assertEquals(0, $returnCode, "$page has syntax errors: ".implode("\n", $output));
         }
     }
 }
-

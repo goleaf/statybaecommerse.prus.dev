@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
@@ -52,7 +54,7 @@ final class DocumentAction
                         ->send();
 
                     if ($data['format'] === 'pdf') {
-                        return response()->download($document->file_path, $document->title . '.pdf');
+                        return response()->download($document->file_path, $document->title.'.pdf');
                     }
 
                     return response($document->content, 200, [
@@ -91,4 +93,3 @@ final class DocumentAction
         return $variables;
     }
 }
-

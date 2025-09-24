@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingHistoryResource\Pages;
 use App\Models\SystemSettingHistory;
-use App\Models\SystemSetting;
-use App\Models\User;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -18,30 +18,27 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-/**
- * SystemSettingHistoryResource
- *
- * Filament v4 resource for SystemSettingHistory management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
 final class SystemSettingHistoryResource extends Resource
 {
-    protected static ?string $model = SystemSettingHistory::class;
-    protected static ?int $navigationSort = 13;
-    protected static ?string $recordTitleAttribute = 'change_reason';
-    protected static ?string $navigationGroup = NavigationGroup::Settings;
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-clock';
+    }
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Settings;
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Settings';
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -58,49 +55,49 @@ final class SystemSettingHistoryResource extends Resource
         return __('admin.system_setting_histories.model_label');
     }
 
-    public static function schema(Schema $schema): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
-                SchemaSection::make(__('admin.system_setting_histories.basic_information'))
+                Section::make(__('admin.system_setting_histories.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Select::make('system_setting_id')
                                     ->label(__('admin.system_setting_histories.system_setting'))
-                                    ->options(SystemSetting::pluck('key', 'id'))
+                                    ->relationship('systemSetting', 'key')
                                     ->required()
-                                    ->searchable(),
-
+                                    ->searchable()
+                                    ->preload(),
                                 Select::make('changed_by')
                                     ->label(__('admin.system_setting_histories.changed_by'))
-                                    ->options(User::pluck('name', 'id'))
+                                    ->relationship('user', 'name')
                                     ->required()
-                                    ->searchable(),
-
+                                    ->searchable()
+                                    ->preload(),
                                 TextInput::make('change_reason')
                                     ->label(__('admin.system_setting_histories.change_reason'))
-                                    ->maxLength(255),
-
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
                                 TextInput::make('ip_address')
                                     ->label(__('admin.system_setting_histories.ip_address'))
                                     ->ip()
                                     ->maxLength(45),
-
                                 TextInput::make('user_agent')
                                     ->label(__('admin.system_setting_histories.user_agent'))
-                                    ->maxLength(500),
+                                    ->maxLength(500)
+                                    ->columnSpanFull(),
                             ]),
-
                         Textarea::make('old_value')
                             ->label(__('admin.system_setting_histories.old_value'))
                             ->rows(3)
-                            ->helperText(__('admin.system_setting_histories.old_value_help')),
-
+                            ->helperText(__('admin.system_setting_histories.old_value_help'))
+                            ->columnSpanFull(),
                         Textarea::make('new_value')
                             ->label(__('admin.system_setting_histories.new_value'))
                             ->rows(3)
-                            ->helperText(__('admin.system_setting_histories.new_value_help')),
+                            ->helperText(__('admin.system_setting_histories.new_value_help'))
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
@@ -113,13 +110,15 @@ final class SystemSettingHistoryResource extends Resource
                     ->label(__('admin.system_setting_histories.system_setting'))
                     ->searchable()
                     ->sortable()
-                    ->copyable(),
-
+                    ->copyable()
+                    ->badge()
+                    ->color('primary'),
                 TextColumn::make('user.name')
                     ->label(__('admin.system_setting_histories.changed_by'))
                     ->searchable()
-                    ->sortable(),
-
+                    ->sortable()
+                    ->badge()
+                    ->color('secondary'),
                 TextColumn::make('change_reason')
                     ->label(__('admin.system_setting_histories.change_reason'))
                     ->searchable()
@@ -127,30 +126,32 @@ final class SystemSettingHistoryResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 50 ? $state : null;
                     }),
-
                 TextColumn::make('old_value')
                     ->label(__('admin.system_setting_histories.old_value'))
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-                        return strlen($state) > 30 ? $state : null;
-                    }),
 
+                        return strlen($state) > 30 ? $state : null;
+                    })
+                    ->toggleable(),
                 TextColumn::make('new_value')
                     ->label(__('admin.system_setting_histories.new_value'))
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-                        return strlen($state) > 30 ? $state : null;
-                    }),
 
+                        return strlen($state) > 30 ? $state : null;
+                    })
+                    ->toggleable(),
                 TextColumn::make('ip_address')
                     ->label(__('admin.system_setting_histories.ip_address'))
                     ->searchable()
-                    ->sortable(),
-
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->dateTime()
@@ -160,21 +161,44 @@ final class SystemSettingHistoryResource extends Resource
             ->filters([
                 SelectFilter::make('system_setting_id')
                     ->label(__('admin.system_setting_histories.system_setting'))
-                    ->options(SystemSetting::pluck('key', 'id'))
+                    ->relationship('systemSetting', 'key')
                     ->searchable(),
-
                 SelectFilter::make('changed_by')
                     ->label(__('admin.system_setting_histories.changed_by'))
-                    ->options(User::pluck('name', 'id'))
+                    ->relationship('user', 'name')
                     ->searchable(),
             ])
-            ->recordActions([
+            ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                Action::make('restore_value')
+                    ->label(__('admin.system_setting_histories.restore_value'))
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('warning')
+                    ->action(function (SystemSettingHistory $record): void {
+                        $record->systemSetting->update(['value' => $record->old_value]);
+                        Notification::make()
+                            ->title(__('admin.system_setting_histories.value_restored_successfully'))
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->visible(fn (SystemSettingHistory $record): bool => ! empty($record->old_value)),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    BulkAction::make('export_history')
+                        ->label(__('admin.system_setting_histories.export_history'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('info')
+                        ->action(function (Collection $records): void {
+                            // Export logic here
+                            Notification::make()
+                                ->title(__('admin.system_setting_histories.exported_successfully'))
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

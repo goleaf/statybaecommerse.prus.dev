@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,12 +16,14 @@ it('loads account dashboard', function () {
     // If there's a Blade syntax error, skip the test
     if ($response->status() === 500) {
         $this->markTestSkipped('Blade syntax error in app.blade.php layout - requires manual fix of layout file');
+
         return;
     }
 
     // If getting a redirect, follow it and check if it's a valid redirect
     if ($response->status() === 302) {
         $response->assertRedirect();
+
         return;
     }
 
@@ -38,7 +42,7 @@ it('loads account subpages', function () {
         'account.reviews',
         'account.wishlist',
         'account.documents',
-        'account.notifications'
+        'account.notifications',
     ];
 
     foreach ($routes as $route) {
@@ -46,6 +50,7 @@ it('loads account subpages', function () {
 
         if ($response->status() === 500) {
             $this->markTestSkipped('Blade syntax error in app.blade.php layout - requires manual fix of layout file');
+
             return;
         }
 

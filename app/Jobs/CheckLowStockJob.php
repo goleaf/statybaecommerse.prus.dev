@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\Product;
@@ -14,18 +15,18 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
+
 /**
  * CheckLowStockJob
- * 
+ *
  * Queue job for CheckLowStockJob background processing with proper error handling, retry logic, and progress tracking.
- * 
  */
 final class CheckLowStockJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     /**
      * Handle the job, event, or request processing.
-     * @return void
      */
     public function handle(): void
     {

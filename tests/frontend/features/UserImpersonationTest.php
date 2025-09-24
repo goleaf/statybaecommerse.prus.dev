@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Order;
 use App\Models\User;
@@ -141,12 +143,12 @@ describe('User Impersonation Actions', function () {
                 'original_user_id' => $this->admin->id,
                 'impersonated_user_id' => $targetUser->id,
                 'started_at' => now()->toISOString(),
-            ]
+            ],
         ]);
         auth()->login($targetUser);
 
         // Test the stopImpersonation method directly
-        $page = new \App\Filament\Pages\UserImpersonation();
+        $page = new \App\Filament\Pages\UserImpersonation;
         $page->stopImpersonation();
 
         expect(session('impersonate'))->toBeNull();
@@ -159,7 +161,7 @@ describe('User Impersonation Actions', function () {
                 'original_user_id' => $this->admin->id,
                 'impersonated_user_id' => 999,
                 'started_at' => now()->toISOString(),
-            ]
+            ],
         ]);
 
         // Test that the page shows the stop impersonation button when impersonating
@@ -279,11 +281,11 @@ describe('User Impersonation Filters', function () {
     it('can filter by recent activity', function () {
         $recentUser = User::factory()->create([
             'is_admin' => false,
-            'last_login_at' => now()->subDays(5)
+            'last_login_at' => now()->subDays(5),
         ]);
         $oldUser = User::factory()->create([
             'is_admin' => false,
-            'last_login_at' => now()->subDays(60)
+            'last_login_at' => now()->subDays(60),
         ]);
 
         $component = Livewire::test(\App\Filament\Pages\UserImpersonation::class);
@@ -336,7 +338,7 @@ describe('User Impersonation Middleware', function () {
                 'original_user_id' => $admin->id,
                 'impersonated_user_id' => $targetUser->id,
                 'started_at' => now()->toISOString(),
-            ]
+            ],
         ]);
 
         // Login as admin first

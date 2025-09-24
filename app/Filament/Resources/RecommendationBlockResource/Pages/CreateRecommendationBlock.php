@@ -23,7 +23,7 @@ final class CreateRecommendationBlock extends CreateRecord
         $data['is_featured'] = $data['is_featured'] ?? false;
         $data['max_items'] = $data['max_items'] ?? 10;
         $data['sort_order'] = $data['sort_order'] ?? 0;
-        
+
         return $data;
     }
 }

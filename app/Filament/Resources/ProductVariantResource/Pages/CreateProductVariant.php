@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductVariantResource\Pages;
 
 use App\Filament\Resources\ProductVariantResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\CreateRecord;
 
 final class CreateProductVariant extends CreateRecord
 {
@@ -33,7 +33,7 @@ final class CreateProductVariant extends CreateRecord
         }
 
         // Set position if not provided
-        if (!isset($data['position'])) {
+        if (! isset($data['position'])) {
             $data['position'] = $this->getNextPosition($data['product_id']);
         }
 
@@ -46,23 +46,23 @@ final class CreateProductVariant extends CreateRecord
         $baseSku = $product ? $product->sku : 'VAR';
         $size = $data['size'] ?? '';
         $suffix = $data['variant_sku_suffix'] ?? '';
-        
+
         $sku = $baseSku;
         if ($size) {
-            $sku .= '-' . strtoupper($size);
+            $sku .= '-'.strtoupper($size);
         }
         if ($suffix) {
-            $sku .= '-' . strtoupper($suffix);
+            $sku .= '-'.strtoupper($suffix);
         }
-        
+
         // Ensure uniqueness
         $originalSku = $sku;
         $counter = 1;
         while (\App\Models\ProductVariant::where('sku', $sku)->exists()) {
-            $sku = $originalSku . '-' . $counter;
+            $sku = $originalSku.'-'.$counter;
             $counter++;
         }
-        
+
         return $sku;
     }
 
@@ -70,7 +70,7 @@ final class CreateProductVariant extends CreateRecord
     {
         $maxPosition = \App\Models\ProductVariant::where('product_id', $productId)
             ->max('position');
-        
+
         return ($maxPosition ?? 0) + 1;
     }
 }

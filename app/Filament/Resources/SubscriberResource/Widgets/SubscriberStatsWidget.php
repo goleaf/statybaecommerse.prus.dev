@@ -7,7 +7,6 @@ namespace App\Filament\Resources\SubscriberResource\Widgets;
 use App\Models\Subscriber;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class SubscriberStatsWidget extends BaseWidget
 {

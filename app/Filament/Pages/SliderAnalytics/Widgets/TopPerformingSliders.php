@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages\SliderAnalytics\Widgets;
 
@@ -32,10 +34,10 @@ final class TopPerformingSliders extends BaseWidget
         $status = $this->pageFilters['status'] ?? 'all';
 
         $query = Slider::query()
-            ->when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate))
-            ->when($sliderId, fn(Builder $query) => $query->where('id', $sliderId))
-            ->when($status !== 'all', fn(Builder $query) => $query->where('is_active', $status === 'active'));
+            ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+            ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
+            ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
         return $table
             ->query($query)
@@ -44,6 +46,7 @@ final class TopPerformingSliders extends BaseWidget
                     ->label('Image')
                     ->getStateUsing(function (Slider $record): ?string {
                         $media = $record->getFirstMedia('slider_images');
+
                         return $media ? $media->getUrl() : null;
                     })
                     ->defaultImageUrl('/images/placeholder-slider.png')
@@ -86,11 +89,11 @@ final class TopPerformingSliders extends BaseWidget
                             $features[] = 'Background';
                         }
 
-                        if (!empty($record->button_text) && !empty($record->button_url)) {
+                        if (! empty($record->button_text) && ! empty($record->button_url)) {
                             $features[] = 'Button';
                         }
 
-                        if (!empty($record->background_color) || !empty($record->text_color)) {
+                        if (! empty($record->background_color) || ! empty($record->text_color)) {
                             $features[] = 'Colors';
                         }
 

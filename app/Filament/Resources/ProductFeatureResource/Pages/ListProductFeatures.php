@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductFeatureResource\Pages;
 
 use App\Filament\Resources\ProductFeatureResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 
 final class ListProductFeatures extends ListRecords
 {
@@ -17,4 +19,3 @@ final class ListProductFeatures extends ListRecords
         ];
     }
 }
-

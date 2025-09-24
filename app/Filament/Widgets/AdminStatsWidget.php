@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -7,8 +9,8 @@ use App\Models\EnumValue;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class AdminStatsWidget extends BaseWidget
 {

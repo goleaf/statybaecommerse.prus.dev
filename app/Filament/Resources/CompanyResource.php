@@ -1,27 +1,27 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Schemas\Schema;
+use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+
+final class CompanyResource extends Resource
+{
+    protected static ?string $model = Company::class;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -41,7 +41,8 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament form schema with fields and validation.
-     * @param Form $schema
+     *
+     * @param  Form  $schema
      * @return Form
      */
     public static function form(Schema $schema): Schema
@@ -98,8 +99,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Configure the Filament table with columns, filters, and actions.
-     * @param Table $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -129,9 +128,9 @@ use Illuminate\Database\Eloquent\Collection;
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('size')
                     ->label(__('companies.size'))
-                    ->formatStateUsing(fn(string $state): string => __("companies.sizes.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("companies.sizes.{$state}"))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'small' => 'green',
                         'medium' => 'blue',
                         'large' => 'purple',
@@ -168,11 +167,11 @@ use Illuminate\Database\Eloquent\Collection;
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('toggle_active')
-                    ->label(fn(Company $record): string => $record->is_active ? __('companies.deactivate') : __('companies.activate'))
-                    ->icon(fn(Company $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Company $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (Company $record): string => $record->is_active ? __('companies.deactivate') : __('companies.activate'))
+                    ->icon(fn (Company $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Company $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Company $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active ? __('companies.activated_successfully') : __('companies.deactivated_successfully'))
@@ -215,7 +214,6 @@ use Illuminate\Database\Eloquent\Collection;
 
     /**
      * Get the relations for this resource.
-     * @return array
      */
     public static function getRelations(): array
     {

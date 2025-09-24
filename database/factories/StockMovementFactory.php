@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\StockMovement;
-use App\Models\VariantInventory;
 use App\Models\User;
+use App\Models\VariantInventory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +20,7 @@ final class StockMovementFactory extends Factory
     {
         $types = ['in', 'out'];
         $reasons = ['sale', 'return', 'adjustment', 'manual_adjustment', 'restock', 'damage', 'theft', 'transfer'];
-        
+
         return [
             'variant_inventory_id' => VariantInventory::factory(),
             'quantity' => $this->faker->numberBetween(1, 100),
@@ -98,4 +98,3 @@ final class StockMovementFactory extends Factory
         ]);
     }
 }
-

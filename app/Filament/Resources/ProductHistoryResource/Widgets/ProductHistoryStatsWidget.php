@@ -7,7 +7,6 @@ namespace App\Filament\Resources\ProductHistoryResource\Widgets;
 use App\Models\ProductHistory;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 final class ProductHistoryStatsWidget extends BaseWidget
 {

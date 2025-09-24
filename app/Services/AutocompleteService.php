@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -14,10 +16,8 @@ use App\Models\Location;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
-use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 /**
@@ -28,16 +28,14 @@ use Illuminate\Support\Str;
 final class AutocompleteService
 {
     private const CACHE_TTL = 300;
+
     // 5 minutes
     private const DEFAULT_LIMIT = 10;
+
     private const MAX_LIMIT = 50;
 
     /**
      * Handle search functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @param array $types
-     * @return array
      */
     public function search(string $query, int $limit = self::DEFAULT_LIMIT, array $types = []): array
     {
@@ -70,6 +68,7 @@ final class AutocompleteService
                         $results = array_merge($results, $typeResults);
                     }
                 }
+
                 // Sort by relevance and limit final results
                 return $this->sortByRelevance($results, $query, $limit);
             });
@@ -99,13 +98,11 @@ final class AutocompleteService
 
     /**
      * Handle searchProducts functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     public function searchProducts(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_products_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_products_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -121,9 +118,10 @@ final class AutocompleteService
                     });
                 });
             })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN sku LIKE ? THEN 2\n                        WHEN description LIKE ? THEN 3\n                        ELSE 4\n                    END\n                ", ["%{$query}%", "%{$query}%", "%{$query}%"])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
+
             return Arr::from($products->skipWhile(function (Product $product) {
                 // Skip products that are not properly configured or have missing essential data
-                return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug);
+                return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
             })->map(function (Product $product) use ($query, $locale) {
                 return ['id' => $product->id, 'type' => 'product', 'title' => $product->getTranslatedName($locale), 'subtitle' => $product->brand?->name, 'description' => Str::limit($product->getTranslatedDescription($locale), 100), 'url' => route('localized.products.show', ['locale' => $locale, 'product' => $product->slug]), 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'price' => $product->getPrice(), 'formatted_price' => $product->getFormattedPrice(), 'sku' => $product->sku, 'in_stock' => $product->isInStock(), 'relevance_score' => $this->calculateRelevanceScore($product->getTranslatedName($locale), $query)];
             }));
@@ -132,13 +130,11 @@ final class AutocompleteService
 
     /**
      * Handle searchCategories functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     public function searchCategories(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_categories_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_categories_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -149,9 +145,10 @@ final class AutocompleteService
                     });
                 });
             })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ", ["%{$query}%", "%{$query}%"])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
+
             return Arr::from($categories->skipWhile(function (Category $category) {
                 // Skip categories that are not properly configured or have missing essential data
-                return empty($category->name) || !$category->is_visible || empty($category->slug);
+                return empty($category->name) || ! $category->is_visible || empty($category->slug);
             })->map(function (Category $category) use ($query, $locale) {
                 return ['id' => $category->id, 'type' => 'category', 'title' => $category->getTranslatedName($locale), 'subtitle' => $category->parent ? $category->parent->getTranslatedName($locale) : null, 'description' => Str::limit($category->getTranslatedDescription($locale), 100), 'url' => route('localized.category.show', ['locale' => $locale, 'category' => $category->slug]), 'image' => $category->getFirstMediaUrl('images', 'thumb'), 'products_count' => $category->products()->count(), 'children_count' => $category->children()->count(), 'relevance_score' => $this->calculateRelevanceScore($category->getTranslatedName($locale), $query)];
             }));
@@ -160,13 +157,11 @@ final class AutocompleteService
 
     /**
      * Handle searchBrands functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     public function searchBrands(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_brands_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_brands_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -177,9 +172,10 @@ final class AutocompleteService
                     });
                 });
             })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ", ["%{$query}%", "%{$query}%"])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
+
             return Arr::from($brands->skipWhile(function (Brand $brand) {
                 // Skip brands that are not properly configured or have missing essential data
-                return empty($brand->name) || !$brand->is_visible || empty($brand->slug);
+                return empty($brand->name) || ! $brand->is_visible || empty($brand->slug);
             })->map(function (Brand $brand) use ($query, $locale) {
                 return ['id' => $brand->id, 'type' => 'brand', 'title' => $brand->getTranslatedName($locale), 'subtitle' => null, 'description' => Str::limit($brand->getTranslatedDescription($locale), 100), 'url' => route('localized.brand.show', ['locale' => $locale, 'brand' => $brand->slug]), 'image' => $brand->getFirstMediaUrl('images', 'thumb'), 'products_count' => $brand->products()->count(), 'relevance_score' => $this->calculateRelevanceScore($brand->getTranslatedName($locale), $query)];
             }));
@@ -188,13 +184,11 @@ final class AutocompleteService
 
     /**
      * Handle searchCollections functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     public function searchCollections(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_collections_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_collections_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -205,9 +199,10 @@ final class AutocompleteService
                     });
                 });
             })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ", ["%{$query}%", "%{$query}%"])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
+
             return Arr::from($collections->skipWhile(function (Collection $collection) {
                 // Skip collections that are not properly configured or have missing essential data
-                return empty($collection->name) || !$collection->is_visible || empty($collection->slug);
+                return empty($collection->name) || ! $collection->is_visible || empty($collection->slug);
             })->map(function (Collection $collection) use ($query, $locale) {
                 return ['id' => $collection->id, 'type' => 'collection', 'title' => $collection->getTranslatedName($locale), 'subtitle' => $collection->is_automatic ? __('frontend.collection.automatic') : __('frontend.collection.manual'), 'description' => Str::limit($collection->getTranslatedDescription($locale), 100), 'url' => route('localized.collection.show', ['locale' => $locale, 'collection' => $collection->slug]), 'image' => $collection->getFirstMediaUrl('images', 'thumb'), 'products_count' => $collection->products()->count(), 'relevance_score' => $this->calculateRelevanceScore($collection->getTranslatedName($locale), $query)];
             }));
@@ -216,13 +211,11 @@ final class AutocompleteService
 
     /**
      * Handle searchAttributes functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     public function searchAttributes(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_attributes_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_attributes_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -245,26 +238,27 @@ final class AutocompleteService
             foreach ($attributeValues as $value) {
                 $results[] = ['id' => $value->id, 'type' => 'attribute_value', 'title' => $value->getDisplayValue(), 'subtitle' => $value->attribute->getTranslatedName($locale), 'description' => Str::limit($value->getDisplayDescription(), 100), 'url' => route('localized.attribute.value.show', ['locale' => $locale, 'attribute' => $value->attribute->slug, 'value' => $value->id]), 'image' => null, 'color_code' => $value->color_code, 'relevance_score' => $this->calculateRelevanceScore($value->getDisplayValue(), $query)];
             }
+
             return $results;
         });
     }
 
     /**
      * Handle getPopularSuggestions functionality with proper error handling.
-     * @param int $limit
-     * @return array
      */
     public function getPopularSuggestions(int $limit = 10): array
     {
-        $cacheKey = "autocomplete_popular_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_popular_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, 3600, function () use ($limit) {
             // Cache for 1 hour
             $locale = app()->getLocale();
             // Get popular products
             $popularProducts = Product::query()->with(['media', 'brand'])->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())->orderBy('published_at', 'desc')->limit($limit)->get();
+
             return Arr::from($popularProducts->skipWhile(function (Product $product) {
                 // Skip popular products that are not properly configured or have missing essential data
-                return empty($product->name) || !$product->is_visible || empty($product->slug) || $product->price <= 0;
+                return empty($product->name) || ! $product->is_visible || empty($product->slug) || $product->price <= 0;
             })->map(function (Product $product) use ($locale) {
                 return ['id' => $product->id, 'type' => 'product', 'title' => $product->getTranslatedName($locale), 'subtitle' => $product->brand?->name, 'url' => route('localized.products.show', ['locale' => $locale, 'product' => $product->slug]), 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'is_popular' => true];
             }));
@@ -273,8 +267,6 @@ final class AutocompleteService
 
     /**
      * Handle getRecentSuggestions functionality with proper error handling.
-     * @param int $limit
-     * @return array
      */
     public function getRecentSuggestions(int $limit = 5): array
     {
@@ -287,17 +279,16 @@ final class AutocompleteService
         $locale = app()->getLocale();
         foreach (array_slice($recentSearches, 0, $limit) as $searchTerm) {
             $quickResults = $this->search($searchTerm, 1);
-            if (!empty($quickResults)) {
+            if (! empty($quickResults)) {
                 $results[] = array_merge($quickResults[0], ['is_recent' => true, 'search_term' => $searchTerm]);
             }
         }
+
         return $results;
     }
 
     /**
      * Handle addToRecentSearches functionality with proper error handling.
-     * @param string $query
-     * @return void
      */
     public function addToRecentSearches(string $query): void
     {
@@ -306,7 +297,7 @@ final class AutocompleteService
         }
         $recentSearches = session('recent_searches', []);
         // Remove if already exists
-        $recentSearches = array_filter($recentSearches, fn($term) => $term !== $query);
+        $recentSearches = array_filter($recentSearches, fn ($term) => $term !== $query);
         // Add to beginning
         array_unshift($recentSearches, $query);
         // Keep only last 10 searches
@@ -316,7 +307,6 @@ final class AutocompleteService
 
     /**
      * Handle clearRecentSearches functionality with proper error handling.
-     * @return void
      */
     public function clearRecentSearches(): void
     {
@@ -325,11 +315,6 @@ final class AutocompleteService
 
     /**
      * Handle searchByType functionality with proper error handling.
-     * @param string $type
-     * @param string $query
-     * @param int $limit
-     * @param string $locale
-     * @return array
      */
     private function searchByType(string $type, string $query, int $limit, string $locale): array
     {
@@ -345,9 +330,6 @@ final class AutocompleteService
 
     /**
      * Handle calculateTypeLimits functionality with proper error handling.
-     * @param array $types
-     * @param int $totalLimit
-     * @return array
      */
     private function calculateTypeLimits(array $types, int $totalLimit): array
     {
@@ -358,15 +340,12 @@ final class AutocompleteService
         foreach ($types as $index => $type) {
             $limits[$type] = $baseLimit + ($index < $remainder ? 1 : 0);
         }
+
         return $limits;
     }
 
     /**
      * Handle sortByRelevance functionality with proper error handling.
-     * @param array $results
-     * @param string $query
-     * @param int $limit
-     * @return array
      */
     private function sortByRelevance(array $results, string $query, int $limit): array
     {
@@ -377,18 +356,18 @@ final class AutocompleteService
             if ($scoreA === $scoreB) {
                 // Type priority: products > categories > brands > collections > attributes
                 $typePriority = ['product' => 1, 'category' => 2, 'brand' => 3, 'collection' => 4, 'attribute' => 5, 'attribute_value' => 6];
+
                 return ($typePriority[$a['type']] ?? 7) <=> ($typePriority[$b['type']] ?? 7);
             }
+
             return $scoreB <=> $scoreA;
         });
+
         return array_slice($results, 0, $limit);
     }
 
     /**
      * Handle calculateRelevanceScore functionality with proper error handling.
-     * @param string $text
-     * @param string $query
-     * @return int
      */
     private function calculateRelevanceScore(string $text, string $query): int
     {
@@ -407,35 +386,31 @@ final class AutocompleteService
             return 70;
         }
         // Word boundary match gets lower score
-        if (preg_match('/\b' . preg_quote($query, '/') . '\b/', $text)) {
+        if (preg_match('/\b'.preg_quote($query, '/').'\b/', $text)) {
             return 60;
         }
         // Fuzzy match gets lowest score
         $similarity = similar_text($text, $query, $percent);
+
         return (int) $percent;
     }
 
     /**
      * Handle prepareSearchTerm functionality with proper error handling.
-     * @param string $query
-     * @return string
      */
     private function prepareSearchTerm(string $query): string
     {
-        return '%' . str_replace(['%', '_'], ['\%', '\_'], $query) . '%';
+        return '%'.str_replace(['%', '_'], ['\%', '\_'], $query).'%';
     }
 
     /**
      * Handle generateCacheKey functionality with proper error handling.
-     * @param string $query
-     * @param int $limit
-     * @param array $types
-     * @return string
      */
     private function generateCacheKey(string $query, int $limit, array $types): string
     {
         $typesKey = empty($types) ? 'all' : implode('_', $types);
-        return "autocomplete_{$typesKey}_{$query}_{$limit}_" . app()->getLocale();
+
+        return "autocomplete_{$typesKey}_{$query}_{$limit}_".app()->getLocale();
     }
 
     /**
@@ -448,7 +423,7 @@ final class AutocompleteService
             $analyticsService->trackSearch($query, $resultCount, auth()->id());
         } catch (\Exception $e) {
             // Silently fail analytics tracking to not break search functionality
-            \Log::warning('Search analytics tracking failed: ' . $e->getMessage());
+            \Log::warning('Search analytics tracking failed: '.$e->getMessage());
         }
     }
 
@@ -462,7 +437,7 @@ final class AutocompleteService
             $performanceService->trackSearchPerformance($query, $executionTime, $resultCount, $searchTypes);
         } catch (\Exception $e) {
             // Silently fail performance tracking to not break search functionality
-            \Log::warning('Search performance tracking failed: ' . $e->getMessage());
+            \Log::warning('Search performance tracking failed: '.$e->getMessage());
         }
     }
 
@@ -473,10 +448,12 @@ final class AutocompleteService
     {
         try {
             $highlightingService = app(\App\Services\SearchHighlightingService::class);
+
             return $highlightingService->highlightResults($results, $query, ['title', 'subtitle', 'description']);
         } catch (\Exception $e) {
             // Silently fail highlighting to not break search functionality
-            \Log::warning('Search highlighting failed: ' . $e->getMessage());
+            \Log::warning('Search highlighting failed: '.$e->getMessage());
+
             return $results;
         }
     }
@@ -495,10 +472,12 @@ final class AutocompleteService
             ];
 
             $rankedResults = $rankingService->rankResults($results, $query, $context);
+
             return $rankingService->applyBusinessRules($rankedResults);
         } catch (\Exception $e) {
             // Silently fail ranking to not break search functionality
-            \Log::warning('Search ranking failed: ' . $e->getMessage());
+            \Log::warning('Search ranking failed: '.$e->getMessage());
+
             return $results;
         }
     }
@@ -510,11 +489,12 @@ final class AutocompleteService
     {
         try {
             $userId = auth()->id();
-            if (!$userId) {
+            if (! $userId) {
                 return [];
             }
 
             $cacheKey = "user_search_history_{$userId}";
+
             return Cache::get($cacheKey, []);
         } catch (\Exception $e) {
             return [];
@@ -562,11 +542,13 @@ final class AutocompleteService
      */
     private function addDoubleLetter(string $word): string
     {
-        if (strlen($word) < 4)
+        if (strlen($word) < 4) {
             return $word;
+        }
 
         $pos = rand(1, strlen($word) - 2);
-        return substr($word, 0, $pos) . $word[$pos] . substr($word, $pos);
+
+        return substr($word, 0, $pos).$word[$pos].substr($word, $pos);
     }
 
     /**
@@ -576,9 +558,10 @@ final class AutocompleteService
     {
         for ($i = 0; $i < strlen($word) - 1; $i++) {
             if ($word[$i] === $word[$i + 1]) {
-                return substr($word, 0, $i) . substr($word, $i + 1);
+                return substr($word, 0, $i).substr($word, $i + 1);
             }
         }
+
         return $word;
     }
 
@@ -587,8 +570,9 @@ final class AutocompleteService
      */
     private function swapAdjacentLetters(string $word): string
     {
-        if (strlen($word) < 3)
+        if (strlen($word) < 3) {
             return $word;
+        }
 
         $pos = rand(0, strlen($word) - 2);
         $chars = str_split($word);
@@ -639,8 +623,8 @@ final class AutocompleteService
         $unique = [];
 
         foreach ($results as $result) {
-            $key = $result['id'] . '_' . $result['type'];
-            if (!isset($seen[$key])) {
+            $key = $result['id'].'_'.$result['type'];
+            if (! isset($seen[$key])) {
                 $seen[$key] = true;
                 $unique[] = $result;
             }
@@ -711,7 +695,8 @@ final class AutocompleteService
      */
     public function searchCustomers(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_customers_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_customers_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -737,7 +722,7 @@ final class AutocompleteService
                 ->takeUntilTimeout(now()->addSeconds(5))
                 ->collect();
 
-            return Arr::from($customers->map(function (User $customer) use ($query, $locale) {
+            return Arr::from($customers->map(function (User $customer) use ($query) {
                 return [
                     'id' => $customer->id,
                     'type' => 'customer',
@@ -760,7 +745,8 @@ final class AutocompleteService
      */
     public function searchAddresses(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_addresses_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_addresses_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -791,13 +777,13 @@ final class AutocompleteService
                 ->takeUntilTimeout(now()->addSeconds(5))
                 ->collect();
 
-            return Arr::from($addresses->map(function (Address $address) use ($query, $locale) {
+            return Arr::from($addresses->map(function (Address $address) use ($query) {
                 return [
                     'id' => $address->id,
                     'type' => 'address',
                     'title' => $address->full_address,
                     'subtitle' => $address->user?->name,
-                    'description' => 'Type: ' . ucfirst($address->type),
+                    'description' => 'Type: '.ucfirst($address->type),
                     'url' => route('filament.admin.resources.addresses.edit', $address),
                     'image' => null,
                     'user_id' => $address->user_id,
@@ -814,7 +800,8 @@ final class AutocompleteService
      */
     public function searchLocations(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_locations_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_locations_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -846,7 +833,7 @@ final class AutocompleteService
                     'id' => $location->id,
                     'type' => 'location',
                     'title' => $location->getTranslatedName($locale),
-                    'subtitle' => $location->city . ', ' . $location->country_code,
+                    'subtitle' => $location->city.', '.$location->country_code,
                     'description' => $location->address_line_1,
                     'url' => route('filament.admin.resources.locations.edit', $location),
                     'image' => null,
@@ -864,7 +851,8 @@ final class AutocompleteService
      */
     public function searchCountries(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_countries_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_countries_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -890,13 +878,13 @@ final class AutocompleteService
                 ->takeUntilTimeout(now()->addSeconds(5))
                 ->collect();
 
-            return Arr::from($countries->map(function (Country $country) use ($query, $locale) {
+            return Arr::from($countries->map(function (Country $country) use ($query) {
                 return [
                     'id' => $country->id,
                     'type' => 'country',
                     'title' => $country->name,
-                    'subtitle' => $country->cca2 . ' - ' . $country->cca3,
-                    'description' => $country->region . ', ' . $country->subregion,
+                    'subtitle' => $country->cca2.' - '.$country->cca3,
+                    'description' => $country->region.', '.$country->subregion,
                     'url' => route('filament.admin.resources.countries.edit', $country),
                     'image' => null,
                     'cca2' => $country->cca2,
@@ -913,7 +901,8 @@ final class AutocompleteService
      */
     public function searchCities(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_cities_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_cities_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -962,7 +951,8 @@ final class AutocompleteService
      */
     public function searchOrders(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_orders_{$query}_{$limit}_" . app()->getLocale();
+        $cacheKey = "autocomplete_orders_{$query}_{$limit}_".app()->getLocale();
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
             $locale = app()->getLocale();
             $searchTerm = $this->prepareSearchTerm($query);
@@ -991,13 +981,13 @@ final class AutocompleteService
                 ->takeUntilTimeout(now()->addSeconds(5))
                 ->collect();
 
-            return Arr::from($orders->map(function (Order $order) use ($query, $locale) {
+            return Arr::from($orders->map(function (Order $order) use ($query) {
                 return [
                     'id' => $order->id,
                     'type' => 'order',
                     'title' => $order->order_number,
-                    'subtitle' => $order->user?->name . ' - ' . $order->formatted_total,
-                    'description' => $order->status . ' - ' . $order->created_at->format('d/m/Y'),
+                    'subtitle' => $order->user?->name.' - '.$order->formatted_total,
+                    'description' => $order->status.' - '.$order->created_at->format('d/m/Y'),
                     'url' => route('filament.admin.resources.orders.edit', $order),
                     'image' => null,
                     'order_number' => $order->order_number,
@@ -1017,7 +1007,7 @@ final class AutocompleteService
      */
     public function searchById(int $id, string $type): ?array
     {
-        $cacheKey = "autocomplete_by_id_{$type}_{$id}_" . app()->getLocale();
+        $cacheKey = "autocomplete_by_id_{$type}_{$id}_".app()->getLocale();
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($id, $type) {
             $locale = app()->getLocale();
@@ -1049,7 +1039,7 @@ final class AutocompleteService
             ->where('is_visible', true)
             ->first();
 
-        if (!$product) {
+        if (! $product) {
             return null;
         }
 
@@ -1076,7 +1066,7 @@ final class AutocompleteService
             ->where('is_visible', true)
             ->first();
 
-        if (!$category) {
+        if (! $category) {
             return null;
         }
 
@@ -1101,7 +1091,7 @@ final class AutocompleteService
             ->where('is_visible', true)
             ->first();
 
-        if (!$brand) {
+        if (! $brand) {
             return null;
         }
 
@@ -1126,7 +1116,7 @@ final class AutocompleteService
             ->where('is_visible', true)
             ->first();
 
-        if (!$collection) {
+        if (! $collection) {
             return null;
         }
 
@@ -1152,7 +1142,7 @@ final class AutocompleteService
             ->where('is_visible', true)
             ->first();
 
-        if (!$attribute) {
+        if (! $attribute) {
             return null;
         }
 
@@ -1177,7 +1167,7 @@ final class AutocompleteService
             ->where('is_active', true)
             ->first();
 
-        if (!$customer) {
+        if (! $customer) {
             return null;
         }
 
@@ -1204,7 +1194,7 @@ final class AutocompleteService
             ->where('id', $id)
             ->first();
 
-        if (!$address) {
+        if (! $address) {
             return null;
         }
 
@@ -1213,7 +1203,7 @@ final class AutocompleteService
             'type' => 'address',
             'title' => $address->full_address,
             'subtitle' => $address->user?->name,
-            'description' => 'Type: ' . ucfirst($address->type),
+            'description' => 'Type: '.ucfirst($address->type),
             'url' => route('filament.admin.resources.addresses.edit', $address),
             'image' => null,
             'user_id' => $address->user_id,
@@ -1231,7 +1221,7 @@ final class AutocompleteService
             ->where('is_enabled', true)
             ->first();
 
-        if (!$location) {
+        if (! $location) {
             return null;
         }
 
@@ -1239,7 +1229,7 @@ final class AutocompleteService
             'id' => $location->id,
             'type' => 'location',
             'title' => $location->getTranslatedName($locale),
-            'subtitle' => $location->city . ', ' . $location->country_code,
+            'subtitle' => $location->city.', '.$location->country_code,
             'description' => $location->address_line_1,
             'url' => route('filament.admin.resources.locations.edit', $location),
             'image' => null,
@@ -1256,7 +1246,7 @@ final class AutocompleteService
     {
         $country = Country::where('id', $id)->first();
 
-        if (!$country) {
+        if (! $country) {
             return null;
         }
 
@@ -1264,8 +1254,8 @@ final class AutocompleteService
             'id' => $country->id,
             'type' => 'country',
             'title' => $country->name,
-            'subtitle' => $country->cca2 . ' - ' . $country->cca3,
-            'description' => $country->region . ', ' . $country->subregion,
+            'subtitle' => $country->cca2.' - '.$country->cca3,
+            'description' => $country->region.', '.$country->subregion,
             'url' => route('filament.admin.resources.countries.edit', $country),
             'image' => null,
             'cca2' => $country->cca2,
@@ -1283,7 +1273,7 @@ final class AutocompleteService
             ->where('id', $id)
             ->first();
 
-        if (!$city) {
+        if (! $city) {
             return null;
         }
 
@@ -1309,7 +1299,7 @@ final class AutocompleteService
             ->where('id', $id)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return null;
         }
 
@@ -1317,8 +1307,8 @@ final class AutocompleteService
             'id' => $order->id,
             'type' => 'order',
             'title' => $order->order_number,
-            'subtitle' => $order->user?->name . ' - ' . $order->formatted_total,
-            'description' => $order->status . ' - ' . $order->created_at->format('d/m/Y'),
+            'subtitle' => $order->user?->name.' - '.$order->formatted_total,
+            'description' => $order->status.' - '.$order->created_at->format('d/m/Y'),
             'url' => route('filament.admin.resources.orders.edit', $order),
             'image' => null,
             'order_number' => $order->order_number,

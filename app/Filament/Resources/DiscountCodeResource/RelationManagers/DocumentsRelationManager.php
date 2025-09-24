@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 final class DocumentsRelationManager extends RelationManager
 {
@@ -24,14 +26,13 @@ final class DocumentsRelationManager extends RelationManager
                 Forms\Components\Select::make('template_id')
                     ->label(__('Template'))
                     ->relationship('template', 'name')
-                    ->searchable(),
-                    ->preload(),
+                    ->searchable()
+                    ->preload()
                     ->required(),
-                
                 Forms\Components\TextInput::make('title')
                     ->label(__('Title'))
-                    ->required()\n                    ->maxLength(255),
-                
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options([
@@ -40,7 +41,6 @@ final class DocumentsRelationManager extends RelationManager
                         'sent' => __('Sent'),
                     ])
                     ->required(),
-                
                 Forms\Components\Select::make('format')
                     ->label(__('Format'))
                     ->options([
@@ -58,32 +58,30 @@ final class DocumentsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('Title'))
-                    ->searchable()\n                    ->sortable(),
+                    ->searchable()
+                    ->sortable()
                     ->weight('bold'),
-                
                 Tables\Columns\TextColumn::make('template.name')
                     ->label(__('Template'))
-                    ->searchable()\n                    ->sortable(),
-                
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'draft' => 'warning',
                         'generated' => 'success',
                         'sent' => 'info',
                         default => 'gray',
                     }),
-                
                 Tables\Columns\TextColumn::make('format')
                     ->label(__('Format'))
-                    ->badge(),
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'html' => 'primary',
                         'pdf' => 'danger',
                         default => 'gray',
                     }),
-                
                 Tables\Columns\TextColumn::make('generated_at')
                     ->label(__('Generated At'))
                     ->dateTime('d/m/Y H:i')
@@ -97,14 +95,12 @@ final class DocumentsRelationManager extends RelationManager
                         'generated' => __('Generated'),
                         'sent' => __('Sent'),
                     ]),
-                
                 Tables\Filters\SelectFilter::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
                         'pdf' => __('PDF'),
                     ]),
-                
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
@@ -125,8 +121,6 @@ final class DocumentsRelationManager extends RelationManager
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]))
-            ->defaultSort("created_at", "desc");
-    }
-}
+            ->defaultSort('created_at', 'desc');
     }
 }

@@ -1,121 +1,114 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
 use App\Models\SystemSettingCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SystemSettingCategory>
+ */
 final class SystemSettingCategoryFactory extends Factory
 {
     protected $model = SystemSettingCategory::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
-        $colors = ['primary', 'secondary', 'success', 'warning', 'danger', 'info'];
-        $icons = [
-            'heroicon-o-cog-6-tooth',
-            'heroicon-o-shield-check',
-            'heroicon-o-envelope',
-            'heroicon-o-credit-card',
-            'heroicon-o-truck',
-            'heroicon-o-globe-alt',
-            'heroicon-o-lock-closed',
-            'heroicon-o-code-bracket',
-            'heroicon-o-paint-brush',
-            'heroicon-o-bell',
-        ];
+        $name = $this->faker->unique()->words(2, true);
 
         return [
-            'name' => $this->faker->words(2, true),
+            'name' => ucwords($name),
+            'slug' => str($name)->slug(),
             'description' => $this->faker->paragraph(),
-            'icon' => $this->faker->randomElement($icons),
-            'color' => $this->faker->randomElement($colors),
+            'icon' => $this->faker->randomElement([
+                'heroicon-o-cog-6-tooth',
+                'heroicon-o-shield-check',
+                'heroicon-o-bolt',
+                'heroicon-o-paint-brush',
+                'heroicon-o-globe-alt',
+                'heroicon-o-database',
+                'heroicon-o-key',
+                'heroicon-o-chart-bar',
+            ]),
+            'color' => $this->faker->randomElement([
+                'primary',
+                'secondary',
+                'success',
+                'warning',
+                'danger',
+                'info',
+                'gray',
+            ]),
             'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_active' => $this->faker->boolean(90),  // 90% chance of being active
+            'is_active' => $this->faker->boolean(90),
             'parent_id' => null,
-            'template' => $this->faker->boolean(30) ? $this->faker->word() : null,
-            'metadata' => $this->faker->boolean(20) ? json_encode(['custom_field' => $this->faker->word()]) : null,
-            'is_collapsible' => $this->faker->boolean(80),  // 80% chance of being collapsible
-            'show_in_sidebar' => $this->faker->boolean(90),  // 90% chance of showing in sidebar
-            'permission' => $this->faker->boolean(40) ? $this->faker->word() : null,
-            'tags' => $this->faker->boolean(50) ? json_encode($this->faker->words(3)) : null,
         ];
     }
 
+    /**
+     * Indicate that the category is active
+     */
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
         ]);
     }
 
+    /**
+     * Indicate that the category is inactive
+     */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
         ]);
     }
 
-    public function withParent(SystemSettingCategory $parent): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'parent_id' => $parent->id,
-        ]);
-    }
-
-    public function root(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'parent_id' => null,
-        ]);
-    }
-
-    public function collapsible(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'is_collapsible' => true,
-        ]);
-    }
-
-    public function notCollapsible(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'is_collapsible' => false,
-        ]);
-    }
-
-    public function showInSidebar(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'show_in_sidebar' => true,
-        ]);
-    }
-
-    public function hideFromSidebar(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'show_in_sidebar' => false,
-        ]);
-    }
-
-    public function withPermission(string $permission): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'permission' => $permission,
-        ]);
-    }
-
+    /**
+     * Create a category with a specific color
+     */
     public function withColor(string $color): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'color' => $color,
         ]);
     }
 
+    /**
+     * Create a category with a specific icon
+     */
     public function withIcon(string $icon): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'icon' => $icon,
+        ]);
+    }
+
+    /**
+     * Create a subcategory with a parent
+     */
+    public function childOf(SystemSettingCategory $parent): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'parent_id' => $parent->id,
+        ]);
+    }
+
+    /**
+     * Create a root category (no parent)
+     */
+    public function root(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'parent_id' => null,
         ]);
     }
 }

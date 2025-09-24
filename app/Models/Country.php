@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -7,9 +9,9 @@ use App\Models\Translations\CountryTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -20,9 +22,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $translationModel
  * @property mixed $table
  * @property mixed $fillable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Country newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Country newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Country query()
+ *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class])]
@@ -31,12 +35,13 @@ final class Country extends Model
     use HasFactory, HasTranslations, SoftDeletes;
 
     protected string $translationModel = CountryTranslation::class;
+
     protected $table = 'countries';
+
     protected $fillable = ['name', 'name_official', 'cca2', 'cca3', 'ccn3', 'code', 'iso_code', 'currency_code', 'currency_symbol', 'phone_code', 'phone_calling_code', 'flag', 'svg_flag', 'region', 'subregion', 'latitude', 'longitude', 'currencies', 'languages', 'timezones', 'is_active', 'is_eu_member', 'requires_vat', 'vat_rate', 'timezone', 'description', 'metadata', 'is_enabled', 'sort_order'];
 
     /**
      * Handle casts functionality with proper error handling.
-     * @return array
      */
     protected function casts(): array
     {
@@ -45,7 +50,6 @@ final class Country extends Model
 
     /**
      * Handle addresses functionality with proper error handling.
-     * @return HasMany
      */
     public function addresses(): HasMany
     {
@@ -54,7 +58,6 @@ final class Country extends Model
 
     /**
      * Handle cities functionality with proper error handling.
-     * @return HasMany
      */
     public function cities(): HasMany
     {
@@ -63,7 +66,6 @@ final class Country extends Model
 
     /**
      * Handle users functionality with proper error handling.
-     * @return HasMany
      */
     public function users(): HasMany
     {
@@ -72,7 +74,6 @@ final class Country extends Model
 
     /**
      * Handle customers functionality with proper error handling.
-     * @return HasMany
      */
     public function customers(): HasMany
     {
@@ -80,17 +81,7 @@ final class Country extends Model
     }
 
     /**
-     * Handle shippingZones functionality with proper error handling.
-     * @return BelongsToMany
-     */
-    public function shippingZones(): BelongsToMany
-    {
-        return $this->belongsToMany(ShippingZone::class, 'country_shipping_zone', 'country_id', 'shipping_zone_id');
-    }
-
-    /**
      * Handle taxRates functionality with proper error handling.
-     * @return HasMany
      */
     public function taxRates(): HasMany
     {
@@ -99,7 +90,6 @@ final class Country extends Model
 
     /**
      * Handle currencies functionality with proper error handling.
-     * @return BelongsToMany
      */
     public function currencies(): BelongsToMany
     {
@@ -108,17 +98,16 @@ final class Country extends Model
 
     /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getDisplayNameAttribute(): string
     {
         $name = $this->trans('name') ?: $this->getOriginal('name');
+
         return $this->phone_calling_code ? "{$name} (+{$this->phone_calling_code})" : $name;
     }
 
     /**
      * Handle getTranslatedNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTranslatedNameAttribute(): string
     {
@@ -127,7 +116,6 @@ final class Country extends Model
 
     /**
      * Handle getTranslatedOfficialNameAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTranslatedOfficialNameAttribute(): string
     {
@@ -136,7 +124,6 @@ final class Country extends Model
 
     /**
      * Handle getTranslatedDescriptionAttribute functionality with proper error handling.
-     * @return string
      */
     public function getTranslatedDescriptionAttribute(): string
     {
@@ -145,7 +132,6 @@ final class Country extends Model
 
     /**
      * Handle getCodeAttribute functionality with proper error handling.
-     * @return string
      */
     public function getCodeAttribute(): string
     {
@@ -154,7 +140,6 @@ final class Country extends Model
 
     /**
      * Handle getIsoCodeAttribute functionality with proper error handling.
-     * @return string
      */
     public function getIsoCodeAttribute(): string
     {
@@ -163,7 +148,6 @@ final class Country extends Model
 
     /**
      * Handle getPhoneCodeAttribute functionality with proper error handling.
-     * @return string|null
      */
     public function getPhoneCodeAttribute(): ?string
     {
@@ -174,7 +158,8 @@ final class Country extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeActive($query)
     {
@@ -183,7 +168,8 @@ final class Country extends Model
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEnabled($query)
     {
@@ -192,7 +178,8 @@ final class Country extends Model
 
     /**
      * Handle scopeEuMembers functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeEuMembers($query)
     {
@@ -201,7 +188,8 @@ final class Country extends Model
 
     /**
      * Handle scopeRequiresVat functionality with proper error handling.
-     * @param mixed $query
+     *
+     * @param  mixed  $query
      */
     public function scopeRequiresVat($query)
     {
@@ -210,8 +198,8 @@ final class Country extends Model
 
     /**
      * Handle scopeByRegion functionality with proper error handling.
-     * @param mixed $query
-     * @param string $region
+     *
+     * @param  mixed  $query
      */
     public function scopeByRegion($query, string $region)
     {
@@ -220,8 +208,8 @@ final class Country extends Model
 
     /**
      * Handle scopeByCurrency functionality with proper error handling.
-     * @param mixed $query
-     * @param string $currencyCode
+     *
+     * @param  mixed  $query
      */
     public function scopeByCurrency($query, string $currencyCode)
     {
@@ -232,7 +220,6 @@ final class Country extends Model
 
     /**
      * Handle isActive functionality with proper error handling.
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -241,7 +228,6 @@ final class Country extends Model
 
     /**
      * Handle isEuMember functionality with proper error handling.
-     * @return bool
      */
     public function isEuMember(): bool
     {
@@ -250,7 +236,6 @@ final class Country extends Model
 
     /**
      * Handle requiresVat functionality with proper error handling.
-     * @return bool
      */
     public function requiresVat(): bool
     {
@@ -259,7 +244,6 @@ final class Country extends Model
 
     /**
      * Handle getVatRate functionality with proper error handling.
-     * @return float|null
      */
     public function getVatRate(): ?float
     {
@@ -268,44 +252,43 @@ final class Country extends Model
 
     /**
      * Handle getFormattedVatRate functionality with proper error handling.
-     * @return string
      */
     public function getFormattedVatRate(): string
     {
-        return $this->vat_rate ? number_format((float) $this->vat_rate, 2) . '%' : 'N/A';
+        return $this->vat_rate ? number_format((float) $this->vat_rate, 2).'%' : 'N/A';
     }
 
     /**
      * Handle getFullAddress functionality with proper error handling.
-     * @return string
      */
     public function getFullAddress(): string
     {
         $parts = array_filter([$this->translated_name, $this->region, $this->subregion]);
+
         return implode(', ', $parts);
     }
 
     /**
      * Handle getFlagUrl functionality with proper error handling.
-     * @return string|null
      */
     public function getFlagUrl(): ?string
     {
         if ($this->flag) {
-            return asset('flags/' . $this->flag);
+            return asset('flags/'.$this->flag);
         }
+
         return null;
     }
 
     /**
      * Handle getSvgFlagUrl functionality with proper error handling.
-     * @return string|null
      */
     public function getSvgFlagUrl(): ?string
     {
         if ($this->svg_flag) {
-            return asset('flags/svg/' . $this->svg_flag);
+            return asset('flags/svg/'.$this->svg_flag);
         }
+
         return null;
     }
 
@@ -313,8 +296,6 @@ final class Country extends Model
 
     /**
      * Handle getTranslatedName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedName(?string $locale = null): ?string
     {
@@ -323,8 +304,6 @@ final class Country extends Model
 
     /**
      * Handle getTranslatedOfficialName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedOfficialName(?string $locale = null): ?string
     {
@@ -333,8 +312,6 @@ final class Country extends Model
 
     /**
      * Handle getTranslatedDescription functionality with proper error handling.
-     * @param string|null $locale
-     * @return string|null
      */
     public function getTranslatedDescription(?string $locale = null): ?string
     {
@@ -345,12 +322,13 @@ final class Country extends Model
 
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
-     * @param mixed $query
-     * @param string|null $locale
+     *
+     * @param  mixed  $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
+
         return $query->with(['translations' => function ($q) use ($locale) {
             $q->where('locale', $locale);
         }]);
@@ -360,7 +338,6 @@ final class Country extends Model
 
     /**
      * Handle getAvailableLocales functionality with proper error handling.
-     * @return array
      */
     public function getAvailableLocales(): array
     {
@@ -371,8 +348,6 @@ final class Country extends Model
 
     /**
      * Handle hasTranslationFor functionality with proper error handling.
-     * @param string $locale
-     * @return bool
      */
     public function hasTranslationFor(string $locale): bool
     {
@@ -383,8 +358,6 @@ final class Country extends Model
 
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     * @param string $locale
-     * @return CountryTranslation
      */
     public function getOrCreateTranslation(string $locale): CountryTranslation
     {
@@ -395,9 +368,6 @@ final class Country extends Model
 
     /**
      * Handle updateTranslation functionality with proper error handling.
-     * @param string $locale
-     * @param array $data
-     * @return bool
      */
     public function updateTranslation(string $locale, array $data): bool
     {
@@ -405,6 +375,7 @@ final class Country extends Model
         if ($translation) {
             return $translation->update($data);
         }
+
         return $this->translations()->create(array_merge(['locale' => $locale], $data)) !== null;
     }
 
@@ -412,14 +383,13 @@ final class Country extends Model
 
     /**
      * Handle updateTranslations functionality with proper error handling.
-     * @param array $translations
-     * @return bool
      */
     public function updateTranslations(array $translations): bool
     {
         foreach ($translations as $locale => $data) {
             $this->updateTranslation($locale, $data);
         }
+
         return true;
     }
 
@@ -427,18 +397,16 @@ final class Country extends Model
 
     /**
      * Handle getFullDisplayName functionality with proper error handling.
-     * @param string|null $locale
-     * @return string
      */
     public function getFullDisplayName(?string $locale = null): string
     {
         $name = $this->getTranslatedName($locale);
+
         return $this->phone_calling_code ? "{$name} (+{$this->phone_calling_code})" : $name;
     }
 
     /**
      * Handle getCoordinatesAttribute functionality with proper error handling.
-     * @return array
      */
     public function getCoordinatesAttribute(): array
     {
@@ -447,7 +415,6 @@ final class Country extends Model
 
     /**
      * Handle getFormattedCurrencyInfo functionality with proper error handling.
-     * @return array
      */
     public function getFormattedCurrencyInfo(): array
     {
@@ -456,7 +423,6 @@ final class Country extends Model
 
     /**
      * Handle getFormattedLanguageInfo functionality with proper error handling.
-     * @return array
      */
     public function getFormattedLanguageInfo(): array
     {
@@ -465,7 +431,6 @@ final class Country extends Model
 
     /**
      * Handle getFormattedVatInfo functionality with proper error handling.
-     * @return array
      */
     public function getFormattedVatInfo(): array
     {
@@ -474,7 +439,6 @@ final class Country extends Model
 
     /**
      * Handle getEconomicInfo functionality with proper error handling.
-     * @return array
      */
     public function getEconomicInfo(): array
     {
@@ -483,7 +447,6 @@ final class Country extends Model
 
     /**
      * Handle getGeographicInfo functionality with proper error handling.
-     * @return array
      */
     public function getGeographicInfo(): array
     {

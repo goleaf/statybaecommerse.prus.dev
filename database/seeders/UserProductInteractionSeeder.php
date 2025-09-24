@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -24,6 +26,7 @@ final class UserProductInteractionSeeder extends Seeder
 
         if ($users->isEmpty() || $products->isEmpty()) {
             $this->command->warn('No users or products found. Please run UserSeeder and ProductSeeder first.');
+
             return;
         }
 

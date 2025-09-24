@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\Pages;
 
@@ -17,4 +19,3 @@ final class ViewBrand extends ViewRecord
         ];
     }
 }
-

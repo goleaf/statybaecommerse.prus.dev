@@ -28,10 +28,10 @@ final class SystemSettingHistoryFactory extends Factory
 
         return [
             'system_setting_id' => SystemSetting::factory(),
-            'old_value' => $this->faker->boolean(70) ? $this->faker->sentence() : null,
-            'new_value' => $this->faker->boolean(80) ? $this->faker->sentence() : null,
+            'old_value' => fake()->boolean(70) ? fake()->sentence() : null,
+            'new_value' => fake()->boolean(80) ? fake()->sentence() : null,
             'changed_by' => User::factory(),
-            'change_reason' => $this->faker->randomElement($reasons),
+            'change_reason' => fake()->randomElement($reasons),
         ];
     }
 
@@ -39,22 +39,22 @@ final class SystemSettingHistoryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'old_value' => null,
-            'new_value' => $this->faker->sentence(),
+            'new_value' => fake()->sentence(),
         ]);
     }
 
     public function updated(): static
     {
         return $this->state(fn (array $attributes) => [
-            'old_value' => $this->faker->sentence(),
-            'new_value' => $this->faker->sentence(),
+            'old_value' => fake()->sentence(),
+            'new_value' => fake()->sentence(),
         ]);
     }
 
     public function deleted(): static
     {
         return $this->state(fn (array $attributes) => [
-            'old_value' => $this->faker->sentence(),
+            'old_value' => fake()->sentence(),
             'new_value' => null,
         ]);
     }
@@ -62,14 +62,14 @@ final class SystemSettingHistoryFactory extends Factory
     public function recent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'created_at' => $this->faker->dateTimeBetween('-7 days'),
+            'created_at' => fake()->dateTimeBetween('-7 days'),
         ]);
     }
 
     public function old(): static
     {
         return $this->state(fn (array $attributes) => [
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-30 days'),
+            'created_at' => fake()->dateTimeBetween('-1 year', '-30 days'),
         ]);
     }
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -6,12 +8,10 @@ use App\Filament\Resources\CompanyResource\Pages\CreateCompany;
 use App\Filament\Resources\CompanyResource\Pages\EditCompany;
 use App\Filament\Resources\CompanyResource\Pages\ListCompanies;
 use App\Filament\Resources\CompanyResource\Pages\ViewCompany;
-use App\Filament\Resources\CompanyResource;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
 
 final class CompanyResourceTest extends TestCase
 {
@@ -227,4 +227,3 @@ final class CompanyResourceTest extends TestCase
             ->assertHasFormErrors(['website' => 'url']);
     }
 }
-

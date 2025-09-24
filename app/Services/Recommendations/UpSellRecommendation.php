@@ -1,22 +1,22 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Services\Recommendations;
 
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+
 /**
  * UpSellRecommendation
- * 
+ *
  * Service class containing UpSellRecommendation business logic, external integrations, and complex operations with proper error handling and logging.
- * 
  */
 final class UpSellRecommendation extends BaseRecommendation
 {
     /**
      * Handle getDefaultConfig functionality with proper error handling.
-     * @return array
      */
     protected function getDefaultConfig(): array
     {
@@ -33,17 +33,14 @@ final class UpSellRecommendation extends BaseRecommendation
             'quality_indicators' => ['review_rating' => 0.4, 'review_count' => 0.3, 'sales_count' => 0.3],
         ];
     }
+
     /**
      * Handle getRecommendations functionality with proper error handling.
-     * @param User|null $user
-     * @param Product|null $product
-     * @param array $context
-     * @return Collection
      */
     public function getRecommendations(?User $user = null, ?Product $product = null, array $context = []): Collection
     {
         $startTime = microtime(true);
-        if (!$product) {
+        if (! $product) {
             return collect();
         }
         $cacheKey = $this->generateCacheKey('up_sell', $user, $product, $context);
@@ -54,13 +51,12 @@ final class UpSellRecommendation extends BaseRecommendation
         $recommendations = $this->calculateUpSellRecommendations($product, $user);
         $this->logPerformance('up_sell', microtime(true) - $startTime, $recommendations->count());
         $this->trackRecommendation('up_sell', $user, $product, $recommendations->toArray());
+
         return $this->cacheResult($cacheKey, $recommendations, $this->config['cache_ttl'] ?? 3600);
     }
+
     /**
      * Handle calculateUpSellRecommendations functionality with proper error handling.
-     * @param Product $product
-     * @param User|null $user
-     * @return Collection
      */
     private function calculateUpSellRecommendations(Product $product, ?User $user = null): Collection
     {
@@ -69,7 +65,7 @@ final class UpSellRecommendation extends BaseRecommendation
         $query = Product::query()->with(['media', 'brand', 'categories', 'reviews'])->where('is_visible', true)->where('id', '!=', $product->id)->whereBetween('price', [$minPrice, $maxPrice]);
         // Filter by similar categories
         $categoryIds = $product->categories->pluck('id')->toArray();
-        if (!empty($categoryIds)) {
+        if (! empty($categoryIds)) {
             $query->whereHas('categories', function ($q) use ($categoryIds) {
                 $q->whereIn('categories.id', $categoryIds);
             });
@@ -79,13 +75,12 @@ final class UpSellRecommendation extends BaseRecommendation
         $candidateProducts = $query->get();
         // Calculate up-sell scores
         $scoredProducts = $this->calculateUpSellScores($product, $candidateProducts);
+
         return $scoredProducts->sortByDesc('score')->take($this->maxResults)->pluck('product');
     }
+
     /**
      * Handle calculateUpSellScores functionality with proper error handling.
-     * @param Product $product
-     * @param Collection $candidateProducts
-     * @return Collection
      */
     private function calculateUpSellScores(Product $product, Collection $candidateProducts): Collection
     {
@@ -99,13 +94,12 @@ final class UpSellRecommendation extends BaseRecommendation
                 $scores->push(['product' => $candidateProduct, 'score' => $totalScore, 'category_score' => $categoryScore, 'price_score' => $priceScore, 'quality_score' => $qualityScore, 'price_increase_ratio' => $candidateProduct->price / $product->price]);
             }
         }
+
         return $scores;
     }
+
     /**
      * Handle calculateCategorySimilarityScore functionality with proper error handling.
-     * @param Product $product
-     * @param Product $candidateProduct
-     * @return float
      */
     private function calculateCategorySimilarityScore(Product $product, Product $candidateProduct): float
     {
@@ -116,13 +110,12 @@ final class UpSellRecommendation extends BaseRecommendation
         }
         $intersection = array_intersect($productCategories, $candidateCategories);
         $union = array_unique(array_merge($productCategories, $candidateCategories));
+
         return count($intersection) / count($union);
     }
+
     /**
      * Handle calculatePriceRatioScore functionality with proper error handling.
-     * @param Product $product
-     * @param Product $candidateProduct
-     * @return float
      */
     private function calculatePriceRatioScore(Product $product, Product $candidateProduct): float
     {
@@ -133,12 +126,12 @@ final class UpSellRecommendation extends BaseRecommendation
         $optimalRatio = ($minRatio + $maxRatio) / 2;
         $distance = abs($priceRatio - $optimalRatio);
         $maxDistance = max($optimalRatio - $minRatio, $maxRatio - $optimalRatio);
+
         return max(0, 1 - $distance / $maxDistance);
     }
+
     /**
      * Handle calculateQualityIndicatorScore functionality with proper error handling.
-     * @param Product $product
-     * @return float
      */
     private function calculateQualityIndicatorScore(Product $product): float
     {
@@ -167,12 +160,12 @@ final class UpSellRecommendation extends BaseRecommendation
             // Cap at 1.0 for 100+ sales
             $totalScore += $salesScore * $indicators['sales_count'];
         }
+
         return $totalScore;
     }
+
     /**
      * Handle getUpSellOpportunities functionality with proper error handling.
-     * @param User $user
-     * @return Collection
      */
     public function getUpSellOpportunities(User $user): Collection
     {
@@ -185,13 +178,12 @@ final class UpSellRecommendation extends BaseRecommendation
                 $opportunities->push(['original_product' => $purchasedProduct, 'up_sell_products' => $upSellRecommendations, 'potential_revenue_increase' => $this->calculatePotentialRevenueIncrease($purchasedProduct, $upSellRecommendations)]);
             }
         }
+
         return $opportunities->sortByDesc('potential_revenue_increase');
     }
+
     /**
      * Handle calculatePotentialRevenueIncrease functionality with proper error handling.
-     * @param Product $originalProduct
-     * @param Collection $upSellProducts
-     * @return float
      */
     private function calculatePotentialRevenueIncrease(Product $originalProduct, Collection $upSellProducts): float
     {
@@ -199,12 +191,12 @@ final class UpSellRecommendation extends BaseRecommendation
         $priceDifference = $avgUpSellPrice - $originalProduct->price;
         // Assume 10% conversion rate for up-sell
         $conversionRate = 0.1;
+
         return $priceDifference * $conversionRate;
     }
+
     /**
      * Handle getUpSellAnalytics functionality with proper error handling.
-     * @param Product $product
-     * @return array
      */
     public function getUpSellAnalytics(Product $product): array
     {
@@ -213,12 +205,12 @@ final class UpSellRecommendation extends BaseRecommendation
         $upSellCandidates = Product::where('is_visible', true)->where('id', '!=', $product->id)->whereBetween('price', [$minPrice, $maxPrice])->whereHas('categories', function ($query) use ($product) {
             $query->whereIn('categories.id', $product->categories->pluck('id'));
         })->get();
+
         return ['total_candidates' => $upSellCandidates->count(), 'price_range' => ['min' => $minPrice, 'max' => $maxPrice, 'avg' => $upSellCandidates->avg('price')], 'category_distribution' => $this->getUpSellCategoryDistribution($upSellCandidates), 'quality_distribution' => $this->getUpSellQualityDistribution($upSellCandidates), 'conversion_potential' => $this->calculateConversionPotential($product, $upSellCandidates)];
     }
+
     /**
      * Handle getUpSellCategoryDistribution functionality with proper error handling.
-     * @param Collection $products
-     * @return Collection
      */
     private function getUpSellCategoryDistribution(Collection $products): Collection
     {
@@ -226,10 +218,9 @@ final class UpSellRecommendation extends BaseRecommendation
             return ['category' => $categories->first(), 'count' => $categories->count()];
         })->sortByDesc('count');
     }
+
     /**
      * Handle getUpSellQualityDistribution functionality with proper error handling.
-     * @param Collection $products
-     * @return array
      */
     private function getUpSellQualityDistribution(Collection $products): array
     {
@@ -240,14 +231,13 @@ final class UpSellRecommendation extends BaseRecommendation
         }), 'high_quality_count' => $products->filter(function ($product) {
             $rating = $product->reviews()->avg('rating') ?? 0;
             $reviewCount = $product->reviews()->count();
+
             return $rating >= 4.0 && $reviewCount >= 10;
         })->count()];
     }
+
     /**
      * Handle calculateConversionPotential functionality with proper error handling.
-     * @param Product $product
-     * @param Collection $upSellCandidates
-     * @return float
      */
     private function calculateConversionPotential(Product $product, Collection $upSellCandidates): float
     {
@@ -261,6 +251,7 @@ final class UpSellRecommendation extends BaseRecommendation
         // Optimal conversion when price ratio is around 1.5 and quality is high
         $priceScore = 1 - abs($avgPriceRatio - 1.5) / 1.5;
         $qualityScore = $avgQuality / 5.0;
+
         return $priceScore * 0.6 + $qualityScore * 0.4;
     }
 }

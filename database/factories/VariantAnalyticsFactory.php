@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\VariantAnalytics;
 use App\Models\ProductVariant;
+use App\Models\VariantAnalytics;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +21,7 @@ final class VariantAnalyticsFactory extends Factory
         $clicks = fake()->numberBetween(1, $views);
         $addToCart = fake()->numberBetween(1, $clicks);
         $purchases = fake()->numberBetween(1, $addToCart);
-        
+
         return [
             'variant_id' => ProductVariant::factory(),
             'date' => fake()->dateTimeBetween('-30 days', 'now'),

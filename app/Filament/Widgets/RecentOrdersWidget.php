@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 
 final class RecentOrdersWidget extends BaseWidget
 {
@@ -34,7 +35,7 @@ final class RecentOrdersWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('orders.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'confirmed' => 'info',
                         'processing' => 'primary',

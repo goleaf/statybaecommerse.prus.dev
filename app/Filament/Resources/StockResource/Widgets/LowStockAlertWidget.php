@@ -6,7 +6,6 @@ namespace App\Filament\Resources\StockResource\Widgets;
 
 use App\Models\Stock;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class LowStockAlertWidget extends ChartWidget
 {

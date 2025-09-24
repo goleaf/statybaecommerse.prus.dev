@@ -1,15 +1,17 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace App\Livewire;
 
 use App\Services\SystemSettingsService;
 use Livewire\Component;
+
 /**
  * SystemSettingsDisplay
- * 
+ *
  * Livewire component for SystemSettingsDisplay with reactive frontend functionality, real-time updates, and user interaction handling.
- * 
+ *
  * @property string $group
  * @property bool $showPublicOnly
  * @property string $search
@@ -18,9 +20,13 @@ use Livewire\Component;
 final class SystemSettingsDisplay extends Component
 {
     public string $group = 'general';
+
     public bool $showPublicOnly = false;
+
     public string $search = '';
+
     protected $queryString = ['group' => ['except' => 'general'], 'showPublicOnly' => ['except' => false], 'search' => ['except' => '']];
+
     /**
      * Render the Livewire component view with current state.
      */
@@ -34,8 +40,10 @@ final class SystemSettingsDisplay extends Component
                 return stripos($key, $this->search) !== false || stripos($value, $this->search) !== false;
             }, ARRAY_FILTER_USE_BOTH);
         }
+
         return view('livewire.system-settings-display', ['settings' => $settings, 'groups' => $this->getAvailableGroups()]);
     }
+
     /**
      * Handle updatedGroup functionality with proper error handling.
      */
@@ -43,6 +51,7 @@ final class SystemSettingsDisplay extends Component
     {
         $this->reset('search');
     }
+
     /**
      * Handle updatedShowPublicOnly functionality with proper error handling.
      */
@@ -50,6 +59,7 @@ final class SystemSettingsDisplay extends Component
     {
         $this->reset('search');
     }
+
     /**
      * Handle updatedSearch functionality with proper error handling.
      */
@@ -57,9 +67,9 @@ final class SystemSettingsDisplay extends Component
     {
         // Search is handled in render method
     }
+
     /**
      * Handle getAvailableGroups functionality with proper error handling.
-     * @return array
      */
     private function getAvailableGroups(): array
     {

@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Models\Campaign;
-use App\Models\Setting;
-use App\Models\Notification;
+declare(strict_types=1);
+
 use App\Models\AnalyticsEvent;
-use App\Models\PartnerTier;
-use App\Models\Product;
-use App\Models\Order;
-use App\Models\User;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Campaign;
+use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Discount;
+use App\Models\Notification;
+use App\Models\Order;
+use App\Models\PartnerTier;
+use App\Models\Product;
 use App\Models\Review;
+use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -31,9 +33,9 @@ describe('Campaign Model', function (): void {
     });
 
     it('has correct fillable attributes', function (): void {
-        $campaign = new Campaign();
+        $campaign = new Campaign;
         $fillable = $campaign->getFillable();
-        
+
         expect($fillable)->toContain('name');
         expect($fillable)->toContain('slug');
         expect($fillable)->toContain('status');
@@ -46,7 +48,7 @@ describe('Campaign Model', function (): void {
         Campaign::factory()->create(['status' => 'inactive']);
 
         $activeCampaigns = Campaign::active()->get();
-        
+
         expect($activeCampaigns)->toHaveCount(1);
         expect($activeCampaigns->first()->status)->toBe('active');
     });
@@ -66,9 +68,9 @@ describe('Setting Model', function (): void {
     });
 
     it('has correct fillable attributes', function (): void {
-        $setting = new Setting();
+        $setting = new Setting;
         $fillable = $setting->getFillable();
-        
+
         expect($fillable)->toContain('key');
         expect($fillable)->toContain('value');
         expect($fillable)->toContain('display_name');
@@ -79,7 +81,7 @@ describe('Setting Model', function (): void {
 describe('Notification Model', function (): void {
     it('can create a notification', function (): void {
         $user = User::factory()->create();
-        
+
         $notification = Notification::factory()->create([
             'type' => 'info',
             'title' => 'Test Notification',
@@ -105,7 +107,7 @@ describe('Notification Model', function (): void {
 describe('AnalyticsEvent Model', function (): void {
     it('can create an analytics event', function (): void {
         $user = User::factory()->create();
-        
+
         $event = AnalyticsEvent::factory()->create([
             'event_name' => 'test_event',
             'event_type' => 'page_view',
@@ -144,9 +146,9 @@ describe('PartnerTier Model', function (): void {
     });
 
     it('has correct fillable attributes', function (): void {
-        $tier = new PartnerTier();
+        $tier = new PartnerTier;
         $fillable = $tier->getFillable();
-        
+
         expect($fillable)->toContain('name');
         expect($fillable)->toContain('description');
         expect($fillable)->toContain('discount_percentage');
@@ -170,9 +172,9 @@ describe('Product Model', function (): void {
     });
 
     it('has correct fillable attributes', function (): void {
-        $product = new Product();
+        $product = new Product;
         $fillable = $product->getFillable();
-        
+
         expect($fillable)->toContain('name');
         expect($fillable)->toContain('slug');
         expect($fillable)->toContain('price');
@@ -184,7 +186,7 @@ describe('Product Model', function (): void {
         Product::factory()->create(['is_visible' => false]);
 
         $visibleProducts = Product::visible()->get();
-        
+
         expect($visibleProducts)->toHaveCount(1);
         expect($visibleProducts->first()->is_visible)->toBeTrue();
     });
@@ -193,7 +195,7 @@ describe('Product Model', function (): void {
 describe('Order Model', function (): void {
     it('can create an order', function (): void {
         $user = User::factory()->create();
-        
+
         $order = Order::factory()->create([
             'user_id' => $user->id,
             'total' => 199.99,
@@ -241,7 +243,7 @@ describe('Category Model', function (): void {
         Category::factory()->create(['is_active' => false]);
 
         $activeCategories = Category::active()->get();
-        
+
         expect($activeCategories)->toHaveCount(1);
         expect($activeCategories->first()->is_active)->toBeTrue();
     });
@@ -265,7 +267,7 @@ describe('Brand Model', function (): void {
         Brand::factory()->create(['is_active' => false]);
 
         $activeBrands = Brand::active()->get();
-        
+
         expect($activeBrands)->toHaveCount(1);
         expect($activeBrands->first()->is_active)->toBeTrue();
     });
@@ -289,7 +291,7 @@ describe('Collection Model', function (): void {
         Collection::factory()->create(['is_active' => false]);
 
         $activeCollections = Collection::active()->get();
-        
+
         expect($activeCollections)->toHaveCount(1);
         expect($activeCollections->first()->is_active)->toBeTrue();
     });
@@ -315,7 +317,7 @@ describe('Discount Model', function (): void {
         Discount::factory()->create(['is_active' => false]);
 
         $activeDiscounts = Discount::active()->get();
-        
+
         expect($activeDiscounts)->toHaveCount(1);
         expect($activeDiscounts->first()->is_active)->toBeTrue();
     });
@@ -325,7 +327,7 @@ describe('Review Model', function (): void {
     it('can create a review', function (): void {
         $user = User::factory()->create();
         $product = Product::factory()->create();
-        
+
         $review = Review::factory()->create([
             'user_id' => $user->id,
             'product_id' => $product->id,

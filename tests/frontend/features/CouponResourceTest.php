@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\CouponResource;
-use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     // Create the admin role if it doesn't exist
     Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-    
+
     $this->admin = User::factory()->create();
     $this->admin->assignRole('admin');
     $this->actingAs($this->admin);
@@ -23,7 +25,7 @@ it('lists coupons in table', function () {
     $coupons = collect(range(1, 3))->map(function () {
         return \App\Models\Coupon::create([
             'code' => Str::upper(Str::random(8)),
-            'name' => 'Test ' . Str::random(5),
+            'name' => 'Test '.Str::random(5),
             'description' => 'Desc',
             'type' => 'fixed',
             'value' => 10,
@@ -58,5 +60,3 @@ it('renders coupon view and edit pages', function () {
     $this->get(CouponResource::getUrl('view', ['record' => $coupon]))->assertSuccessful();
     $this->get(CouponResource::getUrl('edit', ['record' => $coupon]))->assertSuccessful();
 });
-
-

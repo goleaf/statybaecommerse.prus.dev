@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\DiscountRedemptionResource;
 use Filament\Forms\Form;
@@ -50,4 +52,3 @@ it('has navigation badge', function (): void {
 it('has navigation badge color', function (): void {
     expect(DiscountRedemptionResource::getNavigationBadgeColor())->toBe('warning');
 });
-

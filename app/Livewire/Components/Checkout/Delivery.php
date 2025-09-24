@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Components\Checkout;
 
-use App\Models\Country;
 use App\Models\ShippingOption;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,7 +30,6 @@ class Delivery extends StepComponent
 
     /**
      * Initialize the Livewire component with parameters.
-     * @return void
      */
     public function mount(): void
     {
@@ -40,7 +40,6 @@ class Delivery extends StepComponent
 
     /**
      * Handle save functionality with proper error handling.
-     * @return void
      */
     public function save(): void
     {
@@ -62,7 +61,6 @@ class Delivery extends StepComponent
 
     /**
      * Handle stepInfo functionality with proper error handling.
-     * @return array
      */
     public function stepInfo(): array
     {
@@ -71,7 +69,6 @@ class Delivery extends StepComponent
 
     /**
      * Render the Livewire component view with current state.
-     * @return View
      */
     public function render(): View
     {
