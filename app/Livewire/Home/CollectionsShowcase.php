@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
@@ -11,6 +9,7 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -21,13 +20,17 @@ final class CollectionsShowcase extends Component implements HasSchemas
     #[Computed]
     public function collections(): EloquentCollection
     {
-        return ProductCollection::query()
-            ->with('media')
-            ->withCount(['products'])
-            ->visible()
-            ->active()
-            ->ordered()
-            ->get();
+        $cacheKey = sprintf('home:collections:%s', app()->getLocale());
+
+        return Cache::remember($cacheKey, 300, function () {
+            return ProductCollection::query()
+                ->with('media')
+                ->withCount(['products'])
+                ->visible()
+                ->active()
+                ->ordered()
+                ->get();
+        });
     }
 
     public function collectionsSchema(Schema $schema): Schema
@@ -36,7 +39,7 @@ final class CollectionsShowcase extends Component implements HasSchemas
             ViewEntry::make('collections')
                 ->label('')
                 ->view('livewire.home.partials.collections-grid')
-                ->viewData(fn (): array => [
+                ->viewData(fn(): array => [
                     'collections' => $this->collections(),
                 ]),
         ]);

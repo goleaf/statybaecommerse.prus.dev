@@ -24,10 +24,7 @@ final class ReportFactory extends Factory
         $category = fake()->randomElement(['sales', 'marketing', 'operations', 'finance', 'customer_service', 'inventory', 'analytics']);
 
         return [
-            'name' => [
-                'lt' => $name,
-                'en' => $name,
-            ],
+            'name' => $name,
             'slug' => Str::slug($name),
             'type' => $type,
             'category' => $category,
@@ -38,14 +35,8 @@ final class ReportFactory extends Factory
                 'status' => fake()->randomElement(['all', 'paid', 'pending']),
                 'category' => fake()->randomElement(['electronics', 'clothing', 'books']),
             ],
-            'description' => [
-                'lt' => fake()->sentence(),
-                'en' => fake()->sentence(),
-            ],
-            'content' => [
-                'lt' => fake()->paragraphs(3, true),
-                'en' => fake()->paragraphs(3, true),
-            ],
+            'description' => fake()->sentence(),
+            'content' => fake()->paragraphs(3, true),
             'is_active' => fake()->boolean(80),
             'is_public' => fake()->boolean(60),
             'is_scheduled' => fake()->boolean(30),

@@ -196,9 +196,18 @@ return new class extends Migration
         if (Schema::hasTable('product_variants')) {
             Schema::table('product_variants', function (Blueprint $table) {
                 $columns = [
-                    'size', 'size_unit', 'size_display', 'size_price_modifier', 'size_weight_modifier',
-                    'variant_type', 'is_default_variant', 'variant_sku_suffix', 'track_inventory',
-                    'allow_backorder', 'low_stock_threshold', 'variant_metadata',
+                    'size',
+                    'size_unit',
+                    'size_display',
+                    'size_price_modifier',
+                    'size_weight_modifier',
+                    'variant_type',
+                    'is_default_variant',
+                    'variant_sku_suffix',
+                    'track_inventory',
+                    'allow_backorder',
+                    'low_stock_threshold',
+                    'variant_metadata',
                 ];
 
                 foreach ($columns as $column) {

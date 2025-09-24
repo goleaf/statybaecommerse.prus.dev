@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
@@ -8,11 +6,11 @@ use App\Models\Scopes\UserOwnedScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 /**
  * ProductHistory
@@ -37,7 +35,13 @@ final class ProductHistory extends Model
 
     protected $fillable = ['product_id', 'user_id', 'action', 'field_name', 'old_value', 'new_value', 'description', 'ip_address', 'user_agent', 'metadata', 'causer_type', 'causer_id', 'created_at', 'updated_at'];
 
-    protected $casts = ['metadata' => 'array', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = [
+        'metadata' => 'array',
+        'old_value' => 'array',
+        'new_value' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     protected $table = 'product_histories';
 
@@ -48,10 +52,11 @@ final class ProductHistory extends Model
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['action', 'field_name', 'description'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "ProductHistory {$eventName}")->useLogName('product_history');
+        return LogOptions::defaults()->logOnly(['action', 'field_name', 'description'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "ProductHistory {$eventName}")->useLogName('product_history');
     }
 
     // Relations
+
     /**
      * Handle product functionality with proper error handling.
      */
@@ -77,6 +82,7 @@ final class ProductHistory extends Model
     }
 
     // Scopes
+
     /**
      * Handle scopeForProduct functionality with proper error handling.
      *
@@ -128,6 +134,7 @@ final class ProductHistory extends Model
     }
 
     // Accessors & Mutators
+
     /**
      * Handle getFormattedOldValueAttribute functionality with proper error handling.
      */
@@ -166,7 +173,7 @@ final class ProductHistory extends Model
      */
     public function getFieldDisplayAttribute(): string
     {
-        return __('admin.product_history.fields.'.$this->field_name, [], $this->field_name);
+        return __('admin.product_history.fields.' . $this->field_name, [], $this->field_name);
     }
 
     /**
@@ -185,6 +192,7 @@ final class ProductHistory extends Model
     }
 
     // Helper methods
+
     /**
      * Handle formatValue functionality with proper error handling.
      *
@@ -220,7 +228,7 @@ final class ProductHistory extends Model
      */
     public function getChangeImpact(): string
     {
-        if (! $this->isSignificantChange()) {
+        if (!$this->isSignificantChange()) {
             return 'low';
         }
         if (in_array($this->field_name, ['price', 'sale_price', 'stock_quantity'])) {
@@ -231,6 +239,7 @@ final class ProductHistory extends Model
     }
 
     // Static methods
+
     /**
      * Handle createHistoryEntry functionality with proper error handling.
      *
@@ -262,6 +271,7 @@ final class ProductHistory extends Model
     }
 
     // Translation methods
+
     /**
      * Handle getTranslatedAction functionality with proper error handling.
      */
@@ -287,6 +297,7 @@ final class ProductHistory extends Model
     }
 
     // Scope for translated histories
+
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
@@ -302,6 +313,7 @@ final class ProductHistory extends Model
     }
 
     // Get all available locales for this history entry
+
     /**
      * Handle getAvailableLocales functionality with proper error handling.
      */
@@ -311,6 +323,7 @@ final class ProductHistory extends Model
     }
 
     // Check if history entry has translation for specific locale
+
     /**
      * Handle hasTranslationFor functionality with proper error handling.
      */
@@ -320,6 +333,7 @@ final class ProductHistory extends Model
     }
 
     // Get or create translation for locale
+
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
      *
@@ -331,6 +345,7 @@ final class ProductHistory extends Model
     }
 
     // Update translation for specific locale
+
     /**
      * Handle updateTranslation functionality with proper error handling.
      */
@@ -342,6 +357,7 @@ final class ProductHistory extends Model
     }
 
     // Delete translation for specific locale
+
     /**
      * Handle deleteTranslation functionality with proper error handling.
      */

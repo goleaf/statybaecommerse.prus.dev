@@ -454,10 +454,11 @@ Route::prefix('legal')->name('legal.')->group(function () {
     Route::get('/', [App\Http\Controllers\LegalController::class, 'index'])->name('index');
     Route::get('/search', [App\Http\Controllers\LegalController::class, 'search'])->name('search');
     Route::get('/type/{type}', [App\Http\Controllers\LegalController::class, 'type'])->name('type');
-    Route::get('/{key}', [App\Http\Controllers\LegalController::class, 'show'])->name('show');
-    Route::get('/{key}/download/{format?}', [App\Http\Controllers\LegalController::class, 'download'])->name('download');
+    // Specific endpoints must be defined before the catch-all {key}
     Route::get('/sitemap.xml', [App\Http\Controllers\LegalController::class, 'sitemap'])->name('sitemap');
     Route::get('/rss.xml', [App\Http\Controllers\LegalController::class, 'rss'])->name('rss');
+    Route::get('/{key}/download/{format?}', [App\Http\Controllers\LegalController::class, 'download'])->name('download');
+    Route::get('/{key}', [App\Http\Controllers\LegalController::class, 'show'])->name('show');
 });
 
 // Legacy legal route

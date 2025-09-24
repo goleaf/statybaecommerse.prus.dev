@@ -17,5 +17,3 @@ final class TrackedScope implements Scope
         }
     }
 }
-
-

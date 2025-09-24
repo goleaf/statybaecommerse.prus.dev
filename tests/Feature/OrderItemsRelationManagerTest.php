@@ -60,16 +60,13 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('create')
-            ->assertFormExists()
-            ->fillForm([
+            ->callTableAction('create', null, [
                 'product_variant_id' => $this->productVariant->id,
                 'quantity' => 2,
                 'unit_price' => 25.5,
                 'discount_amount' => 5.0,
                 'notes' => 'Test order item',
             ])
-            ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_items', [
@@ -99,13 +96,10 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('edit', $orderItem)
-            ->assertFormExists()
-            ->fillForm([
+            ->callTableAction('edit', $orderItem, [
                 'quantity' => 5,
                 'unit_price' => 30.0,
             ])
-            ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_items', [
@@ -132,7 +126,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('delete', $orderItem)
+            ->callTableAction('delete', $orderItem)
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseMissing('order_items', [
@@ -158,7 +152,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('duplicate_item', $orderItem)
+            ->callTableAction('duplicate_item', $orderItem)
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseCount('order_items', 2);
@@ -294,15 +288,12 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('create')
-            ->assertFormExists()
-            ->fillForm([
+            ->callTableAction('create', null, [
                 'product_variant_id' => $this->productVariant->id,
                 'quantity' => 3,
                 'unit_price' => 20.0,
                 'discount_amount' => 10.0,
             ])
-            ->call('create')
             ->assertHasNoFormErrors();
 
         $orderItem = OrderItem::where('order_id', $this->order->id)->first();
@@ -324,14 +315,11 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('create')
-            ->assertFormExists()
-            ->fillForm([
+            ->callTableAction('create', null, [
                 'product_variant_id' => null,
                 'quantity' => null,
                 'unit_price' => null,
             ])
-            ->call('create')
             ->assertHasFormErrors(['product_variant_id', 'quantity', 'unit_price']);
     }
 
@@ -348,14 +336,11 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('create')
-            ->assertFormExists()
-            ->fillForm([
+            ->callTableAction('create', null, [
                 'product_variant_id' => $this->productVariant->id,
                 'quantity' => 0,
                 'unit_price' => 20.0,
             ])
-            ->call('create')
             ->assertHasFormErrors(['quantity']);
     }
 }

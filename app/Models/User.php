@@ -229,6 +229,11 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         return $this->hasMany(Review::class);
     }
 
+    public function productHistories(): HasMany
+    {
+        return $this->hasMany(ProductHistory::class);
+    }
+
     /**
      * Handle latestReview functionality with proper error handling.
      */
@@ -262,6 +267,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     // Explicit alias for clarity in code: reviews authored by this customer
+
     /**
      * Handle authoredReviews functionality with proper error handling.
      */
@@ -429,6 +435,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     // Referral relationships
+
     /**
      * Handle referrals functionality with proper error handling.
      */
@@ -536,6 +543,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     // Additional relationships for comprehensive user management
+
     /**
      * Handle notifications functionality with proper error handling.
      */
@@ -633,6 +641,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     // Scopes for filtering
+
     /**
      * Handle scopeActive functionality with proper error handling.
      *
@@ -746,6 +755,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     // Helper methods
+
     /**
      * Handle getFullNameAttribute functionality with proper error handling.
      */

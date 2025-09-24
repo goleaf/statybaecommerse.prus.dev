@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
+use Filament\Actions\Testing\TestAction;
+use Filament\Actions\CreateAction;
 
 /**
  * OrderShippingRelationManagerTest
@@ -56,19 +58,19 @@ final class OrderShippingRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('create')
-            ->assertFormExists()
-            ->fillForm([
-                'shipping_method' => 'express',
-                'tracking_number' => 'TRK123456789',
-                'carrier' => 'DHL',
-                'service_type' => 'Express',
-                'base_cost' => 15.0,
-                'insurance_cost' => 5.0,
-                'total_cost' => 20.0,
-            ])
-            ->call('create')
-            ->assertHasNoFormErrors();
+            ->callAction(
+                TestAction::make(CreateAction::class)->table(),
+                [
+                    'shipping_method' => 'express',
+                    'tracking_number' => 'TRK123456789',
+                    'carrier' => 'DHL',
+                    'service_type' => 'Express',
+                    'base_cost' => 15.0,
+                    'insurance_cost' => 5.0,
+                    'total_cost' => 20.0,
+                ]
+            )
+            ->assertNotified();
 
         $this->assertDatabaseHas('order_shippings', [
             'order_id' => $this->order->id,
@@ -96,7 +98,7 @@ final class OrderShippingRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('mark_shipped', $shipping)
+            ->callTableAction('mark_shipped', $shipping)
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_shippings', [
@@ -123,7 +125,7 @@ final class OrderShippingRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('mark_delivered', $shipping)
+            ->callTableAction('mark_delivered', $shipping)
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_shippings', [

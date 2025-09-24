@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
 use BackedEnum;
+use Filament\Pages\Page;
 use UnitEnum;
 
 final class AdvancedReports extends Page
@@ -17,4 +19,9 @@ final class AdvancedReports extends Page
     protected static ?string $slug = 'advanced-reports';
 
     protected string $view = 'filament.pages.advanced-reports';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 }

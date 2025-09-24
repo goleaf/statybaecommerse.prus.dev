@@ -24,7 +24,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\HeaderAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -49,6 +48,22 @@ final class UserBehaviorResource extends Resource
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 5;
+
+    private static function behaviorTypeOptions(): array
+    {
+        return [
+            'view' => __('admin.user_behaviors.behavior_types.view'),
+            'click' => __('admin.user_behaviors.behavior_types.click'),
+            'add_to_cart' => __('admin.user_behaviors.behavior_types.add_to_cart'),
+            'remove_from_cart' => __('admin.user_behaviors.behavior_types.remove_from_cart'),
+            'purchase' => __('admin.user_behaviors.behavior_types.purchase'),
+            'search' => __('admin.user_behaviors.behavior_types.search'),
+            'filter' => __('admin.user_behaviors.behavior_types.filter'),
+            'sort' => __('admin.user_behaviors.behavior_types.sort'),
+            'wishlist' => __('admin.user_behaviors.behavior_types.wishlist'),
+            'share' => __('admin.user_behaviors.behavior_types.share'),
+        ];
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -103,7 +118,7 @@ final class UserBehaviorResource extends Resource
                             ]),
                         Select::make('behavior_type')
                             ->label(__('admin.user_behaviors.behavior_type'))
-                            ->options(__('admin.user_behaviors.behavior_types'))
+                            ->options(self::behaviorTypeOptions())
                             ->required()
                             ->searchable(),
                         DateTimePicker::make('created_at')
@@ -227,7 +242,7 @@ final class UserBehaviorResource extends Resource
                     ->preload(),
                 SelectFilter::make('behavior_type')
                     ->label(__('admin.user_behaviors.behavior_type'))
-                    ->options(__('admin.user_behaviors.behavior_types'))
+                    ->options(self::behaviorTypeOptions())
                     ->multiple(),
                 SelectFilter::make('product_id')
                     ->label(__('admin.user_behaviors.product'))
@@ -360,12 +375,12 @@ final class UserBehaviorResource extends Resource
                 ]),
             ])
             ->headerActions([
-                HeaderAction::make('analytics_dashboard')
+                Action::make('analytics_dashboard')
                     ->label(__('admin.user_behaviors.analytics_dashboard'))
                     ->icon('heroicon-o-chart-pie')
                     ->color('primary')
                     ->url(fn(): string => route('filament.admin.resources.user-behaviors.analytics')),
-                HeaderAction::make('export_all')
+                Action::make('export_all')
                     ->label(__('admin.user_behaviors.export_all'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('info')
@@ -394,6 +409,7 @@ final class UserBehaviorResource extends Resource
             'create' => Pages\CreateUserBehavior::route('/create'),
             'view' => Pages\ViewUserBehavior::route('/{record}'),
             'edit' => Pages\EditUserBehavior::route('/{record}/edit'),
+            'analytics' => Pages\Analytics::route('/analytics'),
         ];
     }
 }

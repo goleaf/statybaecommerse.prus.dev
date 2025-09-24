@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models\Scopes;
 
@@ -33,6 +31,8 @@ final class ActiveScope implements Scope
             $builder->where('is_enabled', true);
         } elseif ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'is_visible')) {
             $builder->where('is_visible', true);
+        } elseif ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'status')) {
+            $builder->where('status', 'active');
         }
     }
 }

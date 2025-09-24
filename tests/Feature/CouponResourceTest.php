@@ -11,12 +11,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-/**
- * CouponResourceTest
- *
- * Comprehensive test suite for CouponResource functionality including CRUD operations, filters, and relationships.
- */
-use Tests\TestCase;
 
 final class CouponResourceTest extends TestCase
 {

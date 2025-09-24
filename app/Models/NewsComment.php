@@ -35,14 +35,14 @@ final class NewsComment extends Model
 
     protected $table = 'news_comments';
 
-    protected $fillable = ['news_id', 'parent_id', 'author_name', 'author_email', 'content', 'is_approved', 'is_visible'];
+    protected $fillable = ['news_id', 'parent_id', 'author_name', 'author_email', 'content', 'is_approved', 'is_visible', 'is_active'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['news_id' => 'integer', 'parent_id' => 'integer', 'is_approved' => 'boolean', 'is_visible' => 'boolean'];
+        return ['news_id' => 'integer', 'parent_id' => 'integer', 'is_approved' => 'boolean', 'is_visible' => 'boolean', 'is_active' => 'boolean'];
     }
 
     /**

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\AdminUser;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 /**
  * NotificationPolicy
@@ -20,126 +23,156 @@ final class NotificationPolicy
     /**
      * Handle viewAny functionality with proper error handling.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(?AuthenticatableContract $user): bool
     {
-        return $user->hasPermissionTo('view notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'view notifications');
     }
 
     /**
      * Handle view functionality with proper error handling.
      */
-    public function view(User $user, Notification $notification): bool
+    public function view(?AuthenticatableContract $user, Notification $notification): bool
     {
         // Users can view their own notifications
-        if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
+        if ($user instanceof User && $notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
 
         // Admins can view all notifications
-        return $user->hasPermissionTo('view notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'view notifications');
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(User $user): bool
+    public function create(?AuthenticatableContract $user): bool
     {
-        return $user->hasPermissionTo('create notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'create notifications');
     }
 
     /**
      * Update the specified resource in storage with validation.
      */
-    public function update(User $user, Notification $notification): bool
+    public function update(?AuthenticatableContract $user, Notification $notification): bool
     {
         // Users can update their own notifications (mark as read/unread)
-        if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
+        if ($user instanceof User && $notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
 
         // Admins can update all notifications
-        return $user->hasPermissionTo('update notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'update notifications');
     }
 
     /**
      * Handle delete functionality with proper error handling.
      */
-    public function delete(User $user, Notification $notification): bool
+    public function delete(?AuthenticatableContract $user, Notification $notification): bool
     {
         // Users can delete their own notifications
-        if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
+        if ($user instanceof User && $notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
 
         // Admins can delete all notifications
-        return $user->hasPermissionTo('delete notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'delete notifications');
     }
 
     /**
      * Handle restore functionality with proper error handling.
      */
-    public function restore(User $user, Notification $notification): bool
+    public function restore(?AuthenticatableContract $user, Notification $notification): bool
     {
-        return $user->hasPermissionTo('restore notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'restore notifications');
     }
 
     /**
      * Handle forceDelete functionality with proper error handling.
      */
-    public function forceDelete(User $user, Notification $notification): bool
+    public function forceDelete(?AuthenticatableContract $user, Notification $notification): bool
     {
-        return $user->hasPermissionTo('force delete notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'force delete notifications');
     }
 
     /**
      * Handle markAsRead functionality with proper error handling.
      */
-    public function markAsRead(User $user, Notification $notification): bool
+    public function markAsRead(?AuthenticatableContract $user, Notification $notification): bool
     {
         // Users can mark their own notifications as read
-        if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
+        if ($user instanceof User && $notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
 
         // Admins can mark any notification as read
-        return $user->hasPermissionTo('update notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'update notifications');
     }
 
     /**
      * Handle markAsUnread functionality with proper error handling.
      */
-    public function markAsUnread(User $user, Notification $notification): bool
+    public function markAsUnread(?AuthenticatableContract $user, Notification $notification): bool
     {
         // Users can mark their own notifications as unread
-        if ($notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
+        if ($user instanceof User && $notification->notifiable_type === User::class && $notification->notifiable_id === $user->id) {
             return true;
         }
 
         // Admins can mark any notification as unread
-        return $user->hasPermissionTo('update notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'update notifications');
     }
 
     /**
      * Handle duplicate functionality with proper error handling.
      */
-    public function duplicate(User $user, Notification $notification): bool
+    public function duplicate(?AuthenticatableContract $user, Notification $notification): bool
     {
-        return $user->hasPermissionTo('create notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'create notifications');
     }
 
     /**
      * Handle bulkUpdate functionality with proper error handling.
      */
-    public function bulkUpdate(User $user): bool
+    public function bulkUpdate(?AuthenticatableContract $user): bool
     {
-        return $user->hasPermissionTo('update notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'update notifications');
     }
 
     /**
      * Handle bulkDelete functionality with proper error handling.
      */
-    public function bulkDelete(User $user): bool
+    public function bulkDelete(?AuthenticatableContract $user): bool
     {
-        return $user->hasPermissionTo('delete notifications') || $user->is_admin;
+        return $this->canAdminister($user, 'delete notifications');
+    }
+
+    private function canAdminister(?AuthenticatableContract $user, string $permission): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($user instanceof User) {
+            $hasPermission = false;
+
+            if (method_exists($user, 'hasPermissionTo')) {
+                try {
+                    $hasPermission = (bool) $user->hasPermissionTo($permission);
+                } catch (PermissionDoesNotExist $e) {
+                    $hasPermission = false;
+                }
+            }
+
+            $isAdmin = (bool) ($user->is_admin ?? false);
+
+            return $hasPermission || $isAdmin;
+        }
+
+        if ($user instanceof AdminUser) {
+            // Allow admin guard users by default
+            return true;
+        }
+
+        return false;
     }
 }

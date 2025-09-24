@@ -33,6 +33,15 @@ final class ProductSimilarity extends Model
 
     protected $casts = ['similarity_score' => 'decimal:6', 'calculation_data' => 'array', 'calculated_at' => 'datetime'];
 
+    protected static function booted(): void
+    {
+        static::creating(function (self $model): void {
+            if ($model->calculated_at === null) {
+                $model->calculated_at = now();
+            }
+        });
+    }
+
     /**
      * Handle product functionality with proper error handling.
      */

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * OrderShipping
@@ -31,10 +33,8 @@ final class OrderShipping extends Model
 
     protected $fillable = [
         'order_id',
-        'shipping_method',
-        'carrier',
+        'carrier_name',
         'service',
-        'service_type',
         'tracking_number',
         'tracking_url',
         'shipped_at',
@@ -42,14 +42,8 @@ final class OrderShipping extends Model
         'delivered_at',
         'weight',
         'dimensions',
-        'base_cost',
-        'insurance_cost',
-        'total_cost',
+        'cost',
         'metadata',
-        'status',
-        'is_delivered',
-        'delivery_notes',
-        'notes',
     ];
 
     /**
@@ -114,7 +108,7 @@ final class OrderShipping extends Model
      */
     public function isShipped(): bool
     {
-        return !is_null($this->shipped_at);
+        return ! is_null($this->shipped_at);
     }
 
     /**
@@ -122,7 +116,7 @@ final class OrderShipping extends Model
      */
     public function isDelivered(): bool
     {
-        return !is_null($this->delivered_at);
+        return ! is_null($this->delivered_at);
     }
 
     /**
@@ -130,7 +124,7 @@ final class OrderShipping extends Model
      */
     public function isInTransit(): bool
     {
-        return $this->isShipped() && !$this->isDelivered();
+        return $this->isShipped() && ! $this->isDelivered();
     }
 
     /**

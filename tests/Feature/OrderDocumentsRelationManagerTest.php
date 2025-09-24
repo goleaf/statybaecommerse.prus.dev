@@ -55,7 +55,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('create')
+            ->mountTableAction('create')
             ->assertFormExists()
             ->fillForm([
                 'name' => 'Test Document',
@@ -66,7 +66,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
                 'is_downloadable' => true,
                 'description' => 'Test document description',
             ])
-            ->call('create')
+            ->callMountedTableAction()
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
@@ -97,7 +97,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('approve', $document)
+            ->callTableAction('approve', $document)
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
@@ -125,7 +125,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         ]);
 
         $component
-            ->call('reject', $document)
+            ->callTableAction('reject', $document)
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [

@@ -10,6 +10,7 @@ use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Route;
 
 final class StockMovementResourceTest extends TestCase
 {
@@ -27,6 +28,10 @@ final class StockMovementResourceTest extends TestCase
         // Ensure required permissions exist for Filament topbar checks
         \Spatie\Permission\Models\Permission::findOrCreate('view notifications');
         $this->adminUser->givePermissionTo('view notifications');
+
+        // Define dummy route for system settings navigation link used by Filament topbar
+        Route::get('/__dummy-system-settings', fn () => 'ok')
+            ->name('filament.admin.resources.system-settings.index');
 
         Filament::setCurrentPanel('admin');
     }

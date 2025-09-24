@@ -18,11 +18,13 @@ final class CreateRecommendationBlock extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Set default values
         $data['is_active'] = $data['is_active'] ?? true;
-        $data['is_featured'] = $data['is_featured'] ?? false;
-        $data['max_items'] = $data['max_items'] ?? 10;
+        $data['is_default'] = $data['is_default'] ?? false;
+        $data['max_products'] = $data['max_products'] ?? 10;
         $data['sort_order'] = $data['sort_order'] ?? 0;
+        $data['show_title'] = $data['show_title'] ?? true;
+        $data['show_description'] = $data['show_description'] ?? false;
+        $data['config_ids'] = $data['config_ids'] ?? [];
 
         return $data;
     }

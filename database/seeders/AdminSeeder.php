@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -360,7 +358,7 @@ final class AdminSeeder extends Seeder
             );
 
             // Attach category to product if not already attached
-            if (isset($categories[$index]) && ! $createdProduct->categories()->where('category_id', $categories[$index]->id)->exists()) {
+            if (isset($categories[$index]) && !$createdProduct->categories()->where('category_id', $categories[$index]->id)->exists()) {
                 $createdProduct->categories()->attach($categories[$index]->id);
             }
 
@@ -382,11 +380,11 @@ final class AdminSeeder extends Seeder
 
             for ($i = 0; $i < $variantCount; $i++) {
                 $variants[] = ProductVariant::firstOrCreate(
-                    ['product_id' => $product->id, 'sku' => $product->sku.'-'.($i + 1)],
+                    ['product_id' => $product->id, 'sku' => $product->sku . '-' . ($i + 1)],
                     [
                         'product_id' => $product->id,
-                        'name' => $product->name.' - Variant '.($i + 1),
-                        'sku' => $product->sku.'-'.($i + 1),
+                        'name' => $product->name . ' - Variant ' . ($i + 1),
+                        'sku' => $product->sku . '-' . ($i + 1),
                         'price' => $product->price + rand(-50, 50),
                         'is_enabled' => true,
                         'attributes' => json_encode([
@@ -481,7 +479,7 @@ final class AdminSeeder extends Seeder
         $orders = [];
 
         for ($i = 0; $i < 5; $i++) {
-            $orderNumber = 'ORD-'.str_pad((string) ($i + 1), 6, '0', STR_PAD_LEFT);
+            $orderNumber = 'ORD-' . str_pad((string) ($i + 1), 6, '0', STR_PAD_LEFT);
             $orders[] = Order::firstOrCreate(
                 ['number' => $orderNumber],
                 [
@@ -493,7 +491,7 @@ final class AdminSeeder extends Seeder
                     'tax_amount' => rand(10, 100),
                     'shipping_amount' => rand(5, 50),
                     'currency' => 'EUR',
-                    'notes' => 'Sample order '.($i + 1),
+                    'notes' => 'Sample order ' . ($i + 1),
                 ]
             );
         }
@@ -541,7 +539,7 @@ final class AdminSeeder extends Seeder
                     'order_id' => $order->id,
                     'carrier_name' => ['DHL', 'UPS', 'FedEx', 'Post'][rand(0, 3)],
                     'service' => ['standard', 'express', 'overnight'][rand(0, 2)],
-                    'tracking_number' => 'TRK'.rand(100000, 999999),
+                    'tracking_number' => 'TRK' . rand(100000, 999999),
                     // Use existing cost fields
                     'base_cost' => rand(10, 50),
                     'total_cost' => rand(15, 75),
@@ -563,7 +561,7 @@ final class AdminSeeder extends Seeder
                 [
                     'documentable_type' => Order::class,
                     'documentable_id' => $order->id,
-                    'title' => 'Invoice for Order '.$order->number,
+                    'title' => 'Invoice for Order ' . $order->number,
                     'content' => 'Sample document content',
                     'status' => ['draft', 'approved', 'rejected'][rand(0, 2)],
                     'format' => 'pdf',

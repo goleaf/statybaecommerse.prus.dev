@@ -10,7 +10,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class PartnerResourceTest extends TestCase
 {
@@ -308,7 +307,7 @@ class PartnerResourceTest extends TestCase
 
         $partnerData = [
             'name' => 'Test Partner',
-            'code' => 'EXISTING001', // Same code as existing partner
+            'code' => 'EXISTING001',  // Same code as existing partner
             'tier_id' => $this->partnerTier->id,
             'is_enabled' => true,
         ];
@@ -328,7 +327,7 @@ class PartnerResourceTest extends TestCase
             'code' => 'TEST001',
             'tier_id' => $this->partnerTier->id,
             'is_enabled' => true,
-            'contact_email' => 'invalid-email', // Invalid email format
+            'contact_email' => 'invalid-email',  // Invalid email format
         ];
 
         Livewire::test(\App\Filament\Resources\PartnerResource\Pages\CreatePartner::class)
@@ -346,7 +345,7 @@ class PartnerResourceTest extends TestCase
             'code' => 'TEST001',
             'tier_id' => $this->partnerTier->id,
             'is_enabled' => true,
-            'discount_rate' => 150.0, // Invalid: exceeds 100%
+            'discount_rate' => 150.0,  // Invalid: exceeds 100%
         ];
 
         Livewire::test(\App\Filament\Resources\PartnerResource\Pages\CreatePartner::class)
@@ -364,7 +363,7 @@ class PartnerResourceTest extends TestCase
             'code' => 'TEST001',
             'tier_id' => $this->partnerTier->id,
             'is_enabled' => true,
-            'commission_rate' => 150.0, // Invalid: exceeds 100%
+            'commission_rate' => 150.0,  // Invalid: exceeds 100%
         ];
 
         Livewire::test(\App\Filament\Resources\PartnerResource\Pages\CreatePartner::class)

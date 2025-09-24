@@ -1,11 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Livewire;
 
 use App\Models\Slider;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -21,11 +20,15 @@ final class HomeSlider extends Component
     #[Computed]
     public function sliders(): Collection
     {
-        return Slider::query()
-            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
-            ->active()
-            ->ordered()
-            ->get();
+        $locale = app()->getLocale();
+
+        return Cache::remember("home:sliders:{$locale}", 300, function () use ($locale) {
+            return Slider::query()
+                ->with(['translations' => fn($q) => $q->where('locale', $locale)])
+                ->active()
+                ->ordered()
+                ->get();
+        });
     }
 
     public function nextSlide(): void
@@ -47,7 +50,7 @@ final class HomeSlider extends Component
 
     public function toggleAutoPlay(): void
     {
-        $this->autoPlay = ! $this->autoPlay;
+        $this->autoPlay = !$this->autoPlay;
     }
 
     public function render(): View

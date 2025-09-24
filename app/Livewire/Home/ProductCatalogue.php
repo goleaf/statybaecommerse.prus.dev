@@ -12,6 +12,7 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -56,11 +57,15 @@ final class ProductCatalogue extends Component implements HasSchemas
     #[Computed]
     public function categories(): array
     {
-        return Category::query()
-            ->where('is_visible', true)
-            ->orderBy('name')
-            ->pluck('name', 'id')
-            ->toArray();
+        $locale = app()->getLocale();
+
+        return Cache::remember("home:catalogue:categories:{$locale}", 300, function (): array {
+            return Category::query()
+                ->where('is_visible', true)
+                ->orderBy('name')
+                ->pluck('name', 'id')
+                ->toArray();
+        });
     }
 
     #[Computed]
@@ -68,6 +73,8 @@ final class ProductCatalogue extends Component implements HasSchemas
     {
         $query = Product::query()
             ->with(['brand', 'categories', 'media'])
+            ->withAvg(['reviews as average_rating' => fn($q) => $q->where('is_approved', true)], 'rating')
+            ->withCount(['reviews' => fn($q) => $q->where('is_approved', true)])
             ->where('is_visible', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
@@ -87,7 +94,7 @@ final class ProductCatalogue extends Component implements HasSchemas
         $query = match ($this->sort) {
             'price_asc' => $query->orderBy('price'),
             'price_desc' => $query->orderByDesc('price'),
-            'popular' => $query->withCount('reviews')->orderByDesc('reviews_count')->orderByDesc('published_at'),
+            'popular' => $query->withSum('orderItems as orders_quantity', 'quantity')->orderByDesc('orders_quantity')->orderByDesc('reviews_count')->orderByDesc('published_at'),
             default => $query->orderByDesc('published_at'),
         };
 

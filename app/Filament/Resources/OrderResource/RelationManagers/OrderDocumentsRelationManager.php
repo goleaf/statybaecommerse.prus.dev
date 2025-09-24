@@ -4,6 +4,9 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Models\Document;
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -277,15 +280,15 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
-                Action::make('create')
+                CreateAction::make()
                     ->label(__('orders.add_document'))
                     ->icon('heroicon-o-plus')
                     ->color('primary'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->color('warning'),
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->color('danger'),
                 Action::make('download')
                     ->label(__('orders.download'))

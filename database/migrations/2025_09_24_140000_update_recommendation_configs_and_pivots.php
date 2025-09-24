@@ -30,10 +30,16 @@ return new class extends Migration {
                 $table->unique(['recommendation_config_id', 'product_id'], 'rcp_unique');
 
                 // Short foreign key names to avoid MySQL 64-char limit
-                $table->foreign('recommendation_config_id', 'rcp_rc_fk')
-                    ->references('id')->on('recommendation_configs')->onDelete('cascade');
-                $table->foreign('product_id', 'rcp_prod_fk')
-                    ->references('id')->on('products')->onDelete('cascade');
+                $table
+                    ->foreign('recommendation_config_id', 'rcp_rc_fk')
+                    ->references('id')
+                    ->on('recommendation_configs')
+                    ->onDelete('cascade');
+                $table
+                    ->foreign('product_id', 'rcp_prod_fk')
+                    ->references('id')
+                    ->on('products')
+                    ->onDelete('cascade');
             });
         }
 
@@ -46,10 +52,16 @@ return new class extends Migration {
                 $table->unique(['recommendation_config_id', 'category_id'], 'rcc_unique');
 
                 // Short foreign key names to avoid MySQL 64-char limit
-                $table->foreign('recommendation_config_id', 'rcc_rc_fk')
-                    ->references('id')->on('recommendation_configs')->onDelete('cascade');
-                $table->foreign('category_id', 'rcc_cat_fk')
-                    ->references('id')->on('categories')->onDelete('cascade');
+                $table
+                    ->foreign('recommendation_config_id', 'rcc_rc_fk')
+                    ->references('id')
+                    ->on('recommendation_configs')
+                    ->onDelete('cascade');
+                $table
+                    ->foreign('category_id', 'rcc_cat_fk')
+                    ->references('id')
+                    ->on('categories')
+                    ->onDelete('cascade');
             });
         }
     }

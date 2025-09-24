@@ -203,12 +203,15 @@ return new class extends Migration
                 $table->string('code')->unique();
                 $table->string('name');
                 $table->text('description')->nullable();
-                $table->enum('type', ['percentage', 'fixed']);
+                $table->enum('type', ['percentage', 'fixed', 'free_shipping']);
                 $table->decimal('value', 10, 2);
                 $table->decimal('minimum_amount', 10, 2)->nullable();
                 $table->integer('usage_limit')->nullable();
                 $table->integer('used_count')->default(0);
                 $table->boolean('is_active')->default(true);
+                $table->boolean('is_public')->default(false);
+                $table->boolean('is_auto_apply')->default(false);
+                $table->boolean('is_stackable')->default(false);
                 $table->timestamp('starts_at')->nullable();
                 $table->timestamp('expires_at')->nullable();
                 $table->timestamps();
