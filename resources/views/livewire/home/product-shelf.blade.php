@@ -1,4 +1,14 @@
-<section class="relative bg-white py-20 text-gray-900" aria-labelledby="home-products-heading-{{ $preset }}">
+@php
+    $bg = match ($preset) {
+        'featured' => 'bg-indigo-50',
+        'latest' => 'bg-sky-50',
+        'trending' => 'bg-amber-50',
+        'sale' => 'bg-rose-50',
+        default => 'bg-white',
+    };
+@endphp
+<section class="relative {{ $bg }} py-20 text-gray-900"
+         aria-labelledby="home-products-heading-{{ $preset }}">
     <div
          class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(79,70,229,0.03),transparent_60%)] pointer-events-none">
     </div>

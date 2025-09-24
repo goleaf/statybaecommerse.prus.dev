@@ -1,4 +1,4 @@
-<section class="relative bg-slate-950 py-24 text-slate-50">
+<section class="relative bg-gradient-to-b from-slate-900 via-slate-950 to-black py-24 text-slate-50">
     <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-indigo-500/15 to-transparent pointer-events-none">
     </div>
 

@@ -1,4 +1,5 @@
-<section class="relative bg-white py-20 text-gray-900" aria-labelledby="home-collections-heading">
+<section class="relative bg-gradient-to-b from-indigo-50 to-white py-20 text-gray-900"
+         aria-labelledby="home-collections-heading">
     <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none">
     </div>
 
