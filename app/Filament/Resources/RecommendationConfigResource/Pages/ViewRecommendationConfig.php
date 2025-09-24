@@ -20,7 +20,7 @@ final class ViewRecommendationConfig extends ViewRecord
         ];
     }
 
-    public function table(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

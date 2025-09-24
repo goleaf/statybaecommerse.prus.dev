@@ -25,7 +25,7 @@ final class RecommendationConfig extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'type', 'config', 'is_active', 'priority', 'filters', 'max_results', 'min_score', 'description', 'cache_ttl', 'enable_caching', 'enable_analytics', 'batch_size', 'timeout_seconds', 'conditions', 'notes', 'metadata'];
+    protected $fillable = ['name', 'type', 'config', 'is_active', 'is_default', 'priority', 'sort_order', 'filters', 'max_results', 'min_score', 'decay_factor', 'description', 'cache_ttl', 'enable_caching', 'enable_analytics', 'batch_size', 'timeout_seconds', 'conditions', 'notes', 'metadata'];
 
     protected $casts = ['config' => 'array', 'filters' => 'array', 'conditions' => 'array', 'metadata' => 'array', 'is_active' => 'boolean', 'enable_caching' => 'boolean', 'enable_analytics' => 'boolean', 'priority' => 'integer', 'max_results' => 'integer', 'min_score' => 'decimal:6', 'cache_ttl' => 'integer', 'batch_size' => 'integer', 'timeout_seconds' => 'integer'];
 

@@ -467,6 +467,62 @@ final class Review extends Model
         return $this->rating <= $maxRating;
     }
 
+    // Accessors for appended attributes
+    public function getStatusAttribute(): string
+    {
+        return $this->getStatus();
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return $this->getStatusColor();
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return $this->getStatusLabel();
+    }
+
+    public function getRatingStarsAttribute(): string
+    {
+        return str_repeat('⭐', (int) $this->rating);
+    }
+
+    public function getRatingLabelAttribute(): string
+    {
+        return $this->getRatingLabel();
+    }
+
+    public function getRatingColorAttribute(): string
+    {
+        return $this->getRatingColor();
+    }
+
+    public function getIsHighRatedAttribute(): bool
+    {
+        return $this->isHighRated();
+    }
+
+    public function getIsLowRatedAttribute(): bool
+    {
+        return $this->isLowRated();
+    }
+
+    public function getIsRecentAttribute(): bool
+    {
+        return $this->isRecent();
+    }
+
+    public function getDaysOldAttribute(): int
+    {
+        return $this->created_at ? $this->created_at->diffInDays(now()) : 0;
+    }
+
+    public function getReviewerTypeAttribute(): string
+    {
+        return $this->user_id ? 'registered' : 'guest';
+    }
+
     /**
      * Handle canBeApproved functionality with proper error handling.
      */

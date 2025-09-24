@@ -11,6 +11,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -130,6 +131,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->multiple()
                                 ->searchable()
                                 ->preload()
+                                ->formatStateUsing(fn ($state) => collect($state)->sort()->values()->toArray())
                                 ->createOptionForm([
                                     TextInput::make('name')
                                         ->required()
@@ -433,7 +435,7 @@ final class RecommendationConfigResourceSimple extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (RecommendationConfigSimple $record): string => $record->is_active ? __('recommendation_configs_simple.deactivate') : __('recommendation_configs_simple.activate'))

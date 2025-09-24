@@ -15,7 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Placeholder;
+use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
@@ -242,9 +242,9 @@ final class OrderItemsRelationManager extends RelationManager
                     ->color('primary'),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make()
+                Tables\Actions\EditAction::make()
                     ->color('warning'),
-                \Filament\Actions\DeleteAction::make()
+                Tables\Actions\DeleteAction::make()
                     ->color('danger'),
                 Action::make('duplicate_item')
                     ->label(__('orders.duplicate_item'))

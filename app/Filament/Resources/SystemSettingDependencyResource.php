@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingDependencyResource\Pages;
 use App\Models\SystemSettingDependency;
+use App\Models\SystemSetting;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -70,27 +71,14 @@ final class SystemSettingDependencyResource extends Resource
                         ->schema([
                             Select::make('setting_id')
                                 ->label(__('admin.system_setting_dependencies.setting'))
-                                ->relationship('setting', 'key')
+                                ->options(fn () => SystemSetting::query()->pluck('key', 'id')->all())
                                 ->required()
                                 ->searchable()
                                 ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('key')
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->label(__('admin.system_settings.key')),
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->label(__('admin.system_settings.name')),
-                                    Textarea::make('description')
-                                        ->rows(2)
-                                        ->label(__('admin.system_settings.description')),
-                                ])
                                 ->helperText(__('admin.system_setting_dependencies.setting_help')),
                             Select::make('depends_on_setting_id')
                                 ->label(__('admin.system_setting_dependencies.depends_on_setting'))
-                                ->relationship('dependsOnSetting', 'key')
+                                ->options(fn () => SystemSetting::query()->pluck('key', 'id')->all())
                                 ->required()
                                 ->searchable()
                                 ->preload()

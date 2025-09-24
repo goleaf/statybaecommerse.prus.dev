@@ -124,7 +124,7 @@ final class LegalController extends Controller
         ]);
     }
 
-    public function download(string $key, string $format = 'pdf'): Response
+    public function download(string $key, string $format = 'pdf')
     {
         return redirect()->route('legal.show', $key);
     }
