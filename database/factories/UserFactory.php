@@ -26,7 +26,7 @@ class UserFactory extends Factory
         $lastName = fake()->lastName();
 
         return [
-            'name' => $firstName.' '.$lastName,
+            'name' => $firstName . ' ' . $lastName,
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             // Avoid Facade usage during factory execution in early boot
@@ -42,7 +42,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -52,7 +52,7 @@ class UserFactory extends Factory
      */
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_admin' => true,
         ]);
     }

@@ -18,7 +18,19 @@ return new class extends Migration {
                 }
             }
             if (!Schema::hasColumn('variant_inventories', 'threshold')) {
-                $table->integer('threshold')->default(0)->after('incoming');
+                $afterColumn = null;
+                if (Schema::hasColumn('variant_inventories', 'incoming')) {
+                    $afterColumn = 'incoming';
+                } elseif (Schema::hasColumn('variant_inventories', 'reserved')) {
+                    $afterColumn = 'reserved';
+                } elseif (Schema::hasColumn('variant_inventories', 'stock')) {
+                    $afterColumn = 'stock';
+                }
+
+                $thresholdColumn = $table->integer('threshold')->default(0);
+                if ($afterColumn !== null) {
+                    $thresholdColumn->after($afterColumn);
+                }
             }
             // Add new columns for enhanced inventory management
             if (!Schema::hasColumn('variant_inventories', 'notes')) {

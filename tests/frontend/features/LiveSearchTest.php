@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature\Livewire;
 
@@ -58,7 +56,7 @@ final class LiveSearchTest extends TestCase
 
         $component = Livewire::test(LiveSearch::class);
 
-        $component->set('query', 'T'); // Less than minQueryLength (2)
+        $component->set('query', 'T');  // Less than minQueryLength (2)
 
         $component->assertSet('showResults', false);
         $this->assertEmpty($component->get('results'));
@@ -130,7 +128,7 @@ final class LiveSearchTest extends TestCase
 
         $categoryResult = collect($results)->firstWhere('type', 'category');
         $this->assertNotNull($categoryResult);
-        $this->assertEquals('Amazing Test Category', $categoryResult['title']);
+        $this->assertEquals('Amazing Test Category', strip_tags($categoryResult['title']));
         $this->assertEquals($category->id, $categoryResult['id']);
     }
 
@@ -158,7 +156,7 @@ final class LiveSearchTest extends TestCase
 
         $brandResult = collect($results)->firstWhere('type', 'brand');
         $this->assertNotNull($brandResult);
-        $this->assertEquals('Amazing Test Brand', $brandResult['title']);
+        $this->assertEquals('Amazing Test Brand', strip_tags($brandResult['title']));
         $this->assertEquals($brand->id, $brandResult['id']);
     }
 
@@ -178,7 +176,7 @@ final class LiveSearchTest extends TestCase
         $component->set('query', 'Test');
 
         $results = $component->get('results');
-        $this->assertLessThanOrEqual(10, count($results)); // Default maxResults is 10
+        $this->assertLessThanOrEqual(10, count($results));  // Default maxResults is 10
     }
 
     public function test_live_search_can_be_configured_with_custom_max_results(): void
@@ -212,7 +210,7 @@ final class LiveSearchTest extends TestCase
         $component = Livewire::test(LiveSearch::class)
             ->set('minQueryLength', 1);
 
-        $component->set('query', 'T'); // Single character
+        $component->set('query', 'T');  // Single character
 
         $component->assertSet('showResults', true);
         $this->assertNotEmpty($component->get('results'));
@@ -225,7 +223,7 @@ final class LiveSearchTest extends TestCase
         $component->set('query', 'Test');
 
         // The component should show loading state briefly
-        $component->assertSet('isSearching', false); // Should be false after search completes
+        $component->assertSet('isSearching', false);  // Should be false after search completes
     }
 
     public function test_live_search_select_result_redirects_to_url(): void

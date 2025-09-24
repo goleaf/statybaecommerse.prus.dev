@@ -24,6 +24,13 @@ class ProductSimilarityForm
                     ->options(Product::query()->pluck('name', 'id'))
                     ->searchable()
                     ->required(),
+                Select::make('algorithm_type')
+                    ->label('admin.product_similarity.algorithm_type')
+                    ->options([
+                        'cosine_similarity' => 'Cosine similarity',
+                        'jaccard_similarity' => 'Jaccard similarity',
+                    ])
+                    ->required(),
                 TextInput::make('similarity_score')
                     ->label('admin.product_similarity.similarity_score')
                     ->numeric()

@@ -1,9 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\Scopes\VisibleScope;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
@@ -14,7 +13,6 @@ use App\Models\News;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\Review;
-use App\Models\Scopes\VisibleScope;
 use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -62,7 +60,7 @@ final class GlobalScopesTest extends TestCase
 
         // Test bypassing specific scope
         $visibleProducts = Product::withoutGlobalScope(VisibleScope::class)->get();
-        $this->assertCount(2, $visibleProducts); // active + unpublished
+        $this->assertCount(2, $visibleProducts);  // active + unpublished
     }
 
     public function test_category_global_scopes_work(): void
@@ -353,13 +351,13 @@ final class GlobalScopesTest extends TestCase
 
         $activeProduct = Product::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_enabled' => true,
             'published_at' => now()->subDay(),
         ]);
 
         $inactiveProduct = Product::factory()->create([
             'is_visible' => false,
-            'is_active' => true,
+            'is_enabled' => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -377,21 +375,21 @@ final class GlobalScopesTest extends TestCase
         // Create products with different states
         $featuredProduct = Product::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_enabled' => true,
             'is_featured' => true,
             'published_at' => now()->subDay(),
         ]);
 
         $regularProduct = Product::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_enabled' => true,
             'is_featured' => false,
             'published_at' => now()->subDay(),
         ]);
 
         $inactiveFeaturedProduct = Product::factory()->create([
             'is_visible' => false,
-            'is_active' => true,
+            'is_enabled' => true,
             'is_featured' => true,
             'published_at' => now()->subDay(),
         ]);

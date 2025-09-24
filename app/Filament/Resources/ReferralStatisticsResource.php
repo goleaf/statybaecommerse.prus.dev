@@ -1,13 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
-use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -22,7 +20,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -30,6 +27,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
 use UnitEnum;
 
 final class ReferralStatisticsResource extends Resource
@@ -223,19 +221,19 @@ final class ReferralStatisticsResource extends Resource
                         return $query
                             ->when(
                                 $data['from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
                             )
                             ->when(
                                 $data['until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     }),
                 Filter::make('has_referrals')
                     ->label(__('referral_statistics.filters.has_referrals'))
-                    ->query(fn (Builder $query): Builder => $query->where('total_referrals', '>', 0)),
+                    ->query(fn(Builder $query): Builder => $query->where('total_referrals', '>', 0)),
                 Filter::make('has_rewards')
                     ->label(__('referral_statistics.filters.has_rewards'))
-                    ->query(fn (Builder $query): Builder => $query->where('total_rewards_earned', '>', 0)),
+                    ->query(fn(Builder $query): Builder => $query->where('total_rewards_earned', '>', 0)),
             ])
             ->actions([
                 ViewAction::make(),

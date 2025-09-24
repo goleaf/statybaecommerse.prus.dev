@@ -33,7 +33,7 @@ final class UserOwnedScope implements Scope
 
         // Check if the model has user-related columns
         $userColumns = $this->getUserColumns($model);
-        if (! empty($userColumns) && auth()->check()) {
+        if (! empty($userColumns)) {
             $userId = auth()->id();
             if ($userId) {
                 $builder->where(function ($query) use ($userColumns, $userId) {
@@ -41,6 +41,9 @@ final class UserOwnedScope implements Scope
                         $query->orWhere($column, $userId);
                     }
                 });
+            } else {
+                // No authenticated user: ensure no records are returned
+                $builder->whereRaw('1 = 0');
             }
         }
     }

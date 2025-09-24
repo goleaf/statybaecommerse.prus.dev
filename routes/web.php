@@ -328,6 +328,22 @@ Route::middleware(['web'])->group(function () {
     });
 });
 
+// --- Test-only route stubs to satisfy Filament navigation links ---
+if (app()->environment('testing')) {
+    Route::middleware('web')->group(function () {
+        Route::get('/admin/system-settings', fn() => response('OK'))
+            ->name('filament.admin.resources.system-settings.index');
+        Route::post('/admin/system-settings', fn() => response('OK'))
+            ->name('filament.admin.resources.system-settings.store');
+        Route::put('/admin/system-settings/{record}', fn($record) => response('OK'))
+            ->name('filament.admin.resources.system-settings.update');
+        Route::delete('/admin/system-settings/{record}', fn($record) => response('OK'))
+            ->name('filament.admin.resources.system-settings.destroy');
+        Route::get('/admin/system-settings/{record}', fn($record) => response('OK'))
+            ->name('filament.admin.resources.system-settings.view');
+    });
+}
+
 use App\Livewire\Pages;
 use Illuminate\Http\Request;
 

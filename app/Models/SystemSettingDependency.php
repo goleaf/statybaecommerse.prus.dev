@@ -1,12 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * SystemSettingDependency
@@ -28,7 +26,7 @@ final class SystemSettingDependency extends Model
 
     protected $fillable = ['setting_id', 'depends_on_setting_id', 'condition', 'is_active'];
 
-    protected $casts = ['condition' => 'json', 'is_active' => 'boolean'];
+    protected $casts = ['is_active' => 'boolean'];
 
     /**
      * Handle setting functionality with proper error handling.
@@ -140,13 +138,16 @@ final class SystemSettingDependency extends Model
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($q) use ($search) {
-            $q->where('condition', 'like', "%{$search}%")
+            $q
+                ->where('condition', 'like', "%{$search}%")
                 ->orWhereHas('setting', function ($q) use ($search) {
-                    $q->where('key', 'like', "%{$search}%")
+                    $q
+                        ->where('key', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
                 })
                 ->orWhereHas('dependsOnSetting', function ($q) use ($search) {
-                    $q->where('key', 'like', "%{$search}%")
+                    $q
+                        ->where('key', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
                 });
         });
@@ -197,7 +198,7 @@ final class SystemSettingDependency extends Model
      */
     public function isConditionMet(): bool
     {
-        if (! $this->dependsOn) {
+        if (!$this->dependsOn) {
             return false;
         }
         $dependencyValue = $this->dependsOn->value;
@@ -209,9 +210,9 @@ final class SystemSettingDependency extends Model
             'greater_than' => $dependencyValue > $condition['value'],
             'less_than' => $dependencyValue < $condition['value'],
             'contains' => str_contains($dependencyValue, $condition['value']),
-            'not_contains' => ! str_contains($dependencyValue, $condition['value']),
+            'not_contains' => !str_contains($dependencyValue, $condition['value']),
             'in' => in_array($dependencyValue, $condition['value'] ?? []),
-            'not_in' => ! in_array($dependencyValue, $condition['value'] ?? []),
+            'not_in' => !in_array($dependencyValue, $condition['value'] ?? []),
             default => false,
         };
     }

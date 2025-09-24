@@ -123,8 +123,7 @@ final class OrderResource extends Resource
                                         ->email()
                                         ->required()
                                         ->maxLength(255),
-                                ])
-                                ,
+                                ]),
                             Select::make('status')
                                 ->label(__('orders.fields.status'))
                                 ->options([
@@ -135,8 +134,7 @@ final class OrderResource extends Resource
                                     'cancelled' => __('orders.status.cancelled'),
                                     'refunded' => __('orders.status.refunded'),
                                 ])
-                                ->default('pending')
-                                ,
+                                ->default('pending'),
                         ]),
                     Grid::make(3)
                         ->schema([
@@ -147,8 +145,7 @@ final class OrderResource extends Resource
                                     'paid' => __('orders.payment_status.paid'),
                                     'failed' => __('orders.payment_status.failed'),
                                     'refunded' => __('orders.payment_status.refunded'),
-                                ])
-                                ,
+                                ]),
                             Select::make('payment_method')
                                 ->label(__('orders.fields.payment_method'))
                                 ->options([
@@ -159,11 +156,9 @@ final class OrderResource extends Resource
                                     'stripe' => __('orders.payment_methods.stripe'),
                                     'apple_pay' => __('orders.payment_methods.credit_card'),
                                     'google_pay' => __('orders.payment_methods.credit_card'),
-                                ])
-                                ,
+                                ]),
                             TextInput::make('payment_reference')
-                                ->label(__('orders.fields.tracking_number'))
-                                ,
+                                ->label(__('orders.fields.tracking_number')),
                         ]),
                 ])
                 ->collapsible(),
@@ -197,7 +192,7 @@ final class OrderResource extends Resource
                         ]),
                     Placeholder::make('total')
                         ->label(__('orders.fields.total'))
-                        ->content(function (Forms\Get $get): string {
+                        ->content(function (\Filament\Schemas\Components\Utilities\Get $get): string {
                             $subtotal = (float) $get('subtotal') ?? 0;
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
@@ -207,7 +202,7 @@ final class OrderResource extends Resource
                             return '€' . number_format($total, 2);
                         }),
                     Hidden::make('total')
-                        ->default(function (Forms\Get $get): float {
+                        ->default(function (\Filament\Schemas\Components\Utilities\Get $get): float {
                             $subtotal = (float) $get('subtotal') ?? 0;
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
@@ -245,11 +240,9 @@ final class OrderResource extends Resource
                     Grid::make(2)
                         ->schema([
                             DateTimePicker::make('shipped_at')
-                                ->label(__('orders.fields.shipped_at'))
-                                ,
+                                ->label(__('orders.fields.shipped_at')),
                             DateTimePicker::make('delivered_at')
-                                ->label(__('orders.fields.delivered_at'))
-                                ,
+                                ->label(__('orders.fields.delivered_at')),
                         ]),
                     TextInput::make('tracking_number')
                         ->label(__('orders.fields.tracking_number'))
@@ -440,6 +433,7 @@ final class OrderResource extends Resource
                     ->color('info'),
                 EditAction::make()
                     ->color('warning'),
+                \Filament\Tables\Actions\DeleteAction::make(),
                 Action::make('mark_processing')
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')

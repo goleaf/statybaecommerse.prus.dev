@@ -24,10 +24,10 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -223,7 +223,7 @@ final class SystemResource extends Resource
                                     ->components([
                                         TextInput::make('value')
                                             ->label(__('system.setting_value'))
-                                            ->visible(fn (callable $get) => in_array($get('type'), ['string', 'integer', 'email', 'url', 'password', 'float', 'text']))
+                                            ->visible(fn(callable $get) => in_array($get('type'), ['string', 'integer', 'email', 'url', 'password', 'float', 'text']))
                                             ->helperText(__('system.setting_value_help')),
                                         TextInput::make('default_value')
                                             ->label(__('system.default_value'))
@@ -238,42 +238,42 @@ final class SystemResource extends Resource
                                             ->helperText(__('system.tooltip_help')),
                                         Toggle::make('value')
                                             ->label(__('system.enabled'))
-                                            ->visible(fn (callable $get) => $get('type') === 'boolean')
+                                            ->visible(fn(callable $get) => $get('type') === 'boolean')
                                             ->helperText(__('system.enabled_help')),
                                         ColorPicker::make('value')
                                             ->label(__('system.color_value'))
-                                            ->visible(fn (callable $get) => $get('type') === 'color')
+                                            ->visible(fn(callable $get) => $get('type') === 'color')
                                             ->helperText(__('system.color_value_help')),
                                         DateTimePicker::make('value')
                                             ->label(__('system.date_time'))
-                                            ->visible(fn (callable $get) => $get('type') === 'datetime')
+                                            ->visible(fn(callable $get) => $get('type') === 'datetime')
                                             ->helperText(__('system.date_time_help')),
                                         DateTimePicker::make('value')
                                             ->label(__('system.date'))
                                             ->displayFormat('Y-m-d')
-                                            ->visible(fn (callable $get) => $get('type') === 'date')
+                                            ->visible(fn(callable $get) => $get('type') === 'date')
                                             ->helperText(__('system.date_help')),
                                         FileUpload::make('value')
                                             ->label(__('system.file_upload'))
-                                            ->visible(fn (callable $get) => $get('type') === 'file')
+                                            ->visible(fn(callable $get) => $get('type') === 'file')
                                             ->helperText(__('system.file_upload_help')),
                                         Select::make('value')
                                             ->label(__('system.select_value'))
-                                            ->visible(fn (callable $get) => $get('type') === 'select')
-                                            ->options(fn (callable $get) => json_decode($get('options') ?? '{}', true) ?? [])
+                                            ->visible(fn(callable $get) => $get('type') === 'select')
+                                            ->options(fn(callable $get) => json_decode($get('options') ?? '{}', true) ?? [])
                                             ->helperText(__('system.select_value_help')),
                                         KeyValue::make('value')
                                             ->label(__('system.key_value_pairs'))
-                                            ->visible(fn (callable $get) => $get('type') === 'json')
+                                            ->visible(fn(callable $get) => $get('type') === 'json')
                                             ->helperText(__('system.key_value_pairs_help')),
                                         Textarea::make('options')
                                             ->label(__('system.options'))
-                                            ->visible(fn (callable $get) => in_array($get('type'), ['select', 'json']))
+                                            ->visible(fn(callable $get) => in_array($get('type'), ['select', 'json']))
                                             ->helperText(__('system.options_help'))
                                             ->rows(3),
                                         Textarea::make('value')
                                             ->label(__('system.array_items'))
-                                            ->visible(fn (callable $get) => $get('type') === 'array')
+                                            ->visible(fn(callable $get) => $get('type') === 'array')
                                             ->helperText(__('system.array_items_help'))
                                             ->rows(3),
                                     ]),
@@ -386,7 +386,7 @@ final class SystemResource extends Resource
                                             ])
                                             ->columns(2)
                                             ->collapsible()
-                                            ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
+                                            ->itemLabel(fn(array $state): ?string => $state['locale'] ?? null),
                                     ]),
                             ]),
                         Tab::make('Dependencies & Relations')
@@ -414,7 +414,7 @@ final class SystemResource extends Resource
                                             ])
                                             ->columns(2)
                                             ->collapsible()
-                                            ->itemLabel(fn (array $state): ?string => $state['dependsOn']['name'] ?? null),
+                                            ->itemLabel(fn(array $state): ?string => $state['dependsOn']['name'] ?? null),
                                     ]),
                             ]),
                     ])
@@ -442,7 +442,7 @@ final class SystemResource extends Resource
                 TextColumn::make('category.name')
                     ->label(__('system.category'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'General' => 'gray',
                         'Security' => 'red',
                         'Performance' => 'blue',
@@ -454,7 +454,7 @@ final class SystemResource extends Resource
                 TextColumn::make('type')
                     ->label(__('system.type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'string' => 'gray',
                         'integer' => 'blue',
                         'boolean' => 'green',
@@ -582,10 +582,10 @@ final class SystemResource extends Resource
                     ->falseLabel(__('system.inactive_only')),
                 Filter::make('has_dependencies')
                     ->label(__('system.has_dependencies'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('dependencies')),
+                    ->query(fn(Builder $query): Builder => $query->whereHas('dependencies')),
                 Filter::make('has_translations')
                     ->label(__('system.has_translations'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('translations')),
+                    ->query(fn(Builder $query): Builder => $query->whereHas('translations')),
             ])
             ->actions([
                 ViewAction::make(),
@@ -602,7 +602,7 @@ final class SystemResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (SystemSetting $record): bool => ! empty($record->cache_key)),
+                    ->visible(fn(SystemSetting $record): bool => !empty($record->cache_key)),
                 TableAction::make('export')
                     ->label(__('system.export'))
                     ->icon('heroicon-o-arrow-down-tray')
@@ -615,7 +615,7 @@ final class SystemResource extends Resource
                             'type' => $record->type,
                             'category' => $record->category->name ?? null,
                         ];
-                        $filename = "setting_{$record->key}_".now()->format('Y-m-d_H-i-s').'.json';
+                        $filename = "setting_{$record->key}_" . now()->format('Y-m-d_H-i-s') . '.json';
 
                         return response()
                             ->json($data)
@@ -640,7 +640,7 @@ final class SystemResource extends Resource
                             ->info()
                             ->send();
                     })
-                    ->visible(fn (SystemSetting $record): bool => $record->dependencies()->exists() || $record->dependents()->exists()),
+                    ->visible(fn(SystemSetting $record): bool => $record->dependencies()->exists() || $record->dependents()->exists()),
                 TableAction::make('view_history')
                     ->label(__('system.view_history'))
                     ->icon('heroicon-o-clock')
@@ -655,7 +655,7 @@ final class SystemResource extends Resource
                             ->info()
                             ->send();
                     })
-                    ->visible(fn (SystemSetting $record): bool => $record->history()->exists()),
+                    ->visible(fn(SystemSetting $record): bool => $record->history()->exists()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -667,7 +667,7 @@ final class SystemResource extends Resource
                         ->action(function (Collection $records) {
                             $cleared = 0;
                             foreach ($records as $record) {
-                                if (! empty($record->cache_key)) {
+                                if (!empty($record->cache_key)) {
                                     Cache::forget($record->cache_key);
                                     $cleared++;
                                 }
@@ -692,7 +692,7 @@ final class SystemResource extends Resource
                                     'category' => $record->category->name ?? null,
                                 ];
                             });
-                            $filename = 'system_settings_'.now()->format('Y-m-d_H-i-s').'.json';
+                            $filename = 'system_settings_' . now()->format('Y-m-d_H-i-s') . '.json';
 
                             return response()
                                 ->json($data->toArray())

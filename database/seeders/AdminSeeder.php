@@ -542,7 +542,9 @@ final class AdminSeeder extends Seeder
                     'carrier_name' => ['DHL', 'UPS', 'FedEx', 'Post'][rand(0, 3)],
                     'service' => ['standard', 'express', 'overnight'][rand(0, 2)],
                     'tracking_number' => 'TRK'.rand(100000, 999999),
-                    'cost' => rand(15, 75),
+                    // Use existing cost fields
+                    'base_cost' => rand(10, 50),
+                    'total_cost' => rand(15, 75),
                 ]
             );
         }

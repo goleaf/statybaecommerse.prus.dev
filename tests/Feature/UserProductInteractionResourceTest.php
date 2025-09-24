@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -27,6 +25,8 @@ final class UserProductInteractionResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
         $this->adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $this->adminUser->assignRole('super_admin');
@@ -167,6 +167,7 @@ final class UserProductInteractionResourceTest extends TestCase
         $interaction2 = UserProductInteraction::factory()->create([
             'user_id' => $this->testUser->id,
             'product_id' => $this->testProduct->id,
+            'interaction_type' => 'click',
             'count' => 2,
         ]);
 
@@ -186,6 +187,7 @@ final class UserProductInteractionResourceTest extends TestCase
         $interaction2 = UserProductInteraction::factory()->create([
             'user_id' => $this->testUser->id,
             'product_id' => $this->testProduct->id,
+            'interaction_type' => 'click',
             'count' => 5,
         ]);
 
@@ -353,8 +355,9 @@ final class UserProductInteractionResourceTest extends TestCase
 
     public function test_requires_authentication(): void
     {
-        $this->get(UserProductInteractionResource::getUrl('index'))
-            ->assertRedirect('/login');
+        $this
+            ->get(UserProductInteractionResource::getUrl('index'))
+            ->assertRedirect('/admin/login');
     }
 
     public function test_requires_permission(): void
@@ -362,7 +365,8 @@ final class UserProductInteractionResourceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $this->get(UserProductInteractionResource::getUrl('index'))
+        $this
+            ->get(UserProductInteractionResource::getUrl('index'))
             ->assertForbidden();
     }
 }

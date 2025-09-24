@@ -1,23 +1,28 @@
+<x-filament::page>
+    <h1 class="text-xl font-semibold mb-4">{{ __('User Impersonation') }}</h1>
+    {{ $this->table }}
+</x-filament::page>
+
 <x-filament-panels::page>
     <div class="space-y-6">
-        @if(session()->has('impersonate'))
+        @if (session()->has('impersonate'))
             <x-filament::card>
                 <div class="flex items-center justify-between p-4 bg-warning-50 border border-warning-200 rounded-lg">
                     <div class="flex items-center gap-3">
                         <x-heroicon-o-exclamation-triangle class="w-6 h-6 text-warning-600" />
                         <div>
-                            <div class="font-semibold text-warning-800">{{ __('admin.impersonation.active_session') }}</div>
+                            <div class="font-semibold text-warning-800">{{ __('admin.impersonation.active_session') }}
+                            </div>
                             <div class="text-sm text-warning-700">
                                 {{ __('admin.impersonation.currently_viewing_as', ['name' => auth()->user()->name]) }}
                             </div>
                         </div>
                     </div>
-                    @if(session()->has('impersonate'))
+                    @if (session()->has('impersonate'))
                         <x-filament::button
-                            color="danger"
-                            icon="heroicon-o-arrow-left"
-                            wire:click="stopImpersonation"
-                        >
+                                            color="danger"
+                                            icon="heroicon-o-arrow-left"
+                                            wire:click="stopImpersonation">
                             {{ __('admin.actions.stop_impersonation') }}
                         </x-filament::button>
                     @endif
@@ -59,6 +64,3 @@
         </x-filament::card>
     </div>
 </x-filament-panels::page>
-
-
-

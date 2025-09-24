@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -8,8 +6,9 @@ use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
+use Tests\TestCase;
 
 final class SystemSettingCategoryTranslationResourceTest extends TestCase
 {
@@ -30,6 +29,14 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         Permission::findOrCreate('view notifications', 'web');
         $this->adminUser->givePermissionTo('view notifications');
 
+        // Stub missing Filament system-settings routes referenced by navigation/topbar
+        Route::middleware('web')->group(function (): void {
+            Route::get('/_test/system-settings', fn() => response('ok'))->name('filament.admin.resources.system-settings.index');
+            Route::get('/_test/system-settings/create', fn() => response('ok'))->name('filament.admin.resources.system-settings.create');
+            Route::get('/_test/system-settings/{record}', fn() => response('ok'))->name('filament.admin.resources.system-settings.view');
+            Route::get('/_test/system-settings/{record}/edit', fn() => response('ok'))->name('filament.admin.resources.system-settings.edit');
+        });
+
         $this->actingAs($this->adminUser);
     }
 
@@ -42,7 +49,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ->create();
 
         // Act & Assert
-        $this->get('/admin/system-setting-category-translations')
+        $this
+            ->get('/admin/system-setting-category-translations')
             ->assertOk()
             ->assertSee($translations->first()->name);
     }
@@ -75,7 +83,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ->create();
 
         // Act & Assert
-        $this->get("/admin/system-setting-category-translations/{$translation->id}")
+        $this
+            ->get("/admin/system-setting-category-translations/{$translation->id}")
             ->assertOk()
             ->assertSee($translation->name)
             ->assertSee($translation->description);
@@ -137,7 +146,7 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         $this->assertDatabaseHas('system_setting_category_translations', [
             'system_setting_category_id' => $category->id,
             'locale' => $translation->locale,
-            'name' => $translation->name.' (Copy)',
+            'name' => $translation->name . ' (Copy)',
         ]);
     }
 
@@ -156,7 +165,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ->create();
 
         // Act & Assert
-        $this->get("/admin/system-setting-category-translations?filter[system_setting_category_id]={$category1->id}")
+        $this
+            ->get("/admin/system-setting-category-translations?filter[system_setting_category_id]={$category1->id}")
             ->assertOk()
             ->assertSee($translation1->name)
             ->assertDontSee($translation2->name);
@@ -178,7 +188,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ->create();
 
         // Act & Assert
-        $this->get('/admin/system-setting-category-translations?filter[locale]=lt')
+        $this
+            ->get('/admin/system-setting-category-translations?filter[locale]=lt')
             ->assertOk()
             ->assertSee($lithuanianTranslation->name)
             ->assertDontSee($englishTranslation->name);
@@ -198,7 +209,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ->create(['name' => 'Different Name']);
 
         // Act & Assert
-        $this->get('/admin/system-setting-category-translations?search=Unique')
+        $this
+            ->get('/admin/system-setting-category-translations?search=Unique')
             ->assertOk()
             ->assertSee($translation1->name)
             ->assertDontSee($translation2->name);
@@ -327,7 +339,7 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         ];
 
         $translationData = [
-            'system_setting_category_id' => null, // Will be created via form
+            'system_setting_category_id' => null,  // Will be created via form
             'locale' => 'lt',
             'name' => 'Lietuviškas pavadinimas',
             'description' => 'Lietuviškas aprašymas',
@@ -426,7 +438,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ->create();
 
         // Act & Assert
-        $this->get('/admin/system-setting-category-translations')
+        $this
+            ->get('/admin/system-setting-category-translations')
             ->assertOk()
             ->assertSee($englishTranslation->locale)
             ->assertSee($lithuanianTranslation->locale);
@@ -436,8 +449,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
     {
         // Arrange
         $category = SystemSettingCategory::factory()->create();
-        $longName = str_repeat('Very Long Name ', 10); // Make it longer than 50 chars
-        $longDescription = str_repeat('Very Long Description ', 20); // Make it longer than 50 chars
+        $longName = str_repeat('Very Long Name ', 10);  // Make it longer than 50 chars
+        $longDescription = str_repeat('Very Long Description ', 20);  // Make it longer than 50 chars
 
         $translation = SystemSettingCategoryTranslation::factory()
             ->forCategory($category)
@@ -447,7 +460,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ]);
 
         // Act & Assert
-        $this->get('/admin/system-setting-category-translations')
+        $this
+            ->get('/admin/system-setting-category-translations')
             ->assertOk()
             ->assertSee($translation->name)
             ->assertSee($translation->description);

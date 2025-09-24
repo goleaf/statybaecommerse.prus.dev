@@ -1,12 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingDependencyResource\Pages;
 use App\Models\SystemSettingDependency;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -14,15 +11,15 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -33,6 +30,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
 use UnitEnum;
 
 final class SystemSettingDependencyResource extends Resource
@@ -114,12 +112,12 @@ final class SystemSettingDependencyResource extends Resource
                                 ->label(__('admin.common.created_at'))
                                 ->disabled()
                                 ->dehydrated(false)
-                                ->visible(fn ($record) => $record?->created_at),
+                                ->visible(fn($record) => $record?->created_at),
                         ]),
                     Placeholder::make('updated_at')
                         ->label(__('admin.common.updated_at'))
-                        ->content(fn ($record) => $record?->updated_at?->format('Y-m-d H:i:s'))
-                        ->visible(fn ($record) => $record?->updated_at),
+                        ->content(fn($record) => $record?->updated_at?->format('Y-m-d H:i:s'))
+                        ->visible(fn($record) => $record?->updated_at),
                 ])
                 ->collapsible(),
         ]);
@@ -211,11 +209,11 @@ final class SystemSettingDependencyResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
                 Filter::make('updated_at')
@@ -229,11 +227,11 @@ final class SystemSettingDependencyResource extends Resource
                         return $query
                             ->when(
                                 $data['updated_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
                             )
                             ->when(
                                 $data['updated_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('updated_at', '<=', $date),
                             );
                     }),
             ])
@@ -245,26 +243,26 @@ final class SystemSettingDependencyResource extends Resource
                     ->label(__('admin.common.edit'))
                     ->icon('heroicon-o-pencil'),
                 Action::make('toggle_active')
-                    ->label(fn (SystemSettingDependency $record): string => $record->is_active ? __('admin.system_setting_dependencies.deactivate') : __('admin.system_setting_dependencies.activate'))
-                    ->icon(fn (SystemSettingDependency $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (SystemSettingDependency $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(SystemSettingDependency $record): string => $record->is_active ? __('admin.system_setting_dependencies.deactivate') : __('admin.system_setting_dependencies.activate'))
+                    ->icon(fn(SystemSettingDependency $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(SystemSettingDependency $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (SystemSettingDependency $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
+                        $record->update(['is_active' => !$record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('admin.system_setting_dependencies.activated_successfully') : __('admin.system_setting_dependencies.deactivated_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->modalHeading(fn (SystemSettingDependency $record): string => $record->is_active ? __('admin.system_setting_dependencies.deactivate_confirm') : __('admin.system_setting_dependencies.activate_confirm'))
-                    ->modalDescription(fn (SystemSettingDependency $record): string => $record->is_active ? __('admin.system_setting_dependencies.deactivate_description') : __('admin.system_setting_dependencies.activate_description')),
+                    ->modalHeading(fn(SystemSettingDependency $record): string => $record->is_active ? __('admin.system_setting_dependencies.deactivate_confirm') : __('admin.system_setting_dependencies.activate_confirm'))
+                    ->modalDescription(fn(SystemSettingDependency $record): string => $record->is_active ? __('admin.system_setting_dependencies.deactivate_description') : __('admin.system_setting_dependencies.activate_description')),
                 Action::make('duplicate')
                     ->label(__('admin.common.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
                     ->action(function (SystemSettingDependency $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->condition = $record->condition.' (Copy)';
+                        $newRecord->condition = $record->condition . ' (Copy)';
                         $newRecord->is_active = false;
                         $newRecord->save();
 
@@ -321,7 +319,7 @@ final class SystemSettingDependencyResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each(function (SystemSettingDependency $record) {
                                 $newRecord = $record->replicate();
-                                $newRecord->condition = $record->condition.' (Copy)';
+                                $newRecord->condition = $record->condition . ' (Copy)';
                                 $newRecord->is_active = false;
                                 $newRecord->save();
                             });

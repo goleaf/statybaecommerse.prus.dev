@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -8,6 +6,7 @@ use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class CategoryResourceFeatureTest extends TestCase
 {
@@ -106,7 +105,7 @@ class CategoryResourceFeatureTest extends TestCase
         $returnCode = 0;
         exec('php -l app/Filament/Resources/CategoryResource.php 2>&1', $output, $returnCode);
 
-        $this->assertEquals(0, $returnCode, 'CategoryResource.php has syntax errors: '.implode("\n", $output));
+        $this->assertEquals(0, $returnCode, 'CategoryResource.php has syntax errors: ' . implode("\n", $output));
     }
 
     public function test_category_model_syntax_validation(): void
@@ -116,7 +115,7 @@ class CategoryResourceFeatureTest extends TestCase
         $returnCode = 0;
         exec('php -l app/Models/Category.php 2>&1', $output, $returnCode);
 
-        $this->assertEquals(0, $returnCode, 'Category.php has syntax errors: '.implode("\n", $output));
+        $this->assertEquals(0, $returnCode, 'Category.php has syntax errors: ' . implode("\n", $output));
     }
 
     public function test_category_resource_pages_syntax_validation(): void
@@ -133,7 +132,7 @@ class CategoryResourceFeatureTest extends TestCase
             $returnCode = 0;
             exec("php -l $page 2>&1", $output, $returnCode);
 
-            $this->assertEquals(0, $returnCode, "$page has syntax errors: ".implode("\n", $output));
+            $this->assertEquals(0, $returnCode, "$page has syntax errors: " . implode("\n", $output));
         }
     }
 }

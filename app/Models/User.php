@@ -150,6 +150,11 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         return $this->hasMany(Order::class);
     }
 
+    public function couponUsages(): HasMany
+    {
+        return $this->hasMany(CouponUsage::class);
+    }
+
     /**
      * Handle latestOrder functionality with proper error handling.
      */

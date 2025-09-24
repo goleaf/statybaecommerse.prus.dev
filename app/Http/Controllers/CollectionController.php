@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -66,14 +64,14 @@ final class CollectionController extends Controller
     public function show(Collection $collection): View
     {
         // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
-        if (! $collection->relationLoaded('products.images') || ! $collection->relationLoaded('products.translations')) {
+        if (!$collection->relationLoaded('products.images') || !$collection->relationLoaded('products.translations')) {
             $collection->load(['products' => function ($query) {
                 $query->published()->with(['images', 'translations']);
             }]);
         }
         $relatedCollections = Collection::withTranslations()->visible()->where('id', '!=', $collection->id)->where('display_type', $collection->display_type)->limit(4)->get()->skipWhile(function ($relatedCollection) {
             // Skip related collections that are not properly configured
-            return empty($relatedCollection->name) || ! $relatedCollection->is_visible || empty($relatedCollection->slug) || $relatedCollection->products()->count() <= 0;
+            return empty($relatedCollection->name) || !$relatedCollection->is_visible || empty($relatedCollection->slug) || $relatedCollection->products()->count() <= 0;
         });
         // Use splitIn method for better product organization
         $galleryService = new ProductGalleryService;
@@ -85,12 +83,13 @@ final class CollectionController extends Controller
     }
 
     // API Endpoints
+
     /**
      * Handle api functionality with proper error handling.
      */
     public function api(Request $request): JsonResponse
     {
-        $query = Collection::withTranslations()->visible();
+        $query = Collection::withTranslations()->visible()->withCount('products');
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
@@ -99,11 +98,20 @@ final class CollectionController extends Controller
         }
         $collections = $query->limit(20)->get();
 
-        return response()->json(['collections' => $collections->skipWhile(function ($collection) {
+        return response()->json(['data' => $collections->skipWhile(function ($collection) {
             // Skip collections that are not properly configured or have missing essential data
-            return empty($collection->name) || ! $collection->is_visible || empty($collection->slug);
+            return empty($collection->name) || !$collection->is_visible || empty($collection->slug);
         })->map(function ($collection) {
-            return ['id' => $collection->id, 'name' => $collection->getTranslatedName(), 'slug' => $collection->slug, 'description' => $collection->getTranslatedDescription(), 'image_url' => $collection->getImageUrl(), 'products_count' => $collection->getProductsCountAttribute(), 'display_type' => $collection->display_type, 'is_automatic' => $collection->is_automatic];
+            return [
+                'id' => $collection->id,
+                'name' => $collection->getTranslatedName(),
+                'slug' => $collection->slug,
+                'description' => $collection->getTranslatedDescription(),
+                'is_visible' => (bool) $collection->is_visible,
+                'is_automatic' => (bool) $collection->is_automatic,
+                'display_type' => $collection->display_type,
+                'products_count' => $collection->products_count ?? $collection->getProductsCountAttribute(),
+            ];
         })]);
     }
 
@@ -113,13 +121,22 @@ final class CollectionController extends Controller
     public function byType(string $type): JsonResponse
     {
         $isAutomatic = $type === 'automatic';
-        $collections = Collection::withTranslations()->visible()->where('is_automatic', $isAutomatic)->orderBy('sort_order')->get();
+        $collections = Collection::withTranslations()->visible()->where('is_automatic', $isAutomatic)->withCount('products')->orderBy('sort_order')->get();
 
-        return response()->json(['collections' => $collections->skipWhile(function ($collection) {
+        return response()->json(['data' => $collections->skipWhile(function ($collection) {
             // Skip collections that are not properly configured or have missing essential data
-            return empty($collection->name) || ! $collection->is_visible || empty($collection->slug);
+            return empty($collection->name) || !$collection->is_visible || empty($collection->slug);
         })->map(function ($collection) {
-            return ['id' => $collection->id, 'name' => $collection->getTranslatedName(), 'slug' => $collection->slug, 'description' => $collection->getTranslatedDescription(), 'image_url' => $collection->getImageUrl(), 'products_count' => $collection->getProductsCountAttribute(), 'display_type' => $collection->display_type];
+            return [
+                'id' => $collection->id,
+                'name' => $collection->getTranslatedName(),
+                'slug' => $collection->slug,
+                'description' => $collection->getTranslatedDescription(),
+                'is_visible' => (bool) $collection->is_visible,
+                'is_automatic' => (bool) $collection->is_automatic,
+                'display_type' => $collection->display_type,
+                'products_count' => $collection->products_count ?? $collection->getProductsCountAttribute(),
+            ];
         })]);
     }
 
@@ -130,11 +147,20 @@ final class CollectionController extends Controller
     {
         $collections = Collection::withTranslations()->visible()->has('products')->withCount('products')->orderBy('products_count', 'desc')->limit(10)->get();
 
-        return response()->json(['collections' => $collections->skipWhile(function ($collection) {
+        return response()->json(['data' => $collections->skipWhile(function ($collection) {
             // Skip collections that are not properly configured or have missing essential data
-            return empty($collection->name) || ! $collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
+            return empty($collection->name) || !$collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
         })->map(function ($collection) {
-            return ['id' => $collection->id, 'name' => $collection->getTranslatedName(), 'slug' => $collection->slug, 'description' => $collection->getTranslatedDescription(), 'image_url' => $collection->getImageUrl(), 'products_count' => $collection->products_count, 'display_type' => $collection->display_type, 'is_automatic' => $collection->is_automatic];
+            return [
+                'id' => $collection->id,
+                'name' => $collection->getTranslatedName(),
+                'slug' => $collection->slug,
+                'description' => $collection->getTranslatedDescription(),
+                'is_visible' => (bool) $collection->is_visible,
+                'is_automatic' => (bool) $collection->is_automatic,
+                'display_type' => $collection->display_type,
+                'products_count' => $collection->products_count,
+            ];
         })]);
     }
 
@@ -145,11 +171,20 @@ final class CollectionController extends Controller
     {
         $collections = Collection::withTranslations()->visible()->withCount('products')->orderBy('products_count', 'desc')->limit(8)->get();
 
-        return response()->json(['collections' => $collections->skipWhile(function ($collection) {
+        return response()->json(['data' => $collections->skipWhile(function ($collection) {
             // Skip collections that are not properly configured or have missing essential data
-            return empty($collection->name) || ! $collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
+            return empty($collection->name) || !$collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
         })->map(function ($collection) {
-            return ['id' => $collection->id, 'name' => $collection->getTranslatedName(), 'slug' => $collection->slug, 'description' => $collection->getTranslatedDescription(), 'image_url' => $collection->getImageUrl('sm'), 'products_count' => $collection->products_count, 'display_type' => $collection->display_type];
+            return [
+                'id' => $collection->id,
+                'name' => $collection->getTranslatedName(),
+                'slug' => $collection->slug,
+                'description' => $collection->getTranslatedDescription(),
+                'is_visible' => (bool) $collection->is_visible,
+                'is_automatic' => (bool) $collection->is_automatic,
+                'display_type' => $collection->display_type,
+                'products_count' => $collection->products_count,
+            ];
         })]);
     }
 
@@ -158,13 +193,25 @@ final class CollectionController extends Controller
      */
     public function statistics(): JsonResponse
     {
-        $totalCollections = Collection::count();
-        $visibleCollections = Collection::visible()->count();
-        $automaticCollections = Collection::where('is_automatic', true)->count();
-        $manualCollections = Collection::where('is_automatic', false)->count();
-        $collectionsWithProducts = Collection::has('products')->count();
+        $totalCollections = Collection::withoutGlobalScopes()->count();
+        $visibleCollections = Collection::withoutGlobalScopes()
+            ->where('is_visible', true)
+            ->where(function ($q) {
+                $q->where('is_automatic', true)->orWhereNull('is_automatic');
+            })
+            ->count();
+        $automaticCollections = Collection::withoutGlobalScopes()->where('is_automatic', true)->count();
+        $manualCollections = Collection::withoutGlobalScopes()->where('is_automatic', false)->whereNotNull('is_automatic')->count();
+        $collectionsWithProducts = Collection::withoutGlobalScopes()->has('products')->count();
 
-        return response()->json(['total_collections' => $totalCollections, 'visible_collections' => $visibleCollections, 'automatic_collections' => $automaticCollections, 'manual_collections' => $manualCollections, 'collections_with_products' => $collectionsWithProducts, 'collections_without_products' => $totalCollections - $collectionsWithProducts]);
+        return response()->json([
+            'total_collections' => $totalCollections,
+            'visible_collections' => $visibleCollections,
+            'automatic_collections' => $automaticCollections,
+            'manual_collections' => $manualCollections,
+            'collections_with_products' => $collectionsWithProducts,
+            'collections_without_products' => $totalCollections - $collectionsWithProducts,
+        ]);
     }
 
     /**
@@ -172,12 +219,36 @@ final class CollectionController extends Controller
      */
     public function products(Collection $collection): JsonResponse
     {
+        if (!$collection->is_visible || !$collection->is_active) {
+            abort(404);
+        }
         $products = PaginationService::paginateQueryWithSkipWhile($collection->products()->published()->with(['images', 'translations'])->getQuery(), function ($product) {
             // Skip products that are not properly configured for display
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
+            return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug) || !$product->getFirstMediaUrl('images');
         }, $collection->products_per_page ?: 12, 2);
 
-        return response()->json(['collection' => ['id' => $collection->id, 'name' => $collection->getTranslatedName(), 'slug' => $collection->slug, 'description' => $collection->getTranslatedDescription(), 'display_type' => $collection->display_type, 'products_per_page' => $collection->products_per_page, 'show_filters' => $collection->show_filters], 'products' => $products->items(), 'pagination' => ['current_page' => $products->currentPage(), 'last_page' => $products->lastPage(), 'per_page' => $products->perPage(), 'total' => $products->total()]]);
+        $data = collect($products->items())->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'description' => $product->description,
+                'brand' => optional($product->brand)->name,
+                'categories' => $product->categories ? $product->categories->pluck('name')->all() : [],
+                'media' => [$product->getFirstMediaUrl('images')],
+            ];
+        });
+
+        return response()->json([
+            'data' => $data,
+            'links' => [],
+            'meta' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+            ],
+        ]);
     }
 
     /**
@@ -192,12 +263,12 @@ final class CollectionController extends Controller
         $galleryService = new ProductGalleryService;
         // Apply advanced filtering based on request parameters
         $filters = $request->only(['min_price', 'max_price', 'min_rating', 'has_images', 'is_featured', 'category_id']);
-        if (! empty(array_filter($filters))) {
+        if (!empty(array_filter($filters))) {
             $products = $galleryService->arrangeWithAdvancedSkipWhile($products, $filters);
         } else {
             // Use basic skipWhile filtering
             $products = $products->skipWhile(function ($product) {
-                return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
+                return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug) || !$product->getFirstMediaUrl('images');
             });
         }
         $organizedProducts = $galleryService->arrangeForGallery($products, $columnCount);
@@ -215,7 +286,7 @@ final class CollectionController extends Controller
         // Limit between 2-6 columns
         $collections = Collection::withTranslations()->visible()->withCount('products')->orderBy('sort_order')->get()->skipWhile(function ($collection) {
             // Skip collections that are not suitable for homepage display
-            return empty($collection->name) || ! $collection->is_visible || empty($collection->slug) || $collection->products_count <= 0 || ! $collection->getImageUrl('sm');
+            return empty($collection->name) || !$collection->is_visible || empty($collection->slug) || $collection->products_count <= 0 || !$collection->getImageUrl('sm');
         });
         $organizedCollections = $collections->splitIn($columnCount);
 
@@ -238,20 +309,20 @@ final class CollectionController extends Controller
         $performanceFilters = $request->only(['min_views', 'min_sales', 'min_rating', 'trending_only']);
         $stockFilters = $request->only(['in_stock_only', 'min_stock']);
         // Apply user preference filtering
-        if (! empty(array_filter($userPreferences))) {
+        if (!empty(array_filter($userPreferences))) {
             $products = $galleryService->arrangeWithUserPreferences($products, $userPreferences);
         }
         // Apply performance filtering
-        if (! empty(array_filter($performanceFilters))) {
+        if (!empty(array_filter($performanceFilters))) {
             $products = $galleryService->arrangeWithPerformanceFiltering($products, $performanceFilters);
         }
         // Apply stock filtering
-        if (! empty(array_filter($stockFilters))) {
+        if (!empty(array_filter($stockFilters))) {
             $products = $galleryService->arrangeWithStockFiltering($products, $stockFilters['in_stock_only'] ?? true, $stockFilters['min_stock'] ?? 1);
         }
         // Final quality filtering
         $products = $products->skipWhile(function ($product) {
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || ! $product->getFirstMediaUrl('images');
+            return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug) || !$product->getFirstMediaUrl('images');
         });
         $columnCount = $request->get('columns', 4);
         $organizedProducts = $galleryService->arrangeForGallery($products, $columnCount);
@@ -267,7 +338,7 @@ final class CollectionController extends Controller
         $days = $request->get('days', 30);
         $columnCount = $request->get('columns', 4);
         $collections = Collection::withTranslations()->visible()->withCount('products')->orderBy('sort_order')->get()->skipWhile(function ($collection) {
-            return empty($collection->name) || ! $collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
+            return empty($collection->name) || !$collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
         });
         $galleryService = new ProductGalleryService;
         $allProducts = collect();
@@ -282,7 +353,7 @@ final class CollectionController extends Controller
         });
         // Remove duplicates and apply final filtering
         $uniqueProducts = $allProducts->unique('id')->skipWhile(function ($product) {
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
+            return empty($product->name) || !$product->is_visible || $product->price <= 0 || empty($product->slug);
         });
         $organizedProducts = $galleryService->arrangeForGallery($uniqueProducts, $columnCount);
 

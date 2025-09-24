@@ -44,7 +44,7 @@ final class StatusScope implements Scope
         $modelClass = get_class($model);
 
         return match ($modelClass) {
-            \App\Models\ProductRequest::class => ['pending', 'in_progress', 'completed', 'cancelled'],
+            \App\Models\ProductRequest::class => ['pending', 'in_progress', 'completed'],
             \App\Models\Order::class => ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed'],
             \App\Models\Campaign::class => ['active', 'running', 'published'],
             \App\Models\Channel::class => ['active', 'enabled'],

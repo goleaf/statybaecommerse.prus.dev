@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -77,6 +75,10 @@ final class RecommendationBlockResource extends Resource
                 ->schema([
                     TextInput::make('name')
                         ->label(__('recommendation_blocks.name'))
+                        ->required()
+                        ->maxLength(255),
+                    TextInput::make('title')
+                        ->label(__('recommendation_blocks.title'))
                         ->required()
                         ->maxLength(255),
                     Textarea::make('description')
@@ -161,7 +163,7 @@ final class RecommendationBlockResource extends Resource
                 TextColumn::make('type')
                     ->label(__('recommendation_blocks.type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'featured' => 'success',
                         'related' => 'info',
                         'similar' => 'warning',
@@ -172,7 +174,7 @@ final class RecommendationBlockResource extends Resource
                 TextColumn::make('position')
                     ->label(__('recommendation_blocks.position'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'top' => 'success',
                         'bottom' => 'info',
                         'sidebar' => 'warning',

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -11,6 +9,7 @@ use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class WishlistItemResourceTest extends TestCase
@@ -37,6 +36,10 @@ class WishlistItemResourceTest extends TestCase
             'email' => 'admin@example.com',
             'is_admin' => true,
         ]);
+
+        // Ensure required permission exists and is granted for Filament topbar checks
+        Permission::findOrCreate('view notifications');
+        $this->adminUser->givePermissionTo('view notifications');
 
         $this->regularUser = User::factory()->create([
             'email' => 'user@example.com',
@@ -67,7 +70,9 @@ class WishlistItemResourceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_view_wishlist_items_index_page(): void
     {
         $this->actingAs($this->adminUser);
@@ -80,7 +85,9 @@ class WishlistItemResourceTest extends TestCase
         $response->assertSee($this->variant->name);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_view_wishlist_item_details(): void
     {
         $this->actingAs($this->adminUser);
@@ -90,11 +97,13 @@ class WishlistItemResourceTest extends TestCase
         $response->assertOk();
         $response->assertSee($this->product->name);
         $response->assertSee($this->variant->name);
-        $response->assertSee('2'); // quantity
+        $response->assertSee('2');  // quantity
         $response->assertSee('Test notes');
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_create_wishlist_item(): void
     {
         $this->actingAs($this->adminUser);
@@ -122,7 +131,9 @@ class WishlistItemResourceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_edit_wishlist_item(): void
     {
         $this->actingAs($this->adminUser);
@@ -144,7 +155,9 @@ class WishlistItemResourceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_delete_wishlist_item(): void
     {
         $this->actingAs($this->adminUser);
@@ -158,7 +171,9 @@ class WishlistItemResourceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_filter_wishlist_items_by_wishlist(): void
     {
         $this->actingAs($this->adminUser);
@@ -181,7 +196,9 @@ class WishlistItemResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_filter_wishlist_items_by_product(): void
     {
         $this->actingAs($this->adminUser);
@@ -203,7 +220,9 @@ class WishlistItemResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_filter_wishlist_items_by_variant(): void
     {
         $this->actingAs($this->adminUser);
@@ -225,7 +244,9 @@ class WishlistItemResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$anotherWishlistItem]);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_filter_wishlist_items_by_has_variant(): void
     {
         $this->actingAs($this->adminUser);
@@ -243,7 +264,9 @@ class WishlistItemResourceTest extends TestCase
             ->assertCanNotSeeTableRecords([$itemWithoutVariant]);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_filter_wishlist_items_by_user(): void
     {
         $this->actingAs($this->adminUser);
@@ -262,11 +285,13 @@ class WishlistItemResourceTest extends TestCase
             ->filterTable('user_id', $this->regularUser->id)
             ->assertCanSeeTableRecords([$this->wishlistItem])
             ->assertCanNotSeeTableRecords(
-                WishlistItem::whereHas('wishlist', fn ($q) => $q->where('user_id', $anotherUser->id))->get()
+                WishlistItem::whereHas('wishlist', fn($q) => $q->where('user_id', $anotherUser->id))->get()
             );
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function admin_can_bulk_delete_wishlist_items(): void
     {
         $this->actingAs($this->adminUser);
@@ -288,7 +313,9 @@ class WishlistItemResourceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function wishlist_item_displays_correct_current_price(): void
     {
         $this->actingAs($this->adminUser);
@@ -298,16 +325,20 @@ class WishlistItemResourceTest extends TestCase
         $this->assertEquals('€129.99', $this->wishlistItem->formatted_current_price);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function wishlist_item_displays_correct_display_name(): void
     {
         $this->actingAs($this->adminUser);
 
-        $expectedName = $this->product->name.' - '.$this->variant->name;
+        $expectedName = $this->product->name . ' - ' . $this->variant->name;
         $this->assertEquals($expectedName, $this->wishlistItem->display_name);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function wishlist_item_without_variant_uses_product_price(): void
     {
         $this->actingAs($this->adminUser);
@@ -322,7 +353,9 @@ class WishlistItemResourceTest extends TestCase
         $this->assertEquals($this->product->name, $itemWithoutVariant->display_name);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function wishlist_item_quantity_validation_works(): void
     {
         $this->actingAs($this->adminUser);
@@ -331,13 +364,15 @@ class WishlistItemResourceTest extends TestCase
             ->fillForm([
                 'wishlist_id' => $this->wishlist->id,
                 'product_id' => $this->product->id,
-                'quantity' => 0, // Invalid quantity
+                'quantity' => 0,  // Invalid quantity
             ])
             ->call('create')
             ->assertHasFormErrors(['quantity']);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function wishlist_item_requires_wishlist_and_product(): void
     {
         $this->actingAs($this->adminUser);

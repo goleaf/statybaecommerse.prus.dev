@@ -1,15 +1,13 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationConfigResource\Pages;
 
 use App\Filament\Resources\RecommendationConfigResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Filament\Actions;
+use Filament\Tables;
 
 final class ViewRecommendationConfig extends ViewRecord
 {

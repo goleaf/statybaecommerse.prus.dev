@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+  <categories>
+    <category>
+      <slug>elektronika</slug>
+      <base>
+        <is_enabled>true</is_enabled>
+        <is_visible>true</is_visible>
+        <sort_order>0</sort_order>
+        <show_in_menu>true</show_in_menu>
+      </base>
+      <translations>
+        <translation locale="en">
+          <name>Electronics</name>
+        </translation>
+      </translations>
+    </category>
+  </categories>
+  <products>
+    <product>
+      <sku>T-1</sku>
+      <slug>telefonas</slug>
+      <base>
+        <price>9.99</price>
+        <status>draft</status>
+        <type>simple</type>
+        <manage_stock>false</manage_stock>
+        <track_stock>false</track_stock>
+        <allow_backorder>false</allow_backorder>
+        <stock_quantity>0</stock_quantity>
+        <low_stock_threshold>0</low_stock_threshold>
+        <minimum_quantity>1</minimum_quantity>
+        <is_visible>true</is_visible>
+        <is_featured>false</is_featured>
+        <is_requestable>false</is_requestable>
+      </base>
+      <categories>
+        <category_slug>elektronika</category_slug>
+      </categories>
+      <translations>
+        <translation locale="en">
+          <name>Phone</name>
+          <slug>telefonas</slug>
+        </translation>
+      </translations>
+      <images>
+        <image src="https://statybaecommerse.prus.dev/images/sample.jpg" alt="Sample"/>
+      </images>
+    </product>
+  </products>
+</catalog>

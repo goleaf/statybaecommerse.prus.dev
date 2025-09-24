@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -21,7 +22,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Schema;
-use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -410,6 +410,7 @@ final class ReviewResource extends Resource
                     ->schema([
                         TextEntry::make('status')
                             ->label(__('reviews.fields.status'))
+                            ->state(fn(Review $record): string => $record->getStatus())
                             ->badge()
                             ->color(fn(string $state): string => match ($state) {
                                 'approved' => 'success',
@@ -435,7 +436,13 @@ final class ReviewResource extends Resource
                     ->schema([
                         TextEntry::make('metadata')
                             ->label(__('reviews.fields.metadata'))
-                            ->json()
+                            ->formatStateUsing(function ($state): string {
+                                if (is_array($state)) {
+                                    return json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                                }
+
+                                return (string) $state;
+                            })
                             ->placeholder(__('reviews.placeholders.no_metadata')),
                     ]),
                 InfolistSection::make(__('reviews.sections.timestamps'))

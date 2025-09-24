@@ -1,28 +1,26 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\UserProductInteraction;
+use Filament\Actions\Action as TableAction;
+use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action as TableAction;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -57,9 +55,9 @@ final class UserProductInteractionResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.user_product_interactions.basic_information'))
+                SchemaSection::make(__('admin.user_product_interactions.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('user_id')
                                     ->label(__('admin.user_product_interactions.user'))
@@ -135,7 +133,7 @@ final class UserProductInteractionResource extends Resource
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('admin.user_product_interactions.additional_information'))
+                SchemaSection::make(__('admin.user_product_interactions.additional_information'))
                     ->schema([
                         Textarea::make('notes')
                             ->label(__('admin.user_product_interactions.notes'))
@@ -157,6 +155,7 @@ final class UserProductInteractionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading(false)
             ->columns([
                 TextColumn::make('id')
                     ->label(__('admin.common.id'))
@@ -169,7 +168,7 @@ final class UserProductInteractionResource extends Resource
                     ->toggleable()
                     ->copyable()
                     ->copyMessage(__('admin.user_product_interactions.user_copied'))
-                    ->url(fn ($record) => UserResource::getUrl('view', ['record' => $record->user_id]))
+                    ->url(fn($record) => UserResource::getUrl('view', ['record' => $record->user_id]))
                     ->openUrlInNewTab(),
                 TextColumn::make('product.name')
                     ->label(__('admin.user_product_interactions.product'))
@@ -209,20 +208,20 @@ final class UserProductInteractionResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->badge()
-                    ->color(fn ($state) => match (true) {
+                    ->color(fn($state) => match (true) {
                         $state >= 4.5 => 'success',
                         $state >= 3.5 => 'warning',
                         $state >= 2.5 => 'info',
                         default => 'danger',
                     })
-                    ->formatStateUsing(fn ($state) => $state ? $state.'/5' : __('admin.user_product_interactions.no_rating')),
+                    ->formatStateUsing(fn($state) => $state ? $state . '/5' : __('admin.user_product_interactions.no_rating')),
                 TextColumn::make('count')
                     ->label(__('admin.user_product_interactions.count'))
                     ->numeric()
                     ->sortable()
                     ->toggleable()
                     ->badge()
-                    ->color(fn ($state) => match (true) {
+                    ->color(fn($state) => match (true) {
                         $state >= 10 => 'success',
                         $state >= 5 => 'warning',
                         $state >= 2 => 'info',
@@ -295,31 +294,31 @@ final class UserProductInteractionResource extends Resource
                     ->falseLabel(__('admin.user_product_interactions.non_anonymous_only')),
                 Filter::make('has_rating')
                     ->label(__('admin.user_product_interactions.has_rating'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('rating')),
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('rating')),
                 Filter::make('high_rating')
                     ->label(__('admin.user_product_interactions.high_rating'))
-                    ->query(fn (Builder $query): Builder => $query->where('rating', '>=', 4.0)),
+                    ->query(fn(Builder $query): Builder => $query->where('rating', '>=', 4.0)),
                 Filter::make('low_rating')
                     ->label(__('admin.user_product_interactions.low_rating'))
-                    ->query(fn (Builder $query): Builder => $query->where('rating', '<', 3.0)),
+                    ->query(fn(Builder $query): Builder => $query->where('rating', '<', 3.0)),
                 Filter::make('recent_interactions')
                     ->label(__('admin.user_product_interactions.recent_interactions'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_interaction', '>=', now()->subDays(7))),
+                    ->query(fn(Builder $query): Builder => $query->where('last_interaction', '>=', now()->subDays(7))),
                 Filter::make('this_month')
                     ->label(__('admin.user_product_interactions.this_month'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfMonth())),
+                    ->query(fn(Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfMonth())),
                 Filter::make('this_week')
                     ->label(__('admin.user_product_interactions.this_week'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfWeek())),
+                    ->query(fn(Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfWeek())),
                 Filter::make('today')
                     ->label(__('admin.user_product_interactions.today'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfDay())),
+                    ->query(fn(Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfDay())),
                 Filter::make('high_count')
                     ->label(__('admin.user_product_interactions.high_count'))
-                    ->query(fn (Builder $query): Builder => $query->where('count', '>=', 5)),
+                    ->query(fn(Builder $query): Builder => $query->where('count', '>=', 5)),
                 Filter::make('single_interaction')
                     ->label(__('admin.user_product_interactions.single_interaction'))
-                    ->query(fn (Builder $query): Builder => $query->where('count', '=', 1)),
+                    ->query(fn(Builder $query): Builder => $query->where('count', '=', 1)),
             ])
             ->actions([
                 ViewAction::make()
@@ -379,13 +378,13 @@ final class UserProductInteractionResource extends Resource
                     ->label(__('admin.user_product_interactions.view_user'))
                     ->icon('heroicon-o-user')
                     ->color('gray')
-                    ->url(fn ($record) => UserResource::getUrl('view', ['record' => $record->user_id]))
+                    ->url(fn($record) => UserResource::getUrl('view', ['record' => $record->user_id]))
                     ->openUrlInNewTab(),
                 TableAction::make('view_product')
                     ->label(__('admin.user_product_interactions.view_product'))
                     ->icon('heroicon-o-cube')
                     ->color('gray')
-                    ->url(fn ($record) => ProductResource::getUrl('view', ['record' => $record->product_id]))
+                    ->url(fn($record) => ProductResource::getUrl('view', ['record' => $record->product_id]))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([

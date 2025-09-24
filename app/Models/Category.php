@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
@@ -10,15 +8,15 @@ use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Category
@@ -213,7 +211,7 @@ final class Category extends Model implements HasMedia
     {
         $name = $this->trans('name', app()->getLocale());
         if ($this->parent) {
-            return $this->parent->getFullNameAttribute().' > '.$name;
+            return $this->parent->getFullNameAttribute() . ' > ' . $name;
         }
 
         return $name;
@@ -600,7 +598,7 @@ final class Category extends Model implements HasMedia
      */
     public function getImageUrl(?string $size = null): ?string
     {
-        if (! $size) {
+        if (!$size) {
             return $this->getFirstMediaUrl('images');
         }
 
@@ -612,7 +610,7 @@ final class Category extends Model implements HasMedia
      */
     public function getBannerUrl(?string $size = null): ?string
     {
-        if (! $size) {
+        if (!$size) {
             return $this->getFirstMediaUrl('banner');
         }
 
@@ -692,7 +690,7 @@ final class Category extends Model implements HasMedia
      */
     public function hasParent(): bool
     {
-        return ! is_null($this->parent_id);
+        return !is_null($this->parent_id);
     }
 
     // Additional scopes

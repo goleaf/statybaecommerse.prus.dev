@@ -49,22 +49,19 @@ final class ReferralRewardResource extends Resource
                     ->schema([
                         Select::make('referral_id')
                             ->label(__('referral_rewards.fields.referral'))
-                            ->relationship('referral', 'referral_code')
-                            ->modifyRelationshipQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes())
+                            ->relationship('referral', 'referral_code', fn(Builder $query) => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->required(),
                         Select::make('user_id')
                             ->label(__('referral_rewards.fields.user'))
-                            ->relationship('user', 'name')
-                            ->modifyRelationshipQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes())
+                            ->relationship('user', 'name', fn(Builder $query) => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->required(),
                         Select::make('order_id')
                             ->label(__('referral_rewards.fields.order'))
-                            ->relationship('order', 'id')
-                            ->modifyRelationshipQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes())
+                            ->relationship('order', 'id', fn(Builder $query) => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->nullable(),

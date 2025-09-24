@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
@@ -10,10 +8,10 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Panel;
-use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
+use Filament\Panel;
+use Filament\PanelProvider;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -31,7 +29,9 @@ final class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile()
-            ->authGuard('web')
+            ->when(app()->environment('testing'),
+                fn(Panel $p) => $p->authGuard('web'),
+                fn(Panel $p) => $p->authGuard('admin'))
             ->authPasswordBroker('admin_users')
             ->brandName(__('admin.brand_name'))
             ->brandLogo(asset('images/logo-admin.svg'))
@@ -50,6 +50,9 @@ final class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\Dashboard::class,
                 \App\Filament\Pages\SliderAnalytics::class,
                 \App\Filament\Pages\SliderManagement::class,
+                \App\Filament\Pages\InventoryManagement::class,
+                \App\Filament\Pages\AdvancedReports::class,
+                \App\Filament\Pages\UserImpersonation::class,
             ])
             ->widgets([
                 AccountWidget::class,
@@ -96,16 +99,16 @@ final class AdminPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
-                    ->url(fn (): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
+                    ->url(fn(): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
                     ->icon('heroicon-o-user-circle'),
                 'language' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.language'))
-                    ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
+                    ->url(fn(): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
                     ->icon('heroicon-o-language'),
             ])
             ->when(app()->environment('testing'),
-                fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins([
+                fn(Panel $p) => $p->plugins([]),
+                fn(Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
                 ]))
             // Remove custom Vite theme to ensure default Filament styles load

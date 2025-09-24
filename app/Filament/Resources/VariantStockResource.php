@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -9,7 +7,6 @@ use App\Models\Location;
 use App\Models\Partner;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
-use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -21,8 +18,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
@@ -32,6 +29,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use BackedEnum;
 use UnitEnum;
 
 final class VariantStockResource extends Resource
@@ -51,7 +49,7 @@ final class VariantStockResource extends Resource
                         ->schema([
                             Select::make('variant_id')
                                 ->label('Variant')
-                                ->relationship('variant', 'name', modifyQueryUsing: fn (Builder $q) => $q->with('product'))
+                                ->relationship('variant', 'name', modifyQueryUsing: fn(Builder $q) => $q->with('product'))
                                 ->required()
                                 ->searchable()
                                 ->preload(),
@@ -119,7 +117,7 @@ final class VariantStockResource extends Resource
                 TextColumn::make('reserved')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('available_stock')
                     ->label('Available')
-                    ->getStateUsing(fn (VariantInventory $record): int => max(0, (int) $record->stock - (int) $record->reserved))
+                    ->getStateUsing(fn(VariantInventory $record): int => max(0, (int) $record->stock - (int) $record->reserved))
                     ->sortable(),
                 BadgeColumn::make('status')->colors([
                     'success' => 'active',
@@ -131,7 +129,7 @@ final class VariantStockResource extends Resource
                 SelectFilter::make('location_id')->relationship('location', 'name')->label('Location')->searchable(),
                 Filter::make('low_stock')
                     ->label('Low stock')
-                    ->query(fn (Builder $query): Builder => $query->whereColumn('stock', '<=', 'threshold')),
+                    ->query(fn(Builder $query): Builder => $query->whereColumn('stock', '<=', 'threshold')),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -148,7 +146,7 @@ final class VariantStockResource extends Resource
                             return;
                         }
                         if (($record->stock - $record->reserved) < $quantity) {
-                            return; // insufficient available
+                            return;  // insufficient available
                         }
                         $record->reserved += $quantity;
                         $record->available = max(0, $record->stock - $record->reserved);

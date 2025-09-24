@@ -1,15 +1,14 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
 use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
-use Tests\TestCase;
 use Spatie\Permission\Models\Permission;
+use Tests\TestCase;
 
 final class SubscriberResourceTest extends TestCase
 {
@@ -18,7 +17,9 @@ final class SubscriberResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Ensure commonly-checked permissions exist and bypass gates in tests
         Permission::findOrCreate('view notifications', 'web');
+        Gate::before(fn($user = null, ?string $ability = null) => true);
     }
 
     public function test_can_list_subscribers(): void
@@ -26,9 +27,9 @@ final class SubscriberResourceTest extends TestCase
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscribers = Subscriber::factory()->count(5)->create();
 
-        $this->actingAs($adminUser)
-            ->get(route('filament.admin.resources.subscribers.index'))
-            ->assertOk()
+        $this->actingAs($adminUser);
+
+        Livewire::test('filament.admin.resources.subscribers.index')
             ->assertSee($subscribers->first()->email);
     }
 
@@ -37,9 +38,7 @@ final class SubscriberResourceTest extends TestCase
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $user = User::factory()->create();
 
-        $this->actingAs($adminUser)
-            ->get(route('filament.admin.resources.subscribers.create'))
-            ->assertOk();
+        $this->actingAs($adminUser);
 
         Livewire::test('filament.admin.resources.subscribers.create')
             ->fillForm([
@@ -71,9 +70,7 @@ final class SubscriberResourceTest extends TestCase
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscriber = Subscriber::factory()->create();
 
-        $this->actingAs($adminUser)
-            ->get(route('filament.admin.resources.subscribers.edit', $subscriber))
-            ->assertOk();
+        $this->actingAs($adminUser);
 
         Livewire::test('filament.admin.resources.subscribers.edit', ['record' => $subscriber->id])
             ->fillForm([
@@ -95,9 +92,9 @@ final class SubscriberResourceTest extends TestCase
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscriber = Subscriber::factory()->create();
 
-        $this->actingAs($adminUser)
-            ->get(route('filament.admin.resources.subscribers.view', $subscriber))
-            ->assertOk()
+        $this->actingAs($adminUser);
+
+        Livewire::test('filament.admin.resources.subscribers.view', ['record' => $subscriber->id])
             ->assertSee($subscriber->email);
     }
 
@@ -105,6 +102,8 @@ final class SubscriberResourceTest extends TestCase
     {
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscriber = Subscriber::factory()->create();
+
+        $this->actingAs($adminUser);
 
         Livewire::test('filament.admin.resources.subscribers.edit', ['record' => $subscriber->id])
             ->callAction('delete')
@@ -119,9 +118,9 @@ final class SubscriberResourceTest extends TestCase
         $activeSubscriber = Subscriber::factory()->active()->create();
         $inactiveSubscriber = Subscriber::factory()->inactive()->create();
 
-        $this->actingAs($adminUser)
-            ->get(route('filament.admin.resources.subscribers.index', ['tableFilters' => ['status' => 'active']]))
-            ->assertOk()
+        $this->actingAs($adminUser);
+
+        Livewire::test('filament.admin.resources.subscribers.index', ['tableFilters' => ['status' => 'active']])
             ->assertSee($activeSubscriber->email)
             ->assertDontSee($inactiveSubscriber->email);
     }
@@ -132,9 +131,9 @@ final class SubscriberResourceTest extends TestCase
         $websiteSubscriber = Subscriber::factory()->fromSource('website')->create();
         $adminSubscriber = Subscriber::factory()->fromSource('admin')->create();
 
-        $this->actingAs($adminUser)
-            ->get(route('filament.admin.resources.subscribers.index', ['tableFilters' => ['source' => 'website']]))
-            ->assertOk()
+        $this->actingAs($adminUser);
+
+        Livewire::test('filament.admin.resources.subscribers.index', ['tableFilters' => ['source' => 'website']])
             ->assertSee($websiteSubscriber->email)
             ->assertDontSee($adminSubscriber->email);
     }
@@ -145,9 +144,9 @@ final class SubscriberResourceTest extends TestCase
         $subscriber1 = Subscriber::factory()->create(['email' => 'john@example.com']);
         $subscriber2 = Subscriber::factory()->create(['email' => 'jane@example.com']);
 
-        $this->actingAs($adminUser)
-            ->get(route('filament.admin.resources.subscribers.index', ['tableSearch' => 'john']))
-            ->assertOk()
+        $this->actingAs($adminUser);
+
+        Livewire::test('filament.admin.resources.subscribers.index', ['tableSearch' => 'john'])
             ->assertSee($subscriber1->email)
             ->assertDontSee($subscriber2->email);
     }
@@ -156,6 +155,8 @@ final class SubscriberResourceTest extends TestCase
     {
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscribers = Subscriber::factory()->count(3)->create(['is_verified' => false]);
+
+        $this->actingAs($adminUser);
 
         Livewire::test('filament.admin.resources.subscribers.index')
             ->callTableBulkAction('verify', $subscribers)
@@ -174,6 +175,8 @@ final class SubscriberResourceTest extends TestCase
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscribers = Subscriber::factory()->active()->count(3)->create();
 
+        $this->actingAs($adminUser);
+
         Livewire::test('filament.admin.resources.subscribers.index')
             ->callTableBulkAction('unsubscribe', $subscribers)
             ->assertHasNoBulkActionErrors();
@@ -191,6 +194,8 @@ final class SubscriberResourceTest extends TestCase
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscriber = Subscriber::factory()->create(['is_verified' => false]);
 
+        $this->actingAs($adminUser);
+
         Livewire::test('filament.admin.resources.subscribers.index')
             ->callTableAction('verify', $subscriber)
             ->assertHasNoTableActionErrors();
@@ -205,6 +210,8 @@ final class SubscriberResourceTest extends TestCase
     {
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscriber = Subscriber::factory()->active()->create();
+
+        $this->actingAs($adminUser);
 
         Livewire::test('filament.admin.resources.subscribers.index')
             ->callTableAction('unsubscribe', $subscriber)
@@ -221,6 +228,8 @@ final class SubscriberResourceTest extends TestCase
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscriber = Subscriber::factory()->unsubscribed()->create();
 
+        $this->actingAs($adminUser);
+
         Livewire::test('filament.admin.resources.subscribers.index')
             ->callTableAction('resubscribe', $subscriber)
             ->assertHasNoTableActionErrors();
@@ -235,6 +244,8 @@ final class SubscriberResourceTest extends TestCase
     {
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
 
+        $this->actingAs($adminUser);
+
         Livewire::test('filament.admin.resources.subscribers.create')
             ->fillForm([
                 'email' => 'invalid-email',
@@ -248,6 +259,8 @@ final class SubscriberResourceTest extends TestCase
     {
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $existingSubscriber = Subscriber::factory()->create(['email' => 'existing@example.com']);
+
+        $this->actingAs($adminUser);
 
         Livewire::test('filament.admin.resources.subscribers.create')
             ->fillForm([

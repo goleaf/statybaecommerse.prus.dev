@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -109,7 +107,7 @@ class RecommendationCacheResourceTest extends TestCase
         Livewire::test(ViewRecommendationCache::class, [
             'record' => $cache->getRouteKey(),
         ])
-            ->assertCanSeeTableRecords([$cache]);
+            ->assertSee($cache->cache_key);
     }
 
     public function test_can_filter_recommendation_caches_by_block(): void

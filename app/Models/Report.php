@@ -1,17 +1,15 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 /**
  * Report
@@ -36,14 +34,12 @@ final class Report extends Model
 
     protected $casts = ['filters' => 'array', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_scheduled' => 'boolean', 'start_date' => 'date', 'end_date' => 'date', 'last_generated_at' => 'datetime', 'view_count' => 'integer', 'download_count' => 'integer', 'settings' => 'array', 'metadata' => 'array'];
 
-    
-
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'type', 'category', 'is_active', 'is_public'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Report {$eventName}")->useLogName('report');
+        return LogOptions::defaults()->logOnly(['name', 'type', 'category', 'is_active', 'is_public'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "Report {$eventName}")->useLogName('report');
     }
 
     /**

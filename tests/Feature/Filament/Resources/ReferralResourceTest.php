@@ -1,9 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-use App\Filament\Resources\ReferralResource;
 use App\Filament\Resources\ReferralResource\Pages\CreateReferral;
+use App\Filament\Resources\ReferralResource;
 use App\Models\Referral;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

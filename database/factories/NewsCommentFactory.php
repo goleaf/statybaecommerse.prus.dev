@@ -4,6 +4,30 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+final class NewsCommentFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'news_id' => 1,
+            'author_name' => fake()->name(),
+            'author_email' => fake()->safeEmail(),
+            'content' => fake()->sentence(12),
+            'is_approved' => true,
+            'is_visible' => true,
+            'is_active' => true,
+        ];
+    }
+}
+
+<?php
+
+declare(strict_types=1);
+
+namespace Database\Factories;
+
 use App\Models\NewsComment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

@@ -186,8 +186,8 @@ final class StockMovementResource extends Resource
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
                         return $query
-                            ->when($data['moved_from'] ?? null, fn ($q, $date) => $q->whereDate('moved_at', '>=', $date))
-                            ->when($data['moved_to'] ?? null, fn ($q, $date) => $q->whereDate('moved_at', '<=', $date));
+                            ->when($data['moved_from'] ?? null, fn($q, $date) => $q->whereDate('moved_at', '>=', $date))
+                            ->when($data['moved_to'] ?? null, fn($q, $date) => $q->whereDate('moved_at', '<=', $date));
                     }),
             ])
             ->actions([

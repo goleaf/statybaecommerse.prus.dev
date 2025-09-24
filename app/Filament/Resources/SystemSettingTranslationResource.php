@@ -83,7 +83,7 @@ final class SystemSettingTranslationResource extends Resource
                                         Select::make('system_setting_id')
                                             ->label(__('admin.system_setting_translations.system_setting'))
                                             ->relationship('systemSetting', 'key')
-                                            ->required()
+                                            ->required(fn(string $context): bool => $context === 'create')
                                             ->searchable()
                                             ->preload()
                                             ->createOptionForm([
@@ -479,7 +479,9 @@ final class SystemSettingTranslationResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return self::getModel()::count();
+        $count = (int) self::getModel()::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 
     public static function getNavigationBadgeColor(): ?string

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 declare(strict_types=1);
 
 namespace App\Filament\Resources;
@@ -9,7 +8,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\NewsImageResource\Pages;
 use App\Models\News;
 use App\Models\NewsImage;
-use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -17,16 +20,11 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
@@ -39,6 +37,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
 use UnitEnum;
 
 final class NewsImageResource extends Resource
@@ -116,7 +115,7 @@ final class NewsImageResource extends Resource
                                             ->live()
                                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                                 if ($state) {
-                                                    $file = storage_path('app/public/'.$state);
+                                                    $file = storage_path('app/public/' . $state);
                                                     if (file_exists($file)) {
                                                         $set('file_size', filesize($file));
                                                         $set('mime_type', mime_content_type($file));
@@ -159,7 +158,7 @@ final class NewsImageResource extends Resource
                                                     ->label(__('admin.news_images.file_size'))
                                                     ->numeric()
                                                     ->disabled()
-                                                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : ''),
+                                                    ->formatStateUsing(fn($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
                                                 TextInput::make('mime_type')
                                                     ->label(__('admin.news_images.mime_type'))
                                                     ->disabled(),
@@ -194,13 +193,13 @@ final class NewsImageResource extends Resource
 
                                                 $info = [];
                                                 if ($fileSize) {
-                                                    $info[] = __('admin.news_images.file_size').': '.number_format($fileSize / 1024, 2).' KB';
+                                                    $info[] = __('admin.news_images.file_size') . ': ' . number_format($fileSize / 1024, 2) . ' KB';
                                                 }
                                                 if ($mimeType) {
-                                                    $info[] = __('admin.news_images.mime_type').': '.$mimeType;
+                                                    $info[] = __('admin.news_images.mime_type') . ': ' . $mimeType;
                                                 }
                                                 if ($dimensions && isset($dimensions['width']) && isset($dimensions['height'])) {
-                                                    $info[] = __('admin.news_images.dimensions').': '.$dimensions['width'].'x'.$dimensions['height'];
+                                                    $info[] = __('admin.news_images.dimensions') . ': ' . $dimensions['width'] . 'x' . $dimensions['height'];
                                                 }
 
                                                 return implode(' | ', $info);
@@ -249,7 +248,7 @@ final class NewsImageResource extends Resource
 
                         return strlen($state) > 40 ? $state : null;
                     })
-                    ->url(fn ($record) => route('admin.news.edit', $record->news_id))
+                    ->url(fn($record) => route('admin.news.edit', $record->news_id))
                     ->color('primary'),
                 TextColumn::make('alt_text')
                     ->label(__('admin.news_images.alt_text'))
@@ -272,7 +271,7 @@ final class NewsImageResource extends Resource
                     ->placeholder(__('admin.news_images.no_caption')),
                 BadgeColumn::make('is_featured')
                     ->label(__('admin.news_images.is_featured'))
-                    ->formatStateUsing(fn ($state) => $state ? __('admin.common.yes') : __('admin.common.no'))
+                    ->formatStateUsing(fn($state) => $state ? __('admin.common.yes') : __('admin.common.no'))
                     ->colors([
                         'success' => true,
                         'gray' => false,
@@ -286,14 +285,14 @@ final class NewsImageResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('file_size')
                     ->label(__('admin.news_images.file_size'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : '')
+                    ->formatStateUsing(fn($state) => $state ? number_format($state / 1024, 2) . ' KB' : '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge()
                     ->color('secondary'),
                 BadgeColumn::make('mime_type')
                     ->label(__('admin.news_images.mime_type'))
-                    ->formatStateUsing(fn ($state) => match ($state) {
+                    ->formatStateUsing(fn($state) => match ($state) {
                         'image/jpeg' => 'JPEG',
                         'image/png' => 'PNG',
                         'image/gif' => 'GIF',
@@ -309,8 +308,8 @@ final class NewsImageResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('dimensions')
                     ->label(__('admin.news_images.dimensions'))
-                    ->formatStateUsing(fn ($state) => $state && isset($state['width'], $state['height'])
-                        ? $state['width'].'x'.$state['height']
+                    ->formatStateUsing(fn($state) => $state && isset($state['width'], $state['height'])
+                        ? $state['width'] . 'x' . $state['height']
                         : '')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge()
@@ -348,15 +347,15 @@ final class NewsImageResource extends Resource
                     ->multiple(),
                 Filter::make('large_files')
                     ->label(__('admin.news_images.large_files'))
-                    ->query(fn (Builder $query): Builder => $query->where('file_size', '>', 1024 * 1024))  // > 1MB
+                    ->query(fn(Builder $query): Builder => $query->where('file_size', '>', 1024 * 1024))  // > 1MB
                     ->toggle(),
                 Filter::make('recent_uploads')
                     ->label(__('admin.news_images.recent_uploads'))
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7)))
+                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7)))
                     ->toggle(),
                 Filter::make('no_alt_text')
                     ->label(__('admin.news_images.no_alt_text'))
-                    ->query(fn (Builder $query): Builder => $query->whereNull('alt_text')->orWhere('alt_text', ''))
+                    ->query(fn(Builder $query): Builder => $query->whereNull('alt_text')->orWhere('alt_text', ''))
                     ->toggle(),
             ])
             ->actions([
@@ -379,7 +378,7 @@ final class NewsImageResource extends Resource
                     Action::make('download')
                         ->label(__('admin.news_images.download'))
                         ->icon('heroicon-o-arrow-down-tray')
-                        ->url(fn (NewsImage $record) => asset('storage/'.$record->file_path))
+                        ->url(fn(NewsImage $record) => asset('storage/' . $record->file_path))
                         ->openUrlInNewTab(),
                     DeleteAction::make()
                         ->label(__('admin.common.delete'))

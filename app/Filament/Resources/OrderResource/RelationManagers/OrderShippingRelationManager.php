@@ -235,7 +235,7 @@ final class OrderShippingRelationManager extends RelationManager
                     ])
                     ->multiple(),
                 SelectFilter::make('status')
-                    ->label(__('orders.status'))
+                    ->label(__('orders.fields.status'))
                     ->options([
                         'pending' => __('orders.shipping_statuses.pending'),
                         'processing' => __('orders.shipping_statuses.processing'),
@@ -253,15 +253,15 @@ final class OrderShippingRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_shipping'))
                     ->icon('heroicon-o-plus')
                     ->color('primary'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                \Filament\Actions\EditAction::make()
                     ->color('warning'),
-                Tables\Actions\DeleteAction::make()
+                \Filament\Actions\DeleteAction::make()
                     ->color('danger'),
                 Action::make('mark_shipped')
                     ->label(__('orders.mark_shipped'))

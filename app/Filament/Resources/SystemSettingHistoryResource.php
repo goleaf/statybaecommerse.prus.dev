@@ -68,13 +68,13 @@ final class SystemSettingHistoryResource extends Resource
                                 Select::make('system_setting_id')
                                     ->label(__('admin.system_setting_histories.system_setting'))
                                     ->relationship('systemSetting', 'key')
-                                    ->required(fn (string $context): bool => $context === 'create')
+                                    ->required(fn(string $context): bool => $context === 'create')
                                     ->searchable()
                                     ->preload(),
                                 Select::make('changed_by')
                                     ->label(__('admin.system_setting_histories.changed_by'))
                                     ->relationship('user', 'name')
-                                    ->required(fn (string $context): bool => $context === 'create')
+                                    ->required(fn(string $context): bool => $context === 'create')
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('change_reason')

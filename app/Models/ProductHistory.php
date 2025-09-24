@@ -37,7 +37,7 @@ final class ProductHistory extends Model
 
     protected $fillable = ['product_id', 'user_id', 'action', 'field_name', 'old_value', 'new_value', 'description', 'ip_address', 'user_agent', 'metadata', 'causer_type', 'causer_id', 'created_at', 'updated_at'];
 
-    protected $casts = ['old_value' => 'array', 'new_value' => 'array', 'metadata' => 'array', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['metadata' => 'array', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     protected $table = 'product_histories';
 
@@ -241,7 +241,24 @@ final class ProductHistory extends Model
     {
         $userId = $user?->id ?? auth()->id();
 
-        return self::create(['product_id' => $product->id, 'user_id' => $userId, 'action' => $action, 'field_name' => $fieldName, 'old_value' => $oldValue, 'new_value' => $newValue, 'description' => $description, 'ip_address' => request()->ip(), 'user_agent' => request()->userAgent(), 'metadata' => ['product_name' => $product->name, 'product_sku' => $product->sku, 'timestamp' => now()->toISOString()], 'causer_type' => User::class, 'causer_id' => $userId]);
+        return self::create([
+            'product_id' => $product->id,
+            'user_id' => $userId,
+            'action' => $action,
+            'field_name' => $fieldName,
+            'old_value' => $oldValue,
+            'new_value' => $newValue,
+            'description' => $description,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'metadata' => [
+                'product_name' => $product->name,
+                'product_sku' => $product->sku,
+                'timestamp' => now()->toISOString(),
+            ],
+            'causer_type' => User::class,
+            'causer_id' => $userId,
+        ]);
     }
 
     // Translation methods

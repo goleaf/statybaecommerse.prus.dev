@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -94,10 +92,10 @@ final class RecommendationCacheResource extends Resource
                                     ->numeric()
                                     ->minValue(0)
                                     ->default(0),
-                        KeyValue::make('recommendations')
-                            ->label(__('admin.recommendation_caches.recommendations'))
-                            ->default([])
-                            ->columnSpanFull(),
+                                KeyValue::make('recommendations')
+                                    ->label(__('admin.recommendation_caches.recommendations'))
+                                    ->default([])
+                                    ->columnSpanFull(),
                             ]),
                         DateTimePicker::make('expires_at')
                             ->label(__('admin.recommendation_caches.expires_at'))
