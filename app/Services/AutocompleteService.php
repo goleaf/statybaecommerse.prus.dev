@@ -18,6 +18,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 /**
@@ -39,7 +40,8 @@ final class AutocompleteService
      */
     public function search(string $query, int $limit = self::DEFAULT_LIMIT, array $types = []): array
     {
-        if (strlen($query) < 2) {
+        // Respect minimum length at the caller level (LiveSearch component). Allow 1-char searches here.
+        if (strlen($query) < 1) {
             return [];
         }
 
@@ -150,7 +152,23 @@ final class AutocompleteService
                 // Skip categories that are not properly configured or have missing essential data
                 return empty($category->name) || ! $category->is_visible || empty($category->slug);
             })->map(function (Category $category) use ($query, $locale) {
-                return ['id' => $category->id, 'type' => 'category', 'title' => $category->getTranslatedName($locale), 'subtitle' => $category->parent ? $category->parent->getTranslatedName($locale) : null, 'description' => Str::limit($category->getTranslatedDescription($locale), 100), 'url' => route('localized.category.show', ['locale' => $locale, 'category' => $category->slug]), 'image' => $category->getFirstMediaUrl('images', 'thumb'), 'products_count' => $category->products()->count(), 'children_count' => $category->children()->count(), 'relevance_score' => $this->calculateRelevanceScore($category->getTranslatedName($locale), $query)];
+                $title = method_exists($category, 'getTranslatedName') ? $category->getTranslatedName($locale) : ($category->name ?? '');
+                $subtitle = $category->parent ? (method_exists($category->parent, 'getTranslatedName') ? $category->parent->getTranslatedName($locale) : ($category->parent->name ?? null)) : null;
+                $description = method_exists($category, 'getTranslatedDescription') ? $category->getTranslatedDescription($locale) : ($category->description ?? '');
+                $url = Route::has('localized.category.show') ? route('localized.category.show', ['locale' => $locale, 'category' => $category->slug]) : url('/category/'.$category->slug);
+
+                return [
+                    'id' => $category->id,
+                    'type' => 'category',
+                    'title' => $title,
+                    'subtitle' => $subtitle,
+                    'description' => Str::limit($description, 100),
+                    'url' => $url,
+                    'image' => $category->getFirstMediaUrl('images', 'thumb'),
+                    'products_count' => $category->products()->count(),
+                    'children_count' => $category->children()->count(),
+                    'relevance_score' => $this->calculateRelevanceScore($title, $query),
+                ];
             }));
         });
     }
@@ -177,7 +195,21 @@ final class AutocompleteService
                 // Skip brands that are not properly configured or have missing essential data
                 return empty($brand->name) || ! $brand->is_visible || empty($brand->slug);
             })->map(function (Brand $brand) use ($query, $locale) {
-                return ['id' => $brand->id, 'type' => 'brand', 'title' => $brand->getTranslatedName($locale), 'subtitle' => null, 'description' => Str::limit($brand->getTranslatedDescription($locale), 100), 'url' => route('localized.brand.show', ['locale' => $locale, 'brand' => $brand->slug]), 'image' => $brand->getFirstMediaUrl('images', 'thumb'), 'products_count' => $brand->products()->count(), 'relevance_score' => $this->calculateRelevanceScore($brand->getTranslatedName($locale), $query)];
+                $title = method_exists($brand, 'getTranslatedName') ? $brand->getTranslatedName($locale) : ($brand->name ?? '');
+                $description = method_exists($brand, 'getTranslatedDescription') ? $brand->getTranslatedDescription($locale) : ($brand->description ?? '');
+                $url = Route::has('localized.brand.show') ? route('localized.brand.show', ['locale' => $locale, 'brand' => $brand->slug]) : url('/brand/'.$brand->slug);
+
+                return [
+                    'id' => $brand->id,
+                    'type' => 'brand',
+                    'title' => $title,
+                    'subtitle' => null,
+                    'description' => Str::limit($description, 100),
+                    'url' => $url,
+                    'image' => $brand->getFirstMediaUrl('images', 'thumb'),
+                    'products_count' => $brand->products()->count(),
+                    'relevance_score' => $this->calculateRelevanceScore($title, $query),
+                ];
             }));
         });
     }

@@ -86,10 +86,17 @@ final class LegalController extends Controller
             abort(404);
         }
 
-        $currentLocale = app()->getLocale();
-        $translation = $document->translations->firstWhere('locale', $currentLocale)
-            ?: $document->translations->firstWhere('locale', config('app.locale', 'en'))
-            ?: new LegalTranslation(['title' => $document->key, 'content' => '']);
+        $preferredLocales = ['lt', app()->getLocale(), (string) config('app.locale', 'en'), 'en'];
+        $translation = null;
+        foreach ($preferredLocales as $loc) {
+            $translation = $document->translations->firstWhere('locale', $loc);
+            if ($translation) {
+                break;
+            }
+        }
+        if ($translation === null) {
+            $translation = new LegalTranslation(['title' => $document->key, 'content' => '']);
+        }
 
         $relatedDocuments = Legal::query()
             ->with('translations')
@@ -120,7 +127,7 @@ final class LegalController extends Controller
 
     public function download(string $key, string $format = 'pdf'): Response
     {
-        return redirect()->route('legal.show', $key)->send();
+        return redirect()->route('legal.show', $key);
     }
 
     public function sitemap(): Response

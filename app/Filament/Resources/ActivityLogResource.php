@@ -110,7 +110,7 @@ final class ActivityLogResource extends Resource
                     ->label(__('View details'))
                     ->modalHeading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) $record->description)
                     ->modalSubheading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) ($record->causer->name ?? 'System'))
-                    ->modalSubmitHidden(),
+                    ->modalSubmitActionLabel(__('Close')),
             ])
             ->defaultSort('created_at', 'desc');
     }

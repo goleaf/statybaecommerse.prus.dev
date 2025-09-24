@@ -178,11 +178,11 @@ final class StockMovementResource extends Resource
                 \Filament\Tables\Filters\Filter::make('moved_at')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('moved_from')
-                            ->label(__('stock_movement.fields.moved_at')).
-                            placeholder(__('stock_movement.filters.from')),
+                            ->label(__('stock_movement.fields.moved_at'))
+                            ->placeholder(__('stock_movement.filters.from')),
                         \Filament\Forms\Components\DatePicker::make('moved_to')
-                            ->label(__('stock_movement.fields.moved_at')).
-                            placeholder(__('stock_movement.filters.to')),
+                            ->label(__('stock_movement.fields.moved_at'))
+                            ->placeholder(__('stock_movement.filters.to')),
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
                         return $query

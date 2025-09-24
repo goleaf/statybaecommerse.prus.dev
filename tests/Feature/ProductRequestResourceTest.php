@@ -85,6 +85,7 @@ class ProductRequestResourceTest extends TestCase
             ->fillForm([
                 'status' => 'completed',
                 'admin_notes' => 'Request completed successfully',
+                'phone' => '+37012345678',
             ])
             ->call('save')
             ->assertHasNoFormErrors();

@@ -26,7 +26,6 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\HeaderAction;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -455,24 +454,6 @@ final class SystemSettingTranslationResource extends Resource
                                 ->send();
                         }),
                 ]),
-            ])
-            ->headerActions([
-                HeaderAction::make('create')
-                    ->label(__('admin.common.create'))
-                    ->icon('heroicon-o-plus')
-                    ->color('primary')
-                    ->url(fn() => self::getUrl('create')),
-                HeaderAction::make('export_all')
-                    ->label(__('admin.system_setting_translations.export_all'))
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('info')
-                    ->action(function (): void {
-                        // Export all logic here
-                        Notification::make()
-                            ->title(__('admin.system_setting_translations.exported_all_successfully'))
-                            ->success()
-                            ->send();
-                    }),
             ])
             ->defaultSort('locale')
             ->reorderable('sort_order')
