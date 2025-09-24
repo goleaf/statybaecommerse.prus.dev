@@ -41,6 +41,9 @@ final class SliderResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Content Management';
 
     protected static ?int $navigationSort = 4;

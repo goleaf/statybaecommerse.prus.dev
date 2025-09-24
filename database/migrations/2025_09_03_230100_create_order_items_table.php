@@ -20,7 +20,11 @@ return new class extends Migration
                 $table->string('sku');
                 $table->integer('quantity');
                 $table->decimal('unit_price', 10, 2);
+                $table->decimal('price', 10, 2)->nullable();
+                $table->decimal('discount_amount', 10, 2)->default(0);
                 $table->decimal('total', 10, 2);
+                $table->enum('status', ['pending', 'processing', 'completed', 'cancelled'])->default('pending');
+                $table->text('notes')->nullable();
                 $table->timestamps();
 
                 $table->index(['order_id']);

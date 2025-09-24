@@ -1,14 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * OrderShipping
@@ -31,14 +29,46 @@ final class OrderShipping extends Model
 
     protected $table = 'order_shippings';
 
-    protected $fillable = ['order_id', 'carrier_name', 'service', 'tracking_number', 'tracking_url', 'shipped_at', 'estimated_delivery', 'delivered_at', 'weight', 'dimensions', 'cost', 'metadata'];
+    protected $fillable = [
+        'order_id',
+        'shipping_method',
+        'carrier',
+        'service',
+        'service_type',
+        'tracking_number',
+        'tracking_url',
+        'shipped_at',
+        'estimated_delivery',
+        'delivered_at',
+        'weight',
+        'dimensions',
+        'base_cost',
+        'insurance_cost',
+        'total_cost',
+        'metadata',
+        'status',
+        'is_delivered',
+        'delivery_notes',
+        'notes',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['shipped_at' => 'datetime', 'estimated_delivery' => 'datetime', 'delivered_at' => 'datetime', 'weight' => 'decimal:3', 'cost' => 'decimal:2', 'dimensions' => 'array', 'metadata' => 'array'];
+        return [
+            'shipped_at' => 'datetime',
+            'estimated_delivery' => 'datetime',
+            'delivered_at' => 'datetime',
+            'weight' => 'decimal:3',
+            'base_cost' => 'decimal:2',
+            'insurance_cost' => 'decimal:2',
+            'total_cost' => 'decimal:2',
+            'dimensions' => 'array',
+            'metadata' => 'array',
+            'is_delivered' => 'boolean',
+        ];
     }
 
     /**
@@ -84,7 +114,7 @@ final class OrderShipping extends Model
      */
     public function isShipped(): bool
     {
-        return ! is_null($this->shipped_at);
+        return !is_null($this->shipped_at);
     }
 
     /**
@@ -92,7 +122,7 @@ final class OrderShipping extends Model
      */
     public function isDelivered(): bool
     {
-        return ! is_null($this->delivered_at);
+        return !is_null($this->delivered_at);
     }
 
     /**
@@ -100,7 +130,7 @@ final class OrderShipping extends Model
      */
     public function isInTransit(): bool
     {
-        return $this->isShipped() && ! $this->isDelivered();
+        return $this->isShipped() && !$this->isDelivered();
     }
 
     /**

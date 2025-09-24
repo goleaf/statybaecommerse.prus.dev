@@ -1,7 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -36,7 +33,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\TextFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -55,7 +51,7 @@ final class SystemSettingTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
@@ -364,9 +360,17 @@ final class SystemSettingTranslationResource extends Resource
                             ->when($data['from'] ?? null, fn(Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
                             ->when($data['until'] ?? null, fn(Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
                     }),
-                TextFilter::make('name')
+                Filter::make('name')
                     ->label(__('admin.system_setting_translations.name'))
-                    ->placeholder(__('admin.common.search_by_name')),
+                    ->form([
+                        TextInput::make('value')
+                            ->label(__('admin.common.search_by_name'))
+                            ->placeholder(__('admin.common.search_by_name')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+                        return $query->when($value, fn(Builder $q, $v): Builder => $q->where('name', 'like', "%{$v}%"));
+                    }),
             ])
             ->actions([
                 ViewAction::make()

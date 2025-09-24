@@ -45,7 +45,7 @@ final class LiveSearchTest extends TestCase
         $component->set('query', 'Test');
 
         $component->assertSet('showResults', true);
-        $component->assertNotEmpty($component->get('results'));
+        $this->assertNotEmpty($component->get('results'));
     }
 
     public function test_live_search_does_not_search_with_short_query(): void
@@ -61,7 +61,7 @@ final class LiveSearchTest extends TestCase
         $component->set('query', 'T'); // Less than minQueryLength (2)
 
         $component->assertSet('showResults', false);
-        $component->assertEmpty($component->get('results'));
+        $this->assertEmpty($component->get('results'));
     }
 
     public function test_live_search_clears_results_when_query_cleared(): void
@@ -77,13 +77,13 @@ final class LiveSearchTest extends TestCase
         // First, set a query to get results
         $component->set('query', 'Test');
         $component->assertSet('showResults', true);
-        $component->assertNotEmpty($component->get('results'));
+        $this->assertNotEmpty($component->get('results'));
 
         // Then clear the query
         $component->set('query', '');
 
         $component->assertSet('showResults', false);
-        $component->assertEmpty($component->get('results'));
+        $this->assertEmpty($component->get('results'));
     }
 
     public function test_live_search_returns_products_in_results(): void
@@ -103,7 +103,7 @@ final class LiveSearchTest extends TestCase
 
         $productResult = collect($results)->firstWhere('type', 'product');
         $this->assertNotNull($productResult);
-        $this->assertEquals('Amazing Test Product', $productResult['title']);
+        $this->assertEquals('Amazing Test Product', strip_tags($productResult['title']));
         $this->assertEquals($product->id, $productResult['id']);
     }
 
@@ -215,7 +215,7 @@ final class LiveSearchTest extends TestCase
         $component->set('query', 'T'); // Single character
 
         $component->assertSet('showResults', true);
-        $component->assertNotEmpty($component->get('results'));
+        $this->assertNotEmpty($component->get('results'));
     }
 
     public function test_live_search_shows_loading_state(): void
@@ -269,7 +269,7 @@ final class LiveSearchTest extends TestCase
         $component->call('selectResult', $productResult);
 
         $component->assertSet('showResults', false);
-        $component->assertEmpty($component->get('results'));
+        $this->assertEmpty($component->get('results'));
     }
 
     public function test_live_search_handles_empty_search_results(): void
@@ -279,7 +279,7 @@ final class LiveSearchTest extends TestCase
         $component->set('query', 'nonexistent');
 
         $component->assertSet('showResults', true);
-        $component->assertEmpty($component->get('results'));
+        $this->assertEmpty($component->get('results'));
     }
 
     public function test_live_search_handles_special_characters_in_query(): void

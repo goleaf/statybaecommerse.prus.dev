@@ -127,12 +127,21 @@
             <p class="text-gray-600 mb-4">
                 {{ __('frontend.legal.contact_us') }}
             </p>
-            <a 
-                href="{{ route('contact') }}"
-                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-                {{ __('frontend.legal.contact_us') }}
-            </a>
+            @if(\Illuminate\Support\Facades\Route::has('contact'))
+                <a 
+                    href="{{ route('contact') }}"
+                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    {{ __('frontend.legal.contact_us') }}
+                </a>
+            @else
+                <a 
+                    href="#"
+                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    {{ __('frontend.legal.contact_us') }}
+                </a>
+            @endif
         </div>
     </div>
 </div>

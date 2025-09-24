@@ -1,21 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
-use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use UnitEnum;
 
 final class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
+
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
     protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 

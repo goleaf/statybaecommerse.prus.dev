@@ -6,9 +6,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin');
+uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend');
 
-uses(RefreshDatabase::class)->in('Feature', 'Unit', 'admin');
+uses(RefreshDatabase::class)->in('Feature', 'Unit', 'admin', 'frontend');
 
 beforeAll(function () {
     config()->set('database.default', 'sqlite');

@@ -8,11 +8,19 @@ use App\Models\Referral;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Permission;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    Permission::query()->firstOrCreate([
+        'name' => 'view notifications',
+        'guard_name' => 'web',
+    ]);
+});
+
 it('loads index page', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['is_admin' => true]);
     $this->actingAs($user);
 
     $this
@@ -21,7 +29,7 @@ it('loads index page', function () {
 });
 
 it('loads create page', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['is_admin' => true]);
     $this->actingAs($user);
 
     $this
@@ -30,7 +38,7 @@ it('loads create page', function () {
 });
 
 it('loads view and edit pages', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['is_admin' => true]);
     $referrer = User::factory()->create();
     $referred = User::factory()->create();
     $this->actingAs($user);
@@ -53,7 +61,7 @@ it('loads view and edit pages', function () {
 });
 
 it('creates a referral via form action', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['is_admin' => true]);
     $referrer = User::factory()->create();
     $referred = User::factory()->create();
     $this->actingAs($user);

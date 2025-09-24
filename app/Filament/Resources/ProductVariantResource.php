@@ -1,7 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -35,7 +32,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
 use UnitEnum;
 
 /**
@@ -47,9 +46,12 @@ final class ProductVariantResource extends Resource
 {
     protected static ?string $model = ProductVariant::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
-
     protected static UnitEnum|string|null $navigationGroup = 'Products';
+
+    public static function getNavigationIcon(): string|\BackedEnum|\Illuminate\Contracts\Support\Htmlable|null
+    {
+        return 'heroicon-o-squares-2x2';
+    }
 
     protected static ?int $navigationSort = 3;
 

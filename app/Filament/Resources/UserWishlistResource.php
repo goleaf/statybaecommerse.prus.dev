@@ -39,8 +39,14 @@ final class UserWishlistResource extends Resource
 {
     protected static ?string $model = UserWishlist::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-heart';
+    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-heart';
+    }
 
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 8;
@@ -62,7 +68,7 @@ final class UserWishlistResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 Select::make('user_id')
                     ->label(__('admin.user_wishlists.user'))
@@ -143,11 +149,11 @@ final class UserWishlistResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_public')
-                    ->label(fn (UserWishlist $record): string => $record->is_public ? __('admin.user_wishlists.make_private') : __('admin.user_wishlists.make_public'))
-                    ->icon(fn (UserWishlist $record): string => $record->is_public ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (UserWishlist $record): string => $record->is_public ? 'warning' : 'success')
+                    ->label(fn(UserWishlist $record): string => $record->is_public ? __('admin.user_wishlists.make_private') : __('admin.user_wishlists.make_public'))
+                    ->icon(fn(UserWishlist $record): string => $record->is_public ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(UserWishlist $record): string => $record->is_public ? 'warning' : 'success')
                     ->action(function (UserWishlist $record): void {
-                        $record->update(['is_public' => ! $record->is_public]);
+                        $record->update(['is_public' => !$record->is_public]);
                         Notification::make()
                             ->title($record->is_public ? __('admin.user_wishlists.made_public_successfully') : __('admin.user_wishlists.made_private_successfully'))
                             ->success()

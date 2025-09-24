@@ -14,6 +14,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -93,6 +94,10 @@ final class RecommendationCacheResource extends Resource
                                     ->numeric()
                                     ->minValue(0)
                                     ->default(0),
+                        KeyValue::make('recommendations')
+                            ->label(__('admin.recommendation_caches.recommendations'))
+                            ->default([])
+                            ->columnSpanFull(),
                             ]),
                         DateTimePicker::make('expires_at')
                             ->label(__('admin.recommendation_caches.expires_at'))

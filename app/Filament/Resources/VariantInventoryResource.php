@@ -52,16 +52,14 @@ final class VariantInventoryResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     public static function getNavigationLabel(): string
     {
         return __('admin.variant_inventory.navigation_label');
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Inventory';
     }
 
     public static function getPluralModelLabel(): string
@@ -76,7 +74,7 @@ final class VariantInventoryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 Section::make(__('admin.variant_inventory.basic_information'))
                     ->schema([
@@ -203,16 +201,16 @@ final class VariantInventoryResource extends Resource
                             ->schema([
                                 Placeholder::make('is_low_stock')
                                     ->label(__('admin.variant_inventory.is_low_stock'))
-                                    ->content(fn ($record) => $record ? ($record->is_low_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
+                                    ->content(fn($record) => $record ? ($record->is_low_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
                                 Placeholder::make('is_out_of_stock')
                                     ->label(__('admin.variant_inventory.is_out_of_stock'))
-                                    ->content(fn ($record) => $record ? ($record->is_out_of_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
+                                    ->content(fn($record) => $record ? ($record->is_out_of_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
                                 Placeholder::make('stock_status')
                                     ->label(__('admin.variant_inventory.stock_status'))
-                                    ->content(fn ($record) => $record ? __('admin.variant_inventory.status_'.$record->stock_status) : '-'),
+                                    ->content(fn($record) => $record ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
                             ]),
                     ])
-                    ->visible(fn ($record) => $record !== null),
+                    ->visible(fn($record) => $record !== null),
             ]);
     }
 
@@ -235,7 +233,7 @@ final class VariantInventoryResource extends Resource
                     ->label(__('admin.variant_inventory.stock'))
                     ->numeric()
                     ->sortable()
-                    ->color(fn ($state) => $state < 10 ? 'danger' : ($state < 50 ? 'warning' : 'success')),
+                    ->color(fn($state) => $state < 10 ? 'danger' : ($state < 50 ? 'warning' : 'success')),
                 TextColumn::make('reserved')
                     ->label(__('admin.variant_inventory.reserved'))
                     ->numeric()
@@ -245,7 +243,7 @@ final class VariantInventoryResource extends Resource
                     ->label(__('admin.variant_inventory.available'))
                     ->numeric()
                     ->sortable()
-                    ->color(fn ($state) => $state < 10 ? 'danger' : ($state < 50 ? 'warning' : 'success')),
+                    ->color(fn($state) => $state < 10 ? 'danger' : ($state < 50 ? 'warning' : 'success')),
                 TextColumn::make('threshold')
                     ->label(__('admin.variant_inventory.threshold'))
                     ->numeric()
@@ -268,7 +266,7 @@ final class VariantInventoryResource extends Resource
                 TextColumn::make('status')
                     ->label(__('admin.variant_inventory.status'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'active' => 'success',
                         'inactive' => 'warning',
                         'discontinued' => 'danger',
@@ -284,17 +282,17 @@ final class VariantInventoryResource extends Resource
                 IconColumn::make('is_low_stock')
                     ->label(__('admin.variant_inventory.is_low_stock'))
                     ->boolean()
-                    ->color(fn ($state) => $state ? 'warning' : 'success')
+                    ->color(fn($state) => $state ? 'warning' : 'success')
                     ->toggleable(),
                 IconColumn::make('is_out_of_stock')
                     ->label(__('admin.variant_inventory.is_out_of_stock'))
                     ->boolean()
-                    ->color(fn ($state) => $state ? 'danger' : 'success')
+                    ->color(fn($state) => $state ? 'danger' : 'success')
                     ->toggleable(),
                 TextColumn::make('utilization_percentage')
                     ->label(__('admin.variant_inventory.utilization_percentage'))
-                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
-                    ->color(fn ($state) => $state > 80 ? 'warning' : 'success')
+                    ->formatStateUsing(fn($state) => number_format($state, 2) . '%')
+                    ->color(fn($state) => $state > 80 ? 'warning' : 'success')
                     ->toggleable(),
                 TextColumn::make('last_restocked_at')
                     ->label(__('admin.variant_inventory.last_restocked_at'))
@@ -332,23 +330,23 @@ final class VariantInventoryResource extends Resource
                     ->falseLabel(__('admin.variant_inventory.not_tracked')),
                 Filter::make('low_stock')
                     ->label(__('admin.variant_inventory.low_stock'))
-                    ->query(fn (Builder $query): Builder => $query->whereRaw('available <= reorder_point'))
+                    ->query(fn(Builder $query): Builder => $query->whereRaw('available <= reorder_point'))
                     ->toggle(),
                 Filter::make('out_of_stock')
                     ->label(__('admin.variant_inventory.out_of_stock'))
-                    ->query(fn (Builder $query): Builder => $query->where('available', '<=', 0))
+                    ->query(fn(Builder $query): Builder => $query->where('available', '<=', 0))
                     ->toggle(),
                 Filter::make('expiring_soon')
                     ->label(__('admin.variant_inventory.expiring_soon'))
-                    ->query(fn (Builder $query): Builder => $query->where('expiry_date', '<=', now()->addDays(30)))
+                    ->query(fn(Builder $query): Builder => $query->where('expiry_date', '<=', now()->addDays(30)))
                     ->toggle(),
                 Filter::make('needs_reorder')
                     ->label(__('admin.variant_inventory.needs_reorder'))
-                    ->query(fn (Builder $query): Builder => $query->whereRaw('available <= reorder_point'))
+                    ->query(fn(Builder $query): Builder => $query->whereRaw('available <= reorder_point'))
                     ->toggle(),
                 Filter::make('high_utilization')
                     ->label(__('admin.variant_inventory.high_utilization'))
-                    ->query(fn (Builder $query): Builder => $query->whereRaw('(reserved / stock) * 100 > 80'))
+                    ->query(fn(Builder $query): Builder => $query->whereRaw('(reserved / stock) * 100 > 80'))
                     ->toggle(),
             ])
             ->groups([

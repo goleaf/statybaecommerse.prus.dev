@@ -11,7 +11,6 @@ use App\Models\SeoData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class SeoDataResourceTest extends TestCase
 {
@@ -327,12 +326,12 @@ class SeoDataResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\CreateSeoData::class)
             ->fillForm([
-                'seoable_type' => '', // Required field
-                'seoable_id' => '', // Required field
-                'locale' => '', // Required field
-                'title' => '', // Required field
-                'description' => '', // Required field
-                'canonical_url' => 'invalid-url', // Must be valid URL
+                'seoable_type' => '',  // Required field
+                'seoable_id' => '',  // Required field
+                'locale' => '',  // Required field
+                'title' => '',  // Required field
+                'description' => '',  // Required field
+                'canonical_url' => 'invalid-url',  // Must be valid URL
             ])
             ->call('create')
             ->assertHasFormErrors(['seoable_type', 'seoable_id', 'locale', 'title', 'description', 'canonical_url']);
@@ -364,7 +363,7 @@ class SeoDataResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\ViewSeoData::class, [
             'record' => $seoData->getRouteKey(),
         ])
-            ->assertCanSeeText('%'); // SEO score percentage
+            ->assertCanSeeText('%');  // SEO score percentage
     }
 
     public function test_robots_display_is_correct(): void

@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 it('loads account dashboard', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
     actingAs($user);
 
-    $response = $this->get(route('account.index'));
+    $response = $this->get(route('account'));
 
     // If there's a Blade syntax error, skip the test
     if ($response->status() === 500) {

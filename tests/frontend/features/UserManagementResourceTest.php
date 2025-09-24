@@ -1,10 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
-use App\Filament\Resources\UserManagementResource;
+use App\Filament\Resources\UserResource as UserManagementResource;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -27,7 +25,8 @@ class UserManagementResourceTest extends TestCase
     {
         $users = User::factory()->count(3)->create();
 
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('index'))
             ->assertOk();
     }
@@ -36,14 +35,16 @@ class UserManagementResourceTest extends TestCase
     {
         $targetUser = User::factory()->create();
 
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('view', ['record' => $targetUser]))
             ->assertOk();
     }
 
     public function test_can_create_user(): void
     {
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('create'))
             ->assertOk();
     }
@@ -52,7 +53,8 @@ class UserManagementResourceTest extends TestCase
     {
         $targetUser = User::factory()->create();
 
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('edit', ['record' => $targetUser]))
             ->assertOk();
     }
@@ -69,7 +71,8 @@ class UserManagementResourceTest extends TestCase
             'email' => 'test@example.com',
         ]);
 
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('index'))
             ->assertSee('Test User')
             ->assertSee('test@example.com');
@@ -77,7 +80,8 @@ class UserManagementResourceTest extends TestCase
 
     public function test_user_form_has_required_fields(): void
     {
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('create'))
             ->assertSee('name')
             ->assertSee('email')
@@ -92,7 +96,8 @@ class UserManagementResourceTest extends TestCase
 
         $regularUser = User::factory()->create();
 
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('index'))
             ->assertSee($adminUser->name)
             ->assertSee($regularUser->name);
@@ -103,8 +108,9 @@ class UserManagementResourceTest extends TestCase
         $user1 = User::factory()->create(['name' => 'Unique User Name']);
         $user2 = User::factory()->create(['name' => 'Another User']);
 
-        $this->actingAs($this->user)
-            ->get(UserManagementResource::getUrl('index').'?search=Unique')
+        $this
+            ->actingAs($this->user)
+            ->get(UserManagementResource::getUrl('index') . '?search=Unique')
             ->assertSee('Unique User Name')
             ->assertDontSee('Another User');
     }
@@ -160,7 +166,8 @@ class UserManagementResourceTest extends TestCase
         $targetUser = User::factory()->create();
         $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
 
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('edit', ['record' => $targetUser]))
             ->assertOk();
     }
@@ -170,7 +177,8 @@ class UserManagementResourceTest extends TestCase
         $targetUser = User::factory()->create();
         $permission = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view_products', 'guard_name' => 'web']);
 
-        $this->actingAs($this->user)
+        $this
+            ->actingAs($this->user)
             ->get(UserManagementResource::getUrl('edit', ['record' => $targetUser]))
             ->assertOk();
     }

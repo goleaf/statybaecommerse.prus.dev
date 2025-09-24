@@ -31,14 +31,20 @@ final class OrderItem extends Model
 
     protected $table = 'order_items';
 
-    protected $fillable = ['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'quantity', 'unit_price', 'price', 'total', 'notes'];
+    protected $fillable = ['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'quantity', 'unit_price', 'price', 'total', 'notes', 'discount_amount', 'status'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['quantity' => 'integer', 'unit_price' => 'float', 'price' => 'float', 'total' => 'float'];
+        return [
+            'quantity' => 'integer',
+            'unit_price' => 'float',
+            'price' => 'float',
+            'total' => 'float',
+            'discount_amount' => 'float',
+        ];
     }
 
     /**
@@ -75,13 +81,15 @@ final class OrderItem extends Model
             if (isset($orderItem->price) && empty($orderItem->unit_price)) {
                 $orderItem->unit_price = $orderItem->price;
             }
+            $discount = (float) ($orderItem->discount_amount ?? 0);
             if (! $orderItem->total) {
-                $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
+                $orderItem->total = ($orderItem->unit_price * $orderItem->quantity) - $discount;
             }
         });
         self::updating(function (OrderItem $orderItem) {
-            if ($orderItem->isDirty(['unit_price', 'quantity'])) {
-                $orderItem->total = $orderItem->unit_price * $orderItem->quantity;
+            if ($orderItem->isDirty(['unit_price', 'quantity', 'discount_amount'])) {
+                $discount = (float) ($orderItem->discount_amount ?? 0);
+                $orderItem->total = ($orderItem->unit_price * $orderItem->quantity) - $discount;
             }
             if ($orderItem->isDirty('price') && ! $orderItem->isDirty('unit_price')) {
                 $orderItem->unit_price = $orderItem->price;

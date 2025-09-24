@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Translatable\HasTranslations;
 
 /**
  * Report
@@ -31,13 +30,13 @@ use Spatie\Translatable\HasTranslations;
  */
 final class Report extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'type', 'category', 'date_range', 'start_date', 'end_date', 'filters', 'description', 'content', 'is_active', 'is_public', 'is_scheduled', 'schedule_frequency', 'last_generated_at', 'generated_by', 'view_count', 'download_count', 'settings', 'metadata'];
 
     protected $casts = ['filters' => 'array', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_scheduled' => 'boolean', 'start_date' => 'date', 'end_date' => 'date', 'last_generated_at' => 'datetime', 'view_count' => 'integer', 'download_count' => 'integer', 'settings' => 'array', 'metadata' => 'array'];
 
-    public array $translatable = ['name', 'description', 'content'];
+    
 
     /**
      * Handle getActivitylogOptions functionality with proper error handling.

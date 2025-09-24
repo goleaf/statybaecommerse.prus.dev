@@ -52,7 +52,7 @@ class SimplifiedStatsWidgetTest extends TestCase
 
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 100.00,
+            'total' => 100.0,
             'status' => 'completed',
         ]);
 
@@ -70,28 +70,28 @@ class SimplifiedStatsWidgetTest extends TestCase
 
         // Check that stats contain expected data
         $statLabels = array_map(fn ($stat) => $stat->getLabel(), $stats);
-        $this->assertContains('translations.total_revenue', $statLabels);
-        $this->assertContains('translations.total_orders', $statLabels);
-        $this->assertContains('translations.total_customers', $statLabels);
-        $this->assertContains('Viso produktų', $statLabels);
+        $this->assertContains(__('translations.total_revenue'), $statLabels);
+        $this->assertContains(__('translations.total_orders'), $statLabels);
+        $this->assertContains(__('translations.total_customers'), $statLabels);
+        $this->assertContains(__('translations.total_products'), $statLabels);
     }
 
     public function test_simplified_stats_widget_revenue_calculation(): void
     {
         // Create orders with different statuses
         Order::factory()->create([
-            'total' => 100.00,
+            'total' => 100.0,
             'status' => 'completed',
         ]);
 
         Order::factory()->create([
-            'total' => 50.00,
+            'total' => 50.0,
             'status' => 'completed',
         ]);
 
         Order::factory()->create([
-            'total' => 25.00,
-            'status' => 'cancelled', // Should not be included
+            'total' => 25.0,
+            'status' => 'cancelled',  // Should not be included
         ]);
 
         $widget = new SimplifiedStatsWidget;
@@ -107,13 +107,13 @@ class SimplifiedStatsWidgetTest extends TestCase
     {
         // Create old orders (last month)
         Order::factory()->create([
-            'total' => 100.00,
+            'total' => 100.0,
             'created_at' => now()->subMonth(),
         ]);
 
         // Create recent orders (this month)
         Order::factory()->create([
-            'total' => 200.00,
+            'total' => 200.0,
             'created_at' => now(),
         ]);
 
@@ -133,12 +133,12 @@ class SimplifiedStatsWidgetTest extends TestCase
         // Test revenue chart
         $revenueChart = $widget->getRevenueChart();
         $this->assertIsArray($revenueChart);
-        $this->assertCount(7, $revenueChart); // 7 days of data
+        $this->assertCount(7, $revenueChart);  // 7 days of data
 
         // Test orders chart
         $ordersChart = $widget->getOrdersChart();
         $this->assertIsArray($ordersChart);
-        $this->assertCount(7, $ordersChart); // 7 days of data
+        $this->assertCount(7, $ordersChart);  // 7 days of data
     }
 
     public function test_simplified_stats_widget_column_span(): void

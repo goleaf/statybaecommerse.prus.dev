@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->nullable()->unique();
             $table->text('description')->nullable();
-            $table->string('type'); // percentage, fixed, free_shipping, bogo
+            $table->string('type');  // percentage, fixed, free_shipping, bogo
             $table->decimal('value', 10, 2)->default(0);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_enabled')->default(true);
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->dateTime('ends_at')->nullable();
             $table->unsignedInteger('usage_limit')->nullable();
             $table->unsignedInteger('usage_count')->default(0);
+            $table->foreignId('channel_id')->nullable()->index();
             $table->decimal('minimum_amount', 10, 2)->nullable();
             $table->decimal('maximum_amount', 10, 2)->nullable();
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();

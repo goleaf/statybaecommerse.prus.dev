@@ -26,6 +26,10 @@ final class StockMovementResourceTest extends TestCase
             'is_admin' => true,
         ]);
 
+        // Ensure required permissions exist for Filament topbar checks
+        \Spatie\Permission\Models\Permission::findOrCreate('view notifications');
+        $this->adminUser->givePermissionTo('view notifications');
+
         Filament::setCurrentPanel('admin');
     }
 

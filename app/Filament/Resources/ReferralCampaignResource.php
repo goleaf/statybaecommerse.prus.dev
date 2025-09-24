@@ -1,9 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -40,7 +35,10 @@ final class ReferralCampaignResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'System';
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -161,7 +159,7 @@ final class ReferralCampaignResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'discount' => 'success',
                         'credit' => 'info',
                         'points' => 'warning',
@@ -172,12 +170,12 @@ final class ReferralCampaignResource extends Resource
                     ->label(__('admin.referral_campaigns.max_referrals_per_user'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => $state ?: __('admin.common.unlimited')),
+                    ->formatStateUsing(fn($state) => $state ?: __('admin.common.unlimited')),
                 TextColumn::make('max_total_referrals')
                     ->label(__('admin.referral_campaigns.max_total_referrals'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => $state ?: __('admin.common.unlimited')),
+                    ->formatStateUsing(fn($state) => $state ?: __('admin.common.unlimited')),
                 IconColumn::make('is_active')
                     ->label(__('admin.referral_campaigns.is_active'))
                     ->boolean()
@@ -250,6 +248,8 @@ final class ReferralCampaignResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return self::$model::count();
+        $count = (int) self::$model::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 }

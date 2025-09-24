@@ -1,9 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\OrderShippingRelationManager;
 use App\Models\Order;
 use App\Models\OrderShipping;
@@ -38,6 +37,7 @@ final class OrderShippingRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => EditOrder::class,
         ]);
 
         $component->assertSuccessful();
@@ -52,6 +52,7 @@ final class OrderShippingRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => EditOrder::class,
         ]);
 
         $component
@@ -91,6 +92,7 @@ final class OrderShippingRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => EditOrder::class,
         ]);
 
         $component
@@ -117,6 +119,7 @@ final class OrderShippingRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => EditOrder::class,
         ]);
 
         $component
@@ -149,6 +152,7 @@ final class OrderShippingRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => EditOrder::class,
         ]);
 
         $component
@@ -172,6 +176,7 @@ final class OrderShippingRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => EditOrder::class,
         ]);
 
         $component

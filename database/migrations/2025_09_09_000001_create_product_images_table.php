@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('path');  // relative path within public storage, e.g., products/{id}/file.webp
             $table->string('alt_text')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             $table

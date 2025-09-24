@@ -67,7 +67,7 @@ final class SystemResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationLabel = 'system.title';
 
@@ -138,6 +138,7 @@ final class SystemResource extends Resource
                                                     ->relationship('category', 'name')
                                                     ->searchable()
                                                     ->preload()
+                                                    ->required()
                                                     ->createOptionForm([
                                                         TextInput::make('name')
                                                             ->label(__('system.category_name'))
@@ -215,6 +216,7 @@ final class SystemResource extends Resource
                                                 'select' => __('system.type_select'),
                                             ])
                                             ->reactive()
+                                            ->required()
                                             ->helperText(__('system.setting_type_help')),
                                     ]),
                                 Section::make('Value Configuration')
@@ -369,7 +371,6 @@ final class SystemResource extends Resource
                                             ->schema([
                                                 TextInput::make('locale')
                                                     ->label(__('system.locale'))
-                                                    ->required()
                                                     ->maxLength(5),
                                                 TextInput::make('name')
                                                     ->label(__('system.translated_name'))
@@ -402,7 +403,7 @@ final class SystemResource extends Resource
                                                     ->relationship('dependsOn', 'name')
                                                     ->searchable()
                                                     ->preload()
-                                                    ->required(),
+                                                    ->nullable(),
                                                 Textarea::make('condition')
                                                     ->label(__('system.condition'))
                                                     ->helperText(__('system.condition_help'))

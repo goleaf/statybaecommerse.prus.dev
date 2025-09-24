@@ -9,6 +9,7 @@ use App\Models\SystemSettingCategoryTranslation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Spatie\Permission\Models\Permission;
 
 final class SystemSettingCategoryTranslationResourceTest extends TestCase
 {
@@ -24,6 +25,10 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             'email' => 'admin@example.com',
             'is_admin' => true,
         ]);
+
+        // Ensure required permissions exist and are assigned to avoid Filament navigation policy failures
+        Permission::findOrCreate('view notifications', 'web');
+        $this->adminUser->givePermissionTo('view notifications');
 
         $this->actingAs($this->adminUser);
     }

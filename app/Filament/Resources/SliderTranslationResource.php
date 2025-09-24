@@ -35,7 +35,7 @@ final class SliderTranslationResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?int $navigationSort = 17;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'title';
 
@@ -107,7 +107,7 @@ final class SliderTranslationResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('admin.slider_translations.locale'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'en' => 'success',
                         'lt' => 'info',
                         'de' => 'warning',

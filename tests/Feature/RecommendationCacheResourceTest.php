@@ -15,7 +15,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class RecommendationCacheResourceTest extends TestCase
 {
@@ -342,9 +341,9 @@ class RecommendationCacheResourceTest extends TestCase
             ['category' => 'electronics']
         );
 
-        $this->assertStringContains('homepage', $cacheKey);
-        $this->assertStringContains('user:1', $cacheKey);
-        $this->assertStringContains('product:2', $cacheKey);
-        $this->assertStringContains('context:product', $cacheKey);
+        $this->assertStringContainsString('homepage', $cacheKey);
+        $this->assertStringContainsString('user:1', $cacheKey);
+        $this->assertStringContainsString('product:2', $cacheKey);
+        $this->assertStringContainsString('context:product', $cacheKey);
     }
 }

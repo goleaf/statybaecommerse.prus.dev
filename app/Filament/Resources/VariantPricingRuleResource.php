@@ -1,7 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -23,12 +20,12 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
@@ -82,7 +79,7 @@ final class VariantPricingRuleResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('variant_pricing_rules.basic_information'))
                     ->schema([
@@ -189,9 +186,9 @@ final class VariantPricingRuleResource extends Resource
                     ->sortable(),
                 TextColumn::make('type')
                     ->label(__('variant_pricing_rules.type'))
-                    ->formatStateUsing(fn (string $state): string => __("variant_pricing_rules.types.{$state}"))
+                    ->formatStateUsing(fn(string $state): string => __("variant_pricing_rules.types.{$state}"))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'percentage' => 'blue',
                         'fixed' => 'green',
                         'tier' => 'purple',
@@ -210,10 +207,10 @@ final class VariantPricingRuleResource extends Resource
                     ->numeric()
                     ->formatStateUsing(function ($state, $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
+                            return $state . '%';
                         }
 
-                        return '€'.number_format($state, 2);
+                        return '€' . number_format($state, 2);
                     }),
                 TextColumn::make('min_quantity')
                     ->label(__('variant_pricing_rules.min_quantity'))
@@ -275,11 +272,11 @@ final class VariantPricingRuleResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn (VariantPricingRule $record): string => $record->is_active ? __('variant_pricing_rules.deactivate') : __('variant_pricing_rules.activate'))
-                    ->icon(fn (VariantPricingRule $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (VariantPricingRule $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(VariantPricingRule $record): string => $record->is_active ? __('variant_pricing_rules.deactivate') : __('variant_pricing_rules.activate'))
+                    ->icon(fn(VariantPricingRule $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(VariantPricingRule $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (VariantPricingRule $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
+                        $record->update(['is_active' => !$record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('variant_pricing_rules.activated_successfully') : __('variant_pricing_rules.deactivated_successfully'))
                             ->success()

@@ -22,7 +22,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -324,7 +324,12 @@ final class ReferralStatisticsResource extends Resource
                     ->schema([
                         TextEntry::make('metadata')
                             ->label(__('referral_statistics.fields.metadata'))
-                            ->json()
+                            ->formatStateUsing(function ($state) {
+                                if (empty($state)) {
+                                    return null;
+                                }
+                                return json_encode($state, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                            })
                             ->placeholder(__('referral_statistics.placeholders.no_metadata')),
                     ]),
                 Section::make(__('referral_statistics.sections.timestamps'))

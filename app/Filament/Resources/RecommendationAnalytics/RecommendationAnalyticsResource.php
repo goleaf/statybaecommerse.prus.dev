@@ -1,7 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationAnalytics;
 
@@ -11,11 +8,11 @@ use App\Filament\Resources\RecommendationAnalytics\Pages\ListRecommendationAnaly
 use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyticsForm;
 use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalyticsTable;
 use App\Models\RecommendationAnalytics;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use BackedEnum;
 
 class RecommendationAnalyticsResource extends Resource
 {

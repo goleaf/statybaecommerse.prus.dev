@@ -51,11 +51,6 @@ final class StockResource extends Resource
         return __('inventory.title');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Inventory';
-    }
-
     public static function getPluralModelLabel(): string
     {
         return __('inventory.plural');
@@ -155,7 +150,7 @@ final class StockResource extends Resource
                     ->label(__('inventory.quantity'))
                     ->numeric()
                     ->sortable()
-                    ->color(fn ($state, $record) => $record->isLowStock() ? 'danger' : 'success'),
+                    ->color(fn($state, $record) => $record->isLowStock() ? 'danger' : 'success'),
                 TextColumn::make('reserved')
                     ->label(__('inventory.reserved'))
                     ->numeric()
@@ -166,9 +161,9 @@ final class StockResource extends Resource
                     ->sortable(),
                 TextColumn::make('available_quantity')
                     ->label(__('inventory.available'))
-                    ->getStateUsing(fn ($record) => $record->available_quantity)
+                    ->getStateUsing(fn($record) => $record->available_quantity)
                     ->numeric()
-                    ->color(fn ($state) => $state > 0 ? 'success' : 'danger'),
+                    ->color(fn($state) => $state > 0 ? 'success' : 'danger'),
                 TextColumn::make('threshold')
                     ->label(__('inventory.threshold'))
                     ->numeric()
@@ -196,7 +191,7 @@ final class StockResource extends Resource
                     ->native(false),
                 SelectFilter::make('low_stock')
                     ->label(__('inventory.low_stock'))
-                    ->query(fn (Builder $query): Builder => $query->whereRaw('quantity <= threshold')),
+                    ->query(fn(Builder $query): Builder => $query->whereRaw('quantity <= threshold')),
             ])
             ->actions([
                 ViewAction::make(),

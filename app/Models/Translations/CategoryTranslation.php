@@ -26,7 +26,7 @@ final class CategoryTranslation extends Model
 {
     protected $table = 'category_translations';
 
-    protected $fillable = ['category_id', 'locale', 'name', 'description', 'short_description', 'seo_title', 'seo_description', 'seo_keywords'];
+    protected $fillable = ['category_id', 'locale', 'name', 'slug', 'description', 'seo_title', 'seo_description'];
 
     protected $casts = ['category_id' => 'integer'];
 

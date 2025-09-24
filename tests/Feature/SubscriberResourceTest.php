@@ -9,10 +9,17 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
+use Spatie\Permission\Models\Permission;
 
 final class SubscriberResourceTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Permission::findOrCreate('view notifications', 'web');
+    }
 
     public function test_can_list_subscribers(): void
     {

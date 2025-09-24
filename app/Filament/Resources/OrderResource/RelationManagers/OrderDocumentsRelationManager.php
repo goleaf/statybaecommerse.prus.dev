@@ -66,7 +66,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                                     ->label(__('orders.document_name'))
                                     ->required()
                                     ->maxLength(255)
-                                    ->prefixIcon('heroicon-o-document-text'),
+                                    ,
                                 Select::make('type')
                                     ->label(__('orders.document_type'))
                                     ->options([
@@ -79,8 +79,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                                         'manual' => __('orders.document_types.manual'),
                                         'other' => __('orders.document_types.other'),
                                     ])
-                                    ->required()
-                                    ->prefixIcon('heroicon-o-tag'),
+                                    ->required(),
                             ]),
                         Grid::make(2)
                             ->components([
@@ -88,7 +87,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                                     ->label(__('orders.document_version'))
                                     ->maxLength(50)
                                     ->default('1.0')
-                                    ->prefixIcon('heroicon-o-hashtag'),
+                                    ,
                                 Select::make('status')
                                     ->label(__('orders.document_status'))
                                     ->options([
@@ -99,8 +98,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                                         'archived' => __('orders.document_statuses.archived'),
                                     ])
                                     ->required()
-                                    ->default('draft')
-                                    ->prefixIcon('heroicon-o-flag'),
+                                    ->default('draft'),
                             ]),
                     ])
                     ->collapsible(),
@@ -114,19 +112,18 @@ final class OrderDocumentsRelationManager extends RelationManager
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                             ->maxSize(10240)  // 10MB
                             ->directory('order-documents')
-                            ->visibility('private')
-                            ->prefixIcon('heroicon-o-cloud-arrow-up'),
+                            ->visibility('private'),
                         Grid::make(2)
                             ->components([
                                 TextInput::make('file_size')
                                     ->label(__('orders.file_size'))
                                     ->numeric()
                                     ->suffix('KB')
-                                    ->prefixIcon('heroicon-o-archive-box'),
+                                    ,
                                 TextInput::make('mime_type')
                                     ->label(__('orders.mime_type'))
                                     ->maxLength(100)
-                                    ->prefixIcon('heroicon-o-document-text'),
+                                    ,
                             ]),
                     ])
                     ->collapsible(),
@@ -151,11 +148,11 @@ final class OrderDocumentsRelationManager extends RelationManager
                                     ->label(__('orders.access_password'))
                                     ->password()
                                     ->maxLength(255)
-                                    ->prefixIcon('heroicon-o-key'),
+                                    ,
                                 TextInput::make('expires_at')
                                     ->label(__('orders.expires_at'))
                                     ->date()
-                                    ->prefixIcon('heroicon-o-calendar'),
+                                    ,
                             ]),
                     ])
                     ->collapsible(),
@@ -195,7 +192,7 @@ final class OrderDocumentsRelationManager extends RelationManager
 
                         return strlen($state) > 30 ? $state : null;
                     })
-                    ->prefixIcon('heroicon-o-document-text'),
+                    ,
                 BadgeColumn::make('type')
                     ->label(__('orders.document_type'))
                     ->colors([
@@ -222,12 +219,12 @@ final class OrderDocumentsRelationManager extends RelationManager
                 TextColumn::make('version')
                     ->label(__('orders.version'))
                     ->sortable()
-                    ->prefixIcon('heroicon-o-hashtag'),
+                    ,
                 TextColumn::make('file_size')
                     ->label(__('orders.file_size'))
                     ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 2).' MB' : '-')
                     ->sortable()
-                    ->prefixIcon('heroicon-o-archive-box'),
+                    ,
                 IconColumn::make('is_public')
                     ->label(__('orders.is_public'))
                     ->boolean()
@@ -247,13 +244,13 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->prefixIcon('heroicon-o-calendar'),
+                    ,
                 TextColumn::make('expires_at')
                     ->label(__('orders.expires_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->prefixIcon('heroicon-o-calendar'),
+                    ,
             ])
             ->filters([
                 SelectFilter::make('type')

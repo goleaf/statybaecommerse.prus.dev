@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -12,21 +10,20 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Rating;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\RatingColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -92,12 +89,16 @@ final class ReviewResource extends Resource
                             ->email()
                             ->required()
                             ->maxLength(255),
-                        Rating::make('rating')
+                        Select::make('rating')
                             ->label(__('reviews.fields.rating'))
                             ->required()
-                            ->minValue(1)
-                            ->maxValue(5)
-                            ->stars(5),
+                            ->options([
+                                1 => '1',
+                                2 => '2',
+                                3 => '3',
+                                4 => '4',
+                                5 => '5',
+                            ]),
                     ]),
                 Section::make(__('reviews.sections.content'))
                     ->description(__('reviews.sections.content_description'))
@@ -173,19 +174,20 @@ final class ReviewResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(30),
-                RatingColumn::make('rating')
+                TextColumn::make('rating')
                     ->label(__('reviews.fields.rating'))
                     ->sortable()
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->formatStateUsing(fn(int $state): string => str_repeat('⭐', $state)),
                 BadgeColumn::make('status')
                     ->label(__('reviews.fields.status'))
-                    ->getStateUsing(fn (Review $record): string => $record->getStatus())
+                    ->getStateUsing(fn(Review $record): string => $record->getStatus())
                     ->colors([
                         'approved' => 'success',
                         'rejected' => 'danger',
                         'pending' => 'warning',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __("reviews.status.{$state}")),
+                    ->formatStateUsing(fn(string $state): string => __("reviews.status.{$state}")),
                 IconColumn::make('is_approved')
                     ->label(__('reviews.fields.is_approved'))
                     ->boolean()
@@ -244,13 +246,13 @@ final class ReviewResource extends Resource
                     ]),
                 Filter::make('high_rated')
                     ->label(__('reviews.filters.high_rated'))
-                    ->query(fn (Builder $query): Builder => $query->where('rating', '>=', 4)),
+                    ->query(fn(Builder $query): Builder => $query->where('rating', '>=', 4)),
                 Filter::make('low_rated')
                     ->label(__('reviews.filters.low_rated'))
-                    ->query(fn (Builder $query): Builder => $query->where('rating', '<=', 2)),
+                    ->query(fn(Builder $query): Builder => $query->where('rating', '<=', 2)),
                 Filter::make('recent')
                     ->label(__('reviews.filters.recent'))
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
+                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
             ])
             ->actions([
                 ViewAction::make(),
@@ -260,7 +262,7 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.actions.approve'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Review $record): bool => $record->canBeApproved())
+                    ->visible(fn(Review $record): bool => $record->canBeApproved())
                     ->action(function (Review $record): void {
                         $record->approve();
                         Notification::make()
@@ -273,7 +275,7 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.actions.reject'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Review $record): bool => $record->canBeRejected())
+                    ->visible(fn(Review $record): bool => $record->canBeRejected())
                     ->action(function (Review $record): void {
                         $record->reject();
                         Notification::make()
@@ -286,7 +288,7 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.actions.feature'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn (Review $record): bool => $record->canBeFeatured())
+                    ->visible(fn(Review $record): bool => $record->canBeFeatured())
                     ->action(function (Review $record): void {
                         $record->update(['is_featured' => true]);
                         Notification::make()
@@ -299,7 +301,7 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.actions.unfeature'))
                     ->icon('heroicon-o-star')
                     ->color('gray')
-                    ->visible(fn (Review $record): bool => $record->canBeUnfeatured())
+                    ->visible(fn(Review $record): bool => $record->canBeUnfeatured())
                     ->action(function (Review $record): void {
                         $record->update(['is_featured' => false]);
                         Notification::make()
@@ -388,13 +390,13 @@ final class ReviewResource extends Resource
                         TextEntry::make('rating')
                             ->label(__('reviews.fields.rating'))
                             ->badge()
-                            ->color(fn (int $state): string => match ($state) {
+                            ->color(fn(int $state): string => match ($state) {
                                 1, 2 => 'danger',
                                 3 => 'warning',
                                 4, 5 => 'success',
                                 default => 'gray',
                             })
-                            ->formatStateUsing(fn (int $state): string => str_repeat('⭐', $state)),
+                            ->formatStateUsing(fn(int $state): string => str_repeat('⭐', $state)),
                     ])
                     ->columns(2),
                 InfolistSection::make(__('reviews.sections.content'))
@@ -409,17 +411,17 @@ final class ReviewResource extends Resource
                         TextEntry::make('status')
                             ->label(__('reviews.fields.status'))
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn(string $state): string => match ($state) {
                                 'approved' => 'success',
                                 'rejected' => 'danger',
                                 'pending' => 'warning',
                                 default => 'gray',
                             })
-                            ->formatStateUsing(fn (string $state): string => __("reviews.status.{$state}")),
-                        TextEntry::make('is_approved')
+                            ->formatStateUsing(fn(string $state): string => __("reviews.status.{$state}")),
+                        IconEntry::make('is_approved')
                             ->label(__('reviews.fields.is_approved'))
                             ->boolean(),
-                        TextEntry::make('is_featured')
+                        IconEntry::make('is_featured')
                             ->label(__('reviews.fields.is_featured'))
                             ->boolean(),
                         TextEntry::make('locale')
@@ -474,6 +476,8 @@ final class ReviewResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return self::$model::count();
+        $count = (int) self::$model::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -29,9 +30,39 @@ final class RecommendationBlock extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'title', 'description', 'config_ids', 'is_active', 'max_products', 'cache_duration', 'display_settings'];
+    protected $fillable = [
+        'name',
+        'title',
+        'description',
+        'type',
+        'position',
+        'is_active',
+        'is_default',
+        'show_title',
+        'show_description',
+        'max_products',
+        'sort_order',
+        'config_ids',
+        'cache_duration',
+        'display_settings',
+    ];
 
-    protected $casts = ['config_ids' => 'array', 'is_active' => 'boolean', 'max_products' => 'integer', 'cache_duration' => 'integer', 'display_settings' => 'array'];
+    protected $casts = [
+        'config_ids' => 'array',
+        'is_active' => 'boolean',
+        'is_default' => 'boolean',
+        'show_title' => 'boolean',
+        'show_description' => 'boolean',
+        'max_products' => 'integer',
+        'sort_order' => 'integer',
+        'cache_duration' => 'integer',
+        'display_settings' => 'array',
+    ];
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'recommendation_block_products', 'recommendation_block_id', 'product_id');
+    }
 
     /**
      * Handle analytics functionality with proper error handling.

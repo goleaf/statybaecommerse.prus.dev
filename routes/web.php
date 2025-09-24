@@ -422,7 +422,12 @@ Route::prefix('collections')->name('collections.')->group(function () {
     Route::get('/', [App\Http\Controllers\CollectionController::class, 'index'])->name('index');
     Route::get('/{collection}', [App\Http\Controllers\CollectionController::class, 'show'])->name('show');
     Route::get('/{collection}/products', [App\Http\Controllers\CollectionController::class, 'products'])->name('products');
-    Route::get('/api/search', [App\Http\Controllers\CollectionController::class, 'search'])->name('search');
+    // JSON API endpoints (used by tests)
+    Route::get('/api/search', [App\Http\Controllers\CollectionController::class, 'api'])->name('api.search');
+    Route::get('/api/by-type/{type}', [App\Http\Controllers\CollectionController::class, 'byType'])->name('api.by-type');
+    Route::get('/api/with-products', [App\Http\Controllers\CollectionController::class, 'withProducts'])->name('api.with-products');
+    Route::get('/api/popular', [App\Http\Controllers\CollectionController::class, 'popular'])->name('api.popular');
+    Route::get('/api/statistics', [App\Http\Controllers\CollectionController::class, 'statistics'])->name('api.statistics');
 });
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
 Route::get('/search', function () {

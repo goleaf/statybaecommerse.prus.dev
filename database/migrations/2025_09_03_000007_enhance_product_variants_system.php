@@ -120,6 +120,8 @@ return new class extends Migration
                 $table->integer('available')->default(0);
                 $table->integer('reorder_point')->default(0);
                 $table->integer('reorder_quantity')->default(0);
+                $table->boolean('is_tracked')->default(true);
+                $table->string('status')->default('active');
                 $table->timestamp('last_restocked_at')->nullable();
                 $table->timestamps();
 

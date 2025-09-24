@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -38,6 +36,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component->assertSuccessful();
@@ -52,6 +51,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -70,7 +70,8 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
-            'order_id' => $this->order->id,
+            'documentable_type' => \App\Models\Order::class,
+            'documentable_id' => $this->order->id,
             'name' => 'Test Document',
             'type' => 'invoice',
             'status' => 'draft',
@@ -85,12 +86,14 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         $this->actingAs($this->user);
 
         $document = Document::factory()->create([
-            'order_id' => $this->order->id,
+            'documentable_type' => \App\Models\Order::class,
+            'documentable_id' => $this->order->id,
             'status' => 'pending',
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -111,12 +114,14 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         $this->actingAs($this->user);
 
         $document = Document::factory()->create([
-            'order_id' => $this->order->id,
+            'documentable_type' => \App\Models\Order::class,
+            'documentable_id' => $this->order->id,
             'status' => 'pending',
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -137,17 +142,20 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         $this->actingAs($this->user);
 
         Document::factory()->create([
-            'order_id' => $this->order->id,
+            'documentable_type' => \App\Models\Order::class,
+            'documentable_id' => $this->order->id,
             'type' => 'invoice',
         ]);
 
         Document::factory()->create([
-            'order_id' => $this->order->id,
+            'documentable_type' => \App\Models\Order::class,
+            'documentable_id' => $this->order->id,
             'type' => 'receipt',
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -165,12 +173,14 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         $this->actingAs($this->user);
 
         $documents = Document::factory()->count(2)->create([
-            'order_id' => $this->order->id,
+            'documentable_type' => \App\Models\Order::class,
+            'documentable_id' => $this->order->id,
             'status' => 'pending',
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -193,12 +203,14 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         $this->actingAs($this->user);
 
         $documents = Document::factory()->count(2)->create([
-            'order_id' => $this->order->id,
+            'documentable_type' => \App\Models\Order::class,
+            'documentable_id' => $this->order->id,
             'is_public' => false,
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component

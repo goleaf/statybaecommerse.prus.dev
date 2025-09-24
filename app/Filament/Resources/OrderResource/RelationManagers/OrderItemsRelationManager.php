@@ -70,12 +70,15 @@ final class OrderItemsRelationManager extends RelationManager
                                     ->preload()
                                     ->required()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set) {
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         if ($state) {
                                             $variant = ProductVariant::find($state);
                                             if ($variant) {
                                                 $set('unit_price', $variant->price);
                                                 $set('total', $variant->price * ($get('quantity') ?? 1));
+                                                $set('product_id', $variant->product_id);
+                                                $set('name', $variant->name ?? ($variant->product->name ?? ''));
+                                                $set('sku', $variant->sku ?? ($variant->product->sku ?? ''));
                                             }
                                         }
                                     })
@@ -134,6 +137,12 @@ final class OrderItemsRelationManager extends RelationManager
                                     })
                                     ->prefixIcon('heroicon-o-banknotes'),
                             ]),
+                        Hidden::make('product_id')
+                            ->required(),
+                        Hidden::make('name')
+                            ->required(),
+                        Hidden::make('sku')
+                            ->required(),
                         Hidden::make('total')
                             ->default(function (Forms\Get $get): float {
                                 $unitPrice = (float) $get('unit_price') ?? 0;
@@ -166,7 +175,7 @@ final class OrderItemsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('productVariant.name')
-                    ->label(__('orders.product'))
+                    ->label(__('orders.fields.product'))
                     ->searchable()
                     ->sortable()
                     ->limit(30)
@@ -174,36 +183,30 @@ final class OrderItemsRelationManager extends RelationManager
                         $state = $column->getState();
 
                         return strlen($state) > 30 ? $state : null;
-                    })
-                    ->prefixIcon('heroicon-o-cube'),
+                    }),
                 TextColumn::make('productVariant.sku')
-                    ->label(__('orders.sku'))
+                    ->label(__('orders.fields.sku'))
                     ->searchable()
                     ->sortable()
-                    ->copyable()
-                    ->prefixIcon('heroicon-o-hashtag'),
+                    ->copyable(),
                 TextColumn::make('quantity')
-                    ->label(__('orders.quantity'))
-                    ->sortable()
-                    ->prefixIcon('heroicon-o-hashtag'),
+                    ->label(__('orders.fields.quantity'))
+                    ->sortable(),
                 TextColumn::make('unit_price')
-                    ->label(__('orders.unit_price'))
+                    ->label(__('orders.fields.unit_price'))
                     ->money('EUR')
-                    ->sortable()
-                    ->prefixIcon('heroicon-o-currency-euro'),
+                    ->sortable(),
                 TextColumn::make('discount_amount')
-                    ->label(__('orders.discount_amount'))
+                    ->label(__('orders.fields.discount_amount'))
                     ->money('EUR')
-                    ->sortable()
-                    ->prefixIcon('heroicon-o-tag'),
+                    ->sortable(),
                 TextColumn::make('total')
-                    ->label(__('orders.total'))
+                    ->label(__('orders.fields.total'))
                     ->money('EUR')
                     ->sortable()
-                    ->weight('bold')
-                    ->prefixIcon('heroicon-o-banknotes'),
+                    ->weight('bold'),
                 BadgeColumn::make('status')
-                    ->label(__('orders.status'))
+                    ->label(__('orders.fields.status'))
                     ->colors([
                         'warning' => 'pending',
                         'primary' => 'processing',
@@ -212,15 +215,14 @@ final class OrderItemsRelationManager extends RelationManager
                     ])
                     ->formatStateUsing(fn (?string $state): string => $state ? __("orders.item_statuses.{$state}") : '-'),
                 TextColumn::make('created_at')
-                    ->label(__('orders.created_at'))
+                    ->label(__('orders.fields.created_at'))
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->prefixIcon('heroicon-o-calendar'),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label(__('orders.status'))
+                    ->label(__('orders.fields.status'))
                     ->options([
                         'pending' => __('orders.item_statuses.pending'),
                         'processing' => __('orders.item_statuses.processing'),
@@ -229,7 +231,7 @@ final class OrderItemsRelationManager extends RelationManager
                     ])
                     ->multiple(),
                 TernaryFilter::make('has_discount')
-                    ->label(__('orders.has_discount'))
+                    ->label(__('orders.filters.has_discount'))
                     ->queries(
                         true: fn (Builder $query) => $query->where('discount_amount', '>', 0),
                         false: fn (Builder $query) => $query->where('discount_amount', '=', 0),

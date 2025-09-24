@@ -49,7 +49,10 @@ final class VariantImageResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'Inventory';
+    }
 
     protected static ?int $navigationSort = 15;
 
@@ -102,7 +105,7 @@ final class VariantImageResource extends Resource
 
                                     return '';
                                 })
-                                ->visible(fn ($get) => ! empty($get('variant_id'))),
+                                ->visible(fn($get) => !empty($get('variant_id'))),
                         ]),
                 ]),
             Section::make(__('admin.variant_images.image_details'))
@@ -121,7 +124,7 @@ final class VariantImageResource extends Resource
                                     '4:3',
                                     '1:1',
                                 ])
-                                ->maxSize(5120) // 5MB
+                                ->maxSize(5120)  // 5MB
                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                 ->helperText(__('admin.variant_images.image_help')),
                             TextInput::make('alt_text')
@@ -242,7 +245,7 @@ final class VariantImageResource extends Resource
                     ->label(__('admin.variant_images.file_size'))
                     ->formatStateUsing(function ($state) {
                         if ($state) {
-                            return number_format($state / 1024, 2).' KB';
+                            return number_format($state / 1024, 2) . ' KB';
                         }
 
                         return '-';
@@ -289,11 +292,11 @@ final class VariantImageResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -319,19 +322,19 @@ final class VariantImageResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn (VariantImage $record): bool => ! $record->is_primary),
+                    ->visible(fn(VariantImage $record): bool => !$record->is_primary),
                 Action::make('toggle_active')
-                    ->label(fn (VariantImage $record): string => $record->is_active
+                    ->label(fn(VariantImage $record): string => $record->is_active
                         ? __('admin.variant_images.deactivate')
                         : __('admin.variant_images.activate'))
-                    ->icon(fn (VariantImage $record): string => $record->is_active
+                    ->icon(fn(VariantImage $record): string => $record->is_active
                         ? 'heroicon-o-x-circle'
                         : 'heroicon-o-check-circle')
-                    ->color(fn (VariantImage $record): string => $record->is_active
+                    ->color(fn(VariantImage $record): string => $record->is_active
                         ? 'danger'
                         : 'success')
                     ->action(function (VariantImage $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
+                        $record->update(['is_active' => !$record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active

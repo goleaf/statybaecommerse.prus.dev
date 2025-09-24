@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\ProductSimilarities\Tables;
 
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -16,11 +16,11 @@ class ProductSimilaritiesTable
     {
         return $table
             ->columns([
-                TextColumn::make('product1.name')
+                TextColumn::make('product.name')
                     ->label('admin.product_similarity.product1')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('product2.name')
+                TextColumn::make('similarProduct.name')
                     ->label('admin.product_similarity.product2')
                     ->searchable()
                     ->sortable(),
@@ -40,12 +40,12 @@ class ProductSimilaritiesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('product1_id')
+                SelectFilter::make('product_id')
                     ->label('admin.product_similarity.product1')
-                    ->relationship('product1', 'name'),
-                SelectFilter::make('product2_id')
+                    ->relationship('product', 'name'),
+                SelectFilter::make('similar_product_id')
                     ->label('admin.product_similarity.product2')
-                    ->relationship('product2', 'name'),
+                    ->relationship('similarProduct', 'name'),
             ])
             ->actions([
                 ViewAction::make(),

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -218,6 +216,8 @@ final class ReferralResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return self::$model::count();
+        $count = (int) self::$model::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 }

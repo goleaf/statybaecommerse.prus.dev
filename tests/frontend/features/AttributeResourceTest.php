@@ -1,12 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
 use App\Models\Attribute;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 final class AttributeResourceTest extends TestCase
@@ -17,7 +16,10 @@ final class AttributeResourceTest extends TestCase
     {
         parent::setUp();
 
-        $this->actingAs(User::factory()->admin()->create());
+        $user = User::factory()->admin()->create();
+        Permission::findOrCreate('view notifications', 'web');
+        $user->givePermissionTo('view notifications');
+        $this->actingAs($user);
     }
 
     public function test_attribute_resource_list_page_renders(): void

@@ -1,0 +1,24 @@
+<catalog>
+  <categories>
+    <category>
+      <slug>pics</slug>
+      <translations>
+        <translation locale="lt"><name>Paveikslai</name></translation>
+      </translations>
+    </category>
+  </categories>
+  <products>
+    <product>
+      <sku>PIC-1</sku>
+      <translations>
+        <translation locale="lt"><name>Nuotrauka</name></translation>
+      </translations>
+      <categories>
+        <category_slug>pics</category_slug>
+      </categories>
+      <images>
+        <image src="data:image/png;base64,iVBORw0KGgo=" alt="A" />
+      </images>
+    </product>
+  </products>
+</catalog>

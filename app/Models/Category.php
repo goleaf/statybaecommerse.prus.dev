@@ -379,7 +379,16 @@ final class Category extends Model implements HasMedia
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\CategoryTranslation
     {
-        return $this->translations()->firstOrCreate(['locale' => $locale], ['name' => $this->name, 'slug' => $this->slug, 'description' => $this->description, 'short_description' => $this->short_description, 'seo_title' => $this->seo_title, 'seo_description' => $this->seo_description]);
+        return $this->translations()->firstOrCreate(
+            ['locale' => $locale],
+            [
+                'name' => $this->name,
+                'slug' => $this->slug,
+                'description' => $this->description,
+                'seo_title' => $this->seo_title,
+                'seo_description' => $this->seo_description,
+            ]
+        );
     }
 
     /**

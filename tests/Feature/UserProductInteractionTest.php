@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -192,12 +190,14 @@ final class UserProductInteractionTest extends TestCase
         UserProductInteraction::factory()->create([
             'user_id' => $user->id,
             'product_id' => $product->id,
+            'interaction_type' => 'view',
             'rating' => 3.0,
         ]);
 
         UserProductInteraction::factory()->create([
             'user_id' => $user->id,
             'product_id' => $product->id,
+            'interaction_type' => 'purchase',
             'rating' => 4.5,
         ]);
 

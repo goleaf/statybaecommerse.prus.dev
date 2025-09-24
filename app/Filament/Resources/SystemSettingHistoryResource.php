@@ -1,35 +1,37 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingHistoryResource\Pages;
 use App\Models\SystemSettingHistory;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
 use UnitEnum;
 
 final class SystemSettingHistoryResource extends Resource
 {
+    protected static ?string $model = SystemSettingHistory::class;
+    protected static ?int $navigationSort = 13;
+    protected static ?string $recordTitleAttribute = 'change_reason';
+
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-clock';
@@ -66,13 +68,13 @@ final class SystemSettingHistoryResource extends Resource
                                 Select::make('system_setting_id')
                                     ->label(__('admin.system_setting_histories.system_setting'))
                                     ->relationship('systemSetting', 'key')
-                                    ->required()
+                                    ->required(fn (string $context): bool => $context === 'create')
                                     ->searchable()
                                     ->preload(),
                                 Select::make('changed_by')
                                     ->label(__('admin.system_setting_histories.changed_by'))
                                     ->relationship('user', 'name')
-                                    ->required()
+                                    ->required(fn (string $context): bool => $context === 'create')
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('change_reason')
@@ -176,14 +178,17 @@ final class SystemSettingHistoryResource extends Resource
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('warning')
                     ->action(function (SystemSettingHistory $record): void {
-                        $record->systemSetting->update(['value' => $record->old_value]);
+                        $record->systemSetting()->update([
+                            'type' => 'string',
+                            'value' => $record->old_value,
+                        ]);
                         Notification::make()
                             ->title(__('admin.system_setting_histories.value_restored_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn (SystemSettingHistory $record): bool => ! empty($record->old_value)),
+                    ->visible(fn(SystemSettingHistory $record): bool => !empty($record->old_value)),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

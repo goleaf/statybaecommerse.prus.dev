@@ -183,6 +183,6 @@ final class DocumentResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return self::$model::count();
+        return (string) self::$model::count();
     }
 }

@@ -1,7 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -18,6 +15,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -68,16 +66,13 @@ final class NotificationTemplateResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null
-                                    ),
-
+                                    ->afterStateUpdated(fn(string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.notification_templates.slug'))
                                     ->required()
                                     ->maxLength(255)
                                     ->unique(NotificationTemplate::class, 'slug', ignoreRecord: true)
                                     ->rules(['alpha_dash']),
-
                                 Select::make('type')
                                     ->label(__('admin.notification_templates.type'))
                                     ->options([
@@ -89,7 +84,6 @@ final class NotificationTemplateResource extends Resource
                                     ->required()
                                     ->default('email')
                                     ->live(),
-
                                 TextInput::make('event')
                                     ->label(__('admin.notification_templates.event'))
                                     ->required()
@@ -97,7 +91,6 @@ final class NotificationTemplateResource extends Resource
                                     ->helperText(__('admin.notification_templates.event_help')),
                             ]),
                     ]),
-
                 SchemaSection::make(__('admin.notification_templates.content'))
                     ->schema([
                         TextInput::make('subject')
@@ -105,19 +98,16 @@ final class NotificationTemplateResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->helperText(__('admin.notification_templates.subject_help')),
-
                         Textarea::make('content')
                             ->label(__('admin.notification_templates.content'))
                             ->required()
                             ->rows(10)
                             ->helperText(__('admin.notification_templates.content_help')),
-
                         Textarea::make('variables')
                             ->label(__('admin.notification_templates.variables'))
                             ->rows(5)
                             ->helperText(__('admin.notification_templates.variables_help')),
                     ]),
-
                 SchemaSection::make(__('admin.notification_templates.status'))
                     ->schema([
                         SchemaGrid::make(1)
@@ -138,29 +128,25 @@ final class NotificationTemplateResource extends Resource
                     ->label(__('admin.notification_templates.name'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('slug')
                     ->label(__('admin.notification_templates.slug'))
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-
                 TextColumn::make('type')
                     ->label(__('admin.notification_templates.type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'email' => 'success',
                         'sms' => 'info',
                         'push' => 'warning',
                         'in_app' => 'danger',
                         default => 'gray',
                     }),
-
                 TextColumn::make('event')
                     ->label(__('admin.notification_templates.event'))
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('subject')
                     ->label(__('admin.notification_templates.subject'))
                     ->limit(50)
@@ -169,11 +155,9 @@ final class NotificationTemplateResource extends Resource
 
                         return strlen($state) > 50 ? $state : null;
                     }),
-
                 IconColumn::make('is_active')
                     ->label(__('admin.notification_templates.is_active'))
                     ->boolean(),
-
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->dateTime()
@@ -189,7 +173,6 @@ final class NotificationTemplateResource extends Resource
                         'push' => __('admin.notification_templates.types.push'),
                         'in_app' => __('admin.notification_templates.types.in_app'),
                     ]),
-
                 TernaryFilter::make('is_active')
                     ->label(__('admin.notification_templates.is_active')),
             ])

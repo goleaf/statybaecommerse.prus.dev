@@ -13,7 +13,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -21,6 +20,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -106,12 +106,12 @@ final class VariantAnalyticsResource extends Resource
                                             ->schema([
                                                 Placeholder::make('variant_name')
                                                     ->label(__('admin.variant_analytics.variant_name'))
-                                                    ->content(fn($record) => $record?->variant?->name ?? '')
-                                                    ->visible(fn($record) => $record !== null),
+                                                    ->content(fn ($record) => $record?->variant?->name ?? '')
+                                                    ->visible(fn ($record) => $record !== null),
                                                 Placeholder::make('product_name')
                                                     ->label(__('admin.variant_analytics.product_name'))
-                                                    ->content(fn($record) => $record?->variant?->product?->name ?? '')
-                                                    ->visible(fn($record) => $record !== null),
+                                                    ->content(fn ($record) => $record?->variant?->product?->name ?? '')
+                                                    ->visible(fn ($record) => $record !== null),
                                             ]),
                                     ]),
                             ]),
@@ -142,7 +142,7 @@ final class VariantAnalyticsResource extends Resource
                                                         $views = (float) $get('views');
                                                         $clicks = (float) $get('clicks');
                                                         if ($views > 0) {
-                                                            return number_format(($clicks / $views) * 100, 2) . '%';
+                                                            return number_format(($clicks / $views) * 100, 2).'%';
                                                         }
 
                                                         return '0%';
@@ -187,7 +187,7 @@ final class VariantAnalyticsResource extends Resource
                                                         $clicks = (float) $get('clicks');
                                                         $addToCart = (float) $get('add_to_cart');
                                                         if ($clicks > 0) {
-                                                            return number_format(($addToCart / $clicks) * 100, 2) . '%';
+                                                            return number_format(($addToCart / $clicks) * 100, 2).'%';
                                                         }
 
                                                         return '0%';
@@ -198,7 +198,7 @@ final class VariantAnalyticsResource extends Resource
                                                         $addToCart = (float) $get('add_to_cart');
                                                         $purchases = (float) $get('purchases');
                                                         if ($addToCart > 0) {
-                                                            return number_format(($purchases / $addToCart) * 100, 2) . '%';
+                                                            return number_format(($purchases / $addToCart) * 100, 2).'%';
                                                         }
 
                                                         return '0%';
@@ -246,7 +246,7 @@ final class VariantAnalyticsResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->copyable()
-                    ->description(fn($record) => $record->variant->product->name ?? ''),
+                    ->description(fn ($record) => $record->variant->product->name ?? ''),
                 TextColumn::make('variant.sku')
                     ->label(__('admin.variant_analytics.sku'))
                     ->searchable()
@@ -274,12 +274,12 @@ final class VariantAnalyticsResource extends Resource
                     ->color('info'),
                 TextColumn::make('click_through_rate')
                     ->label(__('admin.variant_analytics.ctr'))
-                    ->getStateUsing(fn($record) => $record->click_through_rate)
-                    ->formatStateUsing(fn($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(fn ($record) => $record->click_through_rate)
+                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(fn($state) => $state >= 5 ? 'success' : ($state >= 2 ? 'warning' : 'danger')),
+                    ->color(fn ($state) => $state >= 5 ? 'success' : ($state >= 2 ? 'warning' : 'danger')),
                 TextColumn::make('add_to_cart')
                     ->label(__('admin.variant_analytics.add_to_cart'))
                     ->numeric()
@@ -288,12 +288,12 @@ final class VariantAnalyticsResource extends Resource
                     ->color('warning'),
                 TextColumn::make('add_to_cart_rate')
                     ->label(__('admin.variant_analytics.atc_rate'))
-                    ->getStateUsing(fn($record) => $record->add_to_cart_rate)
-                    ->formatStateUsing(fn($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(fn ($record) => $record->add_to_cart_rate)
+                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(fn($state) => $state >= 20 ? 'success' : ($state >= 10 ? 'warning' : 'danger')),
+                    ->color(fn ($state) => $state >= 20 ? 'success' : ($state >= 10 ? 'warning' : 'danger')),
                 TextColumn::make('purchases')
                     ->label(__('admin.variant_analytics.purchases'))
                     ->numeric()
@@ -302,12 +302,12 @@ final class VariantAnalyticsResource extends Resource
                     ->color('success'),
                 TextColumn::make('purchase_rate')
                     ->label(__('admin.variant_analytics.purchase_rate'))
-                    ->getStateUsing(fn($record) => $record->purchase_rate)
-                    ->formatStateUsing(fn($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(fn ($record) => $record->purchase_rate)
+                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(fn($state) => $state >= 30 ? 'success' : ($state >= 15 ? 'warning' : 'danger')),
+                    ->color(fn ($state) => $state >= 30 ? 'success' : ($state >= 15 ? 'warning' : 'danger')),
                 TextColumn::make('revenue')
                     ->label(__('admin.variant_analytics.revenue'))
                     ->money('EUR')
@@ -316,18 +316,18 @@ final class VariantAnalyticsResource extends Resource
                     ->color('success'),
                 TextColumn::make('average_revenue_per_purchase')
                     ->label(__('admin.variant_analytics.avg_revenue'))
-                    ->getStateUsing(fn($record) => $record->average_revenue_per_purchase)
+                    ->getStateUsing(fn ($record) => $record->average_revenue_per_purchase)
                     ->money('EUR')
                     ->sortable(false)
                     ->toggleable()
                     ->color('info'),
                 TextColumn::make('conversion_rate')
                     ->label(__('admin.variant_analytics.conversion_rate'))
-                    ->formatStateUsing(fn($state) => number_format($state, 2) . '%')
+                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                     ->sortable()
                     ->toggleable()
                     ->badge()
-                    ->color(fn($state) => $state >= 5 ? 'success' : ($state >= 2 ? 'warning' : 'danger')),
+                    ->color(fn ($state) => $state >= 5 ? 'success' : ($state >= 2 ? 'warning' : 'danger')),
                 BadgeColumn::make('performance_status')
                     ->label(__('admin.variant_analytics.performance_status'))
                     ->getStateUsing(function ($record) {
@@ -342,7 +342,7 @@ final class VariantAnalyticsResource extends Resource
                             return 'low';
                         }
                     })
-                    ->formatStateUsing(fn($state) => match ($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'high' => __('admin.variant_analytics.high_performing'),
                         'medium' => __('admin.variant_analytics.medium_performing'),
                         'low' => __('admin.variant_analytics.low_performing'),
@@ -392,11 +392,11 @@ final class VariantAnalyticsResource extends Resource
                         return $query
                             ->when(
                                 $data['date_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
                             )
                             ->when(
                                 $data['date_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     }),
                 Filter::make('revenue_range')
@@ -414,11 +414,11 @@ final class VariantAnalyticsResource extends Resource
                         return $query
                             ->when(
                                 $data['revenue_from'],
-                                fn(Builder $query, $amount): Builder => $query->where('revenue', '>=', $amount),
+                                fn (Builder $query, $amount): Builder => $query->where('revenue', '>=', $amount),
                             )
                             ->when(
                                 $data['revenue_to'],
-                                fn(Builder $query, $amount): Builder => $query->where('revenue', '<=', $amount),
+                                fn (Builder $query, $amount): Builder => $query->where('revenue', '<=', $amount),
                             );
                     }),
                 Filter::make('conversion_rate_range')
@@ -438,36 +438,36 @@ final class VariantAnalyticsResource extends Resource
                         return $query
                             ->when(
                                 $data['conversion_rate_from'],
-                                fn(Builder $query, $rate): Builder => $query->where('conversion_rate', '>=', $rate),
+                                fn (Builder $query, $rate): Builder => $query->where('conversion_rate', '>=', $rate),
                             )
                             ->when(
                                 $data['conversion_rate_to'],
-                                fn(Builder $query, $rate): Builder => $query->where('conversion_rate', '<=', $rate),
+                                fn (Builder $query, $rate): Builder => $query->where('conversion_rate', '<=', $rate),
                             );
                     }),
                 Filter::make('high_performing')
                     ->label(__('admin.variant_analytics.high_performing'))
-                    ->query(fn(Builder $query): Builder => $query->where('conversion_rate', '>=', 5.0)),
+                    ->query(fn (Builder $query): Builder => $query->where('conversion_rate', '>=', 5.0)),
                 Filter::make('medium_performing')
                     ->label(__('admin.variant_analytics.medium_performing'))
-                    ->query(fn(Builder $query): Builder => $query->whereBetween('conversion_rate', [2.0, 5.0])),
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('conversion_rate', [2.0, 5.0])),
                 Filter::make('low_performing')
                     ->label(__('admin.variant_analytics.low_performing'))
-                    ->query(fn(Builder $query): Builder => $query->where('conversion_rate', '<', 2.0)),
+                    ->query(fn (Builder $query): Builder => $query->where('conversion_rate', '<', 2.0)),
                 Filter::make('has_purchases')
                     ->label(__('admin.variant_analytics.has_purchases'))
-                    ->query(fn(Builder $query): Builder => $query->where('purchases', '>', 0)),
+                    ->query(fn (Builder $query): Builder => $query->where('purchases', '>', 0)),
                 Filter::make('has_revenue')
                     ->label(__('admin.variant_analytics.has_revenue'))
-                    ->query(fn(Builder $query): Builder => $query->where('revenue', '>', 0)),
+                    ->query(fn (Builder $query): Builder => $query->where('revenue', '>', 0)),
                 TernaryFilter::make('is_recent')
                     ->label(__('admin.variant_analytics.is_recent'))
                     ->placeholder(__('admin.variant_analytics.all_records'))
                     ->trueLabel(__('admin.variant_analytics.last_7_days'))
                     ->falseLabel(__('admin.variant_analytics.older_than_7_days'))
                     ->queries(
-                        true: fn(Builder $query) => $query->where('date', '>=', now()->subDays(7)),
-                        false: fn(Builder $query) => $query->where('date', '<', now()->subDays(7)),
+                        true: fn (Builder $query) => $query->where('date', '>=', now()->subDays(7)),
+                        false: fn (Builder $query) => $query->where('date', '<', now()->subDays(7)),
                     ),
             ])
             ->actions([

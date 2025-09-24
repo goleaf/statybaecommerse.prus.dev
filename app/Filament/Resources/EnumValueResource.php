@@ -1,9 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -39,7 +34,10 @@ final class EnumValueResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'System';
+    }
 
     protected static ?int $navigationSort = 1;
 
@@ -125,10 +123,10 @@ final class EnumValueResource extends Resource
                         ->columnSpanFull(),
                     Placeholder::make('usage_count')
                         ->label(__('admin.enum_values.form.fields.usage_count'))
-                        ->content(fn ($record) => $record?->usage_count ?? 0),
+                        ->content(fn($record) => $record?->usage_count ?? 0),
                     Placeholder::make('formatted_value')
                         ->label(__('admin.enum_values.form.fields.formatted_value'))
-                        ->content(fn ($record) => $record?->formatted_value ?? '-'),
+                        ->content(fn($record) => $record?->formatted_value ?? '-'),
                 ])
                 ->columns(2)
                 ->collapsible(),
@@ -144,7 +142,7 @@ final class EnumValueResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'navigation_group' => 'primary',
                         'order_status' => 'success',
                         'payment_status' => 'warning',
@@ -226,17 +224,17 @@ final class EnumValueResource extends Resource
                     ]),
                 Filter::make('has_default')
                     ->label(__('admin.enum_values.filters.has_default'))
-                    ->query(fn (Builder $query): Builder => $query->where('is_default', true)),
+                    ->query(fn(Builder $query): Builder => $query->where('is_default', true)),
                 Filter::make('high_usage')
                     ->label(__('admin.enum_values.filters.high_usage'))
-                    ->query(fn (Builder $query): Builder => $query->where('usage_count', '>', 50)),
+                    ->query(fn(Builder $query): Builder => $query->where('usage_count', '>', 50)),
             ])
             ->actions([
                 Action::make('activate')
                     ->label(__('admin.enum_values.actions.activate'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (EnumValue $record): bool => ! $record->is_active)
+                    ->visible(fn(EnumValue $record): bool => !$record->is_active)
                     ->action(function (EnumValue $record): void {
                         $record->activate();
                         Notification::make()
@@ -248,7 +246,7 @@ final class EnumValueResource extends Resource
                     ->label(__('admin.enum_values.actions.deactivate'))
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
-                    ->visible(fn (EnumValue $record): bool => $record->is_active)
+                    ->visible(fn(EnumValue $record): bool => $record->is_active)
                     ->action(function (EnumValue $record): void {
                         $record->deactivate();
                         Notification::make()
@@ -260,7 +258,7 @@ final class EnumValueResource extends Resource
                     ->label(__('admin.enum_values.actions.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn (EnumValue $record): bool => ! $record->is_default)
+                    ->visible(fn(EnumValue $record): bool => !$record->is_default)
                     ->action(function (EnumValue $record): void {
                         $record->setAsDefault();
                         Notification::make()

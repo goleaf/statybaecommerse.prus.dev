@@ -11,7 +11,6 @@ use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class ChannelResourceTest extends TestCase
 {
@@ -21,13 +20,13 @@ class ChannelResourceTest extends TestCase
     {
         Channel::factory()->count(3)->create();
 
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\ListChannels::class)
             ->assertCanSeeTableRecords(Channel::all());
     }
 
     public function test_can_create_channel(): void
     {
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\CreateChannel::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\CreateChannel::class)
             ->fillForm([
                 'name' => 'Test Channel',
                 'slug' => 'test-channel',
@@ -62,7 +61,7 @@ class ChannelResourceTest extends TestCase
     {
         $channel = Channel::factory()->create();
 
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\EditChannel::class, [
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\EditChannel::class, [
             'record' => $channel->getRouteKey(),
         ])
             ->fillForm([
@@ -83,7 +82,7 @@ class ChannelResourceTest extends TestCase
     {
         $channel = Channel::factory()->create();
 
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\ViewChannel::class, [
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\ViewChannel::class, [
             'record' => $channel->getRouteKey(),
         ])
             ->assertCanSeeTableRecords([$channel]);
@@ -93,7 +92,7 @@ class ChannelResourceTest extends TestCase
     {
         $channel = Channel::factory()->create();
 
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\ListChannels::class)
             ->callTableAction('delete', $channel)
             ->assertHasNoTableActionErrors();
 
@@ -107,7 +106,7 @@ class ChannelResourceTest extends TestCase
         Channel::factory()->create(['type' => 'web']);
         Channel::factory()->create(['type' => 'mobile']);
 
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\ListChannels::class)
             ->filterTable('type', 'web')
             ->assertCanSeeTableRecords(Channel::where('type', 'web')->get())
             ->assertCanNotSeeTableRecords(Channel::where('type', 'mobile')->get());
@@ -118,7 +117,7 @@ class ChannelResourceTest extends TestCase
         Channel::factory()->create(['is_enabled' => true]);
         Channel::factory()->create(['is_enabled' => false]);
 
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\ListChannels::class)
             ->filterTable('is_enabled', true)
             ->assertCanSeeTableRecords(Channel::where('is_enabled', true)->get())
             ->assertCanNotSeeTableRecords(Channel::where('is_enabled', false)->get());
@@ -137,7 +136,7 @@ class ChannelResourceTest extends TestCase
 
     public function test_channel_validation_rules(): void
     {
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\CreateChannel::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\CreateChannel::class)
             ->fillForm([
                 'name' => '',
                 'slug' => '',
@@ -155,7 +154,7 @@ class ChannelResourceTest extends TestCase
 
     public function test_channel_slug_auto_generation(): void
     {
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\CreateChannel::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\CreateChannel::class)
             ->fillForm([
                 'name' => 'Test Channel Name',
             ])

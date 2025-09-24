@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
 use App\Services\ImportExport\ProviderRegistry;
 use Filament\Actions\Action;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Forms;
 use Illuminate\Support\Facades\Storage;
 
 final class DataImportExport extends Page
@@ -37,7 +39,7 @@ final class DataImportExport extends Page
                         Grid::make(2)->schema([
                             Forms\Components\Select::make('provider')
                                 ->label(__('translations.provider'))
-                                ->options(collect(ProviderRegistry::providers())->mapWithKeys(fn($p, $k) => [$k => $p->label()])->all())
+                                ->options(collect(ProviderRegistry::providers())->mapWithKeys(fn ($p, $k) => [$k => $p->label()])->all())
                                 ->required(),
                             Forms\Components\Select::make('only')
                                 ->label(__('translations.scope'))
@@ -73,7 +75,7 @@ final class DataImportExport extends Page
                 ->label(__('translations.import'))
                 ->action(function (): void {
                     $provider = ProviderRegistry::get($this->provider ?? 'xml');
-                    if (!$provider) {
+                    if (! $provider) {
                         $this->notify('danger', __('translations.provider_not_found'));
 
                         return;
@@ -82,7 +84,7 @@ final class DataImportExport extends Page
                     if (is_array($path)) {
                         $path = $path[0] ?? null;
                     }
-                    if (!$path) {
+                    if (! $path) {
                         $this->notify('danger', __('translations.file_missing'));
 
                         return;
@@ -96,7 +98,7 @@ final class DataImportExport extends Page
                 ->label(__('translations.export'))
                 ->action(function (): void {
                     $provider = ProviderRegistry::get($this->provider ?? 'xml');
-                    if (!$provider) {
+                    if (! $provider) {
                         $this->notify('danger', __('translations.provider_not_found'));
 
                         return;

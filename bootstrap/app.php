@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
             // Load admin routes
             Route::middleware('web')
                 ->group(base_path('routes/admin.php'));
+            // Load reports routes
+            Route::middleware('web')
+                ->group(base_path('routes/reports.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

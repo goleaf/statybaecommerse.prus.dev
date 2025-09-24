@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -9,7 +7,6 @@ use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
 use Tests\TestCase;
 
 class ReviewResourceTest extends TestCase
@@ -348,10 +345,10 @@ class ReviewResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\ReviewResource\Pages\CreateReview::class)
             ->fillForm([
-                'product_id' => '', // Required field
-                'reviewer_name' => '', // Required field
-                'reviewer_email' => 'invalid-email', // Must be valid email
-                'rating' => 6, // Must be between 1-5
+                'product_id' => '',  // Required field
+                'reviewer_name' => '',  // Required field
+                'reviewer_email' => 'invalid-email',  // Must be valid email
+                'rating' => 6,  // Must be between 1-5
             ])
             ->call('create')
             ->assertHasFormErrors(['product_id', 'reviewer_name', 'reviewer_email', 'rating']);
@@ -380,7 +377,7 @@ class ReviewResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\ReviewResource\Pages\ViewReview::class, [
             'record' => $review->getRouteKey(),
         ])
-            ->assertCanSeeText('⭐⭐⭐⭐'); // 4 stars
+            ->assertCanSeeText('⭐⭐⭐⭐');  // 4 stars
     }
 
     public function test_status_display_is_correct(): void

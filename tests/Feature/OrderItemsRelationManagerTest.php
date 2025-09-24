@@ -41,6 +41,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component->assertSuccessful();
@@ -55,6 +56,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -93,6 +95,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -125,6 +128,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -150,6 +154,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -178,6 +183,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -206,6 +212,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -229,6 +236,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -256,6 +264,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -281,6 +290,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -310,6 +320,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -333,6 +344,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
+            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component

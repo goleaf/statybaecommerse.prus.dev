@@ -1,12 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * SystemSettingHistory
@@ -28,7 +26,7 @@ final class SystemSettingHistory extends Model
 
     protected $fillable = ['system_setting_id', 'old_value', 'new_value', 'changed_by', 'change_reason', 'ip_address', 'user_agent'];
 
-    protected $casts = ['old_value' => 'json', 'new_value' => 'json', 'changed_by' => 'integer'];
+    protected $casts = ['old_value' => 'string', 'new_value' => 'string', 'changed_by' => 'integer'];
 
     /**
      * Handle systemSetting functionality with proper error handling.

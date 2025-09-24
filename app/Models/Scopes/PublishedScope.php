@@ -30,5 +30,10 @@ final class PublishedScope implements Scope
         if ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'published_at')) {
             $builder->whereNotNull('published_at')->where('published_at', '<=', now());
         }
+
+        // If model has a status column, ensure published status
+        if ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'status')) {
+            $builder->where('status', 'published');
+        }
     }
 }

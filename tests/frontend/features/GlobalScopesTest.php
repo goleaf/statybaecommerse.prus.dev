@@ -29,25 +29,25 @@ final class GlobalScopesTest extends TestCase
         // Create test products with different states
         $activeProduct = Product::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_enabled' => true,
             'published_at' => now()->subDay(),
         ]);
 
         $inactiveProduct = Product::factory()->create([
             'is_visible' => false,
-            'is_active' => true,
+            'is_enabled' => true,
             'published_at' => now()->subDay(),
         ]);
 
         $unpublishedProduct = Product::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_enabled' => true,
             'published_at' => now()->addDay(),
         ]);
 
         $inactiveUnpublishedProduct = Product::factory()->create([
             'is_visible' => false,
-            'is_active' => false,
+            'is_enabled' => false,
             'published_at' => now()->addDay(),
         ]);
 

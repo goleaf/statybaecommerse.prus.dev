@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -20,7 +18,7 @@ final class SystemSettingCategoryTranslationFactory extends Factory
     public function definition(): array
     {
         $locales = ['lt', 'en', 'de', 'fr', 'es'];
-        $locale = fake()->randomElement($locales);
+        $locale = fake()->unique()->randomElement($locales);
 
         return [
             'system_setting_category_id' => SystemSettingCategory::factory(),
@@ -32,7 +30,7 @@ final class SystemSettingCategoryTranslationFactory extends Factory
 
     public function lithuanian(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'locale' => 'lt',
             'name' => fake()->randomElement([
                 'Bendri nustatymai',
@@ -63,7 +61,7 @@ final class SystemSettingCategoryTranslationFactory extends Factory
 
     public function english(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'locale' => 'en',
             'name' => fake()->randomElement([
                 'General Settings',
@@ -94,7 +92,7 @@ final class SystemSettingCategoryTranslationFactory extends Factory
 
     public function german(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'locale' => 'de',
             'name' => fake()->randomElement([
                 'Allgemeine Einstellungen',
@@ -125,30 +123,30 @@ final class SystemSettingCategoryTranslationFactory extends Factory
 
     public function french(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'locale' => 'fr',
             'name' => fake()->randomElement([
                 'Paramètres généraux',
                 'Paramètres e-commerce',
                 'Paramètres e-mail',
                 'Paramètres de paiement',
-                'Paramètres d\'expédition',
+                "Paramètres d'expédition",
                 'Paramètres SEO',
                 'Paramètres de sécurité',
                 'Paramètres API',
-                'Paramètres d\'apparence',
+                "Paramètres d'apparence",
                 'Paramètres de notification',
             ]),
             'description' => fake()->randomElement([
                 'Paramètres généraux du système et configuration',
                 'Paramètres de fonctionnalité e-commerce et paramètres',
-                'Paramètres d\'envoi et de configuration e-mail',
+                "Paramètres d'envoi et de configuration e-mail",
                 'Paramètres de systèmes de paiement et processus',
-                'Paramètres de méthodes d\'expédition et conditions',
-                'Paramètres d\'optimisation des moteurs de recherche',
-                'Paramètres de sécurité et d\'authentification',
-                'Paramètres d\'accès API et limitations',
-                'Paramètres d\'apparence et de design du site web',
+                "Paramètres de méthodes d'expédition et conditions",
+                "Paramètres d'optimisation des moteurs de recherche",
+                "Paramètres de sécurité et d'authentification",
+                "Paramètres d'accès API et limitations",
+                "Paramètres d'apparence et de design du site web",
                 'Paramètres de systèmes de notification et canaux',
             ]),
         ]);
@@ -156,7 +154,7 @@ final class SystemSettingCategoryTranslationFactory extends Factory
 
     public function spanish(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'locale' => 'es',
             'name' => fake()->randomElement([
                 'Configuración general',
@@ -187,14 +185,14 @@ final class SystemSettingCategoryTranslationFactory extends Factory
 
     public function forCategory(SystemSettingCategory $category): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'system_setting_category_id' => $category->id,
         ]);
     }
 
     public function withLocale(string $locale): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'locale' => $locale,
             'name' => $this->generateTranslatedName($locale),
             'description' => $this->generateTranslatedDescription($locale),
@@ -245,11 +243,11 @@ final class SystemSettingCategoryTranslationFactory extends Factory
                 'Paramètres e-commerce',
                 'Paramètres e-mail',
                 'Paramètres de paiement',
-                'Paramètres d\'expédition',
+                "Paramètres d'expédition",
                 'Paramètres SEO',
                 'Paramètres de sécurité',
                 'Paramètres API',
-                'Paramètres d\'apparence',
+                "Paramètres d'apparence",
                 'Paramètres de notification',
             ]),
             'es' => fake()->randomElement([
@@ -296,9 +294,9 @@ final class SystemSettingCategoryTranslationFactory extends Factory
             'fr' => fake()->randomElement([
                 'Paramètres généraux du système et configuration',
                 'Paramètres de fonctionnalité e-commerce et paramètres',
-                'Paramètres d\'envoi et de configuration e-mail',
+                "Paramètres d'envoi et de configuration e-mail",
                 'Paramètres de systèmes de paiement et processus',
-                'Paramètres de méthodes d\'expédition et conditions',
+                "Paramètres de méthodes d'expédition et conditions",
             ]),
             'es' => fake()->randomElement([
                 'Configuración general del sistema y configuración',

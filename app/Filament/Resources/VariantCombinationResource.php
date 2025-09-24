@@ -49,7 +49,7 @@ final class VariantCombinationResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
-    protected static ?int $navigationSort = 19;
+    protected static ?int $navigationSort = 4;
 
     public static function getNavigationLabel(): string
     {
@@ -116,13 +116,13 @@ final class VariantCombinationResource extends Resource
                     ->schema([
                         Placeholder::make('combination_hash')
                             ->label(__('admin.variant_combinations.combination_hash'))
-                            ->content(fn ($record) => $record?->combination_hash ?? __('admin.variant_combinations.will_be_generated')),
+                            ->content(fn($record) => $record?->combination_hash ?? __('admin.variant_combinations.will_be_generated')),
                         Placeholder::make('formatted_combinations')
                             ->label(__('admin.variant_combinations.formatted_combinations'))
-                            ->content(fn ($record) => $record?->formatted_combinations ?? __('admin.variant_combinations.no_combinations')),
+                            ->content(fn($record) => $record?->formatted_combinations ?? __('admin.variant_combinations.no_combinations')),
                         Placeholder::make('is_valid_combination')
                             ->label(__('admin.variant_combinations.is_valid_combination'))
-                            ->content(fn ($record) => $record?->is_valid_combination
+                            ->content(fn($record) => $record?->is_valid_combination
                                 ? __('admin.variant_combinations.valid_combination')
                                 : __('admin.variant_combinations.invalid_combination')),
                     ])
@@ -144,14 +144,14 @@ final class VariantCombinationResource extends Resource
                     ->label(__('admin.variant_combinations.product'))
                     ->sortable()
                     ->searchable()
-                    ->url(fn ($record) => route('filament.admin.resources.products.view', $record->product_id))
+                    ->url(fn($record) => route('filament.admin.resources.products.view', $record->product_id))
                     ->color('primary'),
                 TextColumn::make('attribute_combinations')
                     ->label(__('admin.variant_combinations.attribute_combinations'))
                     ->formatStateUsing(function ($state) {
                         if (is_array($state)) {
                             return collect($state)->map(function ($value, $key) {
-                                return $key.': '.$value;
+                                return $key . ': ' . $value;
                             })->join(', ');
                         }
 
@@ -167,21 +167,21 @@ final class VariantCombinationResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('is_available')
                     ->label(__('admin.variant_combinations.is_available'))
-                    ->formatStateUsing(fn ($state) => $state ? __('admin.variant_combinations.available') : __('admin.variant_combinations.unavailable'))
+                    ->formatStateUsing(fn($state) => $state ? __('admin.variant_combinations.available') : __('admin.variant_combinations.unavailable'))
                     ->colors([
-                        'success' => fn ($state) => $state,
-                        'danger' => fn ($state) => ! $state,
+                        'success' => fn($state) => $state,
+                        'danger' => fn($state) => !$state,
                     ])
                     ->sortable(),
                 TextColumn::make('combination_hash')
                     ->label(__('admin.variant_combinations.combination_hash'))
                     ->limit(20)
-                    ->tooltip(fn ($record) => $record->combination_hash)
+                    ->tooltip(fn($record) => $record->combination_hash)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('formatted_combinations')
                     ->label(__('admin.variant_combinations.formatted_combinations'))
                     ->limit(30)
-                    ->tooltip(fn ($record) => $record->formatted_combinations)
+                    ->tooltip(fn($record) => $record->formatted_combinations)
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_valid_combination')
                     ->label(__('admin.variant_combinations.is_valid_combination'))
@@ -215,17 +215,17 @@ final class VariantCombinationResource extends Resource
                     ->falseLabel(__('admin.variant_combinations.unavailable_only')),
                 Filter::make('valid_combinations')
                     ->label(__('admin.variant_combinations.valid_combinations_only'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('product', function (Builder $query) {
+                    ->query(fn(Builder $query): Builder => $query->whereHas('product', function (Builder $query) {
                         $query->whereHas('attributes');
                     }))
                     ->toggle(),
                 Filter::make('recent_combinations')
                     ->label(__('admin.variant_combinations.recent_combinations'))
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7)))
+                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7)))
                     ->toggle(),
                 Filter::make('has_attributes')
                     ->label(__('admin.variant_combinations.has_attributes'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('attribute_combinations'))
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('attribute_combinations'))
                     ->toggle(),
             ])
             ->headerActions([
@@ -248,11 +248,11 @@ final class VariantCombinationResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_availability')
-                    ->label(fn (VariantCombination $record): string => $record->is_available ? __('admin.variant_combinations.make_unavailable') : __('admin.variant_combinations.make_available'))
-                    ->icon(fn (VariantCombination $record): string => $record->is_available ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (VariantCombination $record): string => $record->is_available ? 'warning' : 'success')
+                    ->label(fn(VariantCombination $record): string => $record->is_available ? __('admin.variant_combinations.make_unavailable') : __('admin.variant_combinations.make_available'))
+                    ->icon(fn(VariantCombination $record): string => $record->is_available ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(VariantCombination $record): string => $record->is_available ? 'warning' : 'success')
                     ->action(function (VariantCombination $record): void {
-                        $record->update(['is_available' => ! $record->is_available]);
+                        $record->update(['is_available' => !$record->is_available]);
                         Notification::make()
                             ->title($record->is_available ? __('admin.variant_combinations.made_available_successfully') : __('admin.variant_combinations.made_unavailable_successfully'))
                             ->success()
@@ -341,7 +341,7 @@ final class VariantCombinationResource extends Resource
                         ->icon('heroicon-o-check-circle')
                         ->color('primary')
                         ->action(function (Collection $records): void {
-                            $validCount = $records->filter(fn ($record) => $record->is_valid_combination)->count();
+                            $validCount = $records->filter(fn($record) => $record->is_valid_combination)->count();
                             $totalCount = $records->count();
 
                             Notification::make()

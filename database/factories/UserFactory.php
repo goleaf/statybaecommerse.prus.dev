@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -30,7 +29,8 @@ class UserFactory extends Factory
             'name' => $firstName.' '.$lastName,
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            // Avoid Facade usage during factory execution in early boot
+            'password' => static::$password ??= 'password',
             'preferred_locale' => fake()->randomElement(['en', 'lt']),
             'is_admin' => false,
             'remember_token' => Str::random(10),

@@ -26,6 +26,11 @@ final class UserOwnedScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
+        // Skip scoping for admin users
+        if (auth()->check() && (auth()->user()->is_admin ?? false)) {
+            return;
+        }
+
         // Check if the model has user-related columns
         $userColumns = $this->getUserColumns($model);
         if (! empty($userColumns) && auth()->check()) {

@@ -7,6 +7,7 @@ namespace Tests\Admin\Resources;
 use App\Filament\Resources\ActivityLogResource;
 use App\Models\ActivityLog;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,9 +19,14 @@ class ActivityLogResourceTest extends TestCase
     {
         parent::setUp();
 
+        // Ensure Filament uses the admin panel for URL generation in tests
+        Filament::setCurrentPanel('admin');
+
         $this->adminUser = User::factory()->create([
             'email' => 'admin@admin.com',
             'name' => 'Admin User',
+            'is_active' => true,
+            'email_verified_at' => now(),
         ]);
 
         // Create role and permissions if they don't exist
@@ -33,6 +39,7 @@ class ActivityLogResourceTest extends TestCase
             'view_order',
             'view_product',
             'view_user',
+            'view notifications',
         ];
 
         foreach ($permissions as $permission) {
@@ -42,7 +49,7 @@ class ActivityLogResourceTest extends TestCase
 
         $this->adminUser->assignRole($role);
 
-        $this->actingAs($this->adminUser);
+        $this->actingAs($this->adminUser, 'web');
     }
 
     public function test_can_create_activity_log(): void

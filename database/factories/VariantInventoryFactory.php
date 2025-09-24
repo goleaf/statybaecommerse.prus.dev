@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -20,6 +18,7 @@ class VariantInventoryFactory extends Factory
     {
         return [
             'variant_id' => ProductVariant::factory(),
+            'location_id' => 1,
             'warehouse_code' => $this->faker->regexify('[A-Z]{3}-[0-9]{3}'),
             'stock' => $this->faker->numberBetween(0, 1000),
             'reserved' => $this->faker->numberBetween(0, 100),
@@ -40,7 +39,7 @@ class VariantInventoryFactory extends Factory
 
     public function lowStock(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'stock' => $this->faker->numberBetween(1, 10),
             'reorder_point' => $this->faker->numberBetween(15, 25),
         ]);
@@ -48,7 +47,7 @@ class VariantInventoryFactory extends Factory
 
     public function outOfStock(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'stock' => 0,
             'reserved' => 0,
         ]);
@@ -56,7 +55,7 @@ class VariantInventoryFactory extends Factory
 
     public function needsReorder(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'stock' => $this->faker->numberBetween(1, 5),
             'reorder_point' => $this->faker->numberBetween(10, 20),
         ]);
@@ -64,42 +63,42 @@ class VariantInventoryFactory extends Factory
 
     public function expiringSoon(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'expiry_date' => $this->faker->dateTimeBetween('now', '+30 days'),
         ]);
     }
 
     public function tracked(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'active',
         ]);
     }
 
     public function notTracked(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'inactive',
         ]);
     }
 
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'active',
         ]);
     }
 
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'inactive',
         ]);
     }
 
     public function discontinued(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'discontinued',
         ]);
     }

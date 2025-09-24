@@ -36,6 +36,9 @@ final class StockMovementResource extends Resource
 {
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
+    /**
+     * @var UnitEnum|string|null
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 3;
@@ -143,7 +146,7 @@ final class StockMovementResource extends Resource
                 TextColumn::make('type')
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'in' => 'success',
                         'out' => 'danger',
                         'adjustment' => 'warning',
@@ -172,8 +175,20 @@ final class StockMovementResource extends Resource
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
                     ->preload(),
-                DateFilter::make('moved_at')
-                    ->label(__('stock_movement.fields.moved_at')),
+                \Filament\Tables\Filters\Filter::make('moved_at')
+                    ->form([
+                        \Filament\Forms\Components\DatePicker::make('moved_from')
+                            ->label(__('stock_movement.fields.moved_at')).
+                            placeholder(__('stock_movement.filters.from')),
+                        \Filament\Forms\Components\DatePicker::make('moved_to')
+                            ->label(__('stock_movement.fields.moved_at')).
+                            placeholder(__('stock_movement.filters.to')),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
+                        return $query
+                            ->when($data['moved_from'] ?? null, fn ($q, $date) => $q->whereDate('moved_at', '>=', $date))
+                            ->when($data['moved_to'] ?? null, fn ($q, $date) => $q->whereDate('moved_at', '<=', $date));
+                    }),
             ])
             ->actions([
                 EditAction::make(),

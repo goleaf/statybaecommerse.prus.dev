@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\WishlistItemResource\Pages;
 use App\Models\CartItem;
+use App\Models\Category;
+use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\UserWishlist;
@@ -26,9 +28,9 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -403,21 +405,39 @@ final class WishlistItemResource extends Resource
                         true: fn (Builder $query) => $query->whereNotNull('variant_id'),
                         false: fn (Builder $query) => $query->whereNull('variant_id'),
                     ),
-                SelectFilter::make('user_id')
-                    ->label(__('admin.wishlist_items.filters.user'))
-                    ->relationship('wishlist.user', 'name')
-                    ->searchable()
-                    ->preload(),
-                SelectFilter::make('product.category_id')
-                    ->label(__('admin.wishlist_items.filters.category'))
-                    ->relationship('product.category', 'name')
-                    ->searchable()
-                    ->preload(),
-                SelectFilter::make('product.brand_id')
-                    ->label(__('admin.wishlist_items.filters.brand'))
-                    ->relationship('product.brand', 'name')
-                    ->searchable()
-                    ->preload(),
+                Filter::make('user_id')
+                    ->form([
+                        Select::make('user_id')
+                            ->label(__('admin.wishlist_items.filters.user'))
+                            ->options(\App\Models\User::pluck('name', 'id'))
+                            ->searchable()
+                            ->preload(),
+                    ])->query(function (Builder $query, array $data): Builder {
+                        $userId = $data['user_id'] ?? null;
+                        return $query->when($userId, fn (Builder $q): Builder => $q->whereHas('wishlist', fn (Builder $w): Builder => $w->where('user_id', $userId)));
+                    }),
+                Filter::make('category_id')
+                    ->form([
+                        Select::make('category_id')
+                            ->label(__('admin.wishlist_items.filters.category'))
+                            ->options(Category::pluck('name', 'id'))
+                            ->searchable()
+                            ->preload(),
+                    ])->query(function (Builder $query, array $data): Builder {
+                        $categoryId = $data['category_id'] ?? null;
+                        return $query->when($categoryId, fn (Builder $q): Builder => $q->whereHas('product', fn (Builder $p): Builder => $p->where('category_id', $categoryId)));
+                    }),
+                Filter::make('brand_id')
+                    ->form([
+                        Select::make('brand_id')
+                            ->label(__('admin.wishlist_items.filters.brand'))
+                            ->options(Brand::pluck('name', 'id'))
+                            ->searchable()
+                            ->preload(),
+                    ])->query(function (Builder $query, array $data): Builder {
+                        $brandId = $data['brand_id'] ?? null;
+                        return $query->when($brandId, fn (Builder $q): Builder => $q->whereHas('product', fn (Builder $p): Builder => $p->where('brand_id', $brandId)));
+                    }),
                 TernaryFilter::make('product.is_active')
                     ->label(__('admin.wishlist_items.filters.active_products'))
                     ->queries(

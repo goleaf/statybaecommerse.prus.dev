@@ -34,13 +34,19 @@ final class RecommendationAnalyticsResource extends Resource
 {
     protected static ?string $model = RecommendationAnalytics::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
-
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar';
+    }
 
     protected static ?int $navigationSort = 8;
 
     protected static ?string $recordTitleAttribute = 'action';
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'Analytics';
+    }
 
     public static function getNavigationLabel(): string
     {

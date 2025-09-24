@@ -1,7 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategories;
 
@@ -22,7 +19,10 @@ final class NewsCategoryResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'News';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'News';
+    }
 
     public static function form(Schema $schema): Schema
     {

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ProductSimilarities\Schemas;
 use App\Models\Product;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Schema;
 
 class ProductSimilarityForm
@@ -13,14 +14,14 @@ class ProductSimilarityForm
     {
         return $schema
             ->schema([
-                Select::make('product1_id')
+                Select::make('product_id')
                     ->label('admin.product_similarity.product1')
-                    ->options(Product::all()->pluck('name', 'id'))
+                    ->options(Product::query()->pluck('name', 'id'))
                     ->searchable()
                     ->required(),
-                Select::make('product2_id')
+                Select::make('similar_product_id')
                     ->label('admin.product_similarity.product2')
-                    ->options(Product::all()->pluck('name', 'id'))
+                    ->options(Product::query()->pluck('name', 'id'))
                     ->searchable()
                     ->required(),
                 TextInput::make('similarity_score')
@@ -30,9 +31,8 @@ class ProductSimilarityForm
                     ->maxValue(1)
                     ->step(0.01)
                     ->required(),
-                TextInput::make('similarity_data')
+                KeyValue::make('calculation_data')
                     ->label('admin.product_similarity.similarity_data')
-                    ->json()
                     ->columnSpanFull(),
             ]);
     }

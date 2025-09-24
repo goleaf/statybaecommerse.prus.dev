@@ -1,29 +1,30 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
-use BackedEnum;
-use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms;
+use Filament\Tables;
 use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
 {
     protected static ?string $model = VariantPriceHistory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 20;
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'System';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -102,16 +103,16 @@ final class VariantPriceHistoryResource extends Resource
                             $percentage = $record->old_price > 0 ? ($change / $record->old_price) * 100 : 0;
                             $sign = $change >= 0 ? '+' : '';
 
-                            return $sign.'€'.number_format($change, 2).' ('.$sign.number_format($percentage, 1).'%)';
+                            return $sign . '€' . number_format($change, 2) . ' (' . $sign . number_format($percentage, 1) . '%)';
                         }
 
                         return '-';
                     })
                     ->sortable()
-                    ->color(fn ($record) => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
+                    ->color(fn($record) => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
                 Tables\Columns\TextColumn::make('price_type')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'regular' => 'primary',
                         'sale' => 'success',
                         'wholesale' => 'warning',
@@ -121,7 +122,7 @@ final class VariantPriceHistoryResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('change_reason')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'manual' => 'primary',
                         'automatic' => 'success',
                         'promotion' => 'warning',
@@ -181,11 +182,11 @@ final class VariantPriceHistoryResource extends Resource
                         return $query
                             ->when(
                                 $data['effective_from'],
-                                fn ($query, $date) => $query->whereDate('effective_from', '>=', $date),
+                                fn($query, $date) => $query->whereDate('effective_from', '>=', $date),
                             )
                             ->when(
                                 $data['effective_until'],
-                                fn ($query, $date) => $query->whereDate('effective_until', '<=', $date),
+                                fn($query, $date) => $query->whereDate('effective_until', '<=', $date),
                             );
                     }),
                 Tables\Filters\TernaryFilter::make('price_change')
@@ -194,8 +195,8 @@ final class VariantPriceHistoryResource extends Resource
                     ->trueLabel('Increases only')
                     ->falseLabel('Decreases only')
                     ->queries(
-                        true: fn ($query) => $query->increases(),
-                        false: fn ($query) => $query->decreases(),
+                        true: fn($query) => $query->increases(),
+                        false: fn($query) => $query->decreases(),
                     ),
             ])
             ->actions([

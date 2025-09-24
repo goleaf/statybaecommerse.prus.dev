@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -9,12 +7,6 @@ use App\Models\Country;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
-/**
- * CountryResourceTest
- *
- * Comprehensive test suite for CountryResource functionality including CRUD operations, filters, and relationships.
- */
 use Tests\TestCase;
 
 final class CountryResourceTest extends TestCase
@@ -56,7 +48,7 @@ final class CountryResourceTest extends TestCase
             'is_active' => true,
             'is_eu_member' => false,
             'requires_vat' => true,
-            'vat_rate' => 20.00,
+            'vat_rate' => 20.0,
         ];
 
         Livewire::test(CountryResource\Pages\CreateCountry::class)
@@ -285,7 +277,7 @@ final class CountryResourceTest extends TestCase
             ->fillForm([
                 'name' => 'Test Country',
                 'cca2' => 'TC',
-                'vat_rate' => 150.00,
+                'vat_rate' => 150.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['vat_rate' => 'max']);
@@ -300,7 +292,7 @@ final class CountryResourceTest extends TestCase
         ]);
 
         Livewire::test(CountryResource\Pages\ListCountries::class)
-            ->assertCanSeeText('1'); // cities count
+            ->assertCanSeeText('1');  // cities count
     }
 
     public function test_country_relationships_addresses_count(): void
@@ -313,7 +305,7 @@ final class CountryResourceTest extends TestCase
         ]);
 
         Livewire::test(CountryResource\Pages\ListCountries::class)
-            ->assertCanSeeText('1'); // addresses count
+            ->assertCanSeeText('1');  // addresses count
     }
 
     public function test_country_global_search(): void
@@ -398,13 +390,13 @@ final class CountryResourceTest extends TestCase
             'is_active' => true,
             'is_eu_member' => true,
             'requires_vat' => true,
-            'vat_rate' => 20.00,
+            'vat_rate' => 20.0,
         ]);
 
         $this->assertTrue($country->isActive());
         $this->assertTrue($country->isEuMember());
         $this->assertTrue($country->requiresVat());
-        $this->assertEquals(20.00, $country->getVatRate());
+        $this->assertEquals(20.0, $country->getVatRate());
         $this->assertEquals('20.00%', $country->getFormattedVatRate());
     }
 
@@ -436,7 +428,7 @@ final class CountryResourceTest extends TestCase
             'currency_code' => 'EUR',
             'currency_symbol' => '€',
             'requires_vat' => true,
-            'vat_rate' => 21.00,
+            'vat_rate' => 21.0,
             'is_eu_member' => true,
         ]);
 

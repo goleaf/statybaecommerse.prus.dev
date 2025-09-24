@@ -111,7 +111,7 @@ class ProductRequestResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ViewProductRequest::class, [
             'record' => $request->getRouteKey(),
         ])
-            ->assertCanSeeTableRecords([$request]);
+            ->assertSet('record.id', $request->id);
     }
 
     public function test_can_filter_by_status(): void
@@ -190,7 +190,7 @@ class ProductRequestResourceTest extends TestCase
             ->callTableBulkAction('delete', $requests)
             ->assertHasNoTableBulkActionErrors();
 
-        $this->assertDatabaseMissing('product_requests', [
+        $this->assertSoftDeleted('product_requests', [
             'id' => $requests->first()->id,
         ]);
     }

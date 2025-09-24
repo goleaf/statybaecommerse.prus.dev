@@ -1,12 +1,11 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -25,13 +24,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use BackedEnum;
 use UnitEnum;
 
 final class ReferralRewardResource extends Resource
 {
     protected static ?string $model = ReferralReward::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-gift';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
@@ -48,19 +49,22 @@ final class ReferralRewardResource extends Resource
                     ->schema([
                         Select::make('referral_id')
                             ->label(__('referral_rewards.fields.referral'))
-                            ->relationship('referral', 'id')
+                            ->relationship('referral', 'referral_code')
+                            ->modifyRelationshipQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->required(),
                         Select::make('user_id')
                             ->label(__('referral_rewards.fields.user'))
                             ->relationship('user', 'name')
+                            ->modifyRelationshipQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->required(),
                         Select::make('order_id')
                             ->label(__('referral_rewards.fields.order'))
                             ->relationship('order', 'id')
+                            ->modifyRelationshipQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->nullable(),
@@ -77,7 +81,6 @@ final class ReferralRewardResource extends Resource
                             ->label(__('referral_rewards.fields.amount'))
                             ->numeric()
                             ->required()
-                            ->default(0.0)
                             ->prefix('€'),
                         TextInput::make('currency_code')
                             ->label(__('referral_rewards.fields.currency_code'))
@@ -150,7 +153,7 @@ final class ReferralRewardResource extends Resource
                     ->label(__('referral_rewards.fields.title'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('referral.code')
+                TextColumn::make('referral.referral_code')
                     ->label(__('referral_rewards.fields.referral_code'))
                     ->searchable()
                     ->sortable(),
@@ -163,7 +166,7 @@ final class ReferralRewardResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('amount')
-                    ->money(fn (ReferralReward $record) => $record->currency_code)
+                    ->money(fn(ReferralReward $record) => $record->currency_code)
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('referral_rewards.fields.status'))
@@ -214,7 +217,7 @@ final class ReferralRewardResource extends Resource
                     ]),
                 SelectFilter::make('referral_id')
                     ->label(__('referral_rewards.filters.referral'))
-                    ->relationship('referral', 'code'),
+                    ->relationship('referral', 'referral_code'),
                 SelectFilter::make('user_id')
                     ->label(__('referral_rewards.filters.user'))
                     ->relationship('user', 'name'),
@@ -222,9 +225,37 @@ final class ReferralRewardResource extends Resource
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
+                Action::make('apply')
+                    ->label(__('referral_rewards.actions.apply'))
+                    ->requiresConfirmation()
+                    ->action(fn(ReferralReward $record) => $record->apply()),
+                Action::make('expire')
+                    ->label(__('referral_rewards.actions.expire'))
+                    ->requiresConfirmation()
+                    ->action(fn(ReferralReward $record) => $record->markAsExpired()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    BulkAction::make('apply')
+                        ->label(__('referral_rewards.actions.apply_selected'))
+                        ->requiresConfirmation()
+                        ->action(function ($records): void {
+                            foreach ($records as $record) {
+                                if ($record instanceof ReferralReward) {
+                                    $record->apply();
+                                }
+                            }
+                        }),
+                    BulkAction::make('expire')
+                        ->label(__('referral_rewards.actions.expire_selected'))
+                        ->requiresConfirmation()
+                        ->action(function ($records): void {
+                            foreach ($records as $record) {
+                                if ($record instanceof ReferralReward) {
+                                    $record->markAsExpired();
+                                }
+                            }
+                        }),
                     DeleteBulkAction::make(),
                 ]),
             ]);
@@ -254,6 +285,13 @@ final class ReferralRewardResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return self::$model::count();
+        $count = (int) self::$model::count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 }

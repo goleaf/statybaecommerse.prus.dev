@@ -1,15 +1,13 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\StatusScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Document
@@ -30,9 +28,38 @@ final class Document extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['document_template_id', 'title', 'content', 'variables', 'status', 'format', 'file_path', 'documentable_type', 'documentable_id', 'created_by', 'generated_at'];
+    protected $fillable = [
+        'document_template_id',
+        'title',
+        'name',
+        'type',
+        'version',
+        'content',
+        'variables',
+        'status',
+        'format',
+        'file_path',
+        'file_size',
+        'mime_type',
+        'is_public',
+        'is_downloadable',
+        'access_password',
+        'documentable_type',
+        'documentable_id',
+        'created_by',
+        'generated_at',
+        'expires_at',
+        'description',
+        'notes',
+    ];
 
-    protected $casts = ['variables' => 'array', 'generated_at' => 'datetime'];
+    protected $casts = [
+        'variables' => 'array',
+        'generated_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'is_public' => 'bool',
+        'is_downloadable' => 'bool',
+    ];
 
     /**
      * Handle template functionality with proper error handling.
@@ -79,11 +106,11 @@ final class Document extends Model
      */
     public function getFileUrl(): ?string
     {
-        if (! $this->file_path) {
+        if (!$this->file_path) {
             return null;
         }
 
-        return asset('storage/'.$this->file_path);
+        return asset('storage/' . $this->file_path);
     }
 
     /**

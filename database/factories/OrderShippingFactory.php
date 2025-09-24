@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -16,8 +14,10 @@ final class OrderShippingFactory extends Factory
     {
         return [
             'order_id' => Order::factory(),
-            'carrier_name' => fake()->randomElement(['DHL', 'FedEx', 'UPS']),
+            'shipping_method' => fake()->randomElement(['standard', 'express', 'overnight', 'pickup', 'international']),
+            'carrier' => fake()->randomElement(['DHL', 'FedEx', 'UPS']),
             'service' => fake()->randomElement(['Express', 'Standard']),
+            'service_type' => fake()->randomElement(['Express', 'Standard']),
             'tracking_number' => strtoupper(fake()->bothify('TRK#########')),
             'tracking_url' => fake()->url(),
             'shipped_at' => null,
@@ -25,8 +25,12 @@ final class OrderShippingFactory extends Factory
             'delivered_at' => null,
             'weight' => fake()->randomFloat(3, 0.1, 10),
             'dimensions' => '30x20x10',
-            'cost' => fake()->randomFloat(2, 1, 50),
+            'base_cost' => fake()->randomFloat(2, 1, 50),
+            'insurance_cost' => fake()->randomFloat(2, 0, 10),
+            'total_cost' => fn(array $attributes) => ($attributes['base_cost'] ?? 0) + ($attributes['insurance_cost'] ?? 0),
             'metadata' => [],
+            'status' => fake()->randomElement(['pending', 'processing', 'shipped', 'delivered']),
+            'is_delivered' => false,
         ];
     }
 }

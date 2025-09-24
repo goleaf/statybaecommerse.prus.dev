@@ -1,7 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -98,10 +95,10 @@ final class UserResource extends Resource
                         TextInput::make('password')
                             ->label(__('users.fields.password'))
                             ->password()
-                            ->required(fn (string $context): bool => $context === 'create')
+                            ->required(fn(string $context): bool => $context === 'create')
                             ->minLength(8)
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
+                            ->dehydrated(fn($state) => filled($state))
+                            ->dehydrateStateUsing(fn($state) => bcrypt($state)),
                         Select::make('locale')
                             ->label(__('users.fields.locale'))
                             ->options([
@@ -154,7 +151,7 @@ final class UserResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('users.fields.locale'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'lt' => 'success',
                         'en' => 'info',
                         default => 'gray',

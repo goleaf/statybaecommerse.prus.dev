@@ -30,6 +30,8 @@ final class RecommendationCache extends Model
 {
     use HasFactory;
 
+    protected $table = 'recommendation_cache';
+
     protected $fillable = ['cache_key', 'block_id', 'user_id', 'product_id', 'context_type', 'context_data', 'recommendations', 'hit_count', 'expires_at'];
 
     protected $casts = ['context_data' => 'array', 'recommendations' => 'array', 'expires_at' => 'datetime', 'hit_count' => 'integer'];

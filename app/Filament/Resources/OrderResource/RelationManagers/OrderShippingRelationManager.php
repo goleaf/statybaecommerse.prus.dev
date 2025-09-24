@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
@@ -19,13 +17,13 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -175,28 +173,24 @@ final class OrderShippingRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('shipping_method')
                     ->label(__('orders.shipping_method'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_methods.{$state}") : '-')
+                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.shipping_methods.{$state}") : '-')
                     ->searchable()
-                    ->sortable()
-                    ->prefixIcon('heroicon-o-truck'),
+                    ->sortable(),
                 TextColumn::make('tracking_number')
                     ->label(__('orders.tracking_number'))
                     ->searchable()
                     ->sortable()
-                    ->copyable()
-                    ->prefixIcon('heroicon-o-magnifying-glass'),
+                    ->copyable(),
                 TextColumn::make('carrier')
                     ->label(__('orders.carrier'))
                     ->searchable()
-                    ->sortable()
-                    ->prefixIcon('heroicon-o-building-office'),
+                    ->sortable(),
                 TextColumn::make('total_cost')
                     ->label(__('orders.total_cost'))
                     ->money('EUR')
-                    ->sortable()
-                    ->prefixIcon('heroicon-o-banknotes'),
+                    ->sortable(),
                 BadgeColumn::make('status')
-                    ->label(__('orders.status'))
+                    ->label(__('orders.fields.status'))
                     ->colors([
                         'warning' => 'pending',
                         'primary' => 'processing',
@@ -205,7 +199,7 @@ final class OrderShippingRelationManager extends RelationManager
                         'danger' => 'cancelled',
                         'secondary' => 'returned',
                     ])
-                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_statuses.{$state}") : '-'),
+                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.shipping_statuses.{$state}") : '-'),
                 IconColumn::make('is_delivered')
                     ->label(__('orders.is_delivered'))
                     ->boolean()
@@ -217,20 +211,17 @@ final class OrderShippingRelationManager extends RelationManager
                     ->label(__('orders.shipped_at'))
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->prefixIcon('heroicon-o-truck'),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estimated_delivery')
                     ->label(__('orders.estimated_delivery'))
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->prefixIcon('heroicon-o-calendar'),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('delivered_at')
                     ->label(__('orders.delivered_at'))
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->prefixIcon('heroicon-o-check-circle'),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('shipping_method')
@@ -257,8 +248,8 @@ final class OrderShippingRelationManager extends RelationManager
                 TernaryFilter::make('is_delivered')
                     ->label(__('orders.is_delivered'))
                     ->queries(
-                        true: fn (Builder $query) => $query->where('is_delivered', true),
-                        false: fn (Builder $query) => $query->where('is_delivered', false),
+                        true: fn(Builder $query) => $query->where('is_delivered', true),
+                        false: fn(Builder $query) => $query->where('is_delivered', false),
                     ),
             ])
             ->headerActions([
@@ -276,7 +267,7 @@ final class OrderShippingRelationManager extends RelationManager
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn (OrderShipping $record): bool => $record->status !== 'shipped')
+                    ->visible(fn(OrderShipping $record): bool => $record->status !== 'shipped')
                     ->action(function (OrderShipping $record): void {
                         $record->update([
                             'status' => 'shipped',
@@ -293,7 +284,7 @@ final class OrderShippingRelationManager extends RelationManager
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (OrderShipping $record): bool => $record->status !== 'delivered')
+                    ->visible(fn(OrderShipping $record): bool => $record->status !== 'delivered')
                     ->action(function (OrderShipping $record): void {
                         $record->update([
                             'status' => 'delivered',
@@ -311,9 +302,9 @@ final class OrderShippingRelationManager extends RelationManager
                     ->label(__('orders.track_package'))
                     ->icon('heroicon-o-magnifying-glass')
                     ->color('gray')
-                    ->url(fn (OrderShipping $record): string => $record->tracking_url ?? '#')
+                    ->url(fn(OrderShipping $record): string => $record->tracking_url ?? '#')
                     ->openUrlInNewTab()
-                    ->visible(fn (OrderShipping $record): bool => ! empty($record->tracking_number)),
+                    ->visible(fn(OrderShipping $record): bool => !empty($record->tracking_number)),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

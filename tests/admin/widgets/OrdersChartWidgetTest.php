@@ -27,7 +27,7 @@ class OrdersChartWidgetTest extends TestCase
     public function test_orders_chart_widget_has_correct_heading(): void
     {
         $widget = new OrdersChartWidget;
-        $this->assertEquals('Orders Overview', $widget->getHeading());
+        $this->assertEquals(__('analytics.orders_overview'), $widget->getHeading());
     }
 
     public function test_orders_chart_widget_returns_data_array(): void

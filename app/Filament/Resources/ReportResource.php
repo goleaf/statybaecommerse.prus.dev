@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -8,6 +6,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -26,7 +25,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -91,7 +89,7 @@ final class ReportResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live()
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state))),
+                            ->afterStateUpdated(fn($state, callable $set) => $set('slug', \Str::slug($state))),
                         TextInput::make('slug')
                             ->label(__('reports.fields.slug'))
                             ->required()
@@ -166,7 +164,7 @@ final class ReportResource extends Resource
                                 'quarterly' => __('reports.frequencies.quarterly'),
                                 'yearly' => __('reports.frequencies.yearly'),
                             ])
-                            ->visible(fn ($get) => $get('is_scheduled')),
+                            ->visible(fn($get) => $get('is_scheduled')),
                     ]),
                 Section::make(__('reports.sections.date_range'))
                     ->description(__('reports.sections.date_range_description'))
@@ -236,7 +234,7 @@ final class ReportResource extends Resource
                         'analytics' => 'secondary',
                         'custom' => 'gray',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
+                    ->formatStateUsing(fn(string $state): string => __("reports.types.{$state}")),
                 BadgeColumn::make('category')
                     ->label(__('reports.fields.category'))
                     ->searchable()
@@ -250,7 +248,7 @@ final class ReportResource extends Resource
                         'inventory' => 'secondary',
                         'analytics' => 'gray',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
+                    ->formatStateUsing(fn(string $state): string => __("reports.categories.{$state}")),
                 TextColumn::make('generator.name')
                     ->label(__('reports.fields.generated_by'))
                     ->searchable()
@@ -337,10 +335,10 @@ final class ReportResource extends Resource
                     ->preload(),
                 Filter::make('generated_recently')
                     ->label(__('reports.filters.generated_recently'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_generated_at', '>=', now()->subDays(7))),
+                    ->query(fn(Builder $query): Builder => $query->where('last_generated_at', '>=', now()->subDays(7))),
                 Filter::make('never_generated')
                     ->label(__('reports.filters.never_generated'))
-                    ->query(fn (Builder $query): Builder => $query->whereNull('last_generated_at')),
+                    ->query(fn(Builder $query): Builder => $query->whereNull('last_generated_at')),
             ])
             ->actions([
                 ViewAction::make(),
@@ -363,8 +361,8 @@ final class ReportResource extends Resource
                     ->label(__('reports.actions.download'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('info')
-                    ->visible(fn (Report $record): bool => $record->isGenerated())
-                    ->url(fn (Report $record): string => route('reports.download', $record))
+                    ->visible(fn(Report $record): bool => $record->isGenerated())
+                    ->url(fn(Report $record): string => route('reports.download', $record))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
@@ -427,7 +425,7 @@ final class ReportResource extends Resource
                         TextEntry::make('type')
                             ->label(__('reports.fields.type'))
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn(string $state): string => match ($state) {
                                 'sales' => 'success',
                                 'inventory' => 'info',
                                 'customer' => 'warning',
@@ -437,11 +435,11 @@ final class ReportResource extends Resource
                                 'custom' => 'gray',
                                 default => 'gray',
                             })
-                            ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
+                            ->formatStateUsing(fn(string $state): string => __("reports.types.{$state}")),
                         TextEntry::make('category')
                             ->label(__('reports.fields.category'))
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn(string $state): string => match ($state) {
                                 'sales' => 'success',
                                 'marketing' => 'info',
                                 'operations' => 'warning',
@@ -451,7 +449,7 @@ final class ReportResource extends Resource
                                 'analytics' => 'gray',
                                 default => 'gray',
                             })
-                            ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
+                            ->formatStateUsing(fn(string $state): string => __("reports.categories.{$state}")),
                     ])
                     ->columns(2),
                 Section::make(__('reports.sections.content'))
@@ -478,7 +476,7 @@ final class ReportResource extends Resource
                             ->boolean(),
                         TextEntry::make('schedule_frequency')
                             ->label(__('reports.fields.schedule_frequency'))
-                            ->formatStateUsing(fn (string $state): string => __("reports.frequencies.{$state}"))
+                            ->formatStateUsing(fn(string $state): string => __("reports.frequencies.{$state}"))
                             ->placeholder(__('reports.placeholders.no_schedule')),
                     ])
                     ->columns(2),
@@ -572,6 +570,8 @@ final class ReportResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return self::$model::count();
+        $count = (int) self::$model::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 }

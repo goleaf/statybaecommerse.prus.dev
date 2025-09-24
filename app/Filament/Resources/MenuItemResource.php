@@ -1,7 +1,4 @@
-<?php
-
-declare(strict_types=1);
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -24,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use BackedEnum;
 use UnitEnum;
 
 /**
@@ -35,11 +33,13 @@ final class MenuItemResource extends Resource
 {
     protected static ?string $model = MenuItem::class;
 
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
+
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'label';
-
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     public static function getNavigationLabel(): string
     {
@@ -58,7 +58,7 @@ final class MenuItemResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 FormSection::make(__('admin.menu_items.basic_information'))
                     ->schema([
