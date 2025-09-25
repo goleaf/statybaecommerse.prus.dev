@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models\Translations;
 
+use App\Models\Location;
+use Database\Factories\LocationTranslationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,6 +32,14 @@ final class LocationTranslation extends Model
     protected $table = 'location_translations';
 
     protected $fillable = ['location_id', 'locale', 'name', 'slug', 'description'];
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): LocationTranslationFactory
+    {
+        return LocationTranslationFactory::new();
+    }
 
     /**
      * Handle casts functionality with proper error handling.

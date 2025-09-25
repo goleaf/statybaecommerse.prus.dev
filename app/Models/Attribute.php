@@ -49,7 +49,7 @@ final class Attribute extends Model
      */
     protected function casts(): array
     {
-        return ['is_required' => 'boolean', 'is_filterable' => 'boolean', 'is_searchable' => 'boolean', 'is_visible' => 'boolean', 'is_editable' => 'boolean', 'is_sortable' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'category_id' => 'integer', 'min_length' => 'integer', 'max_length' => 'integer', 'min_value' => 'float', 'max_value' => 'float', 'step_value' => 'float', 'validation_rules' => 'string', 'meta_data' => 'array'];
+        return ['is_required' => 'boolean', 'is_filterable' => 'boolean', 'is_searchable' => 'boolean', 'is_visible' => 'boolean', 'is_editable' => 'boolean', 'is_sortable' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'category_id' => 'integer', 'min_length' => 'integer', 'max_length' => 'integer', 'min_value' => 'float', 'max_value' => 'float', 'step_value' => 'float', 'validation_rules' => 'array', 'meta_data' => 'array'];
     }
 
     /**
@@ -312,19 +312,6 @@ final class Attribute extends Model
         $this->attributes['slug'] = $value ?: Str::slug($this->name);
     }
 
-    /**
-     * Handle setValidationRulesAttribute functionality with proper error handling.
-     *
-     * @param  mixed  $value
-     */
-    public function setValidationRulesAttribute($value): void
-    {
-        if (is_array($value)) {
-            $this->attributes['validation_rules'] = implode('|', $value);
-        } else {
-            $this->attributes['validation_rules'] = $value;
-        }
-    }
 
     /**
      * Handle setMetaDataAttribute functionality with proper error handling.

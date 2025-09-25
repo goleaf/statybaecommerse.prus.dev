@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models\Translations;
 
+use Database\Factories\ProductTranslationFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,6 +27,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class ProductTranslation extends Model
 {
+    use HasFactory;
+
     protected $table = 'product_translations';
 
     protected $fillable = ['product_id', 'locale', 'name', 'slug', 'summary', 'description', 'short_description', 'seo_title', 'seo_description', 'meta_keywords', 'alt_text'];
@@ -32,6 +36,14 @@ final class ProductTranslation extends Model
     protected $casts = ['product_id' => 'integer', 'meta_keywords' => 'array'];
 
     public $timestamps = true;
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): ProductTranslationFactory
+    {
+        return ProductTranslationFactory::new();
+    }
 
     /**
      * Handle product functionality with proper error handling.

@@ -41,7 +41,7 @@ class CategoryFactory extends Factory
             'Apšvietimo sprendimai',
         ];
 
-        $name = $this->faker->unique()->randomElement($lithuanianCategories);
+        $name = $this->faker->randomElement($lithuanianCategories);
 
         return [
             'name' => $name,
