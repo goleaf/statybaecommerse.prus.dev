@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -46,6 +44,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-shopping-cart',
                 'color' => 'success',
                 'sort_order' => 2,
+                'is_active' => true,
             ],
             [
                 'name' => 'Email',
@@ -54,6 +53,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-envelope',
                 'color' => 'info',
                 'sort_order' => 3,
+                'is_active' => true,
             ],
             [
                 'name' => 'Payment',
@@ -62,6 +62,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-credit-card',
                 'color' => 'warning',
                 'sort_order' => 4,
+                'is_active' => true,
             ],
             [
                 'name' => 'Shipping',
@@ -70,6 +71,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-truck',
                 'color' => 'secondary',
                 'sort_order' => 5,
+                'is_active' => true,
             ],
             [
                 'name' => 'SEO',
@@ -78,6 +80,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-magnifying-glass',
                 'color' => 'info',
                 'sort_order' => 6,
+                'is_active' => true,
             ],
             [
                 'name' => 'Security',
@@ -86,6 +89,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-shield-check',
                 'color' => 'danger',
                 'sort_order' => 7,
+                'is_active' => true,
             ],
             [
                 'name' => 'API',
@@ -94,6 +98,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-code-bracket',
                 'color' => 'secondary',
                 'sort_order' => 8,
+                'is_active' => true,
             ],
             [
                 'name' => 'Appearance',
@@ -102,6 +107,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-paint-brush',
                 'color' => 'primary',
                 'sort_order' => 9,
+                'is_active' => true,
             ],
             [
                 'name' => 'Notifications',
@@ -110,6 +116,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-bell',
                 'color' => 'warning',
                 'sort_order' => 10,
+                'is_active' => true,
             ],
         ];
 
@@ -136,7 +143,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createGeneralSettings(): void
     {
         $generalCategory = SystemSettingCategory::where('slug', 'general')->first();
-        
+
         if (!$generalCategory) {
             $this->command->warn('General category not found, skipping general settings');
             return;
@@ -256,7 +263,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createEcommerceSettings(): void
     {
         $ecommerceCategory = SystemSettingCategory::where('slug', 'ecommerce')->first();
-        
+
         if (!$ecommerceCategory) {
             $this->command->warn('E-commerce category not found, skipping e-commerce settings');
             return;
@@ -368,7 +375,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createEmailSettings(): void
     {
         $emailCategory = SystemSettingCategory::where('slug', 'email')->first();
-        
+
         if (!$emailCategory) {
             $this->command->warn('Email category not found, skipping email settings');
             return;
@@ -459,7 +466,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createPaymentSettings(): void
     {
         $paymentCategory = SystemSettingCategory::where('slug', 'payment')->first();
-        
+
         if (!$paymentCategory) {
             $this->command->warn('Payment category not found, skipping payment settings');
             return;
@@ -517,7 +524,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createShippingSettings(): void
     {
         $shippingCategory = SystemSettingCategory::where('slug', 'shipping')->first();
-        
+
         if (!$shippingCategory) {
             $this->command->warn('Shipping category not found, skipping shipping settings');
             return;
@@ -574,7 +581,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createSeoSettings(): void
     {
         $seoCategory = SystemSettingCategory::where('slug', 'seo')->first();
-        
+
         if (!$seoCategory) {
             $this->command->warn('SEO category not found, skipping SEO settings');
             return;
@@ -720,7 +727,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createApiSettings(): void
     {
         $apiCategory = SystemSettingCategory::where('slug', 'api')->first();
-        
+
         if (!$apiCategory) {
             $this->command->warn('API category not found, skipping API settings');
             return;
@@ -771,7 +778,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createAppearanceSettings(): void
     {
         $appearanceCategory = SystemSettingCategory::where('slug', 'appearance')->first();
-        
+
         if (!$appearanceCategory) {
             $this->command->warn('Appearance category not found, skipping appearance settings');
             return;
@@ -834,7 +841,7 @@ final class SystemSettingsSeeder extends Seeder
     private function createNotificationSettings(): void
     {
         $notificationCategory = SystemSettingCategory::where('slug', 'notifications')->first();
-        
+
         if (!$notificationCategory) {
             $this->command->warn('Notifications category not found, skipping notification settings');
             return;
@@ -919,7 +926,6 @@ final class SystemSettingsSeeder extends Seeder
             'API' => 'API',
             'Appearance' => 'Išvaizda',
             'Notifications' => 'Pranešimai',
-
             // General Settings
             'Application Name' => 'Programos pavadinimas',
             'Application Description' => 'Programos aprašymas',
@@ -928,7 +934,6 @@ final class SystemSettingsSeeder extends Seeder
             'Default Language' => 'Numatytoji kalba',
             'Maintenance Mode' => 'Priežiūros režimas',
             'Debug Mode' => 'Derinimo režimas',
-
             // E-commerce Settings
             'Default Tax Rate' => 'Numatytasis PVM tarifas',
             'Minimum Order Amount' => 'Minimalus užsakymo dydis',
@@ -938,7 +943,6 @@ final class SystemSettingsSeeder extends Seeder
             'Allow Guest Checkout' => 'Leisti svečių užsakymus',
             'Enable Product Reviews' => 'Įjungti produktų atsiliepimus',
             'Enable Wishlist' => 'Įjungti pageidavimų sąrašą',
-
             // Email Settings
             'From Email Address' => 'Siuntėjo el. pašto adresas',
             'From Name' => 'Siuntėjo vardas',
@@ -946,42 +950,35 @@ final class SystemSettingsSeeder extends Seeder
             'Admin Email' => 'Administratoriaus el. paštas',
             'Queue Emails' => 'El. laiškų eilė',
             'Email Rate Limit' => 'El. laiškų limitas',
-
             // Payment Settings
             'Default Payment Method' => 'Numatytasis mokėjimo būdas',
             'Auto Approve Orders' => 'Automatinis užsakymų patvirtinimas',
             'Payment Timeout (minutes)' => 'Mokėjimo laiko limitas (minutės)',
-
             // Shipping Settings
             'Default Shipping Method' => 'Numatytasis pristatymo būdas',
             'Default Shipping Cost' => 'Numatytasis pristatymo kaina',
             'Estimated Delivery Days' => 'Numatomi pristatymo dienos',
-
             // SEO Settings
             'Default Meta Title' => 'Numatytasis meta pavadinimas',
             'Default Meta Description' => 'Numatytasis meta aprašymas',
             'Default Meta Keywords' => 'Numatytieji meta raktažodžiai',
             'Google Analytics ID' => 'Google Analytics ID',
             'Google Search Console Verification' => 'Google Search Console patvirtinimas',
-
             // Security Settings
             'Minimum Password Length' => 'Minimalus slaptažodžio ilgis',
             'Require Special Characters' => 'Reikalauti specialių simbolių',
             'Session Timeout (minutes)' => 'Sesijos laiko limitas (minutės)',
             'Max Login Attempts' => 'Maksimalus prisijungimo bandymų skaičius',
             'Enable Two-Factor Authentication' => 'Įjungti dviejų faktorių autentifikavimą',
-
             // API Settings
             'API Rate Limit' => 'API užklausų limitas',
             'API Key Length' => 'API rakto ilgis',
             'Enable API' => 'Įjungti API',
-
             // Appearance Settings
             'Primary Color' => 'Pagrindinė spalva',
             'Secondary Color' => 'Antrinė spalva',
             'Logo URL' => 'Logotipo URL',
             'Favicon URL' => 'Favicon URL',
-
             // Notification Settings
             'Enable Email Notifications' => 'Įjungti el. pašto pranešimus',
             'Enable SMS Notifications' => 'Įjungti SMS pranešimus',
