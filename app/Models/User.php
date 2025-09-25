@@ -213,6 +213,11 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         return $this->hasMany(Address::class);
     }
 
+    public function userBehaviors(): HasMany
+    {
+        return $this->hasMany(UserBehavior::class);
+    }
+
     /**
      * Handle cartItems functionality with proper error handling.
      */

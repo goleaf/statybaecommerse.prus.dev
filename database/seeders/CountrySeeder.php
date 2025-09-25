@@ -7,19 +7,35 @@ namespace Database\Seeders;
 use App\Models\Country;
 use App\Models\Translations\CountryTranslation;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 final class CountrySeeder extends Seeder
 {
     public function run(): void
     {
-        DB::transaction(function () {
-            $countries = $this->getCountriesData();
+        $countries = $this->getCountriesData();
 
-            foreach ($countries as $countryData) {
-                $country = Country::updateOrCreate(
-                    ['cca2' => $countryData['cca2']],
-                    [
+        foreach ($countries as $countryData) {
+            // Check if country already exists to maintain idempotency
+            $existingCountry = Country::where('cca2', $countryData['cca2'])->first();
+
+            if ($existingCountry) {
+                // Update existing country
+                $existingCountry->update([
+                    'cca3' => $countryData['cca3'],
+                    'phone_calling_code' => $countryData['phone_calling_code'],
+                    'flag' => $countryData['flag'],
+                    'region' => $countryData['region'],
+                    'subregion' => $countryData['subregion'],
+                    'latitude' => $countryData['latitude'],
+                    'longitude' => $countryData['longitude'],
+                    'currencies' => $countryData['currencies'],
+                ]);
+                $country = $existingCountry;
+            } else {
+                // Create new country using factory
+                $country = Country::factory()
+                    ->state([
+                        'cca2' => $countryData['cca2'],
                         'cca3' => $countryData['cca3'],
                         'phone_calling_code' => $countryData['phone_calling_code'],
                         'flag' => $countryData['flag'],
@@ -28,24 +44,21 @@ final class CountrySeeder extends Seeder
                         'latitude' => $countryData['latitude'],
                         'longitude' => $countryData['longitude'],
                         'currencies' => $countryData['currencies'],
-                    ]
-                );
-
-                // Create translations for Lithuanian and English
-                foreach ($countryData['translations'] as $locale => $translation) {
-                    CountryTranslation::updateOrCreate(
-                        [
-                            'country_id' => $country->id,
-                            'locale' => $locale,
-                        ],
-                        [
-                            'name' => $translation['name'],
-                            'name_official' => $translation['name_official'],
-                        ]
-                    );
-                }
+                    ])
+                    ->create();
             }
-        });
+
+            // Update translations with specific content
+            foreach ($countryData['translations'] as $locale => $translation) {
+                CountryTranslation::updateOrCreate([
+                    'country_id' => $country->id,
+                    'locale' => $locale,
+                ], [
+                    'name' => $translation['name'],
+                    'name_official' => $translation['name_official'],
+                ]);
+            }
+        }
     }
 
     private function getCountriesData(): array

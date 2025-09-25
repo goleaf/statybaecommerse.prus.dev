@@ -7,7 +7,6 @@ namespace Database\Seeders;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductHistory;
 use App\Models\Translations\ProductTranslation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -21,14 +20,13 @@ final class ProductHistoryExampleSeeder extends Seeder
     {
         $catalogManager = $this->createCatalogManager();
 
+        $brand = $this->firstOrCreateBrand();
+        $category = $this->firstOrCreateCategory();
+
         $product = Product::query()->firstWhere('slug', self::PRODUCT_SLUG)
             ?? Product::factory()
-                ->for($this->firstOrCreateBrand())
-                ->hasAttached(
-                    Category::factory()->count(1),
-                    [],
-                    'categories'
-                )
+                ->for($brand)
+                ->hasAttached($category)
                 ->create([
                     'slug' => self::PRODUCT_SLUG,
                     'name' => 'Akrilo hermetikas UE3YIQ',
@@ -52,18 +50,39 @@ final class ProductHistoryExampleSeeder extends Seeder
 
     private function firstOrCreateBrand(): Brand
     {
-        return Brand::query()->first()
+        return Brand::query()->firstWhere('slug', 'statybae-premium')
             ?? Brand::factory()->create([
                 'name' => 'StatyBae Premium',
+                'slug' => 'statybae-premium',
                 'is_enabled' => true,
             ]);
     }
 
+    private function firstOrCreateCategory(): Category
+    {
+        return Category::query()->firstWhere('slug', 'akriliniai-hermetikai')
+            ?? Category::factory()
+                ->state([
+                    'slug' => 'akriliniai-hermetikai',
+                    'name' => 'Akriliniai hermetikai',
+                    'seo_title' => 'Akriliniai hermetikai',
+                    'seo_description' => 'Akriliniai hermetikai ir sandarinimo sprendimai statyboms.',
+                    'is_visible' => true,
+                ])
+                ->create();
+    }
+
     private function seedTranslations(Product $product): void
     {
-        ProductTranslation::query()->updateOrCreate(
-            ['product_id' => $product->id, 'locale' => 'lt'],
-            [
+        ProductTranslation::query()
+            ->where('product_id', $product->id)
+            ->whereIn('locale', ['lt', 'en'])
+            ->delete();
+
+        ProductTranslation::factory()
+            ->for($product)
+            ->state([
+                'locale' => 'lt',
                 'name' => $product->name,
                 'slug' => self::PRODUCT_SLUG,
                 'summary' => 'Profesionalus akrilo hermetikas sandarinimo darbams.',
@@ -73,12 +92,13 @@ final class ProductHistoryExampleSeeder extends Seeder
                 'seo_description' => $product->seo_description ?? 'Aukštos kokybės akrilo hermetikas profesionalams ir meistrams.',
                 'meta_keywords' => ['akrilas', 'hermetikas', 'sandarinimas', 'statyba'],
                 'alt_text' => 'Akrilo hermetiko tūbelė UE3YIQ',
-            ]
-        );
+            ])
+            ->create();
 
-        ProductTranslation::query()->updateOrCreate(
-            ['product_id' => $product->id, 'locale' => 'en'],
-            [
+        ProductTranslation::factory()
+            ->for($product)
+            ->state([
+                'locale' => 'en',
                 'name' => 'Acrylic Sealant UE3YIQ',
                 'slug' => 'acrylic-sealant-ue3yiq',
                 'summary' => 'Professional acrylic sealant for joinery and finishing.',
@@ -88,8 +108,8 @@ final class ProductHistoryExampleSeeder extends Seeder
                 'seo_description' => 'Reliable acrylic sealant with excellent adhesion and elasticity.',
                 'meta_keywords' => ['acrylic sealant', 'interior', 'construction'],
                 'alt_text' => 'Acrylic sealant tube UE3YIQ',
-            ]
-        );
+            ])
+            ->create();
     }
 
     private function seedProductHistory(Product $product, User $user): void

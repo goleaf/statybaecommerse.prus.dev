@@ -96,9 +96,9 @@ final class CouponSeeder extends Seeder
 
         foreach ($data as $row) {
             // Check if coupon already exists to maintain idempotency
-            $existingCoupon = Coupon::where('code', $row['code'])->first();
-            
-            if (!$existingCoupon) {
+            $existingCoupon = Coupon::withoutGlobalScopes()->where('code', $row['code'])->first();
+
+            if (! $existingCoupon) {
                 Coupon::factory()
                     ->state($row)
                     ->create();

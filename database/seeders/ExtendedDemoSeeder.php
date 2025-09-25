@@ -103,7 +103,8 @@ final class ExtendedDemoSeeder extends Seeder
                 // Add media if available
                 $path = 'demo/tshirt.jpg';
                 if (Storage::disk('public')->exists($path)) {
-                    $product->addMedia(Storage::disk('public')->path($path))
+                    $product
+                        ->addMedia(Storage::disk('public')->path($path))
                         ->toMediaCollection(config('media.storage.collection_name'));
                 }
             });
@@ -138,7 +139,8 @@ final class ExtendedDemoSeeder extends Seeder
             ->create();
 
         // Create demo order with relationships
-        $orderProducts = $products->where('is_visible', true)
+        $orderProducts = $products
+            ->where('is_visible', true)
             ->whereNotNull('published_at')
             ->take(3);
 
@@ -174,7 +176,7 @@ final class ExtendedDemoSeeder extends Seeder
                     ->for($product)
                     ->state([
                         'name' => $product->name,
-                        'sku' => $product->sku ?? 'SKU-' . strtoupper(fake()->bothify('??????')),
+                        'sku' => $product->sku ?? 'SKU-'.strtoupper(fake()->bothify('??????')),
                         'unit_price' => $amount,
                         'quantity' => 1,
                         'total' => $amount,

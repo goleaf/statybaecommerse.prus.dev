@@ -39,7 +39,7 @@ class VariantCombinationFactory extends Factory
         return [
             'product_id' => Product::factory(),
             'attribute_combinations' => $this->faker->randomElement($combinations),
-            'is_available' => $this->faker->boolean(85), // 85% chance of being available
+            'is_available' => $this->faker->boolean(85),  // 85% chance of being available
         ];
     }
 

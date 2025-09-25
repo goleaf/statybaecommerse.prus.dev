@@ -29,9 +29,9 @@ final class ComprehensiveProductVariantSeeder extends Seeder
     private function createAttributes(): void
     {
         // Size attributes
-        $sizeAttribute = Attribute::firstOrCreate(
-            ['slug' => 'product-size'],
-            [
+        $sizeAttribute = Attribute::where('slug', 'product-size')->first()
+            ?? Attribute::factory()->create([
+                'slug' => 'product-size',
                 'name' => 'Product Size',
                 'type' => 'select',
                 'is_required' => true,
@@ -39,13 +39,12 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 'is_searchable' => false,
                 'is_enabled' => true,
                 'sort_order' => 1,
-            ]
-        );
+            ]);
 
         // Color attributes
-        $colorAttribute = Attribute::firstOrCreate(
-            ['slug' => 'product-color'],
-            [
+        $colorAttribute = Attribute::where('slug', 'product-color')->first()
+            ?? Attribute::factory()->create([
+                'slug' => 'product-color',
                 'name' => 'Product Color',
                 'type' => 'select',
                 'is_required' => true,
@@ -53,13 +52,12 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 'is_searchable' => false,
                 'is_enabled' => true,
                 'sort_order' => 2,
-            ]
-        );
+            ]);
 
         // Material attributes
-        $materialAttribute = Attribute::firstOrCreate(
-            ['slug' => 'product-material'],
-            [
+        $materialAttribute = Attribute::where('slug', 'product-material')->first()
+            ?? Attribute::factory()->create([
+                'slug' => 'product-material',
                 'name' => 'Product Material',
                 'type' => 'select',
                 'is_required' => false,
@@ -67,8 +65,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 'is_searchable' => true,
                 'is_enabled' => true,
                 'sort_order' => 3,
-            ]
-        );
+            ]);
 
         // Create size values
         $sizes = [
@@ -81,28 +78,34 @@ final class ComprehensiveProductVariantSeeder extends Seeder
         ];
 
         foreach ($sizes as $size) {
-            $attributeValue = AttributeValue::firstOrCreate(
-                [
-                    'attribute_id' => $sizeAttribute->id,
-                    'value' => $size['value'],
-                ],
-                [
-                    'slug' => 'product-size-'.Str::slug($size['value']),
-                    'display_value' => $size['display'],
-                    'sort_order' => $size['sort_order'],
-                    'is_enabled' => true,
-                ]
-            );
+            $attributeValue = AttributeValue::where([
+                'attribute_id' => $sizeAttribute->id,
+                'value' => $size['value'],
+            ])->first() ?? AttributeValue::factory()->for($sizeAttribute)->create([
+                'value' => $size['value'],
+                'slug' => 'product-size-'.Str::slug($size['value']),
+                'display_value' => $size['display'],
+                'sort_order' => $size['sort_order'],
+                'is_enabled' => true,
+            ]);
 
-            // Create translations
-            $attributeValue->translations()->updateOrCreate(
-                ['locale' => 'lt'],
-                ['value' => $size['lt']]
-            );
-            $attributeValue->translations()->updateOrCreate(
-                ['locale' => 'en'],
-                ['value' => $size['display']]
-            );
+            // Create translations using factory
+            if (! $attributeValue->translations()->where('locale', 'lt')->exists()) {
+                $attributeValue->translations()->save(
+                    \App\Models\Translations\AttributeValueTranslation::factory()->make([
+                        'locale' => 'lt',
+                        'value' => $size['lt'],
+                    ])
+                );
+            }
+            if (! $attributeValue->translations()->where('locale', 'en')->exists()) {
+                $attributeValue->translations()->save(
+                    \App\Models\Translations\AttributeValueTranslation::factory()->make([
+                        'locale' => 'en',
+                        'value' => $size['display'],
+                    ])
+                );
+            }
         }
 
         // Create color values
@@ -232,11 +235,11 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     ['size' => 'S', 'color' => 'black', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 50],
                     ['size' => 'M', 'color' => 'black', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 75],
                     ['size' => 'L', 'color' => 'black', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 60],
-                    ['size' => 'XL', 'color' => 'black', 'material' => 'cotton', 'price_modifier' => 5.00, 'stock' => 40],
+                    ['size' => 'XL', 'color' => 'black', 'material' => 'cotton', 'price_modifier' => 5.0, 'stock' => 40],
                     ['size' => 'S', 'color' => 'white', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 45],
                     ['size' => 'M', 'color' => 'white', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 70],
                     ['size' => 'L', 'color' => 'white', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 55],
-                    ['size' => 'XL', 'color' => 'white', 'material' => 'cotton', 'price_modifier' => 5.00, 'stock' => 35],
+                    ['size' => 'XL', 'color' => 'white', 'material' => 'cotton', 'price_modifier' => 5.0, 'stock' => 35],
                 ],
             ],
             [
@@ -253,11 +256,11 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     ['size' => 'S', 'color' => 'black', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 30],
                     ['size' => 'M', 'color' => 'black', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 45],
                     ['size' => 'L', 'color' => 'black', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 40],
-                    ['size' => 'XL', 'color' => 'black', 'material' => 'polyester', 'price_modifier' => 10.00, 'stock' => 25],
+                    ['size' => 'XL', 'color' => 'black', 'material' => 'polyester', 'price_modifier' => 10.0, 'stock' => 25],
                     ['size' => 'S', 'color' => 'white', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 35],
                     ['size' => 'M', 'color' => 'white', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 50],
                     ['size' => 'L', 'color' => 'white', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 45],
-                    ['size' => 'XL', 'color' => 'white', 'material' => 'polyester', 'price_modifier' => 10.00, 'stock' => 30],
+                    ['size' => 'XL', 'color' => 'white', 'material' => 'polyester', 'price_modifier' => 10.0, 'stock' => 30],
                 ],
             ],
             [
@@ -274,11 +277,11 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     ['size' => 'S', 'color' => 'black', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 15],
                     ['size' => 'M', 'color' => 'black', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 20],
                     ['size' => 'L', 'color' => 'black', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 18],
-                    ['size' => 'XL', 'color' => 'black', 'material' => 'leather', 'price_modifier' => 25.00, 'stock' => 12],
+                    ['size' => 'XL', 'color' => 'black', 'material' => 'leather', 'price_modifier' => 25.0, 'stock' => 12],
                     ['size' => 'S', 'color' => 'brown', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 10],
                     ['size' => 'M', 'color' => 'brown', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 15],
                     ['size' => 'L', 'color' => 'brown', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 12],
-                    ['size' => 'XL', 'color' => 'brown', 'material' => 'leather', 'price_modifier' => 25.00, 'stock' => 8],
+                    ['size' => 'XL', 'color' => 'brown', 'material' => 'leather', 'price_modifier' => 25.0, 'stock' => 8],
                 ],
             ],
         ];
@@ -312,9 +315,9 @@ final class ComprehensiveProductVariantSeeder extends Seeder
 
             // Create variants
             foreach ($productData['variants'] as $index => $variantData) {
-                $isOnSale = rand(0, 10) < 3; // 30% chance of being on sale
-                $isNew = rand(0, 10) < 2; // 20% chance of being new
-                $isBestseller = rand(0, 10) < 1; // 10% chance of being bestseller
+                $isOnSale = rand(0, 10) < 3;  // 30% chance of being on sale
+                $isNew = rand(0, 10) < 2;  // 20% chance of being new
+                $isBestseller = rand(0, 10) < 1;  // 10% chance of being bestseller
 
                 $variant = ProductVariant::create([
                     'product_id' => $product->id,

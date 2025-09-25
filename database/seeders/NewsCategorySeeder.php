@@ -8,6 +8,7 @@ use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\Translations\NewsCategoryTranslation;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 final class NewsCategorySeeder extends Seeder
 {
@@ -22,31 +23,66 @@ final class NewsCategorySeeder extends Seeder
             ->unique()
             ->values();
 
-        $categories = [
-            ['lt' => 'Naujienos', 'en' => 'News'],
-            ['lt' => 'Projektai', 'en' => 'Projects'],
-            ['lt' => 'Patarimai', 'en' => 'Tips'],
+        $definitions = [
+            [
+                'sort_order' => 0,
+                'attributes' => ['color' => '#1e40af', 'icon' => 'heroicon-o-newspaper'],
+                'translations' => [
+                    'lt' => ['name' => 'Naujienos', 'description' => 'Pagrindinių įmonės naujienų apžvalga.'],
+                    'en' => ['name' => 'News', 'description' => 'Overview of the latest company news.'],
+                ],
+            ],
+            [
+                'sort_order' => 1,
+                'attributes' => ['color' => '#047857', 'icon' => 'heroicon-o-rectangle-stack'],
+                'translations' => [
+                    'lt' => ['name' => 'Projektai', 'description' => 'Vykdomų ir baigtų projektų pristatymas.'],
+                    'en' => ['name' => 'Projects', 'description' => 'Highlights of ongoing and finished projects.'],
+                ],
+            ],
+            [
+                'sort_order' => 2,
+                'attributes' => ['color' => '#c2410c', 'icon' => 'heroicon-o-light-bulb'],
+                'translations' => [
+                    'lt' => ['name' => 'Patarimai', 'description' => 'Praktiniai patarimai ir rekomendacijos klientams.'],
+                    'en' => ['name' => 'Tips', 'description' => 'Practical tips and recommendations for customers.'],
+                ],
+            ],
         ];
 
+        $slugs = collect($definitions)
+            ->map(fn (array $definition) => Str::slug($definition['translations']['lt']['name']))
+            ->all();
+
+        NewsCategory::query()
+            ->whereHas('translations', fn ($query) => $query->where('locale', 'lt')->whereIn('slug', $slugs))
+            ->get()
+            ->each(function (NewsCategory $category): void {
+                $category->news()->detach();
+                $category->delete();
+            });
+
         $created = collect();
-        foreach ($categories as $i => $names) {
-            /** @var NewsCategory $cat */
-            $cat = NewsCategory::query()->create([
-                'is_visible' => true,
-                'sort_order' => $i,
-            ]);
+        foreach ($definitions as $definition) {
+            $category = NewsCategory::factory()
+                ->visible()
+                ->create(array_merge(['sort_order' => $definition['sort_order']], $definition['attributes']));
+
             foreach ($locales as $locale) {
-                $base = $names[$locale] ?? $names['en'] ?? 'Category';
-                NewsCategoryTranslation::updateOrCreate([
-                    'news_category_id' => $cat->id,
-                    'locale' => $locale,
-                ], [
-                    'name' => $base,
-                    'slug' => str($base)->slug()->toString(),
-                    'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                ]);
+                $translation = $definition['translations'][$locale] ?? $definition['translations']['en'];
+
+                NewsCategoryTranslation::factory()
+                    ->state([
+                        'news_category_id' => $category->id,
+                        'locale' => $locale,
+                        'name' => $translation['name'],
+                        'slug' => Str::slug($translation['name']),
+                        'description' => $translation['description'],
+                    ])
+                    ->create();
             }
-            $created->push($cat);
+
+            $created->push($category);
         }
 
         // Attach existing news to categories in a round-robin fashion

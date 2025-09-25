@@ -21,20 +21,17 @@ final class NewsImageSeeder extends Seeder
         }
 
         foreach ($news as $newsArticle) {
-            // Create 1-5 images per news article
-            $imageCount = fake()->numberBetween(1, 5);
-
-            for ($i = 0; $i < $imageCount; $i++) {
-                NewsImage::factory()
-                    ->forNews($newsArticle)
-                    ->withSortOrder($i + 1)
-                    ->create([
+            NewsImage::factory()
+                ->for($newsArticle, 'news')
+                ->count(fake()->numberBetween(1, 5))
+                ->state(function (array $attributes, NewsImage $newsImage, int $index) {
+                    return [
+                        'is_featured' => $index === 0,
+                        'sort_order' => $index + 1,
                         'file_path' => 'news-images/'.fake()->uuid().'.jpg',
                         'alt_text' => fake()->sentence(6),
                         'caption' => fake()->sentence(10),
-                        'is_featured' => $i === 0,  // First image is featured
-                        'sort_order' => $i + 1,
-                        'file_size' => fake()->numberBetween(100000, 2000000),  // 100KB to 2MB
+                        'file_size' => fake()->numberBetween(100000, 2000000),
                         'mime_type' => fake()->randomElement([
                             'image/jpeg',
                             'image/png',
@@ -45,8 +42,9 @@ final class NewsImageSeeder extends Seeder
                             'width' => fake()->numberBetween(400, 1920),
                             'height' => fake()->numberBetween(300, 1080),
                         ],
-                    ]);
-            }
+                    ];
+                })
+                ->create();
         }
 
         $this->command->info('News images seeded successfully.');

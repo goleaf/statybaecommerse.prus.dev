@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Models\Channel;
 use App\Models\Order;
-use App\Models\Partner;
 use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -26,15 +25,21 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         $subtotal = $this->faker->randomFloat(2, 10, 1000);
-        $taxAmount = $subtotal * 0.21; // 21% VAT
+        $taxAmount = $subtotal * 0.21;  // 21% VAT
         $shippingAmount = $this->faker->randomFloat(2, 0, 20);
-        $discountAmount = $this->faker->randomFloat(2, 0, $subtotal * 0.1); // Max 10% discount
+        $discountAmount = $this->faker->randomFloat(2, 0, $subtotal * 0.1);  // Max 10% discount
         $total = $subtotal + $taxAmount + $shippingAmount - $discountAmount;
 
         return [
             'number' => 'ORD-'.strtoupper($this->faker->unique()->bothify('######')),
             'user_id' => User::factory(),
+            'channel_id' => Channel::factory(),
+            'zone_id' => Zone::factory(),
+            'partner_id' => null,
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed']),
+            'payment_status' => $this->faker->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
+            'payment_method' => $this->faker->randomElement(['credit_card', 'bank_transfer', 'paypal', 'cash_on_delivery']),
+            'payment_reference' => $this->faker->optional(0.6, null)->bothify('PAY-########'),
             'subtotal' => $subtotal,
             'tax_amount' => $taxAmount,
             'shipping_amount' => $shippingAmount,
@@ -62,12 +67,6 @@ class OrderFactory extends Factory
             'notes' => $this->faker->optional(0.3)->sentence(),
             'shipped_at' => $this->faker->optional(0.4)->dateTimeBetween('-30 days', 'now'),
             'delivered_at' => $this->faker->optional(0.2)->dateTimeBetween('-30 days', 'now'),
-            'channel_id' => $this->faker->optional(0.7)->randomElement(Channel::pluck('id')->toArray()),
-            'zone_id' => null, // Zone model removed
-            'partner_id' => $this->faker->optional(0.3)->randomElement(Partner::pluck('id')->toArray()),
-            'payment_status' => $this->faker->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
-            'payment_method' => $this->faker->randomElement(['credit_card', 'bank_transfer', 'paypal', 'cash_on_delivery']),
-            'payment_reference' => $this->faker->optional(0.6)->bothify('PAY-########'),
         ];
     }
 

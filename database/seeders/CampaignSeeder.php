@@ -1,268 +1,72 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\CampaignTranslation;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
 use App\Models\CampaignCustomerSegment;
 use App\Models\CampaignProductTarget;
 use App\Models\CampaignSchedule;
+use App\Models\CampaignTranslation;
 use App\Models\CampaignView;
-use App\Models\Category;
-use App\Models\Channel;
-use App\Models\CustomerGroup;
-use App\Models\Product;
-use Faker\Factory as FakerFactory;
-use Illuminate\Database\QueryException;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 final class CampaignSeeder extends Seeder
 {
-    private bool $skipCampaignClickSeeding = false;
-
-    private bool $skipCampaignConversionSeeding = false;
-
     public function run(): void
     {
-        // Create channels if they don't exist
-        $channelIds = $this->ensureRecords(Channel::class, 3);
-        $categoryIds = $this->ensureRecords(Category::class, 10);
-        $productIds = $this->ensureRecords(Product::class, 20);
-        $customerGroupIds = $this->ensureRecords(CustomerGroup::class, 5);
+        $campaigns = Campaign::query()
+            ->with(['views', 'clicks', 'conversions', 'customerSegments', 'productTargets', 'schedules'])
+            ->get();
 
-        $locales = $this->supportedLocales();
+        if ($campaigns->isEmpty()) {
+            Campaign::factory()
+                ->count(15)
+                ->create();
 
-        // Create featured campaigns
-        $featuredCampaigns = Campaign::factory()
-            ->count(5)
-            ->featured()
-            ->active()
-            ->highPerformance()
-            ->create([
-                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => null,
-            ]);
-
-        // Create regular active campaigns
-        $activeCampaigns = Campaign::factory()
-            ->count(15)
-            ->active()
-            ->create([
-                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => null,
-            ]);
-
-        // Create scheduled campaigns
-        $scheduledCampaigns = Campaign::factory()
-            ->count(8)
-            ->scheduled()
-            ->create([
-                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => null,
-            ]);
-
-        // Create expired campaigns
-        $expiredCampaigns = Campaign::factory()
-            ->count(5)
-            ->expired()
-            ->create([
-                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => null,
-            ]);
-
-        // Create draft campaigns
-        $draftCampaigns = Campaign::factory()
-            ->count(7)
-            ->create([
-                'status' => 'draft',
-                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => null,
-            ]);
-
-        $allCampaigns = $featuredCampaigns
-            ->concat($activeCampaigns)
-            ->concat($scheduledCampaigns)
-            ->concat($expiredCampaigns)
-            ->concat($draftCampaigns);
-
-        foreach ($allCampaigns as $campaign) {
-            $this->syncTranslations($campaign, $locales);
+            $campaigns = Campaign::query()->get();
         }
 
-        // Create campaign views for active and featured campaigns (batched)
-        $viewRows = [];
-        foreach ($featuredCampaigns->concat($activeCampaigns) as $campaign) {
-            $viewCount = fake()->numberBetween(25, 250);
-            $made = CampaignView::factory()->count($viewCount)->make([
-                'campaign_id' => $campaign->id,
-                'viewed_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
-            ]);
-            foreach ($made as $m) {
-                $row = $m->attributesToArray();
-                $row['created_at'] = $row['created_at'] ?? now();
-                $row['updated_at'] = $row['updated_at'] ?? now();
-                $viewRows[] = $row;
+        $campaigns->each(function (Campaign $campaign): void {
+            if (! $campaign->views()->exists()) {
+                $campaign->views()->saveMany(
+                    CampaignView::factory()->count(20)->make()
+                );
             }
-        }
-        if (!empty($viewRows)) {
-            collect($viewRows)->chunk(1000)->each(function ($chunk) {
-                CampaignView::query()->insert($chunk->all());
-            });
-        }
 
-        $engagementCampaigns = $featuredCampaigns->concat($activeCampaigns);
-
-        if (Schema::hasTable('campaign_clicks')) {
-            $clickRows = [];
-            foreach ($engagementCampaigns as $campaign) {
-                if ($this->skipCampaignClickSeeding) {
-                    break;
-                }
-                $clickCount = fake()->numberBetween(5, 75);
-                $made = CampaignClick::factory()->count($clickCount)->make([
-                    'campaign_id' => $campaign->id,
-                    'click_type' => fake()->randomElement(['cta', 'banner', 'link']),
-                    'clicked_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
-                ]);
-                foreach ($made as $m) {
-                    $row = $m->attributesToArray();
-                    $row['created_at'] = $row['created_at'] ?? now();
-                    $row['updated_at'] = $row['updated_at'] ?? now();
-                    $clickRows[] = $row;
-                }
+            if (! $campaign->clicks()->exists()) {
+                $campaign->clicks()->saveMany(
+                    CampaignClick::factory()->count(10)->make()
+                );
             }
-            if (!empty($clickRows)) {
-                collect($clickRows)->chunk(1000)->each(function ($chunk) {
-                    try {
-                        CampaignClick::query()->insert($chunk->all());
-                    } catch (QueryException $exception) {
-                        if ($this->isMissingTableException($exception, 'campaign_clicks')) {
-                            $this->skipCampaignClickSeeding = true;
-                            $this->command?->warn('Skipping campaign click seeding: ' . $exception->getMessage());
 
-                            return;
-                        }
-                        throw $exception;
-                    }
-                });
+            if (! $campaign->conversions()->exists()) {
+                $campaign->conversions()->saveMany(
+                    CampaignConversion::factory()->count(5)->make()
+                );
             }
-        }
 
-        if (Schema::hasTable('campaign_conversions')) {
-            $conversionRows = [];
-            foreach ($engagementCampaigns as $campaign) {
-                if ($this->skipCampaignConversionSeeding) {
-                    break;
-                }
-                $conversionCount = fake()->numberBetween(1, 25);
-                $made = CampaignConversion::factory()->count($conversionCount)->make([
-                    'campaign_id' => $campaign->id,
-                    'conversion_type' => fake()->randomElement(['purchase', 'signup', 'download']),
-                    'conversion_value' => fake()->randomFloat(2, 10, 500),
-                    'converted_at' => fake()->dateTimeBetween($campaign->starts_at, now()),
-                ]);
-                foreach ($made as $m) {
-                    $row = $m->attributesToArray();
-                    $row['created_at'] = $row['created_at'] ?? now();
-                    $row['updated_at'] = $row['updated_at'] ?? now();
-                    $conversionRows[] = $row;
-                }
+            if (! $campaign->customerSegments()->exists()) {
+                $campaign->customerSegments()->saveMany(
+                    CampaignCustomerSegment::factory()->count(3)->make()
+                );
             }
-            if (!empty($conversionRows)) {
-                collect($conversionRows)->chunk(1000)->each(function ($chunk) {
-                    try {
-                        CampaignConversion::query()->insert($chunk->all());
-                    } catch (QueryException $exception) {
-                        if ($this->isMissingTableException($exception, 'campaign_conversions')) {
-                            $this->skipCampaignConversionSeeding = true;
-                            $this->command?->warn('Skipping campaign conversion seeding: ' . $exception->getMessage());
 
-                            return;
-                        }
-                        throw $exception;
-                    }
-                });
+            if (! $campaign->productTargets()->exists()) {
+                $campaign->productTargets()->saveMany(
+                    CampaignProductTarget::factory()->count(4)->make()
+                );
             }
-        }
 
-        // Create customer segments for campaigns (batched)
-        $segmentRows = [];
-        foreach ($allCampaigns as $campaign) {
-            $segmentCount = fake()->numberBetween(1, 3);
-            $usedGroups = collect();
-            for ($i = 0; $i < $segmentCount; $i++) {
-                $availableGroups = $customerGroupIds->diff($usedGroups);
-                $customerGroupId = $availableGroups->isEmpty() ? null : $availableGroups->random();
-                if ($customerGroupId) {
-                    $usedGroups->push($customerGroupId);
-                }
-                $made = CampaignCustomerSegment::factory()->make([
-                    'campaign_id' => $campaign->id,
-                    'customer_group_id' => $customerGroupId,
-                    'segment_type' => fake()->randomElement(['group', 'location', 'behavior', 'custom']),
-                ]);
-                $row = $made->attributesToArray();
-                $row['created_at'] = $row['created_at'] ?? now();
-                $row['updated_at'] = $row['updated_at'] ?? now();
-                $segmentRows[] = $row;
+            if (! $campaign->schedules()->exists()) {
+                $campaign->schedules()->saveMany(
+                    CampaignSchedule::factory()->count(2)->make()
+                );
             }
-        }
-        if (!empty($segmentRows)) {
-            collect($segmentRows)->chunk(1000)->each(function ($chunk) {
-                CampaignCustomerSegment::query()->insert($chunk->all());
-            });
-        }
-
-        // Create product targets for campaigns (batched + ignore duplicates)
-        $productTargetRows = [];
-        foreach ($allCampaigns as $campaign) {
-            $targetCount = fake()->numberBetween(2, 8);
-            for ($i = 0; $i < $targetCount; $i++) {
-                $productId = $productIds->isEmpty() ? null : $productIds->random();
-                $categoryId = $categoryIds->isEmpty() ? null : $categoryIds->random();
-                if ($productId === null && $categoryId === null) {
-                    continue;
-                }
-                $targetType = fake()->randomElement(['product', 'category', 'brand', 'collection']);
-                $productTargetRows[] = [
-                    'campaign_id' => $campaign->id,
-                    'product_id' => $productId,
-                    'category_id' => $categoryId,
-                    'target_type' => $targetType,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-        }
-        if (!empty($productTargetRows)) {
-            collect($productTargetRows)->chunk(1000)->each(function ($chunk) {
-                CampaignProductTarget::query()->insertOrIgnore($chunk->all());
-            });
-        }
-
-        // Create schedules for some campaigns (batched)
-        $scheduleRows = [];
-        foreach ($allCampaigns->random(10) as $campaign) {
-            $made = CampaignSchedule::factory()->make([
-                'campaign_id' => $campaign->id,
-                'schedule_type' => fake()->randomElement(['daily', 'weekly', 'monthly', 'custom']),
-                'is_active' => fake()->boolean(80),
-            ]);
-            $row = $made->attributesToArray();
-            $row['created_at'] = $row['created_at'] ?? now();
-            $row['updated_at'] = $row['updated_at'] ?? now();
-            $scheduleRows[] = $row;
-        }
-        if (!empty($scheduleRows)) {
-            collect($scheduleRows)->chunk(500)->each(function ($chunk) {
-                CampaignSchedule::query()->insert($chunk->all());
-            });
-        }
+        });
 
         // Create special seasonal campaigns
         $seasonalCampaigns = [
@@ -329,12 +133,9 @@ final class CampaignSeeder extends Seeder
             $translations = $campaignData['translations'] ?? [];
             unset($campaignData['translations']);
 
-            $campaign = Campaign::factory()->create(array_merge($campaignData, [
-                'channel_id' => $channelIds->isEmpty() ? null : $channelIds->random(),
-                'zone_id' => null,
-            ]));
+            $campaign = Campaign::factory()->create($campaignData);
 
-            $this->syncTranslations($campaign, $locales, $translations);
+            $this->syncTranslations($campaign, ['lt', 'en'], $translations);
 
             // Add analytics data for active campaigns
             if ($campaign->status === 'active') {
@@ -349,9 +150,9 @@ final class CampaignSeeder extends Seeder
         }
 
         $translationCount = CampaignTranslation::count();
-        $this->command->info(sprintf(
+        $this->command?->info(sprintf(
             'Created %d campaigns with full analytics, targeting data, and %d localized translations.',
-            $allCampaigns->count() + count($seasonalCampaigns),
+            Campaign::query()->count(),
             $translationCount
         ));
     }
@@ -394,8 +195,8 @@ final class CampaignSeeder extends Seeder
         $metaTitle = $isDefaultLocale ? $baseMetaTitle : sprintf('%s - %s', $faker->sentence(3), $faker->words(2, true));
         $metaDescription = $isDefaultLocale ? $baseMetaDescription : $faker->sentence(16);
 
-        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-' . $campaign->id);
-        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase . '-' . $locale);
+        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-'.$campaign->id);
+        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase.'-'.$locale);
 
         return [
             'name' => $name,
@@ -424,11 +225,11 @@ final class CampaignSeeder extends Seeder
     private function localizedBannerAltText(string $locale, string $campaignName): string
     {
         return match ($locale) {
-            'lt' => $campaignName . ' kampanijos baneris',
-            'en' => $campaignName . ' campaign banner',
-            'de' => 'Kampagnenbanner ' . $campaignName,
-            'ru' => 'Баннер кампании ' . $campaignName,
-            default => $campaignName . ' banner',
+            'lt' => $campaignName.' kampanijos baneris',
+            'en' => $campaignName.' campaign banner',
+            'de' => 'Kampagnenbanner '.$campaignName,
+            'ru' => 'Баннер кампании '.$campaignName,
+            default => $campaignName.' banner',
         };
     }
 
@@ -446,7 +247,7 @@ final class CampaignSeeder extends Seeder
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -487,7 +288,7 @@ final class CampaignSeeder extends Seeder
         } catch (QueryException $exception) {
             if ($this->isMissingTableException($exception, 'campaign_clicks')) {
                 $this->skipCampaignClickSeeding = true;
-                $this->command?->warn('Skipping campaign click seeding: ' . $exception->getMessage());
+                $this->command?->warn('Skipping campaign click seeding: '.$exception->getMessage());
 
                 return;
             }
@@ -507,7 +308,7 @@ final class CampaignSeeder extends Seeder
         } catch (QueryException $exception) {
             if ($this->isMissingTableException($exception, 'campaign_conversions')) {
                 $this->skipCampaignConversionSeeding = true;
-                $this->command?->warn('Skipping campaign conversion seeding: ' . $exception->getMessage());
+                $this->command?->warn('Skipping campaign conversion seeding: '.$exception->getMessage());
 
                 return;
             }

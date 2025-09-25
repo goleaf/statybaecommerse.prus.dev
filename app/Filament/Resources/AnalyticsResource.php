@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -68,7 +66,7 @@ final class AnalyticsResource extends Resource
             ->columns([
                 TextColumn::make('order_date')->label('order_date')->date()->toggleable(),
                 TextColumn::make('user.name')->label('user.name')->toggleable(),
-                TextColumn::make('items_count')->label('items_count')->getStateUsing(fn (Order $record): int => method_exists($record, 'items') ? (int) $record->items()->count() : 0)->toggleable(),
+                TextColumn::make('items_count')->label('items_count')->getStateUsing(fn(Order $record): int => method_exists($record, 'items') ? (int) $record->items()->count() : 0)->toggleable(),
                 TextColumn::make('total')->label('total')->money('EUR')->toggleable(),
                 TextColumn::make('status')->label('status')->badge()->toggleable(),
                 TextColumn::make('created_at')->label('created_at')->dateTime()->toggleable(),
@@ -86,13 +84,13 @@ final class AnalyticsResource extends Resource
                     ->form([])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['created_from'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
+                            ->when($data['created_from'] ?? null, fn(Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['created_until'] ?? null, fn(Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
                     }),
                 Filter::make('high_value')
-                    ->query(fn (Builder $query): Builder => $query->where('total', '>=', 500)),
+                    ->query(fn(Builder $query): Builder => $query->where('total', '>=', 500)),
                 Filter::make('this_month')
-                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])),
+                    ->query(fn(Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])),
             ]);
     }
 

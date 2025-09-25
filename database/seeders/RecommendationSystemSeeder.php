@@ -413,7 +413,7 @@ class RecommendationSystemSeeder extends Seeder
             ->state(function () use ($products, $algorithmTypes) {
                 $product1 = $products->random();
                 $product2 = $products->where('id', '!=', $product1->id)->random();
-                
+
                 return [
                     'product_id' => $product1->id,
                     'similar_product_id' => $product2->id,
@@ -482,7 +482,7 @@ class RecommendationSystemSeeder extends Seeder
                 $user = $users->random();
                 $product = $products->random();
                 $interactionType = fake()->randomElement($interactionTypes);
-                
+
                 return [
                     'user_id' => $user->id,
                     'product_id' => $product->id,

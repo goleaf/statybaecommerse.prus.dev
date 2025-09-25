@@ -17,69 +17,19 @@ class WishlistItemSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create some test users
-        $users = User::factory(5)->create();
+        User::factory()
+            ->count(5)
+            ->has(UserWishlist::factory()->count(2))
+            ->create()
+            ->each(function (User $user): void {
+                $user->wishlists->each(function (UserWishlist $wishlist): void {
+                    WishlistItem::factory()
+                        ->count(fake()->numberBetween(3, 8))
+                        ->for($wishlist)
+                        ->create();
+                });
+            });
 
-        foreach ($users as $user) {
-            // Create a default wishlist for each user
-            $wishlist = UserWishlist::factory()->create([
-                'user_id' => $user->id,
-                'name' => 'My Wishlist',
-                'is_default' => true,
-            ]);
-
-            // Create additional wishlists for some users
-            if (rand(0, 1)) {
-                UserWishlist::factory()->create([
-                    'user_id' => $user->id,
-                    'name' => 'Birthday Wishlist',
-                    'description' => 'Items I want for my birthday',
-                ]);
-            }
-
-            // Add some products to the wishlist
-            $products = Product::inRandomOrder()->limit(rand(3, 8))->get();
-
-            foreach ($products as $product) {
-                $quantity = rand(1, 3);
-                $notes = null;
-
-                // Add notes for some items
-                if (rand(0, 1)) {
-                    $notes = collect([
-                        'Really want this!',
-                        'For next month',
-                        'Gift for someone',
-                        'Need to check reviews first',
-                        'Waiting for sale',
-                        'High priority',
-                    ])->random();
-                }
-
-                // Check if product has variants
-                if ($product->variants()->exists()) {
-                    $variant = $product->variants()->inRandomOrder()->first();
-
-                    WishlistItem::create([
-                        'wishlist_id' => $wishlist->id,
-                        'product_id' => $product->id,
-                        'variant_id' => $variant->id,
-                        'quantity' => $quantity,
-                        'notes' => $notes,
-                    ]);
-                } else {
-                    WishlistItem::create([
-                        'wishlist_id' => $wishlist->id,
-                        'product_id' => $product->id,
-                        'variant_id' => null,
-                        'quantity' => $quantity,
-                        'notes' => $notes,
-                    ]);
-                }
-            }
-        }
-
-        // Create some wishlist items with specific scenarios
         $this->createSpecificScenarios();
     }
 
@@ -100,15 +50,15 @@ class WishlistItemSeeder extends Seeder
             'is_public' => true,
         ]);
 
-        $products = Product::inRandomOrder()->limit(15)->get();
+        $products = Product::factory()->count(15)->create();
         foreach ($products as $product) {
-            WishlistItem::create([
-                'wishlist_id' => $powerUserWishlist->id,
-                'product_id' => $product->id,
-                'variant_id' => $product->variants()->exists() ? $product->variants()->inRandomOrder()->first()->id : null,
-                'quantity' => rand(1, 5),
-                'notes' => 'Priority: '.rand(1, 5),
-            ]);
+            WishlistItem::factory()
+                ->for($powerUserWishlist)
+                ->for($product)
+                ->create([
+                    'quantity' => rand(1, 5),
+                    'notes' => 'Priority: '.rand(1, 5),
+                ]);
         }
 
         // Scenario 2: User with empty wishlist
@@ -143,17 +93,12 @@ class WishlistItemSeeder extends Seeder
                 'description' => "My {$wishlistName} wishlist",
             ]);
 
-            // Add 2-4 items to each wishlist
-            $products = Product::inRandomOrder()->limit(rand(2, 4))->get();
-            foreach ($products as $product) {
-                WishlistItem::create([
-                    'wishlist_id' => $wishlist->id,
-                    'product_id' => $product->id,
-                    'variant_id' => null,
-                    'quantity' => 1,
+            WishlistItem::factory()
+                ->count(rand(2, 4))
+                ->for($wishlist)
+                ->create([
                     'notes' => "For {$wishlistName} collection",
                 ]);
-            }
         }
 
         // Scenario 4: Items with high quantities
@@ -167,16 +112,13 @@ class WishlistItemSeeder extends Seeder
             'name' => 'Bulk Orders',
         ]);
 
-        $products = Product::inRandomOrder()->limit(3)->get();
-        foreach ($products as $product) {
-            WishlistItem::create([
-                'wishlist_id' => $bulkWishlist->id,
-                'product_id' => $product->id,
-                'variant_id' => null,
+        WishlistItem::factory()
+            ->count(3)
+            ->for($bulkWishlist)
+            ->create([
                 'quantity' => rand(10, 50),
                 'notes' => 'Bulk order for business',
             ]);
-        }
 
         $this->command->info('Wishlist items seeded successfully!');
         $this->command->info('Created wishlist items for various user scenarios:');

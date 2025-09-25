@@ -12,11 +12,10 @@ final class SimpleCountrySeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Lithuania with translations using factory relationships
-        $lithuania = Country::factory()
-            ->european()
-            ->withCoordinates()
-            ->state([
+        // Create Lithuania with translations (idempotent)
+        $lithuania = Country::firstOrCreate(
+            ['cca2' => 'LT'],
+            [
                 'cca2' => 'LT',
                 'cca3' => 'LTU',
                 'phone_calling_code' => '370',
@@ -28,32 +27,30 @@ final class SimpleCountrySeeder extends Seeder
                 'currencies' => ['EUR'],
                 'is_enabled' => true,
                 'sort_order' => 1,
-            ])
-            ->has(
-                CountryTranslation::factory()
-                    ->lithuanian()
-                    ->state([
-                        'name' => 'Lietuva',
-                        'name_official' => 'Lietuvos Respublika',
-                    ]),
-                'translations'
-            )
-            ->has(
-                CountryTranslation::factory()
-                    ->english()
-                    ->state([
-                        'name' => 'Lithuania',
-                        'name_official' => 'Republic of Lithuania',
-                    ]),
-                'translations'
-            )
-            ->create();
+            ]
+        );
 
-        // Create Germany with translations using factory relationships
-        $germany = Country::factory()
-            ->european()
-            ->withCoordinates()
-            ->state([
+        // Create translations for Lithuania
+        CountryTranslation::firstOrCreate(
+            ['country_id' => $lithuania->id, 'locale' => 'lt'],
+            [
+                'name' => 'Lietuva',
+                'name_official' => 'Lietuvos Respublika',
+            ]
+        );
+
+        CountryTranslation::firstOrCreate(
+            ['country_id' => $lithuania->id, 'locale' => 'en'],
+            [
+                'name' => 'Lithuania',
+                'name_official' => 'Republic of Lithuania',
+            ]
+        );
+
+        // Create Germany with translations (idempotent)
+        $germany = Country::firstOrCreate(
+            ['cca2' => 'DE'],
+            [
                 'cca2' => 'DE',
                 'cca3' => 'DEU',
                 'phone_calling_code' => '49',
@@ -65,32 +62,30 @@ final class SimpleCountrySeeder extends Seeder
                 'currencies' => ['EUR'],
                 'is_enabled' => true,
                 'sort_order' => 2,
-            ])
-            ->has(
-                CountryTranslation::factory()
-                    ->lithuanian()
-                    ->state([
-                        'name' => 'Vokietija',
-                        'name_official' => 'Vokietijos Federacinė Respublika',
-                    ]),
-                'translations'
-            )
-            ->has(
-                CountryTranslation::factory()
-                    ->english()
-                    ->state([
-                        'name' => 'Germany',
-                        'name_official' => 'Federal Republic of Germany',
-                    ]),
-                'translations'
-            )
-            ->create();
+            ]
+        );
 
-        // Create United States with translations using factory relationships
-        $usa = Country::factory()
-            ->american()
-            ->withCoordinates()
-            ->state([
+        // Create translations for Germany
+        CountryTranslation::firstOrCreate(
+            ['country_id' => $germany->id, 'locale' => 'lt'],
+            [
+                'name' => 'Vokietija',
+                'name_official' => 'Vokietijos Federacinė Respublika',
+            ]
+        );
+
+        CountryTranslation::firstOrCreate(
+            ['country_id' => $germany->id, 'locale' => 'en'],
+            [
+                'name' => 'Germany',
+                'name_official' => 'Federal Republic of Germany',
+            ]
+        );
+
+        // Create United States with translations (idempotent)
+        $usa = Country::firstOrCreate(
+            ['cca2' => 'US'],
+            [
                 'cca2' => 'US',
                 'cca3' => 'USA',
                 'phone_calling_code' => '1',
@@ -102,27 +97,26 @@ final class SimpleCountrySeeder extends Seeder
                 'currencies' => ['USD'],
                 'is_enabled' => true,
                 'sort_order' => 3,
-            ])
-            ->has(
-                CountryTranslation::factory()
-                    ->lithuanian()
-                    ->state([
-                        'name' => 'Jungtinės Amerikos Valstijos',
-                        'name_official' => 'Amerikos Jungtinės Valstijos',
-                    ]),
-                'translations'
-            )
-            ->has(
-                CountryTranslation::factory()
-                    ->english()
-                    ->state([
-                        'name' => 'United States',
-                        'name_official' => 'United States of America',
-                    ]),
-                'translations'
-            )
-            ->create();
+            ]
+        );
 
-        $this->command->info('Created ' . Country::count() . ' countries with ' . CountryTranslation::count() . ' translations.');
+        // Create translations for USA
+        CountryTranslation::firstOrCreate(
+            ['country_id' => $usa->id, 'locale' => 'lt'],
+            [
+                'name' => 'Jungtinės Amerikos Valstijos',
+                'name_official' => 'Amerikos Jungtinės Valstijos',
+            ]
+        );
+
+        CountryTranslation::firstOrCreate(
+            ['country_id' => $usa->id, 'locale' => 'en'],
+            [
+                'name' => 'United States',
+                'name_official' => 'United States of America',
+            ]
+        );
+
+        $this->command->info('Created '.Country::count().' countries with '.CountryTranslation::count().' translations.');
     }
 }

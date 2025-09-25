@@ -31,7 +31,7 @@ final class OrderItemFactory extends Factory
             'sku' => $this->faker->unique()->bothify('SKU-####'),
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
-            'price' => $unitPrice, // Same as unit_price for consistency
+            'price' => $unitPrice,  // Same as unit_price for consistency
             'total' => $total,
             'notes' => $this->faker->optional(0.3)->sentence(),
         ];

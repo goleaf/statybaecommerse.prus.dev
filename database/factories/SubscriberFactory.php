@@ -81,13 +81,11 @@ final class SubscriberFactory extends Factory
     public function withUser(): static
     {
         return $this->state(function (array $attributes) {
-            $user = User::factory()->create([
-                'email' => $attributes['email'],
-                'name' => $attributes['first_name'].' '.$attributes['last_name'],
-            ]);
-
             return [
-                'user_id' => $user->id,
+                'user_id' => User::factory()->create([
+                    'email' => $attributes['email'],
+                    'name' => $attributes['first_name'].' '.$attributes['last_name'],
+                ])->id,
             ];
         });
     }

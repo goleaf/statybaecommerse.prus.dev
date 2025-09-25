@@ -20,7 +20,7 @@ final class SimpleAdminSeeder extends Seeder
     {
         $this->command->info('🔐 Creating Super Admin User...');
 
-        // Create basic permissions using factory
+        // Create basic permissions (Spatie models don't have factories by default)
         $permissionNames = [
             'access_admin_panel',
             'manage_all_users',
@@ -31,14 +31,14 @@ final class SimpleAdminSeeder extends Seeder
         ];
 
         $permissions = collect($permissionNames)->map(function ($permissionName) {
-            return Permission::factory()->create([
+            return Permission::firstOrCreate([
                 'name' => $permissionName,
                 'guard_name' => 'web',
             ]);
         });
 
-        // Create super admin role using factory
-        $superAdminRole = Role::factory()->create([
+        // Create super admin role (Spatie models don't have factories by default)
+        $superAdminRole = Role::firstOrCreate([
             'name' => 'super-admin',
             'guard_name' => 'web',
         ]);
@@ -46,17 +46,18 @@ final class SimpleAdminSeeder extends Seeder
         // Assign permissions to super admin role
         $superAdminRole->syncPermissions($permissions);
 
-        // Create super admin user using factory
-        $admin = User::factory()
-            ->admin()
-            ->state([
+        // Create super admin user (idempotent)
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
                 'name' => 'Super Administrator',
                 'email' => 'admin@example.com',
-                'password' => 'password', // Factory will handle hashing
+                'password' => 'password',  // Will be hashed by User model mutator
                 'email_verified_at' => now(),
+                'is_admin' => true,
                 'is_active' => true,
-            ])
-            ->create();
+            ]
+        );
 
         // Assign super admin role to user
         $admin->assignRole($superAdminRole);

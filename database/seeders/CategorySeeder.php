@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Category;
@@ -7,7 +9,7 @@ use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-class CategorySeeder extends Seeder
+final class CategorySeeder extends Seeder
 {
     private LocalImageGeneratorService $imageGenerator;
 
@@ -854,7 +856,7 @@ class CategorySeeder extends Seeder
     private function createCategory(array $categoryData, ?int $parentId = null): void
     {
         // Check if category already exists to maintain idempotency
-        $category = Category::query()->firstWhere('slug', $categoryData['slug']);
+        $category = Category::withoutGlobalScopes()->firstWhere('slug', $categoryData['slug']);
 
         $attributes = [
             'name' => $categoryData['name'],
@@ -865,12 +867,11 @@ class CategorySeeder extends Seeder
             'is_visible' => true,
         ];
 
-        if ($category) {
-            $category->update($attributes);
-        } else {
-            // Use factory to create category with relationships
+        if (! $category) {
+            // Use factory to create category with proper relationships
             $category = Category::factory()
                 ->state($attributes)
+                ->when($parentId, fn ($factory) => $factory->for(Category::find($parentId), 'parent'))
                 ->create();
         }
 
@@ -891,13 +892,13 @@ class CategorySeeder extends Seeder
         }
 
         // Add main image if category was created and doesn't have one
-        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('images')) && isset($categoryData['image_url'])) {
-            $this->downloadAndAttachImage($category, $categoryData['image_url'], 'images', $categoryData['name'] . ' Image');
+        if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('images')) && isset($categoryData['image_url'])) {
+            $this->downloadAndAttachImage($category, $categoryData['image_url'], 'images', $categoryData['name'].' Image');
         }
 
         // Add banner if category was created and doesn't have one
-        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('banner')) && isset($categoryData['banner_url'])) {
-            $this->downloadAndAttachImage($category, $categoryData['banner_url'], 'banner', $categoryData['name'] . ' Banner');
+        if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('banner')) && isset($categoryData['banner_url'])) {
+            $this->downloadAndAttachImage($category, $categoryData['banner_url'], 'banner', $categoryData['name'].' Banner');
         }
 
         // Create children categories recursively
@@ -918,7 +919,7 @@ class CategorySeeder extends Seeder
             $imagePath = $this->imageGenerator->generateCategoryImage($category->name);
 
             if (file_exists($imagePath)) {
-                $filename = Str::slug($name) . '.webp';
+                $filename = Str::slug($name).'.webp';
 
                 // Add media to category
                 $category
@@ -938,14 +939,14 @@ class CategorySeeder extends Seeder
                 $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}");
             }
         } catch (\Exception $e) {
-            $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}: " . $e->getMessage());
+            $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}: ".$e->getMessage());
         }
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -959,7 +960,7 @@ class CategorySeeder extends Seeder
             'en' => $this->translateToEnglish($text),
             'ru' => $this->translateToRussian($text),
             'de' => $this->translateToGerman($text),
-            default => $text . ' (' . strtoupper($locale) . ')',
+            default => $text.' ('.strtoupper($locale).')',
         };
     }
 
@@ -1360,7 +1361,7 @@ class CategorySeeder extends Seeder
             'en' => $this->translateSlugToEnglish($slug),
             'ru' => $this->translateSlugToRussian($slug),
             'de' => $this->translateSlugToGerman($slug),
-            default => $slug . '-' . $locale,
+            default => $slug.'-'.$locale,
         };
     }
 

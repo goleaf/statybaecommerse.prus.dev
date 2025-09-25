@@ -9,7 +9,6 @@ use App\Services\Images\ProductImageService;
 use App\Services\Images\WebPConversionService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -45,9 +44,7 @@ final class OptimizedProductImageSeeder extends Seeder
         $this->ensureDirectoriesExist();
 
         // Process products in optimized batches
-        DB::transaction(function () {
-            $this->processProductsInBatches();
-        });
+        $this->processProductsInBatches();
 
         // Clean up temporary files
         $this->cleanupTempFiles();

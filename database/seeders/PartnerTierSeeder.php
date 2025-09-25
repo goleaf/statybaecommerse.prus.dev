@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\PartnerTier;
 use Illuminate\Database\Seeder;
 
-class PartnerTierSeeder extends Seeder
+final class PartnerTierSeeder extends Seeder
 {
     public function run(): void
     {
@@ -39,11 +41,12 @@ class PartnerTierSeeder extends Seeder
             ],
         ];
 
-        foreach ($tiers as $data) {
-            PartnerTier::query()->updateOrCreate(
-                ['code' => $data['code']],
-                $data,
-            );
+        foreach ($tiers as $attributes) {
+            if (PartnerTier::query()->where('code', $attributes['code'])->exists()) {
+                continue;
+            }
+
+            PartnerTier::factory()->state($attributes)->create();
         }
     }
 }

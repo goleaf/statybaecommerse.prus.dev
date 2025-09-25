@@ -17,68 +17,57 @@ final class ReferralSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create some users for referrals
-        $users = User::factory()->count(20)->create();
+        $users = User::factory()
+            ->count(20)
+            ->has(ReferralCode::factory()->count(1)->active(), 'referralCodes')
+            ->create();
 
-        // Create referral codes for some users
-        $users->take(10)->each(function (User $user) {
-            ReferralCode::factory()->active()->create(['user_id' => $user->id]);
-        });
+        $referrals = Referral::factory()
+            ->count(50)
+            ->state(function () use ($users) {
+                $referrer = $users->random();
+                $referred = $users->where('id', '!=', $referrer->id)->random();
 
-        // Create referrals between users
-        $referrals = collect();
+                return [
+                    'referrer_id' => $referrer->id,
+                    'referred_id' => $referred->id,
+                ];
+            })
+            ->create();
 
-        for ($i = 0; $i < 50; $i++) {
-            $referrer = $users->random();
-            $referred = $users->where('id', '!=', $referrer->id)->random();
+        $referrals->each(function (Referral $referral): void {
+            ReferralReward::factory()
+                ->count(fake()->numberBetween(1, 2))
+                ->referrerBonus()
+                ->for($referral, 'referral')
+                ->for($referral->referrer, 'user')
+                ->create();
 
-            // Check if this combination already exists
-            if ($referrals->contains(fn ($r) => $r->referrer_id === $referrer->id && $r->referred_id === $referred->id)) {
-                continue;
-            }
-
-            $referral = Referral::factory()->create([
-                'referrer_id' => $referrer->id,
-                'referred_id' => $referred->id,
-            ]);
-
-            $referrals->push($referral);
-        }
-
-        // Create rewards for some referrals
-        $referrals->random(30)->each(function (Referral $referral) {
-            // Create referrer bonus
-            ReferralReward::factory()->referrerBonus()->create([
-                'referral_id' => $referral->id,
-                'user_id' => $referral->referrer_id,
-            ]);
-
-            // Create referred discount (50% chance)
             if (fake()->boolean(50)) {
-                ReferralReward::factory()->referredDiscount()->create([
-                    'referral_id' => $referral->id,
-                    'user_id' => $referral->referred_id,
-                ]);
+                ReferralReward::factory()
+                    ->referredDiscount()
+                    ->for($referral, 'referral')
+                    ->for($referral->referred, 'user')
+                    ->create();
             }
         });
 
-        // Create some completed referrals with applied rewards
-        $referrals->random(15)->each(function (Referral $referral) {
+        $referrals->random(15)->each(function (Referral $referral): void {
             $referral->update(['status' => 'completed', 'completed_at' => now()]);
 
-            // Apply some rewards
-            $referral->rewards()->take(1)->each(function ($reward) {
+            $referral->rewards()->take(1)->each(function (ReferralReward $reward): void {
                 $reward->update(['status' => 'applied', 'applied_at' => now()]);
             });
         });
 
-        // Create some expired referrals
-        $referrals->random(5)->each(function (Referral $referral) {
+        $referrals->random(5)->each(function (Referral $referral): void {
             $referral->update(['status' => 'expired']);
         });
 
-        // Create some expired rewards
-        ReferralReward::factory()->count(10)->expired()->create();
+        ReferralReward::factory()
+            ->count(10)
+            ->expired()
+            ->create();
 
         $this->command->info('Referral system seeded successfully!');
         $this->command->info('Created:');

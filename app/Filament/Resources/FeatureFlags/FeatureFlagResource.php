@@ -6,8 +6,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\FeatureFlags;
 
 use App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag;
-use UnitEnum;
-use BackedEnum;
 use App\Filament\Resources\FeatureFlags\Pages\EditFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\ListFeatureFlags;
 use App\Filament\Resources\FeatureFlags\Schemas\FeatureFlagForm;
@@ -17,12 +15,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use BackedEnum;
+use UnitEnum;
 
 class FeatureFlagResource extends Resource
 {
     protected static ?string $model = FeatureFlag::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema
     {

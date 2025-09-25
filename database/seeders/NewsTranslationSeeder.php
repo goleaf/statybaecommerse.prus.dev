@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\UiTranslation;
 use Illuminate\Database\Seeder;
 
 final class NewsTranslationSeeder extends Seeder
@@ -55,29 +56,22 @@ final class NewsTranslationSeeder extends Seeder
             ],
         ];
 
-        // Since this project uses Laravel's built-in translation system,
-        // we'll create language files instead of database entries
+        // Store translations in database using UiTranslation model
         foreach ($translations as $locale => $localeTranslations) {
-            $filePath = lang_path("{$locale}/admin.php");
-
-            // Load existing translations if file exists
-            $existing = [];
-            if (file_exists($filePath)) {
-                $existing = include $filePath;
+            foreach ($localeTranslations as $key => $value) {
+                UiTranslation::factory()
+                    ->forKey($key)
+                    ->forLocale($locale)
+                    ->forGroup('news')
+                    ->create([
+                        'value' => $value,
+                        'metadata' => [
+                            'context' => 'news_admin_interface',
+                            'description' => "News admin interface translation for {$key}",
+                            'seeded_at' => now()->toISOString(),
+                        ],
+                    ]);
             }
-
-            // Merge with new translations
-            $allTranslations = array_merge_recursive($existing, $localeTranslations);
-
-            // Create directory if it doesn't exist
-            $dir = dirname($filePath);
-            if (! is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
-            // Write the translations file
-            $content = "<?php\n\nreturn ".var_export($allTranslations, true).";\n";
-            file_put_contents($filePath, $content);
         }
     }
 }

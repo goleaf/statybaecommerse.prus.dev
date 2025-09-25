@@ -16,10 +16,10 @@ final class LocationTranslationFactory extends Factory
     {
         return [
             'location_id' => Location::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt']),
-            'name' => $this->faker->company().' Location',
-            'description' => $this->faker->paragraph(),
-            'slug' => $this->faker->slug(),
+            'locale' => fake()->randomElement(['en', 'lt']),
+            'name' => fake()->company().' Location',
+            'description' => fake()->paragraph(),
+            'slug' => fake()->slug(),
         ];
     }
 
@@ -27,9 +27,9 @@ final class LocationTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'name' => $this->faker->company().' Location',
-            'description' => $this->faker->paragraph(),
-            'slug' => $this->faker->slug(),
+            'name' => fake()->company().' Location',
+            'description' => fake()->paragraph(),
+            'slug' => fake()->slug(),
         ]);
     }
 
@@ -37,9 +37,9 @@ final class LocationTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'name' => $this->faker->company().' Vieta',
-            'description' => $this->faker->paragraph(),
-            'slug' => $this->faker->slug(),
+            'name' => fake()->company().' Vieta',
+            'description' => fake()->paragraph(),
+            'slug' => fake()->slug(),
         ]);
     }
 }

@@ -199,14 +199,14 @@ final class CurrencySeeder extends Seeder
         foreach ($currencies as $currencyData) {
             $translations = $currencyData['translations'] ?? [];
             unset($currencyData['translations']);
-            
+
             // Set translatable name field using Spatie's HasTranslations
             $currencyData['name'] = $translations;
 
             // Check if currency already exists to maintain idempotency
             $existingCurrency = Currency::withoutGlobalScopes()->where('code', $currencyData['code'])->first();
-            
-            if (!$existingCurrency) {
+
+            if (! $existingCurrency) {
                 /** @var Currency $currency */
                 $currency = Currency::factory()
                     ->state($currencyData)

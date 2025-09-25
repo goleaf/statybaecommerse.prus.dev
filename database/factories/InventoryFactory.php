@@ -25,7 +25,7 @@ final class InventoryFactory extends Factory
             'reserved' => $this->faker->numberBetween(0, 100),
             'incoming' => $this->faker->numberBetween(0, 200),
             'threshold' => $this->faker->numberBetween(5, 50),
-            'is_tracked' => $this->faker->boolean(80), // 80% chance of being tracked
+            'is_tracked' => $this->faker->boolean(80),  // 80% chance of being tracked
         ];
     }
 
@@ -92,7 +92,7 @@ final class InventoryFactory extends Factory
         return $this->state(function (array $attributes) {
             $quantity = $attributes['quantity'] ?? $this->faker->numberBetween(20, 100);
             $reserved = $this->faker->numberBetween(5, min(15, $quantity));
-            
+
             return [
                 'quantity' => $quantity,
                 'reserved' => $reserved,

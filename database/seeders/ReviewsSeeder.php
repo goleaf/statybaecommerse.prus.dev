@@ -56,7 +56,7 @@ class ReviewsSeeder extends Seeder
                 if ($createdCount >= $targetTotal) {
                     break 2;
                 }
-                
+
                 // Aim to distribute reviews roughly evenly across products/locales
                 $remaining = $targetTotal - $createdCount;
                 $perProduct = max(1, (int) floor($remaining / max($products->count(), 1)));
@@ -66,7 +66,7 @@ class ReviewsSeeder extends Seeder
                 // Previous month reviews
                 for ($i = 0; $i < $prevCount && $createdCount < $targetTotal; $i++) {
                     $createdAt = Carbon::createFromTimestamp(random_int($previousMonthStart->timestamp, $previousMonthEnd->timestamp));
-                    
+
                     Review::factory()
                         ->for($product)
                         ->for($customers->random())
@@ -75,14 +75,14 @@ class ReviewsSeeder extends Seeder
                             'created_at' => $createdAt,
                             'updated_at' => $createdAt,
                         ]);
-                    
+
                     $createdCount++;
                 }
 
                 // Current month reviews
                 for ($i = 0; $i < $currCount && $createdCount < $targetTotal; $i++) {
                     $createdAt = Carbon::createFromTimestamp(random_int($currentMonthStart->timestamp, $now->timestamp));
-                    
+
                     Review::factory()
                         ->for($product)
                         ->for($customers->random())
@@ -91,7 +91,7 @@ class ReviewsSeeder extends Seeder
                             'created_at' => $createdAt,
                             'updated_at' => $createdAt,
                         ]);
-                    
+
                     $createdCount++;
                 }
             }

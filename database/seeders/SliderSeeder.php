@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -6,6 +8,7 @@ use App\Models\Slider;
 use App\Models\SliderTranslation;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+
 use function collect;
 
 final class SliderSeeder extends Seeder
@@ -23,14 +26,12 @@ final class SliderSeeder extends Seeder
 
             $slider = Slider::factory()
                 ->state($definition)
-                ->has(
-                    SliderTranslation::factory()
-                        ->count(count($supportedLocales))
-                        ->sequence(
-                            ...$this->buildTranslationStates($supportedLocales, $translations, $definition)
-                        ),
-                    'translations'
-                )
+                ->create();
+
+            SliderTranslation::factory()
+                ->count(count($supportedLocales))
+                ->sequence(...$this->buildTranslationStates($supportedLocales, $translations, $definition))
+                ->for($slider)
                 ->create();
 
             $this->ensureSampleImages($slider, (int) $definition['sort_order']);

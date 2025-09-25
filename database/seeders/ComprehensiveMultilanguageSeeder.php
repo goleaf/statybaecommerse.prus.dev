@@ -11,13 +11,10 @@ use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Location;
 use App\Models\Product;
-use App\Models\Translations\CountryTranslation;
 use App\Models\Zone;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 final class ComprehensiveMultilanguageSeeder extends Seeder
 {
@@ -34,252 +31,123 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
     {
         $this->command->info('🌍 Starting comprehensive multilanguage seeding...');
 
-        DB::transaction(function () {
+        try {
             $this->seedCountriesWithTranslations();
-            $this->seedZonesWithTranslations();
+            $this->seedZones();
             $this->seedCurrenciesWithTranslations();
             $this->seedLocationsWithTranslations();
             $this->seedCategoriesWithTranslations();
             $this->seedBrandsWithTranslations();
             $this->seedCollectionsWithTranslations();
             $this->seedProductsWithTranslations();
-        });
 
-        $this->command->info('✅ Comprehensive multilanguage seeding completed!');
+            $this->command->info('✅ Comprehensive multilanguage seeding completed successfully!');
+        } catch (\Exception $e) {
+            Log::error('Comprehensive multilanguage seeding failed: '.$e->getMessage());
+            $this->command->error('❌ Seeding failed: '.$e->getMessage());
+            throw $e;
+        }
     }
 
     private function seedCountriesWithTranslations(): void
     {
         $this->command->info('🏳️ Seeding countries with translations...');
 
-        $countries = [
-            [
-                'cca2' => 'LT', 'cca3' => 'LTU', 'phone_calling_code' => '370', 'flag' => '🇱🇹',
-                'region' => 'Europe', 'subregion' => 'Northern Europe',
-                'latitude' => 55.169438, 'longitude' => 23.881275, 'currencies' => ['EUR'],
-                'translations' => [
-                    'lt' => ['name' => 'Lietuva', 'name_official' => 'Lietuvos Respublika'],
-                    'en' => ['name' => 'Lithuania', 'name_official' => 'Republic of Lithuania'],
-                ],
-            ],
-            [
-                'cca2' => 'LV', 'cca3' => 'LVA', 'phone_calling_code' => '371', 'flag' => '🇱🇻',
-                'region' => 'Europe', 'subregion' => 'Northern Europe',
-                'latitude' => 56.879635, 'longitude' => 24.603189, 'currencies' => ['EUR'],
-                'translations' => [
-                    'lt' => ['name' => 'Latvija', 'name_official' => 'Latvijos Respublika'],
-                    'en' => ['name' => 'Latvia', 'name_official' => 'Republic of Latvia'],
-                ],
-            ],
-            [
-                'cca2' => 'EE', 'cca3' => 'EST', 'phone_calling_code' => '372', 'flag' => '🇪🇪',
-                'region' => 'Europe', 'subregion' => 'Northern Europe',
-                'latitude' => 58.595272, 'longitude' => 25.013607, 'currencies' => ['EUR'],
-                'translations' => [
-                    'lt' => ['name' => 'Estija', 'name_official' => 'Estijos Respublika'],
-                    'en' => ['name' => 'Estonia', 'name_official' => 'Republic of Estonia'],
-                ],
-            ],
-            [
-                'cca2' => 'DE', 'cca3' => 'DEU', 'phone_calling_code' => '49', 'flag' => '🇩🇪',
-                'region' => 'Europe', 'subregion' => 'Central Europe',
-                'latitude' => 51.165691, 'longitude' => 10.451526, 'currencies' => ['EUR'],
-                'translations' => [
-                    'lt' => ['name' => 'Vokietija', 'name_official' => 'Vokietijos Federacinė Respublika'],
-                    'en' => ['name' => 'Germany', 'name_official' => 'Federal Republic of Germany'],
-                ],
-            ],
-            [
-                'cca2' => 'PL', 'cca3' => 'POL', 'phone_calling_code' => '48', 'flag' => '🇵🇱',
-                'region' => 'Europe', 'subregion' => 'Central Europe',
-                'latitude' => 51.919438, 'longitude' => 19.145136, 'currencies' => ['PLN'],
-                'translations' => [
-                    'lt' => ['name' => 'Lenkija', 'name_official' => 'Lenkijos Respublika'],
-                    'en' => ['name' => 'Poland', 'name_official' => 'Republic of Poland'],
-                ],
-            ],
-            [
-                'cca2' => 'FR', 'cca3' => 'FRA', 'phone_calling_code' => '33', 'flag' => '🇫🇷',
-                'region' => 'Europe', 'subregion' => 'Western Europe',
-                'latitude' => 46.227638, 'longitude' => 2.213749, 'currencies' => ['EUR'],
-                'translations' => [
-                    'lt' => ['name' => 'Prancūzija', 'name_official' => 'Prancūzijos Respublika'],
-                    'en' => ['name' => 'France', 'name_official' => 'French Republic'],
-                ],
-            ],
-            [
-                'cca2' => 'GB', 'cca3' => 'GBR', 'phone_calling_code' => '44', 'flag' => '🇬🇧',
-                'region' => 'Europe', 'subregion' => 'Northern Europe',
-                'latitude' => 55.378051, 'longitude' => -3.435973, 'currencies' => ['GBP'],
-                'translations' => [
-                    'lt' => ['name' => 'Jungtinė Karalystė', 'name_official' => 'Didžiosios Britanijos ir Šiaurės Airijos Jungtinė Karalystė'],
-                    'en' => ['name' => 'United Kingdom', 'name_official' => 'United Kingdom of Great Britain and Northern Ireland'],
-                ],
-            ],
-            [
-                'cca2' => 'US', 'cca3' => 'USA', 'phone_calling_code' => '1', 'flag' => '🇺🇸',
-                'region' => 'Americas', 'subregion' => 'North America',
-                'latitude' => 37.09024, 'longitude' => -95.712891, 'currencies' => ['USD'],
-                'translations' => [
-                    'lt' => ['name' => 'Jungtinės Amerikos Valstijos', 'name_official' => 'Amerikos Jungtinės Valstijos'],
-                    'en' => ['name' => 'United States', 'name_official' => 'United States of America'],
-                ],
-            ],
+        $countriesData = [
+            ['cca2' => 'LT', 'cca3' => 'LTU', 'phone_calling_code' => '370', 'flag' => '🇱🇹', 'region' => 'Europe', 'subregion' => 'Northern Europe', 'latitude' => 55.169438, 'longitude' => 23.881275, 'currencies' => ['EUR'], 'translations' => ['lt' => ['name' => 'Lietuva', 'name_official' => 'Lietuvos Respublika'], 'en' => ['name' => 'Lithuania', 'name_official' => 'Republic of Lithuania']]],
+            ['cca2' => 'LV', 'cca3' => 'LVA', 'phone_calling_code' => '371', 'flag' => '🇱🇻', 'region' => 'Europe', 'subregion' => 'Northern Europe', 'latitude' => 56.879635, 'longitude' => 24.603189, 'currencies' => ['EUR'], 'translations' => ['lt' => ['name' => 'Latvija', 'name_official' => 'Latvijos Respublika'], 'en' => ['name' => 'Latvia', 'name_official' => 'Republic of Latvia']]],
+            ['cca2' => 'EE', 'cca3' => 'EST', 'phone_calling_code' => '372', 'flag' => '🇪🇪', 'region' => 'Europe', 'subregion' => 'Northern Europe', 'latitude' => 58.595272, 'longitude' => 25.013607, 'currencies' => ['EUR'], 'translations' => ['lt' => ['name' => 'Estija', 'name_official' => 'Estijos Respublika'], 'en' => ['name' => 'Estonia', 'name_official' => 'Republic of Estonia']]],
+            ['cca2' => 'DE', 'cca3' => 'DEU', 'phone_calling_code' => '49', 'flag' => '🇩🇪', 'region' => 'Europe', 'subregion' => 'Central Europe', 'latitude' => 51.165691, 'longitude' => 10.451526, 'currencies' => ['EUR'], 'translations' => ['lt' => ['name' => 'Vokietija', 'name_official' => 'Vokietijos Federacinė Respublika'], 'en' => ['name' => 'Germany', 'name_official' => 'Federal Republic of Germany']]],
+            ['cca2' => 'PL', 'cca3' => 'POL', 'phone_calling_code' => '48', 'flag' => '🇵🇱', 'region' => 'Europe', 'subregion' => 'Central Europe', 'latitude' => 51.919438, 'longitude' => 19.145136, 'currencies' => ['PLN'], 'translations' => ['lt' => ['name' => 'Lenkija', 'name_official' => 'Lenkijos Respublika'], 'en' => ['name' => 'Poland', 'name_official' => 'Republic of Poland']]],
         ];
 
-        foreach ($countries as $countryData) {
-            $country = Country::updateOrCreate(
-                ['cca2' => $countryData['cca2']],
-                [
-                    'cca3' => $countryData['cca3'],
-                    'phone_calling_code' => $countryData['phone_calling_code'],
-                    'flag' => $countryData['flag'],
-                    'region' => $countryData['region'],
-                    'subregion' => $countryData['subregion'],
-                    'latitude' => $countryData['latitude'],
-                    'longitude' => $countryData['longitude'],
-                    'currencies' => $countryData['currencies'],
-                    'is_enabled' => true,
-                    'sort_order' => array_search($countryData['cca2'], array_column($countries, 'cca2')) + 1,
-                ]
-            );
+        foreach ($countriesData as $index => $data) {
+            Country::factory()
+                ->hasTranslations(2, function (array $attributes, Country $country) use ($data) {
+                    static $localeIndex = 0;
+                    $locales = ['lt', 'en'];
+                    $locale = $locales[$localeIndex % 2];
+                    $localeIndex++;
 
-            foreach ($countryData['translations'] as $locale => $translation) {
-                CountryTranslation::updateOrCreate(
-                    ['country_id' => $country->id, 'locale' => $locale],
-                    $translation
-                );
-            }
+                    return array_merge([
+                        'locale' => $locale,
+                    ], $data['translations'][$locale]);
+                })
+                ->create([
+                    'cca2' => $data['cca2'],
+                    'cca3' => $data['cca3'],
+                    'phone_calling_code' => $data['phone_calling_code'],
+                    'flag' => $data['flag'],
+                    'region' => $data['region'],
+                    'subregion' => $data['subregion'],
+                    'latitude' => $data['latitude'],
+                    'longitude' => $data['longitude'],
+                    'currencies' => $data['currencies'],
+                    'name' => $data['translations']['en']['name'],
+                    'name_official' => $data['translations']['en']['name_official'],
+                    'is_enabled' => true,
+                    'sort_order' => $index + 1,
+                ]);
         }
 
-        $this->command->info('   ✅ Created '.count($countries).' countries with translations');
+        $this->command->info('   ✅ Created '.count($countriesData).' countries with translations');
     }
 
-    private function seedZonesWithTranslations(): void
+    private function seedZones(): void
     {
-        $this->command->info('🌍 Seeding zones with translations...');
+        $this->command->info('🌍 Seeding zones...');
 
-        $zones = [
-            [
-                'name' => 'Europe',
-                'slug' => 'europe',
-                'code' => 'EU',
-                'is_enabled' => true,
-                'translations' => [
-                    'lt' => ['name' => 'Europa', 'description' => 'Europos regionas'],
-                    'en' => ['name' => 'Europe', 'description' => 'European region'],
-                ],
-            ],
-            [
-                'name' => 'North America',
-                'slug' => 'north-america',
-                'code' => 'NA',
-                'is_enabled' => true,
-                'translations' => [
-                    'lt' => ['name' => 'Šiaurės Amerika', 'description' => 'Šiaurės Amerikos regionas'],
-                    'en' => ['name' => 'North America', 'description' => 'North American region'],
-                ],
-            ],
-            [
-                'name' => 'Baltic States',
-                'slug' => 'baltic-states',
-                'code' => 'BALTIC',
-                'is_enabled' => true,
-                'translations' => [
-                    'lt' => ['name' => 'Baltijos šalys', 'description' => 'Lietuvos, Latvijos ir Estijos regionas'],
-                    'en' => ['name' => 'Baltic States', 'description' => 'Lithuania, Latvia and Estonia region'],
-                ],
-            ],
+        $zonesData = [
+            ['name' => 'Europe', 'code' => 'EU'],
+            ['name' => 'North America', 'code' => 'NA'],
+            ['name' => 'Baltic States', 'code' => 'BALTIC'],
         ];
 
-        foreach ($zones as $zoneData) {
-            $zone = Zone::updateOrCreate(
-                ['code' => $zoneData['code']],
-                [
-                    'name' => $zoneData['name'],
-                    'slug' => Str::slug($zoneData['name']),
-                    'is_enabled' => $zoneData['is_enabled'],
-                ]
-            );
-
-            foreach ($zoneData['translations'] as $locale => $translation) {
-                DB::table('zone_translations')->updateOrInsert(
-                    ['zone_id' => $zone->id, 'locale' => $locale],
-                    array_merge($translation, [
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ])
-                );
-            }
+        foreach ($zonesData as $data) {
+            Zone::factory()->create([
+                'name' => $data['name'],
+                'code' => $data['code'],
+                'is_enabled' => true,
+            ]);
         }
 
-        $this->command->info('   ✅ Created '.count($zones).' zones with translations');
+        $this->command->info('   ✅ Created '.count($zonesData).' zones');
     }
 
     private function seedCurrenciesWithTranslations(): void
     {
         $this->command->info('💰 Seeding currencies with translations...');
 
-        $currencies = [
-            [
-                'code' => 'EUR',
-                'symbol' => '€',
-                'name' => 'Euro',
-                'exchange_rate' => 1.0,
-                'is_default' => true,
-                'translations' => [
-                    'lt' => ['name' => 'Euras'],
-                    'en' => ['name' => 'Euro'],
-                ],
-            ],
-            [
-                'code' => 'USD',
-                'symbol' => '$',
-                'name' => 'US Dollar',
-                'exchange_rate' => 1.08,
-                'is_default' => false,
-                'translations' => [
-                    'lt' => ['name' => 'JAV doleris'],
-                    'en' => ['name' => 'US Dollar'],
-                ],
-            ],
-            [
-                'code' => 'GBP',
-                'symbol' => '£',
-                'name' => 'British Pound',
-                'exchange_rate' => 0.85,
-                'is_default' => false,
-                'translations' => [
-                    'lt' => ['name' => 'Didžiosios Britanijos svaras'],
-                    'en' => ['name' => 'British Pound'],
-                ],
-            ],
+        $currenciesData = [
+            ['code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'translations' => ['lt' => 'Euras', 'en' => 'Euro']],
+            ['code' => 'USD', 'symbol' => '$', 'exchange_rate' => 1.08, 'is_default' => false, 'translations' => ['lt' => 'JAV doleris', 'en' => 'US Dollar']],
+            ['code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 0.85, 'is_default' => false, 'translations' => ['lt' => 'Didžiosios Britanijos svaras', 'en' => 'British Pound']],
         ];
 
-        foreach ($currencies as $currencyData) {
-            $currency = Currency::updateOrCreate(
-                ['code' => $currencyData['code']],
-                [
-                    'symbol' => $currencyData['symbol'],
-                    'name' => $currencyData['name'],
-                    'exchange_rate' => $currencyData['exchange_rate'],
-                    'is_default' => $currencyData['is_default'],
-                    'is_enabled' => true,
-                ]
-            );
+        foreach ($currenciesData as $data) {
+            Currency::factory()
+                ->hasTranslations(2, function (array $attributes, Currency $currency) use ($data) {
+                    static $localeIndex = 0;
+                    $locales = ['lt', 'en'];
+                    $locale = $locales[$localeIndex % 2];
+                    $localeIndex++;
 
-            foreach ($currencyData['translations'] as $locale => $translation) {
-                DB::table('currency_translations')->updateOrInsert(
-                    ['currency_id' => $currency->id, 'locale' => $locale],
-                    array_merge($translation, [
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ])
-                );
-            }
+                    return [
+                        'locale' => $locale,
+                        'name' => $data['translations'][$locale],
+                    ];
+                })
+                ->create([
+                    'code' => $data['code'],
+                    'symbol' => $data['symbol'],
+                    'name' => $data['translations']['en'],
+                    'exchange_rate' => $data['exchange_rate'],
+                    'is_default' => $data['is_default'],
+                    'is_enabled' => true,
+                ]);
         }
 
-        $this->command->info('   ✅ Created '.count($currencies).' currencies with translations');
+        $this->command->info('   ✅ Created '.count($currenciesData).' currencies with translations');
     }
 
     private function seedLocationsWithTranslations(): void
@@ -502,12 +370,9 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
 
             foreach ($categoryData['translations'] as $locale => $translation) {
-                DB::table('category_translations')->updateOrInsert(
-                    ['category_id' => $category->id, 'locale' => $locale],
-                    array_merge($translation, [
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ])
+                $category->translations()->updateOrCreate(
+                    ['locale' => $locale],
+                    $translation
                 );
             }
         }
@@ -615,12 +480,9 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
 
             foreach ($brandData['translations'] as $locale => $translation) {
-                DB::table('brand_translations')->updateOrInsert(
-                    ['brand_id' => $brand->id, 'locale' => $locale],
-                    array_merge($translation, [
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ])
+                $brand->translations()->updateOrCreate(
+                    ['locale' => $locale],
+                    $translation
                 );
             }
         }
@@ -685,12 +547,9 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             );
 
             foreach ($collectionData['translations'] as $locale => $translation) {
-                DB::table('collection_translations')->updateOrInsert(
-                    ['collection_id' => $collection->id, 'locale' => $locale],
-                    array_merge($translation, [
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ])
+                $collection->translations()->updateOrCreate(
+                    ['locale' => $locale],
+                    $translation
                 );
             }
         }
@@ -839,12 +698,9 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
 
             foreach ($productData['translations'] as $locale => $translation) {
-                DB::table('product_translations')->updateOrInsert(
-                    ['product_id' => $product->id, 'locale' => $locale],
-                    array_merge($translation, [
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ])
+                $product->translations()->updateOrCreate(
+                    ['locale' => $locale],
+                    $translation
                 );
             }
         }

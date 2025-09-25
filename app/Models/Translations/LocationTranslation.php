@@ -27,8 +27,6 @@ final class LocationTranslation extends Model
 {
     use HasFactory;
 
-    protected static string $factory = \Database\Factories\LocationTranslationFactory::class;
-
     protected $table = 'location_translations';
 
     protected $fillable = ['location_id', 'locale', 'name', 'slug', 'description'];

@@ -7,7 +7,6 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class LithuanianCatalogSeeder extends Seeder
@@ -328,7 +327,7 @@ final class LithuanianCatalogSeeder extends Seeder
                 'category_id' => $category->id,
                 'locale' => $loc,
                 'name' => $name,
-                'slug' => Str::slug($data['slug'].'-'.$loc), // Ensure unique slugs per locale
+                'slug' => Str::slug($data['slug'].'-'.$loc),  // Ensure unique slugs per locale
                 'description' => $this->translateLike((string) ($data['description'] ?? ''), $loc),
                 'seo_title' => $name,
                 'seo_description' => $this->translateLike('Statybinių prekių kategorija.', $loc),
@@ -336,11 +335,22 @@ final class LithuanianCatalogSeeder extends Seeder
                 'updated_at' => $now,
             ];
         }
-        DB::table('category_translations')->upsert(
-            $rows,
-            ['category_id', 'locale'],
-            ['name', 'slug', 'description', 'seo_title', 'seo_description', 'updated_at']
-        );
+        // Create translations using factory relationships
+        foreach ($rows as $translationData) {
+            $category->translations()->updateOrCreate(
+                [
+                    'category_id' => $translationData['category_id'],
+                    'locale' => $translationData['locale'],
+                ],
+                [
+                    'name' => $translationData['name'],
+                    'slug' => $translationData['slug'],
+                    'description' => $translationData['description'],
+                    'seo_title' => $translationData['seo_title'],
+                    'seo_description' => $translationData['seo_description'],
+                ]
+            );
+        }
 
         if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('images')) && isset($data['image_url'])) {
             $this->attachGeneratedImage($category, 'images', $data['name'].' Image');

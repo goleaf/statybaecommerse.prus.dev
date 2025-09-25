@@ -29,14 +29,14 @@ final class NewsTagTranslationFactory extends Factory
 
     public function forNewsTag(NewsTag $newsTag): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'news_tag_id' => $newsTag->id,
         ]);
     }
 
     public function forLocale(string $locale): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => $locale,
         ]);
     }

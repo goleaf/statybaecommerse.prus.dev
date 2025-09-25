@@ -18,29 +18,35 @@ final class PostSeeder extends Seeder
             'email' => 'admin@example.com',
         ]);
 
-        // Create sample posts
-        Post::factory()->count(20)->create([
-            'user_id' => $user->id,
-        ]);
+        Post::factory()
+            ->for($user)
+            ->count(20)
+            ->create();
 
-        // Create some featured posts
-        Post::factory()->featured()->published()->count(5)->create([
-            'user_id' => $user->id,
-        ]);
+        Post::factory()
+            ->for($user)
+            ->featured()
+            ->published()
+            ->count(5)
+            ->create();
 
-        // Create some pinned posts
-        Post::factory()->pinned()->published()->count(3)->create([
-            'user_id' => $user->id,
-        ]);
+        Post::factory()
+            ->for($user)
+            ->pinned()
+            ->published()
+            ->count(3)
+            ->create();
 
-        // Create some draft posts
-        Post::factory()->draft()->count(3)->create([
-            'user_id' => $user->id,
-        ]);
+        Post::factory()
+            ->for($user)
+            ->draft()
+            ->count(3)
+            ->create();
 
-        // Create some archived posts
-        Post::factory()->archived()->count(2)->create([
-            'user_id' => $user->id,
-        ]);
+        Post::factory()
+            ->for($user)
+            ->archived()
+            ->count(2)
+            ->create();
     }
 }

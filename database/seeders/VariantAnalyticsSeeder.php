@@ -15,27 +15,32 @@ final class VariantAnalyticsSeeder extends Seeder
 
     public function run(): void
     {
-        // Get all existing variants
-        $variants = ProductVariant::all();
-
-        if ($variants->isEmpty()) {
-            $this->command->warn('No product variants found. Creating analytics for sample variants...');
-
-            return;
-        }
+        $variants = ProductVariant::factory()->count(10)->create();
 
         $this->command->info('Creating variant analytics data...');
 
-        // Create analytics for the last 30 days for each variant
-        foreach ($variants as $variant) {
-            $this->createAnalyticsForVariant($variant);
-        }
+        $variants->each(function (ProductVariant $variant): void {
+            VariantAnalytics::factory()
+                ->count(30)
+                ->withVariant($variant)
+                ->create();
+        });
 
-        // Create some high-performing analytics
-        $this->createHighPerformingAnalytics($variants->take(5));
+        $variants->take(5)->each(function (ProductVariant $variant): void {
+            VariantAnalytics::factory()
+                ->count(7)
+                ->highPerforming()
+                ->withVariant($variant)
+                ->create();
+        });
 
-        // Create some low-performing analytics
-        $this->createLowPerformingAnalytics($variants->skip(5)->take(3));
+        $variants->skip(5)->take(3)->each(function (ProductVariant $variant): void {
+            VariantAnalytics::factory()
+                ->count(14)
+                ->lowPerforming()
+                ->withVariant($variant)
+                ->create();
+        });
 
         $this->command->info('Variant analytics data created successfully!');
     }

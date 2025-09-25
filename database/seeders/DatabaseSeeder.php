@@ -40,8 +40,6 @@ class DatabaseSeeder extends Seeder
             AttributeValueSeeder::class,
             // High‑performance product seeding with attributes, relations, translations, and local images
             TurboEcommerceSeeder::class,
-            // Enforce max 100 products per brand/category
-            EnsureBrandProductsSeeder::class,
             LocationSeeder::class,
             InventorySeeder::class,
             VariantInventorySeeder::class,
@@ -84,12 +82,9 @@ class DatabaseSeeder extends Seeder
             // News demo content
             NewsSeeder::class,
             NewsTagSeeder::class,
+            NewsCategorySeeder::class,
             NewsImageSeeder::class,
             NewsCommentSeeder::class,
-            // News translations
-            NewsTranslationSeeder::class,
-            NewsTagTranslationSeeder::class,
-            NewsImageTranslationSeeder::class,
             // Legal pages
             LegalSeeder::class,
             // Build header menu from categories

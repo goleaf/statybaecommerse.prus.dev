@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\AddressType;
 use App\Models\Address;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,7 +25,7 @@ final class AddressFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'type' => $this->faker->randomElement(['shipping', 'billing', 'home', 'work', 'other']),
+            'type' => $this->faker->randomElement(AddressType::values()),
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'company_name' => $this->faker->optional(0.3)->company(),
@@ -41,8 +42,8 @@ final class AddressFactory extends Factory
             'phone' => $this->faker->optional(0.8)->phoneNumber(),
             'email' => $this->faker->optional(0.6)->safeEmail(),
             'is_default' => $this->faker->boolean(20),
-            'is_billing' => $this->faker->boolean(30),
-            'is_shipping' => $this->faker->boolean(30),
+            'is_billing' => false,
+            'is_shipping' => false,
             'is_active' => $this->faker->boolean(95),
             'notes' => $this->faker->optional(0.2)->sentence(),
             'instructions' => $this->faker->optional(0.1)->sentence(),

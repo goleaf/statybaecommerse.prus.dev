@@ -37,5 +37,3 @@ final class DiscountCodeSeeder extends Seeder
         );
     }
 }
-
-

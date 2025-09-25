@@ -96,5 +96,3 @@ final class DiscountRedemptionSeeder extends Seeder
             ->create();
     }
 }
-
-

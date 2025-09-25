@@ -1,13 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models\Translations;
 
 use Database\Factories\BrandTranslationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * BrandTranslation
@@ -27,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class BrandTranslation extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'brand_translations';
 
     protected $fillable = ['brand_id', 'locale', 'name', 'slug', 'description', 'seo_title', 'seo_description'];

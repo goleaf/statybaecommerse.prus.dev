@@ -79,15 +79,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Užsakymas pristatytas', 'message' => 'Jūsų užsakymas #12345 buvo pristatytas', 'urgent' => false],
         ];
 
-        foreach ($orderNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'order',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($orderNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('order')
+                ->create();
         }
     }
 
@@ -99,15 +99,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Kaina pakeista', 'message' => 'Produkto "Profesionalus grąžtuvas" kaina sumažėjo', 'urgent' => false],
         ];
 
-        foreach ($productNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'product',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($productNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('product')
+                ->create();
         }
     }
 
@@ -118,15 +118,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Profilis atnaujintas', 'message' => 'Vartotojo profilis buvo atnaujintas', 'urgent' => false],
         ];
 
-        foreach ($userNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'user',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($userNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('user')
+                ->create();
         }
     }
 
@@ -138,15 +138,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Atsarginė kopija', 'message' => 'Sukurta sėkminga atsarginė kopija', 'urgent' => false],
         ];
 
-        foreach ($systemNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'system',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($systemNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('system')
+                ->create();
         }
     }
 
@@ -158,15 +158,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Grąžinimas', 'message' => 'Grąžinimas už užsakymą #12345 buvo apdorotas', 'urgent' => false],
         ];
 
-        foreach ($paymentNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'payment',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($paymentNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('payment')
+                ->create();
         }
     }
 
@@ -178,15 +178,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Siuntos problemos', 'message' => 'Aptiktos problemos su siunta', 'urgent' => true],
         ];
 
-        foreach ($shippingNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'shipping',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($shippingNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('shipping')
+                ->create();
         }
     }
 
@@ -197,15 +197,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Atsiliepimas patvirtintas', 'message' => 'Jūsų atsiliepimas buvo patvirtintas', 'urgent' => false],
         ];
 
-        foreach ($reviewNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'review',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($reviewNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('review')
+                ->create();
         }
     }
 
@@ -216,15 +216,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Akcija baigiasi', 'message' => 'Akcija baigiasi per 24 valandas', 'urgent' => true],
         ];
 
-        foreach ($promotionNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'promotion',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($promotionNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('promotion')
+                ->create();
         }
     }
 
@@ -235,15 +235,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Prenumerata aktyvuota', 'message' => 'Jūsų prenumerata buvo aktyvuota', 'urgent' => false],
         ];
 
-        foreach ($newsletterNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'newsletter',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($newsletterNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('newsletter')
+                ->create();
         }
     }
 
@@ -254,15 +254,15 @@ final class NotificationSeeder extends Seeder
             ['title' => 'Užklausimas išspręstas', 'message' => 'Palaikymo užklausimas buvo išspręstas', 'urgent' => false],
         ];
 
-        foreach ($supportNotifications as $notification) {
-            Notification::create([
-                'id' => fake()->uuid(),
-                'type' => 'support',
-                'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'data' => $notification,
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
+        foreach ($supportNotifications as $notificationData) {
+            Notification::factory()
+                ->for($user, 'notifiable')
+                ->state([
+                    'data' => $notificationData,
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ])
+                ->ofType('support')
+                ->create();
         }
     }
 }

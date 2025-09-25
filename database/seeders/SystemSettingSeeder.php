@@ -144,7 +144,6 @@ final class SystemSettingSeeder extends Seeder
                 'is_required' => false,
                 'default_value' => false,
             ],
-
             // Security Settings
             [
                 'category' => $securityCategory,
@@ -206,7 +205,6 @@ final class SystemSettingSeeder extends Seeder
                 'is_required' => false,
                 'default_value' => false,
             ],
-
             // Performance Settings
             [
                 'category' => $performanceCategory,
@@ -259,7 +257,6 @@ final class SystemSettingSeeder extends Seeder
                 'is_required' => false,
                 'default_value' => true,
             ],
-
             // UI/UX Settings
             [
                 'category' => $uiCategory,
@@ -306,7 +303,6 @@ final class SystemSettingSeeder extends Seeder
                 'is_required' => false,
                 'default_value' => true,
             ],
-
             // API Settings
             [
                 'category' => $apiCategory,
@@ -359,7 +355,7 @@ final class SystemSettingSeeder extends Seeder
         foreach ($settingsData as $settingData) {
             $category = $settingData['category'];
             unset($settingData['category']);
-            
+
             SystemSetting::firstOrCreate(
                 ['key' => $settingData['key']],
                 SystemSetting::factory()

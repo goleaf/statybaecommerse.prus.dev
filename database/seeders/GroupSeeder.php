@@ -53,7 +53,7 @@ final class GroupSeeder extends Seeder
 
         // Create additional users if needed and attach them to groups
         $existingUsers = User::limit(20)->get();
-        
+
         if ($existingUsers->isEmpty()) {
             // Create some users if none exist
             $existingUsers = User::factory()->count(15)->create();
@@ -61,7 +61,7 @@ final class GroupSeeder extends Seeder
 
         // Attach users to groups using relationships
         $groups = collect([$vipGroup, $studentGroup, $wholesaleGroup]);
-        
+
         foreach ($groups as $group) {
             // Attach random users to each group
             $usersToAttach = $existingUsers->random(min($existingUsers->count(), random_int(3, 8)));

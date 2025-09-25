@@ -94,4 +94,11 @@ final class ReferralCodeFactory extends Factory
             'code' => $code,
         ]);
     }
+
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => $user->id,
+        ]);
+    }
 }

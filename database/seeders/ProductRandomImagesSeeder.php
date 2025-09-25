@@ -74,7 +74,6 @@ final class ProductRandomImagesSeeder extends Seeder
 
                 $this->command->info('   ✓ Paveikslėlis #'.($i + 1)." sukurtas: {$media->name}");
             }
-
         } catch (\Throwable $e) {
             Log::warning('Nepavyko sugeneruoti paveikslėlio produktui', [
                 'product_id' => $product->id,

@@ -14,7 +14,6 @@ use App\Models\User;
 use App\Models\Zone;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 final class ComprehensiveOrderSeeder extends Seeder
@@ -85,70 +84,41 @@ final class ComprehensiveOrderSeeder extends Seeder
 
     private function ensureCurrencies(): void
     {
-        $currencies = [
+        $currenciesData = [
             ['name' => 'Euro', 'code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0],
             ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$', 'exchange_rate' => 1.1],
             ['name' => 'British Pound', 'code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 0.85],
         ];
 
-        foreach ($currencies as $currencyData) {
-            \App\Models\Currency::firstOrCreate(
-                ['code' => $currencyData['code']],
-                array_merge($currencyData, ['is_enabled' => true])
-            );
+        foreach ($currenciesData as $data) {
+            if (! \App\Models\Currency::where('code', $data['code'])->exists()) {
+                \App\Models\Currency::factory()->create([
+                    'code' => $data['code'],
+                    'name' => $data['name'],
+                    'symbol' => $data['symbol'],
+                    'exchange_rate' => $data['exchange_rate'],
+                    'is_enabled' => true,
+                ]);
+            }
         }
     }
 
     private function createZones(): void
     {
-        $eurCurrency = \App\Models\Currency::where('code', 'EUR')->first();
-        $usdCurrency = \App\Models\Currency::where('code', 'USD')->first();
-        $gbpCurrency = \App\Models\Currency::where('code', 'GBP')->first();
-
-        $zones = [
-            [
-                'name' => 'European Union',
-                'slug' => 'european-union',
-                'code' => 'EU',
-                'is_enabled' => true,
-                'is_default' => true,
-                'currency_id' => $eurCurrency->id,
-                'tax_rate' => 21.0,
-                'shipping_rate' => 5.99,
-                'sort_order' => 1,
-                'metadata' => ['region' => 'europe'],
-            ],
-            [
-                'name' => 'North America',
-                'slug' => 'north-america',
-                'code' => 'NA',
-                'is_enabled' => true,
-                'is_default' => false,
-                'currency_id' => $usdCurrency->id,
-                'tax_rate' => 8.5,
-                'shipping_rate' => 15.99,
-                'sort_order' => 2,
-                'metadata' => ['region' => 'north_america'],
-            ],
-            [
-                'name' => 'United Kingdom',
-                'slug' => 'united-kingdom',
-                'code' => 'UK',
-                'is_enabled' => true,
-                'is_default' => false,
-                'currency_id' => $gbpCurrency->id,
-                'tax_rate' => 20.0,
-                'shipping_rate' => 8.99,
-                'sort_order' => 3,
-                'metadata' => ['region' => 'uk'],
-            ],
+        $zonesData = [
+            ['name' => 'European Union', 'code' => 'EU'],
+            ['name' => 'North America', 'code' => 'NA'],
+            ['name' => 'United Kingdom', 'code' => 'UK'],
         ];
 
-        foreach ($zones as $zoneData) {
-            Zone::firstOrCreate(
-                ['code' => $zoneData['code']],
-                $zoneData
-            );
+        foreach ($zonesData as $data) {
+            if (! Zone::where('code', $data['code'])->exists()) {
+                Zone::factory()->create([
+                    'name' => $data['name'],
+                    'code' => $data['code'],
+                    'is_enabled' => true,
+                ]);
+            }
         }
     }
 
@@ -183,7 +153,7 @@ final class ComprehensiveOrderSeeder extends Seeder
             // Create order items using factory
             $itemCount = fake()->numberBetween(1, 5);
             $selectedProducts = $products->random($itemCount);
-            
+
             foreach ($selectedProducts as $product) {
                 OrderItem::factory()
                     ->for($order)
@@ -390,9 +360,16 @@ final class ComprehensiveOrderSeeder extends Seeder
     private function generateAddress(): array
     {
         $lithuanianCounties = [
-            'Alytaus apskritis', 'Kauno apskritis', 'Klaipėdos apskritis',
-            'Marijampolės apskritis', 'Panevėžio apskritis', 'Šiaulių apskritis',
-            'Tauragės apskritis', 'Telšių apskritis', 'Utenos apskritis', 'Vilniaus apskritis',
+            'Alytaus apskritis',
+            'Kauno apskritis',
+            'Klaipėdos apskritis',
+            'Marijampolės apskritis',
+            'Panevėžio apskritis',
+            'Šiaulių apskritis',
+            'Tauragės apskritis',
+            'Telšių apskritis',
+            'Utenos apskritis',
+            'Vilniaus apskritis',
         ];
 
         return [

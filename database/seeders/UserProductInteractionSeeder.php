@@ -21,50 +21,17 @@ final class UserProductInteractionSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::limit(20)->get();
-        $products = Product::limit(50)->get();
+        $users = User::factory()->count(20)->create();
 
-        if ($users->isEmpty() || $products->isEmpty()) {
-            $this->command->warn('No users or products found. Please run UserSeeder and ProductSeeder first.');
-
-            return;
-        }
-
-        $interactionTypes = ['view', 'click', 'add_to_cart', 'purchase', 'review', 'share'];
-
-        foreach ($users as $user) {
-            // Create 5-15 interactions per user
-            $interactionCount = fake()->numberBetween(5, 15);
-
-            for ($i = 0; $i < $interactionCount; $i++) {
-                $product = $products->random();
-                $interactionType = fake()->randomElement($interactionTypes);
-
-                // Check if interaction already exists
-                $existingInteraction = UserProductInteraction::where('user_id', $user->id)
-                    ->where('product_id', $product->id)
-                    ->where('interaction_type', $interactionType)
-                    ->first();
-
-                if ($existingInteraction) {
-                    // Increment existing interaction
-                    $existingInteraction->incrementInteraction(
-                        $interactionType === 'review' ? fake()->randomFloat(1, 1, 5) : null
-                    );
-                } else {
-                    // Create new interaction
-                    UserProductInteraction::create([
-                        'user_id' => $user->id,
-                        'product_id' => $product->id,
-                        'interaction_type' => $interactionType,
-                        'rating' => $interactionType === 'review' ? fake()->randomFloat(1, 1, 5) : null,
-                        'count' => fake()->numberBetween(1, 10),
-                        'first_interaction' => fake()->dateTimeBetween('-6 months', '-1 month'),
-                        'last_interaction' => fake()->dateTimeBetween('-1 month', 'now'),
-                    ]);
-                }
-            }
-        }
+        Product::factory()->count(50)->create()->each(static function (Product $product) use ($users): void {
+            $users->random(fake()->numberBetween(3, 7))->each(function (User $user) use ($product): void {
+                UserProductInteraction::factory()
+                    ->count(fake()->numberBetween(2, 6))
+                    ->for($user)
+                    ->for($product)
+                    ->create();
+            });
+        });
 
         $this->command->info('UserProductInteractionSeeder completed successfully.');
     }

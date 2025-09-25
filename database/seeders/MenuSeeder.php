@@ -14,14 +14,14 @@ final class MenuSeeder extends Seeder
     public function run(): void
     {
         /** @var Menu $menu */
-        $menu = Menu::factory()
-            ->state([
-                'key' => 'main_header',
+        $menu = Menu::query()->firstOrCreate(
+            ['key' => 'main_header'],
+            [
                 'name' => 'Pagrindinis meniu',
                 'location' => 'header',
                 'is_active' => true,
-            ])
-            ->create();
+            ]
+        );
 
         // Clear existing items for idempotency
         $menu->allItems()->delete();

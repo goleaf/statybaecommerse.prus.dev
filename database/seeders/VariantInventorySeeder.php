@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -20,45 +22,19 @@ final class VariantInventorySeeder extends Seeder
      */
     public function run(): void
     {
-        $variants = ProductVariant::query()->with(['inventories' => fn($query) => $query->select('id', 'variant_id', 'location_id')])->get();
-        $locations = Location::query()->get();
+        $locations = Location::factory()->count(5)->create();
 
-        if ($variants->isEmpty() || $locations->isEmpty()) {
-            $this->command->warn('No variants or locations found. Please run ProductVariantSeeder and LocationSeeder first.');
-
-            return;
-        }
-
-        foreach ($variants as $variant) {
-            foreach ($locations as $location) {
-                if ($variant->inventories->contains(fn(VariantInventory $inventory): bool => $inventory->location_id === $location->id)) {
-                    continue;
-                }
-
-                $stock = fake()->numberBetween(15, 120);
-                $reserved = fake()->numberBetween(0, (int) floor($stock / 3));
-
-                $variant
-                    ->inventories()
-                    ->create([
-                        'location_id' => $location->id,
-                        'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id),
-                        'stock' => $stock,
-                        'reserved' => $reserved,
-                        'available' => max(0, $stock - $reserved),
-                        'reorder_point' => fake()->numberBetween(5, 25),
-                        'reorder_quantity' => fake()->numberBetween(25, 75),
-                        'max_stock_level' => fake()->numberBetween(200, 400),
-                        'cost_per_unit' => fake()->randomFloat(2, 5, 150),
-                        'batch_number' => fake()->optional(0.5)->regexify('[A-Z]{3}-[0-9]{4}'),
-                        'expiry_date' => fake()->optional()->dateTimeBetween('+1 month', '+1 year'),
-                        'status' => fake()->randomElement(['active', 'active', 'inactive']),
-                        'notes' => fake()->optional(0.3)->sentence(),
-                        'last_restocked_at' => fake()->optional()->dateTimeBetween('-3 months', 'now'),
-                        'last_sold_at' => fake()->optional()->dateTimeBetween('-1 month', 'now'),
-                    ]);
-            }
-        }
+        ProductVariant::factory()
+            ->count(20)
+            ->create()
+            ->each(function (ProductVariant $variant) use ($locations): void {
+                $locations->each(function (Location $location) use ($variant): void {
+                    VariantInventory::factory()
+                        ->for($variant)
+                        ->for($location)
+                        ->create();
+                });
+            });
 
         $this->command?->info('VariantInventorySeeder: ensured variant inventories via factories and relationships.');
     }
@@ -168,7 +144,7 @@ final class VariantInventorySeeder extends Seeder
     {
         $prefix = strtoupper(substr($location->code ?? $location->name, 0, 3));
         do {
-            $code = $prefix . '-' . fake()->numerify('###');
+            $code = $prefix.'-'.fake()->numerify('###');
             $existsInDb = VariantInventory::query()
                 ->where('variant_id', $variantId)
                 ->where('warehouse_code', $code)

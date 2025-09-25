@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Referral;
 use App\Models\ReferralReward;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,11 +21,9 @@ final class ReferralRewardFactory extends Factory
         $types = ['discount', 'credit'];
         $type = fake()->randomElement($types);
 
-        $currentUserId = auth()->id();
-
         return [
             'referral_id' => null,
-            'user_id' => $currentUserId ?? User::factory(),
+            'user_id' => User::factory(),
             'order_id' => null,
             'type' => $type,
             'title' => [
@@ -125,6 +124,20 @@ final class ReferralRewardFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'priority' => fake()->numberBetween(0, 20),
+        ]);
+    }
+
+    public function forReferral(Referral $referral): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'referral_id' => $referral->id,
+        ]);
+    }
+
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => $user->id,
         ]);
     }
 }

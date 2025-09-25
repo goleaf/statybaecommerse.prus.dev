@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductComparison;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 final class ProductComparisonSeeder extends Seeder
 {
@@ -16,7 +17,6 @@ final class ProductComparisonSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get some users and products for seeding
         $users = User::limit(10)->get();
         $products = Product::limit(20)->get();
 
@@ -26,16 +26,12 @@ final class ProductComparisonSeeder extends Seeder
             return;
         }
 
-        // Create product comparisons for different scenarios
-        $this->createSessionComparisons($users, $products);
+        $this->createSessionComparisons($products);
         $this->createUserComparisons($users, $products);
         $this->createRecentComparisons($users, $products);
     }
 
-    /**
-     * Create comparisons for different sessions
-     */
-    private function createSessionComparisons($users, $products): void
+    private function createSessionComparisons(Collection $products): void
     {
         $sessions = [
             'session_12345',
@@ -46,47 +42,44 @@ final class ProductComparisonSeeder extends Seeder
         ];
 
         foreach ($sessions as $sessionId) {
-            // Each session has 3-7 products being compared
-            $sessionProducts = $products->random(rand(3, 7));
-
-            foreach ($sessionProducts as $product) {
-                ProductComparison::create([
-                    'session_id' => $sessionId,
-                    'user_id' => null, // Anonymous session
-                    'product_id' => $product->id,
-                ]);
+            if (ProductComparison::query()->where('session_id', $sessionId)->exists()) {
+                continue;
             }
+
+            $this->pickProducts($products, 3, 7)->each(function (Product $product) use ($sessionId): void {
+                ProductComparison::factory()
+                    ->forSession($sessionId)
+                    ->forProduct($product)
+                    ->state(['user_id' => null])
+                    ->create();
+            });
         }
     }
 
-    /**
-     * Create comparisons for logged-in users
-     */
-    private function createUserComparisons($users, $products): void
+    private function createUserComparisons(Collection $users, Collection $products): void
     {
-        foreach ($users->take(5) as $user) {
-            // Each user has 2-5 comparison sessions
+        $users->take(5)->each(function (User $user) use ($products): void {
             $userSessions = rand(2, 5);
 
             for ($i = 0; $i < $userSessions; $i++) {
                 $sessionId = 'user_'.$user->id.'_session_'.($i + 1);
-                $sessionProducts = $products->random(rand(2, 6));
 
-                foreach ($sessionProducts as $product) {
-                    ProductComparison::create([
-                        'session_id' => $sessionId,
-                        'user_id' => $user->id,
-                        'product_id' => $product->id,
-                    ]);
+                if (ProductComparison::query()->where('session_id', $sessionId)->exists()) {
+                    continue;
                 }
+
+                $this->pickProducts($products, 2, 6)->each(function (Product $product) use ($user, $sessionId): void {
+                    ProductComparison::factory()
+                        ->forUser($user)
+                        ->forSession($sessionId)
+                        ->forProduct($product)
+                        ->create();
+                });
             }
-        }
+        });
     }
 
-    /**
-     * Create recent comparisons (last 7 days)
-     */
-    private function createRecentComparisons($users, $products): void
+    private function createRecentComparisons(Collection $users, Collection $products): void
     {
         $recentSessions = [
             'recent_session_1',
@@ -95,18 +88,45 @@ final class ProductComparisonSeeder extends Seeder
         ];
 
         foreach ($recentSessions as $sessionId) {
-            $sessionProducts = $products->random(rand(2, 5));
+            $sessionProducts = $this->pickProducts($products, 2, 5);
+            if ($sessionProducts->isEmpty()) {
+                continue;
+            }
+
             $createdAt = now()->subDays(rand(0, 7));
 
-            foreach ($sessionProducts as $product) {
-                ProductComparison::create([
-                    'session_id' => $sessionId,
-                    'user_id' => $users->random()->id,
-                    'product_id' => $product->id,
-                    'created_at' => $createdAt,
-                    'updated_at' => $createdAt,
-                ]);
-            }
+            $sessionProducts->each(function (Product $product) use ($users, $sessionId, $createdAt): void {
+                ProductComparison::factory()
+                    ->forSession($sessionId)
+                    ->forProduct($product)
+                    ->state([
+                        'user_id' => $users->random()->id,
+                        'created_at' => $createdAt,
+                        'updated_at' => $createdAt,
+                    ])
+                    ->create();
+            });
         }
+    }
+
+    private function pickProducts(Collection $products, int $min, int $max): Collection
+    {
+        if ($products->isEmpty()) {
+            return collect();
+        }
+
+        $minPick = min($products->count(), $min);
+        $maxPick = min($products->count(), $max);
+
+        $requested = max($minPick, rand($min, $max));
+        $requested = min($requested, $products->count());
+
+        if ($requested <= 0) {
+            return collect();
+        }
+
+        $selection = $products->random($requested);
+
+        return Collection::wrap($selection);
     }
 }

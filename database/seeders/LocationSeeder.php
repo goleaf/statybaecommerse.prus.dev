@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\Location;
 use App\Models\Translations\LocationTranslation;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 final class LocationSeeder extends Seeder
 {
@@ -14,96 +15,88 @@ final class LocationSeeder extends Seeder
     {
         $locales = $this->supportedLocales();
 
-        $locations = [
+        $definitions = [
             [
-                'code' => 'WH-001',
-                'address_line_1' => 'Sandėlio g. 1',
-                'city' => 'Vilnius',
-                'postal_code' => '01100',
-                'country_code' => 'LT',
-                'phone' => '+37060000001',
-                'email' => 'warehouse@shop.lt',
-                'is_enabled' => true,
-                'is_default' => true,
-                'type' => 'warehouse',
+                'attributes' => [
+                    'code' => 'WH-001',
+                    'address_line_1' => 'Sandėlio g. 1',
+                    'city' => 'Vilnius',
+                    'postal_code' => '01100',
+                    'country_code' => 'LT',
+                    'phone' => '+37060000001',
+                    'email' => 'warehouse@shop.lt',
+                    'is_enabled' => true,
+                    'is_default' => true,
+                    'type' => 'warehouse',
+                ],
                 'translations' => [
                     'lt' => [
                         'name' => 'Pagrindinis sandėlis',
                         'slug' => 'pagrindinis-sandelys',
-                        'description' => 'Pagrindinė prekių saugojimo vieta',
+                        'description' => 'Pagrindinė prekių saugojimo vieta.',
                     ],
                     'en' => [
                         'name' => 'Main Warehouse',
                         'slug' => 'main-warehouse',
-                        'description' => 'Primary storage location',
+                        'description' => 'Primary storage location.',
                     ],
                 ],
             ],
             [
-                'code' => 'WH-002',
-                'address_line_1' => 'Pramonės g. 10',
-                'city' => 'Kaunas',
-                'postal_code' => '44100',
-                'country_code' => 'LT',
-                'phone' => '+37060000002',
-                'email' => 'backup@shop.lt',
-                'is_enabled' => true,
-                'is_default' => false,
-                'type' => 'warehouse',
+                'attributes' => [
+                    'code' => 'WH-002',
+                    'address_line_1' => 'Pramonės g. 10',
+                    'city' => 'Kaunas',
+                    'postal_code' => '44100',
+                    'country_code' => 'LT',
+                    'phone' => '+37060000002',
+                    'email' => 'backup@shop.lt',
+                    'is_enabled' => true,
+                    'is_default' => false,
+                    'type' => 'warehouse',
+                ],
                 'translations' => [
                     'lt' => [
                         'name' => 'Atsarginis sandėlis',
                         'slug' => 'atsarginis-sandelys',
-                        'description' => 'Papildoma atsargų vieta',
+                        'description' => 'Papildoma atsargų vieta.',
                     ],
                     'en' => [
                         'name' => 'Backup Warehouse',
                         'slug' => 'backup-warehouse',
-                        'description' => 'Secondary stock location',
+                        'description' => 'Secondary stock location.',
                     ],
                 ],
             ],
         ];
 
-        foreach ($locations as $data) {
-            $translations = $data['translations'] ?? [];
-            unset($data['translations']);
+        Location::query()
+            ->whereIn('code', collect($definitions)->pluck('attributes.code'))
+            ->get()
+            ->each(function (Location $location): void {
+                $location->translations()->delete();
+                $location->delete();
+            });
 
-            // Prepare JSON fields for name and slug based on translations
-            $nameJson = [];
-            $slugJson = [];
-            $descriptionJson = [];
+        foreach ($definitions as $definition) {
+            $location = Location::factory()
+                ->state($definition['attributes'])
+                ->create();
 
             foreach ($locales as $locale) {
-                $translationData = $translations[$locale] ?? [];
-                $nameJson[$locale] = $translationData['name'] ?? 'Location';
-                $slugJson[$locale] = $translationData['slug'] ?? $data['code'].'-'.$locale;
-                $descriptionJson[$locale] = $translationData['description'] ?? '';
-            }
+                $translation = $definition['translations'][$locale] ?? $definition['translations']['en'];
 
-            // Provide default values for required fields
-            $data['name'] = $data['code']; // Use code as default name
-            $data['slug'] = $data['code']; // Use code as default slug
-            $data['description'] = ''; // Empty description
-
-            $location = Location::updateOrCreate(['code' => $data['code']], $data);
-
-            // Create translations for each locale (if using separate translation table)
-            foreach ($locales as $locale) {
-                $translationData = $translations[$locale] ?? [];
-                $slug = $translationData['slug'] ?? $location->code.'-'.$locale;
-                LocationTranslation::updateOrCreate([
-                    'location_id' => $location->id,
-                    'locale' => $locale,
-                ], [
-                    'name' => $translationData['name'] ?? 'Location',
-                    'slug' => $slug,
-                    'description' => $translationData['description'] ?? '',
-                ]);
+                LocationTranslation::factory()
+                    ->for($location)
+                    ->state([
+                        'locale' => $locale,
+                        'name' => $translation['name'],
+                        'slug' => $translation['slug'] ?? Str::slug($translation['name']),
+                        'description' => $translation['description'] ?? '',
+                    ])
+                    ->create();
             }
         }
-
-        $this->command?->info('LocationSeeder: seeded locations with translations (locales: '.implode(',', $locales).').');
     }
 
     private function supportedLocales(): array

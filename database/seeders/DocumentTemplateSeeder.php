@@ -19,7 +19,7 @@ final class DocumentTemplateSeeder extends Seeder
 
     private function seedInvoiceTemplates(): void
     {
-        DocumentTemplate::factory()
+        $data = DocumentTemplate::factory()
             ->invoice()
             ->state([
                 'slug' => 'invoice-template',
@@ -34,12 +34,15 @@ final class DocumentTemplateSeeder extends Seeder
                 ],
                 'is_active' => true,
             ])
-            ->firstOrCreate();
+            ->make()
+            ->toArray();
+
+        DocumentTemplate::query()->updateOrCreate(['slug' => 'invoice-template'], $data);
     }
 
     private function seedQuoteTemplates(): void
     {
-        DocumentTemplate::factory()
+        $data = DocumentTemplate::factory()
             ->quote()
             ->state([
                 'slug' => 'quote-template',
@@ -53,12 +56,15 @@ final class DocumentTemplateSeeder extends Seeder
                 ],
                 'is_active' => true,
             ])
-            ->firstOrCreate();
+            ->make()
+            ->toArray();
+
+        DocumentTemplate::query()->updateOrCreate(['slug' => 'quote-template'], $data);
     }
 
     private function seedReceiptTemplates(): void
     {
-        DocumentTemplate::factory()
+        $data = DocumentTemplate::factory()
             ->receipt()
             ->state([
                 'slug' => 'receipt-template',
@@ -72,7 +78,10 @@ final class DocumentTemplateSeeder extends Seeder
                 ],
                 'is_active' => true,
             ])
-            ->firstOrCreate();
+            ->make()
+            ->toArray();
+
+        DocumentTemplate::query()->updateOrCreate(['slug' => 'receipt-template'], $data);
     }
 
     private function seedAdditionalTemplates(): void

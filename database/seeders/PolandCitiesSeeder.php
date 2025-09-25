@@ -7,9 +7,10 @@ namespace Database\Seeders;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Region;
-use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
+use Database\Factories\Translations\CityTranslationFactory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 final class PolandCitiesSeeder extends Seeder
 {
@@ -628,40 +629,40 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
         ];
-
         foreach ($cities as $cityData) {
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                [
-                    'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name']),
-                    'is_enabled' => true,
-                    'is_default' => $cityData['is_default'] ?? false,
-                    'is_capital' => $cityData['is_capital'] ?? false,
-                    'country_id' => $poland->id,
-                    'zone_id' => $euZone?->id,
-                    'region_id' => $cityData['region_id'],
-                    'level' => 1,
-                    'latitude' => $cityData['latitude'],
-                    'longitude' => $cityData['longitude'],
-                    'population' => $cityData['population'],
-                    'postal_codes' => $cityData['postal_codes'],
-                    'sort_order' => 0,
-                ]
-            );
+            $translations = $cityData['translations'] ?? [];
+            unset($cityData['translations']);
 
-            // Create translations
-            foreach ($cityData['translations'] as $locale => $translation) {
-                CityTranslation::updateOrCreate(
-                    [
-                        'city_id' => $city->id,
-                        'locale' => $locale,
-                    ],
-                    [
+            $city = City::query()->where('code', $cityData['code'])->first();
+
+            if (! $city) {
+                $city = City::factory()
+                    ->for($poland, 'country')
+                    ->state(array_merge([
+                        'slug' => Str::slug($cityData['name']),
+                        'zone_id' => $cityData['zone_id'] ?? $euZone?->id,
+                    ], $cityData))
+                    ->create();
+            }
+
+            foreach ($translations as $locale => $translation) {
+                $exists = $city->translations()
+                    ->where('locale', $locale)
+                    ->where('name', $translation['name'])
+                    ->exists();
+
+                if ($exists) {
+                    continue;
+                }
+
+                CityTranslationFactory::new()
+                    ->forCity($city)
+                    ->forLocale($locale)
+                    ->state([
                         'name' => $translation['name'],
                         'description' => $translation['description'],
-                    ]
-                );
+                    ])
+                    ->create();
             }
         }
     }

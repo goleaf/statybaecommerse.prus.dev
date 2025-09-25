@@ -163,10 +163,7 @@ final class ProductImageResourceTest extends TestCase
 
     public function test_navigation_group_is_products(): void
     {
-        $this->assertEquals(
-            NavigationGroup::Products,
-            ProductImageResource::getNavigationGroup()
-        );
+        expect(ProductImageResource::getNavigationGroup())->toBe(NavigationGroup::Products->value);
     }
 
     public function test_navigation_sort_is_14(): void

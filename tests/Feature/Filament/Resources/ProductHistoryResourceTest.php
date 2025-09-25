@@ -239,10 +239,7 @@ final class ProductHistoryResourceTest extends TestCase
 
     public function test_navigation_group_is_products(): void
     {
-        $this->assertEquals(
-            NavigationGroup::Products->value,
-            ProductHistoryResource::getNavigationGroup()
-        );
+        expect(ProductHistoryResource::getNavigationGroup())->toBe(NavigationGroup::Products->value);
     }
 
     public function test_navigation_sort_is_11(): void

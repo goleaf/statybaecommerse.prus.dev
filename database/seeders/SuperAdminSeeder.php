@@ -16,21 +16,25 @@ final class SuperAdminSeeder extends Seeder
     {
         $this->command->info('🔐 Creating Super Admin User...');
 
-        $superAdminRole = Role::factory()->create(['name' => 'super-admin', 'guard_name' => 'web']);
-        $permissions = Permission::factory()->count(50)->create();
+        $superAdminRole = Role::firstOrCreate(
+            ['name' => 'super-admin', 'guard_name' => 'web']
+        );
+
+        $permissions = Permission::factory()
+            ->count(50)
+            ->create(['guard_name' => 'web']);
 
         $superAdminRole->syncPermissions($permissions);
 
-        $admin = User::factory()->create([
-            'email' => 'admin@example.com',
-            'name' => 'Super Administrator',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-            'is_admin' => true,
-            'is_active' => true,
-        ]);
+        $admin = User::factory()
+            ->admin()
+            ->create([
+                'email' => 'admin@example.com',
+                'name' => 'Super Administrator',
+                'password' => Hash::make('password'),
+            ]);
 
-        $admin->assignRole($superAdminRole);
+        $admin->syncRoles([$superAdminRole]);
 
         $this->command->info('✅ Super Admin created successfully!');
         $this->command->info('📧 Email: admin@example.com');

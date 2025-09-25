@@ -35,14 +35,14 @@ final class ProductAnalyticsFactory extends Factory
 
     public function forProduct(Product $product): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'product_id' => $product->id,
         ]);
     }
 
     public function withHighPerformance(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'views' => fake()->numberBetween(5000, 20000),
             'clicks' => fake()->numberBetween(500, 2000),
             'conversions' => fake()->numberBetween(50, 300),
@@ -53,7 +53,7 @@ final class ProductAnalyticsFactory extends Factory
 
     public function withLowPerformance(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'views' => fake()->numberBetween(0, 100),
             'clicks' => fake()->numberBetween(0, 10),
             'conversions' => fake()->numberBetween(0, 2),
@@ -64,7 +64,7 @@ final class ProductAnalyticsFactory extends Factory
 
     public function forDateRange(\DateTime $startDate, \DateTime $endDate): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'date' => fake()->dateTimeBetween($startDate, $endDate),
         ]);
     }

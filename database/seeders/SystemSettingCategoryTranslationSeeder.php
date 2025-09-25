@@ -29,9 +29,6 @@ final class SystemSettingCategoryTranslationSeeder extends Seeder
         $translations = [
             'lt' => $this->getLithuanianTranslations($category->slug),
             'en' => $this->getEnglishTranslations($category->slug),
-            'de' => $this->getGermanTranslations($category->slug),
-            'fr' => $this->getFrenchTranslations($category->slug),
-            'es' => $this->getSpanishTranslations($category->slug),
         ];
 
         foreach ($translations as $locale => $translation) {

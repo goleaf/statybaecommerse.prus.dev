@@ -57,8 +57,8 @@ final class UserBehaviorFactory extends Factory
         return [
             'user_id' => User::factory(),
             'session_id' => $this->faker->uuid(),
-            'product_id' => $this->faker->optional(0.7)->randomElement(Product::pluck('id')->toArray()) ?: Product::factory(),
-            'category_id' => $this->faker->optional(0.6)->randomElement(Category::pluck('id')->toArray()) ?: Category::factory(),
+            'product_id' => Product::factory(),
+            'category_id' => Category::factory(),
             'behavior_type' => $this->faker->randomElement($behaviorTypes),
             'referrer' => $this->faker->randomElement($referrers),
             'user_agent' => $this->faker->randomElement($userAgents),
@@ -225,6 +225,34 @@ final class UserBehaviorFactory extends Factory
                 'is_desktop' => false,
                 'viewport_width' => $this->faker->numberBetween(320, 414),
                 'viewport_height' => $this->faker->numberBetween(568, 896),
+            ]),
+        ]);
+    }
+
+    /**
+     * Create a wishlist behavior
+     */
+    public function wishlist(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'behavior_type' => 'wishlist',
+            'metadata' => array_merge($attributes['metadata'] ?? [], [
+                'wishlist_note' => $this->faker->optional()->sentence(),
+            ]),
+        ]);
+    }
+
+    /**
+     * Create a filter behavior
+     */
+    public function filter(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'behavior_type' => 'filter',
+            'metadata' => array_merge($attributes['metadata'] ?? [], [
+                'filters_applied' => $this->faker->randomElements(['price', 'brand', 'color', 'size'], $this->faker->numberBetween(1, 3)),
+                'page_url' => $this->faker->url(),
+                'page_title' => $this->faker->sentence(3),
             ]),
         ]);
     }

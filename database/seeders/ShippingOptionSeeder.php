@@ -31,7 +31,7 @@ class ShippingOptionSeeder extends Seeder
                 ->for($zone)
                 ->state([
                     'name' => 'DHL Express',
-                    'slug' => 'dhl-express-' . $zone->id,
+                    'slug' => 'dhl-express-'.$zone->id,
                     'description' => 'Fast and reliable express delivery',
                     'carrier_name' => 'DHL',
                     'service_type' => 'Express',
@@ -48,7 +48,7 @@ class ShippingOptionSeeder extends Seeder
                 ->for($zone)
                 ->state([
                     'name' => 'DHL Standard',
-                    'slug' => 'dhl-standard-' . $zone->id,
+                    'slug' => 'dhl-standard-'.$zone->id,
                     'description' => 'Standard delivery service',
                     'carrier_name' => 'DHL',
                     'service_type' => 'Standard',
@@ -64,7 +64,7 @@ class ShippingOptionSeeder extends Seeder
                 ->for($zone)
                 ->state([
                     'name' => 'UPS Economy',
-                    'slug' => 'ups-economy-' . $zone->id,
+                    'slug' => 'ups-economy-'.$zone->id,
                     'description' => 'Economical delivery option',
                     'carrier_name' => 'UPS',
                     'service_type' => 'Economy',
@@ -80,7 +80,7 @@ class ShippingOptionSeeder extends Seeder
                 ->for($zone)
                 ->free()
                 ->state([
-                    'slug' => 'free-shipping-' . $zone->id,
+                    'slug' => 'free-shipping-'.$zone->id,
                     'description' => 'Free shipping for orders over €50',
                     'sort_order' => 4,
                     'min_order_amount' => 50.0,
@@ -90,6 +90,6 @@ class ShippingOptionSeeder extends Seeder
                 ->create();
         }
 
-        $this->command->info('Shipping options seeded successfully for ' . $zones->count() . ' zones.');
+        $this->command->info('Shipping options seeded successfully for '.$zones->count().' zones.');
     }
 }

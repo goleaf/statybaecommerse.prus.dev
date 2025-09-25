@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\PartnerTier;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PartnerTier>
@@ -21,7 +22,7 @@ final class PartnerTierFactory extends Factory
 
         return [
             'name' => $tierName,
-            'code' => strtoupper($tierName).'_'.$this->faker->unique()->numerify('###'),
+            'code' => Str::of($tierName)->slug('_').'_'.$this->faker->unique()->numerify('###'),
             'discount_rate' => $this->faker->randomFloat(4, 0.01, 0.15), // 1% to 15%
             'commission_rate' => $this->faker->randomFloat(4, 0.02, 0.10), // 2% to 10%
             'minimum_order_value' => $this->faker->randomFloat(2, 100, 5000),

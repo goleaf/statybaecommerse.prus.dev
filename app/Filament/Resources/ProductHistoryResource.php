@@ -1,15 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
-use UnitEnum;
-use BackedEnum;
-use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
+use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Models\ProductHistory;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
@@ -24,6 +20,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use BackedEnum;
+use UnitEnum;
 
 final class ProductHistoryResource extends Resource
 {
@@ -107,7 +105,7 @@ final class ProductHistoryResource extends Resource
                 TextColumn::make('action')
                     ->label(__('product_history.action'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'created' => 'success',
                         'updated' => 'warning',
                         'deleted' => 'danger',
@@ -143,18 +141,18 @@ final class ProductHistoryResource extends Resource
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from'] ?? null) {
-                            $indicators[] = __('product_history.from').': '.$data['from'];
+                            $indicators[] = __('product_history.from') . ': ' . $data['from'];
                         }
                         if ($data['until'] ?? null) {
-                            $indicators[] = __('product_history.until').': '.$data['until'];
+                            $indicators[] = __('product_history.until') . ': ' . $data['until'];
                         }
 
                         return $indicators;
                     })
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['from'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
-                            ->when($data['until'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
+                            ->when($data['from'] ?? null, fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
+                            ->when($data['until'] ?? null, fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
                     }),
             ]);
     }

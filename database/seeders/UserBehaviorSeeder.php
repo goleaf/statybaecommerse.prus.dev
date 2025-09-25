@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -24,8 +26,9 @@ final class UserBehaviorSeeder extends Seeder
         $categories = Category::factory()->count(8)->create();
         $products = Product::factory()
             ->count(30)
-            ->hasAttached($categories->random(3))
             ->create();
+        $products->each(fn (Product $product) => $product->categories()->attach($categories->random(3)));
+
         $users = User::factory()->count(10)->create();
 
         $this->createViewBehaviors($users, $products, $categories);
@@ -109,9 +112,7 @@ final class UserBehaviorSeeder extends Seeder
 
         UserBehavior::factory()
             ->count(80)
-            ->state(fn () => [
-                'behavior_type' => 'wishlist',
-            ])
+            ->wishlist()
             ->recycle($users)
             ->recycle($products)
             ->create();
@@ -123,14 +124,7 @@ final class UserBehaviorSeeder extends Seeder
 
         UserBehavior::factory()
             ->count(120)
-            ->state(fn () => [
-                'behavior_type' => 'filter',
-                'metadata' => [
-                    'filters_applied' => fake()->randomElements(['price', 'brand', 'color', 'size'], fake()->numberBetween(1, 3)),
-                    'page_url' => fake()->url(),
-                    'page_title' => fake()->sentence(3),
-                ],
-            ])
+            ->filter()
             ->recycle($users)
             ->recycle($categories)
             ->create();

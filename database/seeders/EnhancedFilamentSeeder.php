@@ -138,10 +138,6 @@ final class EnhancedFilamentSeeder extends Seeder
 
     private function createAnalyticsData(): void
     {
-        $products = Product::where('is_visible', true)
-            ->limit(20)
-            ->get();
-
         // Placeholder for analytics data seeding once dedicated model/factory exists
     }
 }

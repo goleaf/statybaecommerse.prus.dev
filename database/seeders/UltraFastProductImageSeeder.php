@@ -81,7 +81,7 @@ final class UltraFastProductImageSeeder extends Seeder
         }
 
         // Ultra-fast chunked processing with minimal overhead and timeout protection
-        $timeout = now()->addMinutes(30); // 30 minute timeout for image generation
+        $timeout = now()->addMinutes(30);  // 30 minute timeout for image generation
 
         Product::query()
             ->select(['id', 'name', 'slug', 'is_featured'])
@@ -196,7 +196,7 @@ final class UltraFastProductImageSeeder extends Seeder
 
             // Save directly to WebP with optimized settings
             $filename = sprintf('product_%d_%d_%s.webp', $product->id, $imageNumber, uniqid('', true));
-            $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
+            $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.$filename;
 
             $success = function_exists('imagewebp')
                 ? imagewebp($image, $path, 85)  // Balanced quality/speed
@@ -326,7 +326,7 @@ final class UltraFastProductImageSeeder extends Seeder
     private function optimizeMemorySettings(): void
     {
         // Optimize PHP settings for maximum performance
-        ini_set('memory_limit', self::MEMORY_LIMIT_MB . 'M');
+        ini_set('memory_limit', self::MEMORY_LIMIT_MB.'M');
         ini_set('max_execution_time', '0');
 
         // Disable garbage collection during processing for speed
@@ -352,7 +352,7 @@ final class UltraFastProductImageSeeder extends Seeder
         ];
 
         foreach ($directories as $directory) {
-            if (!File::exists($directory)) {
+            if (! File::exists($directory)) {
                 File::makeDirectory($directory, 0755, true);
             }
         }
@@ -361,16 +361,16 @@ final class UltraFastProductImageSeeder extends Seeder
     private function displayPerformanceMetrics(): void
     {
         $totalTime = microtime(true) - $this->startTime;
-        $avgBatchTime = !empty($this->batchTimes) ? array_sum($this->batchTimes) / count($this->batchTimes) : 0;
+        $avgBatchTime = ! empty($this->batchTimes) ? array_sum($this->batchTimes) / count($this->batchTimes) : 0;
         $imagesPerSecond = $this->processedCount * self::MAX_IMAGES_PER_PRODUCT / $totalTime;
 
         $this->command->info('');
         $this->command->info('📈 PERFORMANCE METRICS:');
-        $this->command->info('⏱️ Bendras laikas: ' . number_format($totalTime, 2) . 's');
-        $this->command->info('🚀 Vidutinis batch laikas: ' . number_format($avgBatchTime, 3) . 's');
-        $this->command->info('🖼️ Paveikslėlių per sekundę: ' . number_format($imagesPerSecond, 1));
-        $this->command->info('📊 Produktų per sekundę: ' . number_format($this->processedCount / $totalTime, 1));
-        $this->command->info('💾 Atmintis: ' . number_format(memory_get_peak_usage(true) / 1024 / 1024, 1) . 'MB');
+        $this->command->info('⏱️ Bendras laikas: '.number_format($totalTime, 2).'s');
+        $this->command->info('🚀 Vidutinis batch laikas: '.number_format($avgBatchTime, 3).'s');
+        $this->command->info('🖼️ Paveikslėlių per sekundę: '.number_format($imagesPerSecond, 1));
+        $this->command->info('📊 Produktų per sekundę: '.number_format($this->processedCount / $totalTime, 1));
+        $this->command->info('💾 Atmintis: '.number_format(memory_get_peak_usage(true) / 1024 / 1024, 1).'MB');
     }
 
     private function cleanupResources(): void
@@ -384,7 +384,7 @@ final class UltraFastProductImageSeeder extends Seeder
         $this->batchTimes = [];
 
         // Clean up any remaining temp files
-        $tempFiles = glob(sys_get_temp_dir() . '/product_*');
+        $tempFiles = glob(sys_get_temp_dir().'/product_*');
         foreach ($tempFiles as $file) {
             if (is_file($file) && (time() - filemtime($file)) > 300) {  // 5 minutes old
                 unlink($file);

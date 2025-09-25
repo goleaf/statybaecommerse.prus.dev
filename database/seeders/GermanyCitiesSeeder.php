@@ -181,7 +181,7 @@ final class GermanyCitiesSeeder extends Seeder
         // Create cities using factories with relationships
         foreach ($cityData as $data) {
             $region = $regions[$data['region_code']] ?? null;
-            
+
             $city = City::factory()
                 ->for($germany, 'country')
                 ->for($euZone, 'zone')

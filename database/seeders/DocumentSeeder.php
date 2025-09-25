@@ -9,6 +9,7 @@ use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 final class DocumentSeeder extends Seeder
 {
@@ -29,7 +30,7 @@ final class DocumentSeeder extends Seeder
         $this->seedReports($templates, $users, $orders);
     }
 
-    private function seedInvoices($templates, $users, $orders): void
+    private function seedInvoices(Collection $templates, Collection $users, Collection $orders): void
     {
         Document::factory()
             ->count(5)
@@ -40,7 +41,7 @@ final class DocumentSeeder extends Seeder
             ->create();
     }
 
-    private function seedReceipts($templates, $users, $orders): void
+    private function seedReceipts(Collection $templates, Collection $users, Collection $orders): void
     {
         Document::factory()
             ->count(5)
@@ -51,7 +52,7 @@ final class DocumentSeeder extends Seeder
             ->create();
     }
 
-    private function seedDrafts($templates, $users, $orders): void
+    private function seedDrafts(Collection $templates, Collection $users, Collection $orders): void
     {
         Document::factory()
             ->count(3)
@@ -62,7 +63,7 @@ final class DocumentSeeder extends Seeder
             ->create();
     }
 
-    private function seedContracts($templates, $users, $orders): void
+    private function seedContracts(Collection $templates, Collection $users, Collection $orders): void
     {
         Document::factory()
             ->count(3)
@@ -73,7 +74,7 @@ final class DocumentSeeder extends Seeder
             ->create();
     }
 
-    private function seedReports($templates, $users, $orders): void
+    private function seedReports(Collection $templates, Collection $users, Collection $orders): void
     {
         Document::factory()
             ->count(3)

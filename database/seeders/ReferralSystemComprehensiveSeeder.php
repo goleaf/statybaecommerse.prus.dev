@@ -19,263 +19,69 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::transaction(function () {
-            $this->createReferralCampaigns();
-            $this->createReferralCodes();
-            $this->createReferrals();
-            $this->createReferralRewards();
-            $this->createReferralCodeStatistics();
-            $this->createReferralCodeUsageLogs();
-            $this->createReferralRewardLogs();
+        DB::transaction(function (): void {
+            $campaigns = $this->createReferralCampaigns();
+            $users = User::factory()->count(30)->create();
+            $codes = $this->createReferralCodes($users, $campaigns);
+            $referrals = $this->createReferrals($codes);
+            $rewards = $this->createReferralRewards($referrals);
+            $this->createReferralCodeStatistics($codes);
+            $this->createReferralCodeUsageLogs($codes, $users);
+            $this->createReferralRewardLogs($rewards);
         });
     }
 
-    private function createReferralCampaigns(): void
+    private function createReferralCampaigns(): \Illuminate\Support\Collection
     {
-        $campaigns = [
-            [
-                'name' => [
-                    'en' => 'Welcome Bonus Campaign',
-                    'lt' => 'Sveikinimo bonusas kampanija',
-                ],
-                'description' => [
-                    'en' => 'Get bonus rewards for referring new users',
-                    'lt' => 'Gaukite bonusų atlygius už naujų naudotojų rekomendavimą',
-                ],
-                'is_active' => true,
-                'start_date' => now()->subDays(30),
-                'end_date' => now()->addDays(30),
-                'reward_amount' => 10.00,
-                'reward_type' => 'discount',
-                'max_referrals_per_user' => 5,
-                'max_total_referrals' => 1000,
-                'conditions' => [
-                    'min_order_value' => 50.00,
-                    'new_user_only' => true,
-                ],
-                'metadata' => [
-                    'campaign_type' => 'referral',
-                    'target_audience' => 'new_users',
-                ],
-            ],
-            [
-                'name' => [
-                    'en' => 'Holiday Special Campaign',
-                    'lt' => 'Šventinė speciali kampanija',
-                ],
-                'description' => [
-                    'en' => 'Special holiday referral campaign with increased rewards',
-                    'lt' => 'Speciali šventinė rekomendacijų kampanija su padidintais atlygiais',
-                ],
-                'is_active' => true,
-                'start_date' => now()->subDays(15),
-                'end_date' => now()->addDays(15),
-                'reward_amount' => 25.00,
-                'reward_type' => 'credit',
-                'max_referrals_per_user' => 10,
-                'max_total_referrals' => 500,
-                'conditions' => [
-                    'min_order_value' => 100.00,
-                    'new_user_only' => true,
-                ],
-                'metadata' => [
-                    'campaign_type' => 'holiday',
-                    'target_audience' => 'all_users',
-                ],
-            ],
-        ];
-
-        foreach ($campaigns as $campaignData) {
-            ReferralCampaign::create($campaignData);
-        }
+        return ReferralCampaign::factory()
+            ->count(5)
+            ->create();
     }
 
-    private function createReferralCodes(): void
+    private function createReferralCodes($users, $campaigns): \Illuminate\Support\Collection
     {
-        $users = User::limit(10)->get();
-        $campaigns = ReferralCampaign::all();
-
-        foreach ($users as $user) {
-            $campaign = $campaigns->random();
-
-            ReferralCode::create([
-                'user_id' => $user->id,
-                'code' => strtoupper(substr(md5(uniqid()), 0, 8)),
-                'title' => [
-                    'en' => 'Referral Code for '.$user->name,
-                    'lt' => 'Rekomendacijų kodas '.$user->name,
-                ],
-                'description' => [
-                    'en' => 'Use this code to get special rewards',
-                    'lt' => 'Naudokite šį kodą, kad gautumėte specialius atlygius',
-                ],
-                'is_active' => true,
-                'expires_at' => now()->addDays(90),
-                'usage_limit' => rand(5, 20),
-                'usage_count' => 0,
-                'reward_amount' => rand(5, 50),
-                'reward_type' => ['discount', 'credit', 'points', 'gift'][rand(0, 3)],
-                'campaign_id' => $campaign->id,
-                'source' => ['website', 'email', 'social', 'mobile'][rand(0, 3)],
-                'conditions' => [
-                    'min_order_value' => rand(25, 100),
-                    'new_user_only' => true,
-                ],
-                'tags' => [
-                    'premium' => 'true',
-                    'category' => 'referral',
-                ],
-                'metadata' => [
-                    'created_by' => 'system',
-                    'priority' => rand(1, 5),
-                ],
-            ]);
-        }
+        return ReferralCode::factory()
+            ->count(40)
+            ->state(function () use ($users, $campaigns) {
+                return [
+                    'user_id' => $users->random()->id,
+                    'campaign_id' => $campaigns->random()->id,
+                ];
+            })
+            ->create();
     }
 
-    private function createReferrals(): void
+    private function createReferrals($codes): \Illuminate\Support\Collection
     {
-        $users = User::all();
-        $referralCodes = ReferralCode::all();
+        return Referral::factory()
+            ->count(60)
+            ->state(function () use ($codes) {
+                $code = $codes->random();
+                $referrer = $code->user;
+                $referred = User::factory()->create();
 
-        for ($i = 0; $i < 50; $i++) {
-            $referrer = $users->random();
-            $referred = $users->where('id', '!=', $referrer->id)->random();
-            $referralCode = $referralCodes->random();
-
-            // Check if this combination already exists
-            if (! Referral::where('referrer_id', $referrer->id)
-                ->where('referred_id', $referred->id)
-                ->exists()) {
-
-                $statuses = ['pending', 'active', 'completed', 'expired', 'cancelled'];
-                $status = $statuses[rand(0, 4)];
-
-                $referral = Referral::create([
+                return [
                     'referrer_id' => $referrer->id,
                     'referred_id' => $referred->id,
-                    'referral_code' => $referralCode->code,
-                    'status' => $status,
-                    'completed_at' => $status === 'completed' ? now()->subDays(rand(1, 30)) : null,
-                    'expires_at' => now()->addDays(rand(1, 90)),
-                    'source' => ['website', 'email', 'social', 'mobile'][rand(0, 3)],
-                    'campaign' => $referralCode->campaign_id,
-                    'utm_source' => ['google', 'facebook', 'twitter', 'email'][rand(0, 3)],
-                    'utm_medium' => ['cpc', 'social', 'email', 'organic'][rand(0, 3)],
-                    'utm_campaign' => 'referral_campaign_'.rand(1, 5),
-                    'ip_address' => fake()->ipv4(),
-                    'user_agent' => fake()->userAgent(),
-                    'title' => [
-                        'en' => 'Referral from '.$referrer->name,
-                        'lt' => 'Rekomendacija nuo '.$referrer->name,
-                    ],
-                    'description' => [
-                        'en' => 'Get special rewards when you sign up using this referral',
-                        'lt' => 'Gaukite specialius atlygius, kai užsiregistruojate naudodami šią rekomendaciją',
-                    ],
-                    'terms_conditions' => [
-                        'en' => 'Terms and conditions apply. See website for details.',
-                        'lt' => 'Taikomos sąlygos. Detales žiūrėkite svetainėje.',
-                    ],
-                    'benefits_description' => [
-                        'en' => 'Exclusive benefits for referred users',
-                        'lt' => 'Ekskluzyvūs privalumai rekomenduotiems naudotojams',
-                    ],
-                    'how_it_works' => [
-                        'en' => 'Simply sign up using the referral link and start earning rewards',
-                        'lt' => 'Tiesiog užsiregistruokite naudodami rekomendacijos nuorodą ir pradėkite uždirbti atlygius',
-                    ],
-                    'seo_title' => [
-                        'en' => 'Referral Program - Get Rewards',
-                        'lt' => 'Rekomendacijų programa - gaukite atlygius',
-                    ],
-                    'seo_description' => [
-                        'en' => 'Join our referral program and earn rewards for every successful referral',
-                        'lt' => 'Prisijunkite prie mūsų rekomendacijų programos ir uždirbkite atlygius už kiekvieną sėkmingą rekomendaciją',
-                    ],
-                    'seo_keywords' => [
-                        'referral' => 'program',
-                        'rewards' => 'bonus',
-                        'earn' => 'money',
-                    ],
-                    'metadata' => [
-                        'created_by' => 'system',
-                        'priority' => rand(1, 5),
-                    ],
-                ]);
-            }
-        }
+                    'referral_code' => $code->code,
+                ];
+            })
+            ->create();
     }
 
-    private function createReferralRewards(): void
+    private function createReferralRewards($referrals): \Illuminate\Support\Collection
     {
-        $referrals = Referral::where('status', 'completed')->get();
+        return ReferralReward::factory()
+            ->count(120)
+            ->state(function () use ($referrals) {
+                $referral = $referrals->random();
 
-        foreach ($referrals as $referral) {
-            // Create reward for referrer
-            ReferralReward::create([
-                'referral_id' => $referral->id,
-                'user_id' => $referral->referrer_id,
-                'type' => 'referrer_bonus',
-                'amount' => rand(10, 50),
-                'currency_code' => 'EUR',
-                'status' => 'applied',
-                'applied_at' => now()->subDays(rand(1, 30)),
-                'expires_at' => now()->addDays(90),
-                'title' => [
-                    'en' => 'Referrer Bonus',
-                    'lt' => 'Rekomendavimo bonusas',
-                ],
-                'description' => [
-                    'en' => 'Bonus for successful referral',
-                    'lt' => 'Bonusas už sėkmingą rekomendaciją',
-                ],
-                'is_active' => true,
-                'priority' => rand(1, 5),
-                'conditions' => [
-                    'min_order_value' => 50.00,
-                ],
-                'reward_data' => [
+                return [
                     'referral_id' => $referral->id,
-                    'bonus_type' => 'referrer',
-                ],
-                'metadata' => [
-                    'created_by' => 'system',
-                ],
-            ]);
-
-            // Create reward for referred user
-            ReferralReward::create([
-                'referral_id' => $referral->id,
-                'user_id' => $referral->referred_id,
-                'type' => 'referred_discount',
-                'amount' => rand(5, 25),
-                'currency_code' => 'EUR',
-                'status' => 'applied',
-                'applied_at' => now()->subDays(rand(1, 30)),
-                'expires_at' => now()->addDays(60),
-                'title' => [
-                    'en' => 'Welcome Discount',
-                    'lt' => 'Sveikinimo nuolaida',
-                ],
-                'description' => [
-                    'en' => 'Discount for new user',
-                    'lt' => 'Nuolaida naujam naudotojui',
-                ],
-                'is_active' => true,
-                'priority' => rand(1, 5),
-                'conditions' => [
-                    'min_order_value' => 25.00,
-                ],
-                'reward_data' => [
-                    'referral_id' => $referral->id,
-                    'bonus_type' => 'referred',
-                ],
-                'metadata' => [
-                    'created_by' => 'system',
-                ],
-            ]);
-        }
+                    'user_id' => fake()->boolean(70) ? $referral->referrer_id : $referral->referred_id,
+                ];
+            })
+            ->create();
     }
 
     private function createReferralCodeStatistics(): void

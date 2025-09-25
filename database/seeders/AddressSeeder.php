@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -22,128 +20,48 @@ final class AddressSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::all();
-        $countries = Country::all();
+        $countries = Country::query()->pluck('cca2')->all();
 
-        if ($users->isEmpty() || $countries->isEmpty()) {
-            $this->command->warn('No users or countries found. Please run UserSeeder and CountrySeeder first.');
-
+        if (empty($countries)) {
             return;
         }
 
-        // Create addresses for each user
-        foreach ($users as $user) {
-            // Create default shipping address
-            Address::factory()->create([
-                'user_id' => $user->id,
-                'type' => AddressType::SHIPPING,
-                'first_name' => $user->first_name ?? 'John',
-                'last_name' => $user->last_name ?? 'Doe',
-                'address_line_1' => '123 Main Street',
-                'city' => 'Vilnius',
-                'postal_code' => '01101',
-                'country_code' => 'LT',
-                'phone' => '+37060000000',
-                'email' => $user->email,
-                'is_default' => true,
-                'is_active' => true,
-                'is_shipping' => true,
-                'is_billing' => false,
-            ]);
+        $users = User::query()->limit(25)->get();
 
-            // Create billing address
-            Address::factory()->create([
-                'user_id' => $user->id,
-                'type' => AddressType::BILLING,
-                'first_name' => $user->first_name ?? 'John',
-                'last_name' => $user->last_name ?? 'Doe',
-                'address_line_1' => '456 Business Avenue',
-                'city' => 'Kaunas',
-                'postal_code' => '44200',
-                'country_code' => 'LT',
-                'phone' => '+37060000001',
-                'email' => $user->email,
-                'is_default' => false,
-                'is_active' => true,
-                'is_shipping' => false,
-                'is_billing' => true,
-            ]);
-
-            // Create home address
-            Address::factory()->create([
-                'user_id' => $user->id,
-                'type' => AddressType::HOME,
-                'first_name' => $user->first_name ?? 'John',
-                'last_name' => $user->last_name ?? 'Doe',
-                'address_line_1' => '789 Residential Street',
-                'city' => 'Klaipėda',
-                'postal_code' => '91200',
-                'country_code' => 'LT',
-                'phone' => '+37060000002',
-                'email' => $user->email,
-                'is_default' => false,
-                'is_active' => true,
-                'is_shipping' => false,
-                'is_billing' => false,
-            ]);
-
-            // Create work address
-            Address::factory()->create([
-                'user_id' => $user->id,
-                'type' => AddressType::WORK,
-                'first_name' => $user->first_name ?? 'John',
-                'last_name' => $user->last_name ?? 'Doe',
-                'company_name' => 'Tech Company Ltd',
-                'company_vat' => 'LT123456789',
-                'address_line_1' => '321 Corporate Boulevard',
-                'city' => 'Šiauliai',
-                'postal_code' => '76200',
-                'country_code' => 'LT',
-                'phone' => '+37060000003',
-                'email' => $user->email,
-                'is_default' => false,
-                'is_active' => true,
-                'is_shipping' => false,
-                'is_billing' => false,
-            ]);
-
-            // Create other address
-            Address::factory()->create([
-                'user_id' => $user->id,
-                'type' => AddressType::OTHER,
-                'first_name' => $user->first_name ?? 'John',
-                'last_name' => $user->last_name ?? 'Doe',
-                'address_line_1' => '654 Alternative Road',
-                'city' => 'Panevėžys',
-                'postal_code' => '35100',
-                'country_code' => 'LT',
-                'phone' => '+37060000004',
-                'email' => $user->email,
-                'is_default' => false,
-                'is_active' => true,
-                'is_shipping' => false,
-                'is_billing' => false,
-            ]);
-
-            // Create some inactive addresses
-            Address::factory()->create([
-                'user_id' => $user->id,
-                'type' => AddressType::OTHER,
-                'first_name' => $user->first_name ?? 'John',
-                'last_name' => $user->last_name ?? 'Doe',
-                'address_line_1' => '999 Old Street',
-                'city' => 'Alytus',
-                'postal_code' => '62100',
-                'country_code' => 'LT',
-                'phone' => '+37060000005',
-                'email' => $user->email,
-                'is_default' => false,
-                'is_active' => false,
-                'is_shipping' => false,
-                'is_billing' => false,
-            ]);
+        if ($users->isEmpty()) {
+            $users = User::factory()->count(5)->create();
         }
 
-        $this->command->info('Addresses seeded successfully!');
+        $users->each(function (User $user) use ($countries): void {
+            if ($user->addresses()->exists()) {
+                return;
+            }
+
+            Address::factory()
+                ->count(6)
+                ->state(function (int $sequence) use ($countries): array {
+                    $types = [
+                        AddressType::SHIPPING,
+                        AddressType::BILLING,
+                        AddressType::HOME,
+                        AddressType::WORK,
+                        AddressType::OTHER,
+                        AddressType::OTHER,
+                    ];
+
+                    $type = $types[$sequence] ?? AddressType::OTHER;
+
+                    return [
+                        'type' => $type,
+                        'country_code' => $countries[$sequence % count($countries)],
+                        'is_default' => $sequence === 0,
+                        'is_shipping' => in_array($type, [AddressType::SHIPPING, AddressType::HOME], true),
+                        'is_billing' => $type === AddressType::BILLING,
+                        'is_active' => $sequence !== 5,
+                    ];
+                })
+                ->for($user)
+                ->create();
+        });
     }
 }

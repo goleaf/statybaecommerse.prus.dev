@@ -193,8 +193,8 @@ class LithuanianBuilderShopSeeder extends Seeder
                 foreach ($subs as $index => $subName) {
                     $slug = Str::slug($subName);
                     $existing = Category::where('slug', $slug)->first();
-                    
-                    if (!$existing) {
+
+                    if (! $existing) {
                         Category::factory()->create([
                             'name' => $subName,
                             'slug' => $slug,
@@ -276,12 +276,12 @@ class LithuanianBuilderShopSeeder extends Seeder
         Product::factory()
             ->count(50)
             ->sequence(fn ($sequence) => [
-                'brand_id' => !empty($brandIds) ? fake()->randomElement($brandIds) : null,
+                'brand_id' => ! empty($brandIds) ? fake()->randomElement($brandIds) : null,
             ])
             ->create()
             ->each(function (Product $product) use ($categoryIds) {
                 // Assign to 1-2 random categories using factory relationships
-                if (!empty($categoryIds)) {
+                if (! empty($categoryIds)) {
                     $product->categories()->attach(
                         fake()->randomElements($categoryIds, fake()->numberBetween(1, 2))
                     );
@@ -297,7 +297,7 @@ class LithuanianBuilderShopSeeder extends Seeder
         // Create orders for some customers using factory relationships
         $customers->take(10)->each(function (User $customer) {
             $orderCount = fake()->numberBetween(1, 5);
-            
+
             // Create orders using factory
             Order::factory()
                 ->count($orderCount)
@@ -306,7 +306,7 @@ class LithuanianBuilderShopSeeder extends Seeder
                 ->each(function (Order $order) {
                     // Add order items using factory
                     $products = Product::inRandomOrder()->take(fake()->numberBetween(1, 5))->get();
-                    
+
                     foreach ($products as $product) {
                         $quantity = fake()->numberBetween(1, 3);
                         $price = $product->sale_price ?? $product->price;

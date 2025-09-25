@@ -23,7 +23,7 @@ class SliderFactory extends Factory
             'button_url' => fake()->url(),
             'background_color' => fake()->hexColor(),
             'text_color' => fake()->hexColor(),
-            'sort_order' => fake()->numberBetween(0, 100),
+            'sort_order' => fake()->unique()->numberBetween(1, 1000),
             'is_active' => fake()->boolean(80),
             'settings' => [
                 'animation' => fake()->randomElement(['fade', 'slide', 'zoom']),
