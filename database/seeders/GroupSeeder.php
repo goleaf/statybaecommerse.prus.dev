@@ -1,58 +1,78 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
+use App\Models\CustomerGroup;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
-class GroupSeeder extends Seeder
+final class GroupSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::transaction(function () {
-            $groups = [
-                ['name' => 'VIP', 'code' => 'vip'],
-                ['name' => 'Student', 'code' => 'student'],
-                ['name' => 'Wholesale', 'code' => 'wholesale'],
-            ];
+        // Create customer groups using factories
+        $vipGroup = CustomerGroup::factory()->state([
+            'name' => 'VIP',
+            'code' => 'vip',
+            'description' => 'VIP customers with exclusive benefits',
+            'discount_percentage' => 15.0,
+            'is_enabled' => true,
+            'metadata' => [
+                'priority' => 'high',
+                'benefits' => ['free_shipping', 'priority_support', 'exclusive_products'],
+            ],
+        ])->create();
 
-            foreach ($groups as $g) {
-                $exists = DB::table('sh_customer_groups')->where('code', $g['code'])->exists();
-                if (! $exists) {
-                    DB::table('sh_customer_groups')->insert([
-                        'name' => $g['name'],
-                        'code' => $g['code'],
-                        'metadata' => json_encode([]),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-            }
+        $studentGroup = CustomerGroup::factory()->state([
+            'name' => 'Student',
+            'code' => 'student',
+            'description' => 'Students with educational discounts',
+            'discount_percentage' => 10.0,
+            'is_enabled' => true,
+            'metadata' => [
+                'priority' => 'medium',
+                'benefits' => ['student_discount', 'educational_resources'],
+                'verification_required' => true,
+            ],
+        ])->create();
 
-            // Attach random existing users to groups (if users table exists)
-            if (DB::getSchemaBuilder()->hasTable('users')) {
-                $userIds = DB::table('users')->inRandomOrder()->limit(20)->pluck('id')->all();
-                $groupIds = DB::table('sh_customer_groups')->pluck('id')->all();
-                foreach ($groupIds as $groupId) {
-                    $count = count($userIds);
-                    if ($count === 0) {
-                        continue;
-                    }
-                    $take = min($count, random_int(1, min(5, $count)));
-                    foreach (array_slice($userIds, 0, $take) as $userId) {
-                        $exists = DB::table('sh_customer_group_user')
-                            ->where('group_id', $groupId)
-                            ->where('user_id', $userId)
-                            ->exists();
-                        if (! $exists) {
-                            DB::table('sh_customer_group_user')->insert([
-                                'group_id' => $groupId,
-                                'user_id' => $userId,
-                            ]);
-                        }
-                    }
-                }
-            }
-        });
+        $wholesaleGroup = CustomerGroup::factory()->state([
+            'name' => 'Wholesale',
+            'code' => 'wholesale',
+            'description' => 'Wholesale customers with bulk pricing',
+            'discount_percentage' => 25.0,
+            'is_enabled' => true,
+            'metadata' => [
+                'priority' => 'high',
+                'benefits' => ['bulk_pricing', 'extended_payment_terms', 'dedicated_support'],
+                'minimum_order' => 1000,
+            ],
+        ])->create();
+
+        // Create additional users if needed and attach them to groups
+        $existingUsers = User::limit(20)->get();
+        
+        if ($existingUsers->isEmpty()) {
+            // Create some users if none exist
+            $existingUsers = User::factory()->count(15)->create();
+        }
+
+        // Attach users to groups using relationships
+        $groups = collect([$vipGroup, $studentGroup, $wholesaleGroup]);
+        
+        foreach ($groups as $group) {
+            // Attach random users to each group
+            $usersToAttach = $existingUsers->random(min($existingUsers->count(), random_int(3, 8)));
+            $group->users()->syncWithoutDetaching($usersToAttach->pluck('id'));
+        }
+
+        // Some users can be in multiple groups
+        $multiGroupUsers = $existingUsers->random(min($existingUsers->count(), 5));
+        foreach ($multiGroupUsers as $user) {
+            $randomGroups = $groups->random(random_int(1, 2));
+            $user->customerGroups()->syncWithoutDetaching($randomGroups->pluck('id'));
+        }
     }
 }
