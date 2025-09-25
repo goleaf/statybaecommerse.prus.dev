@@ -11,18 +11,20 @@ final class ChannelSeeder extends Seeder
 {
     public function run(): void
     {
-        $channels = [
-            [
-                'name' => 'Default Store',
-                'slug' => 'default',
-                'url' => 'https://statybaecommerse.prus.dev',
-                'is_enabled' => true,
-                'is_default' => true,
-            ],
-        ];
-
-        foreach ($channels as $data) {
-            Channel::updateOrCreate(['slug' => $data['slug']], $data);
+        // Check if default channel already exists to maintain idempotency
+        $existingChannel = Channel::where('slug', 'default')->first();
+        
+        if (!$existingChannel) {
+            // Create default channel using factory with specific attributes
+            Channel::factory()
+                ->state([
+                    'name' => 'Default Store',
+                    'slug' => 'default',
+                    'url' => 'https://statybaecommerse.prus.dev',
+                    'is_enabled' => true,
+                    'is_default' => true,
+                ])
+                ->create();
         }
 
         $this->command?->info('ChannelSeeder: default channel seeded.');

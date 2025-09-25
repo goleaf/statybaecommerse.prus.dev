@@ -853,56 +853,54 @@ class CategorySeeder extends Seeder
 
     private function createCategory(array $categoryData, ?int $parentId = null): void
     {
-        $category = Category::firstOrCreate(
-            ['slug' => $categoryData['slug']],
-            [
-                'name' => $categoryData['name'],
-                'description' => $categoryData['description'],
-                'parent_id' => $parentId,
-                'sort_order' => $categoryData['sort_order'],
-                'is_visible' => true,
-            ]
-        );
+        // Check if category already exists to maintain idempotency
+        $category = Category::query()->firstWhere('slug', $categoryData['slug']);
 
-        // Upsert translations for all supported locales
+        $attributes = [
+            'name' => $categoryData['name'],
+            'slug' => $categoryData['slug'],
+            'description' => $categoryData['description'],
+            'parent_id' => $parentId,
+            'sort_order' => $categoryData['sort_order'],
+            'is_visible' => true,
+        ];
+
+        if ($category) {
+            $category->update($attributes);
+        } else {
+            // Use factory to create category with relationships
+            $category = Category::factory()
+                ->state($attributes)
+                ->create();
+        }
+
         $locales = $this->supportedLocales();
-        $now = now();
-        $trRows = [];
+
+        // Create translations using the model's translation relationship
         foreach ($locales as $loc) {
             $name = $this->translateLike($categoryData['name'], $loc);
-            // Use the original slug as base and make it unique per locale
-            $baseSlug = $categoryData['slug'];
-            $translatedSlug = $this->translateSlug($baseSlug, $loc);
-
-            $trRows[] = [
-                'category_id' => $category->id,
-                'locale' => $loc,
+            $translationData = [
                 'name' => $name,
-                'slug' => $translatedSlug,
+                'slug' => $this->translateSlug($categoryData['slug'], $loc),
                 'description' => $this->translateLike($categoryData['description'], $loc),
                 'seo_title' => $name,
                 'seo_description' => $this->translateLike('Statybinių prekių kategorija.', $loc),
-                'created_at' => $now,
-                'updated_at' => $now,
             ];
+
+            $category->updateTranslation($loc, $translationData);
         }
-        \Illuminate\Support\Facades\DB::table('category_translations')->upsert(
-            $trRows,
-            ['category_id', 'locale'],
-            ['name', 'slug', 'description', 'seo_title', 'seo_description', 'updated_at']
-        );
 
         // Add main image if category was created and doesn't have one
-        if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('images')) && isset($categoryData['image_url'])) {
-            $this->downloadAndAttachImage($category, $categoryData['image_url'], 'images', $categoryData['name'].' Image');
+        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('images')) && isset($categoryData['image_url'])) {
+            $this->downloadAndAttachImage($category, $categoryData['image_url'], 'images', $categoryData['name'] . ' Image');
         }
 
         // Add banner if category was created and doesn't have one
-        if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('banner')) && isset($categoryData['banner_url'])) {
-            $this->downloadAndAttachImage($category, $categoryData['banner_url'], 'banner', $categoryData['name'].' Banner');
+        if ($category && ($category->wasRecentlyCreated || !$category->hasMedia('banner')) && isset($categoryData['banner_url'])) {
+            $this->downloadAndAttachImage($category, $categoryData['banner_url'], 'banner', $categoryData['name'] . ' Banner');
         }
 
-        // Create children categories
+        // Create children categories recursively
         if (isset($categoryData['children'])) {
             foreach ($categoryData['children'] as $childData) {
                 $this->createCategory($childData, $category->id);
@@ -920,7 +918,7 @@ class CategorySeeder extends Seeder
             $imagePath = $this->imageGenerator->generateCategoryImage($category->name);
 
             if (file_exists($imagePath)) {
-                $filename = Str::slug($name).'.webp';
+                $filename = Str::slug($name) . '.webp';
 
                 // Add media to category
                 $category
@@ -940,14 +938,14 @@ class CategorySeeder extends Seeder
                 $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}");
             }
         } catch (\Exception $e) {
-            $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}: ".$e->getMessage());
+            $this->command->warn("✗ Failed to generate {$collection} image for {$category->name}: " . $e->getMessage());
         }
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn ($v) => trim((string) $v))
+            ->map(fn($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -961,7 +959,7 @@ class CategorySeeder extends Seeder
             'en' => $this->translateToEnglish($text),
             'ru' => $this->translateToRussian($text),
             'de' => $this->translateToGerman($text),
-            default => $text.' ('.strtoupper($locale).')',
+            default => $text . ' (' . strtoupper($locale) . ')',
         };
     }
 
@@ -1362,7 +1360,7 @@ class CategorySeeder extends Seeder
             'en' => $this->translateSlugToEnglish($slug),
             'ru' => $this->translateSlugToRussian($slug),
             'de' => $this->translateSlugToGerman($slug),
-            default => $slug.'-'.$locale,
+            default => $slug . '-' . $locale,
         };
     }
 

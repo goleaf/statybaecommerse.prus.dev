@@ -160,10 +160,15 @@ final class ComprehensiveFilamentSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            Setting::firstOrCreate(
-                ['key' => $setting['key']],
-                $setting
-            );
+            $existingSetting = Setting::where('key', $setting['key'])->first();
+            
+            if ($existingSetting) {
+                $existingSetting->update($setting);
+            } else {
+                Setting::factory()
+                    ->state($setting)
+                    ->create();
+            }
         }
     }
 
@@ -202,14 +207,25 @@ final class ComprehensiveFilamentSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            $existingPermission = Permission::where('name', $permission)->first();
+            
+            if (!$existingPermission) {
+                Permission::factory()
+                    ->state(['name' => $permission])
+                    ->create();
+            }
         }
     }
 
     private function seedEnhancedRoles(): void
     {
         // Inventory Manager role
-        $inventoryManager = Role::firstOrCreate(['name' => 'inventory_manager']);
+        $inventoryManager = Role::where('name', 'inventory_manager')->first();
+        if (!$inventoryManager) {
+            $inventoryManager = Role::factory()
+                ->state(['name' => 'inventory_manager'])
+                ->create();
+        }
         $inventoryPermissions = [
             'view_products', 'edit_products',
             'view_inventory', 'manage_inventory', 'adjust_stock',
@@ -219,7 +235,12 @@ final class ComprehensiveFilamentSeeder extends Seeder
         $inventoryManager->givePermissionTo($inventoryPermissions);
 
         // Customer Service role
-        $customerService = Role::firstOrCreate(['name' => 'customer_service']);
+        $customerService = Role::where('name', 'customer_service')->first();
+        if (!$customerService) {
+            $customerService = Role::factory()
+                ->state(['name' => 'customer_service'])
+                ->create();
+        }
         $customerServicePermissions = [
             'view_customers', 'edit_customers',
             'view_customer_details', 'edit_customer_preferences',
@@ -229,7 +250,12 @@ final class ComprehensiveFilamentSeeder extends Seeder
         $customerService->givePermissionTo($customerServicePermissions);
 
         // Analytics Manager role
-        $analyticsManager = Role::firstOrCreate(['name' => 'analytics_manager']);
+        $analyticsManager = Role::where('name', 'analytics_manager')->first();
+        if (!$analyticsManager) {
+            $analyticsManager = Role::factory()
+                ->state(['name' => 'analytics_manager'])
+                ->create();
+        }
         $analyticsPermissions = [
             'view_analytics_dashboard', 'export_analytics',
             'view_customer_analytics', 'view_product_analytics', 'view_sales_analytics',
@@ -241,48 +267,57 @@ final class ComprehensiveFilamentSeeder extends Seeder
     private function seedAdminUsers(): void
     {
         // Inventory Manager User
-        $inventoryManager = User::firstOrCreate(
-            ['email' => 'inventory@example.com'],
-            [
-                'name' => 'Inventory Manager',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-                'is_admin' => true,
-                'is_active' => true,
-                'timezone' => 'Europe/Vilnius',
-                'preferred_locale' => 'lt',
-            ]
-        );
+        $inventoryManager = User::where('email', 'inventory@example.com')->first();
+        if (!$inventoryManager) {
+            $inventoryManager = User::factory()
+                ->state([
+                    'email' => 'inventory@example.com',
+                    'name' => 'Inventory Manager',
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                    'is_admin' => true,
+                    'is_active' => true,
+                    'timezone' => 'Europe/Vilnius',
+                    'preferred_locale' => 'lt',
+                ])
+                ->create();
+        }
         $inventoryManager->assignRole('inventory_manager');
 
         // Customer Service User
-        $customerService = User::firstOrCreate(
-            ['email' => 'support@example.com'],
-            [
-                'name' => 'Customer Service',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-                'is_admin' => true,
-                'is_active' => true,
-                'timezone' => 'Europe/Vilnius',
-                'preferred_locale' => 'lt',
-            ]
-        );
+        $customerService = User::where('email', 'support@example.com')->first();
+        if (!$customerService) {
+            $customerService = User::factory()
+                ->state([
+                    'email' => 'support@example.com',
+                    'name' => 'Customer Service',
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                    'is_admin' => true,
+                    'is_active' => true,
+                    'timezone' => 'Europe/Vilnius',
+                    'preferred_locale' => 'lt',
+                ])
+                ->create();
+        }
         $customerService->assignRole('customer_service');
 
         // Analytics Manager User
-        $analyticsManager = User::firstOrCreate(
-            ['email' => 'analytics@example.com'],
-            [
-                'name' => 'Analytics Manager',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-                'is_admin' => true,
-                'is_active' => true,
-                'timezone' => 'Europe/Vilnius',
-                'preferred_locale' => 'lt',
-            ]
-        );
+        $analyticsManager = User::where('email', 'analytics@example.com')->first();
+        if (!$analyticsManager) {
+            $analyticsManager = User::factory()
+                ->state([
+                    'email' => 'analytics@example.com',
+                    'name' => 'Analytics Manager',
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                    'is_admin' => true,
+                    'is_active' => true,
+                    'timezone' => 'Europe/Vilnius',
+                    'preferred_locale' => 'lt',
+                ])
+                ->create();
+        }
         $analyticsManager->assignRole('analytics_manager');
     }
 

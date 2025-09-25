@@ -1,13 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Translations\CityTranslation;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Region;
-use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
 
@@ -144,7 +142,7 @@ class CitySeeder extends Seeder
                 'region_id' => $panevezysRegion?->id,
                 'level' => 0,
                 'latitude' => 55.7333,
-                'longitude' => 24.3500,
+                'longitude' => 24.35,
                 'population' => 87048,
                 'postal_codes' => ['35001', '35002', '35003', '35004', '35005'],
                 'sort_order' => 5,
@@ -159,8 +157,8 @@ class CitySeeder extends Seeder
                 'zone_id' => $ltZone?->id,
                 'region_id' => $alytusRegion?->id,
                 'level' => 0,
-                'latitude' => 54.4000,
-                'longitude' => 24.0500,
+                'latitude' => 54.4,
+                'longitude' => 24.05,
                 'population' => 52000,
                 'postal_codes' => ['62001', '62002', '62003', '62004', '62005'],
                 'sort_order' => 6,
@@ -176,7 +174,7 @@ class CitySeeder extends Seeder
                 'region_id' => $marijampoleRegion?->id,
                 'level' => 0,
                 'latitude' => 54.5667,
-                'longitude' => 23.3500,
+                'longitude' => 23.35,
                 'population' => 36000,
                 'postal_codes' => ['68001', '68002', '68003', '68004', '68005'],
                 'sort_order' => 7,
@@ -191,7 +189,7 @@ class CitySeeder extends Seeder
                 'zone_id' => $ltZone?->id,
                 'region_id' => $taurageRegion?->id,
                 'level' => 0,
-                'latitude' => 55.2500,
+                'latitude' => 55.25,
                 'longitude' => 22.2833,
                 'population' => 22000,
                 'postal_codes' => ['72001', '72002', '72003', '72004', '72005'],
@@ -208,7 +206,7 @@ class CitySeeder extends Seeder
                 'region_id' => $telsiaiRegion?->id,
                 'level' => 0,
                 'latitude' => 55.9833,
-                'longitude' => 22.2500,
+                'longitude' => 22.25,
                 'population' => 25000,
                 'postal_codes' => ['87001', '87002', '87003', '87004', '87005'],
                 'sort_order' => 9,
@@ -223,13 +221,12 @@ class CitySeeder extends Seeder
                 'zone_id' => $ltZone?->id,
                 'region_id' => $utenaRegion?->id,
                 'level' => 0,
-                'latitude' => 55.5000,
-                'longitude' => 25.6000,
+                'latitude' => 55.5,
+                'longitude' => 25.6,
                 'population' => 28000,
                 'postal_codes' => ['28001', '28002', '28003', '28004', '28005'],
                 'sort_order' => 10,
             ],
-
             // Latvia cities
             [
                 'name' => ['lt' => 'Ryga', 'en' => 'Riga'],
@@ -263,7 +260,6 @@ class CitySeeder extends Seeder
                 'postal_codes' => ['LV-5401', 'LV-5402', 'LV-5403', 'LV-5404', 'LV-5405'],
                 'sort_order' => 2,
             ],
-
             // Estonia cities
             [
                 'name' => ['lt' => 'Talinas', 'en' => 'Tallinn'],
@@ -275,7 +271,7 @@ class CitySeeder extends Seeder
                 'zone_id' => $euZone?->id,
                 'region_id' => $tallinnRegion?->id,
                 'level' => 0,
-                'latitude' => 59.4370,
+                'latitude' => 59.437,
                 'longitude' => 24.7536,
                 'population' => 437619,
                 'postal_codes' => ['10111', '10112', '10113', '10114', '10115'],
@@ -291,13 +287,12 @@ class CitySeeder extends Seeder
                 'zone_id' => $euZone?->id,
                 'region_id' => $tallinnRegion?->id,
                 'level' => 0,
-                'latitude' => 58.3780,
-                'longitude' => 26.7290,
+                'latitude' => 58.378,
+                'longitude' => 26.729,
                 'population' => 91407,
                 'postal_codes' => ['50050', '50051', '50052', '50053', '50054'],
                 'sort_order' => 2,
             ],
-
             // Poland cities
             [
                 'name' => ['lt' => 'Varšuva', 'en' => 'Warsaw'],
@@ -331,7 +326,6 @@ class CitySeeder extends Seeder
                 'postal_codes' => ['30-001', '30-002', '30-003', '30-004', '30-005'],
                 'sort_order' => 2,
             ],
-
             // Germany cities
             [
                 'name' => ['lt' => 'Berlynas', 'en' => 'Berlin'],
@@ -343,8 +337,8 @@ class CitySeeder extends Seeder
                 'zone_id' => $euZone?->id,
                 'region_id' => $bavariaRegion?->id,
                 'level' => 0,
-                'latitude' => 52.5200,
-                'longitude' => 13.4050,
+                'latitude' => 52.52,
+                'longitude' => 13.405,
                 'population' => 3669491,
                 'postal_codes' => ['10115', '10117', '10119', '10178', '10179'],
                 'sort_order' => 1,
@@ -360,12 +354,11 @@ class CitySeeder extends Seeder
                 'region_id' => $bavariaRegion?->id,
                 'level' => 0,
                 'latitude' => 48.1351,
-                'longitude' => 11.5820,
+                'longitude' => 11.582,
                 'population' => 1484226,
                 'postal_codes' => ['80331', '80333', '80335', '80336', '80337'],
                 'sort_order' => 2,
             ],
-
             // France cities
             [
                 'name' => ['lt' => 'Paryžius', 'en' => 'Paris'],
@@ -399,7 +392,6 @@ class CitySeeder extends Seeder
                 'postal_codes' => ['13001', '13002', '13003', '13004', '13005'],
                 'sort_order' => 2,
             ],
-
             // Spain cities
             [
                 'name' => ['lt' => 'Madridas', 'en' => 'Madrid'],
@@ -433,7 +425,6 @@ class CitySeeder extends Seeder
                 'postal_codes' => ['08001', '08002', '08003', '08004', '08005'],
                 'sort_order' => 2,
             ],
-
             // Italy cities
             [
                 'name' => ['lt' => 'Roma', 'en' => 'Rome'],
@@ -462,12 +453,11 @@ class CitySeeder extends Seeder
                 'region_id' => $milanRegion?->id,
                 'level' => 0,
                 'latitude' => 45.4642,
-                'longitude' => 9.1900,
+                'longitude' => 9.19,
                 'population' => 1371498,
                 'postal_codes' => ['20121', '20122', '20123', '20124', '20125'],
                 'sort_order' => 2,
             ],
-
             // USA cities
             [
                 'name' => ['lt' => 'Niujorkas', 'en' => 'New York'],
@@ -480,7 +470,7 @@ class CitySeeder extends Seeder
                 'region_id' => $newyorkRegion?->id,
                 'level' => 0,
                 'latitude' => 40.7128,
-                'longitude' => -74.0060,
+                'longitude' => -74.006,
                 'population' => 8336817,
                 'postal_codes' => ['10001', '10002', '10003', '10004', '10005'],
                 'sort_order' => 1,
@@ -517,7 +507,6 @@ class CitySeeder extends Seeder
                 'postal_codes' => ['60601', '60602', '60603', '60604', '60605'],
                 'sort_order' => 3,
             ],
-
             // Canada cities
             [
                 'name' => ['lt' => 'Torontas', 'en' => 'Toronto'],
@@ -551,7 +540,6 @@ class CitySeeder extends Seeder
                 'postal_codes' => ['H1A', 'H1B', 'H1C', 'H1D', 'H1E'],
                 'sort_order' => 2,
             ],
-
             // UK cities
             [
                 'name' => ['lt' => 'Londonas', 'en' => 'London'],
@@ -612,38 +600,64 @@ class CitySeeder extends Seeder
                 $translations = [];
             }
 
-            $city = City::updateOrCreate(
-                ['code' => $cityData['code']],
-                array_merge($cityData, [
+            // Check if city already exists to maintain idempotency
+            $existingCity = City::where('code', $cityData['code'])->first();
+
+            if ($existingCity) {
+                $existingCity->update(array_merge($cityData, [
                     'name' => $defaultName,
                     'is_enabled' => true,
                     'is_default' => false,
-                ])
-            );
+                ]));
+                $city = $existingCity;
+            } else {
+                // Use factory to create city with relationships
+                $city = City::factory()
+                    ->state(array_merge($cityData, [
+                        'name' => $defaultName,
+                        'is_enabled' => true,
+                        'is_default' => false,
+                    ]))
+                    ->create();
+            }
 
-            // Create translations for each locale
+            // Create translations using factory relationships
             foreach ($locales as $locale) {
                 $translationData = $translations[$locale] ?? [];
-                CityTranslation::updateOrCreate([
+
+                $existingTranslation = CityTranslation::where([
                     'city_id' => $city->id,
                     'locale' => $locale,
-                ], [
-                    'name' => $translationData['name'] ?? 'City',
-                    'description' => $translationData['description'] ?? '',
-                ]);
+                ])->first();
+
+                if ($existingTranslation) {
+                    $existingTranslation->update([
+                        'name' => $translationData['name'] ?? 'City',
+                        'description' => $translationData['description'] ?? '',
+                    ]);
+                } else {
+                    CityTranslation::factory()
+                        ->for($city)
+                        ->state([
+                            'locale' => $locale,
+                            'name' => $translationData['name'] ?? 'City',
+                            'description' => $translationData['description'] ?? '',
+                        ])
+                        ->create();
+                }
             }
 
             $cityName = $translations['en']['name'] ?? $translations['lt']['name'] ?? 'City';
             $this->command->info("Upserted city: {$cityData['code']} - {$cityName}");
         }
 
-        $this->command->info('City seeding completed successfully with translations (locales: '.implode(',', $locales).')!');
+        $this->command->info('City seeding completed successfully with translations (locales: ' . implode(',', $locales) . ')!');
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn ($v) => trim((string) $v))
+            ->map(fn($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()

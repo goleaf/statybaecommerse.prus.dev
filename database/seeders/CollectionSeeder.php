@@ -27,34 +27,64 @@ class CollectionSeeder extends Seeder
         foreach ($definitions as $slug => $definition) {
             $primaryTranslation = $definition['translations']['en'];
 
-            $collection = Collection::updateOrCreate(
-                ['slug' => $slug],
-                [
+            // Check if collection already exists to maintain idempotency
+            $existingCollection = Collection::where('slug', $slug)->first();
+            
+            if ($existingCollection) {
+                $existingCollection->update([
                     'name' => $primaryTranslation['name'],
                     'sort_order' => $definition['sort_order'],
                     'is_visible' => true,
                     'is_automatic' => $definition['is_automatic'] ?? false,
                     'display_type' => $definition['display_type'] ?? 'grid',
-                ],
-            );
+                ]);
+                $collection = $existingCollection;
+            } else {
+                // Use factory to create collection
+                $collection = Collection::factory()
+                    ->state([
+                        'slug' => $slug,
+                        'name' => $primaryTranslation['name'],
+                        'sort_order' => $definition['sort_order'],
+                        'is_visible' => true,
+                        'is_automatic' => $definition['is_automatic'] ?? false,
+                        'display_type' => $definition['display_type'] ?? 'grid',
+                    ])
+                    ->create();
+            }
 
             foreach ($locales as $locale) {
                 $translation = $definition['translations'][$locale] ?? $primaryTranslation;
 
-                CollectionTranslation::updateOrCreate(
-                    [
-                        'collection_id' => $collection->id,
-                        'locale' => $locale,
-                    ],
-                    [
+                $existingTranslation = CollectionTranslation::where([
+                    'collection_id' => $collection->id,
+                    'locale' => $locale,
+                ])->first();
+
+                if ($existingTranslation) {
+                    $existingTranslation->update([
                         'name' => $translation['name'],
                         'slug' => $locale === 'lt' ? $slug : $slug.'-'.$locale,
                         'description' => $translation['description'],
                         'meta_title' => $translation['name'].' | '.config('app.name'),
                         'meta_description' => $translation['description'],
                         'meta_keywords' => $translation['keywords'] ?? [],
-                    ],
-                );
+                    ]);
+                } else {
+                    // Use factory to create translation
+                    CollectionTranslation::factory()
+                        ->for($collection)
+                        ->state([
+                            'locale' => $locale,
+                            'name' => $translation['name'],
+                            'slug' => $locale === 'lt' ? $slug : $slug.'-'.$locale,
+                            'description' => $translation['description'],
+                            'meta_title' => $translation['name'].' | '.config('app.name'),
+                            'meta_description' => $translation['description'],
+                            'meta_keywords' => $translation['keywords'] ?? [],
+                        ])
+                        ->create();
+                }
             }
 
             $this->ensureCollectionMedia($collection, $definition['image_text'] ?? $primaryTranslation['name']);

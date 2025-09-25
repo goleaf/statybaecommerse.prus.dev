@@ -59,32 +59,44 @@ class CollectionProductSeeder extends Seeder
 
         $brand = $this->ensureBrand($productDefinition['brand'] ?? 'Statybae Essentials');
 
-        $product = Product::updateOrCreate(
-            ['slug' => $productDefinition['slug']],
-            [
-                'type' => 'simple',
-                'name' => $english['name'],
-                'sku' => $productDefinition['sku'] ?? strtoupper(Str::random(10)),
-                'description' => $english['description'],
-                'short_description' => $english['short_description'],
-                'price' => $productDefinition['price'],
-                'sale_price' => $productDefinition['sale_price'] ?? null,
-                'brand_id' => $brand->id,
-                'stock_quantity' => $productDefinition['stock'] ?? 50,
-                'low_stock_threshold' => $productDefinition['low_stock_threshold'] ?? 8,
-                'weight' => $productDefinition['weight'] ?? 5.0,
-                'length' => $productDefinition['length'] ?? 40.0,
-                'width' => $productDefinition['width'] ?? 30.0,
-                'height' => $productDefinition['height'] ?? 20.0,
-                'is_visible' => true,
-                'is_featured' => $productDefinition['featured'] ?? false,
-                'manage_stock' => true,
-                'status' => 'published',
-                'published_at' => $productDefinition['published_at'] ?? now()->subDays(random_int(5, 45)),
-                'seo_title' => $english['name'].' - '.config('app.name'),
-                'seo_description' => $english['short_description'],
-            ],
-        );
+        // Check if product already exists to maintain idempotency
+        $existingProduct = Product::where('slug', $productDefinition['slug'])->first();
+        
+        $productData = [
+            'type' => 'simple',
+            'name' => $english['name'],
+            'sku' => $productDefinition['sku'] ?? strtoupper(Str::random(10)),
+            'description' => $english['description'],
+            'short_description' => $english['short_description'],
+            'price' => $productDefinition['price'],
+            'sale_price' => $productDefinition['sale_price'] ?? null,
+            'stock_quantity' => $productDefinition['stock'] ?? 50,
+            'low_stock_threshold' => $productDefinition['low_stock_threshold'] ?? 8,
+            'weight' => $productDefinition['weight'] ?? 5.0,
+            'length' => $productDefinition['length'] ?? 40.0,
+            'width' => $productDefinition['width'] ?? 30.0,
+            'height' => $productDefinition['height'] ?? 20.0,
+            'is_visible' => true,
+            'is_featured' => $productDefinition['featured'] ?? false,
+            'manage_stock' => true,
+            'status' => 'published',
+            'published_at' => $productDefinition['published_at'] ?? now()->subDays(random_int(5, 45)),
+            'seo_title' => $english['name'].' - '.config('app.name'),
+            'seo_description' => $english['short_description'],
+        ];
+
+        if ($existingProduct) {
+            $existingProduct->update($productData);
+            $product = $existingProduct;
+        } else {
+            // Use factory to create product with relationships
+            $product = Product::factory()
+                ->for($brand)
+                ->state(array_merge($productData, [
+                    'slug' => $productDefinition['slug'],
+                ]))
+                ->create();
+        }
 
         $productCategorySlugs = $productDefinition['categories'] ?? [];
         $categoryIds = empty($productCategorySlugs)
@@ -98,22 +110,32 @@ class CollectionProductSeeder extends Seeder
         foreach ($locales as $locale) {
             $localeTranslation = $translations[$locale] ?? $english;
 
-            ProductTranslation::updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'locale' => $locale,
-                ],
-                [
-                    'name' => $localeTranslation['name'],
-                    'slug' => Str::slug($localeTranslation['name'].'-'.$locale),
-                    'summary' => $localeTranslation['short_description'],
-                    'short_description' => $localeTranslation['short_description'],
-                    'description' => $localeTranslation['description'],
-                    'seo_title' => $localeTranslation['name'].' - '.config('app.name'),
-                    'seo_description' => $localeTranslation['short_description'],
-                    'meta_keywords' => [],
-                ],
-            );
+            $existingTranslation = ProductTranslation::where([
+                'product_id' => $product->id,
+                'locale' => $locale,
+            ])->first();
+
+            $translationData = [
+                'name' => $localeTranslation['name'],
+                'slug' => Str::slug($localeTranslation['name'].'-'.$locale),
+                'summary' => $localeTranslation['short_description'],
+                'short_description' => $localeTranslation['short_description'],
+                'description' => $localeTranslation['description'],
+                'seo_title' => $localeTranslation['name'].' - '.config('app.name'),
+                'seo_description' => $localeTranslation['short_description'],
+                'meta_keywords' => [],
+            ];
+
+            if ($existingTranslation) {
+                $existingTranslation->update($translationData);
+            } else {
+                ProductTranslation::factory()
+                    ->for($product)
+                    ->state(array_merge($translationData, [
+                        'locale' => $locale,
+                    ]))
+                    ->create();
+            }
         }
 
         $collection->products()->syncWithoutDetaching([$product->id]);
@@ -145,13 +167,21 @@ class CollectionProductSeeder extends Seeder
 
     private function ensureBrand(string $name): Brand
     {
-        return Brand::firstOrCreate(
-            ['slug' => Str::slug($name)],
-            [
+        $slug = Str::slug($name);
+        $existingBrand = Brand::where('slug', $slug)->first();
+        
+        if ($existingBrand) {
+            return $existingBrand;
+        }
+        
+        // Use factory to create brand
+        return Brand::factory()
+            ->state([
+                'slug' => $slug,
                 'name' => $name,
                 'is_enabled' => true,
-            ],
-        );
+            ])
+            ->create();
     }
 
     private function ensureProductImage(Product $product, string $label, string $categoryName): void

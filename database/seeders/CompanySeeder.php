@@ -11,7 +11,7 @@ final class CompanySeeder extends Seeder
 {
     public function run(): void
     {
-        $companies = [
+        $companiesData = [
             [
                 'name' => 'Statybos Centras UAB',
                 'email' => 'info@statyboscentras.lt',
@@ -124,10 +124,13 @@ final class CompanySeeder extends Seeder
             ],
         ];
 
-        foreach ($companies as $companyData) {
-            Company::create($companyData);
-        }
+        // Create companies using factory with specific data
+        collect($companiesData)->each(function (array $companyData): void {
+            Company::factory()
+                ->state($companyData)
+                ->create();
+        });
 
-        $this->command->info('Created '.count($companies).' construction companies');
+        $this->command->info('Created '.count($companiesData).' construction companies using factories');
     }
 }
