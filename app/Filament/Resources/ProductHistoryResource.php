@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
@@ -27,11 +29,9 @@ final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-clock';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Products;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 11;
 

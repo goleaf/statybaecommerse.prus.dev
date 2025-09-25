@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Models\Scopes\ActiveScope;
 use App\Models\Campaign;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Scopes\ActiveScope;
 use App\Models\User;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
 
 final class EcommerceOverview extends BaseWidget
@@ -60,7 +62,7 @@ final class EcommerceOverview extends BaseWidget
         $avgOrderValue = $ordersThisMonth > 0 ? $revenueThisMonth / $ordersThisMonth : 0.0;
 
         return [
-            Stat::make(__('admin.dashboard.stats.total_revenue'), '€' . number_format($revenueThisMonth, 2))
+            Stat::make(__('admin.dashboard.stats.total_revenue'), '€'.number_format($revenueThisMonth, 2))
                 ->description(sprintf('%+0.1f%%', $revenueChange))
                 ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueChange >= 0 ? 'success' : 'danger'),
@@ -70,7 +72,7 @@ final class EcommerceOverview extends BaseWidget
                 ->color($ordersChange >= 0 ? 'success' : 'danger'),
             Stat::make(__('admin.dashboard.stats.total_customers'), $totalCustomers)
                 ->color('primary'),
-            Stat::make(__('admin.dashboard.stats.average_order_value'), '€' . number_format($avgOrderValue, 2))
+            Stat::make(__('admin.dashboard.stats.average_order_value'), '€'.number_format($avgOrderValue, 2))
                 ->color('info'),
             Stat::make(__('admin.dashboard.stats.total_products'), $totalProducts)
                 ->color('primary'),

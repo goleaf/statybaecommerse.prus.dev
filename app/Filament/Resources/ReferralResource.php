@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralResource\Pages;
+use BackedEnum;
 use App\Models\Referral;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;

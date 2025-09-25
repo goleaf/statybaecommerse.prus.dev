@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralCodeResource\Pages;
+use BackedEnum;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
 use Filament\Actions\Action;

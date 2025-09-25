@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
+use BackedEnum;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;

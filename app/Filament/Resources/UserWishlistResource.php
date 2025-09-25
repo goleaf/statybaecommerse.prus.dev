@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserWishlistResource\Pages;
+use BackedEnum;
 use App\Models\UserWishlist;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;

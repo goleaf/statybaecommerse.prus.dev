@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceListResource\Pages;
+use BackedEnum;
 use App\Models\PriceList;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;

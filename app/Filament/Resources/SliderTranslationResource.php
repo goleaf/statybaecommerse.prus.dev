@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderTranslationResource\Pages;
+use BackedEnum;
 use App\Models\Slider;
 use App\Models\SliderTranslation;
 use Filament\Actions\BulkActionGroup;

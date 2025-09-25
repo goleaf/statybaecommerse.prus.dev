@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationBlockResource\Pages;
+use BackedEnum;
 use App\Models\RecommendationBlock;
 use App\Models\Scopes\ActiveScope;
 use Filament\Actions\BulkActionGroup;

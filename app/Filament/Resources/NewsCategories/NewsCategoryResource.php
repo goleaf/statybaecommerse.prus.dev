@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\NewsCategories;
 
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
+use BackedEnum;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
 use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;

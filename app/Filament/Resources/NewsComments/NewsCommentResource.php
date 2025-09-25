@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsComments;
 
 use App\Filament\Resources\NewsComments\Pages\CreateNewsComment;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\NewsComments\Pages\EditNewsComment;
 use App\Filament\Resources\NewsComments\Pages\ListNewsComments;
 use App\Filament\Resources\NewsComments\Schemas\NewsCommentForm;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationConfigResource\Pages;
+use BackedEnum;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SubscriberResource\Pages;
+use BackedEnum;
 use App\Models\Subscriber;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;

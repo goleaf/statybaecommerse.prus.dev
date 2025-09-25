@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
+use BackedEnum;
 use App\Models\VariantPriceHistory;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;

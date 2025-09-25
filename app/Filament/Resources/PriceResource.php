@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceResource\Pages;
+use BackedEnum;
 use App\Models\Price;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;

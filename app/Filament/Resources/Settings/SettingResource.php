@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Settings;
 
 use App\Filament\Resources\Settings\Pages\CreateSetting;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\Settings\Pages\EditSetting;
 use App\Filament\Resources\Settings\Pages\ListSettings;
 use App\Filament\Resources\Settings\Schemas\SettingForm;

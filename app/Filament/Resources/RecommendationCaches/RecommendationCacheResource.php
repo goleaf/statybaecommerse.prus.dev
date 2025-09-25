@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationCaches;
 
 use App\Filament\Resources\RecommendationCaches\Pages\CreateRecommendationCache;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\RecommendationCaches\Pages\EditRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\ListRecommendationCaches;
 use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;

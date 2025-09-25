@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -42,31 +44,31 @@ final class TopProductsWidget extends BaseWidget
             ->select(['products.*'])
             ->selectRaw(
                 '(SELECT COUNT(*) FROM analytics_events '
-                    . 'WHERE event_type = ? AND analytics_events.created_at >= ? '
-                    . "AND JSON_EXTRACT(properties, '\$.product_id') = products.id) AS views_count",
+                    .'WHERE event_type = ? AND analytics_events.created_at >= ? '
+                    ."AND JSON_EXTRACT(properties, '\$.product_id') = products.id) AS views_count",
                 ['product_view', $since]
             )
             ->selectRaw(
                 '(SELECT COUNT(*) FROM analytics_events '
-                    . 'WHERE event_type = ? AND analytics_events.created_at >= ? '
-                    . "AND JSON_EXTRACT(properties, '\$.product_id') = products.id) AS cart_adds_count",
+                    .'WHERE event_type = ? AND analytics_events.created_at >= ? '
+                    ."AND JSON_EXTRACT(properties, '\$.product_id') = products.id) AS cart_adds_count",
                 ['add_to_cart', $since]
             )
             ->selectRaw(
                 '(SELECT COALESCE(SUM(quantity), 0) FROM order_items '
-                    . 'JOIN orders ON orders.id = order_items.order_id '
-                    . 'WHERE order_items.product_id = products.id AND orders.status = ?) AS total_sold',
+                    .'JOIN orders ON orders.id = order_items.order_id '
+                    .'WHERE order_items.product_id = products.id AND orders.status = ?) AS total_sold',
                 ['completed']
             )
             ->where('products.is_visible', true)
             ->orderByDesc('total_sold');
 
         return $table
-            ->query(fn(): Builder => $query)
+            ->query(fn (): Builder => $query)
             ->columns([
                 ImageColumn::make('thumbnail')
                     ->label(__('analytics.thumbnail'))
-                    ->defaultImageUrl(fn(Product $product): ?string => $product->getFirstMediaUrl('default', 'thumbnail') ?: null)
+                    ->defaultImageUrl(fn (Product $product): ?string => $product->getFirstMediaUrl('default', 'thumbnail') ?: null)
                     ->square()
                     ->visibleOn(['md', 'lg']),
                 TextColumn::make('name')

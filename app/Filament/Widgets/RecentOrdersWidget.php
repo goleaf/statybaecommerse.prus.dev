@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 
 final class RecentOrdersWidget extends BaseWidget
@@ -17,7 +19,7 @@ final class RecentOrdersWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn(): Builder => Order::query()
+            ->query(fn (): Builder => Order::query()
                 ->withoutGlobalScopes()
                 ->with('user')
                 ->latest()
@@ -29,12 +31,12 @@ final class RecentOrdersWidget extends BaseWidget
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('orders.customer'))
-                    ->default(fn(?Order $record): string => $record?->user?->name ?? __('orders.guest_customer'))
+                    ->default(fn (?Order $record): string => $record?->user?->name ?? __('orders.guest_customer'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('orders.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'confirmed', 'processing' => 'primary',
                         'shipped', 'delivered' => 'success',

@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\ReferralRewardLogs;
 
 use App\Filament\Resources\ReferralRewardLogs\Pages\CreateReferralRewardLog;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\ReferralRewardLogs\Pages\EditReferralRewardLog;
 use App\Filament\Resources\ReferralRewardLogs\Pages\ListReferralRewardLogs;
 use App\Filament\Resources\ReferralRewardLogs\Schemas\ReferralRewardLogForm;

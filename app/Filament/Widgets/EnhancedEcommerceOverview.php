@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
@@ -6,14 +8,16 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use UnitEnum;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     /**
      * @var string|null
      */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     /**
@@ -24,6 +28,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     /**
      * @var string|null
      */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
@@ -36,10 +41,10 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
 
         return [
             Stat::make($translations['total_revenue'], $this->getTotalRevenue())->description(
-                $translations['change_since_last_month'] . ': ' . $this->formatDelta($this->getRevenueDelta())
+                $translations['change_since_last_month'].': '.$this->formatDelta($this->getRevenueDelta())
             ),
             Stat::make($translations['total_orders'], $this->getTotalOrders())->description(
-                $translations['change_since_last_month'] . ': ' . $this->formatDelta($this->getOrderDelta())
+                $translations['change_since_last_month'].': '.$this->formatDelta($this->getOrderDelta())
             ),
             Stat::make($translations['total_customers'], $this->getTotalCustomers()),
             Stat::make($translations['average_order_value'], $this->getAverageOrderValue()),
@@ -87,7 +92,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     {
         $average = (float) Review::query()->avg('rating');
 
-        return number_format($average, 1) . '/5';
+        return number_format($average, 1).'/5';
     }
 
     private function getRevenueDelta(): float

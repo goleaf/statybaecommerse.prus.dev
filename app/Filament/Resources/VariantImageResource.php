@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantImageResource\Pages;
+use BackedEnum;
 use App\Models\ProductVariant;
 use App\Models\VariantImage;
 use Filament\Actions\Action;

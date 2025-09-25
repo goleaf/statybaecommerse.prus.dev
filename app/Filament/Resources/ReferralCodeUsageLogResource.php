@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
+use BackedEnum;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeUsageLog;
 use App\Models\User;

@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsTags;
 
 use App\Filament\Resources\NewsTags\Pages\CreateNewsTag;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\NewsTags\Pages\EditNewsTag;
 use App\Filament\Resources\NewsTags\Pages\ListNewsTags;
 use App\Filament\Resources\NewsTags\Schemas\NewsTagForm;

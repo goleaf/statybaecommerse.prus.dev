@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Models\Scopes\ActiveScope;
 use App\Models\Campaign;
 use App\Models\Order;
 use App\Models\Product;
-use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Models\Scopes\ActiveScope;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
 
 final class RealtimeAnalyticsWidget extends ChartWidget
@@ -69,7 +71,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
                 ->description(sprintf('%+0.1f%%', $ordersChange))
                 ->descriptionIcon($ordersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($ordersChange >= 0 ? 'success' : 'danger'),
-            Stat::make(__('admin.widgets.today_revenue'), '€' . number_format($revenueToday, 2))
+            Stat::make(__('admin.widgets.today_revenue'), '€'.number_format($revenueToday, 2))
                 ->description(sprintf('%+0.1f%%', $revenueChange))
                 ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueChange >= 0 ? 'success' : 'danger'),

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
+use BackedEnum;
 use App\Models\VariantPricingRule;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;

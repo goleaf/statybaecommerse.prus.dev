@@ -1,17 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
+use UnitEnum;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard\Actions\FilterAction;
-use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Pages\Dashboard as BaseDashboard;
+use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
 
 /**
  * Slider Analytics Dashboard
@@ -129,10 +132,10 @@ final class SliderAnalytics extends BaseDashboard
         $status = $this->pageFilters['status'] ?? 'all';
 
         $query = Slider::query()
-            ->when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate))
-            ->when($sliderId, fn(Builder $query) => $query->where('id', $sliderId))
-            ->when($status !== 'all', fn(Builder $query) => $query->where('is_active', $status === 'active'));
+            ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+            ->when($sliderId, fn (Builder $query) => $query->where('id', $sliderId))
+            ->when($status !== 'all', fn (Builder $query) => $query->where('is_active', $status === 'active'));
 
         $sliders = $query->with(['media', 'translations'])->get();
 
@@ -153,7 +156,7 @@ final class SliderAnalytics extends BaseDashboard
             ];
         });
 
-        $filename = 'slider_analytics_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $filename = 'slider_analytics_'.now()->format('Y-m-d_H-i-s').'.csv';
 
         $this->notify('success', "Analytics exported successfully as {$filename}");
     }

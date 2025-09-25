@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockMovementResource\Pages;
+use BackedEnum;
 use App\Models\StockMovement;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;

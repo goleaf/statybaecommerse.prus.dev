@@ -14,21 +14,16 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use BackedEnum;
 use UnitEnum;
 
 final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static $navigationGroup = NavigationGroup::Analytics;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {
@@ -114,7 +109,7 @@ final class AnalyticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\Analytics::route('/'),
+            'index' => Pages\AnalyticsDashboard::route('/'),
         ];
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
 use App\Filament\Resources\NotificationTemplateResource\Pages;
 use App\Models\NotificationTemplate;
 use Filament\Actions\BulkActionGroup;
@@ -43,7 +44,7 @@ final class NotificationTemplateResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
-    protected static $navigationGroup = NavigationGroup::Content;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {

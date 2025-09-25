@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralRewardLogResource\Pages;
+use BackedEnum;
 use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
 use App\Models\User;

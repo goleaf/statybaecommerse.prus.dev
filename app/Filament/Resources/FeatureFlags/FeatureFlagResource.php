@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\FeatureFlags;
 
 use App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\FeatureFlags\Pages\EditFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\ListFeatureFlags;
 use App\Filament\Resources\FeatureFlags\Schemas\FeatureFlagForm;

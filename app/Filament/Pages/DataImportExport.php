@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Services\ImportExport\ProviderRegistry;
+use UnitEnum;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -18,7 +20,7 @@ final class DataImportExport extends Page
 {
     protected string $view = 'filament.pages.data-import-export';
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 

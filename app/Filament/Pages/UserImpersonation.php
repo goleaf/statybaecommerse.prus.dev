@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
 use App\Models\User;
+use BackedEnum;
 use Filament\Pages\Page;
+use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Tables;
-use BackedEnum;
 use UnitEnum;
 
 final class UserImpersonation extends Page implements HasTable

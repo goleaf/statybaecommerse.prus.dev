@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderResource\Pages;
+use BackedEnum;
 use App\Models\Slider;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\ColorPicker;

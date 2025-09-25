@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Sliders;
 
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
+use BackedEnum;
 use App\Filament\Resources\Sliders\Pages\EditSlider;
 use App\Filament\Resources\Sliders\Pages\ListSliders;
 use App\Filament\Resources\Sliders\Schemas\SliderForm;

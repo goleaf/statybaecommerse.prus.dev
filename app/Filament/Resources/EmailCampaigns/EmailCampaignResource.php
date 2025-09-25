@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\EmailCampaigns;
 
 use App\Filament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Pages\ListEmailCampaigns;
 use App\Filament\Resources\EmailCampaigns\Schemas\EmailCampaignForm;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
 use Filament\Actions\BulkActionGroup;

@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\ProductSimilarities;
 
 use App\Filament\Resources\ProductSimilarities\Pages\CreateProductSimilarity;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\ProductSimilarities\Pages\EditProductSimilarity;
 use App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities;
 use App\Filament\Resources\ProductSimilarities\Schemas\ProductSimilarityForm;

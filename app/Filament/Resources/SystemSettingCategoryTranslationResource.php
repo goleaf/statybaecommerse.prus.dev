@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages;
+use BackedEnum;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
 use Filament\Actions\Action;

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\RecommendationAnalytics;
 
 use App\Filament\Resources\RecommendationAnalytics\Pages\CreateRecommendationAnalytics;
+use UnitEnum;
 use App\Filament\Resources\RecommendationAnalytics\Pages\EditRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyticsForm;

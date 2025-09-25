@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PartnerResource\Pages;
+use BackedEnum;
 use App\Models\Partner;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;

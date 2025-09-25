@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use BackedEnum;
 use App\Models\User;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;

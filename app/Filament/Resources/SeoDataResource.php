@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
 use App\Filament\Resources\SeoDataResource\Pages;
 use App\Models\Brand;
 use App\Models\Category;

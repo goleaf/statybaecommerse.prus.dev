@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ShippingOptions;
 
 use App\Filament\Resources\ShippingOptions\Pages\CreateShippingOption;
+use UnitEnum;
 use App\Filament\Resources\ShippingOptions\Pages\EditShippingOption;
 use App\Filament\Resources\ShippingOptions\Pages\ListShippingOptions;
 use App\Filament\Resources\ShippingOptions\Schemas\ShippingOptionForm;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserProductInteractionResource\Pages;
+use BackedEnum;
 use App\Models\UserProductInteraction;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;

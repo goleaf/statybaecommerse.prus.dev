@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockResource\Pages;
+use BackedEnum;
 use App\Models\Inventory;
 use App\Models\Product;
 use Filament\Actions\Action;

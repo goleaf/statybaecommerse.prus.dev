@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use BackedEnum;
+use UnitEnum;
 use Filament\Pages\Page;
 
 final class EmailMarketingPage extends Page
 {
     // /** @var BackedEnum|string|null */
-    // protected static BackedEnum|string|null $navigationIcon =  'heroicon-o-envelope-open';
+    //     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope-open';
 
     protected string $view = 'filament.pages.email-marketing-page';
 

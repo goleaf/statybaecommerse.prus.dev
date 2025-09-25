@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserBehaviorResource\Pages;
+use BackedEnum;
 use App\Models\User;
 use App\Models\UserBehavior;
 use Filament\Actions\Action;

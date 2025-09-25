@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SystemSettingDependencies;
 
 use App\Filament\Resources\SystemSettingDependencies\Pages\CreateSystemSettingDependency;
+use UnitEnum;
+use BackedEnum;
 use App\Filament\Resources\SystemSettingDependencies\Pages\EditSystemSettingDependency;
 use App\Filament\Resources\SystemSettingDependencies\Pages\ListSystemSettingDependencies;
 use App\Filament\Resources\SystemSettingDependencies\Schemas\SystemSettingDependencyForm;

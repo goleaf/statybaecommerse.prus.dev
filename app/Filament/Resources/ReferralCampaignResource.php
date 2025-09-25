@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralCampaignResource\Pages;
+use BackedEnum;
 use App\Models\ReferralCampaign;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;

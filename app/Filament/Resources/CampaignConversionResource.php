@@ -24,6 +24,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use BackedEnum;
 use UnitEnum;
 
 /**
@@ -35,11 +36,9 @@ final class CampaignConversionResource extends Resource
 {
     protected static ?string $model = CampaignConversion::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rocket-launch';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rocket-launch';
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Campaigns;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
 
     public static function getNavigationLabel(): string
     {

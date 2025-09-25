@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
+use BackedEnum;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
 use Filament\Actions\BulkActionGroup;
