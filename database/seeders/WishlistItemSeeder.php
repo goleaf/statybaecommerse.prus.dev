@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -17,18 +15,29 @@ class WishlistItemSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()
-            ->count(5)
-            ->has(UserWishlist::factory()->count(2))
-            ->create()
-            ->each(function (User $user): void {
-                $user->wishlists->each(function (UserWishlist $wishlist): void {
-                    WishlistItem::factory()
-                        ->count(fake()->numberBetween(3, 8))
-                        ->for($wishlist)
-                        ->create();
-                });
+        // Use existing users and create wishlists for them
+        $users = User::query()->inRandomOrder()->limit(5)->get();
+
+        if ($users->isEmpty()) {
+            // Create users if none exist
+            $users = User::factory()->count(5)->create();
+        }
+
+        $users->each(function (User $user): void {
+            // Create wishlists for each user
+            $wishlists = UserWishlist::factory()
+                ->count(2)
+                ->for($user)
+                ->create();
+
+            $wishlists->each(function (UserWishlist $wishlist): void {
+                WishlistItem::factory()
+                    ->count(fake()->numberBetween(3, 8))
+                    ->create([
+                        'wishlist_id' => $wishlist->id,
+                    ]);
             });
+        });
 
         $this->createSpecificScenarios();
     }
@@ -39,10 +48,16 @@ class WishlistItemSeeder extends Seeder
     private function createSpecificScenarios(): void
     {
         // Scenario 1: User with many items in wishlist
-        $powerUser = User::factory()->create([
-            'name' => 'Power User',
-            'email' => 'poweruser@example.com',
-        ]);
+        $powerUser = User::firstOrCreate(
+            ['email' => 'poweruser@example.com'],
+            [
+                'name' => 'Power User',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+                'preferred_locale' => 'en',
+                'is_admin' => false,
+            ]
+        );
 
         $powerUserWishlist = UserWishlist::factory()->create([
             'user_id' => $powerUser->id,
@@ -53,19 +68,25 @@ class WishlistItemSeeder extends Seeder
         $products = Product::factory()->count(15)->create();
         foreach ($products as $product) {
             WishlistItem::factory()
-                ->for($powerUserWishlist)
-                ->for($product)
                 ->create([
+                    'wishlist_id' => $powerUserWishlist->id,
+                    'product_id' => $product->id,
                     'quantity' => rand(1, 5),
-                    'notes' => 'Priority: '.rand(1, 5),
+                    'notes' => 'Priority: ' . rand(1, 5),
                 ]);
         }
 
         // Scenario 2: User with empty wishlist
-        $minimalUser = User::factory()->create([
-            'name' => 'Minimal User',
-            'email' => 'minimal@example.com',
-        ]);
+        $minimalUser = User::firstOrCreate(
+            ['email' => 'minimal@example.com'],
+            [
+                'name' => 'Minimal User',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+                'preferred_locale' => 'en',
+                'is_admin' => false,
+            ]
+        );
 
         UserWishlist::factory()->create([
             'user_id' => $minimalUser->id,
@@ -74,10 +95,16 @@ class WishlistItemSeeder extends Seeder
         ]);
 
         // Scenario 3: User with multiple wishlists
-        $organizedUser = User::factory()->create([
-            'name' => 'Organized User',
-            'email' => 'organized@example.com',
-        ]);
+        $organizedUser = User::firstOrCreate(
+            ['email' => 'organized@example.com'],
+            [
+                'name' => 'Organized User',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+                'preferred_locale' => 'en',
+                'is_admin' => false,
+            ]
+        );
 
         $wishlists = [
             'Electronics',
@@ -95,17 +122,23 @@ class WishlistItemSeeder extends Seeder
 
             WishlistItem::factory()
                 ->count(rand(2, 4))
-                ->for($wishlist)
                 ->create([
+                    'wishlist_id' => $wishlist->id,
                     'notes' => "For {$wishlistName} collection",
                 ]);
         }
 
         // Scenario 4: Items with high quantities
-        $bulkBuyer = User::factory()->create([
-            'name' => 'Bulk Buyer',
-            'email' => 'bulk@example.com',
-        ]);
+        $bulkBuyer = User::firstOrCreate(
+            ['email' => 'bulk@example.com'],
+            [
+                'name' => 'Bulk Buyer',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+                'preferred_locale' => 'en',
+                'is_admin' => false,
+            ]
+        );
 
         $bulkWishlist = UserWishlist::factory()->create([
             'user_id' => $bulkBuyer->id,
@@ -114,8 +147,8 @@ class WishlistItemSeeder extends Seeder
 
         WishlistItem::factory()
             ->count(3)
-            ->for($bulkWishlist)
             ->create([
+                'wishlist_id' => $bulkWishlist->id,
                 'quantity' => rand(10, 50),
                 'notes' => 'Bulk order for business',
             ]);

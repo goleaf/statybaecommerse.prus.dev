@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -60,9 +58,14 @@ final class MenuSeeder extends Seeder
             ? ($category->trans('name') ?? $category->name)
             : $category->name;
 
-        return MenuItem::factory()
-            ->for($menu)
-            ->for($parentItem, 'parent')
+        $factory = MenuItem::factory()
+            ->for($menu);
+
+        if ($parentItem !== null) {
+            $factory = $factory->for($parentItem, 'parent');
+        }
+
+        return $factory
             ->state([
                 'label' => $label,
                 'url' => null,
@@ -71,6 +74,7 @@ final class MenuSeeder extends Seeder
                 'icon' => null,
                 'sort_order' => $sortOrder,
                 'is_visible' => true,
+                'parent_id' => $parentItem?->id,
             ])
             ->create();
     }

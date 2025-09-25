@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -83,6 +81,18 @@ final class AnalyticsEventsSeeder extends Seeder
 
         $missing = 10 - $products->count();
 
+        // Get existing brands instead of creating new ones
+        $existingBrands = Brand::query()->enabled()->get();
+        if ($existingBrands->isEmpty()) {
+            // If no brands exist, create just one
+            $brand = Brand::factory()->create([
+                'name' => 'Analytics Brand',
+                'slug' => 'analytics-brand',
+                'is_enabled' => true,
+            ]);
+            $existingBrands = collect([$brand]);
+        }
+
         Product::factory()
             ->count($missing)
             ->state([
@@ -90,8 +100,10 @@ final class AnalyticsEventsSeeder extends Seeder
                 'is_visible' => true,
                 'published_at' => now(),
             ])
-            ->for(Brand::factory(), 'brand')
-            ->create();
+            ->create()
+            ->each(function ($product) use ($existingBrands) {
+                $product->update(['brand_id' => $existingBrands->random()->id]);
+            });
 
         return Product::query()->where('status', 'published')->where('is_visible', true)->limit(10)->get();
     }

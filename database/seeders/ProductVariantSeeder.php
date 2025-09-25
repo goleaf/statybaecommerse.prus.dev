@@ -137,14 +137,24 @@ final class ProductVariantSeeder extends Seeder
 
     private function createProductsWithVariants(): void
     {
-        $brand = Brand::factory()
-            ->state([
-                'slug' => 'fashion-brand',
-                'name' => 'Fashion Brand',
-                'description' => 'Premium fashion brand',
-                'is_enabled' => true,
-            ])
-            ->create();
+        // Use existing brand instead of creating a new one
+        $brand = Brand::query()->firstWhere('slug', 'fashion-brand');
+        if (!$brand) {
+            $existingBrands = Brand::query()->enabled()->get();
+            if ($existingBrands->isNotEmpty()) {
+                $brand = $existingBrands->first();
+            } else {
+                // Only create if no brands exist at all
+                $brand = Brand::factory()
+                    ->state([
+                        'slug' => 'fashion-brand',
+                        'name' => 'Fashion Brand',
+                        'description' => 'Premium fashion brand',
+                        'is_enabled' => true,
+                    ])
+                    ->create();
+            }
+        }
 
         $category = Category::factory()
             ->state([

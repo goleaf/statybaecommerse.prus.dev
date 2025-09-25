@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -24,7 +22,7 @@ final class ReportFactory extends Factory
         $category = fake()->randomElement(['sales', 'marketing', 'operations', 'finance', 'customer_service', 'inventory', 'analytics']);
 
         return [
-            'name' => $name,
+            'name' => ['en' => $name, 'lt' => $name],
             'slug' => Str::slug($name),
             'type' => $type,
             'category' => $category,
@@ -35,14 +33,17 @@ final class ReportFactory extends Factory
                 'status' => fake()->randomElement(['all', 'paid', 'pending']),
                 'category' => fake()->randomElement(['electronics', 'clothing', 'books']),
             ],
-            'description' => fake()->sentence(),
+            'description' => ['en' => fake()->sentence(), 'lt' => fake()->sentence()],
             'content' => fake()->paragraphs(3, true),
             'is_active' => fake()->boolean(80),
             'is_public' => fake()->boolean(60),
             'is_scheduled' => fake()->boolean(30),
             'schedule_frequency' => fake()->randomElement(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']),
             'last_generated_at' => fake()->optional(0.7)->dateTimeBetween('-30 days', 'now'),
-            'generated_by' => fake()->optional(0.7)->randomElement(User::pluck('id')->toArray()),
+            'generated_by' => function () {
+                $userIds = User::pluck('id')->toArray();
+                return empty($userIds) ? null : fake()->randomElement($userIds);
+            },
             'view_count' => fake()->numberBetween(0, 1000),
             'download_count' => fake()->numberBetween(0, 100),
             'settings' => [
@@ -60,21 +61,21 @@ final class ReportFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => true,
         ]);
     }
 
     public function public(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_public' => true,
         ]);
     }
 
     public function scheduled(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_scheduled' => true,
             'schedule_frequency' => fake()->randomElement(['daily', 'weekly', 'monthly']),
         ]);
@@ -82,7 +83,7 @@ final class ReportFactory extends Factory
 
     public function generated(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'last_generated_at' => now(),
             'generated_by' => User::factory(),
         ]);
@@ -90,7 +91,7 @@ final class ReportFactory extends Factory
 
     public function popular(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'view_count' => fake()->numberBetween(500, 5000),
             'download_count' => fake()->numberBetween(50, 500),
         ]);

@@ -30,8 +30,8 @@ final class VariantInventorySeeder extends Seeder
             ->each(function (ProductVariant $variant) use ($locations): void {
                 $locations->each(function (Location $location) use ($variant): void {
                     VariantInventory::factory()
-                        ->for($variant)
-                        ->for($location)
+                        ->for($variant, 'variant')
+                        ->for($location, 'location')
                         ->create();
                 });
             });

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -21,14 +19,15 @@ final class NewsImageSeeder extends Seeder
         }
 
         foreach ($news as $newsArticle) {
-            NewsImage::factory()
-                ->for($newsArticle, 'news')
-                ->count(fake()->numberBetween(1, 5))
-                ->state(function (array $attributes, NewsImage $newsImage, int $index) {
-                    return [
-                        'is_featured' => $index === 0,
-                        'sort_order' => $index + 1,
-                        'file_path' => 'news-images/'.fake()->uuid().'.jpg',
+            $imageCount = fake()->numberBetween(1, 5);
+
+            for ($i = 0; $i < $imageCount; $i++) {
+                NewsImage::factory()
+                    ->for($newsArticle, 'news')
+                    ->create([
+                        'is_featured' => $i === 0,
+                        'sort_order' => $i + 1,
+                        'file_path' => 'news-images/' . fake()->uuid() . '.jpg',
                         'alt_text' => fake()->sentence(6),
                         'caption' => fake()->sentence(10),
                         'file_size' => fake()->numberBetween(100000, 2000000),
@@ -42,9 +41,8 @@ final class NewsImageSeeder extends Seeder
                             'width' => fake()->numberBetween(400, 1920),
                             'height' => fake()->numberBetween(300, 1080),
                         ],
-                    ];
-                })
-                ->create();
+                    ]);
+            }
         }
 
         $this->command->info('News images seeded successfully.');

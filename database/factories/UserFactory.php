@@ -27,9 +27,19 @@ class UserFactory extends Factory
         $firstName = fake()->firstName();
         $lastName = fake()->lastName();
 
+        // Generate unique email
+        $baseEmail = fake()->safeEmail();
+        $email = $baseEmail;
+        $counter = 1;
+        while (\App\Models\User::where('email', $email)->exists()) {
+            $emailParts = explode('@', $baseEmail);
+            $email = $emailParts[0] . $counter . '@' . $emailParts[1];
+            $counter++;
+        }
+
         return [
-            'name' => $firstName.' '.$lastName,
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $firstName . ' ' . $lastName,
+            'email' => $email,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'preferred_locale' => fake()->randomElement(['en', 'lt']),
@@ -43,7 +53,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -53,7 +63,7 @@ class UserFactory extends Factory
      */
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_admin' => true,
             'email_verified_at' => now(),
             'is_active' => true,
@@ -63,7 +73,7 @@ class UserFactory extends Factory
 
     public function shippingAddress(): static
     {
-        return $this->hasAddresses(1, fn (): array => [
+        return $this->hasAddresses(1, fn(): array => [
             'type' => AddressType::SHIPPING,
             'is_default' => true,
             'is_shipping' => true,
@@ -71,13 +81,13 @@ class UserFactory extends Factory
             'city' => 'Vilnius',
             'address_line_1' => 'Gedimino pr. 1',
             'postal_code' => '01103',
-            'phone' => '+370'.fake()->numberBetween(60000000, 69999999),
+            'phone' => '+370' . fake()->numberBetween(60000000, 69999999),
         ]);
     }
 
     public function billingAddress(): static
     {
-        return $this->hasAddresses(1, fn (): array => [
+        return $this->hasAddresses(1, fn(): array => [
             'type' => AddressType::BILLING,
             'is_billing' => true,
             'country_code' => 'LT',

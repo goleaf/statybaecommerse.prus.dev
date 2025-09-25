@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -108,6 +106,14 @@ final class ReportSeeder extends Seeder
         ];
 
         foreach ($reports as $reportData) {
+            // Keep translations as JSON for the database
+            if (!is_array($reportData['name'])) {
+                $reportData['name'] = ['en' => $reportData['name'], 'lt' => $reportData['name']];
+            }
+            if (isset($reportData['description']) && !is_array($reportData['description'])) {
+                $reportData['description'] = ['en' => $reportData['description'], 'lt' => $reportData['description']];
+            }
+
             Report::factory()->create($reportData);
         }
 

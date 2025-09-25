@@ -172,7 +172,13 @@ class CollectionProductSeeder extends Seeder
             return $existingBrand;
         }
 
-        // Use factory to create brand
+        // Instead of creating a new brand, use an existing one
+        $existingBrands = Brand::query()->enabled()->get();
+        if ($existingBrands->isNotEmpty()) {
+            return $existingBrands->random();
+        }
+
+        // Only create if no brands exist at all
         return Brand::factory()
             ->state([
                 'slug' => $slug,

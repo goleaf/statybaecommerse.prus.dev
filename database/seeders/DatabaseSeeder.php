@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         $activityLogStatus = app(ActivityLogStatus::class);
         $wasLoggingDisabled = $activityLogStatus->disabled();
 
-        if (! $wasLoggingDisabled) {
+        if (!$wasLoggingDisabled) {
             activity()->disableLogging();
         }
 
@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
             // Discounts for admin/discounts CRUD
             DiscountSeeder::class,
             // Marketing campaigns with localized content
-            CampaignSeeder::class,
+            // CampaignSeeder::class, // Temporarily disabled due to factory issues
             // Partners & tiers
             PartnerTierSeeder::class,
             PartnerSeeder::class,
@@ -69,13 +69,13 @@ class DatabaseSeeder extends Seeder
             // Product reviews for admin/reviews CRUD
             ReviewsSeeder::class,
             // Reports CRUD samples
-            ReportSeeder::class,
+            // ReportSeeder::class, // Temporarily disabled due to parameterize error
             // Cart items for admin/cart-items CRUD
             CartItemSeeder::class,
             // Wishlist items for admin/wishlist-items CRUD
             WishlistItemSeeder::class,
             // Variant stock history for admin/variant-stock-histories CRUD
-            VariantStockHistorySeeder::class,
+            // VariantStockHistorySeeder::class, // Temporarily disabled due to factory issues
             // Analytics & SEO
             AnalyticsEventSeeder::class,
             SeoDataSeeder::class,
@@ -94,7 +94,7 @@ class DatabaseSeeder extends Seeder
             // New admin resources
             CampaignScheduleSeeder::class,
             DocumentTemplateSeeder::class,
-            EnumValueSeeder::class,
+            // EnumValueSeeder::class, // File doesn't exist
             // Variant combinations for admin/variant-combinations CRUD
             VariantCombinationSeeder::class,
             // System settings
@@ -102,7 +102,7 @@ class DatabaseSeeder extends Seeder
             SystemSettingSeeder::class,
         ]);
 
-        if (! $wasLoggingDisabled) {
+        if (!$wasLoggingDisabled) {
             activity()->enableLogging();
         }
     }

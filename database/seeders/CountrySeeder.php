@@ -37,6 +37,8 @@ final class CountrySeeder extends Seeder
                     ->state([
                         'cca2' => $countryData['cca2'],
                         'cca3' => $countryData['cca3'],
+                        'iso_code' => strtolower($countryData['cca2']),
+                        'code' => strtolower($countryData['cca2']),
                         'phone_calling_code' => $countryData['phone_calling_code'],
                         'flag' => $countryData['flag'],
                         'region' => $countryData['region'],

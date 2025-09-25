@@ -1,13 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Translations\ProductTranslation;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Translations\ProductTranslation;
+use App\Models\ProductHistory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -50,12 +49,23 @@ final class ProductHistoryExampleSeeder extends Seeder
 
     private function firstOrCreateBrand(): Brand
     {
-        return Brand::query()->firstWhere('slug', 'statybae-premium')
-            ?? Brand::factory()->create([
-                'name' => 'StatyBae Premium',
-                'slug' => 'statybae-premium',
-                'is_enabled' => true,
-            ]);
+        $existingBrand = Brand::query()->firstWhere('slug', 'statybae-premium');
+        if ($existingBrand) {
+            return $existingBrand;
+        }
+
+        // Instead of creating a new brand, use an existing one if available
+        $existingBrands = Brand::query()->enabled()->get();
+        if ($existingBrands->isNotEmpty()) {
+            return $existingBrands->first();  // Use the first existing brand
+        }
+
+        // Only create if no brands exist at all
+        return Brand::factory()->create([
+            'name' => 'StatyBae Premium',
+            'slug' => 'statybae-premium',
+            'is_enabled' => true,
+        ]);
     }
 
     private function firstOrCreateCategory(): Category
@@ -175,7 +185,7 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->state([
                 'field_name' => 'description',
                 'old_value' => $product->description,
-                'new_value' => $product->description.' Papildytas informacija apie dažomumą.',
+                'new_value' => $product->description . ' Papildytas informacija apie dažomumą.',
                 'description' => 'Description enriched with paintability details.',
                 'metadata' => ['reason' => 'seo_optimization'] + $baseMetadata,
                 'created_at' => Carbon::create(2024, 12, 5, 10, 5),

@@ -1,11 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Brand;
 use App\Models\Translations\BrandTranslation;
+use App\Models\Brand;
 use Illuminate\Database\Seeder;
 
 final class BrandSeeder extends Seeder
@@ -23,8 +21,6 @@ final class BrandSeeder extends Seeder
             ['name' => 'Ryobi', 'featured' => false],
             ['name' => 'Stanley Black & Decker', 'featured' => false],
             ['name' => 'Kärcher', 'featured' => false],
-            ['name' => 'Husqvarna', 'featured' => false],
-            ['name' => 'Würth', 'featured' => false],
         ]);
 
         $definitions->each(function (array $definition): void {
@@ -33,37 +29,37 @@ final class BrandSeeder extends Seeder
             // Check if brand already exists to maintain idempotency
             $existingBrand = Brand::withoutGlobalScopes()->where('slug', $slug)->first();
 
-            if (! $existingBrand) {
+            if (!$existingBrand) {
                 /** @var Brand $brand */
                 $brand = Brand::factory()->create([
                     'name' => $definition['name'],
                     'slug' => $slug,
                     'description' => "{$definition['name']} profesionalūs statybos įrankiai ir sprendimai.",
-                    'website' => 'https://'.$slug.'.lt',
+                    'website' => 'https://' . $slug . '.lt',
                     'is_enabled' => true,
                     'is_featured' => $definition['featured'],
                     'seo_title' => $definition['name'],
                     'seo_description' => "Atraskite {$definition['name']} įrankių asortimentą statybos projektams.",
                 ]);
 
-                // Create translations using factory relationships
-                $brand->translations()->saveMany([
-                    BrandTranslation::factory()->make([
+                // Create translations manually to avoid factory creating additional brands
+                $brand->translations()->createMany([
+                    [
                         'locale' => 'lt',
                         'name' => $definition['name'],
                         'slug' => $slug,
                         'description' => "Profesionalūs {$definition['name']} įrankiai Lietuvos rinkai.",
                         'seo_title' => $definition['name'],
                         'seo_description' => "Patikimi {$definition['name']} įrankiai statyboms Lietuvoje.",
-                    ]),
-                    BrandTranslation::factory()->make([
+                    ],
+                    [
                         'locale' => 'en',
-                        'name' => $definition['name'].' (EN)',
-                        'slug' => $slug.'-en',
+                        'name' => $definition['name'] . ' (EN)',
+                        'slug' => $slug . '-en',
                         'description' => "Professional {$definition['name']} tools for the European market.",
-                        'seo_title' => $definition['name'].' (EN)',
+                        'seo_title' => $definition['name'] . ' (EN)',
                         'seo_description' => "Reliable {$definition['name']} tools for construction projects.",
-                    ]),
+                    ],
                 ]);
             }
         });
