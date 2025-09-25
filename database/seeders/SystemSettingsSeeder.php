@@ -37,6 +37,7 @@ final class SystemSettingsSeeder extends Seeder
                 'icon' => 'heroicon-o-cog-6-tooth',
                 'color' => 'primary',
                 'sort_order' => 1,
+                'is_active' => true,
             ],
             [
                 'name' => 'E-commerce',
@@ -115,23 +116,19 @@ final class SystemSettingsSeeder extends Seeder
         foreach ($categories as $categoryData) {
             $category = SystemSettingCategory::firstOrCreate(
                 ['slug' => $categoryData['slug']],
-                SystemSettingCategory::factory()->make($categoryData)->toArray()
+                $categoryData
             );
 
-            // Create translations using factory relationships
+            // Create translations directly to avoid factory uniqueness constraints
             SystemSettingCategoryTranslation::firstOrCreate(
                 [
                     'system_setting_category_id' => $category->id,
                     'locale' => 'lt',
                 ],
-                SystemSettingCategoryTranslation::factory()
-                    ->for($category, 'systemSettingCategory')
-                    ->make([
-                        'locale' => 'lt',
-                        'name' => $this->getLithuanianTranslation($categoryData['name']),
-                        'description' => $this->getLithuanianTranslation($categoryData['description']),
-                    ])
-                    ->toArray()
+                [
+                    'name' => $this->getLithuanianTranslation($categoryData['name']),
+                    'description' => $this->getLithuanianTranslation($categoryData['description']),
+                ]
             );
         }
     }
@@ -139,6 +136,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createGeneralSettings(): void
     {
         $generalCategory = SystemSettingCategory::where('slug', 'general')->first();
+        
+        if (!$generalCategory) {
+            $this->command->warn('General category not found, skipping general settings');
+            return;
+        }
 
         $settings = [
             [
@@ -254,6 +256,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createEcommerceSettings(): void
     {
         $ecommerceCategory = SystemSettingCategory::where('slug', 'ecommerce')->first();
+        
+        if (!$ecommerceCategory) {
+            $this->command->warn('E-commerce category not found, skipping e-commerce settings');
+            return;
+        }
 
         $settings = [
             [
@@ -361,6 +368,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createEmailSettings(): void
     {
         $emailCategory = SystemSettingCategory::where('slug', 'email')->first();
+        
+        if (!$emailCategory) {
+            $this->command->warn('Email category not found, skipping email settings');
+            return;
+        }
 
         $settings = [
             [
@@ -447,6 +459,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createPaymentSettings(): void
     {
         $paymentCategory = SystemSettingCategory::where('slug', 'payment')->first();
+        
+        if (!$paymentCategory) {
+            $this->command->warn('Payment category not found, skipping payment settings');
+            return;
+        }
 
         $settings = [
             [
@@ -500,6 +517,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createShippingSettings(): void
     {
         $shippingCategory = SystemSettingCategory::where('slug', 'shipping')->first();
+        
+        if (!$shippingCategory) {
+            $this->command->warn('Shipping category not found, skipping shipping settings');
+            return;
+        }
 
         $settings = [
             [
@@ -552,6 +574,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createSeoSettings(): void
     {
         $seoCategory = SystemSettingCategory::where('slug', 'seo')->first();
+        
+        if (!$seoCategory) {
+            $this->command->warn('SEO category not found, skipping SEO settings');
+            return;
+        }
 
         $settings = [
             [
@@ -693,6 +720,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createApiSettings(): void
     {
         $apiCategory = SystemSettingCategory::where('slug', 'api')->first();
+        
+        if (!$apiCategory) {
+            $this->command->warn('API category not found, skipping API settings');
+            return;
+        }
 
         $settings = [
             [
@@ -739,6 +771,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createAppearanceSettings(): void
     {
         $appearanceCategory = SystemSettingCategory::where('slug', 'appearance')->first();
+        
+        if (!$appearanceCategory) {
+            $this->command->warn('Appearance category not found, skipping appearance settings');
+            return;
+        }
 
         $settings = [
             [
@@ -797,6 +834,11 @@ final class SystemSettingsSeeder extends Seeder
     private function createNotificationSettings(): void
     {
         $notificationCategory = SystemSettingCategory::where('slug', 'notifications')->first();
+        
+        if (!$notificationCategory) {
+            $this->command->warn('Notifications category not found, skipping notification settings');
+            return;
+        }
 
         $settings = [
             [
@@ -845,24 +887,20 @@ final class SystemSettingsSeeder extends Seeder
         foreach ($settings as $settingData) {
             $setting = SystemSetting::firstOrCreate(
                 ['key' => $settingData['key']],
-                SystemSetting::factory()->make($settingData)->toArray()
+                $settingData
             );
 
-            // Create Lithuanian translations using factory relationships
+            // Create Lithuanian translations directly to avoid factory uniqueness constraints
             SystemSettingTranslation::firstOrCreate(
                 [
                     'system_setting_id' => $setting->id,
                     'locale' => 'lt',
                 ],
-                SystemSettingTranslation::factory()
-                    ->for($setting, 'systemSetting')
-                    ->make([
-                        'locale' => 'lt',
-                        'name' => $this->getLithuanianTranslation($settingData['name']),
-                        'description' => $this->getLithuanianTranslation($settingData['description'] ?? ''),
-                        'help_text' => $this->getLithuanianTranslation($settingData['help_text'] ?? ''),
-                    ])
-                    ->toArray()
+                [
+                    'name' => $this->getLithuanianTranslation($settingData['name']),
+                    'description' => $this->getLithuanianTranslation($settingData['description'] ?? ''),
+                    'help_text' => $this->getLithuanianTranslation($settingData['help_text'] ?? ''),
+                ]
             );
         }
     }

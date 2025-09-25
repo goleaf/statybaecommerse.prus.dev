@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -12,8 +10,8 @@ use App\Models\ProductImage;
 use App\Models\ProductTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
@@ -30,7 +28,9 @@ final class TurboEcommerceSeeder extends Seeder
 {
     private LocalImageGeneratorService $imageGen;
 
-    /** @var array<int,string> */
+    /**
+     * @var array<int,string>
+     */
     private array $sharedImagePool = [];
 
     private string $sharedImagePoolDir;
@@ -88,7 +88,7 @@ final class TurboEcommerceSeeder extends Seeder
         $this->buildSharedImagePool(100);
 
         // Generate products per brand using factories with timeout protection
-        $timeout = now()->addMinutes(60); // 60 minute timeout for seeder operations
+        $timeout = now()->addMinutes(60);  // 60 minute timeout for seeder operations
 
         LazyCollection::make($brands->chunk(10))
             ->takeUntilTimeout($timeout)
@@ -195,7 +195,7 @@ final class TurboEcommerceSeeder extends Seeder
 
         foreach ($products as $product) {
             $categoriesToAttach = $categories->random(min($this->categoriesPerProduct, $categories->count()));
-            
+
             // Use Eloquent relationship to attach categories
             $product->categories()->syncWithoutDetaching($categoriesToAttach->pluck('id'));
         }
@@ -210,7 +210,7 @@ final class TurboEcommerceSeeder extends Seeder
         foreach ($products as $product) {
             $count = mt_rand($this->attributesPerProductMin, $this->attributesPerProductMax);
             $picked = $attributes->shuffle()->take($count);
-            
+
             $attributeData = [];
             foreach ($picked as $attr) {
                 /** @var Attribute $attr */
@@ -275,12 +275,12 @@ final class TurboEcommerceSeeder extends Seeder
                     $picks = $toAdd === 1
                         ? [Arr::random($this->sharedImagePool)]
                         : Arr::random($this->sharedImagePool, $toAdd);
-                    
+
                     foreach ($picks as $index => $path) {
                         if (!$path || !file_exists($path)) {
                             continue;
                         }
-                        
+
                         // Create product image using factory with relationship
                         ProductImage::factory()
                             ->for($product, 'product')
@@ -371,7 +371,7 @@ final class TurboEcommerceSeeder extends Seeder
         $raw = (string) config('app.supported_locales', 'lt');
 
         return collect(explode(',', $raw))
-            ->map(fn ($v) => trim((string) $v))
+            ->map(fn($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -393,14 +393,44 @@ final class TurboEcommerceSeeder extends Seeder
     private function ltNamePool(): array
     {
         return [
-            'Elektrinis perforatorius', 'Kampinis šlifuoklis', 'Smūginis gręžtuvas', 'Suktuvas-gręžtuvas',
-            'Vibracinė šlifavimo mašina', 'Diskinis pjūklas', 'Planuoklis', 'Frezeris', 'Grandininis pjūklas',
-            'Profesionalus plaktukas', 'Statybinė gulsčiukė', 'Ruletė 10m', 'Universalus peilis', 'Raktų komplektas',
-            'Atsuktuvų rinkinys', 'Replės elektrikui', 'Metalinė liniuotė', 'Kaltų rinkinys', 'Kampuotė',
-            'Cemento mišinys', 'Gipso plokštės', 'Termoizoliacijos plokštės', 'Hidroizoliacijos plėvelė',
-            'Statybinės putos', 'Akrilo hermetikas', 'Gruntavimo skystis', 'Fasadiniai dažai', 'Klijų mišinys',
-            'Betono priedas', 'Apsauginiai akiniai', 'Darbo pirštinės', 'Apsauginis šalmas', 'Apsauginiai batai',
-            'Respiratorius', 'Ausų apsaugos', 'Apsauginis diržas', 'Šviečianti liemenė', 'Pirmos pagalbos rinkinys',
+            'Elektrinis perforatorius',
+            'Kampinis šlifuoklis',
+            'Smūginis gręžtuvas',
+            'Suktuvas-gręžtuvas',
+            'Vibracinė šlifavimo mašina',
+            'Diskinis pjūklas',
+            'Planuoklis',
+            'Frezeris',
+            'Grandininis pjūklas',
+            'Profesionalus plaktukas',
+            'Statybinė gulsčiukė',
+            'Ruletė 10m',
+            'Universalus peilis',
+            'Raktų komplektas',
+            'Atsuktuvų rinkinys',
+            'Replės elektrikui',
+            'Metalinė liniuotė',
+            'Kaltų rinkinys',
+            'Kampuotė',
+            'Cemento mišinys',
+            'Gipso plokštės',
+            'Termoizoliacijos plokštės',
+            'Hidroizoliacijos plėvelė',
+            'Statybinės putos',
+            'Akrilo hermetikas',
+            'Gruntavimo skystis',
+            'Fasadiniai dažai',
+            'Klijų mišinys',
+            'Betono priedas',
+            'Apsauginiai akiniai',
+            'Darbo pirštinės',
+            'Apsauginis šalmas',
+            'Apsauginiai batai',
+            'Respiratorius',
+            'Ausų apsaugos',
+            'Apsauginis diržas',
+            'Šviečianti liemenė',
+            'Pirmos pagalbos rinkinys',
         ];
     }
 }
