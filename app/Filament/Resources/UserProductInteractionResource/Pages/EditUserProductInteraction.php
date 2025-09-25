@@ -10,4 +10,11 @@ use Filament\Resources\Pages\EditRecord;
 final class EditUserProductInteraction extends EditRecord
 {
     protected static string $resource = UserProductInteractionResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            \Filament\Actions\DeleteAction::make(),
+        ];
+    }
 }

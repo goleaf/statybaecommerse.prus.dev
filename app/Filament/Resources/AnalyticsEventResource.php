@@ -10,6 +10,7 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -86,6 +87,17 @@ final class AnalyticsEventResource extends Resource
                                     'search' => __('analytics_events.types.search'),
                                     'download' => __('analytics_events.types.download'),
                                     'custom' => __('analytics_events.types.custom'),
+                                    // Extended set to avoid validation issues on edit
+                                    'product_view' => __('analytics_events.types.product_view'),
+                                    'add_to_cart' => __('analytics_events.types.add_to_cart'),
+                                    'remove_from_cart' => __('analytics_events.types.remove_from_cart'),
+                                    'user_register' => __('analytics_events.types.user_register'),
+                                    'user_login' => __('analytics_events.types.user_login'),
+                                    'user_logout' => __('analytics_events.types.user_logout'),
+                                    'newsletter_signup' => __('analytics_events.types.newsletter_signup'),
+                                    'contact_form' => __('analytics_events.types.contact_form'),
+                                    'video_play' => __('analytics_events.types.video_play'),
+                                    'social_share' => __('analytics_events.types.social_share'),
                                 ])
                                 ->default('custom'),
                         ]),
@@ -104,7 +116,7 @@ final class AnalyticsEventResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, \Filament\Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, \Filament\Schemas\Components\Utilities\Set $set) {
                             if ($state) {
                                 $user = User::find($state);
                                 if ($user) {
@@ -313,6 +325,7 @@ final class AnalyticsEventResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('mark_important')
                     ->label(__('analytics_events.mark_important'))
                     ->icon('heroicon-o-star')

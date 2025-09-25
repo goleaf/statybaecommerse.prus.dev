@@ -7,7 +7,6 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Services\Images\ProductImageService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 final class ProductRandomImagesSeeder extends Seeder
@@ -23,19 +22,24 @@ final class ProductRandomImagesSeeder extends Seeder
     {
         $this->command->info('🎨 Pradedame generuoti atsitiktinius produktų paveikslėlius...');
 
-        DB::transaction(function () {
-            Product::query()
-                ->with('media')
-                ->whereDoesntHave('media', function ($q) {
-                    $q->where('collection_name', 'images');
-                })
-                ->orderBy('id')
-                ->chunkById(50, function ($products): void {
-                    foreach ($products as $product) {
-                        $this->generateImagesForProduct($product);
-                    }
-                });
-        });
+        // Get existing products or create some if none exist
+        $products = Product::query()
+            ->with('media')
+            ->whereDoesntHave('media', function ($q) {
+                $q->where('collection_name', 'images');
+            })
+            ->get();
+
+        if ($products->isEmpty()) {
+            $this->command->info('Nėra produktų be paveikslėlių. Kuriame naujus produktus...');
+            $products = Product::factory()
+                ->count(20)
+                ->create();
+        }
+
+        foreach ($products as $product) {
+            $this->generateImagesForProduct($product);
+        }
 
         $this->command->info('✅ Produktų paveikslėlių generavimas baigtas!');
     }

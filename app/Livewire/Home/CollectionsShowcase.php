@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
@@ -23,8 +25,13 @@ final class CollectionsShowcase extends Component implements HasSchemas
         $cacheKey = sprintf('home:collections:%s', app()->getLocale());
 
         return Cache::remember($cacheKey, 300, function () {
+            $locale = app()->getLocale();
+
             return ProductCollection::query()
                 ->with('media')
+                ->with(['translations' => function ($q) use ($locale) {
+                    $q->where('locale', $locale);
+                }])
                 ->withCount(['products'])
                 ->visible()
                 ->active()
@@ -39,7 +46,7 @@ final class CollectionsShowcase extends Component implements HasSchemas
             ViewEntry::make('collections')
                 ->label('')
                 ->view('livewire.home.partials.collections-grid')
-                ->viewData(fn(): array => [
+                ->viewData(fn (): array => [
                     'collections' => $this->collections(),
                 ]),
         ]);

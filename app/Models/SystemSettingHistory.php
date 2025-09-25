@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * SystemSettingHistory
@@ -33,7 +35,7 @@ final class SystemSettingHistory extends Model
      */
     public function systemSetting(): BelongsTo
     {
-        return $this->belongsTo(SystemSetting::class);
+        return $this->belongsTo(SystemSetting::class)->withoutGlobalScopes();
     }
 
     /**

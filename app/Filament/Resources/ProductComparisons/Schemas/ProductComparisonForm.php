@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\ProductComparisons\Schemas;
 
-use App\Models\Product;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -13,27 +12,21 @@ class ProductComparisonForm
     {
         return $schema
             ->schema([
-                Select::make('product1_id')
-                    ->label('admin.product_comparison.product1')
-                    ->options(Product::all()->pluck('name', 'id'))
+                Select::make('user_id')
+                    ->label(__('product_comparisons.user'))
+                    ->relationship('user', 'name')
                     ->searchable()
+                    ->preload()
                     ->required(),
-                Select::make('product2_id')
-                    ->label('admin.product_comparison.product2')
-                    ->options(Product::all()->pluck('name', 'id'))
+                Select::make('product_id')
+                    ->label(__('product_comparisons.product'))
+                    ->relationship('product', 'name')
                     ->searchable()
+                    ->preload()
                     ->required(),
-                TextInput::make('similarity_score')
-                    ->label('admin.product_comparison.similarity_score')
-                    ->numeric()
-                    ->minValue(0)
-                    ->maxValue(1)
-                    ->step(0.01)
-                    ->required(),
-                TextInput::make('comparison_data')
-                    ->label('admin.product_comparison.comparison_data')
-                    ->json()
-                    ->columnSpanFull(),
+                TextInput::make('session_id')
+                    ->label(__('product_comparisons.session_id'))
+                    ->maxLength(255),
             ]);
     }
 }

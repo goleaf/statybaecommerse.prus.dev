@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     // Analytics Dashboard
@@ -84,4 +82,14 @@ return [
     'featured' => 'rekomenduojami',
     'report_exported_successfully' => 'Ataskaita sėkmingai eksportuota',
     'data_refreshed_successfully' => 'Duomenys sėkmingai atnaujinti',
+    'enhanced_overview' => [
+        'title' => 'Išplėstinė el. prekybos apžvalga',
+        'total_revenue' => 'Visos pajamos',
+        'total_orders' => 'Visi užsakymai',
+        'total_customers' => 'Visi klientai',
+        'average_order_value' => 'Vidutinė užsakymo vertė',
+        'total_products' => 'Visi produktai',
+        'average_rating' => 'Vidutinis įvertinimas',
+        'change_since_last_month' => 'Pokytis nuo praėjusio mėnesio',
+    ],
 ];

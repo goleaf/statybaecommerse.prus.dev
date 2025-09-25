@@ -1,15 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('variant_inventories', function (Blueprint $table) {
             // Ensure location support exists for per-location stock management
-            if (!Schema::hasColumn('variant_inventories', 'location_id')) {
+            if (! Schema::hasColumn('variant_inventories', 'location_id')) {
                 $table->unsignedBigInteger('location_id')->default(1)->after('variant_id');
                 try {
                     $table->index(['location_id']);
@@ -17,7 +20,7 @@ return new class extends Migration {
                     // ignore index creation race
                 }
             }
-            if (!Schema::hasColumn('variant_inventories', 'threshold')) {
+            if (! Schema::hasColumn('variant_inventories', 'threshold')) {
                 $afterColumn = null;
                 if (Schema::hasColumn('variant_inventories', 'incoming')) {
                     $afterColumn = 'incoming';
@@ -33,39 +36,42 @@ return new class extends Migration {
                 }
             }
             // Add new columns for enhanced inventory management
-            if (!Schema::hasColumn('variant_inventories', 'notes')) {
+            if (! Schema::hasColumn('variant_inventories', 'notes')) {
                 $table->text('notes')->nullable();
             }
-            if (!Schema::hasColumn('variant_inventories', 'last_restocked_at')) {
+            if (! Schema::hasColumn('variant_inventories', 'last_restocked_at')) {
                 $table->timestamp('last_restocked_at')->nullable();
             }
-            if (!Schema::hasColumn('variant_inventories', 'last_sold_at')) {
+            if (! Schema::hasColumn('variant_inventories', 'incoming')) {
+                $table->integer('incoming')->default(0);
+            }
+            if (! Schema::hasColumn('variant_inventories', 'last_sold_at')) {
                 $table->timestamp('last_sold_at')->nullable();
             }
-            if (!Schema::hasColumn('variant_inventories', 'cost_per_unit')) {
+            if (! Schema::hasColumn('variant_inventories', 'cost_per_unit')) {
                 $table->decimal('cost_per_unit', 10, 2)->nullable();
             }
-            if (!Schema::hasColumn('variant_inventories', 'reorder_point')) {
+            if (! Schema::hasColumn('variant_inventories', 'reorder_point')) {
                 $table->integer('reorder_point')->default(0);
             }
-            if (!Schema::hasColumn('variant_inventories', 'max_stock_level')) {
+            if (! Schema::hasColumn('variant_inventories', 'max_stock_level')) {
                 $table->integer('max_stock_level')->nullable();
             }
-            if (!Schema::hasColumn('variant_inventories', 'supplier_id')) {
+            if (! Schema::hasColumn('variant_inventories', 'supplier_id')) {
                 $table->unsignedBigInteger('supplier_id')->nullable();
             }
-            if (!Schema::hasColumn('variant_inventories', 'batch_number')) {
+            if (! Schema::hasColumn('variant_inventories', 'batch_number')) {
                 $table->string('batch_number')->nullable();
             }
-            if (!Schema::hasColumn('variant_inventories', 'expiry_date')) {
+            if (! Schema::hasColumn('variant_inventories', 'expiry_date')) {
                 $table->date('expiry_date')->nullable();
             }
-            if (!Schema::hasColumn('variant_inventories', 'status')) {
+            if (! Schema::hasColumn('variant_inventories', 'status')) {
                 $table->string('status')->default('active');
             }
 
             // Add soft deletes
-            if (!Schema::hasColumn('variant_inventories', 'deleted_at')) {
+            if (! Schema::hasColumn('variant_inventories', 'deleted_at')) {
                 $table->softDeletes();
             }
         });
@@ -133,7 +139,7 @@ return new class extends Migration {
         }
 
         // Create stock_movements table
-        if (!Schema::hasTable('stock_movements')) {
+        if (! Schema::hasTable('stock_movements')) {
             Schema::create('stock_movements', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_inventory_id');

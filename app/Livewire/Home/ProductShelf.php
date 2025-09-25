@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
@@ -40,9 +42,9 @@ final class ProductShelf extends Component implements HasSchemas
 
         $this->title = $title !== ''
             ? $title
-            : __('frontend/home.products.sections.' . $sectionKey . '.title');
+            : __('frontend/home.products.sections.'.$sectionKey.'.title');
 
-        $this->subtitle = $subtitle ?? __('frontend/home.products.sections.' . $sectionKey . '.subtitle');
+        $this->subtitle = $subtitle ?? __('frontend/home.products.sections.'.$sectionKey.'.subtitle');
     }
 
     #[Computed]
@@ -51,10 +53,17 @@ final class ProductShelf extends Component implements HasSchemas
         $cacheKey = sprintf('home:shelf:%s:%d:%s', $this->preset, $this->limit, app()->getLocale());
 
         return Cache::remember($cacheKey, 60, function (): EloquentCollection {
+            $locale = app()->getLocale();
+
             $query = Product::query()
                 ->with(['brand', 'media', 'categories'])
-                ->withAvg(['reviews as average_rating' => fn($q) => $q->where('is_approved', true)], 'rating')
-                ->withCount(['reviews' => fn($q) => $q->where('is_approved', true)])
+                ->with(['translations' => function ($q) use ($locale) {
+                    $q->where('locale', $locale);
+                }, 'categories.translations' => function ($q) use ($locale) {
+                    $q->where('locale', $locale);
+                }])
+                ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
+                ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
                 ->where('is_visible', true)
                 ->whereNotNull('published_at')
                 ->where('published_at', '<=', now())
@@ -96,7 +105,7 @@ final class ProductShelf extends Component implements HasSchemas
             ViewEntry::make('products')
                 ->label('')
                 ->view('livewire.home.partials.product-shelf')
-                ->viewData(fn(): array => [
+                ->viewData(fn (): array => [
                     'products' => $this->products(),
                     'title' => $this->title,
                     'subtitle' => $this->subtitle,

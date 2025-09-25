@@ -15,88 +15,81 @@ class ShippingOptionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all zones to create shipping options for each
-        $zones = Zone::all();
-
-        if ($zones->isEmpty()) {
-            $this->command->warn('No zones found. Please run ZoneSeeder first.');
-
-            return;
+        // Ensure we have zones to work with
+        if (Zone::count() === 0) {
+            // Create default zones if none exist
+            Zone::factory()->count(3)->create([
+                'is_enabled' => true,
+            ]);
         }
 
+        $zones = Zone::where('is_enabled', true)->get();
+
         foreach ($zones as $zone) {
-            // Create multiple shipping options for each zone
-            $shippingOptions = [
-                [
+            // Create DHL Express (default option)
+            ShippingOption::factory()
+                ->for($zone)
+                ->state([
                     'name' => 'DHL Express',
-                    'slug' => 'dhl-express-'.$zone->id,
+                    'slug' => 'dhl-express-' . $zone->id,
                     'description' => 'Fast and reliable express delivery',
                     'carrier_name' => 'DHL',
                     'service_type' => 'Express',
                     'price' => 15.99,
-                    'currency_code' => 'EUR',
-                    'is_enabled' => true,
                     'is_default' => true,
                     'sort_order' => 1,
                     'estimated_days_min' => 1,
                     'estimated_days_max' => 2,
-                ],
-                [
+                ])
+                ->create();
+
+            // Create DHL Standard
+            ShippingOption::factory()
+                ->for($zone)
+                ->state([
                     'name' => 'DHL Standard',
-                    'slug' => 'dhl-standard-'.$zone->id,
+                    'slug' => 'dhl-standard-' . $zone->id,
                     'description' => 'Standard delivery service',
                     'carrier_name' => 'DHL',
                     'service_type' => 'Standard',
                     'price' => 9.99,
-                    'currency_code' => 'EUR',
-                    'is_enabled' => true,
-                    'is_default' => false,
                     'sort_order' => 2,
                     'estimated_days_min' => 3,
                     'estimated_days_max' => 5,
-                ],
-                [
+                ])
+                ->create();
+
+            // Create UPS Economy
+            ShippingOption::factory()
+                ->for($zone)
+                ->state([
                     'name' => 'UPS Economy',
-                    'slug' => 'ups-economy-'.$zone->id,
+                    'slug' => 'ups-economy-' . $zone->id,
                     'description' => 'Economical delivery option',
                     'carrier_name' => 'UPS',
                     'service_type' => 'Economy',
                     'price' => 6.99,
-                    'currency_code' => 'EUR',
-                    'is_enabled' => true,
-                    'is_default' => false,
                     'sort_order' => 3,
                     'estimated_days_min' => 5,
                     'estimated_days_max' => 7,
-                ],
-                [
-                    'name' => 'Free Shipping',
-                    'slug' => 'free-shipping-'.$zone->id,
+                ])
+                ->create();
+
+            // Create Free Shipping
+            ShippingOption::factory()
+                ->for($zone)
+                ->free()
+                ->state([
+                    'slug' => 'free-shipping-' . $zone->id,
                     'description' => 'Free shipping for orders over €50',
-                    'carrier_name' => 'Standard',
-                    'service_type' => 'Free',
-                    'price' => 0.0,
-                    'currency_code' => 'EUR',
-                    'is_enabled' => true,
-                    'is_default' => false,
                     'sort_order' => 4,
                     'min_order_amount' => 50.0,
                     'estimated_days_min' => 7,
                     'estimated_days_max' => 10,
-                ],
-            ];
-
-            foreach ($shippingOptions as $option) {
-                ShippingOption::updateOrCreate(
-                    [
-                        'slug' => $option['slug'],
-                        'zone_id' => $zone->id,
-                    ],
-                    array_merge($option, ['zone_id' => $zone->id])
-                );
-            }
+                ])
+                ->create();
         }
 
-        $this->command->info('Shipping options seeded successfully for '.$zones->count().' zones.');
+        $this->command->info('Shipping options seeded successfully for ' . $zones->count() . ' zones.');
     }
 }

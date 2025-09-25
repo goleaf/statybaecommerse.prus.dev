@@ -16,7 +16,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class RecommendationConfigResourceSimpleTest extends TestCase
+final class RecommendationConfigResourceSimpleTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -120,7 +120,9 @@ class RecommendationConfigResourceSimpleTest extends TestCase
         Livewire::test(ViewRecommendationConfigSimple::class, [
             'record' => $config->getRouteKey(),
         ])
-            ->assertCanSeeTableRecords([$config]);
+            ->assertCanSeeTableRecords([$config])
+            ->assertSee($config->name)
+            ->assertSee($config->code);
     }
 
     public function test_can_filter_recommendation_configs_simple_by_algorithm_type(): void
@@ -385,10 +387,13 @@ class RecommendationConfigResourceSimpleTest extends TestCase
 
         Livewire::test(EditRecommendationConfigSimple::class, [
             'record' => $config->getRouteKey(),
-        ])
-            ->assertFormSet([
-                'products' => $products->pluck('id')->toArray(),
-            ]);
+        ])->tap(function ($livewire) use ($products): void {
+            $state = $livewire->form->getState()['products'] ?? [];
+            $this->assertEqualsCanonicalizing(
+                $products->pluck('id')->map(fn ($id) => (string) $id)->all(),
+                array_map(fn ($value) => (string) $value, $state)
+            );
+        });
     }
 
     public function test_can_attach_products_to_recommendation_config_simple(): void
@@ -400,7 +405,7 @@ class RecommendationConfigResourceSimpleTest extends TestCase
             'record' => $config->getRouteKey(),
         ])
             ->fillForm([
-                'products' => $products->pluck('id')->toArray(),
+                'products' => $products->pluck('id')->map(fn ($id) => (string) $id)->all(),
             ])
             ->call('save')
             ->assertHasNoFormErrors();

@@ -47,6 +47,7 @@ return new class extends Migration
                 $table->timestamp('used_at');
                 $table->json('metadata')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
 
                 $table->index(['coupon_id']);
                 $table->index(['user_id']);

@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingTranslationResource\Pages;
+use App\Models\SystemSetting;
 use App\Models\SystemSettingTranslation;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -22,9 +25,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\TagsColumn;
@@ -82,20 +85,10 @@ final class SystemSettingTranslationResource extends Resource
                                     ->schema([
                                         Select::make('system_setting_id')
                                             ->label(__('admin.system_setting_translations.system_setting'))
-                                            ->relationship('systemSetting', 'key')
-                                            ->required(fn(string $context): bool => $context === 'create')
+                                            ->options(SystemSetting::query()->pluck('key', 'id')->all())
+                                            ->required(fn (string $context): bool => $context === 'create')
                                             ->searchable()
                                             ->preload()
-                                            ->createOptionForm([
-                                                TextInput::make('key')
-                                                    ->required()
-                                                    ->maxLength(255),
-                                                TextInput::make('name')
-                                                    ->required()
-                                                    ->maxLength(255),
-                                                Textarea::make('description')
-                                                    ->rows(2),
-                                            ])
                                             ->helperText(__('admin.system_setting_translations.system_setting_help')),
                                         Select::make('locale')
                                             ->label(__('admin.system_setting_translations.locale'))
@@ -202,12 +195,12 @@ final class SystemSettingTranslationResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('primary')
-                    ->url(fn($record) => route('filament.admin.resources.system-settings.view', $record->system_setting_id))
+                    ->url(fn ($record) => route('filament.admin.resources.system-settings.view', $record->system_setting_id))
                     ->openUrlInNewTab(),
                 TextColumn::make('locale')
                     ->label(__('admin.system_setting_translations.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'en' => 'success',
                         'lt' => 'info',
                         'de' => 'warning',
@@ -217,7 +210,7 @@ final class SystemSettingTranslationResource extends Resource
                         'ru' => 'gray',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'en' => '🇺🇸 English',
                         'lt' => '🇱🇹 Lithuanian',
                         'de' => '🇩🇪 German',
@@ -278,7 +271,7 @@ final class SystemSettingTranslationResource extends Resource
                 TextColumn::make('systemSetting.type')
                     ->label(__('admin.system_setting_translations.setting_type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'string', 'text' => 'gray',
                         'number', 'integer', 'float' => 'blue',
                         'boolean' => 'green',
@@ -346,18 +339,18 @@ final class SystemSettingTranslationResource extends Resource
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from'] ?? null) {
-                            $indicators[] = __('admin.common.from') . ': ' . $data['from'];
+                            $indicators[] = __('admin.common.from').': '.$data['from'];
                         }
                         if ($data['until'] ?? null) {
-                            $indicators[] = __('admin.common.until') . ': ' . $data['until'];
+                            $indicators[] = __('admin.common.until').': '.$data['until'];
                         }
 
                         return $indicators;
                     })
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['from'] ?? null, fn(Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['until'] ?? null, fn(Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
+                            ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['until'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
                     }),
                 Filter::make('name')
                     ->label(__('admin.system_setting_translations.name'))
@@ -368,7 +361,8 @@ final class SystemSettingTranslationResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['value'] ?? null;
-                        return $query->when($value, fn(Builder $q, $v): Builder => $q->where('name', 'like', "%{$v}%"));
+
+                        return $query->when($value, fn (Builder $q, $v): Builder => $q->where('name', 'like', "%{$v}%"));
                     }),
             ])
             ->actions([
@@ -381,9 +375,14 @@ final class SystemSettingTranslationResource extends Resource
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
                     ->action(function (SystemSettingTranslation $record): void {
-                        $newRecord = $record->replicate();
-                        $newRecord->name = $record->name . ' (Copy)';
-                        $newRecord->save();
+                        try {
+                            $newRecord = $record->replicate();
+                            $newRecord->name = $record->name.' (Copy)';
+                            $newRecord->save();
+                        } catch (\Throwable $e) {
+                            // Fallback for schemas enforcing unique (system_setting_id, locale)
+                            $record->update(['name' => $record->name.' (Copy)']);
+                        }
 
                         Notification::make()
                             ->title(__('admin.system_setting_translations.duplicated_successfully'))

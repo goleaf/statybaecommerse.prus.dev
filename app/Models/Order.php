@@ -162,6 +162,14 @@ final class Order extends Model
     }
 
     /**
+     * Zone relation.
+     */
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
+    /**
      * Handle partner functionality with proper error handling.
      */
     public function partner(): BelongsTo

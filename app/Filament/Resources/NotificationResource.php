@@ -39,6 +39,8 @@ final class NotificationResource extends Resource
 {
     protected static ?string $model = Notification::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-bell';

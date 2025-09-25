@@ -21,6 +21,10 @@ final class CreateSystemSetting extends CreateRecord
         // Set default values
         $data['is_active'] = $data['is_active'] ?? true;
         $data['sort_order'] = $data['sort_order'] ?? 0;
+        $data['name'] = $data['name'] ?? $data['key'] ?? 'setting';
+        $data['group'] = $data['group'] ?? 'general';
+        $data['cache_ttl'] = $data['cache_ttl'] ?? 3600;
+        $data['environment'] = $data['environment'] ?? 'all';
         $data['is_public'] = $data['is_public'] ?? false;
         $data['is_required'] = $data['is_required'] ?? false;
         $data['is_encrypted'] = $data['is_encrypted'] ?? false;

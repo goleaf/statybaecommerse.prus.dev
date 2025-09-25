@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 final class FeatureFlagResourceTest extends TestCase
 {
@@ -28,7 +27,8 @@ final class FeatureFlagResourceTest extends TestCase
     {
         FeatureFlag::factory()->count(3)->create();
 
-        $this->get('/admin/feature-flags')
+        $this
+            ->get('/admin/feature-flags')
             ->assertOk()
             ->assertSee('Feature Flags');
     }
@@ -90,7 +90,8 @@ final class FeatureFlagResourceTest extends TestCase
     {
         $featureFlag = FeatureFlag::factory()->create();
 
-        $this->get("/admin/feature-flags/{$featureFlag->id}")
+        $this
+            ->get("/admin/feature-flags/{$featureFlag->id}")
             ->assertOk()
             ->assertSee($featureFlag->name);
     }
@@ -115,7 +116,8 @@ final class FeatureFlagResourceTest extends TestCase
         FeatureFlag::factory()->create(['category' => 'ui']);
         FeatureFlag::factory()->create(['category' => 'performance']);
 
-        $this->get('/admin/feature-flags?tableFilters[category][value]=ui')
+        $this
+            ->get('/admin/feature-flags?tableFilters[category][value]=ui')
             ->assertOk()
             ->assertSee('ui')
             ->assertDontSee('performance');
@@ -126,7 +128,8 @@ final class FeatureFlagResourceTest extends TestCase
         FeatureFlag::factory()->create(['environment' => 'production']);
         FeatureFlag::factory()->create(['environment' => 'staging']);
 
-        $this->get('/admin/feature-flags?tableFilters[environment][value]=production')
+        $this
+            ->get('/admin/feature-flags?tableFilters[environment][value]=production')
             ->assertOk();
     }
 
@@ -135,7 +138,8 @@ final class FeatureFlagResourceTest extends TestCase
         FeatureFlag::factory()->create(['is_active' => true]);
         FeatureFlag::factory()->create(['is_active' => false]);
 
-        $this->get('/admin/feature-flags?tableFilters[is_active][value]=1')
+        $this
+            ->get('/admin/feature-flags?tableFilters[is_active][value]=1')
             ->assertOk();
     }
 
@@ -144,7 +148,8 @@ final class FeatureFlagResourceTest extends TestCase
         FeatureFlag::factory()->create(['is_enabled' => true]);
         FeatureFlag::factory()->create(['is_enabled' => false]);
 
-        $this->get('/admin/feature-flags?tableFilters[is_enabled][value]=1')
+        $this
+            ->get('/admin/feature-flags?tableFilters[is_enabled][value]=1')
             ->assertOk();
     }
 
@@ -153,7 +158,8 @@ final class FeatureFlagResourceTest extends TestCase
         FeatureFlag::factory()->create(['is_global' => true]);
         FeatureFlag::factory()->create(['is_global' => false]);
 
-        $this->get('/admin/feature-flags?tableFilters[is_global][value]=1')
+        $this
+            ->get('/admin/feature-flags?tableFilters[is_global][value]=1')
             ->assertOk();
     }
 

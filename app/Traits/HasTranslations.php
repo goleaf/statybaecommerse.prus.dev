@@ -27,6 +27,15 @@ trait HasTranslations
             $this->load('translations');
         }
         $translation = $this->translations->firstWhere('locale', $locale);
+        // If relation was loaded earlier and now a new locale was added, fetch it fresh
+        if (! $translation) {
+            $fresh = $this->translations()->where('locale', $locale)->first();
+            if ($fresh) {
+                // Merge freshly fetched translation into the loaded relation to keep cache coherent
+                $this->setRelation('translations', $this->translations->push($fresh));
+                $translation = $fresh;
+            }
+        }
         if ($translation && isset($translation->{$field}) && ! empty($translation->{$field})) {
             $value = $translation->{$field};
             if (is_array($value)) {

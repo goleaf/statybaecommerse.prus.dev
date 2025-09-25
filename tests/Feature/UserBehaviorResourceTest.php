@@ -61,7 +61,7 @@ final class UserBehaviorResourceTest extends TestCase
         $response = $this->get('/admin/user-behaviors');
 
         $response->assertOk();
-        $response->assertSee('User Behaviors');
+        $response->assertSee(__('admin.user_behaviors.navigation_label'));
         $response->assertSee($this->adminUser->name);
         $response->assertSee('view');
     }

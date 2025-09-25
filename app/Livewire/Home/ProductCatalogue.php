@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
@@ -71,23 +73,33 @@ final class ProductCatalogue extends Component implements HasSchemas
     #[Computed]
     public function products(): LengthAwarePaginator
     {
+        $locale = app()->getLocale();
+
         $query = Product::query()
             ->with(['brand', 'categories', 'media'])
-            ->withAvg(['reviews as average_rating' => fn($q) => $q->where('is_approved', true)], 'rating')
-            ->withCount(['reviews' => fn($q) => $q->where('is_approved', true)])
+            ->with([
+                'translations' => function ($q) use ($locale) {
+                    $q->where('locale', $locale);
+                },
+                'categories.translations' => function ($q) use ($locale) {
+                    $q->where('locale', $locale);
+                },
+            ])
+            ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
+            ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
             ->where('is_visible', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
 
         if ($this->category) {
-            $query->whereHas('categories', fn($relation) => $relation->where('categories.id', $this->category));
+            $query->whereHas('categories', fn ($relation) => $relation->where('categories.id', $this->category));
         }
 
         if (filled($this->search)) {
             $query->where(function ($builder): void {
                 $builder
-                    ->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('sku', 'like', '%' . $this->search . '%');
+                    ->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('sku', 'like', '%'.$this->search.'%');
             });
         }
 
@@ -107,7 +119,7 @@ final class ProductCatalogue extends Component implements HasSchemas
             ViewEntry::make('catalogue')
                 ->label('')
                 ->view('livewire.home.product-catalogue')
-                ->viewData(fn(): array => [
+                ->viewData(fn (): array => [
                     'products' => $this->products(),
                     'categories' => $this->categories(),
                     'sort' => $this->sort,

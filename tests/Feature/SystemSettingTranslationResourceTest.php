@@ -89,13 +89,15 @@ final class SystemSettingTranslationResourceTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $translation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
+            'name' => 'View Name',
+            'description' => 'View Description',
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\ViewSystemSettingTranslation::class, [
             'record' => $translation->id,
         ])
-            ->assertCanSeeText($translation->name)
-            ->assertCanSeeText($translation->description);
+            ->assertSet('record.name', 'View Name')
+            ->assertSet('record.description', 'View Description');
     }
 
     public function test_can_delete_system_setting_translation(): void
@@ -118,15 +120,18 @@ final class SystemSettingTranslationResourceTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $translation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
+            'locale' => 'lt',
+            'name' => 'Duplicate Name',
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\ListSystemSettingTranslations::class)
-            ->callTableAction('duplicate', $translation);
+            ->callTableAction('duplicate', $translation)
+            ->assertNotified();
 
         $this->assertDatabaseHas('system_setting_translations', [
             'system_setting_id' => $systemSetting->id,
-            'locale' => $translation->locale,
-            'name' => $translation->name.' (Copy)',
+            'locale' => 'lt',
+            'name' => 'Duplicate Name (Copy)',
         ]);
     }
 

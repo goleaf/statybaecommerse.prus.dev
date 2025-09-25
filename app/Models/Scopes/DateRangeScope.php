@@ -42,7 +42,18 @@ final class DateRangeScope implements Scope
         $schema = $model->getConnection()->getSchemaBuilder();
         $dateColumns = [];
         // Check for common date column names
-        $possibleColumns = ['created_at', 'updated_at', 'published_at', 'scheduled_at', 'expires_at', 'starts_at', 'ends_at'];
+        $possibleColumns = [
+            'created_at',
+            'updated_at',
+            'published_at',
+            'scheduled_at',
+            'expires_at',
+            'starts_at',
+            'ends_at',
+            // Common alternatives used in campaign-like models
+            'start_date',
+            'end_date',
+        ];
         foreach ($possibleColumns as $column) {
             if ($schema->hasColumn($table, $column)) {
                 $dateColumns[] = $column;
@@ -96,6 +107,16 @@ final class DateRangeScope implements Scope
                         $query->whereNull($column)->orWhere($column, '>=', now());
                     });
                 }
+                break;
+            case 'start_date':
+                $builder->where(function ($query) use ($column) {
+                    $query->whereNull($column)->orWhere($column, '<=', now());
+                });
+                break;
+            case 'end_date':
+                $builder->where(function ($query) use ($column) {
+                    $query->whereNull($column)->orWhere($column, '>=', now());
+                });
                 break;
             default:
                 // For created_at, updated_at, etc., no additional filtering

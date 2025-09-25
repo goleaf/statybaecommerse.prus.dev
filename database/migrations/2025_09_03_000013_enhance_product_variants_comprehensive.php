@@ -119,7 +119,7 @@ return new class extends Migration
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
                 $table->unsignedBigInteger('attribute_id');
-                $table->string('attribute_name');
+                $table->string('attribute_name')->nullable();
                 $table->string('attribute_value');
                 $table->string('attribute_value_display')->nullable();
                 $table->string('attribute_value_lt')->nullable();
@@ -133,7 +133,7 @@ return new class extends Migration
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
 
-                $table->unique(['variant_id', 'attribute_id']);
+                // Allow multiple values per attribute for a variant (no unique pair constraint)
                 $table->index(['attribute_id', 'attribute_value']);
                 $table->index(['variant_id', 'sort_order']);
                 $table->index(['is_filterable', 'is_searchable']);
@@ -147,7 +147,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('variant_id');
                 $table->decimal('old_price', 10, 4);
                 $table->decimal('new_price', 10, 4);
-                $table->string('price_type')->default('regular'); // regular, sale, wholesale, member
+                $table->string('price_type')->default('regular');  // regular, sale, wholesale, member
                 $table->string('change_reason')->nullable();
                 $table->unsignedBigInteger('changed_by')->nullable();
                 $table->timestamp('effective_from')->nullable();
@@ -170,10 +170,10 @@ return new class extends Migration
                 $table->integer('old_quantity');
                 $table->integer('new_quantity');
                 $table->integer('quantity_change');
-                $table->string('change_type')->default('adjustment'); // adjustment, sale, return, restock
+                $table->string('change_type')->default('adjustment');  // adjustment, sale, return, restock
                 $table->string('change_reason')->nullable();
                 $table->unsignedBigInteger('changed_by')->nullable();
-                $table->string('reference_type')->nullable(); // order, return, adjustment
+                $table->string('reference_type')->nullable();  // order, return, adjustment
                 $table->unsignedBigInteger('reference_id')->nullable();
                 $table->timestamps();
 
@@ -213,7 +213,7 @@ return new class extends Migration
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
                 $table->unsignedBigInteger('recommended_variant_id');
-                $table->string('recommendation_type')->default('similar'); // similar, complementary, upsell, cross_sell
+                $table->string('recommendation_type')->default('similar');  // similar, complementary, upsell, cross_sell
                 $table->decimal('confidence_score', 3, 2)->default(0);
                 $table->integer('sort_order')->default(0);
                 $table->boolean('is_active')->default(true);
@@ -281,13 +281,30 @@ return new class extends Migration
         if (Schema::hasTable('product_variants')) {
             Schema::table('product_variants', function (Blueprint $table) {
                 $columns = [
-                    'variant_name_lt', 'variant_name_en', 'description_lt', 'description_en',
-                    'wholesale_price', 'member_price', 'promotional_price',
-                    'is_on_sale', 'sale_start_date', 'sale_end_date',
-                    'reserved_quantity', 'available_quantity', 'sold_quantity',
-                    'seo_title_lt', 'seo_title_en', 'seo_description_lt', 'seo_description_en',
-                    'views_count', 'clicks_count', 'conversion_rate',
-                    'is_featured', 'is_new', 'is_bestseller', 'variant_combination_hash',
+                    'variant_name_lt',
+                    'variant_name_en',
+                    'description_lt',
+                    'description_en',
+                    'wholesale_price',
+                    'member_price',
+                    'promotional_price',
+                    'is_on_sale',
+                    'sale_start_date',
+                    'sale_end_date',
+                    'reserved_quantity',
+                    'available_quantity',
+                    'sold_quantity',
+                    'seo_title_lt',
+                    'seo_title_en',
+                    'seo_description_lt',
+                    'seo_description_en',
+                    'views_count',
+                    'clicks_count',
+                    'conversion_rate',
+                    'is_featured',
+                    'is_new',
+                    'is_bestseller',
+                    'variant_combination_hash',
                 ];
 
                 foreach ($columns as $column) {

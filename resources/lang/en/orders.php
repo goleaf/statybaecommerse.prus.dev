@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 return [
     // Navigation
     'navigation' => [
         'orders' => 'Orders',
     ],
-
     // Models
     'models' => [
         'order' => 'Order',
         'orders' => 'Orders',
     ],
-
     // Fields
     'fields' => [
         'order_number' => 'Order Number',
@@ -37,7 +35,6 @@ return [
         'created_at' => 'Created',
         'updated_at' => 'Updated',
     ],
-
     // Sections
     'sections' => [
         'order_details' => 'Order Details',
@@ -46,7 +43,6 @@ return [
         'shipping_information' => 'Shipping Information',
         'order_shipping' => 'Order Shipping',
     ],
-
     // Statuses
     'status' => [
         'pending' => 'Pending',
@@ -56,7 +52,6 @@ return [
         'cancelled' => 'Cancelled',
         'refunded' => 'Refunded',
     ],
-
     'statuses' => [
         'pending' => 'Pending',
         'processing' => 'Processing',
@@ -65,7 +60,6 @@ return [
         'cancelled' => 'Cancelled',
         'refunded' => 'Refunded',
     ],
-
     // Payment statuses
     'payment_status' => [
         'pending' => 'Pending',
@@ -73,14 +67,12 @@ return [
         'failed' => 'Failed',
         'refunded' => 'Refunded',
     ],
-
     'payment_statuses' => [
         'pending' => 'Pending',
         'paid' => 'Paid',
         'failed' => 'Failed',
         'refunded' => 'Refunded',
     ],
-
     // Payment methods
     'payment_methods' => [
         'credit_card' => 'Credit Card',
@@ -91,7 +83,6 @@ return [
         'apple_pay' => 'Apple Pay',
         'google_pay' => 'Google Pay',
     ],
-
     // Actions
     'actions' => [
         'create' => 'Create',
@@ -99,20 +90,17 @@ return [
         'edit' => 'Edit',
         'delete' => 'Delete',
     ],
-
     'mark_processing' => 'Mark as Processing',
     'mark_shipped' => 'Mark as Shipped',
     'mark_delivered' => 'Mark as Delivered',
     'cancel_order' => 'Cancel Order',
     'refund_order' => 'Refund Order',
-
     // Bulk actions
     'bulk_mark_processing' => 'Mark as Processing',
     'bulk_mark_shipped' => 'Mark as Shipped',
     'bulk_mark_delivered' => 'Mark as Delivered',
     'bulk_cancel' => 'Cancel Orders',
     'export' => 'Export',
-
     // Notifications
     'processing_success' => 'Order successfully marked as processing',
     'shipped_successfully' => 'Order successfully marked as shipped',
@@ -124,12 +112,11 @@ return [
     'bulk_delivered_success' => 'Orders successfully marked as delivered',
     'bulk_cancelled_success' => 'Orders successfully cancelled',
     'export_success' => 'Orders successfully exported',
-
     // Filters
     'is_paid' => 'Paid',
     'total_from' => 'Total From',
     'total_until' => 'Total Until',
-
     // Help text
     'number_help' => 'Unique order number',
+    'guest_customer' => 'Guest customer',
 ];

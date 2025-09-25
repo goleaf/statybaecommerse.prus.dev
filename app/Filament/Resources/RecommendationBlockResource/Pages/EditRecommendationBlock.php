@@ -17,6 +17,23 @@ final class EditRecommendationBlock extends EditRecord
         return [
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
+            Actions\Action::make('toggle_active')
+                ->label(__('recommendation_blocks.actions.toggle_active'))
+                ->icon('heroicon-o-power')
+                ->color('warning')
+                ->action(function (): void {
+                    $this->record->is_active = ! $this->record->is_active;
+                    $this->record->save();
+                }),
+            Actions\Action::make('set_default')
+                ->label(__('recommendation_blocks.actions.set_default'))
+                ->icon('heroicon-o-star')
+                ->color('success')
+                ->visible(fn () => ! $this->record->is_default)
+                ->action(function (): void {
+                    $this->record->is_default = true;
+                    $this->record->save();
+                }),
         ];
     }
 

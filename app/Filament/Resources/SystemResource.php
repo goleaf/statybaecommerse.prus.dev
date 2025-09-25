@@ -139,6 +139,21 @@ final class SystemResource extends Resource
                                                     ->searchable()
                                                     ->preload()
                                                     ->required()
+                                                    ->afterStateUpdated(function ($state, callable $set) {
+                                                        if (is_array($state)) {
+                                                            $payload = [
+                                                                'name' => $state['name'] ?? null,
+                                                                'description' => $state['description'] ?? null,
+                                                                'color' => $state['color'] ?? null,
+                                                                'parent_id' => $state['parent_id'] ?? null,
+                                                                'icon' => $state['icon'] ?? null,
+                                                                'sort_order' => $state['sort_order'] ?? 0,
+                                                                'is_active' => $state['is_active'] ?? true,
+                                                            ];
+                                                            $category = SystemSettingCategory::create(array_filter($payload, fn ($v) => $v !== null));
+                                                            $set('category_id', (int) $category->getKey());
+                                                        }
+                                                    })
                                                     ->createOptionForm([
                                                         TextInput::make('name')
                                                             ->label(__('system.category_name'))
@@ -185,7 +200,25 @@ final class SystemResource extends Resource
 
                                                         return (int) $category->getKey();
                                                     })
-                                                    ->columnSpan(1),
+                                                    ->columnSpan(1)
+                                                    ->dehydrateStateUsing(function ($state) {
+                                                        if (is_array($state)) {
+                                                            $payload = [
+                                                                'name' => $state['name'] ?? null,
+                                                                'description' => $state['description'] ?? null,
+                                                                'color' => $state['color'] ?? null,
+                                                                'parent_id' => $state['parent_id'] ?? null,
+                                                                'icon' => $state['icon'] ?? null,
+                                                                'sort_order' => $state['sort_order'] ?? 0,
+                                                                'is_active' => $state['is_active'] ?? true,
+                                                            ];
+                                                            $category = SystemSettingCategory::create(array_filter($payload, fn ($v) => $v !== null));
+
+                                                            return (int) $category->getKey();
+                                                        }
+
+                                                        return $state;
+                                                    }),
                                             ]),
                                         TextInput::make('name')
                                             ->label(__('system.display_name'))
@@ -314,9 +347,11 @@ final class SystemResource extends Resource
                                             ->helperText(__('system.tags_help')),
                                         TextInput::make('version')
                                             ->label(__('system.version'))
+                                            ->default('1.0.0')
                                             ->helperText(__('system.version_help')),
                                         TextInput::make('environment')
                                             ->label(__('system.environment'))
+                                            ->default('production')
                                             ->helperText(__('system.environment_help')),
                                         Grid::make(2)
                                             ->components([
@@ -389,6 +424,7 @@ final class SystemResource extends Resource
                                             ->schema([
                                                 TextInput::make('locale')
                                                     ->label(__('system.locale'))
+                                                    ->required()
                                                     ->maxLength(5),
                                                 TextInput::make('name')
                                                     ->label(__('system.translated_name'))
@@ -403,6 +439,9 @@ final class SystemResource extends Resource
                                                     ->rows(2),
                                             ])
                                             ->columns(2)
+                                            ->defaultItems(0)
+                                            ->minItems(0)
+                                            ->dehydrated(false)
                                             ->collapsible()
                                             ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
                                     ]),
@@ -431,6 +470,9 @@ final class SystemResource extends Resource
                                                     ->default(true),
                                             ])
                                             ->columns(2)
+                                            ->defaultItems(0)
+                                            ->minItems(0)
+                                            ->dehydrated(false)
                                             ->collapsible()
                                             ->itemLabel(fn (array $state): ?string => $state['dependsOn']['name'] ?? null),
                                     ]),
@@ -600,14 +642,15 @@ final class SystemResource extends Resource
                     ->falseLabel(__('system.inactive_only')),
                 Filter::make('has_dependencies')
                     ->label(__('system.has_dependencies'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('dependencies')),
+                    ->query(fn (Builder $query): Builder => $query->withoutGlobalScopes()->whereHas('dependencies')),
                 Filter::make('has_translations')
                     ->label(__('system.has_translations'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('translations')),
+                    ->query(fn (Builder $query): Builder => $query->withoutGlobalScopes()->whereHas('translations')),
             ])
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                \Filament\Actions\DeleteAction::make(),
                 TableAction::make('clear_cache')
                     ->label(__('system.clear_cache'))
                     ->icon('heroicon-o-trash')
@@ -620,7 +663,7 @@ final class SystemResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (SystemSetting $record): bool => ! empty($record->cache_key)),
+                    ->visible(fn ($record): bool => $record !== null && ! empty($record->cache_key)),
                 TableAction::make('export')
                     ->label(__('system.export'))
                     ->icon('heroicon-o-arrow-down-tray')
@@ -658,7 +701,7 @@ final class SystemResource extends Resource
                             ->info()
                             ->send();
                     })
-                    ->visible(fn (SystemSetting $record): bool => $record->dependencies()->exists() || $record->dependents()->exists()),
+                    ->visible(fn ($record): bool => $record?->dependencies()->exists() || $record?->dependents()->exists()),
                 TableAction::make('view_history')
                     ->label(__('system.view_history'))
                     ->icon('heroicon-o-clock')
@@ -673,7 +716,7 @@ final class SystemResource extends Resource
                             ->info()
                             ->send();
                     })
-                    ->visible(fn (SystemSetting $record): bool => $record->history()->exists()),
+                    ->visible(fn ($record): bool => $record?->history()->exists()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -821,7 +864,7 @@ final class SystemResource extends Resource
      */
     public static function getNavigationBadge(): ?string
     {
-        return (string) self::getModel()::count();
+        return (string) self::getModel()::withoutGlobalScopes()->count();
     }
 
     /**

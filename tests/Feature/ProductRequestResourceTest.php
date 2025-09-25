@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -13,24 +15,36 @@ class ProductRequestResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    private User $adminUser;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->actingAs(User::factory()->create([
+        $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
             'is_admin' => true,
-        ]));
+        ]);
+
+        $this->actingAs($this->adminUser);
+    }
+
+    private function makePublishedProduct(): Product
+    {
+        return Product::factory()->create([
+            'is_visible' => true,
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
     }
 
     public function test_can_list_product_requests(): void
     {
-        $product = Product::factory()->create();
-        $user = User::factory()->create();
+        $product = $this->makePublishedProduct();
 
         ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
             'name' => 'Test Request',
             'email' => 'test@example.com',
             'status' => 'pending',
@@ -42,13 +56,12 @@ class ProductRequestResourceTest extends TestCase
 
     public function test_can_create_product_request(): void
     {
-        $product = Product::factory()->create();
-        $user = User::factory()->create();
+        $product = $this->makePublishedProduct();
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\CreateProductRequest::class)
             ->fillForm([
                 'product_id' => $product->id,
-                'user_id' => $user->id,
+                'user_id' => $this->adminUser->id,
                 'name' => 'New Request',
                 'email' => 'new@example.com',
                 'phone' => '+37012345678',
@@ -63,17 +76,17 @@ class ProductRequestResourceTest extends TestCase
             'name' => 'New Request',
             'email' => 'new@example.com',
             'status' => 'pending',
+            'user_id' => $this->adminUser->id,
         ]);
     }
 
     public function test_can_edit_product_request(): void
     {
-        $product = Product::factory()->create();
-        $user = User::factory()->create();
+        $product = $this->makePublishedProduct();
 
         $request = ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
             'status' => 'pending',
         ]);
 
@@ -97,12 +110,11 @@ class ProductRequestResourceTest extends TestCase
 
     public function test_can_view_product_request(): void
     {
-        $product = Product::factory()->create();
-        $user = User::factory()->create();
+        $product = $this->makePublishedProduct();
 
         $request = ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
             'name' => 'Test Request',
             'email' => 'test@example.com',
         ]);
@@ -115,18 +127,17 @@ class ProductRequestResourceTest extends TestCase
 
     public function test_can_filter_by_status(): void
     {
-        $product = Product::factory()->create();
-        $user = User::factory()->create();
+        $product = $this->makePublishedProduct();
 
         ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
             'status' => 'pending',
         ]);
 
         ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
             'status' => 'completed',
         ]);
 
@@ -138,18 +149,17 @@ class ProductRequestResourceTest extends TestCase
 
     public function test_can_filter_by_product(): void
     {
-        $product1 = Product::factory()->create(['name' => 'Product 1']);
-        $product2 = Product::factory()->create(['name' => 'Product 2']);
-        $user = User::factory()->create();
+        $product1 = $this->makePublishedProduct();
+        $product2 = $this->makePublishedProduct();
 
         ProductRequest::factory()->create([
             'product_id' => $product1->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
         ]);
 
         ProductRequest::factory()->create([
             'product_id' => $product2->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ListProductRequests::class)
@@ -160,12 +170,11 @@ class ProductRequestResourceTest extends TestCase
 
     public function test_can_search_product_requests(): void
     {
-        $product = Product::factory()->create();
-        $user = User::factory()->create();
+        $product = $this->makePublishedProduct();
 
         ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
             'name' => 'Test Request',
             'email' => 'test@example.com',
         ]);
@@ -177,32 +186,29 @@ class ProductRequestResourceTest extends TestCase
 
     public function test_can_bulk_delete_product_requests(): void
     {
-        $product = Product::factory()->create();
-        $user = User::factory()->create();
+        $product = $this->makePublishedProduct();
 
         $requests = ProductRequest::factory()->count(3)->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id' => $this->adminUser->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ListProductRequests::class)
-            ->callTableBulkAction('delete', $requests)
+            ->callTableBulkAction('delete', $requests->pluck('id')->all())
             ->assertHasNoTableBulkActionErrors();
 
-        $this->assertSoftDeleted('product_requests', [
-            'id' => $requests->first()->id,
-        ]);
+        $requests->each(function (ProductRequest $request): void {
+            $this->assertSoftDeleted('product_requests', ['id' => $request->id]);
+        });
     }
 
     public function test_product_request_relationships_work(): void
     {
-        $product = Product::factory()->create(['name' => 'Test Product']);
+        $product = $this->makePublishedProduct()->forceFill(['name' => 'Test Product']);
+        $product->save();
         $user = User::factory()->create(['name' => 'Test User']);
 
-        $request = ProductRequest::factory()->create([
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-        ]);
+        $request = ProductRequest::factory()->for($product)->for($user)->create();
 
         $this->assertEquals('Test Product', $request->product->name);
         $this->assertEquals('Test User', $request->user->name);
@@ -210,19 +216,11 @@ class ProductRequestResourceTest extends TestCase
 
     public function test_product_request_status_scopes_work(): void
     {
-        $product = Product::factory()->create();
-        $user = User::factory()->create();
-
-        ProductRequest::factory()->create([
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-            'status' => 'pending',
+        ProductRequest::factory()->pending()->create([
+            'user_id' => $this->adminUser->id,
         ]);
-
-        ProductRequest::factory()->create([
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-            'status' => 'completed',
+        ProductRequest::factory()->completed()->create([
+            'user_id' => $this->adminUser->id,
         ]);
 
         $this->assertCount(1, ProductRequest::pending()->get());

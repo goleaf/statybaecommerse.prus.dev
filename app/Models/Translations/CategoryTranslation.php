@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class CategoryTranslation extends Model
 {
+    protected static string $factory = \Database\Factories\Translations\CategoryTranslationFactory::class;
+
     protected $table = 'category_translations';
 
     protected $fillable = ['category_id', 'locale', 'name', 'slug', 'description', 'seo_title', 'seo_description'];

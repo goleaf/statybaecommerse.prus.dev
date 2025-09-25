@@ -5,129 +5,115 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\AnalyticsEvent;
+use App\Models\Brand;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 final class AnalyticsEventsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Get some published products
-        $products = Product::where('status', 'published')
-            ->where('is_visible', true)
-            ->limit(20)
-            ->get();
+        $products = $this->ensurePublishedProducts();
 
         if ($products->isEmpty()) {
-            $this->command->warn('No published products found. Skipping analytics events seeding.');
-
             return;
         }
 
-        // Get some users for realistic data
-        $users = User::limit(10)->get();
+        $users = $this->ensureSeedUsers();
 
-        $this->command->info('Creating analytics events for top products widget...');
+        $products->each(function (Product $product) use ($users): void {
+            AnalyticsEvent::query()->where('session_id', 'like', "seed-{$product->getKey()}-%")->delete();
 
-        // Create product view events (last 30 days)
-        foreach ($products as $product) {
-            $viewCount = rand(5, 50);  // Random views per product
+            foreach (range(1, 15) as $index) {
+                $user = $users[$index % $users->count()];
 
-            for ($i = 0; $i < $viewCount; $i++) {
-                AnalyticsEvent::create([
-                    'event_type' => 'product_view',
-                    'session_id' => 'session_'.uniqid(),
-                    'user_id' => $users->random()->id ?? null,
-                    'properties' => [
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'product_sku' => $product->sku,
-                        'category' => $product->categories->first()?->name ?? 'Uncategorized',
-                    ],
-                    'url' => "/products/{$product->slug}",
-                    'referrer' => rand(0, 1) ? 'https://google.com' : 'https://facebook.com',
-                    'user_agent' => 'Mozilla/5.0 (compatible; TestBot/1.0)',
-                    'ip_address' => '192.168.'.rand(1, 255).'.'.rand(1, 255),
-                    'country_code' => collect(['LT', 'US', 'GB', 'DE', 'FR'])->random(),
-                    'created_at' => now()->subDays(rand(0, 30)),
-                ]);
+                AnalyticsEvent::factory()
+                    ->productView()
+                    ->for($user, 'user')
+                    ->state([
+                        'session_id' => "seed-{$product->getKey()}-view-{$index}",
+                        'properties' => [
+                            'product_id' => $product->getKey(),
+                            'product_name' => $product->name,
+                            'product_sku' => $product->sku,
+                            'brand' => $product->brand?->name,
+                        ],
+                        'trackable_type' => Product::class,
+                        'trackable_id' => $product->getKey(),
+                        'created_at' => now()->subDays($index % 30),
+                    ])
+                    ->create();
             }
+
+            foreach (range(1, 5) as $index) {
+                $user = $users[$index % $users->count()];
+
+                AnalyticsEvent::factory()
+                    ->addToCart()
+                    ->for($user, 'user')
+                    ->state([
+                        'session_id' => "seed-{$product->getKey()}-cart-{$index}",
+                        'properties' => [
+                            'product_id' => $product->getKey(),
+                            'product_name' => $product->name,
+                            'quantity' => 1,
+                            'price' => $product->price,
+                        ],
+                        'trackable_type' => Product::class,
+                        'trackable_id' => $product->getKey(),
+                        'created_at' => now()->subDays($index % 7),
+                    ])
+                    ->create();
+            }
+        });
+    }
+
+    /**
+     * Ensure we have a consistent set of published products to track.
+     */
+    private function ensurePublishedProducts(): Collection
+    {
+        $products = Product::query()->where('status', 'published')->where('is_visible', true)->limit(10)->get();
+
+        if ($products->count() >= 10) {
+            return $products;
         }
 
-        // Create add to cart events (fewer than views)
-        foreach ($products as $product) {
-            $cartCount = rand(1, 15);  // Random cart adds per product
+        $missing = 10 - $products->count();
 
-            for ($i = 0; $i < $cartCount; $i++) {
-                AnalyticsEvent::create([
-                    'event_type' => 'add_to_cart',
-                    'session_id' => 'session_'.uniqid(),
-                    'user_id' => $users->random()->id ?? null,
-                    'properties' => [
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'product_sku' => $product->sku,
-                        'quantity' => rand(1, 3),
-                        'price' => $product->price,
-                    ],
-                    'url' => "/products/{$product->slug}",
-                    'referrer' => "/products/{$product->slug}",
-                    'user_agent' => 'Mozilla/5.0 (compatible; TestBot/1.0)',
-                    'ip_address' => '192.168.'.rand(1, 255).'.'.rand(1, 255),
-                    'country_code' => collect(['LT', 'US', 'GB', 'DE', 'FR'])->random(),
-                    'created_at' => now()->subDays(rand(0, 30)),
-                ]);
-            }
+        Product::factory()
+            ->count($missing)
+            ->state([
+                'status' => 'published',
+                'is_visible' => true,
+                'published_at' => now(),
+            ])
+            ->for(Brand::factory(), 'brand')
+            ->create();
+
+        return Product::query()->where('status', 'published')->where('is_visible', true)->limit(10)->get();
+    }
+
+    /**
+     * Ensure we have a stable collection of users for seeding events.
+     */
+    private function ensureSeedUsers(): Collection
+    {
+        $users = User::query()->limit(5)->get();
+
+        if ($users->count() < 5) {
+            $additional = User::factory()
+                ->count(5 - $users->count())
+                ->state([
+                    'preferred_locale' => 'lt',
+                ])
+                ->create();
+
+            $users = $users->merge($additional);
         }
 
-        // Create some recent events (last 7 days) for better widget display
-        $recentProducts = $products->take(10);
-
-        foreach ($recentProducts as $product) {
-            // Recent views
-            for ($i = 0; $i < rand(3, 15); $i++) {
-                AnalyticsEvent::create([
-                    'event_type' => 'product_view',
-                    'session_id' => 'session_'.uniqid(),
-                    'user_id' => $users->random()->id ?? null,
-                    'properties' => [
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'product_sku' => $product->sku,
-                    ],
-                    'url' => "/products/{$product->slug}",
-                    'referrer' => 'https://google.com/search?q='.urlencode($product->name),
-                    'user_agent' => 'Mozilla/5.0 (compatible; TestBot/1.0)',
-                    'ip_address' => '192.168.'.rand(1, 255).'.'.rand(1, 255),
-                    'country_code' => 'LT',
-                    'created_at' => now()->subDays(rand(0, 7)),
-                ]);
-            }
-
-            // Recent cart adds
-            for ($i = 0; $i < rand(1, 8); $i++) {
-                AnalyticsEvent::create([
-                    'event_type' => 'add_to_cart',
-                    'session_id' => 'session_'.uniqid(),
-                    'user_id' => $users->random()->id ?? null,
-                    'properties' => [
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'quantity' => rand(1, 2),
-                        'price' => $product->price,
-                    ],
-                    'url' => "/products/{$product->slug}",
-                    'referrer' => "/products/{$product->slug}",
-                    'user_agent' => 'Mozilla/5.0 (compatible; TestBot/1.0)',
-                    'ip_address' => '192.168.'.rand(1, 255).'.'.rand(1, 255),
-                    'country_code' => 'LT',
-                    'created_at' => now()->subDays(rand(0, 7)),
-                ]);
-            }
-        }
-
-        $totalEvents = AnalyticsEvent::count();
-        $this->command->info("Created analytics events. Total events in database: {$totalEvents}");
+        return $users->values();
     }
 }

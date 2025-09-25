@@ -16,7 +16,6 @@ use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 final class ProductComparisonResourceTest extends TestCase
 {

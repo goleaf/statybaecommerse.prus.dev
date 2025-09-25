@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -30,10 +32,10 @@ final class RecommendationConfigFactory extends Factory
             'max_results' => $this->faker->numberBetween(5, 50),
             'decay_factor' => $this->faker->randomFloat(2, 0, 1),
             'priority' => $this->faker->numberBetween(0, 10),
+            'sort_order' => $this->faker->numberBetween(0, 100),
             'is_active' => $this->faker->boolean(80),
             'is_default' => false,
             'cache_ttl' => $this->faker->numberBetween(30, 3600),
-            'sort_order' => $this->faker->numberBetween(0, 100),
             'config' => [],
             'filters' => [],
             'conditions' => [],

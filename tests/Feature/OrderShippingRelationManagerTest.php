@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -7,11 +9,11 @@ use App\Filament\Resources\OrderResource\RelationManagers\OrderShippingRelationM
 use App\Models\Order;
 use App\Models\OrderShipping;
 use App\Models\User;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Filament\Actions\Testing\TestAction;
-use Filament\Actions\CreateAction;
 
 /**
  * OrderShippingRelationManagerTest

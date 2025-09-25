@@ -96,6 +96,11 @@ final class VariantInventory extends Model
         return $this->belongsTo(Location::class, 'location_id');
     }
 
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Partner::class, 'supplier_id');
+    }
+
     /**
      * Handle stockMovements functionality with proper error handling.
      */
@@ -154,6 +159,31 @@ final class VariantInventory extends Model
         }
 
         return ($this->reserved / $this->stock) * 100;
+    }
+
+    public function getAvailableStockAttribute(): int
+    {
+        return max(0, (int) $this->stock - (int) $this->reserved);
+    }
+
+    public function getStockValueAttribute(): float
+    {
+        return (float) $this->stock * (float) $this->cost_per_unit;
+    }
+
+    public function getReservedValueAttribute(): float
+    {
+        return (float) $this->reserved * (float) $this->cost_per_unit;
+    }
+
+    public function getStockStatusLabelAttribute(): string
+    {
+        return match ($this->stock_status) {
+            'out_of_stock' => 'Out of Stock',
+            'low_stock' => 'Low Stock',
+            'in_stock' => 'In Stock',
+            default => 'Unknown',
+        };
     }
 
     /**
@@ -261,6 +291,23 @@ final class VariantInventory extends Model
         $this->available = $this->stock - $this->reserved;
 
         return $this->save();
+    }
+
+    public function adjustStock(int $quantity, string $reason = 'manual_adjustment'): bool
+    {
+        return $quantity >= 0
+            ? $this->addStock($quantity)
+            : $this->removeStock(abs($quantity));
+    }
+
+    public function reserve(int $quantity): bool
+    {
+        return $this->reserveStock($quantity);
+    }
+
+    public function unreserve(int $quantity): bool
+    {
+        return $this->releaseStock($quantity);
     }
 
     /**

@@ -30,7 +30,6 @@ class ProductFactory extends Factory
             'Frezeris',
             'Elektrinė grandinės pjovimo mašina',
             'Smūginis gręžtuvas',
-
             // Rankiniai įrankiai
             'Profesionalus plaktukas',
             'Statybinė gulsčioji',
@@ -42,7 +41,6 @@ class ProductFactory extends Factory
             'Metalinis liniuotė',
             'Kaltai medžiui',
             'Kampuotė',
-
             // Statybinės medžiagos
             'Cemento mišinys',
             'Gipso plokštės',
@@ -54,7 +52,6 @@ class ProductFactory extends Factory
             'Fasadiniai dažai',
             'Klijų mišinys plytelėms',
             'Betono priedas',
-
             // Saugos priemonės
             'Apsauginiai akiniai',
             'Darbo pirštinės',
@@ -88,13 +85,13 @@ class ProductFactory extends Factory
             'length' => $this->faker->randomFloat(2, 5, 200),
             'width' => $this->faker->randomFloat(2, 5, 200),
             'height' => $this->faker->randomFloat(2, 2, 100),
-            'is_visible' => true,
-            'is_featured' => $this->faker->boolean(15),
+            'is_visible' => false,
+            'is_featured' => false,
             'manage_stock' => $this->faker->boolean(85),
-            'status' => 'published',
+            'status' => 'draft',
             'seo_title' => $name.' - Profesionalūs statybos įrankiai',
             'seo_description' => 'Pirkite '.strtolower($name).' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
-            'published_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
+            'published_at' => null,
         ];
     }
 

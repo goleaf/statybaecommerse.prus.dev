@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -118,6 +120,7 @@ final class RecommendationConfigResource extends Resource
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
+                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
                                 ->native(false),
                             Select::make('categories')
                                 ->label(__('recommendation_config.fields.categories'))
@@ -125,6 +128,7 @@ final class RecommendationConfigResource extends Resource
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
+                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
                                 ->native(false),
                         ]),
                 ]),
@@ -176,11 +180,11 @@ final class RecommendationConfigResource extends Resource
                 BulkAction::make('activate')
                     ->label(__('recommendation_config.actions.activate'))
                     ->requiresConfirmation()
-                    ->action(fn($records) => $records->each->update(['is_active' => true])),
+                    ->action(fn ($records) => $records->each->update(['is_active' => true])),
                 BulkAction::make('deactivate')
                     ->label(__('recommendation_config.actions.deactivate'))
                     ->requiresConfirmation()
-                    ->action(fn($records) => $records->each->update(['is_active' => false])),
+                    ->action(fn ($records) => $records->each->update(['is_active' => false])),
             ])
             ->defaultSort('created_at', 'desc');
     }

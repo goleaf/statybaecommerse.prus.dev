@@ -8,6 +8,7 @@ use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
@@ -17,7 +18,6 @@ use App\Models\VariantPriceHistory;
 use App\Models\VariantPricingRule;
 use App\Models\VariantStockHistory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class EnhancedProductVariantSeeder extends Seeder
@@ -27,16 +27,14 @@ final class EnhancedProductVariantSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::transaction(function () {
-            $this->createEnhancedAttributes();
-            $this->createEnhancedProductsWithVariants();
-            $this->createVariantAttributeValues();
-            $this->createEnhancedPricingRules();
-            $this->createEnhancedInventories();
-            $this->createPriceHistory();
-            $this->createStockHistory();
-            $this->createAnalytics();
-        });
+        $this->createEnhancedAttributes();
+        $this->createEnhancedProductsWithVariants();
+        $this->createVariantAttributeValues();
+        $this->createEnhancedPricingRules();
+        $this->createEnhancedInventories();
+        $this->createPriceHistory();
+        $this->createStockHistory();
+        $this->createAnalytics();
     }
 
     private function createEnhancedAttributes(): void
@@ -478,16 +476,25 @@ final class EnhancedProductVariantSeeder extends Seeder
                 // Update available quantity
                 $variant->updateAvailableQuantity();
 
-                // Create variant inventory
-                VariantInventory::create([
-                    'variant_id' => $variant->id,
-                    'warehouse_code' => 'main',
-                    'stock' => $variantData['stock'],
-                    'reserved' => $variant->reserved_quantity,
-                    'available' => $variant->available_quantity,
-                    'reorder_point' => 10,
-                    'reorder_quantity' => 50,
-                ]);
+                // Create variant inventory using factory
+                $mainLocation = Location::firstOrCreate(
+                    ['code' => 'MAIN'],
+                    ['name' => 'Main Warehouse', 'is_active' => true]
+                );
+
+                VariantInventory::factory()
+                    ->for($variant)
+                    ->for($mainLocation)
+                    ->state([
+                        'warehouse_code' => 'MAIN-001',
+                        'stock' => $variantData['stock'],
+                        'reserved' => $variant->reserved_quantity,
+                        'available' => $variant->available_quantity,
+                        'reorder_point' => 10,
+                        'reorder_quantity' => 50,
+                        'status' => 'active',
+                    ])
+                    ->create();
             }
         }
     }
@@ -625,30 +632,39 @@ final class EnhancedProductVariantSeeder extends Seeder
 
     private function createEnhancedInventories(): void
     {
-        $variants = ProductVariant::all();
+        $variants = ProductVariant::query()->with('inventories')->get();
+        $locations = Location::query()->get();
+
+        if ($locations->isEmpty()) {
+            $this->command?->warn('No locations found. Creating default location for inventory.');
+            $locations = collect([
+                Location::factory()->create(['name' => 'Main Warehouse', 'code' => 'MAIN']),
+                Location::factory()->create(['name' => 'Secondary Warehouse', 'code' => 'SEC']),
+                Location::factory()->create(['name' => 'Regional Warehouse', 'code' => 'REG']),
+            ]);
+        }
 
         foreach ($variants as $variant) {
-            // Create secondary warehouse inventory
-            VariantInventory::create([
-                'variant_id' => $variant->id,
-                'warehouse_code' => 'secondary',
-                'stock' => rand(5, 25),
-                'reserved' => 0,
-                'available' => rand(5, 25),
-                'reorder_point' => 5,
-                'reorder_quantity' => 25,
-            ]);
+            foreach ($locations as $location) {
+                // Skip if inventory already exists for this variant-location combination
+                if ($variant->inventories->contains('location_id', $location->id)) {
+                    continue;
+                }
 
-            // Create regional warehouse inventory
-            VariantInventory::create([
-                'variant_id' => $variant->id,
-                'warehouse_code' => 'regional',
-                'stock' => rand(10, 40),
-                'reserved' => rand(0, 5),
-                'available' => rand(10, 40),
-                'reorder_point' => 8,
-                'reorder_quantity' => 30,
-            ]);
+                // Create inventory using factory with realistic stock levels
+                VariantInventory::factory()
+                    ->for($variant)
+                    ->for($location)
+                    ->state([
+                        'warehouse_code' => $location->code . '-' . fake()->numerify('###'),
+                        'stock' => fake()->numberBetween(5, 40),
+                        'reserved' => fake()->numberBetween(0, 5),
+                        'reorder_point' => fake()->numberBetween(5, 15),
+                        'reorder_quantity' => fake()->numberBetween(25, 50),
+                        'status' => 'active',
+                    ])
+                    ->create();
+            }
         }
     }
 
@@ -657,35 +673,31 @@ final class EnhancedProductVariantSeeder extends Seeder
         $variants = ProductVariant::all();
 
         foreach ($variants as $variant) {
-            // Create some price history records
-            $basePrice = $variant->cost_price;
-            $currentPrice = $variant->price;
-
-            // Historical price changes
-            $oldPrice = $basePrice * 1.5; // Original higher price
-            VariantPriceHistory::create([
-                'variant_id' => $variant->id,
-                'old_price' => $oldPrice,
-                'new_price' => $currentPrice,
-                'price_type' => 'regular',
-                'change_reason' => 'Price adjustment',
-                'changed_by' => null,
-                'effective_from' => now()->subDays(rand(30, 90)),
-                'effective_until' => null,
-            ]);
+            // Create historical price records using factory
+            VariantPriceHistory::factory()
+                ->for($variant)
+                ->state([
+                    'old_price' => $variant->cost_price * 1.5,
+                    'new_price' => $variant->price,
+                    'price_type' => 'regular',
+                    'change_reason' => 'Price adjustment',
+                    'effective_from' => now()->subDays(fake()->numberBetween(30, 90)),
+                ])
+                ->create();
 
             // Sale price history if on sale
             if ($variant->is_on_sale && $variant->promotional_price) {
-                VariantPriceHistory::create([
-                    'variant_id' => $variant->id,
-                    'old_price' => $currentPrice,
-                    'new_price' => $variant->promotional_price,
-                    'price_type' => 'sale',
-                    'change_reason' => 'Sale promotion',
-                    'changed_by' => null,
-                    'effective_from' => $variant->sale_start_date,
-                    'effective_until' => $variant->sale_end_date,
-                ]);
+                VariantPriceHistory::factory()
+                    ->for($variant)
+                    ->state([
+                        'old_price' => $variant->price,
+                        'new_price' => $variant->promotional_price,
+                        'price_type' => 'sale',
+                        'change_reason' => 'Sale promotion',
+                        'effective_from' => $variant->sale_start_date,
+                        'effective_until' => $variant->sale_end_date,
+                    ])
+                    ->create();
             }
         }
     }
@@ -695,50 +707,48 @@ final class EnhancedProductVariantSeeder extends Seeder
         $variants = ProductVariant::all();
 
         foreach ($variants as $variant) {
-            // Create stock history records
-            $initialStock = $variant->stock_quantity + rand(20, 100);
+            $initialStock = $variant->stock_quantity + fake()->numberBetween(20, 100);
+            $soldQuantity = fake()->numberBetween(5, 30);
             $currentStock = $variant->stock_quantity;
 
-            // Initial stock adjustment
-            VariantStockHistory::create([
-                'variant_id' => $variant->id,
-                'old_quantity' => 0,
-                'new_quantity' => $initialStock,
-                'quantity_change' => $initialStock,
-                'change_type' => 'restock',
-                'change_reason' => 'Initial stock',
-                'changed_by' => null,
-                'reference_type' => null,
-                'reference_id' => null,
-            ]);
+            // Initial stock record using factory
+            VariantStockHistory::factory()
+                ->for($variant)
+                ->state([
+                    'old_quantity' => 0,
+                    'new_quantity' => $initialStock,
+                    'quantity_change' => $initialStock,
+                    'change_type' => 'increase',
+                    'change_reason' => 'restock',
+                ])
+                ->create();
 
-            // Some sales
-            $soldQuantity = rand(5, 30);
-            VariantStockHistory::create([
-                'variant_id' => $variant->id,
-                'old_quantity' => $initialStock,
-                'new_quantity' => $initialStock - $soldQuantity,
-                'quantity_change' => -$soldQuantity,
-                'change_type' => 'sale',
-                'change_reason' => 'Customer purchase',
-                'changed_by' => null,
-                'reference_type' => 'order',
-                'reference_id' => rand(1000, 9999),
-            ]);
+            // Sales record using factory
+            VariantStockHistory::factory()
+                ->for($variant)
+                ->state([
+                    'old_quantity' => $initialStock,
+                    'new_quantity' => $initialStock - $soldQuantity,
+                    'quantity_change' => -$soldQuantity,
+                    'change_type' => 'decrease',
+                    'change_reason' => 'sale',
+                    'reference_type' => 'order',
+                    'reference_id' => fake()->numberBetween(1000, 9999),
+                ])
+                ->create();
 
-            // Current stock adjustment
+            // Current stock adjustment if needed
             if ($currentStock !== ($initialStock - $soldQuantity)) {
-                VariantStockHistory::create([
-                    'variant_id' => $variant->id,
-                    'old_quantity' => $initialStock - $soldQuantity,
-                    'new_quantity' => $currentStock,
-                    'quantity_change' => $currentStock - ($initialStock - $soldQuantity),
-                    'change_type' => 'adjustment',
-                    'change_reason' => 'Stock adjustment',
-                    'changed_by' => null,
-                    'reference_type' => null,
-                    'reference_id' => null,
-                ]);
+                VariantStockHistory::factory()
+                    ->for($variant)
+                    ->state([
+                        'old_quantity' => $initialStock - $soldQuantity,
+                        'new_quantity' => $currentStock,
+                        'quantity_change' => $currentStock - ($initialStock - $soldQuantity),
+                        'change_type' => 'adjustment',
+                        'change_reason' => 'adjustment',
+                    ])
+                    ->create();
             }
         }
     }
@@ -748,27 +758,27 @@ final class EnhancedProductVariantSeeder extends Seeder
         $variants = ProductVariant::all();
 
         foreach ($variants as $variant) {
-            // Create analytics for the last 30 days
+            // Create analytics for the last 30 days using factory
             for ($i = 0; $i < 30; $i++) {
-                $date = now()->subDays($i)->toDateString();
+                $date = now()->subDays($i);
 
-                $views = rand(0, 20);
-                $clicks = $views > 0 ? rand(0, $views) : 0;
-                $addToCart = $clicks > 0 ? rand(0, $clicks) : 0;
-                $purchases = $addToCart > 0 ? rand(0, $addToCart) : 0;
-                $revenue = $purchases * $variant->price;
-                $conversionRate = $views > 0 ? ($purchases / $views) * 100 : 0;
+                // Skip some days randomly (not all variants have analytics every day)
+                if (fake()->boolean(20)) {
+                    continue;
+                }
 
-                VariantAnalytics::create([
-                    'variant_id' => $variant->id,
-                    'date' => $date,
-                    'views' => $views,
-                    'clicks' => $clicks,
-                    'add_to_cart' => $addToCart,
-                    'purchases' => $purchases,
-                    'revenue' => $revenue,
-                    'conversion_rate' => $conversionRate,
-                ]);
+                VariantAnalytics::factory()
+                    ->for($variant)
+                    ->state([
+                        'date' => $date->toDateString(),
+                        'views' => fake()->numberBetween(0, 20),
+                        'clicks' => fake()->numberBetween(0, 15),
+                        'add_to_cart' => fake()->numberBetween(0, 10),
+                        'purchases' => fake()->numberBetween(0, 5),
+                        'revenue' => fake()->randomFloat(2, 0, $variant->price * 5),
+                        'conversion_rate' => fake()->randomFloat(2, 0, 15),
+                    ])
+                    ->create();
             }
         }
     }

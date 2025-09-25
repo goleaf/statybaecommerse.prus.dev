@@ -10,7 +10,6 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class InventoryResourceTest extends TestCase
 {
@@ -41,7 +40,8 @@ class InventoryResourceTest extends TestCase
             'is_tracked' => true,
         ]);
 
-        $this->get('/admin/inventories')
+        $this
+            ->get('/admin/inventories')
             ->assertOk()
             ->assertSee($product->name)
             ->assertSee($location->name)
@@ -55,7 +55,8 @@ class InventoryResourceTest extends TestCase
         $product = Product::factory()->create();
         $location = Location::factory()->create();
 
-        $this->get('/admin/inventories/create')
+        $this
+            ->get('/admin/inventories/create')
             ->assertOk();
 
         $this->post('/admin/inventories', [
@@ -88,7 +89,8 @@ class InventoryResourceTest extends TestCase
             'location_id' => $location->id,
         ]);
 
-        $this->get("/admin/inventories/{$inventory->id}")
+        $this
+            ->get("/admin/inventories/{$inventory->id}")
             ->assertOk()
             ->assertSee($product->name)
             ->assertSee($location->name);
@@ -103,7 +105,8 @@ class InventoryResourceTest extends TestCase
             'location_id' => $location->id,
         ]);
 
-        $this->get("/admin/inventories/{$inventory->id}/edit")
+        $this
+            ->get("/admin/inventories/{$inventory->id}/edit")
             ->assertOk();
 
         $this->put("/admin/inventories/{$inventory->id}", [
@@ -135,7 +138,8 @@ class InventoryResourceTest extends TestCase
             'location_id' => $location->id,
         ]);
 
-        $this->delete("/admin/inventories/{$inventory->id}")
+        $this
+            ->delete("/admin/inventories/{$inventory->id}")
             ->assertRedirect();
 
         $this->assertDatabaseMissing('inventories', [
@@ -159,7 +163,8 @@ class InventoryResourceTest extends TestCase
             'location_id' => $location->id,
         ]);
 
-        $this->get('/admin/inventories?product='.$product1->id)
+        $this
+            ->get('/admin/inventories?product='.$product1->id)
             ->assertOk()
             ->assertSee('Product 1')
             ->assertDontSee('Product 2');
@@ -181,7 +186,8 @@ class InventoryResourceTest extends TestCase
             'location_id' => $location2->id,
         ]);
 
-        $this->get('/admin/inventories?location='.$location1->id)
+        $this
+            ->get('/admin/inventories?location='.$location1->id)
             ->assertOk()
             ->assertSee('Location 1')
             ->assertDontSee('Location 2');
@@ -218,15 +224,18 @@ class InventoryResourceTest extends TestCase
             'threshold' => 20,
         ]);
 
-        $this->get('/admin/inventories?stock_status=out_of_stock')
+        $this
+            ->get('/admin/inventories?stock_status=out_of_stock')
             ->assertOk()
             ->assertSee('0');
 
-        $this->get('/admin/inventories?stock_status=low_stock')
+        $this
+            ->get('/admin/inventories?stock_status=low_stock')
             ->assertOk()
             ->assertSee('10');
 
-        $this->get('/admin/inventories?stock_status=in_stock')
+        $this
+            ->get('/admin/inventories?stock_status=in_stock')
             ->assertOk()
             ->assertSee('100');
     }
@@ -248,10 +257,12 @@ class InventoryResourceTest extends TestCase
             'is_tracked' => false,
         ]);
 
-        $this->get('/admin/inventories?is_tracked=1')
+        $this
+            ->get('/admin/inventories?is_tracked=1')
             ->assertOk();
 
-        $this->get('/admin/inventories?is_tracked=0')
+        $this
+            ->get('/admin/inventories?is_tracked=0')
             ->assertOk();
     }
 

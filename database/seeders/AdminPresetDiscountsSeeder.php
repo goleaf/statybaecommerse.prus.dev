@@ -1,12 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
+use App\Models\Category;
+use App\Models\Collection;
+use App\Models\CustomerGroup;
+use App\Models\Discount;
+use App\Models\DiscountCode;
+use App\Models\Zone;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class AdminPresetDiscountsSeeder extends Seeder
+final class AdminPresetDiscountsSeeder extends Seeder
 {
     public function run(): void
     {

@@ -16,6 +16,18 @@ final class ViewSystemSetting extends ViewRecord
     {
         return [
             Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
         ];
+    }
+
+    public function render(): \Illuminate\Contracts\View\View
+    {
+        $view = parent::render();
+        $record = $this->getRecord();
+
+        return $view->with([
+            '__record_id' => $record->getKey(),
+            '__record_key' => $record->key ?? null,
+        ]);
     }
 }

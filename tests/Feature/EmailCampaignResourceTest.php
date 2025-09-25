@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class EmailCampaignResourceTest extends TestCase
 {
@@ -116,9 +115,9 @@ class EmailCampaignResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\EmailCampaignResource\Pages\CreateEmailCampaign::class)
             ->fillForm([
-                'name' => '', // Required field
-                'subject' => '', // Required field
-                'from_email' => 'invalid-email', // Invalid email
+                'name' => '',  // Required field
+                'subject' => '',  // Required field
+                'from_email' => 'invalid-email',  // Invalid email
             ])
             ->call('create')
             ->assertHasFormErrors(['name', 'subject', 'from_email']);

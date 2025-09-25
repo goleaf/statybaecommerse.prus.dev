@@ -22,7 +22,7 @@ final class RealProductImagesSeeder extends Seeder
     {
         $this->command->info('Generating local WebP product images...');
 
-        // Get products that need images (without images or only have placeholder images)
+        // Get existing products or create some if none exist
         $products = Product::query()
             ->with('media', 'category')
             ->get()
@@ -39,13 +39,17 @@ final class RealProductImagesSeeder extends Seeder
                 return $allPlaceholders;
             });
 
-        $this->command->info("Found {$products->count()} products that need real images.");
-
         if ($products->isEmpty()) {
-            $this->command->info('All products already have images.');
-
-            return;
+            $this->command->info('No products found. Creating products with categories...');
+            $products = Product::factory()
+                ->count(15)
+                ->hasAttached(
+                    \App\Models\Category::factory()->count(3)
+                )
+                ->create();
         }
+
+        $this->command->info("Found {$products->count()} products that need real images.");
 
         foreach ($products as $product) {
             try {

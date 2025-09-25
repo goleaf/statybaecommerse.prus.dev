@@ -159,7 +159,9 @@ class RecommendationSystemSeeder extends Seeder
         ];
 
         foreach ($blocks as $blockData) {
-            RecommendationBlock::create($blockData);
+            RecommendationBlock::factory()
+                ->state($blockData)
+                ->create();
         }
     }
 
@@ -229,7 +231,9 @@ class RecommendationSystemSeeder extends Seeder
         ];
 
         foreach ($configs as $configData) {
-            RecommendationConfig::create($configData);
+            RecommendationConfig::factory()
+                ->state($configData)
+                ->create();
         }
     }
 
@@ -305,7 +309,9 @@ class RecommendationSystemSeeder extends Seeder
         ];
 
         foreach ($configs as $configData) {
-            RecommendationConfigSimple::create($configData);
+            RecommendationConfigSimple::factory()
+                ->state($configData)
+                ->create();
         }
     }
 
@@ -315,29 +321,32 @@ class RecommendationSystemSeeder extends Seeder
         $users = User::all();
         $products = Product::all();
 
-        for ($i = 0; $i < 20; $i++) {
-            RecommendationCache::create([
-                'cache_key' => 'cache_'.$i.'_'.now()->timestamp,
-                'block_id' => $blocks->random()->id,
-                'user_id' => $users->random()->id,
-                'product_id' => $products->random()->id,
-                'context_type' => fake()->randomElement(['homepage', 'product', 'category', 'cart', 'checkout']),
-                'context_data' => [
-                    'page_type' => fake()->randomElement(['homepage', 'product', 'category']),
-                    'category_id' => fake()->optional()->numberBetween(1, 5),
-                    'search_query' => fake()->optional()->words(2, true),
-                ],
-                'recommendations' => $products->random(5)->map(function ($product) {
-                    return [
-                        'product_id' => $product->id,
-                        'score' => fake()->randomFloat(2, 0.1, 1.0),
-                        'reason' => fake()->randomElement(['similar_users', 'similar_products', 'popular', 'trending']),
-                    ];
-                })->toArray(),
-                'hit_count' => fake()->numberBetween(0, 100),
-                'expires_at' => now()->addHours(fake()->numberBetween(1, 24)),
-            ]);
-        }
+        RecommendationCache::factory()
+            ->count(20)
+            ->state(function () use ($blocks, $users, $products) {
+                return [
+                    'cache_key' => 'cache_'.fake()->uuid().'_'.now()->timestamp,
+                    'block_id' => $blocks->random()->id,
+                    'user_id' => $users->random()->id,
+                    'product_id' => $products->random()->id,
+                    'context_type' => fake()->randomElement(['homepage', 'product', 'category', 'cart', 'checkout']),
+                    'context_data' => [
+                        'page_type' => fake()->randomElement(['homepage', 'product', 'category']),
+                        'category_id' => fake()->optional()->numberBetween(1, 5),
+                        'search_query' => fake()->optional()->words(2, true),
+                    ],
+                    'recommendations' => $products->random(5)->map(function ($product) {
+                        return [
+                            'product_id' => $product->id,
+                            'score' => fake()->randomFloat(2, 0.1, 1.0),
+                            'reason' => fake()->randomElement(['similar_users', 'similar_products', 'popular', 'trending']),
+                        ];
+                    })->toArray(),
+                    'hit_count' => fake()->numberBetween(0, 100),
+                    'expires_at' => now()->addHours(fake()->numberBetween(1, 24)),
+                ];
+            })
+            ->create();
     }
 
     private function createRecommendationAnalytics(): void
@@ -347,69 +356,78 @@ class RecommendationSystemSeeder extends Seeder
         $users = User::all();
         $products = Product::all();
 
-        for ($i = 0; $i < 50; $i++) {
-            RecommendationAnalytics::create([
-                'block_id' => $blocks->random()->id,
-                'config_id' => $configs->random()->id,
-                'user_id' => $users->random()->id,
-                'product_id' => $products->random()->id,
-                'action' => fake()->randomElement(['view', 'click', 'add_to_cart', 'purchase']),
-                'ctr' => fake()->randomFloat(4, 0.01, 0.5),
-                'conversion_rate' => fake()->randomFloat(4, 0.01, 0.3),
-                'metrics' => [
-                    'impressions' => fake()->numberBetween(100, 10000),
-                    'clicks' => fake()->numberBetween(10, 1000),
-                    'conversions' => fake()->numberBetween(1, 100),
-                    'revenue' => fake()->randomFloat(2, 10, 1000),
-                ],
-                'date' => fake()->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
-            ]);
-        }
+        RecommendationAnalytics::factory()
+            ->count(50)
+            ->state(function () use ($blocks, $configs, $users, $products) {
+                return [
+                    'block_id' => $blocks->random()->id,
+                    'config_id' => $configs->random()->id,
+                    'user_id' => $users->random()->id,
+                    'product_id' => $products->random()->id,
+                    'action' => fake()->randomElement(['view', 'click', 'add_to_cart', 'purchase']),
+                    'ctr' => fake()->randomFloat(4, 0.01, 0.5),
+                    'conversion_rate' => fake()->randomFloat(4, 0.01, 0.3),
+                    'metrics' => [
+                        'impressions' => fake()->numberBetween(100, 10000),
+                        'clicks' => fake()->numberBetween(10, 1000),
+                        'conversions' => fake()->numberBetween(1, 100),
+                        'revenue' => fake()->randomFloat(2, 10, 1000),
+                    ],
+                    'date' => fake()->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
+                ];
+            })
+            ->create();
     }
 
     private function createUserBehaviors($users, $products): void
     {
-        for ($i = 0; $i < 200; $i++) {
-            UserBehavior::create([
-                'user_id' => $users->random()->id,
-                'session_id' => fake()->uuid(),
-                'product_id' => $products->random()->id,
-                'category_id' => fake()->optional()->numberBetween(1, 5),
-                'behavior_type' => fake()->randomElement(['view', 'click', 'add_to_cart', 'purchase', 'wishlist', 'search']),
-                'metadata' => [
-                    'page_url' => fake()->url(),
+        UserBehavior::factory()
+            ->count(200)
+            ->state(function () use ($users, $products) {
+                return [
+                    'user_id' => $users->random()->id,
+                    'session_id' => fake()->uuid(),
+                    'product_id' => $products->random()->id,
+                    'category_id' => fake()->optional()->numberBetween(1, 5),
+                    'behavior_type' => fake()->randomElement(['view', 'click', 'add_to_cart', 'purchase', 'wishlist', 'search']),
+                    'metadata' => [
+                        'page_url' => fake()->url(),
+                        'referrer' => fake()->optional()->url(),
+                        'search_query' => fake()->optional()->words(2, true),
+                    ],
                     'referrer' => fake()->optional()->url(),
-                    'search_query' => fake()->optional()->words(2, true),
-                ],
-                'referrer' => fake()->optional()->url(),
-                'user_agent' => fake()->userAgent(),
-                'ip_address' => fake()->ipv4(),
-                'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            ]);
-        }
+                    'user_agent' => fake()->userAgent(),
+                    'ip_address' => fake()->ipv4(),
+                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ];
+            })
+            ->create();
     }
 
     private function createProductSimilarities($products): void
     {
         $algorithmTypes = ['content_based', 'collaborative', 'hybrid'];
 
-        for ($i = 0; $i < 100; $i++) {
-            $product1 = $products->random();
-            $product2 = $products->where('id', '!=', $product1->id)->random();
-
-            ProductSimilarity::create([
-                'product_id' => $product1->id,
-                'similar_product_id' => $product2->id,
-                'algorithm_type' => fake()->randomElement($algorithmTypes),
-                'similarity_score' => fake()->randomFloat(6, 0.1, 1.0),
-                'calculation_data' => [
-                    'features_matched' => fake()->numberBetween(1, 10),
-                    'weighted_score' => fake()->randomFloat(6, 0.1, 1.0),
-                    'confidence' => fake()->randomFloat(2, 0.5, 1.0),
-                ],
-                'calculated_at' => fake()->dateTimeBetween('-7 days', 'now'),
-            ]);
-        }
+        ProductSimilarity::factory()
+            ->count(100)
+            ->state(function () use ($products, $algorithmTypes) {
+                $product1 = $products->random();
+                $product2 = $products->where('id', '!=', $product1->id)->random();
+                
+                return [
+                    'product_id' => $product1->id,
+                    'similar_product_id' => $product2->id,
+                    'algorithm_type' => fake()->randomElement($algorithmTypes),
+                    'similarity_score' => fake()->randomFloat(6, 0.1, 1.0),
+                    'calculation_data' => [
+                        'features_matched' => fake()->numberBetween(1, 10),
+                        'weighted_score' => fake()->randomFloat(6, 0.1, 1.0),
+                        'confidence' => fake()->randomFloat(2, 0.5, 1.0),
+                    ],
+                    'calculated_at' => fake()->dateTimeBetween('-7 days', 'now'),
+                ];
+            })
+            ->create();
     }
 
     private function createUserPreferences($users, $categories): void
@@ -418,17 +436,19 @@ class RecommendationSystemSeeder extends Seeder
 
         foreach ($users as $user) {
             foreach ($preferenceTypes as $type) {
-                UserPreference::create([
-                    'user_id' => $user->id,
-                    'preference_type' => $type,
-                    'preference_key' => fake()->randomElement(['category_'.fake()->numberBetween(1, 5), 'brand_'.fake()->word(), 'price_'.fake()->randomElement(['low', 'medium', 'high'])]),
-                    'preference_score' => fake()->randomFloat(6, 0.1, 1.0),
-                    'metadata' => [
-                        'source' => fake()->randomElement(['explicit', 'implicit', 'inferred']),
-                        'confidence' => fake()->randomFloat(2, 0.5, 1.0),
-                    ],
-                    'last_updated' => fake()->dateTimeBetween('-30 days', 'now'),
-                ]);
+                UserPreference::factory()
+                    ->for($user)
+                    ->state([
+                        'preference_type' => $type,
+                        'preference_key' => fake()->randomElement(['category_'.fake()->numberBetween(1, 5), 'brand_'.fake()->word(), 'price_'.fake()->randomElement(['low', 'medium', 'high'])]),
+                        'preference_score' => fake()->randomFloat(6, 0.1, 1.0),
+                        'metadata' => [
+                            'source' => fake()->randomElement(['explicit', 'implicit', 'inferred']),
+                            'confidence' => fake()->randomFloat(2, 0.5, 1.0),
+                        ],
+                        'last_updated' => fake()->dateTimeBetween('-30 days', 'now'),
+                    ])
+                    ->create();
             }
         }
     }
@@ -439,13 +459,15 @@ class RecommendationSystemSeeder extends Seeder
 
         foreach ($products as $product) {
             foreach ($featureTypes as $type) {
-                ProductFeature::create([
-                    'product_id' => $product->id,
-                    'feature_type' => $type,
-                    'feature_key' => fake()->word(),
-                    'feature_value' => fake()->randomFloat(6, 0, 1),
-                    'weight' => fake()->randomFloat(4, 0.5, 1.0),
-                ]);
+                ProductFeature::factory()
+                    ->for($product)
+                    ->state([
+                        'feature_type' => $type,
+                        'feature_key' => fake()->word(),
+                        'feature_value' => fake()->randomFloat(6, 0, 1),
+                        'weight' => fake()->randomFloat(4, 0.5, 1.0),
+                    ])
+                    ->create();
             }
         }
     }
@@ -454,24 +476,23 @@ class RecommendationSystemSeeder extends Seeder
     {
         $interactionTypes = ['view', 'cart', 'purchase', 'wishlist', 'review'];
 
-        for ($i = 0; $i < 300; $i++) {
-            $user = $users->random();
-            $product = $products->random();
-            $interactionType = fake()->randomElement($interactionTypes);
-
-            UserProductInteraction::updateOrCreate(
-                [
+        UserProductInteraction::factory()
+            ->count(300)
+            ->state(function () use ($users, $products, $interactionTypes) {
+                $user = $users->random();
+                $product = $products->random();
+                $interactionType = fake()->randomElement($interactionTypes);
+                
+                return [
                     'user_id' => $user->id,
                     'product_id' => $product->id,
                     'interaction_type' => $interactionType,
-                ],
-                [
                     'rating' => $interactionType === 'review' ? fake()->randomFloat(2, 1, 5) : null,
                     'count' => fake()->numberBetween(1, 10),
                     'first_interaction' => fake()->dateTimeBetween('-30 days', 'now'),
                     'last_interaction' => fake()->dateTimeBetween('-7 days', 'now'),
-                ]
-            );
-        }
+                ];
+            })
+            ->create();
     }
 }

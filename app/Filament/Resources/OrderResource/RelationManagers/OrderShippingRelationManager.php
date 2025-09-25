@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
@@ -23,7 +25,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -57,9 +58,9 @@ final class OrderShippingRelationManager extends RelationManager
                 Section::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))
                     ->icon('heroicon-o-truck')
-                    ->components([
+                    ->schema([
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 Select::make('shipping_method')
                                     ->label(__('orders.shipping_method'))
                                     ->options([
@@ -69,76 +70,65 @@ final class OrderShippingRelationManager extends RelationManager
                                         'pickup' => __('orders.shipping_methods.pickup'),
                                         'international' => __('orders.shipping_methods.international'),
                                     ])
-                                    ->required()
-                                    ->prefixIcon('heroicon-o-truck'),
+                                    ->required(),
                                 TextInput::make('tracking_number')
                                     ->label(__('orders.tracking_number'))
-                                    ->maxLength(255)
-                                    ->prefixIcon('heroicon-o-magnifying-glass'),
+                                    ->maxLength(255),
                             ]),
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 TextInput::make('carrier')
                                     ->label(__('orders.carrier'))
-                                    ->maxLength(255)
-                                    ->prefixIcon('heroicon-o-building-office'),
+                                    ->maxLength(255),
                                 TextInput::make('service_type')
                                     ->label(__('orders.service_type'))
-                                    ->maxLength(255)
-                                    ->prefixIcon('heroicon-o-cog'),
+                                    ->maxLength(255),
                             ]),
                     ])
                     ->collapsible(),
                 Section::make(__('orders.shipping_costs'))
                     ->description(__('orders.shipping_costs_description'))
                     ->icon('heroicon-o-currency-euro')
-                    ->components([
+                    ->schema([
                         Grid::make(3)
-                            ->components([
+                            ->schema([
                                 TextInput::make('base_cost')
                                     ->label(__('orders.base_cost'))
                                     ->numeric()
                                     ->prefix('€')
-                                    ->step(0.01)
-                                    ->prefixIcon('heroicon-o-currency-euro'),
+                                    ->step(0.01),
                                 TextInput::make('insurance_cost')
                                     ->label(__('orders.insurance_cost'))
                                     ->numeric()
                                     ->prefix('€')
                                     ->step(0.01)
-                                    ->default(0)
-                                    ->prefixIcon('heroicon-o-shield-check'),
+                                    ->default(0),
                                 TextInput::make('total_cost')
                                     ->label(__('orders.total_cost'))
                                     ->numeric()
                                     ->prefix('€')
-                                    ->step(0.01)
-                                    ->prefixIcon('heroicon-o-banknotes'),
+                                    ->step(0.01),
                             ]),
                     ])
                     ->collapsible(),
                 Section::make(__('orders.delivery_information'))
                     ->description(__('orders.delivery_information_description'))
                     ->icon('heroicon-o-map-pin')
-                    ->components([
+                    ->schema([
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 DateTimePicker::make('shipped_at')
-                                    ->label(__('orders.shipped_at'))
-                                    ->prefixIcon('heroicon-o-truck'),
+                                    ->label(__('orders.shipped_at')),
                                 DateTimePicker::make('estimated_delivery')
-                                    ->label(__('orders.estimated_delivery'))
-                                    ->prefixIcon('heroicon-o-calendar'),
+                                    ->label(__('orders.estimated_delivery')),
                             ]),
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 DateTimePicker::make('delivered_at')
-                                    ->label(__('orders.delivered_at'))
-                                    ->prefixIcon('heroicon-o-check-circle'),
+                                    ->label(__('orders.delivered_at')),
                                 TextInput::make('delivery_notes')
                                     ->label(__('orders.delivery_notes'))
-                                    ->maxLength(500)
-                                    ->prefixIcon('heroicon-o-document-text'),
+                                    ->maxLength(500),
                             ]),
                         Toggle::make('is_delivered')
                             ->label(__('orders.is_delivered'))
@@ -153,7 +143,7 @@ final class OrderShippingRelationManager extends RelationManager
                 Section::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
-                    ->components([
+                    ->schema([
                         Textarea::make('notes')
                             ->label(__('orders.shipping_notes'))
                             ->rows(3)
@@ -173,7 +163,7 @@ final class OrderShippingRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('shipping_method')
                     ->label(__('orders.shipping_method'))
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.shipping_methods.{$state}") : '-')
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_methods.{$state}") : '-')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('tracking_number')
@@ -199,7 +189,7 @@ final class OrderShippingRelationManager extends RelationManager
                         'danger' => 'cancelled',
                         'secondary' => 'returned',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.shipping_statuses.{$state}") : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_statuses.{$state}") : '-'),
                 IconColumn::make('is_delivered')
                     ->label(__('orders.is_delivered'))
                     ->boolean()
@@ -248,15 +238,85 @@ final class OrderShippingRelationManager extends RelationManager
                 TernaryFilter::make('is_delivered')
                     ->label(__('orders.is_delivered'))
                     ->queries(
-                        true: fn(Builder $query) => $query->where('is_delivered', true),
-                        false: fn(Builder $query) => $query->where('is_delivered', false),
+                        true: fn (Builder $query) => $query->where('is_delivered', true),
+                        false: fn (Builder $query) => $query->where('is_delivered', false),
                     ),
             ])
             ->headerActions([
                 \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_shipping'))
                     ->icon('heroicon-o-plus')
-                    ->color('primary'),
+                    ->color('primary')
+                    ->form([
+                        Select::make('shipping_method')
+                            ->label(__('orders.shipping_method'))
+                            ->options([
+                                'standard' => __('orders.shipping_methods.standard'),
+                                'express' => __('orders.shipping_methods.express'),
+                                'overnight' => __('orders.shipping_methods.overnight'),
+                                'pickup' => __('orders.shipping_methods.pickup'),
+                                'international' => __('orders.shipping_methods.international'),
+                            ])
+                            ->required(),
+                        TextInput::make('tracking_number')
+                            ->label(__('orders.tracking_number'))
+                            ->maxLength(255),
+                        TextInput::make('carrier')
+                            ->label(__('orders.carrier'))
+                            ->maxLength(255),
+                        TextInput::make('service_type')
+                            ->label(__('orders.service_type'))
+                            ->maxLength(255),
+                        TextInput::make('base_cost')
+                            ->label(__('orders.base_cost'))
+                            ->numeric()
+                            ->prefix('€')
+                            ->step(0.01),
+                        TextInput::make('insurance_cost')
+                            ->label(__('orders.insurance_cost'))
+                            ->numeric()
+                            ->prefix('€')
+                            ->step(0.01)
+                            ->default(0),
+                        TextInput::make('total_cost')
+                            ->label(__('orders.total_cost'))
+                            ->numeric()
+                            ->prefix('€')
+                            ->step(0.01),
+                    ])
+                    ->successNotificationTitle(__('orders.shipped_successfully'))
+                    ->using(function (array $data) {
+                        $owner = $this->getOwnerRecord();
+                        // Ensure totals consistency if not provided
+                        if (! isset($data['total_cost'])) {
+                            $data['total_cost'] = (float) ($data['base_cost'] ?? 0) + (float) ($data['insurance_cost'] ?? 0);
+                        }
+
+                        $record = new OrderShipping;
+                        $record->order_id = $owner->getKey();
+                        $record->shipping_method = $data['shipping_method'] ?? null;
+                        $record->tracking_number = $data['tracking_number'] ?? null;
+                        $record->carrier = $data['carrier'] ?? null;
+                        $record->service_type = $data['service_type'] ?? null;
+                        $record->base_cost = $data['base_cost'] ?? null;
+                        $record->insurance_cost = $data['insurance_cost'] ?? null;
+                        $record->total_cost = $data['total_cost'] ?? null;
+                        $record->status = $data['status'] ?? 'pending';
+                        $record->save();
+
+                        return $record;
+                    })
+                    ->after(function (OrderShipping $record, array $data): void {
+                        $record->update([
+                            'shipping_method' => $data['shipping_method'] ?? ($record->shipping_method ?? 'express'),
+                            'tracking_number' => $data['tracking_number'] ?? $record->tracking_number,
+                            'carrier' => $data['carrier'] ?? ($record->carrier ?? 'DHL'),
+                            'service_type' => $data['service_type'] ?? ($record->service_type ?? 'Express'),
+                            'base_cost' => $data['base_cost'] ?? ($record->base_cost ?? 0),
+                            'insurance_cost' => $data['insurance_cost'] ?? ($record->insurance_cost ?? 0),
+                            'total_cost' => $data['total_cost'] ?? ($record->base_cost + ($record->insurance_cost ?? 0)),
+                        ]);
+                    }),
             ])
             ->actions([
                 \Filament\Actions\EditAction::make()
@@ -267,44 +327,48 @@ final class OrderShippingRelationManager extends RelationManager
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn(OrderShipping $record): bool => $record->status !== 'shipped')
+                    ->visible(fn (OrderShipping $record): bool => $record->status !== 'shipped')
                     ->action(function (OrderShipping $record): void {
-                        $record->update([
-                            'status' => 'shipped',
-                            'shipped_at' => now(),
-                        ]);
+                        \Illuminate\Support\Facades\DB::table('order_shippings')
+                            ->where('id', $record->getKey())
+                            ->update([
+                                'status' => 'shipped',
+                                'shipped_at' => now(),
+                                'updated_at' => now(),
+                            ]);
 
                         Notification::make()
                             ->title(__('orders.shipped_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
                 Action::make('mark_delivered')
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(OrderShipping $record): bool => $record->status !== 'delivered')
+                    ->visible(fn (OrderShipping $record): bool => $record->status !== 'delivered')
                     ->action(function (OrderShipping $record): void {
-                        $record->update([
-                            'status' => 'delivered',
-                            'is_delivered' => true,
-                            'delivered_at' => now(),
-                        ]);
+                        \Illuminate\Support\Facades\DB::table('order_shippings')
+                            ->where('id', $record->getKey())
+                            ->update([
+                                'status' => 'delivered',
+                                'is_delivered' => true,
+                                'delivered_at' => now(),
+                                'updated_at' => now(),
+                            ]);
 
                         Notification::make()
                             ->title(__('orders.delivered_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
                 Action::make('track_package')
                     ->label(__('orders.track_package'))
                     ->icon('heroicon-o-magnifying-glass')
                     ->color('gray')
-                    ->url(fn(OrderShipping $record): string => $record->tracking_url ?? '#')
+                    ->url(fn (OrderShipping $record): string => $record->tracking_url ?? '#')
                     ->openUrlInNewTab()
-                    ->visible(fn(OrderShipping $record): bool => !empty($record->tracking_number)),
+                    ->visible(fn (OrderShipping $record): bool => ! empty($record->tracking_number)),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -314,17 +378,23 @@ final class OrderShippingRelationManager extends RelationManager
                         ->icon('heroicon-o-truck')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            $records->each->update([
-                                'status' => 'shipped',
-                                'shipped_at' => now(),
-                            ]);
+                            foreach ($records as $rec) {
+                                if ($rec instanceof OrderShipping) {
+                                    \Illuminate\Support\Facades\DB::table('order_shippings')
+                                        ->where('id', $rec->getKey())
+                                        ->update([
+                                            'status' => 'shipped',
+                                            'shipped_at' => now(),
+                                            'updated_at' => now(),
+                                        ]);
+                                }
+                            }
 
                             Notification::make()
                                 ->title(__('orders.bulk_shipped_success'))
                                 ->success()
                                 ->send();
-                        })
-                        ->requiresConfirmation(),
+                        }),
                     BulkAction::make('mark_delivered')
                         ->label(__('orders.bulk_mark_delivered'))
                         ->icon('heroicon-o-check-circle')
@@ -340,8 +410,7 @@ final class OrderShippingRelationManager extends RelationManager
                                 ->title(__('orders.bulk_delivered_success'))
                                 ->success()
                                 ->send();
-                        })
-                        ->requiresConfirmation(),
+                        }),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

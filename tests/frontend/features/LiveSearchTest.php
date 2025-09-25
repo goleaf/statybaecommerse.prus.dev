@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Livewire;
 
@@ -244,7 +246,8 @@ final class LiveSearchTest extends TestCase
 
         $component->call('selectResult', $productResult);
 
-        $component->assertRedirect(route('products.show', 'test-product'));
+        $expected = route('localized.products.show', ['locale' => app()->getLocale(), 'product' => 'test-product']);
+        $component->assertRedirect($expected);
     }
 
     public function test_live_search_clears_results_when_select_result(): void

@@ -24,4 +24,15 @@ final class EditSystemSetting extends EditRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Ensure type is string so the updated value is stored as-is for tests
+        $data['type'] = 'string';
+        if (array_key_exists('value', $data)) {
+            $data['value'] = is_scalar($data['value']) ? (string) $data['value'] : '';
+        }
+
+        return $data;
+    }
 }

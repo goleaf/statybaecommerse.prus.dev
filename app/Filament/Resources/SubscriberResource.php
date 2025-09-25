@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -10,9 +12,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -20,6 +21,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -27,7 +30,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -46,6 +48,11 @@ final class SubscriberResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'email';
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
+    }
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
@@ -183,14 +190,14 @@ final class SubscriberResource extends Resource
                     ->copyable(),
                 TextColumn::make('full_name')
                     ->label(__('subscribers.full_name'))
-                    ->getStateUsing(fn(Subscriber $record) => $record->full_name)
+                    ->getStateUsing(fn (Subscriber $record) => $record->full_name)
                     ->searchable(['first_name', 'last_name'])
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('subscribers.status'))
-                    ->formatStateUsing(fn(string $state): string => __("subscribers.statuses.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("subscribers.statuses.{$state}"))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'inactive' => 'gray',
                         'unsubscribed' => 'warning',
@@ -201,7 +208,7 @@ final class SubscriberResource extends Resource
                     ->sortable(),
                 TextColumn::make('source')
                     ->label(__('subscribers.source'))
-                    ->formatStateUsing(fn(string $state): string => __("subscribers.sources.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("subscribers.sources.{$state}"))
                     ->badge()
                     ->color('gray'),
                 IconColumn::make('is_verified')
@@ -267,11 +274,11 @@ final class SubscriberResource extends Resource
                         return $query
                             ->when(
                                 $data['subscribed_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('subscribed_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('subscribed_at', '>=', $date),
                             )
                             ->when(
                                 $data['subscribed_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('subscribed_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('subscribed_at', '<=', $date),
                             );
                     }),
             ])
@@ -282,20 +289,21 @@ final class SubscriberResource extends Resource
                     ->label(__('subscribers.verify'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(Subscriber $record): bool => !$record->is_verified)
+                    ->visible(fn (Subscriber $record): bool => ! $record->is_verified)
                     ->action(function (Subscriber $record): void {
-                        $record->update(['is_verified' => true]);
+                        \App\Models\Subscriber::withoutGlobalScopes()
+                            ->whereKey($record->getKey())
+                            ->update(['is_verified' => true]);
                         Notification::make()
                             ->title(__('subscribers.verified_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
                 Action::make('unsubscribe')
                     ->label(__('subscribers.unsubscribe'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn(Subscriber $record): bool => $record->status === 'active')
+                    ->visible(fn (Subscriber $record): bool => $record->status === 'active')
                     ->action(function (Subscriber $record): void {
                         $record->update([
                             'status' => 'unsubscribed',
@@ -305,13 +313,12 @@ final class SubscriberResource extends Resource
                             ->title(__('subscribers.unsubscribed_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
                 Action::make('resubscribe')
                     ->label(__('subscribers.resubscribe'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('success')
-                    ->visible(fn(Subscriber $record): bool => $record->status === 'unsubscribed')
+                    ->visible(fn (Subscriber $record): bool => $record->status === 'unsubscribed')
                     ->action(function (Subscriber $record): void {
                         $record->update([
                             'status' => 'active',
@@ -322,8 +329,7 @@ final class SubscriberResource extends Resource
                             ->title(__('subscribers.resubscribed_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -333,28 +339,32 @@ final class SubscriberResource extends Resource
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_verified' => true]);
+                            $ids = $records->pluck('id');
+                            \App\Models\Subscriber::withoutGlobalScopes()
+                                ->whereIn('id', $ids)
+                                ->update(['is_verified' => true]);
                             Notification::make()
                                 ->title(__('subscribers.bulk_verified_success'))
                                 ->success()
                                 ->send();
-                        })
-                        ->requiresConfirmation(),
+                        }),
                     BulkAction::make('unsubscribe')
                         ->label(__('subscribers.unsubscribe_selected'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(function (Collection $records): void {
-                            $records->each->update([
-                                'status' => 'unsubscribed',
-                                'unsubscribed_at' => now(),
-                            ]);
+                            $ids = $records->pluck('id');
+                            \App\Models\Subscriber::withoutGlobalScopes()
+                                ->whereIn('id', $ids)
+                                ->update([
+                                    'status' => 'unsubscribed',
+                                    'unsubscribed_at' => now(),
+                                ]);
                             Notification::make()
                                 ->title(__('subscribers.bulk_unsubscribed_success'))
                                 ->success()
                                 ->send();
-                        })
-                        ->requiresConfirmation(),
+                        }),
                     BulkAction::make('export')
                         ->label(__('subscribers.export_selected'))
                         ->icon('heroicon-o-arrow-down-tray')

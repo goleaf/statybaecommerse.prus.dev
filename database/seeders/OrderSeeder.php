@@ -16,15 +16,13 @@ class OrderSeeder extends Seeder
             $user = \App\Models\User::query()->first() ?? \App\Models\User::factory()->create();
 
             $currency = \App\Models\Currency::query()->where('code', 'EUR')->first()
-                ?: \App\Models\Currency::query()->where('is_default', true)->first();
+                ?: \App\Models\Currency::factory()->create(['code' => 'EUR', 'is_default' => true]);
 
             $zone = \App\Models\Zone::query()->where('currency_id', $currency->id)->first()
-                ?: \App\Models\Zone::query()->first();
-            $channelId = \App\Models\Channel::query()->value('id');
-
-            if (! $currency || ! $zone || ! $channelId) {
-                return;
-            }
+                ?: \App\Models\Zone::factory()->create(['currency_id' => $currency->id]);
+            
+            $channelId = \App\Models\Channel::query()->value('id')
+                ?: \App\Models\Channel::factory()->create()->id;
 
             $visibleProducts = \App\Models\Product::query()
                 ->where('is_visible', true)
@@ -34,7 +32,9 @@ class OrderSeeder extends Seeder
                 ->get();
 
             if ($visibleProducts->isEmpty()) {
-                return;
+                $visibleProducts = \App\Models\Product::factory()
+                    ->count(10)
+                    ->create(['is_visible' => true, 'published_at' => now()]);
             }
 
             // Create a mix of paid orders across current and previous month
@@ -49,8 +49,8 @@ class OrderSeeder extends Seeder
 
             foreach ($ordersToCreate as $config) {
                 for ($i = 0; $i < $config['count']; $i++) {
-                    /** @var \App\Models\Order $order */
-                    $order = \App\Models\Order::query()->create([
+                    // Create order using factory
+                    $order = \App\Models\Order::factory()->create([
                         'number' => 'WEB-'.Str::upper(Str::random(8)),
                         'currency' => $currency->code,
                         'channel_id' => $channelId,
@@ -63,15 +63,18 @@ class OrderSeeder extends Seeder
                         'updated_at' => now(),
                     ]);
 
-                    // 1-4 items per order
+                    // Create order items using factory
                     $items = $visibleProducts->random(min(random_int(1, 4), $visibleProducts->count()));
                     $subtotal = 0.0;
+                    
                     foreach ($items as $p) {
                         $unit = (float) (optional($p->prices()->whereHas('currency', fn ($q) => $q->where('code', $currency->code))->first())->amount ?? (random_int(1000, 5000) / 100));
                         $qty = random_int(1, 3);
                         $lineTotal = $unit * $qty;
                         $subtotal += $lineTotal;
-                        $order->items()->create([
+                        
+                        \App\Models\OrderItem::factory()->create([
+                            'order_id' => $order->id,
                             'product_id' => $p->id,
                             'name' => $p->name,
                             'sku' => $p->sku ?? 'SKU-'.Str::upper(Str::random(6)),
@@ -94,7 +97,9 @@ class OrderSeeder extends Seeder
                         'total' => $total,
                     ]);
 
-                    $order->shipping()->create([
+                    // Create shipping using factory
+                    \App\Models\OrderShipping::factory()->create([
+                        'order_id' => $order->id,
                         'carrier_name' => 'standard',
                         'service' => 'ground',
                         'cost' => $shippingCost,

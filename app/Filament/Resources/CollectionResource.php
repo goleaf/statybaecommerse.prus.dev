@@ -13,6 +13,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -24,7 +25,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -218,7 +218,7 @@ final class CollectionResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (Collection $record): string => $record->is_active ? __('collections.deactivate') : __('collections.activate'))
@@ -236,7 +236,7 @@ final class CollectionResource extends Resource
                     ->label(__('collections.update_products'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('info')
-                    ->visible(fn (Collection $record): bool => $record->auto_update)
+                    ->visible(fn (Collection $record): bool => (bool) $record->auto_update)
                     ->action(function (Collection $record): void {
                         // Auto-update products based on collection settings
                         Notification::make()

@@ -9,6 +9,7 @@ use App\Models\DocumentTemplate;
 use App\Models\User;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 final class DocumentActionTest extends TestCase
 {

@@ -18,4 +18,10 @@ final class ViewReferralReward extends ViewRecord
             Actions\EditAction::make(),
         ];
     }
+
+    public function mount(int|string $record): void
+    {
+        parent::mount($record);
+        $this->record = $this->record->loadMissing(['user', 'referral', 'order']);
+    }
 }

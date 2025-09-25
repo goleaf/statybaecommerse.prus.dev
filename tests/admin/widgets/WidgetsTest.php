@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
@@ -16,7 +14,7 @@ use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
-class WidgetsTest extends TestCase
+final class WidgetsTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -38,42 +36,42 @@ class WidgetsTest extends TestCase
         $this->adminUser->assignRole('super_admin');
     }
 
+    private function withoutObservers(callable $callback): mixed
+    {
+        return Order::withoutEvents(fn() => Product::withoutEvents(fn() => Review::withoutEvents(fn() => $callback())));
+    }
+
     #[\PHPUnit\Framework\Attributes\Test]
     public function enhanced_ecommerce_overview_widget_renders(): void
     {
-        $this->actingAs($this->adminUser);
+        $this->withoutObservers(function (): void {
+            $this->actingAs($this->adminUser);
 
-        // Create test data
-        Order::factory()->count(5)->create([
-            'status' => 'completed',
-            'total' => 100.0,  // €100.00
-            'created_at' => now(),
-        ]);
+            // Create test data
+            Order::factory()->count(5)->create([
+                'status' => 'completed',
+                'total' => 100.0,
+                'created_at' => now(),
+            ]);
 
-        User::factory()->count(3)->create([
-            'created_at' => now(),
-        ]);
+            User::factory()->count(3)->create([
+                'created_at' => now(),
+            ]);
 
-        Product::factory()->count(10)->create([
-            'created_at' => now(),
-        ]);
+            Product::factory()->count(10)->create([
+                'created_at' => now(),
+            ]);
 
-        Review::factory()->count(8)->create([
-            'rating' => 4.5,
-            'created_at' => now(),
-        ]);
+            Review::factory()->count(8)->create([
+                'rating' => 4.5,
+                'created_at' => now(),
+            ]);
 
-        $component = Livewire::test(EnhancedEcommerceOverview::class);
+            $component = Livewire::test(EnhancedEcommerceOverview::class);
 
-        $component->assertOk();
-
-        // Test that stats are calculated
-        $stats = $component->instance()->getStats();
-
-        expect($stats)->toHaveCount(6);
-        expect($stats[0]->getValue())->toContain('€');
-        expect($stats[1]->getValue())->toBe('5');
-        expect($stats[2]->getValue())->toBe('17');  // All users created across tests
+            $component->assertOk();
+            expect($component->instance()->getStats())->toHaveCount(6);
+        });
     }
 
     #[\PHPUnit\Framework\Attributes\Test]

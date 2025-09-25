@@ -218,7 +218,7 @@ final class CouponResource extends Resource
                             return __('coupons.free_shipping');
                         }
 
-                        return '€'.number_format($state, 2);
+                        return '€'.number_format((float) $state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -297,10 +297,17 @@ final class CouponResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                \Filament\Actions\DeleteAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn (Coupon $record): string => $record->is_active ? __('coupons.deactivate') : __('coupons.activate'))
-                    ->icon(fn (Coupon $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Coupon $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(function ($record): string {
+                        return $record && $record->is_active ? __('coupons.deactivate') : __('coupons.activate');
+                    })
+                    ->icon(function ($record): string {
+                        return $record && $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye';
+                    })
+                    ->color(function ($record): string {
+                        return $record && $record->is_active ? 'warning' : 'success';
+                    })
                     ->action(function (Coupon $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
 

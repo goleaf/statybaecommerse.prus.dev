@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Brand;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
@@ -45,7 +46,7 @@ class BrandFactory extends Factory
             'Tremco Baltic',
         ];
 
-        $name = $this->faker->randomElement($lithuanianBrands);
+        $name = Arr::random($lithuanianBrands);
 
         return [
             'name' => $name,
@@ -68,7 +69,7 @@ class BrandFactory extends Factory
             "Pilna {$brandName} įrankių ir įrangos gama namų statybai ir remontui.",
         ];
 
-        return $this->faker->randomElement($descriptions);
+        return Arr::random($descriptions);
     }
 
     public function configure(): static

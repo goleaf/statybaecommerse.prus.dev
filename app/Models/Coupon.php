@@ -31,11 +31,12 @@ final class Coupon extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_amount', 'maximum_discount', 'usage_limit', 'usage_limit_per_user', 'used_count', 'is_active', 'starts_at', 'expires_at', 'applicable_products', 'applicable_categories'];
+    protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_amount', 'maximum_discount', 'usage_limit', 'usage_limit_per_user', 'used_count', 'is_active', 'is_public', 'is_auto_apply', 'is_stackable', 'starts_at', 'expires_at', 'applicable_products', 'applicable_categories'];
 
-    protected $casts = ['value' => 'decimal:2', 'minimum_amount' => 'decimal:2', 'maximum_discount' => 'decimal:2', 'usage_limit' => 'integer', 'usage_limit_per_user' => 'integer', 'used_count' => 'integer', 'is_active' => 'boolean', 'starts_at' => 'datetime', 'expires_at' => 'datetime', 'applicable_products' => 'array', 'applicable_categories' => 'array'];
+    protected $casts = ['value' => 'decimal:2', 'minimum_amount' => 'decimal:2', 'maximum_discount' => 'decimal:2', 'usage_limit' => 'integer', 'usage_limit_per_user' => 'integer', 'used_count' => 'integer', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_auto_apply' => 'boolean', 'is_stackable' => 'boolean', 'starts_at' => 'datetime', 'expires_at' => 'datetime', 'applicable_products' => 'array', 'applicable_categories' => 'array'];
 
     // Relationships
+
     /**
      * Handle products functionality with proper error handling.
      */
@@ -50,6 +51,11 @@ final class Coupon extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'coupon_categories');
+    }
+
+    public function customerGroup()
+    {
+        return $this->belongsTo(CustomerGroup::class);
     }
 
     /**
@@ -69,6 +75,7 @@ final class Coupon extends Model
     }
 
     // Scopes
+
     /**
      * Handle scopeActive functionality with proper error handling.
      *

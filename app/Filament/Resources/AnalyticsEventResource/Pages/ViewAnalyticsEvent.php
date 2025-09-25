@@ -12,6 +12,11 @@ final class ViewAnalyticsEvent extends ViewRecord
 {
     protected static string $resource = AnalyticsEventResource::class;
 
+    public function getTitle(): string
+    {
+        return (string) ($this->record->event_name ?? parent::getTitle());
+    }
+
     protected function getHeaderActions(): array
     {
         return [

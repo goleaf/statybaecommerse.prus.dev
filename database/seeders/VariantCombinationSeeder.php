@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Attribute;
+use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\VariantCombination;
 use Illuminate\Database\Seeder;
@@ -21,51 +23,51 @@ class VariantCombinationSeeder extends Seeder
         if ($products->isEmpty()) {
             $this->command->warn('No products with attributes found. Creating sample products first...');
 
-            // Create sample products with attributes
+            // Create sample products with attributes using factories
             $products = collect();
             for ($i = 1; $i <= 3; $i++) {
                 $product = Product::factory()->create([
                     'name' => "Sample Product {$i}",
-                    'is_enabled' => true,
+                    'is_visible' => true,
                 ]);
 
-                // Create sample attributes for the product
-                $product->attributes()->createMany([
-                    [
-                        'name' => 'color',
-                        'display_name' => 'Color',
-                        'type' => 'select',
-                        'is_required' => true,
-                        'sort_order' => 1,
-                    ],
-                    [
-                        'name' => 'size',
-                        'display_name' => 'Size',
-                        'type' => 'select',
-                        'is_required' => true,
-                        'sort_order' => 2,
-                    ],
+                // Create sample attributes using factories
+                $colorAttribute = Attribute::factory()->create([
+                    'name' => 'color',
+                    'slug' => 'color',
+                    'type' => 'select',
+                    'is_required' => true,
+                    'sort_order' => 1,
                 ]);
 
-                // Create attribute values
-                $colorAttribute = $product->attributes()->where('name', 'color')->first();
-                $sizeAttribute = $product->attributes()->where('name', 'size')->first();
+                $sizeAttribute = Attribute::factory()->create([
+                    'name' => 'size',
+                    'slug' => 'size',
+                    'type' => 'select',
+                    'is_required' => true,
+                    'sort_order' => 2,
+                ]);
 
-                if ($colorAttribute) {
-                    $colorAttribute->values()->createMany([
-                        ['value' => 'red', 'display_name' => 'Red'],
-                        ['value' => 'blue', 'display_name' => 'Blue'],
-                        ['value' => 'green', 'display_name' => 'Green'],
-                    ]);
-                }
+                // Create attribute values using factories
+                $colorValues = AttributeValue::factory()->count(3)->create([
+                    'attribute_id' => $colorAttribute->id,
+                ])->each(function ($value, $index) {
+                    $colors = ['red', 'blue', 'green'];
+                    $value->update(['value' => $colors[$index]]);
+                });
 
-                if ($sizeAttribute) {
-                    $sizeAttribute->values()->createMany([
-                        ['value' => 'small', 'display_name' => 'Small'],
-                        ['value' => 'medium', 'display_name' => 'Medium'],
-                        ['value' => 'large', 'display_name' => 'Large'],
-                    ]);
-                }
+                $sizeValues = AttributeValue::factory()->count(3)->create([
+                    'attribute_id' => $sizeAttribute->id,
+                ])->each(function ($value, $index) {
+                    $sizes = ['small', 'medium', 'large'];
+                    $value->update(['value' => $sizes[$index]]);
+                });
+
+                // Attach attributes to product
+                $product->attributes()->attach([
+                    $colorAttribute->id,
+                    $sizeAttribute->id,
+                ]);
 
                 $products->push($product);
             }
@@ -74,79 +76,27 @@ class VariantCombinationSeeder extends Seeder
         foreach ($products as $product) {
             $this->command->info("Creating variant combinations for product: {$product->name}");
 
-            // Create sample variant combinations
+            // Create variant combinations using factory
             $combinations = [
-                [
-                    'attribute_combinations' => [
-                        'color' => 'red',
-                        'size' => 'small',
-                    ],
-                    'is_available' => true,
-                ],
-                [
-                    'attribute_combinations' => [
-                        'color' => 'red',
-                        'size' => 'medium',
-                    ],
-                    'is_available' => true,
-                ],
-                [
-                    'attribute_combinations' => [
-                        'color' => 'red',
-                        'size' => 'large',
-                    ],
-                    'is_available' => true,
-                ],
-                [
-                    'attribute_combinations' => [
-                        'color' => 'blue',
-                        'size' => 'small',
-                    ],
-                    'is_available' => true,
-                ],
-                [
-                    'attribute_combinations' => [
-                        'color' => 'blue',
-                        'size' => 'medium',
-                    ],
-                    'is_available' => false, // Some unavailable
-                ],
-                [
-                    'attribute_combinations' => [
-                        'color' => 'blue',
-                        'size' => 'large',
-                    ],
-                    'is_available' => true,
-                ],
-                [
-                    'attribute_combinations' => [
-                        'color' => 'green',
-                        'size' => 'small',
-                    ],
-                    'is_available' => true,
-                ],
-                [
-                    'attribute_combinations' => [
-                        'color' => 'green',
-                        'size' => 'medium',
-                    ],
-                    'is_available' => true,
-                ],
-                [
-                    'attribute_combinations' => [
-                        'color' => 'green',
-                        'size' => 'large',
-                    ],
-                    'is_available' => false, // Some unavailable
-                ],
+                ['color' => 'red', 'size' => 'small'],
+                ['color' => 'red', 'size' => 'medium'],
+                ['color' => 'red', 'size' => 'large'],
+                ['color' => 'blue', 'size' => 'small'],
+                ['color' => 'blue', 'size' => 'medium'],
+                ['color' => 'blue', 'size' => 'large'],
+                ['color' => 'green', 'size' => 'small'],
+                ['color' => 'green', 'size' => 'medium'],
+                ['color' => 'green', 'size' => 'large'],
             ];
 
-            foreach ($combinations as $combinationData) {
-                VariantCombination::create([
-                    'product_id' => $product->id,
-                    'attribute_combinations' => $combinationData['attribute_combinations'],
-                    'is_available' => $combinationData['is_available'],
-                ]);
+            foreach ($combinations as $index => $combination) {
+                VariantCombination::factory()
+                    ->forProduct($product)
+                    ->withCombination($combination)
+                    ->state([
+                        'is_available' => $index % 3 !== 1, // Make some unavailable for variety
+                    ])
+                    ->create();
             }
 
             $this->command->info('Created '.count($combinations)." variant combinations for {$product->name}");

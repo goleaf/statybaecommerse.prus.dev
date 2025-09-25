@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class DiscountResourceTest extends TestCase
 {
@@ -37,7 +36,7 @@ class DiscountResourceTest extends TestCase
         $discountData = [
             'name' => 'Test Discount',
             'type' => 'percentage',
-            'value' => 10.00,
+            'value' => 10.0,
             'status' => 'active',
             'is_active' => true,
             'is_enabled' => true,
@@ -51,7 +50,7 @@ class DiscountResourceTest extends TestCase
         $this->assertDatabaseHas('discounts', [
             'name' => 'Test Discount',
             'type' => 'percentage',
-            'value' => 10.00,
+            'value' => 10.0,
         ]);
     }
 
@@ -64,7 +63,7 @@ class DiscountResourceTest extends TestCase
         ])
             ->fillForm([
                 'name' => 'Updated Discount Name',
-                'value' => 15.00,
+                'value' => 15.0,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -72,7 +71,7 @@ class DiscountResourceTest extends TestCase
         $this->assertDatabaseHas('discounts', [
             'id' => $discount->id,
             'name' => 'Updated Discount Name',
-            'value' => 15.00,
+            'value' => 15.0,
         ]);
     }
 
@@ -172,9 +171,9 @@ class DiscountResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\DiscountResource\Pages\CreateDiscount::class)
             ->fillForm([
-                'name' => '', // Required field
-                'type' => 'invalid_type', // Invalid type
-                'value' => -10, // Negative value
+                'name' => '',  // Required field
+                'type' => 'invalid_type',  // Invalid type
+                'value' => -10,  // Negative value
             ])
             ->call('create')
             ->assertHasFormErrors(['name', 'type', 'value']);
@@ -186,7 +185,7 @@ class DiscountResourceTest extends TestCase
             ->fillForm([
                 'name' => 'Test Discount Name',
                 'type' => 'percentage',
-                'value' => 10.00,
+                'value' => 10.0,
                 'status' => 'active',
             ])
             ->call('create')

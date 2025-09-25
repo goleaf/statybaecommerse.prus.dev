@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,11 +8,11 @@ use App\Models\Scopes\UserOwnedScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * ProductHistory
@@ -37,8 +39,8 @@ final class ProductHistory extends Model
 
     protected $casts = [
         'metadata' => 'array',
-        'old_value' => 'array',
-        'new_value' => 'array',
+        'old_value' => 'json',
+        'new_value' => 'json',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -47,12 +49,24 @@ final class ProductHistory extends Model
 
     protected string $translationModel = \App\Models\Translations\ProductHistoryTranslation::class;
 
+    protected static function booted(): void
+    {
+        self::creating(function (self $model): void {
+            if (empty($model->causer_type)) {
+                $model->causer_type = User::class;
+            }
+            if (empty($model->causer_id)) {
+                $model->causer_id = auth()->id();
+            }
+        });
+    }
+
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['action', 'field_name', 'description'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "ProductHistory {$eventName}")->useLogName('product_history');
+        return LogOptions::defaults()->logOnly(['action', 'field_name', 'description'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "ProductHistory {$eventName}")->useLogName('product_history');
     }
 
     // Relations
@@ -162,7 +176,7 @@ final class ProductHistory extends Model
             'deleted' => __('admin.product_history.actions.deleted'),
             'restored' => __('admin.product_history.actions.restored'),
             'price_changed' => __('admin.product_history.actions.price_changed'),
-            'stock_updated' => __('admin.product_history.actions.stock_updated'),
+            'stock_changed', 'stock_updated' => __('admin.product_history.actions.stock_updated'),
             'status_changed' => __('admin.product_history.actions.status_changed'),
             default => $this->action,
         };
@@ -173,7 +187,7 @@ final class ProductHistory extends Model
      */
     public function getFieldDisplayAttribute(): string
     {
-        return __('admin.product_history.fields.' . $this->field_name, [], $this->field_name);
+        return __('admin.product_history.fields.'.$this->field_name, [], $this->field_name);
     }
 
     /**
@@ -228,7 +242,7 @@ final class ProductHistory extends Model
      */
     public function getChangeImpact(): string
     {
-        if (!$this->isSignificantChange()) {
+        if (! $this->isSignificantChange()) {
             return 'low';
         }
         if (in_array($this->field_name, ['price', 'sale_price', 'stock_quantity'])) {

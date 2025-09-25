@@ -139,14 +139,16 @@ class LithuanianBuilderShopSeeder extends Seeder
 
         $categories = [];
         foreach ($mainCategories as $categoryData) {
-            $categories[] = Category::firstOrCreate(
-                ['slug' => $categoryData['slug']],
-                $categoryData + [
+            $existing = Category::where('slug', $categoryData['slug'])->first();
+            if ($existing) {
+                $categories[] = $existing;
+            } else {
+                $categories[] = Category::factory()->create($categoryData + [
                     'is_visible' => true,
                     'seo_title' => $categoryData['name'].' - Statybaecommerse.lt',
                     'seo_description' => $categoryData['description'].'. Geriausi sprendimai statybininkams.',
-                ]
-            );
+                ]);
+            }
         }
 
         return $categories;
@@ -189,19 +191,21 @@ class LithuanianBuilderShopSeeder extends Seeder
             $parent = collect($mainCategories)->first(fn ($cat) => $cat->name === $parentName);
             if ($parent) {
                 foreach ($subs as $index => $subName) {
-                    Category::firstOrCreate(
-                        ['slug' => Str::slug($subName)],
-                        [
+                    $slug = Str::slug($subName);
+                    $existing = Category::where('slug', $slug)->first();
+                    
+                    if (!$existing) {
+                        Category::factory()->create([
                             'name' => $subName,
-                            'slug' => Str::slug($subName),
+                            'slug' => $slug,
                             'description' => "Specializuoti {$subName} aukščiausios kokybės",
                             'parent_id' => $parent->id,
                             'sort_order' => $index + 1,
                             'is_visible' => true,
                             'seo_title' => $subName.' - '.$parentName,
                             'seo_description' => "Profesionalūs {$subName} statybos darbams. Platus pasirinkimas ir konkurencingos kainos.",
-                        ]
-                    );
+                        ]);
+                    }
                 }
             }
         }
@@ -249,13 +253,15 @@ class LithuanianBuilderShopSeeder extends Seeder
 
         $brands = [];
         foreach ($lithuanianBrands as $brandData) {
-            $brands[] = Brand::firstOrCreate(
-                ['slug' => $brandData['slug']],
-                $brandData + [
+            $existing = Brand::where('slug', $brandData['slug'])->first();
+            if ($existing) {
+                $brands[] = $existing;
+            } else {
+                $brands[] = Brand::factory()->create($brandData + [
                     'seo_title' => $brandData['name'].' - Oficialus atstovas Lietuvoje',
                     'seo_description' => $brandData['description'].'. Originalūs gaminiai su garantija.',
-                ]
-            );
+                ]);
+            }
         }
 
         return $brands;
@@ -266,49 +272,56 @@ class LithuanianBuilderShopSeeder extends Seeder
         $brandIds = collect($brands)->pluck('id')->toArray();
         $categoryIds = collect($categories)->pluck('id')->toArray();
 
-        // Create 50 products with Lithuanian builder focus
-        for ($i = 0; $i < 50; $i++) {
-            $product = Product::factory()->create([
-                'brand_id' => ! empty($brandIds) ? fake()->randomElement($brandIds) : null,
-            ]);
-
-            // Assign to 1-2 random categories
-            if (! empty($categoryIds)) {
-                $product->categories()->attach(
-                    fake()->randomElements($categoryIds, fake()->numberBetween(1, 2))
-                );
-            }
-        }
+        // Create 50 products with Lithuanian builder focus using factory relationships
+        Product::factory()
+            ->count(50)
+            ->sequence(fn ($sequence) => [
+                'brand_id' => !empty($brandIds) ? fake()->randomElement($brandIds) : null,
+            ])
+            ->create()
+            ->each(function (Product $product) use ($categoryIds) {
+                // Assign to 1-2 random categories using factory relationships
+                if (!empty($categoryIds)) {
+                    $product->categories()->attach(
+                        fake()->randomElements($categoryIds, fake()->numberBetween(1, 2))
+                    );
+                }
+            });
     }
 
     private function createSampleOrders(): void
     {
-        // Create some sample customers
+        // Create some sample customers using factories
         $customers = User::factory()->count(20)->create();
 
-        // Create orders for some customers
+        // Create orders for some customers using factory relationships
         $customers->take(10)->each(function (User $customer) {
             $orderCount = fake()->numberBetween(1, 5);
-            for ($i = 0; $i < $orderCount; $i++) {
-                $order = Order::factory()->create(['user_id' => $customer->id]);
+            
+            // Create orders using factory
+            Order::factory()
+                ->count($orderCount)
+                ->for($customer)
+                ->create()
+                ->each(function (Order $order) {
+                    // Add order items using factory
+                    $products = Product::inRandomOrder()->take(fake()->numberBetween(1, 5))->get();
+                    
+                    foreach ($products as $product) {
+                        $quantity = fake()->numberBetween(1, 3);
+                        $price = $product->sale_price ?? $product->price;
 
-                // Add order items
-                $products = Product::inRandomOrder()->take(fake()->numberBetween(1, 5))->get();
-                foreach ($products as $product) {
-                    $quantity = fake()->numberBetween(1, 3);
-                    $price = $product->sale_price ?? $product->price;
-
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $product->id,
-                        'name' => $product->name,
-                        'sku' => $product->sku,
-                        'quantity' => $quantity,
-                        'unit_price' => $price,
-                        'total' => $price * $quantity,
-                    ]);
-                }
-            }
+                        OrderItem::factory()->create([
+                            'order_id' => $order->id,
+                            'product_id' => $product->id,
+                            'name' => $product->name,
+                            'sku' => $product->sku,
+                            'quantity' => $quantity,
+                            'unit_price' => $price,
+                            'total' => $price * $quantity,
+                        ]);
+                    }
+                });
         });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Location;
 use App\Models\Partner;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
@@ -16,21 +17,27 @@ class VariantInventoryFactory extends Factory
 
     public function definition(): array
     {
+        $stock = $this->faker->numberBetween(15, 150);
+        $reserved = $this->faker->numberBetween(0, (int) floor($stock / 3));
+
         return [
             'variant_id' => ProductVariant::factory(),
-            'location_id' => 1,
+            'location_id' => Location::factory(),
             'warehouse_code' => $this->faker->regexify('[A-Z]{3}-[0-9]{3}'),
-            'stock' => $this->faker->numberBetween(0, 1000),
-            'reserved' => $this->faker->numberBetween(0, 100),
-            'available' => $this->faker->numberBetween(0, 900),
-            'reorder_point' => $this->faker->numberBetween(1, 20),
-            'reorder_quantity' => $this->faker->numberBetween(50, 200),
-            'max_stock_level' => $this->faker->numberBetween(500, 2000),
-            'cost_per_unit' => $this->faker->randomFloat(2, 1, 100),
+            'stock' => $stock,
+            'reserved' => $reserved,
+            'available' => max(0, $stock - $reserved),
+            'incoming' => $this->faker->numberBetween(0, 40),
+            'threshold' => $this->faker->numberBetween(5, 20),
+            'reorder_point' => $this->faker->numberBetween(5, 20),
+            'reorder_quantity' => $this->faker->numberBetween(25, 100),
+            'max_stock_level' => $this->faker->numberBetween(200, 500),
+            'cost_per_unit' => $this->faker->randomFloat(2, 5, 150),
             'supplier_id' => Partner::factory(),
             'batch_number' => $this->faker->optional()->regexify('[A-Z0-9]{8}'),
-            'expiry_date' => $this->faker->optional()->dateTimeBetween('now', '+1 year'),
+            'expiry_date' => $this->faker->optional()->dateTimeBetween('+1 month', '+1 year'),
             'status' => $this->faker->randomElement(['active', 'inactive', 'discontinued']),
+            'is_tracked' => true,
             'notes' => $this->faker->optional()->sentence(),
             'last_restocked_at' => $this->faker->optional()->dateTimeBetween('-6 months', 'now'),
             'last_sold_at' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),

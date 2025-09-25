@@ -9,3 +9,4 @@ final class AnalyticsDashboard extends ListRecords
 {
     protected static string $resource = AnalyticsResource::class;
 }
+

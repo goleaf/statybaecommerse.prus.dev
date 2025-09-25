@@ -91,8 +91,8 @@ class ReportResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ViewReport::class, [
             'record' => $report->getRouteKey(),
         ])
-            ->assertCanSeeText($report->name)
-            ->assertCanSeeText($report->description);
+            ->assertSee($report->name)
+            ->assertSee($report->description);
     }
 
     public function test_can_delete_report(): void
@@ -223,8 +223,8 @@ class ReportResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
             ->searchTable('Sales')
-            ->assertCanSeeTableRecords([$report1])
-            ->assertCanNotSeeTableRecords([$report2]);
+            ->assertSee($report1->name)
+            ->assertDontSee($report2->name);
     }
 
     public function test_can_sort_reports(): void
@@ -258,7 +258,9 @@ class ReportResourceTest extends TestCase
                 'type' => 'sales',
                 'category' => 'sales',
             ])
-            ->assertFormSet('slug', 'test-report-name');
+            ->assertFormSet([
+                'slug' => 'test-report-name',
+            ]);
     }
 
     public function test_schedule_frequency_is_visible_when_scheduled(): void
@@ -281,7 +283,7 @@ class ReportResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ViewReport::class, [
             'record' => $report->getRouteKey(),
         ])
-            ->assertCanSeeText($user->name);
+            ->assertSee($user->name);
     }
 
     public function test_download_action_is_visible_for_generated_reports(): void
@@ -290,7 +292,7 @@ class ReportResourceTest extends TestCase
         $ungeneratedReport = Report::factory()->create(['last_generated_at' => null]);
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
-            ->assertTableActionExists('download', $generatedReport)
-            ->assertTableActionDoesNotExist('download', $ungeneratedReport);
+            ->assertTableActionVisible('download', $generatedReport)
+            ->assertTableActionHidden('download', $ungeneratedReport);
     }
 }

@@ -56,7 +56,7 @@
                 $comparePrice = $priceData?->compare?->amount ?? $product->compare_price;
                 $discountPercent = $priceData?->percentage ?? null;
                 $shortDescription = $product->trans('short_description') ?? $product->short_description;
-                $recentHistories = $product->recentHistories()->limit(4)->get();
+                $recentHistories = $this->recentHistories;
                 $contactUrl = Route::has('contact')
                     ? route('contact', ['locale' => app()->getLocale()])
                     : 'mailto:' . (config('mail.from.address') ?? 'info@example.com');
@@ -566,12 +566,7 @@
                 'url' => url()->current(),
             ];
         }
-        $recentReviews = \App\Models\Review::query()
-            ->where('product_id', $product->id)
-            ->where('is_approved', true)
-            ->latest('id')
-            ->limit(5)
-            ->get(['title', 'content', 'rating', 'created_at']);
+        $recentReviews = $this->recentApprovedReviewsLimited;
         $reviewsSchema = null;
         if ($recentReviews->isNotEmpty()) {
             $reviewsSchema = [

@@ -11,59 +11,66 @@ final class DiscountSeeder extends Seeder
 {
     public function run(): void
     {
-        // Basic percentage discount
-        Discount::query()->firstOrCreate(
-            ['slug' => 'summer-sale-15'],
-            [
+        $this->seedPercentageDiscount();
+        $this->seedFixedDiscount();
+        $this->seedFreeShippingDiscount();
+    }
+
+    private function seedPercentageDiscount(): void
+    {
+        Discount::factory()
+            ->percentage()
+            ->state([
+                'slug' => 'summer-sale-15',
                 'name' => 'Summer Sale 15%',
                 'description' => 'Seasonal sale on selected items',
-                'type' => 'percentage',
                 'value' => 15.0,
-                'is_active' => true,
-                'is_enabled' => true,
-                'starts_at' => now()->subDays(1),
+                'starts_at' => now()->subDay(),
                 'ends_at' => now()->addDays(30),
                 'usage_limit' => 1000,
-                'usage_count' => 0,
                 'minimum_amount' => 0,
-            ]
-        );
+                'is_enabled' => true,
+                'is_active' => true,
+            ])
+            ->firstOrCreate();
+    }
 
-        // Fixed amount discount
-        Discount::query()->firstOrCreate(
-            ['slug' => 'welcome-10'],
-            [
+    private function seedFixedDiscount(): void
+    {
+        Discount::factory()
+            ->fixed()
+            ->state([
+                'slug' => 'welcome-10',
                 'name' => 'Welcome €10',
                 'description' => 'Flat €10 off for new users',
-                'type' => 'fixed',
                 'value' => 10.0,
-                'is_active' => true,
-                'is_enabled' => true,
-                'starts_at' => now()->subDays(1),
+                'starts_at' => now()->subDay(),
                 'ends_at' => now()->addDays(90),
-                'usage_limit' => null,
-                'usage_count' => 0,
                 'minimum_amount' => 25.0,
-            ]
-        );
+                'usage_limit' => null,
+                'is_enabled' => true,
+                'is_active' => true,
+            ])
+            ->firstOrCreate();
+    }
 
-        // Free shipping example (represented with type free_shipping and flag)
-        Discount::query()->firstOrCreate(
-            ['slug' => 'free-shipping-99'],
-            [
+    private function seedFreeShippingDiscount(): void
+    {
+        Discount::factory()
+            ->state([
+                'slug' => 'free-shipping-99',
                 'name' => 'Free Shipping Over €99',
                 'description' => 'Free shipping when cart total exceeds €99',
                 'type' => 'free_shipping',
                 'value' => 0.0,
-                'is_active' => true,
-                'is_enabled' => true,
-                'starts_at' => now()->subDays(1),
+                'starts_at' => now()->subDay(),
                 'ends_at' => now()->addDays(60),
-                'usage_limit' => null,
-                'usage_count' => 0,
                 'minimum_amount' => 99.0,
                 'free_shipping' => true,
-            ]
-        );
+                'usage_limit' => null,
+                'is_enabled' => true,
+                'is_active' => true,
+            ])
+            ->firstOrCreate();
     }
 }

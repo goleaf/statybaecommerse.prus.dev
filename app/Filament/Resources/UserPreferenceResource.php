@@ -90,7 +90,8 @@ final class UserPreferenceResource extends Resource
                     ->numeric()
                     ->minValue(0)
                     ->maxValue(1)
-                    ->step(0.000001),
+                    ->step(0.000001)
+                    ->default(0),
                 DateTimePicker::make('last_updated')
                     ->label(__('admin.user_preferences.last_updated'))
                     ->default(now()),
@@ -228,5 +229,10 @@ final class UserPreferenceResource extends Resource
             'view' => Pages\ViewUserPreference::route('/{record}'),
             'edit' => Pages\EditUserPreference::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return UserPreference::query()->withoutGlobalScopes();
     }
 }

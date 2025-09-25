@@ -26,6 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
@@ -91,6 +92,7 @@ final class AttributeResource extends Resource
                         ->label(__('attributes.type'))
                         ->options([
                             'text' => __('attributes.types.text'),
+                            'textarea' => __('attributes.types.textarea'),
                             'number' => __('attributes.types.number'),
                             'select' => __('attributes.types.select'),
                             'multiselect' => __('attributes.types.multiselect'),
@@ -99,6 +101,7 @@ final class AttributeResource extends Resource
                             'datetime' => __('attributes.types.datetime'),
                             'color' => __('attributes.types.color'),
                             'file' => __('attributes.types.file'),
+                            'image' => __('attributes.types.image'),
                             'url' => __('attributes.types.url'),
                         ])
                         ->default('text')
@@ -186,6 +189,14 @@ final class AttributeResource extends Resource
                             Select::make('group_name')
                                 ->label(__('attributes.group'))
                                 ->options([
+                                    // Legacy / factory-generated group names
+                                    'basic_info' => 'basic_info',
+                                    'technical_specs' => 'technical_specs',
+                                    'materials' => 'materials',
+                                    'features' => 'features',
+                                    'compatibility' => 'compatibility',
+                                    'warranty' => 'warranty',
+                                    // Current UI groups
                                     'general' => __('attributes.groups.general'),
                                     'technical' => __('attributes.groups.technical'),
                                     'appearance' => __('attributes.groups.appearance'),
@@ -206,6 +217,7 @@ final class AttributeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(\App\Models\Attribute::query()->withoutGlobalScopes())
             ->deferLoading(false)
             ->columns([
                 TextColumn::make('name')
@@ -277,6 +289,7 @@ final class AttributeResource extends Resource
                 SelectFilter::make('type')
                     ->options([
                         'text' => __('attributes.types.text'),
+                        'textarea' => __('attributes.types.textarea'),
                         'number' => __('attributes.types.number'),
                         'select' => __('attributes.types.select'),
                         'multiselect' => __('attributes.types.multiselect'),
@@ -285,6 +298,7 @@ final class AttributeResource extends Resource
                         'datetime' => __('attributes.types.datetime'),
                         'color' => __('attributes.types.color'),
                         'file' => __('attributes.types.file'),
+                        'image' => __('attributes.types.image'),
                         'url' => __('attributes.types.url'),
                     ]),
                 SelectFilter::make('group_name')
@@ -317,6 +331,15 @@ final class AttributeResource extends Resource
             ->actions([
                 Actions\ViewAction::make(),
                 Actions\EditAction::make(),
+                Actions\DeleteAction::make()
+                    ->label(__('attributes.delete'))
+                    ->action(function (Attribute $record): void {
+                        $record->forceDelete();
+                        Notification::make()
+                            ->title(__('attributes.deleted_successfully'))
+                            ->success()
+                            ->send();
+                    }),
                 Actions\Action::make('toggle_active')
                     ->label(fn (Attribute $record): string => $record->is_active ? __('attributes.deactivate') : __('attributes.activate'))
                     ->icon(fn (Attribute $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -333,7 +356,14 @@ final class AttributeResource extends Resource
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            $records->each->forceDelete();
+                            Notification::make()
+                                ->title(__('attributes.bulk_deleted_success'))
+                                ->success()
+                                ->send();
+                        }),
                     Actions\BulkAction::make('activate')
                         ->label(__('attributes.activate_selected'))
                         ->icon('heroicon-o-eye')
@@ -384,5 +414,10 @@ final class AttributeResource extends Resource
             'view' => Pages\ViewAttribute::route('/{record}'),
             'edit' => Pages\EditAttribute::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 }

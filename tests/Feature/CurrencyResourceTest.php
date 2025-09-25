@@ -10,13 +10,12 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
+
 /**
  * CurrencyResourceTest
  *
  * Comprehensive test suite for CurrencyResource functionality including CRUD operations, filters, and relationships.
  */
-use Tests\TestCase;
-
 final class CurrencyResourceTest extends TestCase
 {
     use RefreshDatabase;
@@ -202,7 +201,7 @@ final class CurrencyResourceTest extends TestCase
             ->callTableAction('update_rate', $currency);
 
         // This would test the rate update functionality
-        $this->assertTrue(true); // Placeholder for actual rate update test
+        $this->assertTrue(true);  // Placeholder for actual rate update test
     }
 
     public function test_can_bulk_activate_currencies(): void
@@ -239,7 +238,7 @@ final class CurrencyResourceTest extends TestCase
             ->callTableBulkAction('update_rates', $currencies);
 
         // This would test the bulk rate update functionality
-        $this->assertTrue(true); // Placeholder for actual bulk rate update test
+        $this->assertTrue(true);  // Placeholder for actual bulk rate update test
     }
 
     public function test_currency_validation_requires_name(): void
@@ -295,7 +294,7 @@ final class CurrencyResourceTest extends TestCase
             ->fillForm([
                 'name' => 'Test Currency',
                 'code' => 'TST',
-                'exchange_rate' => -1.00,
+                'exchange_rate' => -1.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['exchange_rate' => 'min']);
@@ -460,7 +459,7 @@ final class CurrencyResourceTest extends TestCase
             'decimal_places' => 2,
         ]);
 
-        $formatted = $currency->formatAmount(100.00);
+        $formatted = $currency->formatAmount(100.0);
         $this->assertStringStartsWith('$', $formatted);
     }
 
@@ -472,7 +471,7 @@ final class CurrencyResourceTest extends TestCase
             'decimal_places' => 2,
         ]);
 
-        $formatted = $currency->formatAmount(100.00);
+        $formatted = $currency->formatAmount(100.0);
         $this->assertStringEndsWith('$', $formatted);
     }
 

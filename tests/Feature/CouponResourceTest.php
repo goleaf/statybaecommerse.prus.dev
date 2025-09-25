@@ -41,9 +41,9 @@ final class CouponResourceTest extends TestCase
             'name' => 'Test Coupon',
             'description' => 'Test coupon description',
             'type' => 'percentage',
-            'value' => 20.00,
-            'minimum_amount' => 50.00,
-            'maximum_discount' => 100.00,
+            'value' => 20.0,
+            'minimum_amount' => 50.0,
+            'maximum_discount' => 100.0,
             'usage_limit' => 100,
             'usage_limit_per_user' => 1,
             'is_active' => true,
@@ -237,7 +237,7 @@ final class CouponResourceTest extends TestCase
             ->fillForm([
                 'code' => '',
                 'type' => 'percentage',
-                'value' => 20.00,
+                'value' => 20.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['code' => 'required']);
@@ -251,7 +251,7 @@ final class CouponResourceTest extends TestCase
             ->fillForm([
                 'code' => 'EXISTING',
                 'type' => 'percentage',
-                'value' => 20.00,
+                'value' => 20.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['code' => 'unique']);
@@ -263,7 +263,7 @@ final class CouponResourceTest extends TestCase
             ->fillForm([
                 'code' => 'INVALID CODE',
                 'type' => 'percentage',
-                'value' => 20.00,
+                'value' => 20.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['code' => 'alpha_dash']);
@@ -287,7 +287,7 @@ final class CouponResourceTest extends TestCase
             ->fillForm([
                 'code' => 'TEST',
                 'type' => 'percentage',
-                'value' => -10.00,
+                'value' => -10.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['value' => 'min']);
@@ -367,56 +367,56 @@ final class CouponResourceTest extends TestCase
         $this->assertTrue($coupon->isValid());
         $this->assertFalse($coupon->isExpired());
         $this->assertFalse($coupon->isNotStarted());
-        $this->assertTrue($coupon->canBeUsed(100.00));
+        $this->assertTrue($coupon->canBeUsed(100.0));
     }
 
     public function test_coupon_calculate_discount_percentage(): void
     {
         $coupon = Coupon::factory()->create([
             'type' => 'percentage',
-            'value' => 20.00,
+            'value' => 20.0,
             'is_active' => true,
         ]);
 
-        $discount = $coupon->calculateDiscount(100.00);
-        $this->assertEquals(20.00, $discount);
+        $discount = $coupon->calculateDiscount(100.0);
+        $this->assertEquals(20.0, $discount);
     }
 
     public function test_coupon_calculate_discount_fixed(): void
     {
         $coupon = Coupon::factory()->create([
             'type' => 'fixed',
-            'value' => 15.00,
+            'value' => 15.0,
             'is_active' => true,
         ]);
 
-        $discount = $coupon->calculateDiscount(100.00);
-        $this->assertEquals(15.00, $discount);
+        $discount = $coupon->calculateDiscount(100.0);
+        $this->assertEquals(15.0, $discount);
     }
 
     public function test_coupon_calculate_discount_free_shipping(): void
     {
         $coupon = Coupon::factory()->create([
             'type' => 'free_shipping',
-            'value' => 0.00,
+            'value' => 0.0,
             'is_active' => true,
         ]);
 
-        $discount = $coupon->calculateDiscount(100.00);
-        $this->assertEquals(0.00, $discount);
+        $discount = $coupon->calculateDiscount(100.0);
+        $this->assertEquals(0.0, $discount);
     }
 
     public function test_coupon_minimum_amount_validation(): void
     {
         $coupon = Coupon::factory()->create([
             'type' => 'percentage',
-            'value' => 20.00,
-            'minimum_amount' => 50.00,
+            'value' => 20.0,
+            'minimum_amount' => 50.0,
             'is_active' => true,
         ]);
 
-        $this->assertFalse($coupon->canBeUsed(30.00));
-        $this->assertTrue($coupon->canBeUsed(60.00));
+        $this->assertFalse($coupon->canBeUsed(30.0));
+        $this->assertTrue($coupon->canBeUsed(60.0));
     }
 
     public function test_coupon_usage_limit_validation(): void
@@ -505,35 +505,35 @@ final class CouponResourceTest extends TestCase
     {
         $coupon = Coupon::factory()->create([
             'type' => 'percentage',
-            'value' => 20.00,
+            'value' => 20.0,
         ]);
 
         // This would be tested in the table column formatting
         $this->assertEquals('percentage', $coupon->type);
-        $this->assertEquals(20.00, $coupon->value);
+        $this->assertEquals(20.0, $coupon->value);
     }
 
     public function test_coupon_value_formatting_fixed(): void
     {
         $coupon = Coupon::factory()->create([
             'type' => 'fixed',
-            'value' => 15.00,
+            'value' => 15.0,
         ]);
 
         // This would be tested in the table column formatting
         $this->assertEquals('fixed', $coupon->type);
-        $this->assertEquals(15.00, $coupon->value);
+        $this->assertEquals(15.0, $coupon->value);
     }
 
     public function test_coupon_value_formatting_free_shipping(): void
     {
         $coupon = Coupon::factory()->create([
             'type' => 'free_shipping',
-            'value' => 0.00,
+            'value' => 0.0,
         ]);
 
         // This would be tested in the table column formatting
         $this->assertEquals('free_shipping', $coupon->type);
-        $this->assertEquals(0.00, $coupon->value);
+        $this->assertEquals(0.0, $coupon->value);
     }
 }

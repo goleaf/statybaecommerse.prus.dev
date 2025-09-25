@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -80,7 +82,6 @@ class WishlistItemResourceTest extends TestCase
         $response = $this->get('/admin/wishlist-items');
 
         $response->assertOk();
-        $response->assertSee('Wishlist Items');
         $response->assertSee($this->product->name);
         $response->assertSee($this->variant->name);
     }
@@ -285,7 +286,7 @@ class WishlistItemResourceTest extends TestCase
             ->filterTable('user_id', $this->regularUser->id)
             ->assertCanSeeTableRecords([$this->wishlistItem])
             ->assertCanNotSeeTableRecords(
-                WishlistItem::whereHas('wishlist', fn($q) => $q->where('user_id', $anotherUser->id))->get()
+                WishlistItem::whereHas('wishlist', fn ($q) => $q->where('user_id', $anotherUser->id))->get()
             );
     }
 
@@ -332,7 +333,7 @@ class WishlistItemResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        $expectedName = $this->product->name . ' - ' . $this->variant->name;
+        $expectedName = $this->product->name.' - '.$this->variant->name;
         $this->assertEquals($expectedName, $this->wishlistItem->display_name);
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories\Translations;
 
+use App\Models\AttributeValue;
 use App\Models\Translations\AttributeValueTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,7 +18,7 @@ final class AttributeValueTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'attribute_value_id' => null, // Let tests specify this
+            'attribute_value_id' => AttributeValue::factory(),
             'locale' => $this->faker->randomElement(['en', 'lt', 'de']),
             'value' => $this->faker->word(),
             'description' => $this->faker->optional(0.7)->sentence(),

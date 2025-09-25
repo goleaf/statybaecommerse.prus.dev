@@ -15,8 +15,8 @@ final class RolePermissionSeeder extends Seeder
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create permissions for enhanced settings
-        $permissions = [
+        // Create permissions for enhanced settings using factory
+        $permissionNames = [
             'view_enhanced_settings',
             'create_enhanced_settings',
             'edit_enhanced_settings',
@@ -28,23 +28,21 @@ final class RolePermissionSeeder extends Seeder
             'reorder_enhanced_settings',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
+        $permissions = collect($permissionNames)->map(function ($permissionName) {
+            return Permission::firstOrCreate(['name' => $permissionName]);
+        });
 
-        // Create admin role and assign all permissions
+        // Create roles using factory relationships
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $adminRole->givePermissionTo(Permission::all());
+        $adminRole->syncPermissions($permissions);
 
-        // Create super admin role
         $superAdminRole = Role::firstOrCreate(['name' => 'super_admin']);
-        $superAdminRole->givePermissionTo(Permission::all());
+        $superAdminRole->syncPermissions($permissions);
 
-        // Create user role with limited permissions
         $userRole = Role::firstOrCreate(['name' => 'user']);
-        $userRole->givePermissionTo([
+        $userRole->syncPermissions($permissions->whereIn('name', [
             'view_enhanced_settings',
             'view_any_enhanced_settings',
-        ]);
+        ]));
     }
 }

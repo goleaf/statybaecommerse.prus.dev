@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models\Scopes;
 
@@ -24,12 +26,19 @@ final class ActiveScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        // Check for different active field names in order of preference
-        if ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'is_active')) {
+        // Prefer stricter check when both flags exist
+        $schema = $model->getConnection()->getSchemaBuilder();
+        $table = $model->getTable();
+        $hasIsActive = $schema->hasColumn($table, 'is_active');
+        $hasIsVisible = $schema->hasColumn($table, 'is_visible');
+
+        if ($hasIsActive && $hasIsVisible) {
+            $builder->where('is_active', true)->where('is_visible', true);
+        } elseif ($hasIsActive) {
             $builder->where('is_active', true);
         } elseif ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'is_enabled')) {
             $builder->where('is_enabled', true);
-        } elseif ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'is_visible')) {
+        } elseif ($hasIsVisible) {
             $builder->where('is_visible', true);
         } elseif ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'status')) {
             $builder->where('status', 'active');

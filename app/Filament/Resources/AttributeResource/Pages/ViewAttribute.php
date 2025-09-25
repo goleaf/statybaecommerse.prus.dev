@@ -12,6 +12,11 @@ final class ViewAttribute extends ViewRecord
 {
     protected static string $resource = AttributeResource::class;
 
+    public function getTitle(): string
+    {
+        return (string) ($this->record->name ?? parent::getTitle());
+    }
+
     protected function getHeaderActions(): array
     {
         return [

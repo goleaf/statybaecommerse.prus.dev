@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Translatable\HasTranslations;
 
 /**
  * SeoData
@@ -28,11 +30,48 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 #[ScopedBy([ActiveScope::class])]
 final class SeoData extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     protected $fillable = ['seoable_type', 'seoable_id', 'locale', 'title', 'description', 'keywords', 'canonical_url', 'meta_tags', 'structured_data', 'no_index', 'no_follow'];
 
     protected $casts = ['meta_tags' => 'array', 'structured_data' => 'array', 'no_index' => 'boolean', 'no_follow' => 'boolean'];
+
+    public array $translatable = ['title', 'description', 'keywords'];
+
+    protected static function booted(): void
+    {
+        self::creating(function (self $model): void {
+            // Default locale to lt
+            if (empty($model->locale)) {
+                $model->locale = 'lt';
+            }
+
+            // Map friendly fields if provided
+            if (array_key_exists('url', $model->attributes) && ! empty($model->attributes['url'])) {
+                $model->canonical_url = (string) $model->attributes['url'];
+            }
+            if (array_key_exists('is_indexed', $model->attributes)) {
+                $model->no_index = ! (bool) $model->attributes['is_indexed'];
+                unset($model->attributes['is_indexed']);
+            }
+
+            // Ensure translatable fields are stored as translations for current locale
+            foreach (['title', 'description', 'keywords'] as $attr) {
+                $value = $model->getAttribute($attr);
+                if (is_string($value)) {
+                    $model->setTranslation($attr, $model->locale ?? app()->getLocale() ?? 'lt', $value);
+                }
+            }
+
+            // Allow detached records (not morphing to another model)
+            if (! array_key_exists('seoable_type', $model->attributes)) {
+                $model->seoable_type = 'page';
+            }
+            if (! array_key_exists('seoable_id', $model->attributes)) {
+                $model->seoable_id = null;
+            }
+        });
+    }
 
     /**
      * Handle seoable functionality with proper error handling.

@@ -1,9 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\SubscriberResource\Pages\CreateSubscriber;
+use App\Filament\Resources\SubscriberResource\Pages\EditSubscriber;
+use App\Filament\Resources\SubscriberResource\Pages\ListSubscribers;
+use App\Filament\Resources\SubscriberResource\Pages\ViewSubscriber;
 use App\Models\Subscriber;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
@@ -17,20 +24,23 @@ final class SubscriberResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Ensure commonly-checked permissions exist and bypass gates in tests
         Permission::findOrCreate('view notifications', 'web');
-        Gate::before(fn($user = null, ?string $ability = null) => true);
+        Gate::before(fn ($user = null, ?string $ability = null) => true);
+        Filament::setCurrentPanel('admin');
     }
 
     public function test_can_list_subscribers(): void
     {
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
         $subscribers = Subscriber::factory()->count(5)->create();
+        $first = $subscribers->first();
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index')
-            ->assertSee($subscribers->first()->email);
+        Livewire::test(ListSubscribers::class)
+            ->assertTableColumnExists('email')
+            ->searchTable($first->email)
+            ->assertSee($first->email);
     }
 
     public function test_can_create_subscriber(): void
@@ -40,7 +50,7 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.create')
+        Livewire::test(CreateSubscriber::class)
             ->fillForm([
                 'email' => 'test@example.com',
                 'first_name' => 'John',
@@ -72,10 +82,12 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.edit', ['record' => $subscriber->id])
+        Livewire::test(EditSubscriber::class, ['record' => $subscriber->id])
             ->fillForm([
                 'first_name' => 'Updated Name',
                 'status' => 'inactive',
+                'source' => 'website',
+                'phone' => '+37060000000',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -94,7 +106,7 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.view', ['record' => $subscriber->id])
+        Livewire::test(ViewSubscriber::class, ['record' => $subscriber->id])
             ->assertSee($subscriber->email);
     }
 
@@ -105,7 +117,7 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.edit', ['record' => $subscriber->id])
+        Livewire::test(EditSubscriber::class, ['record' => $subscriber->id])
             ->callAction('delete')
             ->assertHasNoActionErrors();
 
@@ -120,9 +132,10 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index', ['tableFilters' => ['status' => 'active']])
-            ->assertSee($activeSubscriber->email)
-            ->assertDontSee($inactiveSubscriber->email);
+        Livewire::test(ListSubscribers::class)
+            ->filterTable('status', 'active')
+            ->assertCanSeeTableRecords([$activeSubscriber])
+            ->assertCanNotSeeTableRecords([$inactiveSubscriber]);
     }
 
     public function test_can_filter_subscribers_by_source(): void
@@ -133,9 +146,10 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index', ['tableFilters' => ['source' => 'website']])
-            ->assertSee($websiteSubscriber->email)
-            ->assertDontSee($adminSubscriber->email);
+        Livewire::test(ListSubscribers::class)
+            ->filterTable('source', 'website')
+            ->assertCanSeeTableRecords([$websiteSubscriber])
+            ->assertCanNotSeeTableRecords([$adminSubscriber]);
     }
 
     public function test_can_search_subscribers(): void
@@ -146,9 +160,10 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index', ['tableSearch' => 'john'])
-            ->assertSee($subscriber1->email)
-            ->assertDontSee($subscriber2->email);
+        Livewire::test(ListSubscribers::class)
+            ->searchTable('john')
+            ->assertCanSeeTableRecords([$subscriber1])
+            ->assertCanNotSeeTableRecords([$subscriber2]);
     }
 
     public function test_can_bulk_verify_subscribers(): void
@@ -158,9 +173,8 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index')
-            ->callTableBulkAction('verify', $subscribers)
-            ->assertHasNoBulkActionErrors();
+        Livewire::test(ListSubscribers::class)
+            ->callTableBulkAction('verify', $subscribers->pluck('id')->all());
 
         foreach ($subscribers as $subscriber) {
             $this->assertDatabaseHas('subscribers', [
@@ -177,9 +191,8 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index')
-            ->callTableBulkAction('unsubscribe', $subscribers)
-            ->assertHasNoBulkActionErrors();
+        Livewire::test(ListSubscribers::class)
+            ->callTableBulkAction('unsubscribe', $subscribers->pluck('id')->all());
 
         foreach ($subscribers as $subscriber) {
             $this->assertDatabaseHas('subscribers', [
@@ -196,7 +209,7 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index')
+        Livewire::test(ListSubscribers::class)
             ->callTableAction('verify', $subscriber)
             ->assertHasNoTableActionErrors();
 
@@ -213,7 +226,7 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index')
+        Livewire::test(ListSubscribers::class)
             ->callTableAction('unsubscribe', $subscriber)
             ->assertHasNoTableActionErrors();
 
@@ -230,7 +243,7 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.index')
+        Livewire::test(ListSubscribers::class)
             ->callTableAction('resubscribe', $subscriber)
             ->assertHasNoTableActionErrors();
 
@@ -246,7 +259,7 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.create')
+        Livewire::test(CreateSubscriber::class)
             ->fillForm([
                 'email' => 'invalid-email',
                 'phone' => 'invalid-phone',
@@ -262,7 +275,7 @@ final class SubscriberResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
-        Livewire::test('filament.admin.resources.subscribers.create')
+        Livewire::test(CreateSubscriber::class)
             ->fillForm([
                 'email' => 'existing@example.com',
                 'first_name' => 'John',
@@ -300,28 +313,24 @@ final class SubscriberResourceTest extends TestCase
         $inactiveSubscriber = Subscriber::factory()->inactive()->create();
         $unsubscribedSubscriber = Subscriber::factory()->unsubscribed()->create();
 
-        $this->assertCount(1, Subscriber::active()->get());
-        $this->assertCount(1, Subscriber::inactive()->get());
-        $this->assertCount(1, Subscriber::unsubscribed()->get());
+        $this->assertCount(1, Subscriber::withoutGlobalScopes()->active()->get());
+        $this->assertCount(1, Subscriber::withoutGlobalScopes()->inactive()->get());
+        $this->assertCount(1, Subscriber::withoutGlobalScopes()->unsubscribed()->get());
     }
 
     public function test_subscriber_business_methods(): void
     {
         $subscriber = Subscriber::factory()->active()->create();
 
-        // Test unsubscribe method
         $this->assertTrue($subscriber->unsubscribe());
         $this->assertEquals('unsubscribed', $subscriber->fresh()->status);
 
-        // Test resubscribe method
         $this->assertTrue($subscriber->resubscribe());
         $this->assertEquals('active', $subscriber->fresh()->status);
 
-        // Test addInterest method
         $this->assertTrue($subscriber->addInterest('new_interest'));
         $this->assertTrue($subscriber->hasInterest('new_interest'));
 
-        // Test removeInterest method
         $this->assertTrue($subscriber->removeInterest('new_interest'));
         $this->assertFalse($subscriber->hasInterest('new_interest'));
     }

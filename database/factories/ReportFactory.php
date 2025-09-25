@@ -20,7 +20,7 @@ final class ReportFactory extends Factory
     {
         $dateRange = fake()->randomElement(['today', 'yesterday', 'last_7_days', 'last_30_days', 'last_90_days', 'this_year']);
         $name = fake()->sentence(3);
-        $type = fake()->randomElement(['sales', 'products', 'customers', 'inventory', 'analytics', 'financial', 'marketing', 'custom']);
+        $type = fake()->randomElement(['sales', 'inventory', 'customer', 'product', 'analytics', 'financial', 'custom']);
         $category = fake()->randomElement(['sales', 'marketing', 'operations', 'finance', 'customer_service', 'inventory', 'analytics']);
 
         return [

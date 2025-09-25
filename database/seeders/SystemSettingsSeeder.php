@@ -113,15 +113,26 @@ final class SystemSettingsSeeder extends Seeder
         ];
 
         foreach ($categories as $categoryData) {
-            $category = SystemSettingCategory::create($categoryData);
+            $category = SystemSettingCategory::firstOrCreate(
+                ['slug' => $categoryData['slug']],
+                SystemSettingCategory::factory()->make($categoryData)->toArray()
+            );
 
-            // Create translations
-            SystemSettingCategoryTranslation::create([
-                'system_setting_category_id' => $category->id,
-                'locale' => 'lt',
-                'name' => $this->getLithuanianTranslation($categoryData['name']),
-                'description' => $this->getLithuanianTranslation($categoryData['description']),
-            ]);
+            // Create translations using factory relationships
+            SystemSettingCategoryTranslation::firstOrCreate(
+                [
+                    'system_setting_category_id' => $category->id,
+                    'locale' => 'lt',
+                ],
+                SystemSettingCategoryTranslation::factory()
+                    ->for($category, 'systemSettingCategory')
+                    ->make([
+                        'locale' => 'lt',
+                        'name' => $this->getLithuanianTranslation($categoryData['name']),
+                        'description' => $this->getLithuanianTranslation($categoryData['description']),
+                    ])
+                    ->toArray()
+            );
         }
     }
 
@@ -832,16 +843,27 @@ final class SystemSettingsSeeder extends Seeder
     private function createSettingsWithTranslations(array $settings): void
     {
         foreach ($settings as $settingData) {
-            $setting = SystemSetting::create($settingData);
+            $setting = SystemSetting::firstOrCreate(
+                ['key' => $settingData['key']],
+                SystemSetting::factory()->make($settingData)->toArray()
+            );
 
-            // Create Lithuanian translations
-            SystemSettingTranslation::create([
-                'system_setting_id' => $setting->id,
-                'locale' => 'lt',
-                'name' => $this->getLithuanianTranslation($settingData['name']),
-                'description' => $this->getLithuanianTranslation($settingData['description'] ?? ''),
-                'help_text' => $this->getLithuanianTranslation($settingData['help_text'] ?? ''),
-            ]);
+            // Create Lithuanian translations using factory relationships
+            SystemSettingTranslation::firstOrCreate(
+                [
+                    'system_setting_id' => $setting->id,
+                    'locale' => 'lt',
+                ],
+                SystemSettingTranslation::factory()
+                    ->for($setting, 'systemSetting')
+                    ->make([
+                        'locale' => 'lt',
+                        'name' => $this->getLithuanianTranslation($settingData['name']),
+                        'description' => $this->getLithuanianTranslation($settingData['description'] ?? ''),
+                        'help_text' => $this->getLithuanianTranslation($settingData['help_text'] ?? ''),
+                    ])
+                    ->toArray()
+            );
         }
     }
 

@@ -14,7 +14,6 @@ use Filament\Resources\Pages\ListRecords;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 final class ProductFeatureResourceTest extends TestCase
 {

@@ -1,12 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
 use App\Filament\Resources\OrderResource\RelationManagers\OrderDocumentsRelationManager;
 use App\Models\Document;
+use App\Models\DocumentTemplate;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -49,6 +53,9 @@ final class OrderDocumentsRelationManagerTest extends TestCase
     {
         $this->actingAs($this->user);
 
+        Storage::fake();
+        $template = DocumentTemplate::factory()->create();
+
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
             'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
@@ -58,6 +65,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             ->mountTableAction('create')
             ->assertFormExists()
             ->fillForm([
+                'document_template_id' => $template->id,
                 'name' => 'Test Document',
                 'type' => 'invoice',
                 'version' => '1.0',

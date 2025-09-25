@@ -244,10 +244,7 @@ final class SettingsSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            Setting::updateOrCreate(
-                ['key' => $setting['key']],
-                $setting
-            );
+            Setting::factory()->create($setting);
         }
 
         $this->command->info('Settings seeded successfully with multilanguage support!');

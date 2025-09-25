@@ -23,6 +23,7 @@ return new class extends Migration
                 $table->integer('sort_order')->default(0);
                 $table->string('seo_title')->nullable();
                 $table->text('seo_description')->nullable();
+                $table->unsignedBigInteger('customer_group_id')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
 
@@ -60,7 +61,7 @@ return new class extends Migration
                 $table->string('slug')->unique();
                 $table->text('description')->nullable();
                 $table->text('short_description')->nullable();
-                $table->string('sku')->unique();
+                $table->string('sku')->nullable()->unique();
                 $table->text('summary')->nullable();
                 $table->decimal('price', 10, 2)->nullable();
                 $table->decimal('sale_price', 10, 2)->nullable();
@@ -218,6 +219,7 @@ return new class extends Migration
                 $table->softDeletes();
 
                 $table->index(['code', 'is_active']);
+                // $table->index(['customer_group_id']); // removed, column not defined in this table
                 $table->index(['is_active', 'starts_at', 'expires_at']);
             });
         }

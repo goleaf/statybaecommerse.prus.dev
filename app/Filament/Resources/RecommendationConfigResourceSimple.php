@@ -21,7 +21,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -131,7 +130,8 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->multiple()
                                 ->searchable()
                                 ->preload()
-                                ->formatStateUsing(fn ($state) => collect($state)->sort()->values()->toArray())
+                                ->afterStateHydrated(fn (Select $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
+                                ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
                                 ->createOptionForm([
                                     TextInput::make('name')
                                         ->required()

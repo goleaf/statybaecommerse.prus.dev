@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -30,7 +31,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             // Avoid Facade usage during factory execution in early boot
-            'password' => static::$password ??= 'password',
+            'password' => static::$password ??= Hash::make('password'),
             'preferred_locale' => fake()->randomElement(['en', 'lt']),
             'is_admin' => false,
             'remember_token' => Str::random(10),
@@ -48,12 +49,15 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user is an admin.
+     * Indicate that the user is an admin with a verified email and active status.
      */
     public function admin(): static
     {
         return $this->state(fn(array $attributes) => [
             'is_admin' => true,
+            'email_verified_at' => now(),
+            'is_active' => true,
+            'password' => Hash::make('password'),
         ]);
     }
 }

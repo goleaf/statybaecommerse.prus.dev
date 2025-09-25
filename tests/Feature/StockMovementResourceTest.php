@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\StockMovementResource\Pages\ListStockMovements;
 use App\Filament\Resources\StockMovementResource;
+use App\Filament\Resources\StockMovementResource\Pages\ListStockMovements;
 use App\Models\StockMovement;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Route;
 
 final class StockMovementResourceTest extends TestCase
 {

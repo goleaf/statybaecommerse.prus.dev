@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -31,10 +33,10 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
 
         // Stub missing Filament system-settings routes referenced by navigation/topbar
         Route::middleware('web')->group(function (): void {
-            Route::get('/_test/system-settings', fn() => response('ok'))->name('filament.admin.resources.system-settings.index');
-            Route::get('/_test/system-settings/create', fn() => response('ok'))->name('filament.admin.resources.system-settings.create');
-            Route::get('/_test/system-settings/{record}', fn() => response('ok'))->name('filament.admin.resources.system-settings.view');
-            Route::get('/_test/system-settings/{record}/edit', fn() => response('ok'))->name('filament.admin.resources.system-settings.edit');
+            Route::get('/_test/system-settings', fn () => response('ok'))->name('filament.admin.resources.system-settings.index');
+            Route::get('/_test/system-settings/create', fn () => response('ok'))->name('filament.admin.resources.system-settings.create');
+            Route::get('/_test/system-settings/{record}', fn () => response('ok'))->name('filament.admin.resources.system-settings.view');
+            Route::get('/_test/system-settings/{record}/edit', fn () => response('ok'))->name('filament.admin.resources.system-settings.edit');
         });
 
         $this->actingAs($this->adminUser);
@@ -146,7 +148,7 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         $this->assertDatabaseHas('system_setting_category_translations', [
             'system_setting_category_id' => $category->id,
             'locale' => $translation->locale,
-            'name' => $translation->name . ' (Copy)',
+            'name' => $translation->name.' (Copy)',
         ]);
     }
 

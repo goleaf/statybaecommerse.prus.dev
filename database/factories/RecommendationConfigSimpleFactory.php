@@ -48,3 +48,4 @@ final class RecommendationConfigSimpleFactory extends Factory
         ];
     }
 }
+

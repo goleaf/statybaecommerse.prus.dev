@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -18,7 +19,7 @@ class ProductVariantFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => fn () => \App\Models\Product::factory()->create()->id,
+            'product_id' => Product::factory(),
             'name' => Str::title($this->faker->words(2, true)),
             'sku' => strtoupper(Str::random(12)),
             'barcode' => $this->faker->boolean(40) ? strtoupper(Str::random(12)) : null,

@@ -45,6 +45,18 @@ final class NewsComment extends Model
         return ['news_id' => 'integer', 'parent_id' => 'integer', 'is_approved' => 'boolean', 'is_visible' => 'boolean', 'is_active' => 'boolean'];
     }
 
+    protected static function booted(): void
+    {
+        self::addGlobalScope('active_flag', function (Builder $builder): void {
+            $builder->where('is_active', true);
+        });
+        self::creating(function (self $comment): void {
+            if (! array_key_exists('is_active', $comment->getAttributes())) {
+                $comment->is_active = (bool) ($comment->is_visible ?? true);
+            }
+        });
+    }
+
     /**
      * Handle news functionality with proper error handling.
      */

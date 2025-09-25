@@ -90,24 +90,22 @@ final class CustomerSegmentationSeeder extends Seeder
         ];
 
         foreach ($customerGroups as $groupData) {
-            $payload = $groupData;
-            $payload['code'] = $groupData['code'] ?? Str::upper(Str::of($groupData['slug'])->replace('-', '_'));
+            $groupData['code'] = $groupData['code'] ?? Str::upper(Str::of($groupData['slug'])->replace('-', '_'));
 
-            CustomerGroup::updateOrCreate(
-                ['slug' => $groupData['slug']],
-                $payload
-            );
+            CustomerGroup::factory()
+                ->state($groupData)
+                ->create();
         }
 
-        // Assign some users to customer groups
+        // Assign some users to customer groups using relationships
         $users = User::limit(10)->get();
-        $groups = CustomerGroup::where('is_enabled', true)->get();
+        $groups = CustomerGroup::enabled()->get();
 
-        foreach ($users as $index => $user) {
-            if ($groups->count() > 0) {
-                $groupIndex = $index % $groups->count();
-                $user->customerGroups()->syncWithoutDetaching([$groups[$groupIndex]->id]);
+        $users->each(function (User $user, int $index) use ($groups) {
+            if ($groups->isNotEmpty()) {
+                $group = $groups[$index % $groups->count()];
+                $user->customerGroups()->syncWithoutDetaching([$group->id]);
             }
-        }
+        });
     }
 }

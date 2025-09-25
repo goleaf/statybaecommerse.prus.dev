@@ -35,7 +35,7 @@ final class ProductSimilarity extends Model
 
     protected static function booted(): void
     {
-        static::creating(function (self $model): void {
+        self::creating(function (self $model): void {
             if ($model->calculated_at === null) {
                 $model->calculated_at = now();
             }

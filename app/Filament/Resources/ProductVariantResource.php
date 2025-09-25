@@ -1,7 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
+use App\Enums\NavigationIcon;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Models\ProductVariant;
 use Filament\Actions\Action;
@@ -11,7 +15,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -19,12 +22,14 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -34,7 +39,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
 use UnitEnum;
 
 /**
@@ -45,13 +49,6 @@ use UnitEnum;
 final class ProductVariantResource extends Resource
 {
     protected static ?string $model = ProductVariant::class;
-
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
-
-    public static function getNavigationIcon(): string|\BackedEnum|\Illuminate\Contracts\Support\Htmlable|null
-    {
-        return 'heroicon-o-squares-2x2';
-    }
 
     protected static ?int $navigationSort = 3;
 
@@ -70,6 +67,16 @@ final class ProductVariantResource extends Resource
     public static function getModelLabel(): string
     {
         return __('product_variants.single');
+    }
+
+    public static function getNavigationIcon(): string|\BackedEnum|Htmlable|null
+    {
+        return 'heroicon-o-squares-2x2';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
     }
 
     public static function form(Schema $schema): Schema
@@ -298,14 +305,14 @@ final class ProductVariantResource extends Resource
                     ->label(__('product_variants.fields.stock'))
                     ->sortable()
                     ->badge()
-                    ->color(fn(int $state): string => match (true) {
+                    ->color(fn (int $state): string => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 10 => 'warning',
                         default => 'success',
                     }),
                 BadgeColumn::make('stock_status')
                     ->label(__('product_variants.fields.stock_status'))
-                    ->formatStateUsing(fn($state) => match ($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'in_stock' => __('product_variants.stock_status.in_stock'),
                         'low_stock' => __('product_variants.stock_status.low_stock'),
                         'out_of_stock' => __('product_variants.stock_status.out_of_stock'),
@@ -376,7 +383,7 @@ final class ProductVariantResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn(ProductVariant $record): bool => !$record->is_default_variant),
+                    ->visible(fn (ProductVariant $record): bool => ! $record->is_default_variant),
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),

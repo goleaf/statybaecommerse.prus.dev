@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Address;
+use App\Models\CustomerGroup;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\LazyCollection;
@@ -61,112 +63,97 @@ final class BulkCustomerSeeder extends Seeder
         // Use timeout protection for large customer seeding operations
         $timeout = now()->addMinutes(30); // 30 minute timeout for bulk customer seeding
 
-        DB::transaction(function () use ($targetCount, $chunkSize, $now, &$baseIndex, $timeout): void {
-            LazyCollection::make(range($baseIndex, $targetCount))
-                ->takeUntilTimeout($timeout)
-                ->chunk($chunkSize)
-                ->each(function ($chunk) use ($now, &$baseIndex) {
-                    $baseIndex = $chunk->first();
-                    $end = $chunk->last();
+        LazyCollection::make(range($baseIndex, $targetCount))
+            ->takeUntilTimeout($timeout)
+            ->chunk($chunkSize)
+            ->each(function ($chunk) use ($now, &$baseIndex) {
+                $baseIndex = $chunk->first();
+                $end = $chunk->last();
 
-                    // Users batch
-                    $usersBatch = [];
-                    for ($i = $baseIndex; $i <= $end; $i++) {
-                        $name = 'Customer '.$i;
-                        $usersBatch[] = [
-                            'name' => $name,
+                // Create users using factory in batches
+                $users = collect();
+                for ($i = $baseIndex; $i <= $end; $i++) {
+                    $user = User::factory()
+                        ->state([
+                            'name' => 'Customer '.$i,
                             'email' => sprintf('customer%05d@example.com', $i),
-                            'email_verified_at' => $now,
-                            'password' => Hash::make('password'),
                             'preferred_locale' => ($i % 2) === 0 ? 'lt' : 'en',
-                            'remember_token' => Str::random(10),
                             'is_admin' => false,
                             'created_at' => $now,
                             'updated_at' => $now,
-                        ];
-                    }
-                    // Use upsert to handle existing records
-                    DB::table('users')->upsert($usersBatch, ['email'], ['name', 'password', 'preferred_locale', 'remember_token', 'is_admin', 'updated_at']);
-                    // advance users bar
-                    if (isset($usersBar)) {
-                        $usersBar->advance(count($usersBatch));
-                    }
+                        ])
+                        ->create();
+                    
+                    $users->push($user);
+                }
 
-                    // Resolve IDs
-                    $emails = array_map(fn ($i) => sprintf('customer%05d@example.com', $i), range($baseIndex, $end));
-                    $insertedUsers = DB::table('users')->whereIn('email', $emails)->select('id', 'name', 'email')->get();
+                // advance users bar
+                if (isset($usersBar)) {
+                    $usersBar->advance($users->count());
+                }
 
-                    // Addresses batch
-                    if ($this->tableExists('addresses')) {
-                        $addresses = [];
-                        $hasCountryCode = $this->columnExists('addresses', 'country_code');
-                        $hasCountry = $this->columnExists('addresses', 'country');
-                        foreach ($insertedUsers as $u) {
-                            $firstLast = explode(' ', (string) $u->name, 2);
-                            $first = $firstLast[0] ?? 'Customer';
-                            $last = $firstLast[1] ?? 'User';
-                            $countryValue = 'LT';
-                            $base = [
-                                'user_id' => $u->id,
-                                'first_name' => $first,
-                                'last_name' => $last,
-                                'address_line_1' => 'Gedimino pr. 1',
-                                'city' => 'Vilnius',
-                                'postal_code' => '01103',
-                                'phone' => '+37060000000',
+                $insertedUsers = $users;
+
+                // Create addresses using factory and relationships
+                if ($this->tableExists('addresses')) {
+                    foreach ($insertedUsers as $user) {
+                        // Create shipping address using factory
+                        Address::factory()
+                            ->for($user)
+                            ->state([
+                                'type' => 'shipping',
                                 'is_default' => true,
                                 'created_at' => $now,
                                 'updated_at' => $now,
-                            ];
-                            if ($hasCountryCode) {
-                                $base['country_code'] = $countryValue;
-                            }
-                            if ($hasCountry) {
-                                $base['country'] = $countryValue;
-                            }
+                            ])
+                            ->create();
 
-                            $addresses[] = array_merge($base, ['type' => 'shipping']);
-                            $addresses[] = array_merge($base, ['type' => 'billing', 'is_default' => false]);
+                        // Create billing address using factory
+                        Address::factory()
+                            ->for($user)
+                            ->state([
+                                'type' => 'billing',
+                                'is_default' => false,
+                                'created_at' => $now,
+                                'updated_at' => $now,
+                            ])
+                            ->create();
+                    }
+                    
+                    if (isset($addressesBar)) {
+                        $addressesBar->advance($insertedUsers->count() * 2);
+                    }
+                }
+
+                // Assign to customer group using relationships
+                if ($this->tableExists('customer_groups') && $this->tableExists('customer_group_user')) {
+                    $customerGroup = CustomerGroup::first();
+                    if ($customerGroup) {
+                        // init groups bar on first use
+                        if ($this->command && ! isset($groupsBar)) {
+                            $groupsBar = $this->command->getOutput()->createProgressBar(100);
+                            $groupsBar->setFormat('Groups: %current%/%max% [%bar%] %percent:3s%%');
+                            $this->command->line('');
+                            $groupsBar->start();
                         }
-                        if (! empty($addresses)) {
-                            DB::table('addresses')->insert($addresses);
-                            if (isset($addressesBar)) {
-                                $addressesBar->advance(count($addresses));
-                            }
+                        
+                        foreach ($insertedUsers as $user) {
+                            // Use model relationship to attach user to group
+                            $customerGroup->users()->attach($user->id, [
+                                'assigned_at' => $now,
+                                'created_at' => $now,
+                                'updated_at' => $now,
+                            ]);
+                        }
+                        
+                        if (isset($groupsBar)) {
+                            $groupsBar->advance(count($insertedUsers));
                         }
                     }
+                }
 
-                    // Assign to one customer group if present
-                    if ($this->tableExists('customer_groups') && $this->tableExists('customer_group_user')) {
-                        $groupId = DB::table('customer_groups')->value('id');
-                        if ($groupId) {
-                            // init groups bar on first use
-                            if ($this->command && ! isset($groupsBar)) {
-                                $groupsBar = $this->command->getOutput()->createProgressBar(100);
-                                $groupsBar->setFormat('Groups: %current%/%max% [%bar%] %percent:3s%%');
-                                $this->command->line('');
-                                $groupsBar->start();
-                            }
-                            $pivot = [];
-                            foreach ($insertedUsers as $u) {
-                                $pivot[] = [
-                                    'customer_group_id' => $groupId,
-                                    'user_id' => $u->id,
-                                    'assigned_at' => $now,
-                                    'created_at' => $now,
-                                    'updated_at' => $now,
-                                ];
-                            }
-                            DB::table('customer_group_user')->insertOrIgnore($pivot);
-                            if (isset($groupsBar)) {
-                                $groupsBar->advance(count($insertedUsers));
-                            }
-                        }
-                    }
-
-                    $baseIndex = $end + 1;
-                });
-        });
+                $baseIndex = $end + 1;
+            });
 
         // Finish detailed bars and step 2–4
         if (isset($usersBar)) {

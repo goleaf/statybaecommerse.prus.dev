@@ -26,8 +26,8 @@ final class UserOwnedScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        // Skip scoping for admin users
-        if (auth()->check() && (auth()->user()->is_admin ?? false)) {
+        // Skip scoping for admin or users with super_admin role
+        if (auth()->check() && ((auth()->user()->is_admin ?? false) || auth()->user()?->hasRole('super_admin'))) {
             return;
         }
 

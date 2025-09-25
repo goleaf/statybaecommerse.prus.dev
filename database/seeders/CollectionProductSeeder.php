@@ -1,14 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Translations\ProductTranslation;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
-use App\Models\Translations\ProductTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Database\Seeders\Data\HouseBuilderCollections;
 use Illuminate\Database\Seeder;
@@ -32,8 +30,8 @@ class CollectionProductSeeder extends Seeder
             /** @var Collection|null $collection */
             $collection = Collection::where('slug', $slug)->first();
 
-            if (! $collection) {
-                $this->command?->warn('CollectionProductSeeder: missing collection "'.$slug.'".');
+            if (!$collection) {
+                $this->command?->warn('CollectionProductSeeder: missing collection "' . $slug . '".');
 
                 continue;
             }
@@ -48,7 +46,7 @@ class CollectionProductSeeder extends Seeder
             $targetCount = max(count($definition['products'] ?? []), 8);
             $this->topUpCollectionWithExistingProducts($collection, $targetCount);
 
-            $this->command?->info('CollectionProductSeeder: populated "'.$collection->name.'" with curated products.');
+            $this->command?->info('CollectionProductSeeder: populated "' . $collection->name . '" with curated products.');
         }
     }
 
@@ -61,7 +59,7 @@ class CollectionProductSeeder extends Seeder
 
         // Check if product already exists to maintain idempotency
         $existingProduct = Product::where('slug', $productDefinition['slug'])->first();
-        
+
         $productData = [
             'type' => 'simple',
             'name' => $english['name'],
@@ -81,7 +79,7 @@ class CollectionProductSeeder extends Seeder
             'manage_stock' => true,
             'status' => 'published',
             'published_at' => $productDefinition['published_at'] ?? now()->subDays(random_int(5, 45)),
-            'seo_title' => $english['name'].' - '.config('app.name'),
+            'seo_title' => $english['name'] . ' - ' . config('app.name'),
             'seo_description' => $english['short_description'],
         ];
 
@@ -103,7 +101,7 @@ class CollectionProductSeeder extends Seeder
             ? $collectionCategoryIds
             : Category::whereIn('slug', $productCategorySlugs)->pluck('id')->all();
 
-        if (! empty($categoryIds)) {
+        if (!empty($categoryIds)) {
             $product->categories()->syncWithoutDetaching($categoryIds);
         }
 
@@ -117,11 +115,11 @@ class CollectionProductSeeder extends Seeder
 
             $translationData = [
                 'name' => $localeTranslation['name'],
-                'slug' => Str::slug($localeTranslation['name'].'-'.$locale),
+                'slug' => Str::slug($localeTranslation['name'] . '-' . $locale),
                 'summary' => $localeTranslation['short_description'],
                 'short_description' => $localeTranslation['short_description'],
                 'description' => $localeTranslation['description'],
-                'seo_title' => $localeTranslation['name'].' - '.config('app.name'),
+                'seo_title' => $localeTranslation['name'] . ' - ' . config('app.name'),
                 'seo_description' => $localeTranslation['short_description'],
                 'meta_keywords' => [],
             ];
@@ -169,11 +167,11 @@ class CollectionProductSeeder extends Seeder
     {
         $slug = Str::slug($name);
         $existingBrand = Brand::where('slug', $slug)->first();
-        
+
         if ($existingBrand) {
             return $existingBrand;
         }
-        
+
         // Use factory to create brand
         return Brand::factory()
             ->state([
@@ -196,21 +194,21 @@ class CollectionProductSeeder extends Seeder
             $product
                 ->addMedia($imagePath)
                 ->withCustomProperties(['source' => 'generated'])
-                ->usingName($label.' Image')
+                ->usingName($label . ' Image')
                 ->toMediaCollection('images');
 
             if (file_exists($imagePath)) {
                 unlink($imagePath);
             }
         } catch (\Throwable $exception) {
-            $this->command?->warn('CollectionProductSeeder: failed to generate product image for '.$product->slug.': '.$exception->getMessage());
+            $this->command?->warn('CollectionProductSeeder: failed to generate product image for ' . $product->slug . ': ' . $exception->getMessage());
         }
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en,ru,de')))
-            ->map(fn ($locale) => trim($locale))
+            ->map(fn($locale) => trim($locale))
             ->filter()
             ->unique()
             ->values()

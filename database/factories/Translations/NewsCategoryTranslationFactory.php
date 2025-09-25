@@ -19,7 +19,7 @@ final class NewsCategoryTranslationFactory extends Factory
         $name = $this->faker->words(2, true);
 
         return [
-            'news_category_id' => 1,  // Will be overridden
+            'news_category_id' => null,
             'locale' => $this->faker->randomElement(['lt', 'en']),
             'name' => ucwords($name),
             'slug' => str($name)->slug()->toString(),

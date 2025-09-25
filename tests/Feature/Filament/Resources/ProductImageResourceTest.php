@@ -16,7 +16,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 final class ProductImageResourceTest extends TestCase
 {

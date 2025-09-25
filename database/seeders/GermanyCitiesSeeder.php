@@ -15,35 +15,65 @@ final class GermanyCitiesSeeder extends Seeder
 {
     public function run(): void
     {
-        $germany = Country::where('cca2', 'DE')->first();
-        $euZone = Zone::where('code', 'EU')->first();
+        // Get or create Germany and EU zone using factories
+        $germany = Country::factory()->state(['cca2' => 'DE', 'name' => 'Germany'])->create();
+        $euZone = Zone::factory()->state(['code' => 'EU', 'name' => 'European Union'])->create();
 
-        // Get regions
-        $bavariaRegion = Region::where('code', 'DE-BY')->first();
-        $badenWurttembergRegion = Region::where('code', 'DE-BW')->first();
-        $northRhineWestphaliaRegion = Region::where('code', 'DE-NW')->first();
-        $hesseRegion = Region::where('code', 'DE-HE')->first();
-        $saxonyRegion = Region::where('code', 'DE-SN')->first();
-        $lowerSaxonyRegion = Region::where('code', 'DE-NI')->first();
-        $brandenburgRegion = Region::where('code', 'DE-BB')->first();
-        $saxonyAnhaltRegion = Region::where('code', 'DE-ST')->first();
-        $thuringiaRegion = Region::where('code', 'DE-TH')->first();
-        $mecklenburgVorpommernRegion = Region::where('code', 'DE-MV')->first();
-        $schleswigHolsteinRegion = Region::where('code', 'DE-SH')->first();
-        $saarlandRegion = Region::where('code', 'DE-SL')->first();
-        $bremenRegion = Region::where('code', 'DE-HB')->first();
-        $hamburgRegion = Region::where('code', 'DE-HH')->first();
-        $berlinRegion = Region::where('code', 'DE-BE')->first();
-        $rhinelandPalatinateRegion = Region::where('code', 'DE-RP')->first();
+        // Create German regions using factories
+        $regions = $this->createGermanRegions($germany, $euZone);
 
-        $cities = [
+        // Create major German cities using factories
+        $this->createGermanCities($germany, $euZone, $regions);
+    }
+
+    private function createGermanRegions(Country $germany, Zone $euZone): array
+    {
+        $regionData = [
+            'DE-BE' => ['name' => 'Berlin', 'type' => 'state'],
+            'DE-HH' => ['name' => 'Hamburg', 'type' => 'state'],
+            'DE-BY' => ['name' => 'Bavaria', 'type' => 'state'],
+            'DE-BW' => ['name' => 'Baden-Württemberg', 'type' => 'state'],
+            'DE-NW' => ['name' => 'North Rhine-Westphalia', 'type' => 'state'],
+            'DE-HE' => ['name' => 'Hesse', 'type' => 'state'],
+            'DE-SN' => ['name' => 'Saxony', 'type' => 'state'],
+            'DE-NI' => ['name' => 'Lower Saxony', 'type' => 'state'],
+            'DE-BB' => ['name' => 'Brandenburg', 'type' => 'state'],
+            'DE-ST' => ['name' => 'Saxony-Anhalt', 'type' => 'state'],
+            'DE-TH' => ['name' => 'Thuringia', 'type' => 'state'],
+            'DE-MV' => ['name' => 'Mecklenburg-Vorpommern', 'type' => 'state'],
+            'DE-SH' => ['name' => 'Schleswig-Holstein', 'type' => 'state'],
+            'DE-SL' => ['name' => 'Saarland', 'type' => 'state'],
+            'DE-HB' => ['name' => 'Bremen', 'type' => 'state'],
+            'DE-RP' => ['name' => 'Rhineland-Palatinate', 'type' => 'state'],
+        ];
+
+        $regions = [];
+        foreach ($regionData as $code => $data) {
+            $regions[$code] = Region::factory()
+                ->for($germany, 'country')
+                ->for($euZone, 'zone')
+                ->state([
+                    'code' => $code,
+                    'name' => $data['name'],
+                    'type' => $data['type'],
+                    'is_enabled' => true,
+                ])
+                ->create();
+        }
+
+        return $regions;
+    }
+
+    private function createGermanCities(Country $germany, Zone $euZone, array $regions): void
+    {
+        $cityData = [
             // Berlin
             [
                 'name' => 'Berlin',
                 'code' => 'DE-BE-BER',
+                'region_code' => 'DE-BE',
                 'is_capital' => true,
                 'is_default' => true,
-                'region_id' => $berlinRegion?->id,
                 'latitude' => 52.52,
                 'longitude' => 13.405,
                 'population' => 3669491,

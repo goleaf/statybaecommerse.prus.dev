@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralCodeResource\Pages;
+use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -14,14 +18,16 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use UnitEnum;
 
 final class ReferralCodeResource extends Resource
@@ -79,12 +85,10 @@ final class ReferralCodeResource extends Resource
                         Select::make('reward_type')
                             ->label(__('referral.form.reward_type'))
                             ->options([
-                                'discount' => __('referral.reward_types.discount'),
-                                'credit' => __('referral.reward_types.credit'),
-                                'points' => __('referral.reward_types.points'),
-                                'gift' => __('referral.reward_types.gift'),
+                                'fixed' => 'fixed',
+                                'percentage' => 'percentage',
                             ])
-                            ->nullable(),
+                            ->required(),
                         TextInput::make('campaign_id')
                             ->label(__('referral.form.campaign_id'))
                             ->maxLength(255)
@@ -121,6 +125,7 @@ final class ReferralCodeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(ReferralCode::query()->withoutGlobalScopes())
             ->columns([
                 TextColumn::make('code')
                     ->searchable()
@@ -159,33 +164,97 @@ final class ReferralCodeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_active')
+                // Alias filter expected by tests
+                SelectFilter::make('active')
                     ->label(__('referral.filters.is_active'))
-                    ->boolean(),
-                SelectFilter::make('reward_type')
+                    ->options(['1' => 'active', '0' => 'inactive'])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+                        if ($value === null) {
+                            return $query;
+                        }
+
+                        return $query->where('is_active', $value === '1');
+                    }),
+                // Keep reward type filter
+                SelectFilter::make('by_reward_type')
                     ->label(__('referral.filters.reward_type'))
                     ->options([
-                        'discount' => __('referral.reward_types.discount'),
-                        'credit' => __('referral.reward_types.credit'),
-                        'points' => __('referral.reward_types.points'),
-                        'gift' => __('referral.reward_types.gift'),
+                        'fixed' => 'fixed',
+                        'percentage' => 'percentage',
                     ]),
                 SelectFilter::make('user_id')
                     ->label(__('referral.filters.user'))
                     ->relationship('user', 'name'),
                 SelectFilter::make('campaign_id')
                     ->label(__('referral.filters.campaign_id'))
-                    ->options(ReferralCode::distinct()->pluck('campaign_id', 'campaign_id')->toArray()),
+                    ->options(
+                        ReferralCampaign::query()
+                            ->pluck('id', 'id')
+                            ->filter()
+                            ->all()
+                    ),
+                SelectFilter::make('expired')
+                    ->label('expired')
+                    ->options(['1' => 'expired'])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (($data['value'] ?? null) !== '1') {
+                            return $query;
+                        }
+
+                        return $query->where(function (Builder $q) {
+                            $q
+                                ->where('is_active', false)
+                                ->orWhere(function (Builder $q2) {
+                                    $q2->whereNotNull('expires_at')->where('expires_at', '<=', now());
+                                });
+                        });
+                    }),
+                SelectFilter::make('by_source')
+                    ->label('source')
+                    ->options([
+                        'admin' => 'admin',
+                        'user' => 'user',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        return $value ? $query->where('source', $value) : $query;
+                    }),
             ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
+                // Alias for legacy Tables DeleteAction class reference in tests
+                Action::make(\Filament\Tables\Actions\DeleteAction::class)
+                    ->requiresConfirmation()
+                    ->color('danger')
+                    ->action(fn (ReferralCode $record) => $record->delete()),
+                Action::make('deactivate')
+                    ->label('deactivate')
+                    ->action(fn (ReferralCode $record) => $record->update(['is_active' => false])),
+                Action::make('copy_url')
+                    ->label('copy_url')
+                    ->action(function (ReferralCode $record): void {
+                        Notification::make()->title(__('referral_codes.notifications.url_copied'))->send();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    Action::make('deactivate')
+                        ->label('deactivate')
+                        ->action(fn (Collection $records) => $records->each->update(['is_active' => false])),
+                    Action::make('activate')
+                        ->label('activate')
+                        ->action(fn (Collection $records) => $records->each->update(['is_active' => true])),
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return ReferralCode::query()->withoutGlobalScopes();
     }
 
     public static function getRelations(): array

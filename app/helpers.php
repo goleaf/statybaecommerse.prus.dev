@@ -31,10 +31,17 @@ use Illuminate\Support\Facades\Schema;
 if (! function_exists('current_currency')) {
     function current_currency(): string
     {
+        // Per-request memoization to avoid duplicate DB lookups in lists
+        static $resolved = null;
+
         // If a forced currency was set by locale mapping or user choice, honor it
         $forced = session('forced_currency');
         if (is_string($forced) && $forced !== '') {
             return $forced;
+        }
+
+        if ($resolved !== null) {
+            return $resolved;
         }
 
         // During tests or before settings table exists, fallback safely without DB access
@@ -42,7 +49,7 @@ if (! function_exists('current_currency')) {
             try {
                 $code = \App\Models\Setting::where('key', 'currency_code')->value('value');
                 if (is_string($code) && $code !== '') {
-                    return $code;
+                    return $resolved = $code;
                 }
             } catch (\Throwable $e) {
                 // ignore and continue to default
@@ -50,7 +57,7 @@ if (! function_exists('current_currency')) {
         }
 
         // Default project currency
-        return 'EUR';
+        return $resolved = 'EUR';
     }
 }
 

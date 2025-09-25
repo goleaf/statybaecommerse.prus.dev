@@ -15,6 +15,8 @@ if ($env !== 'testing') {
     $providers[] = App\Providers\AdminNavigationServiceProvider::class;
     $providers[] = App\Providers\HorizonServiceProvider::class;
     $providers[] = BezhanSalleh\FilamentShield\FilamentShieldServiceProvider::class;
+} else {
+    $providers[] = App\Providers\TestingLivewireAliasesProvider::class;
 }
 
 return $providers;

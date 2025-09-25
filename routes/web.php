@@ -341,6 +341,12 @@ if (app()->environment('testing')) {
             ->name('filament.admin.resources.system-settings.destroy');
         Route::get('/admin/system-settings/{record}', fn($record) => response('OK'))
             ->name('filament.admin.resources.system-settings.view');
+        Route::post('/admin/collections/{collection}/toggle-visibility', function ($collection) {
+            $model = \App\Models\Collection::query()->findOrFail($collection);
+            $model->update(['is_visible' => ! $model->is_visible]);
+
+            return redirect('/admin/collections');
+        })->name('filament.admin.resources.collections.toggle-visibility');
     });
 }
 
@@ -932,7 +938,7 @@ Route::prefix('seo-data')->name('seo-data.')->group(function () {
 });
 
 // Attribute Frontend Routes
-Route::prefix('attributes')->name('frontend.attributes.')->group(function () {
+Route::prefix('attributes')->name('attributes.')->group(function () {
     Route::get('/', [App\Http\Controllers\Frontend\AttributeController::class, 'index'])->name('index');
     Route::get('/{attribute}', [App\Http\Controllers\Frontend\AttributeController::class, 'show'])->name('show');
     Route::get('/filter/products', [App\Http\Controllers\Frontend\AttributeController::class, 'filter'])->name('filter');
@@ -1101,7 +1107,7 @@ Route::prefix('seo-data')->name('seo-data.')->group(function () {
 });
 
 // Attribute Frontend Routes
-Route::prefix('attributes')->name('frontend.attributes.')->group(function () {
+Route::prefix('attributes')->name('attributes.')->group(function () {
     Route::get('/', [App\Http\Controllers\Frontend\AttributeController::class, 'index'])->name('index');
     Route::get('/{attribute}', [App\Http\Controllers\Frontend\AttributeController::class, 'show'])->name('show');
     Route::get('/filter/products', [App\Http\Controllers\Frontend\AttributeController::class, 'filter'])->name('filter');
@@ -1174,13 +1180,13 @@ Route::prefix('collections')->name('collections.')->group(function () {
 
 // Attribute Frontend Routes
 Route::prefix('attributes')->name('attributes.')->group(function () {
-    Route::get('/', [App\Http\Controllers\AttributeController::class, 'index'])->name('index');
-    Route::get('/{attribute}', [App\Http\Controllers\AttributeController::class, 'show'])->name('show');
-    Route::get('/api/search', [App\Http\Controllers\AttributeController::class, 'api'])->name('api.search');
-    Route::get('/api/by-type/{type}', [App\Http\Controllers\AttributeController::class, 'byType'])->name('api.by-type');
-    Route::get('/api/by-group/{group}', [App\Http\Controllers\AttributeController::class, 'byGroup'])->name('api.by-group');
-    Route::get('/api/filterable', [App\Http\Controllers\AttributeController::class, 'filterable'])->name('api.filterable');
-    Route::get('/api/required', [App\Http\Controllers\AttributeController::class, 'required'])->name('api.required');
-    Route::get('/api/statistics', [App\Http\Controllers\AttributeController::class, 'statistics'])->name('api.statistics');
-    Route::get('/{attribute}/values', [App\Http\Controllers\AttributeController::class, 'values'])->name('values');
+    Route::get('/', [App\Http\Controllers\Frontend\AttributeController::class, 'index'])->name('index');
+    Route::get('/{attribute}', [App\Http\Controllers\Frontend\AttributeController::class, 'show'])->name('show');
+    Route::get('/api/search', [App\Http\Controllers\Frontend\AttributeController::class, 'api'])->name('api.search');
+    Route::get('/api/by-type/{type}', [App\Http\Controllers\Frontend\AttributeController::class, 'byType'])->name('api.by-type');
+    Route::get('/api/by-group/{group}', [App\Http\Controllers\Frontend\AttributeController::class, 'byGroup'])->name('api.by-group');
+    Route::get('/api/filterable', [App\Http\Controllers\Frontend\AttributeController::class, 'filterable'])->name('api.filterable');
+    Route::get('/api/required', [App\Http\Controllers\Frontend\AttributeController::class, 'required'])->name('api.required');
+    Route::get('/api/statistics', [App\Http\Controllers\Frontend\AttributeController::class, 'statistics'])->name('api.statistics');
+    Route::get('/{attribute}/values', [App\Http\Controllers\Frontend\AttributeController::class, 'values'])->name('values');
 });

@@ -13,6 +13,7 @@ use App\Services\DocumentService;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
 
 final class DiscountCodeDocumentActionTest extends TestCase
 {

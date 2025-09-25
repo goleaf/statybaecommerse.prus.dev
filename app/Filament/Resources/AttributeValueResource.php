@@ -31,8 +31,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
-use Filament\Schemas\Components\Tabs\Tabs as SchemaTabs;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ColorColumn;
@@ -101,161 +99,137 @@ final class AttributeValueResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            SchemaTabs::make('Attribute Value')
-                ->tabs([
-                    SchemaTab::make(__('attribute_values.basic_information'))
-                        ->icon('heroicon-o-information-circle')
+            SchemaSection::make(__('attribute_values.basic_information'))
+                ->schema([
+                    SchemaGrid::make(2)
                         ->schema([
-                            SchemaSection::make(__('attribute_values.basic_information'))
-                                ->description(__('attribute_values.basic_information'))
-                                ->schema([
-                                    SchemaGrid::make(2)
-                                        ->schema([
-                                            Select::make('attribute_id')
-                                                ->label(__('attribute_values.attribute'))
-                                                ->relationship('attribute', 'name')
-                                                ->searchable()
-                                                ->preload()
-                                                ->required()
-                                                ->live()
-                                                ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                                    if ($state) {
-                                                        $attribute = Attribute::find($state);
-                                                        if ($attribute) {
-                                                            $set('attribute_name', $attribute->name);
-                                                            $set('attribute_type', $attribute->type);
-                                                        }
-                                                    }
-                                                }),
-                                            TextInput::make('attribute_name')
-                                                ->label(__('attribute_values.attribute_name'))
-                                                ->disabled(),
-                                            Select::make('attribute_value_type')
-                                                ->label(__('attribute_values.attribute_value_type'))
-                                                ->options([
-                                                    'text' => __('attribute_values.types.text'),
-                                                    'number' => __('attribute_values.types.number'),
-                                                    'color' => __('attribute_values.types.color'),
-                                                    'image' => __('attribute_values.types.image'),
-                                                ])
-                                                ->required(),
-                                        ]),
-                                    SchemaGrid::make(2)
-                                        ->schema([
-                                            Select::make('valueable_type')
-                                                ->label(__('attribute_values.valueable_type'))
-                                                ->options([
-                                                    'product' => __('attribute_values.types.product'),
-                                                    'product_variant' => __('attribute_values.types.product_variant'),
-                                                ])
-                                                ->live()
-                                                ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                                    $set('valueable_id', null);
-                                                }),
-                                            Select::make('valueable_id')
-                                                ->label(__('attribute_values.valueable_item'))
-                                                ->options(function (Get $get) {
-                                                    $type = $get('valueable_type');
-                                                    if ($type === 'product') {
-                                                        return Product::pluck('name', 'id');
-                                                    } elseif ($type === 'product_variant') {
-                                                        return ProductVariant::pluck('name', 'id');
-                                                    }
+                            Select::make('attribute_id')
+                                ->label(__('attribute_values.attribute'))
+                                ->relationship('attribute', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                ->live()
+                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                    if ($state) {
+                                        $attribute = Attribute::find($state);
+                                        if ($attribute) {
+                                            $set('attribute_name', $attribute->name);
+                                            $set('attribute_type', $attribute->type);
+                                        }
+                                    }
+                                }),
+                            TextInput::make('attribute_name')
+                                ->label(__('attribute_values.attribute_name'))
+                                ->disabled(),
+                            Select::make('attribute_value_type')
+                                ->label(__('attribute_values.attribute_value_type'))
+                                ->options([
+                                    'text' => __('attribute_values.types.text'),
+                                    'number' => __('attribute_values.types.number'),
+                                    'color' => __('attribute_values.types.color'),
+                                    'image' => __('attribute_values.types.image'),
+                                ])
+                                ->required(),
+                        ]),
+                    SchemaGrid::make(2)
+                        ->schema([
+                            Select::make('valueable_type')
+                                ->label(__('attribute_values.valueable_type'))
+                                ->options([
+                                    'product' => __('attribute_values.types.product'),
+                                    'product_variant' => __('attribute_values.types.product_variant'),
+                                ])
+                                ->live()
+                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                    $set('valueable_id', null);
+                                }),
+                            Select::make('valueable_id')
+                                ->label(__('attribute_values.valueable_item'))
+                                ->options(function (\Filament\Forms\Get $get) {
+                                    $type = $get('valueable_type');
+                                    if ($type === 'product') {
+                                        return Product::pluck('name', 'id');
+                                    } elseif ($type === 'product_variant') {
+                                        return ProductVariant::pluck('name', 'id');
+                                    }
 
-                                                    return [];
-                                                })
-                                                ->live()
-                                                ->searchable(),
-                                        ]),
-                                ]),
+                                    return [];
+                                })
+                                ->live()
+                                ->searchable(),
                         ]),
-                    SchemaTab::make(__('attribute_values.value_information'))
-                        ->icon('heroicon-o-document-text')
+                ]),
+            SchemaSection::make(__('attribute_values.value_information'))
+                ->schema([
+                    SchemaGrid::make(2)
                         ->schema([
-                            SchemaSection::make(__('attribute_values.value_information'))
-                                ->description(__('attribute_values.value_information'))
-                                ->schema([
-                                    SchemaGrid::make(2)
-                                        ->schema([
-                                            TextInput::make('value')
-                                                ->label(__('attribute_values.value'))
-                                                ->maxLength(255)
-                                                ->required()
-                                                ->live()
-                                                ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                                    if (empty($state)) {
-                                                        $set('slug', null);
-                                                    } else {
-                                                        $set('slug', Str::slug($state));
-                                                    }
-                                                }),
-                                            TextInput::make('display_value')
-                                                ->label(__('attribute_values.display_value'))
-                                                ->helperText(__('attribute_values.display_value_help'))
-                                                ->maxLength(255),
-                                        ]),
-                                    TextInput::make('slug')
-                                        ->label(__('attributes.slug'))
-                                        ->maxLength(255)
-                                        ->unique(AttributeValue::class, 'slug', ignoreRecord: true)
-                                        ->helperText(__('attributes.slug_auto_generated')),
-                                    Textarea::make('description')
-                                        ->label(__('attribute_values.description'))
-                                        ->rows(3)
-                                        ->maxLength(500)
-                                        ->columnSpanFull(),
-                                ]),
+                            TextInput::make('value')
+                                ->label(__('attribute_values.value'))
+                                ->maxLength(255)
+                                ->required()
+                                ->live()
+                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                    if (empty($state)) {
+                                        $set('slug', null);
+                                    } else {
+                                        $set('slug', Str::slug($state));
+                                    }
+                                }),
+                            TextInput::make('display_value')
+                                ->label(__('attribute_values.display_value'))
+                                ->helperText(__('attribute_values.display_value_help'))
+                                ->maxLength(255),
                         ]),
-                    SchemaTab::make(__('attribute_values.settings'))
-                        ->icon('heroicon-o-cog-6-tooth')
+                    TextInput::make('slug')
+                        ->label(__('attributes.slug'))
+                        ->maxLength(255)
+                        ->unique(AttributeValue::class, 'slug', ignoreRecord: true)
+                        ->helperText(__('attributes.slug_auto_generated')),
+                    Textarea::make('description')
+                        ->label(__('attribute_values.description'))
+                        ->rows(3)
+                        ->maxLength(500)
+                        ->columnSpanFull(),
+                ]),
+            SchemaSection::make(__('attribute_values.settings'))
+                ->schema([
+                    SchemaGrid::make(3)
                         ->schema([
-                            SchemaSection::make(__('attribute_values.settings'))
-                                ->description(__('attribute_values.settings'))
-                                ->schema([
-                                    SchemaGrid::make(3)
-                                        ->schema([
-                                            Toggle::make('is_active')
-                                                ->label(__('attribute_values.is_active'))
-                                                ->default(true)
-                                                ->helperText(__('attribute_values.is_active_help')),
-                                            Toggle::make('is_default')
-                                                ->label(__('attribute_values.is_default'))
-                                                ->helperText(__('attribute_values.is_default_help')),
-                                            Toggle::make('is_searchable')
-                                                ->label(__('attribute_values.is_searchable'))
-                                                ->default(false)
-                                                ->helperText(__('attribute_values.is_searchable_help')),
-                                        ]),
-                                    SchemaGrid::make(2)
-                                        ->schema([
-                                            TextInput::make('sort_order')
-                                                ->label(__('attribute_values.sort_order'))
-                                                ->numeric()
-                                                ->default(0)
-                                                ->minValue(0)
-                                                ->helperText(__('attribute_values.sort_order_help')),
-                                            TextInput::make('color_code')
-                                                ->label(__('attributes.color'))
-                                                ->maxLength(7)
-                                                ->helperText(__('attributes.color_help')),
-                                        ]),
-                                ]),
+                            Toggle::make('is_active')
+                                ->label(__('attribute_values.is_active'))
+                                ->default(true)
+                                ->helperText(__('attribute_values.is_active_help')),
+                            Toggle::make('is_default')
+                                ->label(__('attribute_values.is_default'))
+                                ->helperText(__('attribute_values.is_default_help')),
+                            Toggle::make('is_searchable')
+                                ->label(__('attribute_values.is_searchable'))
+                                ->default(false)
+                                ->helperText(__('attribute_values.is_searchable_help')),
                         ]),
-                    SchemaTab::make(__('attributes.meta_data'))
-                        ->icon('heroicon-o-code-bracket')
+                    SchemaGrid::make(2)
                         ->schema([
-                            SchemaSection::make(__('attributes.meta_data'))
-                                ->description(__('attributes.meta_data_help'))
-                                ->schema([
-                                    KeyValue::make('metadata')
-                                        ->label(__('attributes.meta_data'))
-                                        ->keyLabel(__('attributes.key'))
-                                        ->valueLabel(__('attributes.value'))
-                                        ->helperText(__('attributes.meta_data_help')),
-                                ]),
+                            TextInput::make('sort_order')
+                                ->label(__('attribute_values.sort_order'))
+                                ->numeric()
+                                ->default(0)
+                                ->minValue(0)
+                                ->helperText(__('attribute_values.sort_order_help')),
+                            TextInput::make('color_code')
+                                ->label(__('attributes.color'))
+                                ->maxLength(7)
+                                ->helperText(__('attributes.color_help')),
                         ]),
-                ])
-                ->columnSpanFull(),
+                ]),
+            SchemaSection::make(__('attributes.meta_data'))
+                ->schema([
+                    KeyValue::make('metadata')
+                        ->label(__('attributes.meta_data'))
+                        ->keyLabel(__('attributes.key'))
+                        ->valueLabel(__('attributes.value'))
+                        ->helperText(__('attributes.meta_data_help')),
+                ]),
         ]);
     }
 
@@ -265,6 +239,7 @@ final class AttributeValueResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading(false)
             ->columns([
                 TextColumn::make('id')
                     ->label('ID')
@@ -449,6 +424,7 @@ final class AttributeValueResource extends Resource
                     ->slideOver(),
                 EditAction::make()
                     ->slideOver(),
+                \Filament\Actions\DeleteAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (AttributeValue $record): string => $record->is_active ? __('attribute_values.deactivate') : __('attribute_values.activate'))
                     ->icon(fn (AttributeValue $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -510,7 +486,9 @@ final class AttributeValueResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => true]);
+                            $records->each(function (AttributeValue $record) {
+                                $record->update(['is_active' => true]);
+                            });
                             Notification::make()
                                 ->title(__('attribute_values.bulk_activated_success'))
                                 ->success()
@@ -522,7 +500,9 @@ final class AttributeValueResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => false]);
+                            $records->each(function (AttributeValue $record) {
+                                $record->update(['is_active' => false]);
+                            });
 
                             Notification::make()
                                 ->title(__('attribute_values.bulk_deactivated_success'))

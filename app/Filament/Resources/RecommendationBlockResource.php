@@ -1,9 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
+use App\Models\Scopes\ActiveScope;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -19,6 +22,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -76,6 +80,7 @@ final class RecommendationBlockResource extends Resource
                     TextInput::make('name')
                         ->label(__('recommendation_blocks.name'))
                         ->required()
+                        ->unique(ignoreRecord: true)
                         ->maxLength(255),
                     TextInput::make('title')
                         ->label(__('recommendation_blocks.title'))
@@ -112,9 +117,12 @@ final class RecommendationBlockResource extends Resource
                     Select::make('product_ids')
                         ->label(__('recommendation_blocks.products'))
                         ->multiple()
-                        ->relationship('products', 'name')
+                        ->relationship('products', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
                         ->searchable()
                         ->preload()
+                        ->afterStateHydrated(function ($state, callable $set): void {
+                            $set('product_ids', collect($state)->sort()->values()->all());
+                        })
                         ->createOptionForm([
                             TextInput::make('name')
                                 ->required()
@@ -163,7 +171,7 @@ final class RecommendationBlockResource extends Resource
                 TextColumn::make('type')
                     ->label(__('recommendation_blocks.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'featured' => 'success',
                         'related' => 'info',
                         'similar' => 'warning',
@@ -174,7 +182,7 @@ final class RecommendationBlockResource extends Resource
                 TextColumn::make('position')
                     ->label(__('recommendation_blocks.position'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'top' => 'success',
                         'bottom' => 'info',
                         'sidebar' => 'warning',
@@ -259,5 +267,11 @@ final class RecommendationBlockResource extends Resource
             'create' => Pages\CreateRecommendationBlock::route('/create'),
             'edit' => Pages\EditRecommendationBlock::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScope(ActiveScope::class);
     }
 }

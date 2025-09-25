@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -15,7 +17,7 @@ final class XmlCatalogService
 {
     public function import(string $xmlPath, array $options = []): array
     {
-        if (!is_file($xmlPath)) {
+        if (! is_file($xmlPath)) {
             return ['categories' => ['created' => 0, 'updated' => 0], 'products' => ['created' => 0, 'updated' => 0]];
         }
 
@@ -60,7 +62,7 @@ final class XmlCatalogService
                     $catEl = $doc->createElement('category');
 
                     $catEl->appendChild($doc->createElement('slug', (string) $category->slug));
-                    if (!is_null($category->parent_id)) {
+                    if (! is_null($category->parent_id)) {
                         $catEl->appendChild($doc->createElement('parent_slug', (string) optional($category->parent)->slug));
                     }
 
@@ -166,12 +168,12 @@ final class XmlCatalogService
                     $imagesEl = $doc->createElement('images');
                     foreach ($product->images()->orderBy('sort_order')->get() as $img) {
                         $path = (string) $img->path;
-                        if (!str_starts_with($path, 'http://') && !str_starts_with($path, 'https://') && !str_starts_with($path, '/')) {
+                        if (! str_starts_with($path, 'http://') && ! str_starts_with($path, 'https://') && ! str_starts_with($path, '/')) {
                             $path = asset(trim($path, '/'));
                         }
                         $iEl = $doc->createElement('image');
                         $iEl->setAttribute('src', $path);
-                        if (!empty($img->alt_text)) {
+                        if (! empty($img->alt_text)) {
                             $iEl->setAttribute('alt', (string) $img->alt_text);
                         }
                         $imagesEl->appendChild($iEl);
@@ -223,6 +225,9 @@ final class XmlCatalogService
             ]);
 
             $category = Category::query()->withTrashed()->where('slug', $slug)->first();
+            if (! $category) {
+                $category = Category::query()->withoutGlobalScopes()->withTrashed()->where('slug', $slug)->first();
+            }
             $nameLt = '';
             if (isset($c->translations)) {
                 foreach ($c->translations->translation as $tt) {
@@ -264,8 +269,8 @@ final class XmlCatalogService
                         'seo_title' => trim((string) ($t->seo_title ?? '')),
                         'seo_description' => trim((string) ($t->seo_description ?? '')),
                     ];
-                    $trPayload = array_filter($trPayload, fn($v) => $v !== '' && $v !== null);
-                    if (!empty($trPayload)) {
+                    $trPayload = array_filter($trPayload, fn ($v) => $v !== '' && $v !== null);
+                    if (! empty($trPayload)) {
                         $category->updateTranslation($locale, $trPayload);
                     }
                 }
@@ -277,8 +282,8 @@ final class XmlCatalogService
             if ($parentSlug === '') {
                 continue;
             }
-            $category = Category::query()->withTrashed()->where('slug', $slug)->first();
-            $parent = Category::query()->withTrashed()->where('slug', $parentSlug)->first();
+            $category = Category::query()->withoutGlobalScopes()->withTrashed()->where('slug', $slug)->first();
+            $parent = Category::query()->withoutGlobalScopes()->withTrashed()->where('slug', $parentSlug)->first();
             if ($category && $parent && Schema::hasColumn('categories', 'parent_id')) {
                 $category->parent()->associate($parent);
                 $category->save();
@@ -307,10 +312,10 @@ final class XmlCatalogService
 
             $product = null;
             if ($sku !== '') {
-                $product = Product::query()->withTrashed()->where('sku', $sku)->first();
+                $product = Product::query()->withoutGlobalScopes()->withTrashed()->where('sku', $sku)->first();
             }
-            if (!$product && $slug !== '') {
-                $product = Product::query()->withTrashed()->where('slug', $slug)->first();
+            if (! $product && $slug !== '') {
+                $product = Product::query()->withoutGlobalScopes()->withTrashed()->where('slug', $slug)->first();
             }
 
             // Build payload from base
@@ -323,7 +328,7 @@ final class XmlCatalogService
                 $payload['slug'] = $slug;
             }
 
-            if (!isset($payload['slug']) || $payload['slug'] === '') {
+            if (! isset($payload['slug']) || $payload['slug'] === '') {
                 // Prefer LT translation name for slug, fallback to SKU, then random
                 $ltName = '';
                 if (isset($p->translations)) {
@@ -391,11 +396,32 @@ final class XmlCatalogService
                 }
                 $baseName = $nameLt !== '' ? $nameLt : ($payload['slug'] ?? ($sku !== '' ? $sku : 'product'));
                 $payload['name'] = $baseName;
-                if (!isset($payload['slug']) || $payload['slug'] === '') {
+                if (! isset($payload['slug']) || $payload['slug'] === '') {
                     $payload['slug'] = Str::slug($payload['name'] ?? $sku ?? Str::uuid()->toString());
                 }
-                $product = Product::query()->create($payload);
-                $created++;
+                try {
+                    $product = Product::query()->create($payload);
+                    $created++;
+                } catch (\Throwable $e) {
+                    // Handle unique constraint (e.g., soft-deleted product exists with same SKU/slug)
+                    $existing = null;
+                    if ($sku !== '') {
+                        $existing = Product::query()->withoutGlobalScopes()->withTrashed()->where('sku', $sku)->first();
+                    }
+                    if (! $existing && ($payload['slug'] ?? '') !== '') {
+                        $existing = Product::query()->withoutGlobalScopes()->withTrashed()->where('slug', $payload['slug'])->first();
+                    }
+                    if ($existing) {
+                        if (method_exists($existing, 'trashed') && $existing->trashed()) {
+                            $existing->restore();
+                        }
+                        $existing->update($payload);
+                        $product = $existing;
+                        $updated++;
+                    } else {
+                        throw $e;
+                    }
+                }
             }
 
             // Categories by slug
@@ -407,9 +433,9 @@ final class XmlCatalogService
                         $slugs[] = $s;
                     }
                 }
-                if (!empty($slugs)) {
-                    $categoryIds = Category::query()->withTrashed()->whereIn('slug', array_values(array_unique($slugs)))->pluck('id')->all();
-                    if (!empty($categoryIds)) {
+                if (! empty($slugs)) {
+                    $categoryIds = Category::query()->withoutGlobalScopes()->withTrashed()->whereIn('slug', array_values(array_unique($slugs)))->pluck('id')->all();
+                    if (! empty($categoryIds)) {
                         $product->categories()->syncWithoutDetaching($categoryIds);
                     }
                 }
@@ -427,8 +453,8 @@ final class XmlCatalogService
                         'seo_title' => trim((string) ($t->seo_title ?? '')),
                         'seo_description' => trim((string) ($t->seo_description ?? '')),
                     ];
-                    $trPayload = array_filter($trPayload, fn($v) => $v !== '' && $v !== null);
-                    if (!empty($trPayload)) {
+                    $trPayload = array_filter($trPayload, fn ($v) => $v !== '' && $v !== null);
+                    if (! empty($trPayload)) {
                         $product->updateTranslation($locale, $trPayload);
                     }
                 }
@@ -535,15 +561,15 @@ final class XmlCatalogService
                     }
                 }
             }
-            if (!$contents) {
+            if (! $contents) {
                 return '';
             }
-            $dir = 'product-images/' . (string) $product->id;
-            $filename = 'image-' . $index . '-' . Str::random(8) . '.' . $extension;
-            $path = $dir . '/' . $filename;
+            $dir = 'product-images/'.(string) $product->id;
+            $filename = 'image-'.$index.'-'.Str::random(8).'.'.$extension;
+            $path = $dir.'/'.$filename;
             Storage::disk('public')->put($path, $contents);
 
-            return 'storage/' . $path;
+            return 'storage/'.$path;
         } catch (\Throwable $e) {
             return '';
         }

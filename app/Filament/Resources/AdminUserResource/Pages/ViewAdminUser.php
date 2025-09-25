@@ -18,4 +18,9 @@ class ViewAdminUser extends ViewRecord
             Actions\EditAction::make(),
         ];
     }
+
+    public function getTitle(): string
+    {
+        return (string) ($this->record->name ?? parent::getTitle());
+    }
 }

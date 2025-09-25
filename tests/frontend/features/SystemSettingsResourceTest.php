@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
-use App\Filament\Resources\SystemSettingsResource;
+use App\Filament\Resources\SystemSettingResource as SystemSettingsResource;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +27,8 @@ final class SystemSettingsResourceTest extends TestCase
 
     public function test_can_render_settings_index_page(): void
     {
-        $this->get(SystemSettingsResource::getUrl('index'))
+        $this
+            ->get(SystemSettingsResource::getUrl('index'))
             ->assertOk();
     }
 
@@ -41,7 +42,8 @@ final class SystemSettingsResourceTest extends TestCase
 
     public function test_can_render_settings_create_page(): void
     {
-        $this->get(SystemSettingsResource::getUrl('create'))
+        $this
+            ->get(SystemSettingsResource::getUrl('create'))
             ->assertOk();
     }
 
@@ -74,7 +76,8 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $setting = Setting::factory()->create();
 
-        $this->get(SystemSettingsResource::getUrl('edit', ['record' => $setting]))
+        $this
+            ->get(SystemSettingsResource::getUrl('edit', ['record' => $setting]))
             ->assertOk();
     }
 
@@ -93,9 +96,12 @@ final class SystemSettingsResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         expect($setting->refresh())
-            ->key->toBe($newData->key)
-            ->display_name->toBe($newData->display_name)
-            ->value->toBe($newData->value);
+            ->key
+            ->toBe($newData->key)
+            ->display_name
+            ->toBe($newData->display_name)
+            ->value
+            ->toBe($newData->value);
     }
 
     public function test_can_delete_setting(): void

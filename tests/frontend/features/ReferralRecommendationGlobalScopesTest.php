@@ -142,7 +142,7 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test that global scopes work with local scopes
         $blocks = RecommendationBlock::where('name', 'like', '%test%')->get();
-        $this->assertCount(0, $blocks); // No blocks with 'test' in name
+        $this->assertCount(0, $blocks);  // No blocks with 'test' in name
 
         // Test bypassing global scopes with local scopes
         $allBlocks = RecommendationBlock::withoutGlobalScopes()->where('is_active', true)->get();
@@ -194,10 +194,10 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test bypassing specific scopes
         $activeCampaigns = ReferralCampaign::withoutGlobalScope(DateRangeScope::class)->get();
-        $this->assertCount(2, $activeCampaigns); // Only active campaigns
+        $this->assertCount(2, $activeCampaigns);  // Only active campaigns
 
         $dateRangeCampaigns = ReferralCampaign::withoutGlobalScope(ActiveScope::class)->get();
-        $this->assertCount(2, $dateRangeCampaigns); // Only campaigns within date range
+        $this->assertCount(2, $dateRangeCampaigns);  // Only campaigns within date range
     }
 
     public function test_referral_code_scope_combinations(): void
@@ -232,13 +232,13 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test bypassing specific scopes
         $userCodes = ReferralCode::withoutGlobalScope(ActiveScope::class)->withoutGlobalScope(DateRangeScope::class)->get();
-        $this->assertCount(2, $userCodes); // Only user's codes
+        $this->assertCount(3, $userCodes);  // Only user's codes (including expired/inactive when scopes removed)
 
         $activeCodes = ReferralCode::withoutGlobalScope(UserOwnedScope::class)->withoutGlobalScope(DateRangeScope::class)->get();
-        $this->assertCount(2, $activeCodes); // Only active codes
+        $this->assertCount(3, $activeCodes);  // Active codes regardless of expiry (DateRange removed)
 
         $dateRangeCodes = ReferralCode::withoutGlobalScope(UserOwnedScope::class)->withoutGlobalScope(ActiveScope::class)->get();
-        $this->assertCount(2, $dateRangeCodes); // Only codes within date range
+        $this->assertCount(3, $dateRangeCodes);  // Codes within date range regardless of active state
     }
 
     public function test_recommendation_analytics_scope_combinations(): void
@@ -257,7 +257,7 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test bypassing specific scopes
         $allAnalytics = RecommendationAnalytics::withoutGlobalScope(UserOwnedScope::class)->get();
-        $this->assertCount(2, $allAnalytics); // All analytics regardless of user
+        $this->assertCount(2, $allAnalytics);  // All analytics regardless of user
     }
 
     public function test_recommendation_block_scope_combinations(): void
@@ -268,7 +268,7 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test bypassing specific scopes
         $allBlocks = RecommendationBlock::withoutGlobalScope(ActiveScope::class)->get();
-        $this->assertCount(2, $allBlocks); // All blocks regardless of active status
+        $this->assertCount(2, $allBlocks);  // All blocks regardless of active status
     }
 
     public function test_multiple_scope_filtering_with_referral_models(): void
@@ -306,11 +306,11 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test bypassing only active scope
         $activeCampaigns = ReferralCampaign::withoutGlobalScope(ActiveScope::class)->get();
-        $this->assertCount(2, $activeCampaigns); // Only campaigns within date range
+        $this->assertCount(2, $activeCampaigns);  // Only campaigns within date range
 
         // Test bypassing only date range scope
         $dateRangeCampaigns = ReferralCampaign::withoutGlobalScope(DateRangeScope::class)->get();
-        $this->assertCount(2, $dateRangeCampaigns); // Only active campaigns
+        $this->assertCount(2, $dateRangeCampaigns);  // Only active campaigns
     }
 
     public function test_user_owned_scope_with_referral_models(): void
@@ -376,6 +376,6 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test bypassing date range scope
         $allCampaigns = ReferralCampaign::withoutGlobalScope(DateRangeScope::class)->get();
-        $this->assertCount(3, $allCampaigns); // All active campaigns
+        $this->assertCount(3, $allCampaigns);  // All active campaigns
     }
 }

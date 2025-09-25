@@ -85,4 +85,18 @@ final class DiscountRedemptionFactory extends Factory
             'currency_code' => 'EUR',
         ]);
     }
+
+    public function forDiscount(?Discount $discount = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'discount_id' => $discount?->getKey() ?? Discount::factory(),
+        ]);
+    }
+
+    public function forCode(?DiscountCode $discountCode = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'code_id' => $discountCode?->getKey() ?? DiscountCode::factory(),
+        ]);
+    }
 }

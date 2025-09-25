@@ -1,7 +1,8 @@
-<x-filament::page>
-    <h1 class="text-xl font-semibold mb-4">{{ __('Inventory Management') }}</h1>
-    {{ $this->table }}
-</x-filament::page>
+<div>
+    <div class="p-4">
+        <h1 class="text-xl font-semibold">Inventory Management</h1>
+    </div>
+</div>
 
 <x-filament-panels::page>
     <div class="space-y-6">

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -11,6 +13,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
@@ -25,12 +28,10 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -55,15 +56,18 @@ final class OrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'number';
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-bag';
-
     protected static ?string $navigationLabel = 'orders.navigation.orders';
 
     protected static ?string $modelLabel = 'orders.models.order';
 
     protected static ?string $pluralModelLabel = 'orders.models.orders';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationIcon(): string|\BackedEnum|null
+    {
+        return 'heroicon-o-shopping-bag';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'System';
     }
@@ -199,7 +203,7 @@ final class OrderResource extends Resource
                             $discount = (float) $get('discount_amount') ?? 0;
                             $total = $subtotal + $tax + $shipping - $discount;
 
-                            return '€' . number_format($total, 2);
+                            return '€'.number_format($total, 2);
                         }),
                     Hidden::make('total')
                         ->default(function (\Filament\Schemas\Components\Utilities\Get $get): float {
@@ -309,7 +313,7 @@ final class OrderResource extends Resource
                         'danger' => 'cancelled',
                         'secondary' => 'refunded',
                     ])
-                    ->formatStateUsing(fn(string $state): string => __("orders.status.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("orders.status.{$state}"))
                     ->sortable(),
                 BadgeColumn::make('payment_status')
                     ->label(__('orders.fields.payment_status'))
@@ -319,7 +323,7 @@ final class OrderResource extends Resource
                         'danger' => 'failed',
                         'secondary' => 'refunded',
                     ])
-                    ->formatStateUsing(fn(string $state): string => __("orders.payment_status.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("orders.payment_status.{$state}"))
                     ->sortable(),
                 TextColumn::make('total')
                     ->label(__('orders.fields.total'))
@@ -331,7 +335,7 @@ final class OrderResource extends Resource
                     ->sortable(),
                 TextColumn::make('payment_method')
                     ->label(__('orders.fields.payment_method'))
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.payment_methods.{$state}") : '-')
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_methods.{$state}") : '-')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 TextColumn::make('channel.name')
@@ -384,8 +388,8 @@ final class OrderResource extends Resource
                 TernaryFilter::make('is_paid')
                     ->label(__('orders.is_paid'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
-                        false: fn(Builder $query) => $query->whereNotIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
+                        true: fn (Builder $query) => $query->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
+                        false: fn (Builder $query) => $query->whereNotIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
                     ),
                 Filter::make('created_at')
                     ->form([
@@ -398,11 +402,11 @@ final class OrderResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date),
+                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'] ?? null,
-                                fn(Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date),
+                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date),
                             );
                     }),
                 Filter::make('total_range')
@@ -420,11 +424,11 @@ final class OrderResource extends Resource
                         return $query
                             ->when(
                                 $data['total_from'],
-                                fn(Builder $query, $amount): Builder => $query->where('total', '>=', $amount),
+                                fn (Builder $query, $amount): Builder => $query->where('total', '>=', $amount),
                             )
                             ->when(
                                 $data['total_until'],
-                                fn(Builder $query, $amount): Builder => $query->where('total', '<=', $amount),
+                                fn (Builder $query, $amount): Builder => $query->where('total', '<=', $amount),
                             );
                     }),
             ])
@@ -438,7 +442,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')
                     ->color('primary')
-                    ->visible(fn(Order $record): bool => $record->status === 'pending')
+                    ->visible(fn (Order $record): bool => $record->status === 'pending')
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'processing']);
                         Notification::make()
@@ -451,7 +455,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn(Order $record): bool => $record->status === 'processing')
+                    ->visible(fn (Order $record): bool => $record->status === 'processing')
                     ->action(function (Order $record): void {
                         $record->update([
                             'status' => 'shipped',
@@ -467,7 +471,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(Order $record): bool => $record->status === 'shipped')
+                    ->visible(fn (Order $record): bool => $record->status === 'shipped')
                     ->action(function (Order $record): void {
                         $record->update([
                             'status' => 'delivered',
@@ -483,7 +487,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.cancel_order'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn(Order $record): bool => in_array($record->status, ['pending', 'processing']))
+                    ->visible(fn (Order $record): bool => in_array($record->status, ['pending', 'processing']))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'cancelled']);
                         Notification::make()
@@ -496,7 +500,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.refund_order'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('secondary')
-                    ->visible(fn(Order $record): bool => in_array($record->status, ['delivered', 'completed']))
+                    ->visible(fn (Order $record): bool => in_array($record->status, ['delivered', 'completed']))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'refunded']);
                         Notification::make()
@@ -614,7 +618,7 @@ final class OrderResource extends Resource
     {
         return [
             'Customer' => $record->user->name ?? 'N/A',
-            'Total' => '€' . number_format((float) $record->total, 2),
+            'Total' => '€'.number_format((float) $record->total, 2),
             'Status' => __("orders.statuses.{$record->status}"),
         ];
     }

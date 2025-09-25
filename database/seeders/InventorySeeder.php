@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -8,45 +6,52 @@ use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 
 final class InventorySeeder extends Seeder
 {
     public function run(): void
     {
-        if (! Schema::hasTable('inventories')) {
-            $this->command?->warn('InventorySeeder: inventories table missing, skipping.');
-
-            return;
-        }
-
-        $locationIds = Location::query()->pluck('id');
-        if ($locationIds->isEmpty()) {
+        $locations = Location::query()->get();
+        if ($locations->isEmpty()) {
             $this->command?->warn('InventorySeeder: no locations found, skipping.');
 
             return;
         }
 
-        Product::query()->select(['id'])->orderBy('id')->chunkById(200, function ($products) use ($locationIds) {
-            foreach ($products as $product) {
-                foreach ($locationIds as $locId) {
-                    Inventory::updateOrCreate(
-                        [
-                            'product_id' => $product->id,
-                            'location_id' => $locId,
-                        ],
-                        [
-                            'quantity' => random_int(5, 50),
-                            'reserved' => 0,
-                            'incoming' => random_int(0, 10),
-                            'threshold' => 5,
-                            'is_tracked' => true,
-                        ]
-                    );
-                }
-            }
-        });
+        $locationsById = $locations->keyBy('id');
 
-        $this->command?->info('InventorySeeder: seeded product stock for all locations.');
+        Product::query()
+            ->with('inventories')
+            ->orderBy('id')
+            ->chunkById(100, function ($products) use ($locations, $locationsById): void {
+                $trackedLocationIds = $locations->pluck('id');
+
+                $products->each(function (Product $product) use ($trackedLocationIds, $locationsById): void {
+                    $missingLocationIds = $trackedLocationIds
+                        ->diff($product->inventories->pluck('location_id'));
+
+                    if ($missingLocationIds->isEmpty()) {
+                        return;
+                    }
+
+                    $inventories = $missingLocationIds->map(
+                        function (int $locationId) use ($product, $locationsById): Inventory {
+                            return Inventory::factory()
+                                ->for($product)
+                                ->for($locationsById->get($locationId))
+                                ->state([
+                                    'is_tracked' => true,
+                                    'incoming' => fake()->numberBetween(0, 20),
+                                    'threshold' => fake()->numberBetween(5, 15),
+                                ])
+                                ->make();
+                        }
+                    );
+
+                    $product->inventories()->saveMany($inventories->all());
+                });
+            });
+
+        $this->command?->info('InventorySeeder: ensured product inventories via factories.');
     }
 }

@@ -1,19 +1,70 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
 use App\Models\Slider;
 use App\Models\SliderTranslation;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
+use function collect;
 
 final class SliderSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create comprehensive sliders with translations
-        $sliders = [
+        $supportedLocales = $this->getSupportedLocales();
+        $sliderDefinitions = $this->getSliderDefinitions();
+
+        $this->resetExistingSliders($sliderDefinitions->pluck('sort_order')->all());
+
+        $sliderDefinitions->each(function (array $definition) use ($supportedLocales): void {
+            $translations = $definition['translations'] ?? [];
+            unset($definition['translations']);
+
+            $slider = Slider::factory()
+                ->state($definition)
+                ->has(
+                    SliderTranslation::factory()
+                        ->count(count($supportedLocales))
+                        ->sequence(
+                            ...$this->buildTranslationStates($supportedLocales, $translations, $definition)
+                        ),
+                    'translations'
+                )
+                ->create();
+
+            $this->ensureSampleImages($slider, (int) $definition['sort_order']);
+        });
+    }
+
+    private function getSupportedLocales(): array
+    {
+        $supportedLocales = config('app.supported_locales', ['lt', 'en']);
+
+        if (is_string($supportedLocales)) {
+            $supportedLocales = array_filter(array_map('trim', explode(',', $supportedLocales)));
+        }
+
+        if (! is_array($supportedLocales) || $supportedLocales === []) {
+            $supportedLocales = ['lt', 'en'];
+        }
+
+        $supportedLocales = array_values(array_unique($supportedLocales));
+
+        if (! in_array('lt', $supportedLocales, true)) {
+            array_unshift($supportedLocales, 'lt');
+        }
+
+        if (! in_array('en', $supportedLocales, true)) {
+            $supportedLocales[] = 'en';
+        }
+
+        return array_values(array_unique($supportedLocales));
+    }
+
+    private function getSliderDefinitions(): Collection
+    {
+        return collect([
             [
                 'title' => 'Sveiki atvykę į Statybae Commerce',
                 'description' => 'Atraskite puikius statybos produktus ir paslaugas vienoje vietoje. Kokybė, patikimumas ir konkurencingi kainos.',
@@ -29,10 +80,25 @@ final class SliderSeeder extends Seeder
                     'autoplay' => true,
                 ],
                 'translations' => [
+                    'lt' => [
+                        'title' => 'Sveiki atvykę į Statybae Commerce',
+                        'description' => 'Atraskite puikius statybos produktus ir paslaugas vienoje vietoje. Kokybė, patikimumas ir konkurencingi kainos.',
+                        'button_text' => 'Pradėti apsipirkinėti',
+                    ],
                     'en' => [
                         'title' => 'Welcome to Statybae Commerce',
                         'description' => 'Discover great construction products and services in one place. Quality, reliability and competitive prices.',
                         'button_text' => 'Start Shopping',
+                    ],
+                    'ru' => [
+                        'title' => 'Добро пожаловать в Statybae Commerce',
+                        'description' => 'Откройте лучшие строительные товары и услуги в одном месте. Качество, надежность и конкурентные цены.',
+                        'button_text' => 'Начать покупки',
+                    ],
+                    'de' => [
+                        'title' => 'Willkommen bei Statybae Commerce',
+                        'description' => 'Entdecken Sie hochwertige Bauprodukte und Dienstleistungen an einem Ort. Qualität, Zuverlässigkeit und faire Preise.',
+                        'button_text' => 'Einkauf starten',
                     ],
                 ],
             ],
@@ -51,10 +117,25 @@ final class SliderSeeder extends Seeder
                     'autoplay' => true,
                 ],
                 'translations' => [
+                    'lt' => [
+                        'title' => 'Kokybės garantija',
+                        'description' => 'Visos prekės patikrintos ir sertifikuotos. Mes garantuojame aukščiausią kokybę ir ilgalaikį tarnavimą.',
+                        'button_text' => 'Sužinoti daugiau',
+                    ],
                     'en' => [
                         'title' => 'Quality Guarantee',
                         'description' => 'All products are tested and certified. We guarantee the highest quality and long-term service.',
                         'button_text' => 'Learn More',
+                    ],
+                    'ru' => [
+                        'title' => 'Гарантия качества',
+                        'description' => 'Все товары проверены и сертифицированы. Мы гарантируем высочайшее качество и долгий срок службы.',
+                        'button_text' => 'Узнать больше',
+                    ],
+                    'de' => [
+                        'title' => 'Qualitätsgarantie',
+                        'description' => 'Alle Produkte sind geprüft und zertifiziert. Wir garantieren höchste Qualität und lange Lebensdauer.',
+                        'button_text' => 'Mehr erfahren',
                     ],
                 ],
             ],
@@ -73,10 +154,25 @@ final class SliderSeeder extends Seeder
                     'autoplay' => true,
                 ],
                 'translations' => [
+                    'lt' => [
+                        'title' => 'Specialūs pasiūlymai',
+                        'description' => 'Nepraleiskite galimybės sutaupyti. Iki 50% nuolaida pasirinktoms prekėms!',
+                        'button_text' => 'Žiūrėti akcijas',
+                    ],
                     'en' => [
                         'title' => 'Special Offers',
                         'description' => "Don't miss the opportunity to save. Up to 50% discount on selected items!",
                         'button_text' => 'View Sales',
+                    ],
+                    'ru' => [
+                        'title' => 'Специальные предложения',
+                        'description' => 'Не упустите шанс сэкономить. Скидки до 50% на выбранные товары!',
+                        'button_text' => 'Посмотреть акции',
+                    ],
+                    'de' => [
+                        'title' => 'Sonderangebote',
+                        'description' => 'Verpassen Sie nicht die Chance zu sparen. Bis zu 50 % Rabatt auf ausgewählte Artikel!',
+                        'button_text' => 'Angebote ansehen',
                     ],
                 ],
             ],
@@ -95,10 +191,25 @@ final class SliderSeeder extends Seeder
                     'autoplay' => true,
                 ],
                 'translations' => [
+                    'lt' => [
+                        'title' => 'Profesionalūs įrankiai',
+                        'description' => 'Aukščiausios kokybės statybos įrankiai profesionalams ir savininkams. Platus asortimentas, greitas pristatymas.',
+                        'button_text' => 'Peržiūrėti įrankius',
+                    ],
                     'en' => [
                         'title' => 'Professional Tools',
                         'description' => 'Highest quality construction tools for professionals and homeowners. Wide range, fast delivery.',
                         'button_text' => 'Browse Tools',
+                    ],
+                    'ru' => [
+                        'title' => 'Профессиональные инструменты',
+                        'description' => 'Строительные инструменты высокого качества для профессионалов и домовладельцев. Широкий ассортимент и быстрая доставка.',
+                        'button_text' => 'Смотреть инструменты',
+                    ],
+                    'de' => [
+                        'title' => 'Professionelle Werkzeuge',
+                        'description' => 'Hochwertige Bauwerkzeuge für Profis und Hausbesitzer. Breites Sortiment, schnelle Lieferung.',
+                        'button_text' => 'Werkzeuge ansehen',
                     ],
                 ],
             ],
@@ -117,10 +228,25 @@ final class SliderSeeder extends Seeder
                     'autoplay' => true,
                 ],
                 'translations' => [
+                    'lt' => [
+                        'title' => 'Nemokamas pristatymas',
+                        'description' => 'Nemokamas pristatymas visoje Lietuvoje užsakymams virš 100€.',
+                        'button_text' => 'Sužinoti daugiau',
+                    ],
                     'en' => [
                         'title' => 'Free Delivery',
                         'description' => 'Free delivery throughout Lithuania for orders over €100. Fast and secure delivery.',
                         'button_text' => 'Learn More',
+                    ],
+                    'ru' => [
+                        'title' => 'Бесплатная доставка',
+                        'description' => 'Бесплатная доставка по всей Литве для заказов свыше 100 €. Быстрая и надежная доставка.',
+                        'button_text' => 'Узнать больше',
+                    ],
+                    'de' => [
+                        'title' => 'Kostenlose Lieferung',
+                        'description' => 'Kostenlose Lieferung in ganz Litauen für Bestellungen über 100 €. Schnelle und sichere Zustellung.',
+                        'button_text' => 'Mehr erfahren',
                     ],
                 ],
             ],
@@ -132,40 +258,75 @@ final class SliderSeeder extends Seeder
                 'background_color' => '#ea580c',
                 'text_color' => '#ffffff',
                 'sort_order' => 6,
-                'is_active' => false,  // This one is inactive by default
+                'is_active' => false,
                 'settings' => [
                     'animation' => 'zoom',
                     'duration' => 5000,
                     'autoplay' => false,
                 ],
                 'translations' => [
+                    'lt' => [
+                        'title' => 'Nauji produktai',
+                        'description' => 'Atraskite naujausius statybos produktus ir technologijas. Būkite pirmieji, kurie išbandys naujoves.',
+                        'button_text' => 'Peržiūrėti naujoves',
+                    ],
                     'en' => [
                         'title' => 'New Products',
                         'description' => 'Discover the latest construction products and technologies. Be the first to try new innovations.',
                         'button_text' => 'Browse New Items',
                     ],
+                    'ru' => [
+                        'title' => 'Новые продукты',
+                        'description' => 'Откройте самые последние строительные товары и технологии. Будьте первыми, кто попробует новинки.',
+                        'button_text' => 'Посмотреть новинки',
+                    ],
+                    'de' => [
+                        'title' => 'Neue Produkte',
+                        'description' => 'Entdecken Sie die neuesten Bauprodukte und Technologien. Seien Sie die Ersten, die Innovationen ausprobieren.',
+                        'button_text' => 'Neuheiten ansehen',
+                    ],
                 ],
             ],
-        ];
+        ]);
+    }
 
-        foreach ($sliders as $sliderData) {
-            $translations = $sliderData['translations'];
-            unset($sliderData['translations']);
+    private function buildTranslationStates(array $locales, array $translations, array $sliderAttributes): array
+    {
+        return array_map(static function (string $locale) use ($translations, $sliderAttributes): array {
+            $translation = $translations[$locale] ?? [
+                'title' => $sliderAttributes['title'],
+                'description' => $sliderAttributes['description'],
+                'button_text' => $sliderAttributes['button_text'],
+            ];
 
-            $slider = Slider::create($sliderData);
+            return array_merge(['locale' => $locale], $translation);
+        }, $locales);
+    }
 
-            // Create translations
-            foreach ($translations as $locale => $translationData) {
-                SliderTranslation::create([
-                    'slider_id' => $slider->id,
-                    'locale' => $locale,
-                    ...$translationData,
-                ]);
-            }
-
-            // Add sample images if they exist
-            $this->addSampleImages($slider, $sliderData['sort_order']);
+    private function resetExistingSliders(array $sortOrders): void
+    {
+        if ($sortOrders === []) {
+            return;
         }
+
+        Slider::with('translations')
+            ->whereIn('sort_order', $sortOrders)
+            ->get()
+            ->each(function (Slider $slider): void {
+                $slider->translations()->delete();
+                $slider->clearMediaCollection('slider_images');
+                $slider->clearMediaCollection('slider_backgrounds');
+                $slider->delete();
+            });
+    }
+
+    private function ensureSampleImages(Slider $slider, int $sortOrder): void
+    {
+        if ($slider->hasImage()) {
+            return;
+        }
+
+        $this->addSampleImages($slider, $sortOrder);
     }
 
     private function addSampleImages(Slider $slider, int $sortOrder): void
@@ -185,34 +346,33 @@ final class SliderSeeder extends Seeder
             $slider
                 ->addMediaFromDisk($imagePath, 'public')
                 ->toMediaCollection('slider_images');
-        } else {
-            // Create a placeholder image using a simple colored rectangle
-            $this->createPlaceholderImage($slider, $sortOrder);
+
+            return;
         }
+
+        $this->createPlaceholderImage($slider, $sortOrder);
     }
 
     private function createPlaceholderImage(Slider $slider, int $sortOrder): void
     {
         $colors = [
-            1 => '#3B82F6',  // Blue
-            2 => '#10B981',  // Green
-            3 => '#F59E0B',  // Yellow
-            4 => '#EF4444',  // Red
-            5 => '#8B5CF6',  // Purple
-            6 => '#06B6D4',  // Cyan
+            1 => '#3B82F6',
+            2 => '#10B981',
+            3 => '#F59E0B',
+            4 => '#EF4444',
+            5 => '#8B5CF6',
+            6 => '#06B6D4',
         ];
 
         $color = $colors[$sortOrder] ?? '#6B7280';
 
-        // Create a simple colored image
         $image = imagecreate(1200, 600);
         $bgColor = $this->hexToRgb($color);
         $backgroundColor = imagecolorallocate($image, $bgColor['r'], $bgColor['g'], $bgColor['b']);
         imagefill($image, 0, 0, $backgroundColor);
 
-        // Add text
         $textColor = imagecolorallocate($image, 255, 255, 255);
-        $font = 5;  // Built-in font
+        $font = 5;
         $text = "Slider {$sortOrder}";
         $textWidth = imagefontwidth($font) * strlen($text);
         $textHeight = imagefontheight($font);
@@ -220,19 +380,16 @@ final class SliderSeeder extends Seeder
         $y = (int) ((600 - $textHeight) / 2);
         imagestring($image, $font, $x, $y, $text, $textColor);
 
-        // Save to temporary file
         $tempPath = sys_get_temp_dir()."/slider-{$sortOrder}.jpg";
         imagejpeg($image, $tempPath, 90);
         imagedestroy($image);
 
-        // Add to media library
         $slider
             ->addMedia($tempPath)
             ->usingName("Slider {$sortOrder} Placeholder")
             ->usingFileName("slider-{$sortOrder}.jpg")
             ->toMediaCollection('slider_images');
 
-        // Clean up
         if (file_exists($tempPath)) {
             unlink($tempPath);
         }

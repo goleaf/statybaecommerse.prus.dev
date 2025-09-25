@@ -4,145 +4,129 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Attribute;
+use App\Models\Translations\AttributeTranslation;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 final class AttributeSeeder extends Seeder
 {
     public function run(): void
     {
-        $attributes = [
+        $attributes = collect([
             [
-                'name' => ['lt' => 'Spalva', 'en' => 'Color'],
                 'slug' => 'color',
                 'type' => 'select',
-                'is_required' => false,
-                'is_filterable' => true,
-                'is_searchable' => true,
-                'is_enabled' => true,
                 'sort_order' => 1,
+                'translations' => [
+                    'lt' => 'Spalva',
+                    'en' => 'Color',
+                ],
             ],
             [
-                'name' => ['lt' => 'Dydis', 'en' => 'Size'],
                 'slug' => 'size',
                 'type' => 'select',
-                'is_required' => false,
-                'is_filterable' => true,
-                'is_searchable' => true,
-                'is_enabled' => true,
                 'sort_order' => 2,
+                'translations' => [
+                    'lt' => 'Dydis',
+                    'en' => 'Size',
+                ],
             ],
             [
-                'name' => ['lt' => 'Svoris', 'en' => 'Weight'],
                 'slug' => 'weight',
                 'type' => 'text',
-                'is_required' => false,
-                'is_filterable' => false,
-                'is_searchable' => false,
-                'is_enabled' => true,
                 'sort_order' => 3,
+                'translations' => [
+                    'lt' => 'Svoris',
+                    'en' => 'Weight',
+                ],
             ],
             [
-                'name' => ['lt' => 'Medžiaga', 'en' => 'Material'],
                 'slug' => 'material',
                 'type' => 'text',
-                'is_required' => false,
-                'is_filterable' => true,
-                'is_searchable' => true,
-                'is_enabled' => true,
                 'sort_order' => 4,
+                'translations' => [
+                    'lt' => 'Medžiaga',
+                    'en' => 'Material',
+                ],
             ],
             [
-                'name' => ['lt' => 'Ilgis', 'en' => 'Length'],
                 'slug' => 'length',
                 'type' => 'number',
-                'is_required' => false,
-                'is_filterable' => true,
-                'is_searchable' => false,
-                'is_enabled' => true,
                 'sort_order' => 5,
+                'translations' => [
+                    'lt' => 'Ilgis',
+                    'en' => 'Length',
+                ],
             ],
             [
-                'name' => ['lt' => 'Plotis', 'en' => 'Width'],
                 'slug' => 'width',
                 'type' => 'number',
-                'is_required' => false,
-                'is_filterable' => true,
-                'is_searchable' => false,
-                'is_enabled' => true,
                 'sort_order' => 6,
+                'translations' => [
+                    'lt' => 'Plotis',
+                    'en' => 'Width',
+                ],
             ],
             [
-                'name' => ['lt' => 'Aukštis', 'en' => 'Height'],
                 'slug' => 'height',
                 'type' => 'number',
-                'is_required' => false,
-                'is_filterable' => true,
-                'is_searchable' => false,
-                'is_enabled' => true,
                 'sort_order' => 7,
+                'translations' => [
+                    'lt' => 'Aukštis',
+                    'en' => 'Height',
+                ],
             ],
             [
-                'name' => ['lt' => 'Spalvų paletė', 'en' => 'Color Palette'],
                 'slug' => 'color-palette',
                 'type' => 'multiselect',
-                'is_required' => false,
-                'is_filterable' => true,
-                'is_searchable' => true,
-                'is_enabled' => true,
                 'sort_order' => 8,
-            ],
-        ];
-
-        $locales = $this->supportedLocales();
-        $now = now();
-
-        foreach ($attributes as $data) {
-            $baseName = $data['name']['lt'] ?? (is_array($data['name']) ? reset($data['name']) : (string) $data['name']);
-
-            // Upsert base attribute row (string name)
-            DB::table('attributes')->upsert([
-                [
-                    'slug' => $data['slug'],
-                    'name' => $baseName,
-                    'type' => $data['type'],
-                    'is_required' => (bool) $data['is_required'],
-                    'is_filterable' => (bool) $data['is_filterable'],
-                    'is_searchable' => (bool) $data['is_searchable'],
-                    'is_enabled' => (bool) $data['is_enabled'],
-                    'sort_order' => (int) $data['sort_order'],
-                    'updated_at' => $now,
-                    'created_at' => $now,
+                'translations' => [
+                    'lt' => 'Spalvų paletė',
+                    'en' => 'Color Palette',
                 ],
-            ], ['slug'], ['name', 'type', 'is_required', 'is_filterable', 'is_searchable', 'is_enabled', 'sort_order', 'updated_at']);
+            ],
+        ]);
 
-            $attrId = (int) DB::table('attributes')->where('slug', $data['slug'])->value('id');
-            if (! $attrId) {
-                continue;
+        $attributes->each(function (array $definition): void {
+            $existing = Attribute::query()->firstWhere('slug', $definition['slug']);
+
+            $attribute = $existing
+                ? tap($existing)->update([
+                    'name' => $definition['translations']['lt'],
+                    'type' => $definition['type'],
+                    'is_required' => false,
+                    'is_filterable' => true,
+                    'is_searchable' => true,
+                    'is_enabled' => true,
+                    'sort_order' => $definition['sort_order'],
+                ])
+                : Attribute::factory()->create([
+                    'slug' => $definition['slug'],
+                    'name' => $definition['translations']['lt'],
+                    'type' => $definition['type'],
+                    'is_required' => false,
+                    'is_filterable' => true,
+                    'is_searchable' => true,
+                    'is_enabled' => true,
+                    'sort_order' => $definition['sort_order'],
+                ]);
+
+            foreach ($definition['translations'] as $locale => $name) {
+                $translation = AttributeTranslation::query()->firstOrNew([
+                    'attribute_id' => $attribute->getKey(),
+                    'locale' => $locale,
+                ]);
+
+                if ($translation->exists) {
+                    $translation->update(['name' => $name]);
+                } else {
+                    AttributeTranslation::factory()->create([
+                        'attribute_id' => $attribute->getKey(),
+                        'locale' => $locale,
+                        'name' => $name,
+                    ]);
+                }
             }
-
-            // Translations per locale
-            $trRows = [];
-            foreach ($locales as $loc) {
-                $trRows[] = [
-                    'attribute_id' => $attrId,
-                    'locale' => $loc,
-                    'name' => $data['name'][$loc] ?? ($data['name']['lt'] ?? $baseName),
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-            }
-            DB::table('attribute_translations')->upsert($trRows, ['attribute_id', 'locale'], ['name', 'updated_at']);
-        }
-
-        $this->command?->info('AttributeSeeder: seeded attributes with translations (locales: '.implode(',', $locales).').');
-    }
-
-    private function supportedLocales(): array
-    {
-        return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn ($v) => trim((string) $v))
-            ->filter()
-            ->unique()->values()->all();
+        });
     }
 }

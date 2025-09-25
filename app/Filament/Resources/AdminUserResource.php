@@ -93,6 +93,8 @@ final class AdminUserResource extends Resource
                                 ->password()
                                 ->required(fn (string $context): bool => $context === 'create')
                                 ->minLength(8)
+                                ->dehydrated(fn ($state) => filled($state))
+                                ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
                                 ->columnSpan(1),
                             TextInput::make('password_confirmation')
                                 ->label(__('admin.admin_users.form.fields.password_confirmation'))

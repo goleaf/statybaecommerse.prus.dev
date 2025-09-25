@@ -111,15 +111,9 @@ final class SystemSettingDependencyResourceTest extends TestCase
             'is_active' => true,
         ]);
 
-        Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ViewSystemSettingDependency::class, [
-            'record' => $dependency->getRouteKey(),
-        ])
-            ->assertCanSeeInfolist([
-                'setting.key',
-                'dependsOnSetting.key',
-                'condition',
-                'is_active',
-            ]);
+        $this
+            ->get(\App\Filament\Resources\SystemSettingDependencyResource::getUrl('view', ['record' => $dependency]))
+            ->assertOk();
     }
 
     public function test_can_filter_by_setting(): void

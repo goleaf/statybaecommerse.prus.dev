@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Order;
-use App\Models\Referral;
 use App\Models\ReferralReward;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -19,15 +17,15 @@ final class ReferralRewardFactory extends Factory
 
     public function definition(): array
     {
-        $types = ['referrer_bonus', 'referred_discount'];
-        $statuses = ['pending', 'applied', 'expired'];
+        $types = ['discount', 'credit'];
         $type = fake()->randomElement($types);
-        $status = fake()->randomElement($statuses);
+
+        $currentUserId = auth()->id();
 
         return [
-            'referral_id' => Referral::factory(),
-            'user_id' => User::factory(),
-            'order_id' => $status === 'applied' ? Order::factory() : null,
+            'referral_id' => null,
+            'user_id' => $currentUserId ?? User::factory(),
+            'order_id' => null,
             'type' => $type,
             'title' => [
                 'en' => fake()->sentence(3),
@@ -39,10 +37,12 @@ final class ReferralRewardFactory extends Factory
             ],
             'amount' => fake()->randomFloat(2, 5, 100),
             'currency_code' => 'EUR',
-            'status' => $status,
-            'applied_at' => $status === 'applied' ? fake()->dateTimeBetween('-1 year', 'now') : null,
+            'status' => 'pending',
+            'applied_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
             'expires_at' => fake()->optional(0.3)->dateTimeBetween('now', '+1 year'),
-            'is_active' => fake()->boolean(90),
+            'is_active' => true,
             'priority' => fake()->numberBetween(0, 100),
             'conditions' => fake()->optional(0.2)->randomElements([
                 ['field' => 'order_total', 'operator' => '>=', 'value' => 50],

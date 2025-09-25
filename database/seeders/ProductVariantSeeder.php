@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -13,7 +11,6 @@ use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Models\VariantPricingRule;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class ProductVariantSeeder extends Seeder
@@ -23,20 +20,17 @@ final class ProductVariantSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::transaction(function () {
-            $this->createAttributes();
-            $this->createProductsWithVariants();
-            $this->createPricingRules();
-            $this->createInventories();
-        });
+        $this->createAttributes();
+        $this->createProductsWithVariants();
+        $this->createPricingRules();
     }
 
     private function createAttributes(): void
     {
-        // Size attribute
-        $sizeAttribute = Attribute::firstOrCreate(
-            ['slug' => 'size'],
-            [
+        // Create size attribute using factory
+        $sizeAttribute = Attribute::factory()
+            ->state([
+                'slug' => 'size',
                 'name' => 'Size',
                 'type' => 'select',
                 'is_required' => true,
@@ -44,10 +38,9 @@ final class ProductVariantSeeder extends Seeder
                 'is_searchable' => false,
                 'is_enabled' => true,
                 'sort_order' => 1,
-            ]
-        );
+            ])
+            ->create();
 
-        // Create size values
         $sizes = [
             ['value' => 'XS', 'display' => 'Extra Small', 'sort_order' => 1],
             ['value' => 'S', 'display' => 'Small', 'sort_order' => 2],
@@ -58,24 +51,21 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($sizes as $size) {
-            AttributeValue::firstOrCreate(
-                [
-                    'attribute_id' => $sizeAttribute->id,
+            AttributeValue::factory()
+                ->for($sizeAttribute)
+                ->state([
                     'value' => $size['value'],
-                ],
-                [
                     'slug' => Str::slug($size['value']),
                     'display_value' => $size['display'],
                     'sort_order' => $size['sort_order'],
                     'is_enabled' => true,
-                ]
-            );
+                ])
+                ->create();
         }
 
-        // Color attribute
-        $colorAttribute = Attribute::firstOrCreate(
-            ['slug' => 'color'],
-            [
+        $colorAttribute = Attribute::factory()
+            ->state([
+                'slug' => 'color',
                 'name' => 'Color',
                 'type' => 'select',
                 'is_required' => false,
@@ -83,10 +73,9 @@ final class ProductVariantSeeder extends Seeder
                 'is_searchable' => false,
                 'is_enabled' => true,
                 'sort_order' => 2,
-            ]
-        );
+            ])
+            ->create();
 
-        // Create color values
         $colors = [
             ['value' => 'Black', 'hex' => '#000000', 'sort_order' => 1],
             ['value' => 'White', 'hex' => '#FFFFFF', 'sort_order' => 2],
@@ -99,24 +88,21 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($colors as $color) {
-            AttributeValue::firstOrCreate(
-                [
-                    'attribute_id' => $colorAttribute->id,
+            AttributeValue::factory()
+                ->for($colorAttribute)
+                ->state([
                     'value' => $color['value'],
-                ],
-                [
                     'slug' => Str::slug($color['value']),
                     'hex_color' => $color['hex'],
                     'sort_order' => $color['sort_order'],
                     'is_enabled' => true,
-                ]
-            );
+                ])
+                ->create();
         }
 
-        // Material attribute
-        $materialAttribute = Attribute::firstOrCreate(
-            ['slug' => 'material'],
-            [
+        $materialAttribute = Attribute::factory()
+            ->state([
+                'slug' => 'material',
                 'name' => 'Material',
                 'type' => 'select',
                 'is_required' => false,
@@ -124,10 +110,9 @@ final class ProductVariantSeeder extends Seeder
                 'is_searchable' => false,
                 'is_enabled' => true,
                 'sort_order' => 3,
-            ]
-        );
+            ])
+            ->create();
 
-        // Create material values
         $materials = [
             ['value' => 'Cotton', 'sort_order' => 1],
             ['value' => 'Polyester', 'sort_order' => 2],
@@ -138,44 +123,39 @@ final class ProductVariantSeeder extends Seeder
         ];
 
         foreach ($materials as $material) {
-            AttributeValue::firstOrCreate(
-                [
-                    'attribute_id' => $materialAttribute->id,
+            AttributeValue::factory()
+                ->for($materialAttribute)
+                ->state([
                     'value' => $material['value'],
-                ],
-                [
                     'slug' => Str::slug($material['value']),
                     'sort_order' => $material['sort_order'],
                     'is_enabled' => true,
-                ]
-            );
+                ])
+                ->create();
         }
     }
 
     private function createProductsWithVariants(): void
     {
-        // Get or create a brand
-        $brand = Brand::firstOrCreate(
-            ['name' => 'Fashion Brand'],
-            [
+        $brand = Brand::factory()
+            ->state([
                 'slug' => 'fashion-brand',
+                'name' => 'Fashion Brand',
                 'description' => 'Premium fashion brand',
                 'is_enabled' => true,
-            ]
-        );
+            ])
+            ->create();
 
-        // Get or create a category
-        $category = Category::firstOrCreate(
-            ['name' => 'Clothing'],
-            [
+        $category = Category::factory()
+            ->state([
                 'slug' => 'clothing',
+                'name' => 'Clothing',
                 'description' => 'Clothing category',
                 'is_enabled' => true,
                 'is_visible' => true,
-            ]
-        );
+            ])
+            ->create();
 
-        // Create products with variants
         $products = [
             [
                 'name' => 'Premium T-Shirt',
@@ -184,9 +164,9 @@ final class ProductVariantSeeder extends Seeder
                 'variants' => [
                     ['size' => 'S', 'price_modifier' => 0, 'stock' => 50],
                     ['size' => 'M', 'price_modifier' => 0, 'stock' => 75],
-                    ['size' => 'L', 'price_modifier' => 2.00, 'stock' => 60],
-                    ['size' => 'XL', 'price_modifier' => 4.00, 'stock' => 40],
-                    ['size' => 'XXL', 'price_modifier' => 6.00, 'stock' => 25],
+                    ['size' => 'L', 'price_modifier' => 2.0, 'stock' => 60],
+                    ['size' => 'XL', 'price_modifier' => 4.0, 'stock' => 40],
+                    ['size' => 'XXL', 'price_modifier' => 6.0, 'stock' => 25],
                 ],
             ],
             [
@@ -197,9 +177,9 @@ final class ProductVariantSeeder extends Seeder
                     ['size' => '28', 'price_modifier' => 0, 'stock' => 30],
                     ['size' => '30', 'price_modifier' => 0, 'stock' => 45],
                     ['size' => '32', 'price_modifier' => 0, 'stock' => 55],
-                    ['size' => '34', 'price_modifier' => 5.00, 'stock' => 40],
-                    ['size' => '36', 'price_modifier' => 10.00, 'stock' => 25],
-                    ['size' => '38', 'price_modifier' => 15.00, 'stock' => 15],
+                    ['size' => '34', 'price_modifier' => 5.0, 'stock' => 40],
+                    ['size' => '36', 'price_modifier' => 10.0, 'stock' => 25],
+                    ['size' => '38', 'price_modifier' => 15.0, 'stock' => 15],
                 ],
             ],
             [
@@ -209,9 +189,9 @@ final class ProductVariantSeeder extends Seeder
                 'variants' => [
                     ['size' => 'S', 'price_modifier' => 0, 'stock' => 20],
                     ['size' => 'M', 'price_modifier' => 0, 'stock' => 25],
-                    ['size' => 'L', 'price_modifier' => 20.00, 'stock' => 20],
-                    ['size' => 'XL', 'price_modifier' => 40.00, 'stock' => 15],
-                    ['size' => 'XXL', 'price_modifier' => 60.00, 'stock' => 10],
+                    ['size' => 'L', 'price_modifier' => 20.0, 'stock' => 20],
+                    ['size' => 'XL', 'price_modifier' => 40.0, 'stock' => 15],
+                    ['size' => 'XXL', 'price_modifier' => 60.0, 'stock' => 10],
                 ],
             ],
             [
@@ -226,9 +206,9 @@ final class ProductVariantSeeder extends Seeder
                     ['size' => '40', 'price_modifier' => 0, 'stock' => 60],
                     ['size' => '41', 'price_modifier' => 0, 'stock' => 55],
                     ['size' => '42', 'price_modifier' => 0, 'stock' => 50],
-                    ['size' => '43', 'price_modifier' => 5.00, 'stock' => 45],
-                    ['size' => '44', 'price_modifier' => 10.00, 'stock' => 40],
-                    ['size' => '45', 'price_modifier' => 15.00, 'stock' => 30],
+                    ['size' => '43', 'price_modifier' => 5.0, 'stock' => 45],
+                    ['size' => '44', 'price_modifier' => 10.0, 'stock' => 40],
+                    ['size' => '45', 'price_modifier' => 15.0, 'stock' => 30],
                 ],
             ],
             [
@@ -239,67 +219,61 @@ final class ProductVariantSeeder extends Seeder
                     ['size' => 'XS', 'price_modifier' => 0, 'stock' => 15],
                     ['size' => 'S', 'price_modifier' => 0, 'stock' => 20],
                     ['size' => 'M', 'price_modifier' => 0, 'stock' => 25],
-                    ['size' => 'L', 'price_modifier' => 10.00, 'stock' => 20],
-                    ['size' => 'XL', 'price_modifier' => 20.00, 'stock' => 15],
-                    ['size' => 'XXL', 'price_modifier' => 30.00, 'stock' => 10],
+                    ['size' => 'L', 'price_modifier' => 10.0, 'stock' => 20],
+                    ['size' => 'XL', 'price_modifier' => 20.0, 'stock' => 15],
+                    ['size' => 'XXL', 'price_modifier' => 30.0, 'stock' => 10],
                 ],
             ],
         ];
 
         foreach ($products as $productData) {
-            $product = Product::create([
-                'name' => $productData['name'],
-                'slug' => Str::slug($productData['name']),
-                'description' => $productData['description'],
-                'short_description' => substr($productData['description'], 0, 100),
-                'sku' => 'PROD-'.strtoupper(Str::random(8)),
-                'price' => $productData['base_price'],
-                'compare_price' => $productData['base_price'] * 1.2,
-                'cost_price' => $productData['base_price'] * 0.6,
-                'manage_stock' => true,
-                'stock_quantity' => 0,
-                'weight' => 0.5,
-                'is_visible' => true,
-                'is_featured' => true,
-                'published_at' => now(),
-                'brand_id' => $brand->id,
-                'status' => 'published',
-                'type' => 'variable',
-            ]);
+            $product = Product::factory()
+                ->for($brand)
+                ->hasAttached($category)
+                ->state([
+                    'name' => $productData['name'],
+                    'description' => $productData['description'],
+                    'short_description' => substr($productData['description'], 0, 100),
+                    'price' => $productData['base_price'],
+                    'compare_price' => $productData['base_price'] * 1.2,
+                    'cost_price' => $productData['base_price'] * 0.6,
+                    'manage_stock' => true,
+                    'stock_quantity' => 0,
+                    'type' => 'variable',
+                    'is_visible' => true,
+                    'is_featured' => true,
+                    'published_at' => now(),
+                ])
+                ->create();
 
-            // Attach category
-            $product->categories()->attach($category->id);
-
-            // Create variants
             foreach ($productData['variants'] as $index => $variantData) {
-                $variant = ProductVariant::create([
-                    'product_id' => $product->id,
-                    'name' => $productData['name'].' - '.$variantData['size'],
-                    'sku' => $product->sku.'-'.$variantData['size'],
-                    'price' => $productData['base_price'] + $variantData['price_modifier'],
-                    'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
-                    'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
-                    'stock_quantity' => $variantData['stock'],
-                    'weight' => 0.5,
-                    'track_inventory' => true,
-                    'is_default' => $index === 0,
-                    'is_enabled' => true,
-                    'attributes' => json_encode(['size' => $variantData['size']]),
-                ]);
+                $variant = ProductVariant::factory()
+                    ->for($product)
+                    ->state([
+                        'name' => $productData['name'] . ' - ' . $variantData['size'],
+                        'sku' => $product->sku . '-' . $variantData['size'],
+                        'price' => $productData['base_price'] + $variantData['price_modifier'],
+                        'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
+                        'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
+                        'stock_quantity' => $variantData['stock'],
+                        'is_default' => $index === 0,
+                        'track_inventory' => true,
+                        'is_enabled' => true,
+                        'attributes' => ['size' => $variantData['size']],
+                    ])
+                    ->create();
 
-                // Note: Attributes are stored in JSON format in the attributes column
-                // The relationship will be handled by the frontend components
-
-                // Create variant inventory
-                VariantInventory::create([
-                    'variant_id' => $variant->id,
-                    'warehouse_code' => 'main',
-                    'stock' => $variantData['stock'],
-                    'reserved' => 0,
-                    'available' => $variantData['stock'],
-                    'reorder_point' => 10,
-                    'reorder_quantity' => 50,
-                ]);
+                VariantInventory::factory()
+                    ->for($variant)
+                    ->state([
+                        'warehouse_code' => 'main',
+                        'stock' => $variantData['stock'],
+                        'reserved' => 0,
+                        'available' => $variantData['stock'],
+                        'reorder_point' => 10,
+                        'reorder_quantity' => 50,
+                    ])
+                    ->create();
             }
         }
     }
@@ -310,66 +284,70 @@ final class ProductVariantSeeder extends Seeder
         $products = Product::where('type', 'variable')->get();
 
         foreach ($products as $product) {
-            VariantPricingRule::create([
-                'product_id' => $product->id,
-                'rule_name' => 'Large Size Premium',
-                'rule_type' => 'size_based',
-                'conditions' => [
-                    [
-                        'attribute' => 'size',
-                        'operator' => 'greater_than',
-                        'value' => 'L',
+            VariantPricingRule::factory()
+                ->for($product)
+                ->state([
+                    'rule_name' => 'Large Size Premium',
+                    'rule_type' => 'size_based',
+                    'conditions' => [
+                        [
+                            'attribute' => 'size',
+                            'operator' => 'greater_than',
+                            'value' => 'L',
+                        ],
                     ],
-                ],
-                'pricing_modifiers' => [
-                    [
-                        'type' => 'percentage',
-                        'value' => 5,
-                        'conditions' => [
-                            [
-                                'attribute' => 'size',
-                                'operator' => 'equals',
-                                'value' => 'XL',
+                    'pricing_modifiers' => [
+                        [
+                            'type' => 'percentage',
+                            'value' => 5,
+                            'conditions' => [
+                                [
+                                    'attribute' => 'size',
+                                    'operator' => 'equals',
+                                    'value' => 'XL',
+                                ],
+                            ],
+                        ],
+                        [
+                            'type' => 'percentage',
+                            'value' => 10,
+                            'conditions' => [
+                                [
+                                    'attribute' => 'size',
+                                    'operator' => 'equals',
+                                    'value' => 'XXL',
+                                ],
                             ],
                         ],
                     ],
-                    [
-                        'type' => 'percentage',
-                        'value' => 10,
-                        'conditions' => [
-                            [
-                                'attribute' => 'size',
-                                'operator' => 'equals',
-                                'value' => 'XXL',
-                            ],
-                        ],
-                    ],
-                ],
-                'is_active' => true,
-                'priority' => 1,
-            ]);
+                    'is_active' => true,
+                    'priority' => 1,
+                ])
+                ->create();
 
             // Quantity-based discount rule
-            VariantPricingRule::create([
-                'product_id' => $product->id,
-                'rule_name' => 'Bulk Discount',
-                'rule_type' => 'quantity_based',
-                'conditions' => [
-                    [
-                        'attribute' => 'quantity',
-                        'operator' => 'greater_than',
-                        'value' => 10,
+            VariantPricingRule::factory()
+                ->for($product)
+                ->state([
+                    'rule_name' => 'Bulk Discount',
+                    'rule_type' => 'quantity_based',
+                    'conditions' => [
+                        [
+                            'attribute' => 'quantity',
+                            'operator' => 'greater_than',
+                            'value' => 10,
+                        ],
                     ],
-                ],
-                'pricing_modifiers' => [
-                    [
-                        'type' => 'percentage',
-                        'value' => -10, // 10% discount
+                    'pricing_modifiers' => [
+                        [
+                            'type' => 'percentage',
+                            'value' => -10,  // 10% discount
+                        ],
                     ],
-                ],
-                'is_active' => true,
-                'priority' => 2,
-            ]);
+                    'is_active' => true,
+                    'priority' => 2,
+                ])
+                ->create();
         }
     }
 
@@ -380,15 +358,17 @@ final class ProductVariantSeeder extends Seeder
 
         foreach ($variants as $variant) {
             // Create secondary warehouse inventory
-            VariantInventory::create([
-                'variant_id' => $variant->id,
-                'warehouse_code' => 'secondary',
-                'stock' => rand(5, 25),
-                'reserved' => 0,
-                'available' => rand(5, 25),
-                'reorder_point' => 5,
-                'reorder_quantity' => 25,
-            ]);
+            VariantInventory::factory()
+                ->for($variant)
+                ->state([
+                    'warehouse_code' => 'secondary',
+                    'stock' => fake()->numberBetween(5, 25),
+                    'reserved' => 0,
+                    'available' => fake()->numberBetween(5, 25),
+                    'reorder_point' => 5,
+                    'reorder_quantity' => 25,
+                ])
+                ->create();
         }
     }
 }

@@ -1,15 +1,15 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Translations\CityTranslation;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Region;
-use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 final class LatviaCitiesSeeder extends Seeder
 {
@@ -18,21 +18,18 @@ final class LatviaCitiesSeeder extends Seeder
         $latvia = Country::where('cca2', 'LV')->first();
         $euZone = Zone::where('code', 'EU')->first();
 
-        // Get regions
-        $rigaRegion = Region::where('code', 'LV-RI')->first();
-        $kurzemeRegion = Region::where('code', 'LV-KU')->first();
-        $latgaleRegion = Region::where('code', 'LV-LG')->first();
-        $vidzemeRegion = Region::where('code', 'LV-VI')->first();
-        $zemgaleRegion = Region::where('code', 'LV-ZM')->first();
+        $regions = Region::query()
+            ->whereIn('code', ['LV-RI', 'LV-KU', 'LV-LG', 'LV-VI', 'LV-ZM'])
+            ->get()
+            ->keyBy('code');
 
         $cities = [
-            // Riga region
             [
                 'name' => 'Riga',
                 'code' => 'LV-RI-RIG',
                 'is_capital' => true,
                 'is_default' => true,
-                'region_id' => $rigaRegion?->id,
+                'region_code' => 'LV-RI',
                 'latitude' => 56.9496,
                 'longitude' => 24.1052,
                 'population' => 614618,
@@ -45,7 +42,7 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Jurmala',
                 'code' => 'LV-RI-JUR',
-                'region_id' => $rigaRegion?->id,
+                'region_code' => 'LV-RI',
                 'latitude' => 56.968,
                 'longitude' => 23.7703,
                 'population' => 57409,
@@ -55,11 +52,10 @@ final class LatviaCitiesSeeder extends Seeder
                     'en' => ['name' => 'Jurmala', 'description' => 'Resort city'],
                 ],
             ],
-            // Kurzeme region
             [
                 'name' => 'Liepaja',
                 'code' => 'LV-KU-LIE',
-                'region_id' => $kurzemeRegion?->id,
+                'region_code' => 'LV-KU',
                 'latitude' => 56.5084,
                 'longitude' => 21.0132,
                 'population' => 67964,
@@ -72,7 +68,7 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Ventspils',
                 'code' => 'LV-KU-VEN',
-                'region_id' => $kurzemeRegion?->id,
+                'region_code' => 'LV-KU',
                 'latitude' => 57.3937,
                 'longitude' => 21.5647,
                 'population' => 34420,
@@ -82,11 +78,10 @@ final class LatviaCitiesSeeder extends Seeder
                     'en' => ['name' => 'Ventspils', 'description' => 'Port city'],
                 ],
             ],
-            // Latgale region
             [
                 'name' => 'Daugavpils',
                 'code' => 'LV-LG-DAU',
-                'region_id' => $latgaleRegion?->id,
+                'region_code' => 'LV-LG',
                 'latitude' => 55.8752,
                 'longitude' => 26.5362,
                 'population' => 82946,
@@ -99,7 +94,7 @@ final class LatviaCitiesSeeder extends Seeder
             [
                 'name' => 'Rezekne',
                 'code' => 'LV-LG-REZ',
-                'region_id' => $latgaleRegion?->id,
+                'region_code' => 'LV-LG',
                 'latitude' => 56.5103,
                 'longitude' => 27.3319,
                 'population' => 25694,
@@ -109,11 +104,10 @@ final class LatviaCitiesSeeder extends Seeder
                     'en' => ['name' => 'Rezekne', 'description' => 'Center of Latgale'],
                 ],
             ],
-            // Vidzeme region
             [
                 'name' => 'Valmiera',
                 'code' => 'LV-VI-VAL',
-                'region_id' => $vidzemeRegion?->id,
+                'region_code' => 'LV-VI',
                 'latitude' => 57.5408,
                 'longitude' => 25.4275,
                 'population' => 23556,
@@ -123,11 +117,10 @@ final class LatviaCitiesSeeder extends Seeder
                     'en' => ['name' => 'Valmiera', 'description' => 'Center of Vidzeme'],
                 ],
             ],
-            // Zemgale region
             [
                 'name' => 'Jelgava',
                 'code' => 'LV-ZM-JEL',
-                'region_id' => $zemgaleRegion?->id,
+                'region_code' => 'LV-ZM',
                 'latitude' => 56.6511,
                 'longitude' => 23.7214,
                 'population' => 55897,
@@ -140,27 +133,27 @@ final class LatviaCitiesSeeder extends Seeder
         ];
 
         foreach ($cities as $cityData) {
+            $region = $regions->get($cityData['region_code'] ?? '') ?: null;
+
             $city = City::updateOrCreate(
                 ['code' => $cityData['code']],
                 [
                     'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name']),
-                    'is_enabled' => true,
-                    'is_default' => $cityData['is_default'] ?? false,
+                    'slug' => Str::slug($cityData['name']),
                     'is_capital' => $cityData['is_capital'] ?? false,
-                    'country_id' => $latvia->id,
+                    'is_default' => $cityData['is_default'] ?? false,
+                    'country_id' => $latvia?->id,
                     'zone_id' => $euZone?->id,
-                    'region_id' => $cityData['region_id'],
+                    'region_id' => $region?->id,
                     'level' => 1,
                     'latitude' => $cityData['latitude'],
                     'longitude' => $cityData['longitude'],
                     'population' => $cityData['population'],
                     'postal_codes' => $cityData['postal_codes'],
-                    'sort_order' => 0,
+                    'is_enabled' => true,
                 ]
             );
 
-            // Create translations
             foreach ($cityData['translations'] as $locale => $translation) {
                 CityTranslation::updateOrCreate(
                     [
@@ -168,8 +161,8 @@ final class LatviaCitiesSeeder extends Seeder
                         'locale' => $locale,
                     ],
                     [
-                        'name' => $translation['name'],
-                        'description' => $translation['description'],
+                        'name' => Arr::get($translation, 'name'),
+                        'description' => Arr::get($translation, 'description'),
                     ]
                 );
             }

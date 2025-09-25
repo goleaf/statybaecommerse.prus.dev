@@ -32,13 +32,53 @@ final class AnalyticsEvent extends Model
 {
     use HasFactory;
 
+    protected $attributes = [
+        'conversion_currency' => 'EUR',
+    ];
+
+    public function setConversionCurrencyAttribute($value): void
+    {
+        $this->attributes['conversion_currency'] = $value ?? 'EUR';
+    }
+
     protected $fillable = [
-        'event_name', 'event_type', 'description', 'session_id', 'user_id', 'url', 'referrer',
-        'ip_address', 'country_code', 'device_type', 'browser', 'os', 'screen_resolution',
-        'trackable_type', 'trackable_id', 'value', 'currency', 'properties', 'user_agent',
-        'is_important', 'is_conversion', 'conversion_value', 'conversion_currency', 'notes',
-        'user_name', 'user_email', 'event_data', 'utm_source', 'utm_medium', 'utm_campaign',
-        'utm_term', 'utm_content', 'referrer_url', 'country', 'city', 'created_at', 'updated_at',
+        'event_name',
+        'event_type',
+        'description',
+        'session_id',
+        'user_id',
+        'url',
+        'referrer',
+        'ip_address',
+        'country_code',
+        'device_type',
+        'browser',
+        'os',
+        'screen_resolution',
+        'trackable_type',
+        'trackable_id',
+        'value',
+        'currency',
+        'properties',
+        'user_agent',
+        'is_important',
+        'is_conversion',
+        'conversion_value',
+        'conversion_currency',
+        'notes',
+        'user_name',
+        'user_email',
+        'event_data',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'utm_term',
+        'utm_content',
+        'referrer_url',
+        'country',
+        'city',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [

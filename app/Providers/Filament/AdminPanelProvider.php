@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
@@ -8,10 +10,10 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
+use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -30,8 +32,8 @@ final class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile()
             ->when(app()->environment('testing'),
-                fn(Panel $p) => $p->authGuard('web'),
-                fn(Panel $p) => $p->authGuard('admin'))
+                fn (Panel $p) => $p->authGuard('web'),
+                fn (Panel $p) => $p->authGuard('admin'))
             ->authPasswordBroker('admin_users')
             ->brandName(__('admin.brand_name'))
             ->brandLogo(asset('images/logo-admin.svg'))
@@ -46,6 +48,9 @@ final class AdminPanelProvider extends PanelProvider
                 'info' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->resources([
+                \App\Filament\Resources\SystemSettingResource::class,
+            ])
             ->pages([
                 \App\Filament\Pages\Dashboard::class,
                 \App\Filament\Pages\SliderAnalytics::class,
@@ -72,8 +77,7 @@ final class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->databaseNotifications()
-            ->databaseNotificationsPolling('30s')
+            // Disable database notifications polling to prevent auto-refresh on the main page
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarCollapsibleOnDesktop()
             ->topNavigation()
@@ -99,16 +103,16 @@ final class AdminPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
-                    ->url(fn(): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
+                    ->url(fn (): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
                     ->icon('heroicon-o-user-circle'),
                 'language' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.language'))
-                    ->url(fn(): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
+                    ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
                     ->icon('heroicon-o-language'),
             ])
             ->when(app()->environment('testing'),
-                fn(Panel $p) => $p->plugins([]),
-                fn(Panel $p) => $p->plugins([
+                fn (Panel $p) => $p->plugins([]),
+                fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
                 ]))
             // Remove custom Vite theme to ensure default Filament styles load

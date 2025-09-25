@@ -65,10 +65,14 @@ class ReferralRewardResourceTest extends TestCase
             'amount' => 10.0,
             'currency_code' => 'EUR',
             'status' => 'pending',
-            'title' => 'Test Reward',
-            'description' => 'Test Description',
             'is_active' => true,
             'priority' => 1,
+        ]);
+
+        // Assert translatable fields stored for default locale
+        $this->assertDatabaseHas('referral_rewards', [
+            'title->lt' => 'Test Reward',
+            'description->lt' => 'Test Description',
         ]);
     }
 
@@ -83,15 +87,17 @@ class ReferralRewardResourceTest extends TestCase
                 'title' => 'Updated Title',
                 'description' => 'Updated Description',
                 'amount' => 20.0,
+                'type' => 'discount',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $referralReward->refresh();
 
-        $this->assertEquals('Updated Title', $referralReward->title);
-        $this->assertEquals('Updated Description', $referralReward->description);
+        $this->assertEquals('Updated Title', $referralReward->getTranslation('title', 'lt'));
+        $this->assertEquals('Updated Description', $referralReward->getTranslation('description', 'lt'));
         $this->assertEquals(20.0, $referralReward->amount);
+        $this->assertEquals('discount', $referralReward->type);
     }
 
     public function test_can_view_referral_reward(): void
@@ -101,8 +107,8 @@ class ReferralRewardResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\ReferralRewardResource\Pages\ViewReferralReward::class, [
             'record' => $referralReward->getRouteKey(),
         ])
-            ->assertCanSeeText($referralReward->title)
-            ->assertCanSeeText($referralReward->description);
+            ->assertSee($referralReward->getTranslation('title', 'lt'))
+            ->assertSee($referralReward->getTranslation('description', 'lt'));
     }
 
     public function test_can_delete_referral_reward(): void
@@ -203,8 +209,8 @@ class ReferralRewardResourceTest extends TestCase
 
     public function test_can_search_referral_rewards(): void
     {
-        $reward1 = ReferralReward::factory()->create(['title' => 'Test Reward 1']);
-        $reward2 = ReferralReward::factory()->create(['title' => 'Another Reward']);
+        $reward1 = ReferralReward::factory()->create(['title' => ['lt' => 'Test Reward 1']]);
+        $reward2 = ReferralReward::factory()->create(['title' => ['lt' => 'Another Reward']]);
 
         Livewire::test(\App\Filament\Resources\ReferralRewardResource\Pages\ListReferralRewards::class)
             ->searchTable('Test')
@@ -214,8 +220,8 @@ class ReferralRewardResourceTest extends TestCase
 
     public function test_can_sort_referral_rewards(): void
     {
-        $reward1 = ReferralReward::factory()->create(['title' => 'A Reward']);
-        $reward2 = ReferralReward::factory()->create(['title' => 'B Reward']);
+        $reward1 = ReferralReward::factory()->create(['title' => ['lt' => 'A Reward']]);
+        $reward2 = ReferralReward::factory()->create(['title' => ['lt' => 'B Reward']]);
 
         Livewire::test(\App\Filament\Resources\ReferralRewardResource\Pages\ListReferralRewards::class)
             ->sortTable('title')
@@ -247,8 +253,8 @@ class ReferralRewardResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\ReferralRewardResource\Pages\ViewReferralReward::class, [
             'record' => $referralReward->getRouteKey(),
         ])
-            ->assertCanSeeText($user->name)
-            ->assertCanSeeText($referral->code)
-            ->assertCanSeeText($order->id);
+            ->assertSee($user->name)
+            ->assertSee($referral->referral_code)
+            ->assertSee((string) $order->id);
     }
 }

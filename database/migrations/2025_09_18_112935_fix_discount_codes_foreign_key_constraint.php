@@ -2,63 +2,94 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        // Check if we're using SQLite or MySQL
-        $isSQLite = DB::getDriverName() === 'sqlite';
-
-        if ($isSQLite) {
-            // Disable foreign key checks for SQLite
-            DB::statement('PRAGMA foreign_keys=OFF');
-        } else {
-            // Disable foreign key checks for MySQL
-            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        // Fix discount_codes foreign key without dropping existing columns
+        if (! Schema::hasTable('discount_codes')) {
+            return;
         }
 
-        try {
-            // Drop the old foreign key constraint
-            if (Schema::hasTable('discount_codes')) {
-                // Recreate the table with correct foreign key constraint
-                Schema::dropIfExists('discount_codes');
-
-                Schema::create('discount_codes', function (Blueprint $table) {
-                    $table->id();
-                    $table->foreignId('discount_id')->constrained('discounts')->cascadeOnDelete();
-                    $table->string('code')->unique();
-                    $table->timestamp('expires_at')->nullable();
-                    $table->unsignedInteger('max_uses')->nullable();
-                    $table->unsignedInteger('usage_count')->default(0);
-                    $table->json('metadata')->nullable();
-                    $table->timestamps();
-                    $table->string('description_lt')->nullable();
-                    $table->string('description_en')->nullable();
-                    $table->timestamp('starts_at')->nullable();
-                    $table->unsignedInteger('usage_limit_per_user')->nullable();
-                    $table->boolean('is_active')->default(true);
-                    $table->string('status')->default('active');
-                    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-                    $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-                    $table->softDeletes();
-
-                    $table->index(['is_active', 'status']);
-                    $table->index(['starts_at', 'expires_at']);
-                    $table->index(['created_by']);
-                    $table->index(['updated_by']);
-                });
+        Schema::table('discount_codes', function (Blueprint $table) {
+            if (! Schema::hasColumn('discount_codes', 'discount_id')) {
+                $table->unsignedBigInteger('discount_id')->nullable()->after('id');
             }
-        } finally {
-            // Re-enable foreign key checks
-            if ($isSQLite) {
-                DB::statement('PRAGMA foreign_keys=ON');
-            } else {
-                DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+            // Add missing columns only if they don't exist (keep previously created structure intact)
+            if (! Schema::hasColumn('discount_codes', 'name')) {
+                $table->string('name')->nullable()->after('code');
             }
-        }
+            if (! Schema::hasColumn('discount_codes', 'description')) {
+                $table->text('description')->nullable()->after('name');
+            }
+            if (! Schema::hasColumn('discount_codes', 'type')) {
+                $table->string('type')->nullable()->after('description');
+            }
+            if (! Schema::hasColumn('discount_codes', 'value')) {
+                $table->decimal('value', 10, 2)->default(0)->after('type');
+            }
+            if (! Schema::hasColumn('discount_codes', 'minimum_amount')) {
+                $table->decimal('minimum_amount', 10, 2)->default(0)->after('value');
+            }
+            if (! Schema::hasColumn('discount_codes', 'maximum_discount')) {
+                $table->decimal('maximum_discount', 10, 2)->nullable()->after('minimum_amount');
+            }
+            if (! Schema::hasColumn('discount_codes', 'usage_limit')) {
+                $table->integer('usage_limit')->nullable()->after('maximum_discount');
+            }
+            if (! Schema::hasColumn('discount_codes', 'usage_limit_per_user')) {
+                $table->integer('usage_limit_per_user')->nullable()->after('usage_limit');
+            }
+            if (! Schema::hasColumn('discount_codes', 'usage_count')) {
+                $table->integer('usage_count')->default(0)->after('usage_limit_per_user');
+            }
+            if (! Schema::hasColumn('discount_codes', 'valid_from')) {
+                $table->dateTime('valid_from')->nullable()->after('usage_count');
+            }
+            if (! Schema::hasColumn('discount_codes', 'valid_until')) {
+                $table->dateTime('valid_until')->nullable()->after('valid_from');
+            }
+            if (! Schema::hasColumn('discount_codes', 'is_active')) {
+                $table->boolean('is_active')->default(true)->after('valid_until');
+            }
+            if (! Schema::hasColumn('discount_codes', 'is_public')) {
+                $table->boolean('is_public')->default(false)->after('is_active');
+            }
+            if (! Schema::hasColumn('discount_codes', 'is_auto_apply')) {
+                $table->boolean('is_auto_apply')->default(false)->after('is_public');
+            }
+            if (! Schema::hasColumn('discount_codes', 'is_stackable')) {
+                $table->boolean('is_stackable')->default(false)->after('is_auto_apply');
+            }
+            if (! Schema::hasColumn('discount_codes', 'is_first_time_only')) {
+                $table->boolean('is_first_time_only')->default(false)->after('is_stackable');
+            }
+            if (! Schema::hasColumn('discount_codes', 'customer_group_id')) {
+                $table->unsignedBigInteger('customer_group_id')->nullable()->after('is_first_time_only');
+            }
+            if (! Schema::hasColumn('discount_codes', 'status')) {
+                $table->string('status')->default('inactive')->after('customer_group_id');
+            }
+            if (! Schema::hasColumn('discount_codes', 'metadata')) {
+                $table->json('metadata')->nullable()->after('status');
+            }
+            if (! Schema::hasColumn('discount_codes', 'created_by')) {
+                $table->unsignedBigInteger('created_by')->nullable()->after('metadata');
+            }
+            if (! Schema::hasColumn('discount_codes', 'updated_by')) {
+                $table->unsignedBigInteger('updated_by')->nullable()->after('created_by');
+            }
+
+            // Indexes
+            if (! Schema::hasColumn('discount_codes', 'valid_from')) {
+                // skip
+            }
+        });
+
+        // Foreign keys are managed in earlier migrations; avoid duplicate FK additions here.
     }
 
     public function down(): void

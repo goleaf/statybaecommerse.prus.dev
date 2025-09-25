@@ -1,15 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Models\Document;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -26,7 +29,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -63,6 +65,12 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ->components([
                         Grid::make(2)
                             ->components([
+                                Select::make('document_template_id')
+                                    ->label(__('orders.document_template'))
+                                    ->relationship('template', 'name')
+                                    ->required()
+                                    ->searchable()
+                                    ->preload(),
                                 TextInput::make('name')
                                     ->label(__('orders.document_name'))
                                     ->required()
@@ -107,7 +115,6 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ->components([
                         FileUpload::make('file_path')
                             ->label(__('orders.document_file'))
-                            ->required()
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                             ->maxSize(10240)  // 10MB
                             ->directory('order-documents')
@@ -145,9 +152,8 @@ final class OrderDocumentsRelationManager extends RelationManager
                                     ->label(__('orders.access_password'))
                                     ->password()
                                     ->maxLength(255),
-                                TextInput::make('expires_at')
-                                    ->label(__('orders.expires_at'))
-                                    ->date(),
+                                DateTimePicker::make('expires_at')
+                                    ->label(__('orders.expires_at')),
                             ]),
                     ])
                     ->collapsible(),
@@ -199,7 +205,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                         'gray' => 'manual',
                         'slate' => 'other',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.document_types.{$state}") : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.document_types.{$state}") : '-'),
                 BadgeColumn::make('status')
                     ->label(__('orders.document_status'))
                     ->colors([
@@ -209,13 +215,13 @@ final class OrderDocumentsRelationManager extends RelationManager
                         'danger' => 'rejected',
                         'secondary' => 'archived',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.document_statuses.{$state}") : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.document_statuses.{$state}") : '-'),
                 TextColumn::make('version')
                     ->label(__('orders.version'))
                     ->sortable(),
                 TextColumn::make('file_size')
                     ->label(__('orders.file_size'))
-                    ->formatStateUsing(fn(?int $state): string => $state ? number_format($state / 1024, 2) . ' MB' : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 2).' MB' : '-')
                     ->sortable(),
                 IconColumn::make('is_public')
                     ->label(__('orders.is_public'))
@@ -269,14 +275,14 @@ final class OrderDocumentsRelationManager extends RelationManager
                 TernaryFilter::make('is_public')
                     ->label(__('orders.is_public'))
                     ->queries(
-                        true: fn(Builder $query) => $query->where('is_public', true),
-                        false: fn(Builder $query) => $query->where('is_public', false),
+                        true: fn (Builder $query) => $query->where('is_public', true),
+                        false: fn (Builder $query) => $query->where('is_public', false),
                     ),
                 TernaryFilter::make('is_downloadable')
                     ->label(__('orders.is_downloadable'))
                     ->queries(
-                        true: fn(Builder $query) => $query->where('is_downloadable', true),
-                        false: fn(Builder $query) => $query->where('is_downloadable', false),
+                        true: fn (Builder $query) => $query->where('is_downloadable', true),
+                        false: fn (Builder $query) => $query->where('is_downloadable', false),
                     ),
             ])
             ->headerActions([
@@ -294,20 +300,20 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ->label(__('orders.download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('info')
-                    ->url(fn(Document $record): string => $record->file_path)
+                    ->url(fn (Document $record): string => $record->file_path)
                     ->openUrlInNewTab()
-                    ->visible(fn(Document $record): bool => $record->is_downloadable),
+                    ->visible(fn (Document $record): bool => $record->is_downloadable),
                 Action::make('preview')
                     ->label(__('orders.preview'))
                     ->icon('heroicon-o-eye')
                     ->color('gray')
-                    ->url(fn(Document $record): string => $record->file_path)
+                    ->url(fn (Document $record): string => $record->file_path)
                     ->openUrlInNewTab(),
                 Action::make('approve')
                     ->label(__('orders.approve'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn(Document $record): bool => $record->status === 'pending')
+                    ->visible(fn (?Document $record): bool => ($record?->status) === 'pending')
                     ->action(function (Document $record): void {
                         $record->update(['status' => 'approved']);
 
@@ -321,7 +327,7 @@ final class OrderDocumentsRelationManager extends RelationManager
                     ->label(__('orders.reject'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn(Document $record): bool => $record->status === 'pending')
+                    ->visible(fn (?Document $record): bool => ($record?->status) === 'pending')
                     ->action(function (Document $record): void {
                         $record->update(['status' => 'rejected']);
 

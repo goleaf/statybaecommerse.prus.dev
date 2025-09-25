@@ -1,13 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 
 final class RecentOrdersWidget extends BaseWidget
 {
@@ -18,11 +17,11 @@ final class RecentOrdersWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Order::query()
-                    ->latest()
-                    ->limit(10)
-            )
+            ->query(fn(): Builder => Order::query()
+                ->withoutGlobalScopes()
+                ->with('user')
+                ->latest()
+                ->limit(10))
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label(__('orders.id'))
@@ -30,23 +29,20 @@ final class RecentOrdersWidget extends BaseWidget
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('orders.customer'))
-                    ->sortable()
-                    ->searchable(),
+                    ->default(fn(?Order $record): string => $record?->user?->name ?? __('orders.guest_customer'))
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('orders.status'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'pending' => 'warning',
-                        'confirmed' => 'info',
-                        'processing' => 'primary',
-                        'shipped' => 'success',
-                        'delivered' => 'success',
+                        'confirmed', 'processing' => 'primary',
+                        'shipped', 'delivered' => 'success',
                         'cancelled' => 'danger',
-                        'refunded' => 'secondary',
-                        'returned' => 'warning',
-                        default => 'gray',
+                        'refunded' => 'gray',
+                        default => 'secondary',
                     }),
-                Tables\Columns\TextColumn::make('total_amount')
+                Tables\Columns\TextColumn::make('total')
                     ->label(__('orders.total_amount'))
                     ->money('EUR')
                     ->sortable(),

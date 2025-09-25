@@ -23,26 +23,16 @@ final class UserBehaviorSeeder extends Seeder
         $this->command->info('Creating user behaviors...');
 
         // Get existing users, products, and categories
-        $users = User::all();
-        $products = Product::all();
-        $categories = Category::all();
+        $categories = Category::factory()->count(8)->create();
+        $products = Product::factory()
+            ->count(30)
+            ->hasAttached($categories->random(3))
+            ->create();
+        $users = User::factory()
+            ->count(10)
+            ->hasUserBehaviors(50)
+            ->create();
 
-        if ($users->isEmpty()) {
-            $this->command->warn('No users found. Creating sample users...');
-            $users = User::factory(10)->create();
-        }
-
-        if ($products->isEmpty()) {
-            $this->command->warn('No products found. Creating sample products...');
-            $products = Product::factory(20)->create();
-        }
-
-        if ($categories->isEmpty()) {
-            $this->command->warn('No categories found. Creating sample categories...');
-            $categories = Category::factory(5)->create();
-        }
-
-        // Create realistic user behavior patterns
         $this->createViewBehaviors($users, $products, $categories);
         $this->createClickBehaviors($users, $products, $categories);
         $this->createAddToCartBehaviors($users, $products, $categories);
@@ -61,13 +51,11 @@ final class UserBehaviorSeeder extends Seeder
         // Create view behaviors for the last 30 days
         for ($i = 0; $i < 500; $i++) {
             UserBehavior::factory()
+                ->for($users->random())
+                ->for($products->random())
+                ->for($categories->random())
                 ->view()
-                ->forUser($users->random())
-                ->forProduct($products->random())
-                ->forCategory($categories->random())
-                ->create([
-                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-                ]);
+                ->create();
         }
     }
 
@@ -76,16 +64,10 @@ final class UserBehaviorSeeder extends Seeder
         $this->command->info('Creating click behaviors...');
 
         // Create click behaviors (usually follow views)
-        for ($i = 0; $i < 200; $i++) {
-            UserBehavior::factory()
-                ->click()
-                ->forUser($users->random())
-                ->forProduct($products->random())
-                ->forCategory($categories->random())
-                ->create([
-                    'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-                ]);
-        }
+        UserBehavior::factory()
+            ->count(200)
+            ->click()
+            ->create();
     }
 
     private function createAddToCartBehaviors(Collection $users, Collection $products, Collection $categories): void
@@ -93,16 +75,18 @@ final class UserBehaviorSeeder extends Seeder
         $this->command->info('Creating add to cart behaviors...');
 
         // Create add to cart behaviors (conversion from views/clicks)
-        for ($i = 0; $i < 150; $i++) {
-            UserBehavior::factory()
-                ->addToCart()
-                ->forUser($users->random())
-                ->forProduct($products->random())
-                ->forCategory($categories->random())
-                ->create([
+        UserBehavior::factory()
+            ->count(150)
+            ->state(function () use ($users, $products, $categories) {
+                return [
+                    'user_id' => $users->random()->id,
+                    'product_id' => $products->random()->id,
+                    'category_id' => $categories->random()->id,
+                    'behavior_type' => 'add_to_cart',
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-                ]);
-        }
+                ];
+            })
+            ->create();
     }
 
     private function createPurchaseBehaviors(Collection $users, Collection $products, Collection $categories): void
@@ -110,16 +94,18 @@ final class UserBehaviorSeeder extends Seeder
         $this->command->info('Creating purchase behaviors...');
 
         // Create purchase behaviors (final conversion)
-        for ($i = 0; $i < 100; $i++) {
-            UserBehavior::factory()
-                ->purchase()
-                ->forUser($users->random())
-                ->forProduct($products->random())
-                ->forCategory($categories->random())
-                ->create([
+        UserBehavior::factory()
+            ->count(100)
+            ->state(function () use ($users, $products, $categories) {
+                return [
+                    'user_id' => $users->random()->id,
+                    'product_id' => $products->random()->id,
+                    'category_id' => $categories->random()->id,
+                    'behavior_type' => 'purchase',
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-                ]);
-        }
+                ];
+            })
+            ->create();
     }
 
     private function createSearchBehaviors(Collection $users, Collection $categories): void
@@ -127,15 +113,17 @@ final class UserBehaviorSeeder extends Seeder
         $this->command->info('Creating search behaviors...');
 
         // Create search behaviors
-        for ($i = 0; $i < 300; $i++) {
-            UserBehavior::factory()
-                ->search()
-                ->forUser($users->random())
-                ->forCategory($categories->random())
-                ->create([
+        UserBehavior::factory()
+            ->count(300)
+            ->state(function () use ($users, $categories) {
+                return [
+                    'user_id' => $users->random()->id,
+                    'category_id' => $categories->random()->id,
+                    'behavior_type' => 'search',
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-                ]);
-        }
+                ];
+            })
+            ->create();
     }
 
     private function createWishlistBehaviors(Collection $users, Collection $products): void
@@ -143,15 +131,17 @@ final class UserBehaviorSeeder extends Seeder
         $this->command->info('Creating wishlist behaviors...');
 
         // Create wishlist behaviors
-        for ($i = 0; $i < 80; $i++) {
-            UserBehavior::factory()
-                ->forUser($users->random())
-                ->forProduct($products->random())
-                ->create([
+        UserBehavior::factory()
+            ->count(80)
+            ->state(function () use ($users, $products) {
+                return [
+                    'user_id' => $users->random()->id,
+                    'product_id' => $products->random()->id,
                     'behavior_type' => 'wishlist',
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-                ]);
-        }
+                ];
+            })
+            ->create();
     }
 
     private function createFilterBehaviors(Collection $users, Collection $categories): void
@@ -159,11 +149,12 @@ final class UserBehaviorSeeder extends Seeder
         $this->command->info('Creating filter behaviors...');
 
         // Create filter behaviors
-        for ($i = 0; $i < 120; $i++) {
-            UserBehavior::factory()
-                ->forUser($users->random())
-                ->forCategory($categories->random())
-                ->create([
+        UserBehavior::factory()
+            ->count(120)
+            ->state(function () use ($users, $categories) {
+                return [
+                    'user_id' => $users->random()->id,
+                    'category_id' => $categories->random()->id,
                     'behavior_type' => 'filter',
                     'metadata' => [
                         'filters_applied' => fake()->randomElements(['price', 'brand', 'color', 'size'], fake()->numberBetween(1, 3)),
@@ -171,7 +162,8 @@ final class UserBehaviorSeeder extends Seeder
                         'page_title' => fake()->sentence(3),
                     ],
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-                ]);
-        }
+                ];
+            })
+            ->create();
     }
 }

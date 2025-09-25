@@ -9,7 +9,6 @@ use App\Models\Location;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class LocationResourceTest extends TestCase
 {
@@ -35,7 +34,8 @@ class LocationResourceTest extends TestCase
             'is_enabled' => true,
         ]);
 
-        $this->get('/admin/locations')
+        $this
+            ->get('/admin/locations')
             ->assertOk()
             ->assertSee('Vilnius Store')
             ->assertSee('VIL001')
@@ -46,7 +46,8 @@ class LocationResourceTest extends TestCase
     {
         $country = Country::factory()->create();
 
-        $this->get('/admin/locations/create')
+        $this
+            ->get('/admin/locations/create')
             ->assertOk();
 
         $this->post('/admin/locations', [
@@ -94,7 +95,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country->cca2,
         ]);
 
-        $this->get("/admin/locations/{$location->id}")
+        $this
+            ->get("/admin/locations/{$location->id}")
             ->assertOk()
             ->assertSee('Riga Office');
     }
@@ -107,7 +109,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country->cca2,
         ]);
 
-        $this->get("/admin/locations/{$location->id}/edit")
+        $this
+            ->get("/admin/locations/{$location->id}/edit")
             ->assertOk();
 
         $this->put("/admin/locations/{$location->id}", [
@@ -121,7 +124,7 @@ class LocationResourceTest extends TestCase
             'phone' => '+372 6 123456',
             'email' => 'tallinn@example.com',
             'type' => 'store',
-            'latitude' => 59.4370,
+            'latitude' => 59.437,
             'longitude' => 24.7536,
             'is_enabled' => false,
             'is_default' => true,
@@ -139,7 +142,7 @@ class LocationResourceTest extends TestCase
             'phone' => '+372 6 123456',
             'email' => 'tallinn@example.com',
             'type' => 'store',
-            'latitude' => 59.4370,
+            'latitude' => 59.437,
             'longitude' => 24.7536,
             'is_enabled' => false,
             'is_default' => true,
@@ -154,7 +157,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country->cca2,
         ]);
 
-        $this->delete("/admin/locations/{$location->id}")
+        $this
+            ->delete("/admin/locations/{$location->id}")
             ->assertRedirect();
 
         $this->assertDatabaseMissing('locations', [
@@ -177,7 +181,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country2->cca2,
         ]);
 
-        $this->get('/admin/locations?country_id='.$country1->id)
+        $this
+            ->get('/admin/locations?country_id='.$country1->id)
             ->assertOk()
             ->assertSee('Vilnius Store')
             ->assertDontSee('Riga Store');
@@ -199,7 +204,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country->cca2,
         ]);
 
-        $this->get('/admin/locations?type=warehouse')
+        $this
+            ->get('/admin/locations?type=warehouse')
             ->assertOk()
             ->assertSee('Warehouse')
             ->assertDontSee('Store');
@@ -221,7 +227,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country->cca2,
         ]);
 
-        $this->get('/admin/locations?is_enabled=1')
+        $this
+            ->get('/admin/locations?is_enabled=1')
             ->assertOk()
             ->assertSee('Enabled Location')
             ->assertDontSee('Disabled Location');
@@ -243,7 +250,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country->cca2,
         ]);
 
-        $this->get('/admin/locations?is_default=1')
+        $this
+            ->get('/admin/locations?is_default=1')
             ->assertOk()
             ->assertSee('Default Location')
             ->assertDontSee('Non-default Location');
@@ -267,7 +275,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country->cca2,
         ]);
 
-        $this->get('/admin/locations?has_coordinates=yes')
+        $this
+            ->get('/admin/locations?has_coordinates=yes')
             ->assertOk()
             ->assertSee('With Coordinates')
             ->assertDontSee('Without Coordinates');
@@ -291,7 +300,8 @@ class LocationResourceTest extends TestCase
             'country_code' => $country->cca2,
         ]);
 
-        $this->get('/admin/locations?has_opening_hours=yes')
+        $this
+            ->get('/admin/locations?has_opening_hours=yes')
             ->assertOk()
             ->assertSee('With Hours')
             ->assertDontSee('Without Hours');

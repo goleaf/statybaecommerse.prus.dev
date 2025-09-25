@@ -95,28 +95,10 @@ return new class extends Migration
             });
         }
 
-        // Create product analytics table
-        if (! Schema::hasTable('product_analytics')) {
-            Schema::create('product_analytics', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-                $table->date('date');
-                $table->unsignedInteger('views')->default(0);
-                $table->unsignedInteger('cart_additions')->default(0);
-                $table->unsignedInteger('purchases')->default(0);
-                $table->decimal('revenue', 10, 2)->default(0);
-                $table->timestamps();
-
-                $table->unique(['product_id', 'date']);
-                $table->index(['date', 'views']);
-                $table->index(['date', 'revenue']);
-            });
-        }
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('product_analytics');
         Schema::dropIfExists('system_notifications');
         Schema::dropIfExists('admin_activity_logs');
 

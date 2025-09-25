@@ -8,7 +8,7 @@ use App\Models\NormalSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\TestCase;
+use Livewire\Livewire;
 
 final class NormalSettingResourceTest extends TestCase
 {

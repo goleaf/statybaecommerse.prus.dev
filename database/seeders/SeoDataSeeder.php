@@ -20,23 +20,19 @@ final class SeoDataSeeder extends Seeder
 
         $createFor = static function (string $type, int $id, array $attributes) use ($locales): void {
             foreach ($locales as $locale) {
-                SeoData::updateOrCreate(
-                    [
-                        'seoable_type' => $type,
-                        'seoable_id' => $id,
-                        'locale' => $locale,
-                    ],
-                    [
-                        'title' => $attributes['title'][$locale] ?? $attributes['title']['lt'] ?? null,
-                        'description' => $attributes['description'][$locale] ?? $attributes['description']['lt'] ?? null,
-                        'keywords' => $attributes['keywords'][$locale] ?? ($attributes['keywords']['lt'] ?? null),
-                        'canonical_url' => $attributes['canonical_url'][$locale] ?? $attributes['canonical_url']['lt'] ?? null,
-                        'meta_tags' => $attributes['meta_tags'][$locale] ?? [],
-                        'structured_data' => $attributes['structured_data'][$locale] ?? [],
-                        'no_index' => false,
-                        'no_follow' => false,
-                    ]
-                );
+                SeoData::factory()->create([
+                    'seoable_type' => $type,
+                    'seoable_id' => $id,
+                    'locale' => $locale,
+                    'title' => $attributes['title'][$locale] ?? $attributes['title']['lt'] ?? null,
+                    'description' => $attributes['description'][$locale] ?? $attributes['description']['lt'] ?? null,
+                    'keywords' => $attributes['keywords'][$locale] ?? ($attributes['keywords']['lt'] ?? null),
+                    'canonical_url' => $attributes['canonical_url'][$locale] ?? $attributes['canonical_url']['lt'] ?? null,
+                    'meta_tags' => $attributes['meta_tags'][$locale] ?? [],
+                    'structured_data' => $attributes['structured_data'][$locale] ?? [],
+                    'no_index' => false,
+                    'no_follow' => false,
+                ]);
             }
         };
 

@@ -1,7 +1,11 @@
 @php
     use Illuminate\View\ComponentAttributeBag;
 
-    $image = $product->getFirstMediaUrl('images', 'image-lg') ?: $product->getFirstMediaUrl('images');
+    // Avoid repeated media queries: prefer preloaded relations or cached accessors
+    $image = method_exists($product, 'getMainImage')
+        ? $product->getMainImage('image-lg') ?? $product->getMainImage()
+        : ($product->getFirstMediaUrl('images', 'image-lg') ?:
+        $product->getFirstMediaUrl('images'));
     $currentPrice =
         $product->sale_price && $product->sale_price < $product->price ? $product->sale_price : $product->price;
     $hasDiscount =

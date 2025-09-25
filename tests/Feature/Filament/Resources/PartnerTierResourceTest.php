@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class PartnerTierResourceTest extends TestCase
 {
@@ -46,7 +45,7 @@ class PartnerTierResourceTest extends TestCase
             'is_enabled' => true,
             'discount_rate' => 15.0,
             'commission_rate' => 8.0,
-            'minimum_order_value' => 1000.00,
+            'minimum_order_value' => 1000.0,
             'benefits' => [
                 ['benefit' => 'Priority Support'],
                 ['benefit' => 'Extended Warranty'],
@@ -65,7 +64,7 @@ class PartnerTierResourceTest extends TestCase
             'is_enabled' => true,
             'discount_rate' => 15.0,
             'commission_rate' => 8.0,
-            'minimum_order_value' => 1000.00,
+            'minimum_order_value' => 1000.0,
         ]);
     }
 
@@ -93,7 +92,7 @@ class PartnerTierResourceTest extends TestCase
                 'name' => 'Updated Tier',
                 'discount_rate' => 20.0,
                 'commission_rate' => 12.0,
-                'minimum_order_value' => 2000.00,
+                'minimum_order_value' => 2000.0,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -103,7 +102,7 @@ class PartnerTierResourceTest extends TestCase
             'name' => 'Updated Tier',
             'discount_rate' => 20.0,
             'commission_rate' => 12.0,
-            'minimum_order_value' => 2000.00,
+            'minimum_order_value' => 2000.0,
         ]);
     }
 
@@ -234,7 +233,7 @@ class PartnerTierResourceTest extends TestCase
 
         $tierData = [
             'name' => 'Test Tier',
-            'code' => 'EXISTING', // Same code as existing tier
+            'code' => 'EXISTING',  // Same code as existing tier
             'is_enabled' => true,
         ];
 
@@ -252,7 +251,7 @@ class PartnerTierResourceTest extends TestCase
             'name' => 'Test Tier',
             'code' => 'TEST',
             'is_enabled' => true,
-            'discount_rate' => 150.0, // Invalid: exceeds 100%
+            'discount_rate' => 150.0,  // Invalid: exceeds 100%
         ];
 
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
@@ -269,7 +268,7 @@ class PartnerTierResourceTest extends TestCase
             'name' => 'Test Tier',
             'code' => 'TEST',
             'is_enabled' => true,
-            'commission_rate' => 150.0, // Invalid: exceeds 100%
+            'commission_rate' => 150.0,  // Invalid: exceeds 100%
         ];
 
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
@@ -286,7 +285,7 @@ class PartnerTierResourceTest extends TestCase
             'name' => 'Test Tier',
             'code' => 'TEST',
             'is_enabled' => true,
-            'minimum_order_value' => -100.00, // Invalid: negative value
+            'minimum_order_value' => -100.0,  // Invalid: negative value
         ];
 
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
@@ -305,7 +304,7 @@ class PartnerTierResourceTest extends TestCase
             'is_enabled' => true,
             'discount_rate' => 25.0,
             'commission_rate' => 10.0,
-            'minimum_order_value' => 5000.00,
+            'minimum_order_value' => 5000.0,
             'benefits' => [
                 ['benefit' => '24/7 Support'],
                 ['benefit' => 'Free Shipping Worldwide'],
@@ -324,7 +323,7 @@ class PartnerTierResourceTest extends TestCase
             'code' => 'PREMIUM',
             'discount_rate' => 25.0,
             'commission_rate' => 10.0,
-            'minimum_order_value' => 5000.00,
+            'minimum_order_value' => 5000.0,
         ]);
     }
 

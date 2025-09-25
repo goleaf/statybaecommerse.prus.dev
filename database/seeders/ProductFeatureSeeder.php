@@ -7,166 +7,142 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\ProductFeature;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 final class ProductFeatureSeeder extends Seeder
 {
+    private const FEATURE_TEMPLATES = [
+        'electronics' => [
+            'specification' => [
+                'weight' => ['Lengvas', 'Sunkus', 'Ypač lengvas'],
+                'dimensions' => ['Kompaktiškas', 'Didelis', 'Nešiojamas'],
+                'battery_life' => ['Ilgaamžė', 'Greitas įkrovimas', 'Pratęsta veikimo trukmė'],
+                'connectivity' => ['WiFi', 'Bluetooth', 'USB-C', 'Belaidis'],
+                'screen_size' => ['Mažas', 'Vidutinis', 'Didelis', 'Ypač didelis'],
+            ],
+            'benefit' => [
+                'energy_efficient' => ['Energiją taupantis', 'Ekologiškas', 'Mažai vartojantis'],
+                'user_friendly' => ['Lengvai naudojamas', 'Intuityvus', 'Pradedantiesiems'],
+                'durable' => ['Ilgaamžis', 'Patvarus', 'Patikimas'],
+            ],
+            'technical' => [
+                'processor' => ['Greitas', 'Efektyvus', 'Didelio našumo'],
+                'memory' => ['Didelės talpos', 'Sparti', 'Išplečiama'],
+                'storage' => ['Talpi', 'Greitas perdavimas', 'Saugus'],
+            ],
+            'performance' => [
+                'speed' => ['Greitas', 'Ypač greitas', 'Žaibiškas'],
+                'quality' => ['Aukštos kokybės', 'Premium', 'Profesionalus'],
+                'efficiency' => ['Optimizuotas', 'Supaprastintas', 'Patobulintas'],
+            ],
+        ],
+        'clothing' => [
+            'specification' => [
+                'material' => ['Medvilnė', 'Poliesteris', 'Vilna', 'Šilkas', 'Linas'],
+                'size' => ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+                'color' => ['Juoda', 'Balta', 'Mėlyna', 'Raudona', 'Žalia', 'Įvairiaspalvė'],
+                'fit' => ['Aptemptas', 'Įprastas', 'Laisvas', 'Perdydis'],
+            ],
+            'benefit' => [
+                'comfort' => ['Patogus', 'Minkštas', 'Kvėpuojantis'],
+                'style' => ['Madingas', 'Stilingas', 'Klasikinis', 'Šiuolaikiškas'],
+                'versatility' => ['Universalus', 'Daugiafunkcis', 'Lankstus'],
+            ],
+            'technical' => [
+                'care_instructions' => ['Skalbti mašina', 'Skalbti rankomis', 'Valyti sausu būdu'],
+                'fabric_technology' => ['Drėgmę sugeriantis', 'Tamprus', 'Antibakterinis'],
+            ],
+        ],
+        'home_garden' => [
+            'specification' => [
+                'dimensions' => ['Kompaktiškas', 'Standartinis', 'Didelis'],
+                'material' => ['Medis', 'Metalas', 'Plastikas', 'Stiklas', 'Keramika'],
+                'capacity' => ['Maža', 'Vidutinė', 'Didelė', 'Ypač didelė'],
+            ],
+            'benefit' => [
+                'durability' => ['Ilgaamžiškas', 'Atsparus orams', 'Tvirtas'],
+                'aesthetics' => ['Gražus', 'Elegantiškas', 'Modernus', 'Tradicinis'],
+                'functionality' => ['Praktiškas', 'Daugiafunkcis', 'Taupantis vietą'],
+            ],
+            'technical' => [
+                'installation' => ['Lengvas montavimas', 'Reikia specialisto', 'Tinka DIY'],
+                'maintenance' => ['Mažai priežiūros', 'Lengvai valomas', 'Savaime išsivalantis'],
+            ],
+        ],
+    ];
+
+    private const GENERIC_FEATURES = [
+        'warranty' => ['1 metų garantija', '2 metų garantija', '3 metų garantija', '5 metų garantija', 'Viso gyvenimo garantija'],
+        'shipping' => ['Nemokamas pristatymas', 'Skubi pristatymo paslauga', 'Standartinis pristatymas'],
+        'availability' => ['Sandėlyje', 'Ribotas kiekis', 'Išankstinis užsakymas'],
+        'rating' => ['5 žvaigždutės', 'Aukštai įvertintas', 'Klientų favoritas'],
+        'popularity' => ['Perkamiausias', 'Populiarus pasirinkimas', 'Tendencijas kuriantis'],
+    ];
+
+    private const FEATURE_TYPES = ['specification', 'benefit', 'feature', 'technical', 'performance'];
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $products = Product::limit(15)->get();
+        $products = Product::query()->limit(15)->get();
 
         if ($products->isEmpty()) {
-            $this->command->warn('No products found. Please run ProductSeeder first.');
+            $this->command?->warn('Nerasta produktų. Pirmiausia paleiskite ProductSeeder.');
 
             return;
         }
 
-        // Define feature templates for different product types
-        $featureTemplates = [
-            'electronics' => [
-                'specification' => [
-                    'weight' => ['Lightweight', 'Heavy', 'Ultra-light'],
-                    'dimensions' => ['Compact', 'Large', 'Portable'],
-                    'battery_life' => ['Long-lasting', 'Quick charge', 'Extended'],
-                    'connectivity' => ['WiFi', 'Bluetooth', 'USB-C', 'Wireless'],
-                    'screen_size' => ['Small', 'Medium', 'Large', 'Extra Large'],
-                ],
-                'benefit' => [
-                    'energy_efficient' => ['Saves power', 'Eco-friendly', 'Low consumption'],
-                    'user_friendly' => ['Easy to use', 'Intuitive', 'Beginner-friendly'],
-                    'durable' => ['Long-lasting', 'Robust', 'Reliable'],
-                ],
-                'technical' => [
-                    'processor' => ['Fast', 'Efficient', 'High-performance'],
-                    'memory' => ['Large capacity', 'Fast access', 'Expandable'],
-                    'storage' => ['High capacity', 'Fast transfer', 'Secure'],
-                ],
-                'performance' => [
-                    'speed' => ['Fast', 'Ultra-fast', 'Lightning quick'],
-                    'quality' => ['High quality', 'Premium', 'Professional'],
-                    'efficiency' => ['Optimized', 'Streamlined', 'Enhanced'],
-                ],
-            ],
-            'clothing' => [
-                'specification' => [
-                    'material' => ['Cotton', 'Polyester', 'Wool', 'Silk', 'Linen'],
-                    'size' => ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-                    'color' => ['Black', 'White', 'Blue', 'Red', 'Green', 'Multi-color'],
-                    'fit' => ['Slim', 'Regular', 'Loose', 'Oversized'],
-                ],
-                'benefit' => [
-                    'comfort' => ['Comfortable', 'Soft', 'Breathable'],
-                    'style' => ['Fashionable', 'Trendy', 'Classic', 'Modern'],
-                    'versatility' => ['Versatile', 'Multi-purpose', 'Flexible'],
-                ],
-                'technical' => [
-                    'care_instructions' => ['Machine wash', 'Hand wash', 'Dry clean'],
-                    'fabric_technology' => ['Moisture-wicking', 'Stretch', 'Anti-bacterial'],
-                ],
-            ],
-            'home_garden' => [
-                'specification' => [
-                    'dimensions' => ['Compact', 'Standard', 'Large'],
-                    'material' => ['Wood', 'Metal', 'Plastic', 'Glass', 'Ceramic'],
-                    'capacity' => ['Small', 'Medium', 'Large', 'Extra Large'],
-                ],
-                'benefit' => [
-                    'durability' => ['Long-lasting', 'Weather-resistant', 'Sturdy'],
-                    'aesthetics' => ['Beautiful', 'Elegant', 'Modern', 'Traditional'],
-                    'functionality' => ['Practical', 'Multi-functional', 'Space-saving'],
-                ],
-                'technical' => [
-                    'installation' => ['Easy install', 'Professional required', 'DIY friendly'],
-                    'maintenance' => ['Low maintenance', 'Easy clean', 'Self-cleaning'],
-                ],
-            ],
-        ];
-
         foreach ($products as $product) {
-            $this->createFeaturesForProduct($product, $featureTemplates);
+            if (ProductFeature::query()->where('product_id', $product->id)->exists()) {
+                continue;
+            }
+
+            $categoryKey = Arr::random(array_keys(self::FEATURE_TEMPLATES));
+            $featureCount = fake()->numberBetween(8, 15);
+
+            ProductFeature::factory()
+                ->count($featureCount)
+                ->for($product)
+                ->state(fn () => $this->featureState($categoryKey))
+                ->create();
         }
     }
 
-    /**
-     * Create features for a specific product
-     */
-    private function createFeaturesForProduct(Product $product, array $templates): void
+    private function featureState(string $categoryKey): array
     {
-        // Determine product category based on name or random selection
-        $categories = array_keys($templates);
-        $category = $categories[array_rand($categories)];
-        $categoryFeatures = $templates[$category];
+        $categoryFeatures = self::FEATURE_TEMPLATES[$categoryKey] ?? [];
 
-        $featureCount = rand(8, 15); // Each product gets 8-15 features
-        $createdFeatures = 0;
-
-        foreach ($categoryFeatures as $featureType => $features) {
-            if ($createdFeatures >= $featureCount) {
-                break;
-            }
-
-            $typeFeatures = $features;
-            $selectedFeatures = array_rand($typeFeatures, min(rand(2, 4), count($typeFeatures)));
-
-            if (! is_array($selectedFeatures)) {
-                $selectedFeatures = [$selectedFeatures];
-            }
-
-            foreach ($selectedFeatures as $featureKey) {
-                if ($createdFeatures >= $featureCount) {
-                    break;
-                }
-
-                $featureValues = $typeFeatures[$featureKey];
-                $selectedValue = $featureValues[array_rand($featureValues)];
-
-                ProductFeature::create([
-                    'product_id' => $product->id,
-                    'feature_type' => $featureType,
-                    'feature_key' => $featureKey,
-                    'feature_value' => $selectedValue,
-                    'weight' => $this->generateWeight($featureType),
-                ]);
-
-                $createdFeatures++;
-            }
+        if (empty($categoryFeatures) || fake()->boolean(25)) {
+            return $this->genericFeatureState();
         }
 
-        // Add some generic features
-        $this->addGenericFeatures($product, $featureCount - $createdFeatures);
-    }
+        $featureType = Arr::random(array_keys($categoryFeatures));
+        $featureOptions = $categoryFeatures[$featureType];
+        $featureKey = Arr::random(array_keys($featureOptions));
+        $featureValue = Arr::random($featureOptions[$featureKey]);
 
-    /**
-     * Add generic features to reach target count
-     */
-    private function addGenericFeatures(Product $product, int $remainingCount): void
-    {
-        $genericFeatures = [
-            'warranty' => ['1 year', '2 years', '3 years', '5 years', 'Lifetime'],
-            'shipping' => ['Free shipping', 'Express delivery', 'Standard delivery'],
-            'availability' => ['In stock', 'Limited quantity', 'Pre-order'],
-            'rating' => ['5 stars', 'Highly rated', 'Customer favorite'],
-            'popularity' => ['Best seller', 'Trending', 'Popular choice'],
+        return [
+            'feature_type' => $featureType,
+            'feature_key' => $featureKey,
+            'feature_value' => $featureValue,
+            'weight' => $this->generateWeight($featureType),
         ];
+    }
 
-        $featureTypes = ['specification', 'benefit', 'feature', 'technical', 'performance'];
+    private function genericFeatureState(): array
+    {
+        $featureKey = Arr::random(array_keys(self::GENERIC_FEATURES));
+        $featureValue = Arr::random(self::GENERIC_FEATURES[$featureKey]);
+        $featureType = Arr::random(self::FEATURE_TYPES);
 
-        for ($i = 0; $i < $remainingCount; $i++) {
-            $featureKey = array_rand($genericFeatures);
-            $featureValues = $genericFeatures[$featureKey];
-            $selectedValue = $featureValues[array_rand($featureValues)];
-            $featureType = $featureTypes[array_rand($featureTypes)];
-
-            ProductFeature::create([
-                'product_id' => $product->id,
-                'feature_type' => $featureType,
-                'feature_key' => $featureKey,
-                'feature_value' => $selectedValue,
-                'weight' => $this->generateWeight($featureType),
-            ]);
-        }
+        return [
+            'feature_type' => $featureType,
+            'feature_key' => $featureKey,
+            'feature_value' => $featureValue,
+            'weight' => $this->generateWeight($featureType),
+        ];
     }
 
     /**
@@ -175,11 +151,11 @@ final class ProductFeatureSeeder extends Seeder
     private function generateWeight(string $featureType): float
     {
         return match ($featureType) {
-            'specification' => rand(80, 100) / 100, // 0.8 - 1.0
-            'benefit' => rand(70, 95) / 100, // 0.7 - 0.95
-            'technical' => rand(60, 90) / 100, // 0.6 - 0.9
-            'performance' => rand(75, 100) / 100, // 0.75 - 1.0
-            default => rand(50, 85) / 100, // 0.5 - 0.85
+            'specification' => fake()->numberBetween(80, 100) / 100,
+            'benefit' => fake()->numberBetween(70, 95) / 100,
+            'technical' => fake()->numberBetween(60, 90) / 100,
+            'performance' => fake()->numberBetween(75, 100) / 100,
+            default => fake()->numberBetween(50, 85) / 100,
         };
     }
 }

@@ -1,24 +1,27 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -26,7 +29,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
 use UnitEnum;
 
 /**
@@ -65,7 +67,7 @@ final class SystemSettingResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return false;
+        return true;
     }
 
     public static function form(Schema $schema): Schema
@@ -84,7 +86,6 @@ final class SystemSettingResource extends Resource
                                     ->helperText(__('system_settings.key_help')),
                                 TextInput::make('name')
                                     ->label(__('system_settings.name'))
-                                    ->required()
                                     ->maxLength(255)
                                     ->helperText(__('system_settings.name_help')),
                             ]),
@@ -105,9 +106,12 @@ final class SystemSettingResource extends Resource
                             ->schema([
                                 Select::make('type')
                                     ->label(__('system_settings.type'))
-                                    ->required()
+                                    ->default('string')
                                     ->options([
                                         'string' => __('system_settings.types.string'),
+                                        'email' => 'Email',
+                                        'url' => 'URL',
+                                        'password' => 'Password',
                                         'integer' => __('system_settings.types.integer'),
                                         'boolean' => __('system_settings.types.boolean'),
                                         'float' => __('system_settings.types.float'),
@@ -241,7 +245,7 @@ final class SystemSettingResource extends Resource
                 TextColumn::make('type')
                     ->label(__('system_settings.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'string' => 'gray',
                         'integer' => 'blue',
                         'boolean' => 'green',
@@ -260,24 +264,28 @@ final class SystemSettingResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+                        $state = is_scalar($state) ? (string) $state : '';
 
                         return strlen($state) > 50 ? $state : null;
                     })
-                    ->formatStateUsing(function (string $state, SystemSetting $record): string {
+                    ->formatStateUsing(function ($state, SystemSetting $record): string {
+                        $stringState = is_scalar($state) ? (string) $state : '';
                         if ($record->type === 'password') {
-                            return str_repeat('*', min(strlen($state), 8));
+                            return str_repeat('*', min(strlen($stringState), 8));
                         }
                         if ($record->type === 'boolean') {
-                            return $state ? __('system_settings.yes') : __('system_settings.no');
+                            return ($stringState === '1' || strtolower($stringState) === 'true')
+                                ? __('system_settings.yes')
+                                : __('system_settings.no');
                         }
 
-                        return $state;
+                        return $stringState;
                     }),
                 TextColumn::make('category')
                     ->label(__('system_settings.category'))
-                    ->formatStateUsing(fn(string $state): string => __("system_settings.categories.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __("system_settings.categories.{$state}"))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'general' => 'gray',
                         'appearance' => 'blue',
                         'email' => 'green',
@@ -391,12 +399,17 @@ final class SystemSettingResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                \Filament\Actions\DeleteAction::make()
+                    ->action(function (SystemSetting $record): void {
+                        $record->forceDelete();
+                    }),
                 Action::make('reset_to_default')
                     ->label(__('system_settings.reset_to_default'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
-                    ->visible(fn(SystemSetting $record): bool => !empty($record->default_value))
+                    ->visible(fn (SystemSetting $record): bool => ! empty($record->default_value))
                     ->action(function (SystemSetting $record): void {
+                        $record->type = 'string';
                         $record->update(['value' => $record->default_value]);
                         Notification::make()
                             ->title(__('system_settings.reset_to_default_success'))
@@ -405,11 +418,11 @@ final class SystemSettingResource extends Resource
                     })
                     ->requiresConfirmation(),
                 Action::make('toggle_active')
-                    ->label(fn(SystemSetting $record): string => $record->is_active ? __('system_settings.deactivate') : __('system_settings.activate'))
-                    ->icon(fn(SystemSetting $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(SystemSetting $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (SystemSetting $record): string => $record->is_active ? __('system_settings.deactivate') : __('system_settings.activate'))
+                    ->icon(fn (SystemSetting $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (SystemSetting $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (SystemSetting $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('system_settings.activated_successfully') : __('system_settings.deactivated_successfully'))
                             ->success()
@@ -419,7 +432,10 @@ final class SystemSettingResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            $records->each->forceDelete();
+                        }),
                     BulkAction::make('activate')
                         ->label(__('system_settings.activate_selected'))
                         ->icon('heroicon-o-eye')
@@ -450,7 +466,7 @@ final class SystemSettingResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each(function (SystemSetting $record): void {
-                                if (!empty($record->default_value)) {
+                                if (! empty($record->default_value)) {
                                     $record->update(['value' => $record->default_value]);
                                 }
                             });
@@ -480,6 +496,16 @@ final class SystemSettingResource extends Resource
             'view' => Pages\ViewSystemSetting::route('/{record}'),
             'edit' => Pages\EditSystemSetting::route('/{record}/edit'),
         ];
+    }
+
+    public static function getSlug(?\Filament\Panel $panel = null): string
+    {
+        return 'system-settings';
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return SystemSetting::query()->withoutGlobalScopes();
     }
 
     // duplicate method removed

@@ -1,25 +1,28 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
 use App\Models\Product;
+use BackedEnum;
+use Filament\Actions\BulkAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Tables;
+use UnitEnum;
 
 final class InventoryManagement extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Products';
-
-    protected string $view = 'filament.pages.inventory-management';
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     public static function getSlug(?\Filament\Panel $panel = null): string
     {
@@ -43,20 +46,20 @@ final class InventoryManagement extends Page implements HasTable
                 BulkAction::make('bulk_stock_update')
                     ->label('Bulk Stock Update')
                     ->form([
-                        Tables\Components\Select::make('operation')
+                        Select::make('operation')
                             ->options([
                                 'increase' => 'Increase',
                                 'decrease' => 'Decrease',
                             ])
                             ->required(),
-                        Tables\Components\TextInput::make('quantity')
+                        TextInput::make('quantity')
                             ->numeric()
                             ->minValue(0)
                             ->required(),
                     ])
                     ->action(function (array $data, $records): void {
                         foreach ($records as $product) {
-                            if (!$product instanceof Product) {
+                            if (! $product instanceof Product) {
                                 continue;
                             }
                             $delta = (int) ($data['quantity'] ?? 0);

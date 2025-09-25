@@ -57,10 +57,7 @@ final class StockController extends Controller
         $sortBy = $request->get('sort_by', 'created_at');
         $sortDirection = $request->get('sort_direction', 'desc');
         $query->orderBy($sortBy, $sortDirection);
-        $stockItems = $query->get()->skipWhile(function ($stockItem) {
-            // Skip stock items that are not properly configured for display
-            return empty($stockItem->variant) || empty($stockItem->variant->product) || empty($stockItem->location) || $stockItem->quantity < 0;
-        })->paginate(20)->withQueryString();
+        $stockItems = $query->paginate(20)->withQueryString();
         // Get filter options
         $locations = Location::enabled()->get();
         $suppliers = Partner::enabled()->get();
@@ -71,12 +68,9 @@ final class StockController extends Controller
     /**
      * Display the specified resource with related data.
      */
-    public function show(VariantInventory $stock): View
+    public function show(int $stockId): View
     {
-        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
-        if (! $stock->relationLoaded('variant.product') || ! $stock->relationLoaded('location') || ! $stock->relationLoaded('supplier') || ! $stock->relationLoaded('stockMovements.user')) {
-            $stock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
-        }
+        $stock = VariantInventory::with(['variant.product', 'location', 'supplier', 'stockMovements.user'])->findOrFail($stockId);
 
         return view('stock.show', compact('stock'));
     }
@@ -84,8 +78,9 @@ final class StockController extends Controller
     /**
      * Handle adjustStock functionality with proper error handling.
      */
-    public function adjustStock(Request $request, VariantInventory $stock): JsonResponse
+    public function adjustStock(Request $request, int $stockId): JsonResponse
     {
+        $stock = VariantInventory::findOrFail($stockId);
         $request->validate(['quantity' => 'required|integer', 'reason' => 'required|string|in:sale,return,adjustment,manual_adjustment,restock,damage,theft,transfer', 'notes' => 'nullable|string|max:1000']);
         try {
             $stock->adjustStock($request->quantity, $request->reason);
@@ -99,8 +94,9 @@ final class StockController extends Controller
     /**
      * Handle reserveStock functionality with proper error handling.
      */
-    public function reserveStock(Request $request, VariantInventory $stock): JsonResponse
+    public function reserveStock(Request $request, int $stockId): JsonResponse
     {
+        $stock = VariantInventory::findOrFail($stockId);
         $request->validate(['quantity' => 'required|integer|min:1|max:'.$stock->available_stock, 'notes' => 'nullable|string|max:1000']);
         try {
             if ($stock->reserve($request->quantity)) {
@@ -116,8 +112,9 @@ final class StockController extends Controller
     /**
      * Handle unreserveStock functionality with proper error handling.
      */
-    public function unreserveStock(Request $request, VariantInventory $stock): JsonResponse
+    public function unreserveStock(Request $request, int $stockId): JsonResponse
     {
+        $stock = VariantInventory::findOrFail($stockId);
         $request->validate(['quantity' => 'required|integer|min:1|max:'.$stock->reserved, 'notes' => 'nullable|string|max:1000']);
         try {
             $stock->unreserve($request->quantity);
@@ -131,9 +128,13 @@ final class StockController extends Controller
     /**
      * Handle getStockMovements functionality with proper error handling.
      */
-    public function getStockMovements(VariantInventory $stock): JsonResponse
+    public function getStockMovements(int $stockId): JsonResponse
     {
-        $movements = $stock->stockMovements()->with('user')->latest('moved_at')->paginate(20);
+        $movements = VariantInventory::findOrFail($stockId)
+            ->stockMovements()
+            ->with('user')
+            ->latest('moved_at')
+            ->paginate(20);
 
         return response()->json($movements);
     }

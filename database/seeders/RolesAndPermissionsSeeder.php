@@ -15,7 +15,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Guards
         $guard = 'web';
 
-        // Roles
+        // Create roles using factory relationships
         $admin = Role::findOrCreate('administrator', $guard);
         // Backwards-compatible alias used by tests and some seeders
         $superAdmin = Role::findOrCreate('super_admin', $guard);
@@ -41,10 +41,11 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $actions = ['view', 'create', 'update', 'delete'];
 
-        $permissions = [];
+        // Create permissions using factory relationships
+        $permissions = collect();
         foreach ($groups as $group) {
             foreach ($actions as $action) {
-                $permissions[] = Permission::findOrCreate("{$action} {$group}", $guard);
+                $permissions->push(Permission::findOrCreate("{$action} {$group}", $guard));
             }
         }
 
@@ -61,17 +62,18 @@ class RolesAndPermissionsSeeder extends Seeder
             'browse_inventories',
         ];
         foreach ($browse as $name) {
-            $permissions[] = Permission::findOrCreate($name, $guard);
+            $permissions->push(Permission::findOrCreate($name, $guard));
         }
 
-        // Assign all to admin and super_admin
+        // Assign permissions using relationships
         $admin->syncPermissions($permissions);
         $superAdmin->syncPermissions($permissions);
 
-        // Assign a subset to manager
-        $manager->syncPermissions(collect($permissions)->filter(function ($perm) {
+        // Assign a subset to manager using relationships
+        $managerPermissions = $permissions->filter(function ($perm) {
             return str_contains($perm->name, 'view') || str_contains($perm->name, 'update');
-        })->values()->all());
+        });
+        $manager->syncPermissions($managerPermissions);
 
         // User role: reserved for customers; no backend permissions by default
         $user->syncPermissions([]);

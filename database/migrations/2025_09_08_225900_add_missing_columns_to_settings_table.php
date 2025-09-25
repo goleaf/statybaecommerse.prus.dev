@@ -22,6 +22,7 @@ return new class extends Migration
                 $table->boolean('is_public')->default(false);
                 $table->boolean('is_required')->default(false);
                 $table->boolean('is_encrypted')->default(false);
+                $table->boolean('is_active')->default(true)->after('is_encrypted');
                 $table->timestamps();
                 $table->index(['group', 'key']);
                 $table->index('is_public');
@@ -39,6 +40,9 @@ return new class extends Migration
                 }
                 if (! Schema::hasColumn('settings', 'is_encrypted')) {
                     $table->boolean('is_encrypted')->default(false)->after('is_required');
+                }
+                if (! Schema::hasColumn('settings', 'is_active')) {
+                    $table->boolean('is_active')->default(true)->after('is_encrypted');
                 }
             });
         }

@@ -32,6 +32,8 @@ class AdminPanelProvider extends PanelProvider
                     \App\Filament\Resources\PostResource::class,
                     \App\Filament\Resources\RecommendationAnalyticsResource::class,
                     \App\Filament\Resources\RecommendationConfigResource::class,
+                    \App\Filament\Resources\NotificationResource::class,
+                    \App\Filament\Resources\UserBehaviorResource::class,
                 ])
                 ->pages([])
                 ->widgets([

@@ -6,7 +6,6 @@ use App\Models\Location;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 /**
  * VariantInventorySeeder
@@ -21,8 +20,8 @@ final class VariantInventorySeeder extends Seeder
      */
     public function run(): void
     {
-        $variants = ProductVariant::all();
-        $locations = Location::all();
+        $variants = ProductVariant::query()->with(['inventories' => fn($query) => $query->select('id', 'variant_id', 'location_id')])->get();
+        $locations = Location::query()->get();
 
         if ($variants->isEmpty() || $locations->isEmpty()) {
             $this->command->warn('No variants or locations found. Please run ProductVariantSeeder and LocationSeeder first.');
@@ -30,58 +29,38 @@ final class VariantInventorySeeder extends Seeder
             return;
         }
 
-        $partnerIds = DB::table('partners')->pluck('id')->all();
-
-        $inventoryData = [];
-        $usedCodesByVariant = [];
-
         foreach ($variants as $variant) {
             foreach ($locations as $location) {
-                // Skip some combinations to make it more realistic
-                if (fake()->boolean(70)) {
-                    $stockLevel = fake()->numberBetween(0, 500);
-                    $reserved = fake()->numberBetween(0, min(50, $stockLevel));
-                    $available = max(0, $stockLevel - $reserved);
-
-                    $supplierId = null;
-                    if (!empty($partnerIds)) {
-                        $supplierId = $partnerIds[array_rand($partnerIds)];
-                    }
-
-                    $inventoryData[] = [
-                        'variant_id' => $variant->id,
-                        'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id, $usedCodesByVariant),
-                        'stock' => $stockLevel,
-                        'reserved' => $reserved,
-                        'available' => $available,
-                        'reorder_point' => fake()->numberBetween(5, 25),
-                        'reorder_quantity' => fake()->numberBetween(50, 200),
-                        'max_stock_level' => fake()->numberBetween(300, 1000),
-                        'cost_per_unit' => fake()->randomFloat(2, 5, 100),
-                        'supplier_id' => $supplierId,
-                        'batch_number' => fake()->optional(0.8)->numerify('BATCH-####'),
-                        'expiry_date' => fake()->optional(0.6)->dateTimeBetween('+1 month', '+2 years'),
-                        'status' => fake()->randomElement(['active', 'active', 'active', 'inactive']),  // 75% active
-                        'notes' => fake()->optional(0.3)->sentence(),
-                        'last_restocked_at' => fake()->optional(0.7)->dateTimeBetween('-6 months', 'now'),
-                        'last_sold_at' => fake()->optional(0.8)->dateTimeBetween('-3 months', 'now'),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                if ($variant->inventories->contains(fn(VariantInventory $inventory): bool => $inventory->location_id === $location->id)) {
+                    continue;
                 }
+
+                $stock = fake()->numberBetween(15, 120);
+                $reserved = fake()->numberBetween(0, (int) floor($stock / 3));
+
+                $variant
+                    ->inventories()
+                    ->create([
+                        'location_id' => $location->id,
+                        'warehouse_code' => $this->generateWarehouseCodeUnique($location, $variant->id),
+                        'stock' => $stock,
+                        'reserved' => $reserved,
+                        'available' => max(0, $stock - $reserved),
+                        'reorder_point' => fake()->numberBetween(5, 25),
+                        'reorder_quantity' => fake()->numberBetween(25, 75),
+                        'max_stock_level' => fake()->numberBetween(200, 400),
+                        'cost_per_unit' => fake()->randomFloat(2, 5, 150),
+                        'batch_number' => fake()->optional(0.5)->regexify('[A-Z]{3}-[0-9]{4}'),
+                        'expiry_date' => fake()->optional()->dateTimeBetween('+1 month', '+1 year'),
+                        'status' => fake()->randomElement(['active', 'active', 'inactive']),
+                        'notes' => fake()->optional(0.3)->sentence(),
+                        'last_restocked_at' => fake()->optional()->dateTimeBetween('-3 months', 'now'),
+                        'last_sold_at' => fake()->optional()->dateTimeBetween('-1 month', 'now'),
+                    ]);
             }
         }
 
-        // Insert in chunks to avoid memory issues
-        $chunks = array_chunk($inventoryData, 100);
-        foreach ($chunks as $chunk) {
-            VariantInventory::insert($chunk);
-        }
-
-        // Create some specific scenarios for testing (after base insert to avoid collisions)
-        $this->createSpecificScenarios($variants, $locations);
-
-        $this->command->info('VariantInventory seeded successfully with ' . count($inventoryData) . ' records.');
+        $this->command?->info('VariantInventorySeeder: ensured variant inventories via factories and relationships.');
     }
 
     /**

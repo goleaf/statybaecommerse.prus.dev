@@ -27,10 +27,8 @@ final class EnhancedFilamentSeeder extends Seeder
 
     private function createAdminUser(): void
     {
-        // Create admin role if not exists
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $adminRole = Role::query()->firstOrCreate(['name' => 'admin']);
 
-        // Create admin permissions
         $permissions = [
             'view_admin_panel',
             'manage_products',
@@ -40,14 +38,11 @@ final class EnhancedFilamentSeeder extends Seeder
             'view_analytics',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
+        collect($permissions)->each(fn (string $permission) => Permission::query()->firstOrCreate(['name' => $permission]));
 
         $adminRole->syncPermissions($permissions);
 
-        // Create admin user
-        $admin = User::firstOrCreate(
+        $admin = User::query()->firstOrCreate(
             ['email' => 'admin@statybaecommerse.prus.dev'],
             [
                 'name' => 'System Administrator',
@@ -98,29 +93,11 @@ final class EnhancedFilamentSeeder extends Seeder
             return;
         }
 
-        foreach (range(1, 20) as $i) {
-            $user = $users->random();
-            $orderProducts = $products->random(rand(1, 5));
-            $total = 0;
-
-            foreach ($orderProducts as $product) {
-                $total += $product->price * rand(1, 3);
-            }
-
-            Order::create([
-                'number' => 'ORD-'.str_pad($i, 6, '0', STR_PAD_LEFT),
-                'user_id' => $user->id,
-                'status' => ['pending', 'processing', 'shipped', 'delivered'][rand(0, 3)],
-                'payment_status' => ['pending', 'paid', 'failed'][rand(0, 2)],
-                'payment_method' => ['credit_card', 'bank_transfer', 'paypal'][rand(0, 2)],
-                'subtotal' => $total,
-                'tax_amount' => $total * 0.21,
-                'shipping_amount' => rand(5, 15),
-                'total' => $total + ($total * 0.21) + rand(5, 15),
-                'currency' => 'EUR',
-                'created_at' => now()->subDays(rand(0, 30)),
-            ]);
-        }
+        Order::factory()
+            ->count(20)
+            ->recent()
+            ->for($users->random())
+            ->create();
 
         $this->command->info('✅ Created 20 sample orders');
     }
@@ -147,48 +124,24 @@ final class EnhancedFilamentSeeder extends Seeder
             'Produktas atitiko visus lūkesčius.',
         ];
 
-        foreach (range(1, 50) as $i) {
-            $user = $users->random();
-            $product = $products->random();
-
-            Review::create([
-                'product_id' => $product->id,
-                'user_id' => $user->id,
-                'reviewer_name' => $user->name,
-                'reviewer_email' => $user->email,
-                'rating' => rand(3, 5),
-                'title' => 'Puikus produktas',
+        Review::factory()
+            ->count(50)
+            ->state(fn () => [
                 'content' => $reviewTexts[rand(0, count($reviewTexts) - 1)],
-                'is_approved' => rand(0, 1) === 1,
-                'created_at' => now()->subDays(rand(0, 60)),
-            ]);
-        }
+            ])
+            ->for($products->random())
+            ->for($users->random())
+            ->create();
 
         $this->command->info('✅ Created 50 sample reviews');
     }
 
     private function createAnalyticsData(): void
     {
-        $products = Product::where('is_visible', true)->limit(20)->get();
+        $products = Product::where('is_visible', true)
+            ->limit(20)
+            ->get();
 
-        foreach ($products as $product) {
-            foreach (range(0, 30) as $daysAgo) {
-                $date = now()->subDays($daysAgo)->format('Y-m-d');
-
-                \DB::table('product_analytics')->insertOrIgnore([
-                    'product_id' => $product->id,
-                    'date' => $date,
-                    'views' => rand(10, 100),
-                    'cart_additions' => rand(1, 20),
-                    'purchases' => rand(0, 5),
-                    'wishlist_additions' => rand(0, 10),
-                    'conversion_rate' => rand(100, 500) / 10000, // 1-5%
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        }
-
-        $this->command->info('✅ Created analytics data for products');
+        // Placeholder for analytics data seeding once dedicated model/factory exists
     }
 }

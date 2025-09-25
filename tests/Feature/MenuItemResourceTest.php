@@ -9,7 +9,6 @@ use App\Models\MenuItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class MenuItemResourceTest extends TestCase
 {
@@ -35,7 +34,8 @@ class MenuItemResourceTest extends TestCase
             'is_visible' => true,
         ]);
 
-        $this->get('/admin/menu-items')
+        $this
+            ->get('/admin/menu-items')
             ->assertOk()
             ->assertSee('Main Menu')
             ->assertSee('Home')
@@ -46,7 +46,8 @@ class MenuItemResourceTest extends TestCase
     {
         $menu = Menu::factory()->create();
 
-        $this->get('/admin/menu-items/create')
+        $this
+            ->get('/admin/menu-items/create')
             ->assertOk();
 
         $this->post('/admin/menu-items', [
@@ -78,7 +79,8 @@ class MenuItemResourceTest extends TestCase
             'label' => 'Contact',
         ]);
 
-        $this->get("/admin/menu-items/{$menuItem->id}")
+        $this
+            ->get("/admin/menu-items/{$menuItem->id}")
             ->assertOk()
             ->assertSee('Contact');
     }
@@ -91,7 +93,8 @@ class MenuItemResourceTest extends TestCase
             'label' => 'Services',
         ]);
 
-        $this->get("/admin/menu-items/{$menuItem->id}/edit")
+        $this
+            ->get("/admin/menu-items/{$menuItem->id}/edit")
             ->assertOk();
 
         $this->put("/admin/menu-items/{$menuItem->id}", [
@@ -122,7 +125,8 @@ class MenuItemResourceTest extends TestCase
             'menu_id' => $menu->id,
         ]);
 
-        $this->delete("/admin/menu-items/{$menuItem->id}")
+        $this
+            ->delete("/admin/menu-items/{$menuItem->id}")
             ->assertRedirect();
 
         $this->assertDatabaseMissing('menu_items', [
@@ -145,7 +149,8 @@ class MenuItemResourceTest extends TestCase
             'label' => 'Privacy Policy',
         ]);
 
-        $this->get('/admin/menu-items?menu_id='.$menu1->id)
+        $this
+            ->get('/admin/menu-items?menu_id='.$menu1->id)
             ->assertOk()
             ->assertSee('Home')
             ->assertDontSee('Privacy Policy');
@@ -171,7 +176,8 @@ class MenuItemResourceTest extends TestCase
             'label' => 'About',
         ]);
 
-        $this->get('/admin/menu-items?parent_id='.$parentItem->id)
+        $this
+            ->get('/admin/menu-items?parent_id='.$parentItem->id)
             ->assertOk()
             ->assertSee('Electronics')
             ->assertDontSee('About');
@@ -193,7 +199,8 @@ class MenuItemResourceTest extends TestCase
             'is_visible' => false,
         ]);
 
-        $this->get('/admin/menu-items?is_visible=1')
+        $this
+            ->get('/admin/menu-items?is_visible=1')
             ->assertOk()
             ->assertSee('Visible Item')
             ->assertDontSee('Hidden Item');
@@ -321,7 +328,8 @@ class MenuItemResourceTest extends TestCase
         $menu = Menu::factory()->create();
 
         // Test required fields
-        $this->post('/admin/menu-items', [])
+        $this
+            ->post('/admin/menu-items', [])
             ->assertSessionHasErrors(['menu_id', 'label']);
 
         // Test valid data

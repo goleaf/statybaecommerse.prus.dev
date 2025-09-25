@@ -16,21 +16,73 @@ final class SystemSettingSeeder extends Seeder
      */
     public function run(): void
     {
-        $adminUser = User::first() ?? User::factory()->create([
-            'email' => 'admin@example.com',
-            'name' => 'Admin User',
-        ]);
+        // Ensure admin user exists using factory
+        $adminUser = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            User::factory()->make(['name' => 'Admin User'])->toArray()
+        );
 
-        $generalCategory = SystemSettingCategory::where('slug', 'general')->first();
-        $securityCategory = SystemSettingCategory::where('slug', 'security')->first();
-        $performanceCategory = SystemSettingCategory::where('slug', 'performance')->first();
-        $uiCategory = SystemSettingCategory::where('slug', 'ui-ux')->first();
-        $apiCategory = SystemSettingCategory::where('slug', 'api')->first();
+        // Ensure categories exist using factory relationships
+        $generalCategory = SystemSettingCategory::firstOrCreate(
+            ['slug' => 'general'],
+            SystemSettingCategory::factory()->make([
+                'name' => 'General',
+                'description' => 'General system settings',
+                'icon' => 'heroicon-o-cog-6-tooth',
+                'color' => 'primary',
+                'sort_order' => 1,
+            ])->toArray()
+        );
 
-        $settings = [
+        $securityCategory = SystemSettingCategory::firstOrCreate(
+            ['slug' => 'security'],
+            SystemSettingCategory::factory()->make([
+                'name' => 'Security',
+                'description' => 'Security and authentication settings',
+                'icon' => 'heroicon-o-shield-check',
+                'color' => 'danger',
+                'sort_order' => 2,
+            ])->toArray()
+        );
+
+        $performanceCategory = SystemSettingCategory::firstOrCreate(
+            ['slug' => 'performance'],
+            SystemSettingCategory::factory()->make([
+                'name' => 'Performance',
+                'description' => 'Performance optimization settings',
+                'icon' => 'heroicon-o-bolt',
+                'color' => 'success',
+                'sort_order' => 3,
+            ])->toArray()
+        );
+
+        $uiCategory = SystemSettingCategory::firstOrCreate(
+            ['slug' => 'ui-ux'],
+            SystemSettingCategory::factory()->make([
+                'name' => 'UI/UX',
+                'description' => 'User interface and experience settings',
+                'icon' => 'heroicon-o-paint-brush',
+                'color' => 'info',
+                'sort_order' => 4,
+            ])->toArray()
+        );
+
+        $apiCategory = SystemSettingCategory::firstOrCreate(
+            ['slug' => 'api'],
+            SystemSettingCategory::factory()->make([
+                'name' => 'API',
+                'description' => 'API configuration settings',
+                'icon' => 'heroicon-o-code-bracket',
+                'color' => 'secondary',
+                'sort_order' => 5,
+            ])->toArray()
+        );
+
+        // Create settings using factory with relationships
+        $settingsData = [
             // General Settings
             [
-                'category_id' => $generalCategory->id,
+                'category' => $generalCategory,
                 'key' => 'app_name',
                 'name' => 'Application Name',
                 'description' => 'The name of the application',
@@ -46,10 +98,9 @@ final class SystemSettingSeeder extends Seeder
                 'is_encrypted' => false,
                 'is_cacheable' => true,
                 'default_value' => 'E-commerce Platform',
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $generalCategory->id,
+                'category' => $generalCategory,
                 'key' => 'app_description',
                 'name' => 'Application Description',
                 'description' => 'Description of the application',
@@ -61,14 +112,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => true,
                 'is_required' => false,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => 'A modern e-commerce platform',
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $generalCategory->id,
+                'category' => $generalCategory,
                 'key' => 'app_version',
                 'name' => 'Application Version',
                 'description' => 'Current version of the application',
@@ -80,14 +127,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => true,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => '1.0.0',
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $generalCategory->id,
+                'category' => $generalCategory,
                 'key' => 'maintenance_mode',
                 'name' => 'Maintenance Mode',
                 'description' => 'Enable or disable maintenance mode',
@@ -99,16 +142,12 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => false,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => false,
-                'updated_by' => $adminUser->id,
             ],
 
             // Security Settings
             [
-                'category_id' => $securityCategory->id,
+                'category' => $securityCategory,
                 'key' => 'password_min_length',
                 'name' => 'Minimum Password Length',
                 'description' => 'Minimum length for user passwords',
@@ -120,14 +159,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => 8,
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $securityCategory->id,
+                'category' => $securityCategory,
                 'key' => 'max_login_attempts',
                 'name' => 'Maximum Login Attempts',
                 'description' => 'Maximum number of failed login attempts before account lockout',
@@ -139,14 +174,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => 5,
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $securityCategory->id,
+                'category' => $securityCategory,
                 'key' => 'session_timeout',
                 'name' => 'Session Timeout (minutes)',
                 'description' => 'How long user sessions remain active',
@@ -158,14 +189,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => 120,
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $securityCategory->id,
+                'category' => $securityCategory,
                 'key' => 'enable_two_factor',
                 'name' => 'Enable Two-Factor Authentication',
                 'description' => 'Enable two-factor authentication for enhanced security',
@@ -177,16 +204,12 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => false,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => false,
-                'updated_by' => $adminUser->id,
             ],
 
             // Performance Settings
             [
-                'category_id' => $performanceCategory->id,
+                'category' => $performanceCategory,
                 'key' => 'cache_driver',
                 'name' => 'Cache Driver',
                 'description' => 'The cache driver to use for application caching',
@@ -198,9 +221,6 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => false,
                 'options' => json_encode([
                     'file' => 'File',
                     'redis' => 'Redis',
@@ -208,10 +228,9 @@ final class SystemSettingSeeder extends Seeder
                     'database' => 'Database',
                 ]),
                 'default_value' => 'file',
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $performanceCategory->id,
+                'category' => $performanceCategory,
                 'key' => 'cache_ttl',
                 'name' => 'Default Cache TTL (seconds)',
                 'description' => 'Default time-to-live for cached items',
@@ -223,14 +242,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => 3600,
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $performanceCategory->id,
+                'category' => $performanceCategory,
                 'key' => 'enable_query_cache',
                 'name' => 'Enable Query Cache',
                 'description' => 'Enable caching of database queries',
@@ -242,16 +257,12 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => false,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => true,
-                'updated_by' => $adminUser->id,
             ],
 
             // UI/UX Settings
             [
-                'category_id' => $uiCategory->id,
+                'category' => $uiCategory,
                 'key' => 'theme_color',
                 'name' => 'Theme Color',
                 'description' => 'Primary color theme for the application',
@@ -263,14 +274,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => true,
                 'is_required' => false,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => '#3B82F6',
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $uiCategory->id,
+                'category' => $uiCategory,
                 'key' => 'items_per_page',
                 'name' => 'Items Per Page',
                 'description' => 'Default number of items to display per page',
@@ -282,14 +289,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => 15,
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $uiCategory->id,
+                'category' => $uiCategory,
                 'key' => 'enable_dark_mode',
                 'name' => 'Enable Dark Mode',
                 'description' => 'Allow users to switch to dark mode',
@@ -301,16 +304,12 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => true,
                 'is_required' => false,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => true,
-                'updated_by' => $adminUser->id,
             ],
 
             // API Settings
             [
-                'category_id' => $apiCategory->id,
+                'category' => $apiCategory,
                 'key' => 'api_rate_limit',
                 'name' => 'API Rate Limit (requests per minute)',
                 'description' => 'Maximum number of API requests per minute per user',
@@ -322,14 +321,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => false,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => 60,
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $apiCategory->id,
+                'category' => $apiCategory,
                 'key' => 'api_version',
                 'name' => 'API Version',
                 'description' => 'Current version of the API',
@@ -341,14 +336,10 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => true,
                 'is_required' => true,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => 'v1',
-                'updated_by' => $adminUser->id,
             ],
             [
-                'category_id' => $apiCategory->id,
+                'category' => $apiCategory,
                 'key' => 'enable_api_docs',
                 'name' => 'Enable API Documentation',
                 'description' => 'Make API documentation publicly accessible',
@@ -360,18 +351,22 @@ final class SystemSettingSeeder extends Seeder
                 'is_active' => true,
                 'is_public' => true,
                 'is_required' => false,
-                'is_readonly' => false,
-                'is_encrypted' => false,
-                'is_cacheable' => true,
                 'default_value' => true,
-                'updated_by' => $adminUser->id,
             ],
         ];
 
-        foreach ($settings as $settingData) {
-            SystemSetting::updateOrCreate(
+        // Create settings using factory with relationships
+        foreach ($settingsData as $settingData) {
+            $category = $settingData['category'];
+            unset($settingData['category']);
+            
+            SystemSetting::firstOrCreate(
                 ['key' => $settingData['key']],
-                $settingData
+                SystemSetting::factory()
+                    ->for($category, 'category')
+                    ->for($adminUser, 'updatedBy')
+                    ->make($settingData)
+                    ->toArray()
             );
         }
     }

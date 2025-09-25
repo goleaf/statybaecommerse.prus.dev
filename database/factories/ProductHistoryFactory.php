@@ -23,11 +23,13 @@ final class ProductHistoryFactory extends Factory
      */
     public function definition(): array
     {
+        $currentUserId = auth()->id();
+
         return [
             'product_id' => Product::factory(),
-            'user_id' => User::factory(),
+            'user_id' => $currentUserId ?? User::factory(),
             'causer_type' => User::class,
-            'causer_id' => User::factory(),
+            'causer_id' => $currentUserId ?? User::factory(),
             'action' => $this->faker->randomElement(['created', 'updated', 'deleted', 'restored', 'price_changed', 'stock_updated', 'status_changed', 'category_changed', 'image_changed', 'custom']),
             'field_name' => $this->faker->randomElement(['name', 'description', 'price', 'stock_quantity', 'status', 'category_id', 'image', 'meta_title', 'meta_description']),
             'old_value' => $this->faker->optional()->sentence(),

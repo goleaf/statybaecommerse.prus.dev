@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Foundation\Auth\User as AuthUser;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Spatie\Permission\Models\Role;
 
 /**
@@ -20,7 +20,7 @@ class RolePolicy
     /**
      * Handle viewAny functionality with proper error handling.
      */
-    public function viewAny(AuthUser $authUser): bool
+    public function viewAny(AuthenticatableContract $authUser): bool
     {
         return $authUser->can('ViewAny:Role');
     }
@@ -28,7 +28,7 @@ class RolePolicy
     /**
      * Handle view functionality with proper error handling.
      */
-    public function view(AuthUser $authUser, Role $role): bool
+    public function view(AuthenticatableContract $authUser, Role $role): bool
     {
         return $authUser->can('View:Role');
     }
@@ -36,7 +36,7 @@ class RolePolicy
     /**
      * Show the form for creating a new resource.
      */
-    public function create(AuthUser $authUser): bool
+    public function create(AuthenticatableContract $authUser): bool
     {
         return $authUser->can('Create:Role');
     }
@@ -44,7 +44,7 @@ class RolePolicy
     /**
      * Update the specified resource in storage with validation.
      */
-    public function update(AuthUser $authUser, Role $role): bool
+    public function update(AuthenticatableContract $authUser, Role $role): bool
     {
         return $authUser->can('Update:Role');
     }
@@ -52,7 +52,7 @@ class RolePolicy
     /**
      * Handle delete functionality with proper error handling.
      */
-    public function delete(AuthUser $authUser, Role $role): bool
+    public function delete(AuthenticatableContract $authUser, Role $role): bool
     {
         return $authUser->can('Delete:Role');
     }
@@ -60,7 +60,7 @@ class RolePolicy
     /**
      * Handle restore functionality with proper error handling.
      */
-    public function restore(AuthUser $authUser, Role $role): bool
+    public function restore(AuthenticatableContract $authUser, Role $role): bool
     {
         return $authUser->can('Restore:Role');
     }
@@ -68,7 +68,7 @@ class RolePolicy
     /**
      * Handle forceDelete functionality with proper error handling.
      */
-    public function forceDelete(AuthUser $authUser, Role $role): bool
+    public function forceDelete(AuthenticatableContract $authUser, Role $role): bool
     {
         return $authUser->can('ForceDelete:Role');
     }
@@ -76,7 +76,7 @@ class RolePolicy
     /**
      * Handle forceDeleteAny functionality with proper error handling.
      */
-    public function forceDeleteAny(AuthUser $authUser): bool
+    public function forceDeleteAny(AuthenticatableContract $authUser): bool
     {
         return $authUser->can('ForceDeleteAny:Role');
     }
@@ -84,7 +84,7 @@ class RolePolicy
     /**
      * Handle restoreAny functionality with proper error handling.
      */
-    public function restoreAny(AuthUser $authUser): bool
+    public function restoreAny(AuthenticatableContract $authUser): bool
     {
         return $authUser->can('RestoreAny:Role');
     }
@@ -92,7 +92,7 @@ class RolePolicy
     /**
      * Handle replicate functionality with proper error handling.
      */
-    public function replicate(AuthUser $authUser, Role $role): bool
+    public function replicate(AuthenticatableContract $authUser, Role $role): bool
     {
         return $authUser->can('Replicate:Role');
     }
@@ -100,7 +100,7 @@ class RolePolicy
     /**
      * Handle reorder functionality with proper error handling.
      */
-    public function reorder(AuthUser $authUser): bool
+    public function reorder(AuthenticatableContract $authUser): bool
     {
         return $authUser->can('Reorder:Role');
     }

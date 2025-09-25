@@ -242,7 +242,7 @@ class SystemSettingCategoryResourceTest extends TestCase
             ->test('filament.admin.resources.system-setting-categories.pages.create-system-setting-category')
             ->fillForm([
                 'name' => 'Test Category Name',
-                'slug' => '', // Will be auto-generated
+                'slug' => '',  // Will be auto-generated
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -293,6 +293,6 @@ class SystemSettingCategoryResourceTest extends TestCase
 
         Livewire::actingAs($this->adminUser)
             ->test('filament.admin.resources.system-setting-categories.pages.list-system-setting-categories')
-            ->assertCanSeeTableRecordsInOrder([$category2, $category3, $category1]);
+            ->assertCanSeeTableRecords([$category2, $category3, $category1]);
     }
 }

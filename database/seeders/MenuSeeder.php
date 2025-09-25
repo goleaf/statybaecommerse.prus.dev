@@ -14,14 +14,14 @@ final class MenuSeeder extends Seeder
     public function run(): void
     {
         /** @var Menu $menu */
-        $menu = Menu::query()->firstOrCreate(
-            ['key' => 'main_header'],
-            [
+        $menu = Menu::factory()
+            ->state([
+                'key' => 'main_header',
                 'name' => 'Pagrindinis meniu',
                 'location' => 'header',
                 'is_active' => true,
-            ]
-        );
+            ])
+            ->create();
 
         // Clear existing items for idempotency
         $menu->allItems()->delete();
@@ -60,16 +60,18 @@ final class MenuSeeder extends Seeder
             ? ($category->trans('name') ?? $category->name)
             : $category->name;
 
-        return MenuItem::query()->create([
-            'menu_id' => $menu->id,
-            'parent_id' => $parentItem?->id,
-            'label' => $label,
-            'url' => null,
-            'route_name' => 'category.show',
-            'route_params' => ['category' => $category->slug],
-            'icon' => null,
-            'sort_order' => $sortOrder,
-            'is_visible' => true,
-        ]);
+        return MenuItem::factory()
+            ->for($menu)
+            ->for($parentItem, 'parent')
+            ->state([
+                'label' => $label,
+                'url' => null,
+                'route_name' => 'category.show',
+                'route_params' => ['category' => $category->slug],
+                'icon' => null,
+                'sort_order' => $sortOrder,
+                'is_visible' => true,
+            ])
+            ->create();
     }
 }

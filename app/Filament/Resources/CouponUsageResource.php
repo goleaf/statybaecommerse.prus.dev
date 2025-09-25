@@ -11,145 +11,112 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 
 final class CouponUsageResource extends Resource
 {
     protected static ?string $model = CouponUsage::class;
 
-    /**
-     * Handle getPluralModelLabel functionality with proper error handling.
-     */
     public static function getPluralModelLabel(): string
     {
         return __('admin.coupon_usages.plural');
     }
 
-    /**
-     * Handle getModelLabel functionality with proper error handling.
-     */
     public static function getModelLabel(): string
     {
         return __('admin.coupon_usages.single');
     }
 
-    /**
-     * Configure the Filament form schema with fields and validation.
-     */
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             Tabs::make('coupon_usage_tabs')
                 ->tabs([
                     Tab::make(__('admin.coupon_usages.form.tabs.basic_information'))
-                        ->icon('heroicon-o-information-circle')
                         ->schema([
-                            SchemaSection::make(__('admin.coupon_usages.form.sections.basic_information'))
+                            Section::make(__('admin.coupon_usages.form.sections.basic_information'))
                                 ->schema([
-                                    SchemaGrid::make(2)
+                                    Grid::make(2)
                                         ->schema([
                                             Select::make('coupon_id')
                                                 ->label(__('admin.coupon_usages.form.fields.coupon'))
                                                 ->relationship('coupon', 'code')
                                                 ->searchable()
                                                 ->preload()
-                                                ->required()
-                                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->code} - {$record->name}")
-                                                ->columnSpan(1),
+                                                ->required(),
                                             Select::make('user_id')
                                                 ->label(__('admin.coupon_usages.form.fields.user'))
                                                 ->relationship('user', 'name')
                                                 ->searchable()
                                                 ->preload()
-                                                ->required()
-                                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name} ({$record->email})")
-                                                ->columnSpan(1),
-                                        ]),
-                                    SchemaGrid::make(2)
-                                        ->schema([
+                                                ->required(),
                                             Select::make('order_id')
                                                 ->label(__('admin.coupon_usages.form.fields.order'))
                                                 ->relationship('order', 'id')
                                                 ->searchable()
-                                                ->preload()
-                                                ->getOptionLabelFromRecordUsing(fn ($record) => "Order #{$record->id} - {$record->total_amount}€")
-                                                ->columnSpan(1),
+                                                ->preload(),
                                             TextInput::make('discount_amount')
                                                 ->label(__('admin.coupon_usages.form.fields.discount_amount'))
                                                 ->numeric()
-                                                ->prefix('€')
-                                                ->required()
                                                 ->minValue(0)
-                                                ->columnSpan(1),
+                                                ->prefix('€')
+                                                ->required(),
                                         ]),
                                     DateTimePicker::make('used_at')
                                         ->label(__('admin.coupon_usages.form.fields.used_at'))
                                         ->required()
                                         ->default(now())
                                         ->columnSpanFull(),
-                                ])
-                                ->columns(1),
-                        ]),
-                    Tab::make(__('admin.coupon_usages.form.tabs.usage_details'))
-                        ->icon('heroicon-o-chart-bar')
-                        ->schema([
-                            SchemaSection::make(__('admin.coupon_usages.form.sections.usage_details'))
-                                ->schema([
-                                    Placeholder::make('coupon_name')
-                                        ->label(__('admin.coupon_usages.form.fields.coupon_name'))
-                                        ->content(fn ($record) => $record?->coupon?->name ?? '-'),
-                                    Placeholder::make('coupon_discount_type')
-                                        ->label(__('admin.coupon_usages.form.fields.coupon_discount_type'))
-                                        ->content(fn ($record) => $record?->coupon?->discount_type ?? '-'),
-                                    Placeholder::make('user_email')
-                                        ->label(__('admin.coupon_usages.form.fields.user_email'))
-                                        ->content(fn ($record) => $record?->user?->email ?? '-'),
-                                    Placeholder::make('order_total')
-                                        ->label(__('admin.coupon_usages.form.fields.order_total'))
-                                        ->content(fn ($record) => $record?->order ? '€'.number_format($record->order->total_amount, 2) : '-'),
-                                ])
-                                ->columns(2),
-                        ]),
-                    Tab::make(__('admin.coupon_usages.form.tabs.metadata'))
-                        ->icon('heroicon-o-cog-6-tooth')
-                        ->schema([
-                            SchemaSection::make(__('admin.coupon_usages.form.sections.metadata'))
-                                ->schema([
                                     KeyValue::make('metadata')
                                         ->label(__('admin.coupon_usages.form.fields.metadata'))
                                         ->keyLabel(__('admin.coupon_usages.form.fields.key'))
                                         ->valueLabel(__('admin.coupon_usages.form.fields.value'))
                                         ->columnSpanFull(),
-                                ])
-                                ->columns(1),
+                                ]),
                         ]),
-                ])
-                ->columnSpanFull(),
+                    Tab::make(__('admin.coupon_usages.form.tabs.usage_details'))
+                        ->schema([
+                            Section::make(__('admin.coupon_usages.form.sections.usage_details'))
+                                ->schema([
+                                    Placeholder::make('coupon_name')
+                                        ->label(__('admin.coupon_usages.form.fields.coupon_name'))
+                                        ->content(fn (?Model $record) => $record?->coupon?->name ?? '-'),
+                                    Placeholder::make('user_email')
+                                        ->label(__('admin.coupon_usages.form.fields.user_email'))
+                                        ->content(fn (?Model $record) => $record?->user?->email ?? '-'),
+                                    Placeholder::make('order_total')
+                                        ->label(__('admin.coupon_usages.form.fields.order_total'))
+                                        ->content(fn (?Model $record) => $record?->order ? '€'.number_format($record->order->total_amount, 2) : '-'),
+                                    Textarea::make('notes')
+                                        ->label(__('admin.coupon_usages.form.fields.notes'))
+                                        ->rows(3),
+                                ])->columns(2),
+                        ]),
+                ])->columnSpanFull(),
         ]);
     }
 
-    /**
-     * Configure the Filament table with columns, filters, and actions.
-     */
     public static function table(Table $table): Table
     {
         return $table
@@ -157,8 +124,7 @@ final class CouponUsageResource extends Resource
                 TextColumn::make('coupon.code')
                     ->label(__('admin.coupon_usages.form.fields.coupon'))
                     ->searchable()
-                    ->sortable()
-                    ->copyable(),
+                    ->sortable(),
                 TextColumn::make('user.name')
                     ->label(__('admin.coupon_usages.form.fields.user'))
                     ->searchable()
@@ -177,26 +143,9 @@ final class CouponUsageResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('usage_period')
                     ->label(__('admin.coupon_usages.form.fields.usage_period'))
-                    ->formatStateUsing(function ($record) {
-                        if (! $record->used_at) {
-                            return '-';
-                        }
-
-                        $usedAt = $record->used_at;
-                        if ($usedAt->isToday()) {
-                            return __('admin.coupon_usages.periods.today');
-                        }
-                        if ($usedAt->isThisWeek()) {
-                            return __('admin.coupon_usages.periods.this_week');
-                        }
-                        if ($usedAt->isThisMonth()) {
-                            return __('admin.coupon_usages.periods.this_month');
-                        }
-
-                        return __('admin.coupon_usages.periods.older');
-                    })
+                    ->formatStateUsing(fn (CouponUsage $record) => $record->usage_period)
                     ->colors([
-                        'success' => fn ($state) => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')]),
+                        'success' => fn ($state) => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')], true),
                         'warning' => fn ($state) => $state === __('admin.coupon_usages.periods.this_month'),
                         'danger' => fn ($state) => $state === __('admin.coupon_usages.periods.older'),
                     ]),
@@ -217,17 +166,33 @@ final class CouponUsageResource extends Resource
                     ->relationship('order', 'id')
                     ->searchable()
                     ->preload(),
-                DateFilter::make('used_at')
-                    ->label(__('admin.coupon_usages.filters.used_at')),
-                Filter::make('used_today')
+                Filter::make('used_at_range')
+                    ->label(__('admin.coupon_usages.filters.used_at'))
+                    ->form([
+                        DateTimePicker::make('from')->label(__('admin.coupon_usages.filters.used_at_from')),
+                        DateTimePicker::make('until')->label(__('admin.coupon_usages.filters.used_at_until')),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))
+                        ->when($data['until'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '<=', $date))),
+                TernaryFilter::make('used_today')
                     ->label(__('admin.coupon_usages.filters.used_today'))
-                    ->query(fn (Builder $query): Builder => $query->usedToday()),
-                Filter::make('used_this_week')
+                    ->queries(
+                        true: fn (Builder $query) => $query->usedToday(),
+                        false: fn (Builder $query) => $query->whereDate('used_at', '!=', today()),
+                    ),
+                TernaryFilter::make('used_this_week')
                     ->label(__('admin.coupon_usages.filters.used_this_week'))
-                    ->query(fn (Builder $query): Builder => $query->usedThisWeek()),
-                Filter::make('used_this_month')
+                    ->queries(
+                        true: fn (Builder $query) => $query->usedThisWeek(),
+                        false: fn (Builder $query) => $query->whereNotBetween('used_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                    ),
+                TernaryFilter::make('used_this_month')
                     ->label(__('admin.coupon_usages.filters.used_this_month'))
-                    ->query(fn (Builder $query): Builder => $query->usedThisMonth()),
+                    ->queries(
+                        true: fn (Builder $query) => $query->usedThisMonth(),
+                        false: fn (Builder $query) => $query->whereNotBetween('used_at', [now()->startOfMonth(), now()->endOfMonth()]),
+                    ),
             ])
             ->actions([
                 ViewAction::make(),
@@ -236,13 +201,10 @@ final class CouponUsageResource extends Resource
                     ->label(__('admin.coupon_usages.actions.export_usage_report'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('info')
-                    ->action(function (CouponUsage $record): void {
-                        // Export usage report logic here
-                        FilamentNotification::make()
-                            ->title(__('admin.coupon_usages.usage_report_exported_successfully'))
-                            ->success()
-                            ->send();
-                    }),
+                    ->action(fn (CouponUsage $record) => FilamentNotification::make()
+                        ->title(__('admin.coupon_usages.usage_report_exported_successfully'))
+                        ->success()
+                        ->send()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -251,13 +213,10 @@ final class CouponUsageResource extends Resource
                         ->label(__('admin.coupon_usages.actions.export_bulk_report'))
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('info')
-                        ->action(function (EloquentCollection $records): void {
-                            // Export bulk usage report logic here
-                            FilamentNotification::make()
-                                ->title(__('admin.coupon_usages.bulk_report_exported_successfully'))
-                                ->success()
-                                ->send();
-                        }),
+                        ->action(fn (EloquentCollection $records) => FilamentNotification::make()
+                            ->title(__('admin.coupon_usages.bulk_report_exported_successfully'))
+                            ->success()
+                            ->send()),
                 ]),
             ])
             ->defaultSort('used_at', 'desc');
@@ -265,9 +224,7 @@ final class CouponUsageResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

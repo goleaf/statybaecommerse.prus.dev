@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\CustomerGroup;
+use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -41,6 +42,7 @@ final class DiscountCodeFactory extends Factory
             'is_auto_apply' => $this->faker->boolean(30),
             'is_stackable' => $this->faker->boolean(40),
             'is_first_time_only' => $this->faker->boolean(20),
+            'discount_id' => Discount::factory(),
             'customer_group_id' => CustomerGroup::factory(),
             'status' => $this->faker->randomElement(['active', 'inactive', 'expired', 'scheduled']),
             'metadata' => [],
@@ -136,5 +138,14 @@ final class DiscountCodeFactory extends Factory
             'type' => 'free_shipping',
             'value' => 0,
         ]);
+    }
+
+    public function withDiscount(?Discount $discount = null): static
+    {
+        return $this->state(function (array $attributes) use ($discount) {
+            return [
+                'discount_id' => $discount?->getKey() ?? Discount::factory(),
+            ];
+        });
     }
 }

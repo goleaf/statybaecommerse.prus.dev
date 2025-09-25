@@ -101,29 +101,31 @@ final class ProductImageSeeder extends Seeder
             $sizes = ['thumb', 'small', 'medium', 'large', 'xlarge'];
 
             foreach ($sizes as $size) {
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'path' => "product-images/{$product->id}/{$size}-image.jpg",
-                    'alt_text' => "{$product->name} - {$size} image",
-                    'sort_order' => $this->getSortOrderForSize($size),
-                ]);
+                ProductImage::factory()
+                    ->for($product)
+                    ->create([
+                        'path' => "product-images/{$product->id}/{$size}-image.jpg",
+                        'alt_text' => "{$product->name} - {$size} image",
+                        'sort_order' => $this->getSortOrderForSize($size),
+                    ]);
             }
         }
     }
 
     /**
-     * Create a single image for a product
+     * Create a single image for a product using factory
      */
     private function createImageForProduct(Product $product, string $type, string $altText, int $sortOrder): void
     {
         $imagePath = $this->generateImagePath($product, $type, $sortOrder);
 
-        ProductImage::create([
-            'product_id' => $product->id,
-            'path' => $imagePath,
-            'alt_text' => $altText,
-            'sort_order' => $sortOrder,
-        ]);
+        ProductImage::factory()
+            ->for($product)
+            ->create([
+                'path' => $imagePath,
+                'alt_text' => $altText,
+                'sort_order' => $sortOrder,
+            ]);
     }
 
     /**

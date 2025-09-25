@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductComparisonResource\Pages;
 use App\Models\ProductComparison;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -29,9 +31,11 @@ use UnitEnum;
  */
 final class ProductComparisonResource extends Resource
 {
+    protected static ?string $slug = 'product-comparisons';
+
     public static function getNavigationGroup(): UnitEnum|string|null
     {
-        return 'System';
+        return NavigationGroup::Products;
     }
 
     protected static ?string $model = ProductComparison::class;
@@ -163,7 +167,7 @@ final class ProductComparisonResource extends Resource
                 EditAction::make(),
             ])
             ->bulkActions([
-                \Filament\Tables\Actions\BulkActionGroup::make([
+                BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
             ])

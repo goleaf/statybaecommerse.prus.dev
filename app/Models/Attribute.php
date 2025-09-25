@@ -42,14 +42,14 @@ final class Attribute extends Model
 
     protected $table = 'attributes';
 
-    protected $fillable = ['name', 'slug', 'type', 'description', 'validation_rules', 'default_value', 'is_required', 'is_filterable', 'is_searchable', 'is_visible', 'is_editable', 'is_sortable', 'sort_order', 'is_enabled', 'is_active', 'category_id', 'group_name', 'icon', 'color', 'min_value', 'max_value', 'step_value', 'placeholder', 'help_text', 'meta_data'];
+    protected $fillable = ['name', 'slug', 'type', 'description', 'validation_rules', 'default_value', 'is_required', 'is_filterable', 'is_searchable', 'is_visible', 'is_editable', 'is_sortable', 'sort_order', 'is_enabled', 'is_active', 'category_id', 'group_name', 'icon', 'color', 'min_length', 'max_length', 'min_value', 'max_value', 'step_value', 'placeholder', 'help_text', 'meta_data'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_required' => 'boolean', 'is_filterable' => 'boolean', 'is_searchable' => 'boolean', 'is_visible' => 'boolean', 'is_editable' => 'boolean', 'is_sortable' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'category_id' => 'integer', 'min_value' => 'float', 'max_value' => 'float', 'step_value' => 'float', 'validation_rules' => 'array', 'meta_data' => 'array'];
+        return ['is_required' => 'boolean', 'is_filterable' => 'boolean', 'is_searchable' => 'boolean', 'is_visible' => 'boolean', 'is_editable' => 'boolean', 'is_sortable' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'category_id' => 'integer', 'min_length' => 'integer', 'max_length' => 'integer', 'min_value' => 'float', 'max_value' => 'float', 'step_value' => 'float', 'validation_rules' => 'string', 'meta_data' => 'array'];
     }
 
     /**
@@ -250,6 +250,7 @@ final class Attribute extends Model
     }
 
     // Accessor methods
+
     /**
      * Handle getFormattedTypeAttribute functionality with proper error handling.
      */
@@ -275,7 +276,22 @@ final class Attribute extends Model
      */
     public function getValidationRulesArrayAttribute(): array
     {
-        return $this->validation_rules ?? [];
+        $rules = $this->validation_rules;
+        if (is_array($rules)) {
+            return $rules;
+        }
+        if (is_string($rules)) {
+            // Try JSON decode first
+            $decoded = json_decode($rules, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            // Fallback to pipe-delimited
+            return array_filter(array_map('trim', explode('|', $rules)));
+        }
+
+        return [];
     }
 
     /**
@@ -287,6 +303,7 @@ final class Attribute extends Model
     }
 
     // Mutator methods
+
     /**
      * Handle setSlugAttribute functionality with proper error handling.
      */
@@ -302,7 +319,11 @@ final class Attribute extends Model
      */
     public function setValidationRulesAttribute($value): void
     {
-        $this->attributes['validation_rules'] = is_array($value) ? json_encode($value) : $value;
+        if (is_array($value)) {
+            $this->attributes['validation_rules'] = implode('|', $value);
+        } else {
+            $this->attributes['validation_rules'] = $value;
+        }
     }
 
     /**
@@ -316,6 +337,7 @@ final class Attribute extends Model
     }
 
     // Helper methods
+
     /**
      * Handle isSelectType functionality with proper error handling.
      */
@@ -406,6 +428,7 @@ final class Attribute extends Model
     }
 
     // Additional helper methods
+
     /**
      * Handle getDisplayNameAttribute functionality with proper error handling.
      */
@@ -471,8 +494,9 @@ final class Attribute extends Model
         if ($this->is_required) {
             $rules[] = 'required';
         }
-        if ($this->validation_rules) {
-            $rules = array_merge($rules, $this->validation_rules);
+        $extra = $this->getValidationRulesArrayAttribute();
+        if (! empty($extra)) {
+            $rules = array_merge($rules, $extra);
         }
 
         return $rules;
@@ -649,6 +673,7 @@ final class Attribute extends Model
     }
 
     // Advanced Translation Methods
+
     /**
      * Handle getTranslatedName functionality with proper error handling.
      */
@@ -660,6 +685,7 @@ final class Attribute extends Model
     }
 
     // Scope for translated attributes
+
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
@@ -675,6 +701,7 @@ final class Attribute extends Model
     }
 
     // Translation Management Methods
+
     /**
      * Handle getAvailableLocales functionality with proper error handling.
      */
@@ -724,6 +751,7 @@ final class Attribute extends Model
     }
 
     // Helper Methods
+
     /**
      * Handle getFullDisplayName functionality with proper error handling.
      */

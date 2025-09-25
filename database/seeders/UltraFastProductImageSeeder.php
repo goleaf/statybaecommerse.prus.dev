@@ -7,7 +7,6 @@ namespace Database\Seeders;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -128,9 +127,6 @@ final class UltraFastProductImageSeeder extends Seeder
 
     private function processBatchUltraFast(Collection $products): void
     {
-        $mediaInserts = [];
-        $tempFiles = [];
-
         foreach ($products as $product) {
             try {
                 $imageCount = $this->calculateOptimalImageCount($product);
@@ -139,12 +135,8 @@ final class UltraFastProductImageSeeder extends Seeder
                     $imagePath = $this->generateUltraFastImage($product, $i);
 
                     if ($imagePath && file_exists($imagePath)) {
-                        // Prepare media insert data for bulk insert
-                        $mediaData = $this->prepareMediaData($product, $imagePath, $i);
-                        if ($mediaData) {
-                            $mediaInserts[] = $mediaData;
-                            $tempFiles[] = $imagePath;
-                        }
+                        // Use Spatie Media Library to attach image with factory-like approach
+                        $this->attachImageToProduct($product, $imagePath, $i);
                     }
                 }
             } catch (\Throwable $e) {
@@ -154,16 +146,35 @@ final class UltraFastProductImageSeeder extends Seeder
                 ]);
             }
         }
+    }
 
-        // Bulk insert all media records for maximum performance
-        if (! empty($mediaInserts)) {
-            $this->bulkInsertMedia($mediaInserts);
-        }
+    private function attachImageToProduct(Product $product, string $imagePath, int $imageNumber): void
+    {
+        try {
+            // Use Spatie Media Library's addMedia method (factory-like approach)
+            $media = $product
+                ->addMedia($imagePath)
+                ->withCustomProperties([
+                    'placeholder' => false,
+                    'generated' => true,
+                    'image_number' => $imageNumber,
+                ])
+                ->toMediaCollection('images');
 
-        // Cleanup temp files after successful insert
-        foreach ($tempFiles as $tempFile) {
-            if (file_exists($tempFile)) {
-                unlink($tempFile);
+            // Clean up temporary file after successful attachment
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to attach image to product', [
+                'product_id' => $product->id,
+                'image_path' => $imagePath,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Clean up on failure
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
             }
         }
     }
@@ -185,7 +196,7 @@ final class UltraFastProductImageSeeder extends Seeder
 
             // Save directly to WebP with optimized settings
             $filename = sprintf('product_%d_%d_%s.webp', $product->id, $imageNumber, uniqid('', true));
-            $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.$filename;
+            $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
 
             $success = function_exists('imagewebp')
                 ? imagewebp($image, $path, 85)  // Balanced quality/speed
@@ -269,48 +280,6 @@ final class UltraFastProductImageSeeder extends Seeder
         imagestring($image, $font, (int) $x, (int) $y, $text, $white);
     }
 
-    private function prepareMediaData(Product $product, string $imagePath, int $imageNumber): ?array
-    {
-        $fileInfo = pathinfo($imagePath);
-        $fileName = sprintf('%s_%d.%s', $product->slug, $imageNumber, $fileInfo['extension']);
-        $destinationPath = storage_path('app/public/products/'.$fileName);
-
-        // Move file to final destination
-        if (! File::move($imagePath, $destinationPath)) {
-            return null;
-        }
-
-        return [
-            'model_type' => Product::class,
-            'model_id' => $product->id,
-            'uuid' => \Illuminate\Support\Str::uuid(),
-            'collection_name' => 'images',
-            'name' => $fileInfo['filename'],
-            'file_name' => $fileName,
-            'mime_type' => $fileInfo['extension'] === 'webp' ? 'image/webp' : 'image/png',
-            'disk' => 'public',
-            'conversions_disk' => 'public',
-            'size' => filesize($destinationPath),
-            'manipulations' => json_encode([]),
-            'custom_properties' => json_encode(['placeholder' => false]),
-            'generated_conversions' => json_encode([]),
-            'responsive_images' => json_encode([]),
-            'order_column' => $imageNumber,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-    }
-
-    private function bulkInsertMedia(array $mediaInserts): void
-    {
-        // Ultra-fast bulk insert with chunking to avoid memory issues
-        $chunks = array_chunk($mediaInserts, 100);
-
-        foreach ($chunks as $chunk) {
-            DB::table('media')->insert($chunk);
-        }
-    }
-
     private function calculateOptimalImageCount(Product $product): int
     {
         // Ultra-fast calculation based on simple rules
@@ -357,7 +326,7 @@ final class UltraFastProductImageSeeder extends Seeder
     private function optimizeMemorySettings(): void
     {
         // Optimize PHP settings for maximum performance
-        ini_set('memory_limit', self::MEMORY_LIMIT_MB.'M');
+        ini_set('memory_limit', self::MEMORY_LIMIT_MB . 'M');
         ini_set('max_execution_time', '0');
 
         // Disable garbage collection during processing for speed
@@ -383,7 +352,7 @@ final class UltraFastProductImageSeeder extends Seeder
         ];
 
         foreach ($directories as $directory) {
-            if (! File::exists($directory)) {
+            if (!File::exists($directory)) {
                 File::makeDirectory($directory, 0755, true);
             }
         }
@@ -392,16 +361,16 @@ final class UltraFastProductImageSeeder extends Seeder
     private function displayPerformanceMetrics(): void
     {
         $totalTime = microtime(true) - $this->startTime;
-        $avgBatchTime = ! empty($this->batchTimes) ? array_sum($this->batchTimes) / count($this->batchTimes) : 0;
+        $avgBatchTime = !empty($this->batchTimes) ? array_sum($this->batchTimes) / count($this->batchTimes) : 0;
         $imagesPerSecond = $this->processedCount * self::MAX_IMAGES_PER_PRODUCT / $totalTime;
 
         $this->command->info('');
         $this->command->info('📈 PERFORMANCE METRICS:');
-        $this->command->info('⏱️ Bendras laikas: '.number_format($totalTime, 2).'s');
-        $this->command->info('🚀 Vidutinis batch laikas: '.number_format($avgBatchTime, 3).'s');
-        $this->command->info('🖼️ Paveikslėlių per sekundę: '.number_format($imagesPerSecond, 1));
-        $this->command->info('📊 Produktų per sekundę: '.number_format($this->processedCount / $totalTime, 1));
-        $this->command->info('💾 Atmintis: '.number_format(memory_get_peak_usage(true) / 1024 / 1024, 1).'MB');
+        $this->command->info('⏱️ Bendras laikas: ' . number_format($totalTime, 2) . 's');
+        $this->command->info('🚀 Vidutinis batch laikas: ' . number_format($avgBatchTime, 3) . 's');
+        $this->command->info('🖼️ Paveikslėlių per sekundę: ' . number_format($imagesPerSecond, 1));
+        $this->command->info('📊 Produktų per sekundę: ' . number_format($this->processedCount / $totalTime, 1));
+        $this->command->info('💾 Atmintis: ' . number_format(memory_get_peak_usage(true) / 1024 / 1024, 1) . 'MB');
     }
 
     private function cleanupResources(): void
@@ -415,7 +384,7 @@ final class UltraFastProductImageSeeder extends Seeder
         $this->batchTimes = [];
 
         // Clean up any remaining temp files
-        $tempFiles = glob(sys_get_temp_dir().'/product_*');
+        $tempFiles = glob(sys_get_temp_dir() . '/product_*');
         foreach ($tempFiles as $file) {
             if (is_file($file) && (time() - filemtime($file)) > 300) {  // 5 minutes old
                 unlink($file);

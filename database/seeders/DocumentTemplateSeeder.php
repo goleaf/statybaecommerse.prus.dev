@@ -1,67 +1,82 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\DocumentTemplate;
 use Illuminate\Database\Seeder;
 
-class DocumentTemplateSeeder extends Seeder
+final class DocumentTemplateSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Create invoice template
-        DocumentTemplate::create([
-            'name' => 'Invoice Template',
-            'slug' => 'invoice-template',
-            'description' => 'Standard invoice template for billing',
-            'content' => '<h1>Invoice #{{invoice_number}}</h1><p>Date: {{invoice_date}}</p><p>Customer: {{customer_name}}</p><p>Amount: €{{total_amount}}</p>',
-            'variables' => ['invoice_number', 'invoice_date', 'customer_name', 'total_amount'],
-            'type' => 'invoice',
-            'category' => 'business',
-            'settings' => [
-                'page_size' => 'A4',
-                'orientation' => 'portrait',
-                'margins' => ['top' => 20, 'right' => 20, 'bottom' => 20, 'left' => 20],
-            ],
-            'is_active' => true,
-        ]);
+        $this->seedInvoiceTemplates();
+        $this->seedQuoteTemplates();
+        $this->seedReceiptTemplates();
+        $this->seedAdditionalTemplates();
+    }
 
-        // Create quote template
-        DocumentTemplate::create([
-            'name' => 'Quote Template',
-            'slug' => 'quote-template',
-            'description' => 'Professional quote template',
-            'content' => '<h1>Quote #{{quote_number}}</h1><p>Valid until: {{valid_until}}</p><p>Customer: {{customer_name}}</p><p>Total: €{{total_amount}}</p>',
-            'variables' => ['quote_number', 'valid_until', 'customer_name', 'total_amount'],
-            'type' => 'quote',
-            'category' => 'business',
-            'settings' => [
-                'page_size' => 'A4',
-                'orientation' => 'portrait',
-            ],
-            'is_active' => true,
-        ]);
+    private function seedInvoiceTemplates(): void
+    {
+        DocumentTemplate::factory()
+            ->invoice()
+            ->state([
+                'slug' => 'invoice-template',
+                'name' => 'Invoice Template',
+                'description' => 'Standard invoice template for billing',
+                'content' => '<h1>Invoice #{{invoice_number}}</h1><p>Date: {{invoice_date}}</p><p>Customer: {{customer_name}}</p><p>Amount: €{{total_amount}}</p>',
+                'variables' => ['invoice_number', 'invoice_date', 'customer_name', 'total_amount'],
+                'settings' => [
+                    'page_size' => 'A4',
+                    'orientation' => 'portrait',
+                    'margins' => ['top' => 20, 'right' => 20, 'bottom' => 20, 'left' => 20],
+                ],
+                'is_active' => true,
+            ])
+            ->firstOrCreate();
+    }
 
-        // Create receipt template
-        DocumentTemplate::create([
-            'name' => 'Receipt Template',
-            'slug' => 'receipt-template',
-            'description' => 'Simple receipt template',
-            'content' => '<h1>Receipt</h1><p>Date: {{receipt_date}}</p><p>Amount: €{{amount}}</p><p>Payment method: {{payment_method}}</p>',
-            'variables' => ['receipt_date', 'amount', 'payment_method'],
-            'type' => 'receipt',
-            'category' => 'financial',
-            'settings' => [
-                'page_size' => 'A4',
-                'orientation' => 'portrait',
-            ],
-            'is_active' => true,
-        ]);
+    private function seedQuoteTemplates(): void
+    {
+        DocumentTemplate::factory()
+            ->quote()
+            ->state([
+                'slug' => 'quote-template',
+                'name' => 'Quote Template',
+                'description' => 'Professional quote template',
+                'content' => '<h1>Quote #{{quote_number}}</h1><p>Valid until: {{valid_until}}</p><p>Customer: {{customer_name}}</p><p>Total: €{{total_amount}}</p>',
+                'variables' => ['quote_number', 'valid_until', 'customer_name', 'total_amount'],
+                'settings' => [
+                    'page_size' => 'A4',
+                    'orientation' => 'portrait',
+                ],
+                'is_active' => true,
+            ])
+            ->firstOrCreate();
+    }
 
-        // Create additional templates
-        DocumentTemplate::factory(15)->create();
+    private function seedReceiptTemplates(): void
+    {
+        DocumentTemplate::factory()
+            ->receipt()
+            ->state([
+                'slug' => 'receipt-template',
+                'name' => 'Receipt Template',
+                'description' => 'Simple receipt template',
+                'content' => '<h1>Receipt</h1><p>Date: {{receipt_date}}</p><p>Amount: €{{amount}}</p><p>Payment method: {{payment_method}}</p>',
+                'variables' => ['receipt_date', 'amount', 'payment_method'],
+                'settings' => [
+                    'page_size' => 'A4',
+                    'orientation' => 'portrait',
+                ],
+                'is_active' => true,
+            ])
+            ->firstOrCreate();
+    }
+
+    private function seedAdditionalTemplates(): void
+    {
+        DocumentTemplate::factory()->count(15)->create();
     }
 }

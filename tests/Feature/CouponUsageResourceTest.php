@@ -12,13 +12,12 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
+
 /**
  * CouponUsageResourceTest
  *
  * Comprehensive test suite for CouponUsageResource functionality including CRUD operations, filters, and relationships.
  */
-use Tests\TestCase;
-
 final class CouponUsageResourceTest extends TestCase
 {
     use RefreshDatabase;
@@ -51,7 +50,7 @@ final class CouponUsageResourceTest extends TestCase
             'coupon_id' => $coupon->id,
             'user_id' => $user->id,
             'order_id' => $order->id,
-            'discount_amount' => 15.00,
+            'discount_amount' => 15.0,
             'used_at' => now(),
         ];
 
@@ -70,26 +69,26 @@ final class CouponUsageResourceTest extends TestCase
     public function test_can_edit_coupon_usage(): void
     {
         $couponUsage = CouponUsage::factory()->create([
-            'discount_amount' => 10.00,
+            'discount_amount' => 10.0,
         ]);
 
         Livewire::test(CouponUsageResource\Pages\EditCouponUsage::class, [
             'record' => $couponUsage->getRouteKey(),
         ])
             ->fillForm([
-                'discount_amount' => 20.00,
+                'discount_amount' => 20.0,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $couponUsage->refresh();
-        $this->assertEquals(20.00, $couponUsage->discount_amount);
+        $this->assertEquals(20.0, $couponUsage->discount_amount);
     }
 
     public function test_can_view_coupon_usage(): void
     {
         $couponUsage = CouponUsage::factory()->create([
-            'discount_amount' => 25.00,
+            'discount_amount' => 25.0,
         ]);
 
         Livewire::test(CouponUsageResource\Pages\ViewCouponUsage::class, [
@@ -227,7 +226,7 @@ final class CouponUsageResourceTest extends TestCase
             ->callTableAction('export_usage_report', $couponUsage);
 
         // This would test the export functionality
-        $this->assertTrue(true); // Placeholder for actual export test
+        $this->assertTrue(true);  // Placeholder for actual export test
     }
 
     public function test_can_export_bulk_usage_report(): void
@@ -238,7 +237,7 @@ final class CouponUsageResourceTest extends TestCase
             ->callTableBulkAction('export_bulk_report', $couponUsages);
 
         // This would test the bulk export functionality
-        $this->assertTrue(true); // Placeholder for actual bulk export test
+        $this->assertTrue(true);  // Placeholder for actual bulk export test
     }
 
     public function test_coupon_usage_validation_requires_coupon(): void
@@ -247,7 +246,7 @@ final class CouponUsageResourceTest extends TestCase
             ->fillForm([
                 'coupon_id' => '',
                 'user_id' => User::factory()->create()->id,
-                'discount_amount' => 10.00,
+                'discount_amount' => 10.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['coupon_id' => 'required']);
@@ -259,7 +258,7 @@ final class CouponUsageResourceTest extends TestCase
             ->fillForm([
                 'coupon_id' => Coupon::factory()->create()->id,
                 'user_id' => '',
-                'discount_amount' => 10.00,
+                'discount_amount' => 10.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['user_id' => 'required']);
@@ -295,7 +294,7 @@ final class CouponUsageResourceTest extends TestCase
             ->fillForm([
                 'coupon_id' => Coupon::factory()->create()->id,
                 'user_id' => User::factory()->create()->id,
-                'discount_amount' => -10.00,
+                'discount_amount' => -10.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['discount_amount' => 'min']);
@@ -307,7 +306,7 @@ final class CouponUsageResourceTest extends TestCase
             ->fillForm([
                 'coupon_id' => Coupon::factory()->create()->id,
                 'user_id' => User::factory()->create()->id,
-                'discount_amount' => 10.00,
+                'discount_amount' => 10.0,
                 'used_at' => '',
             ])
             ->call('create')
@@ -404,10 +403,10 @@ final class CouponUsageResourceTest extends TestCase
 
     public function test_coupon_usage_discount_amount_formatting(): void
     {
-        $couponUsage = CouponUsage::factory()->create(['discount_amount' => 25.50]);
+        $couponUsage = CouponUsage::factory()->create(['discount_amount' => 25.5]);
 
         // This would test the discount amount formatting in the table
-        $this->assertEquals(25.50, $couponUsage->discount_amount);
+        $this->assertEquals(25.5, $couponUsage->discount_amount);
     }
 
     public function test_coupon_usage_order_id_formatting(): void

@@ -1,13 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        if (!Schema::hasTable('recommendation_block_products')) {
+        if (! Schema::hasTable('recommendation_block_products')) {
             Schema::create('recommendation_block_products', function (Blueprint $table) {
                 $table->id();
                 $table
@@ -31,3 +34,4 @@ return new class extends Migration {
         Schema::dropIfExists('recommendation_block_products');
     }
 };
+

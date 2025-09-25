@@ -117,7 +117,7 @@ final class ReferralStatisticsResourceTest extends TestCase
 
         $this->assertDatabaseHas('referral_statistics', [
             'user_id' => $user->id,
-            'date' => now()->toDateString(),
+            'date' => now()->startOfDay()->toDateTimeString(),
             'total_referrals' => 10,
             'completed_referrals' => 8,
             'pending_referrals' => 2,

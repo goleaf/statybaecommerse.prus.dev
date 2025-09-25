@@ -19,129 +19,65 @@ final class ProductHistoryExampleSeeder extends Seeder
 
     public function run(): void
     {
-        $user = $this->ensureCatalogManager();
-        $brand = $this->ensureBrand();
-        $category = $this->ensureCategory();
-        $product = $this->ensureProduct($brand->id, $category->id);
+        $catalogManager = $this->createCatalogManager();
 
-        $this->seedTranslations($product->id);
-        $this->seedProductHistory($product, $user);
-    }
-
-    private function ensureCatalogManager(): User
-    {
-        return User::query()->firstOrCreate(
-            ['email' => 'catalog.manager@statybae.lt'],
-            [
-                'name' => 'Catalog Manager',
-                'first_name' => 'Catalog',
-                'last_name' => 'Manager',
-                'password' => bcrypt('password'),
-                'email_verified_at' => Carbon::now(),
-                'preferred_locale' => 'lt',
-            ]
-        );
-    }
-
-    private function ensureBrand(): Brand
-    {
-        return Brand::query()->firstOrCreate(
-            ['slug' => 'statybae-premium'],
-            [
-                'name' => 'StatyBae Premium',
-                'description' => 'Premium building chemistry showcased in demo seeding.',
-                'website' => 'https://statybaecommerse.prus.dev',
-                'is_enabled' => true,
-                'sort_order' => 5,
-                'seo_title' => 'StatyBae Premium',
-                'seo_description' => 'Premium construction chemistry and sealants.',
-            ]
-        );
-    }
-
-    private function ensureCategory(): Category
-    {
-        return Category::query()->firstOrCreate(
-            ['slug' => 'akriliniai-hermetikai'],
-            [
-                'name' => 'Akriliniai hermetikai',
-                'description' => 'Akriliniai hermetikai ir sandarinimo sprendimai statyboms.',
-                'sort_order' => 15,
-                'is_visible' => true,
-                'seo_title' => 'Akriliniai hermetikai',
-                'seo_description' => 'Profesionalūs akrilo hermetikų sprendimai StatyBae parduotuvėje.',
-            ]
-        );
-    }
-
-    private function ensureProduct(int $brandId, int $categoryId): Product
-    {
-        $publishedAt = Carbon::create(2024, 10, 1, 8, 0, 0);
-
-        $product = Product::withoutEvents(function () use ($brandId, $publishedAt) {
-            return Product::query()->updateOrCreate(
-                ['slug' => self::PRODUCT_SLUG],
-                [
+        $product = Product::query()->firstWhere('slug', self::PRODUCT_SLUG)
+            ?? Product::factory()
+                ->for($this->firstOrCreateBrand())
+                ->hasAttached(
+                    Category::factory()->count(1),
+                    [],
+                    'categories'
+                )
+                ->create([
+                    'slug' => self::PRODUCT_SLUG,
                     'name' => 'Akrilo hermetikas UE3YIQ',
-                    'description' => 'Profesionalus akrilo hermetikas, skirtas langų, durų ir apdailos sandarinimui. Sudėtyje esančios elastingos dervos užtikrina ilgalaikį rezultatą.',
-                    'short_description' => 'Profesionalus akrilo hermetikas vidaus darbams.',
-                    'sku' => 'AKR-UE3YIQ',
-                    'barcode' => '5901234567890',
-                    'price' => 5.49,
-                    'sale_price' => 4.99,
-                    'compare_price' => 6.49,
-                    'cost_price' => 3.10,
-                    'manage_stock' => true,
-                    'track_stock' => true,
-                    'allow_backorder' => false,
-                    'stock_quantity' => 150,
-                    'low_stock_threshold' => 15,
-                    'weight' => 0.32,
-                    'length' => 23.5,
-                    'width' => 5.1,
-                    'height' => 5.1,
-                    'is_visible' => true,
-                    'is_featured' => true,
-                    'is_requestable' => false,
-                    'published_at' => $publishedAt,
-                    'seo_title' => 'Akrilo hermetikas UE3YIQ',
-                    'seo_description' => 'Profesionalus akrilo hermetikas langams ir durims su puikiu sukibimu.',
-                    'brand_id' => $brandId,
                     'status' => 'published',
-                    'type' => 'simple',
-                    'metadata' => [
-                        'color' => 'Baltas',
-                        'volume_ml' => 280,
-                        'application' => 'Sandarinimas vidaus darbams',
-                    ],
-                ]
-            );
-        });
+                    'is_visible' => true,
+                    'published_at' => Carbon::create(2024, 10, 1, 8, 0, 0),
+                ]);
 
-        $product->categories()->syncWithoutDetaching([$categoryId]);
-
-        return $product;
+        $this->seedTranslations($product);
+        $this->seedProductHistory($product, $catalogManager);
     }
 
-    private function seedTranslations(int $productId): void
+    private function createCatalogManager(): User
+    {
+        return User::factory()->create([
+            'email' => 'catalog.manager@statybae.lt',
+            'preferred_locale' => 'lt',
+            'name' => 'Catalog Manager',
+        ]);
+    }
+
+    private function firstOrCreateBrand(): Brand
+    {
+        return Brand::query()->first()
+            ?? Brand::factory()->create([
+                'name' => 'StatyBae Premium',
+                'is_enabled' => true,
+            ]);
+    }
+
+    private function seedTranslations(Product $product): void
     {
         ProductTranslation::query()->updateOrCreate(
-            ['product_id' => $productId, 'locale' => 'lt'],
+            ['product_id' => $product->id, 'locale' => 'lt'],
             [
-                'name' => 'Akrilo hermetikas UE3YIQ',
+                'name' => $product->name,
                 'slug' => self::PRODUCT_SLUG,
                 'summary' => 'Profesionalus akrilo hermetikas sandarinimo darbams.',
                 'description' => 'Lietuviškas akrilo hermetikas, skirtas profesionaliam langų, durų ir apdailos sandarinimui. Sudaro elastingą, dažomą paviršių.',
                 'short_description' => 'Profesionalus akrilo hermetikas, kuris išlieka elastingas.',
-                'seo_title' => 'Akrilo hermetikas UE3YIQ',
-                'seo_description' => 'Aukštos kokybės akrilo hermetikas profesionalams ir meistrams.',
+                'seo_title' => $product->seo_title ?? 'Akrilo hermetikas UE3YIQ',
+                'seo_description' => $product->seo_description ?? 'Aukštos kokybės akrilo hermetikas profesionalams ir meistrams.',
                 'meta_keywords' => ['akrilas', 'hermetikas', 'sandarinimas', 'statyba'],
                 'alt_text' => 'Akrilo hermetiko tūbelė UE3YIQ',
             ]
         );
 
         ProductTranslation::query()->updateOrCreate(
-            ['product_id' => $productId, 'locale' => 'en'],
+            ['product_id' => $product->id, 'locale' => 'en'],
             [
                 'name' => 'Acrylic Sealant UE3YIQ',
                 'slug' => 'acrylic-sealant-ue3yiq',
@@ -165,11 +101,12 @@ final class ProductHistoryExampleSeeder extends Seeder
             'categories' => $product->categories->pluck('name')->toArray(),
         ];
 
-        $timeline = [
-            [
-                'action' => 'created',
+        ProductHistory::factory()
+            ->for($product)
+            ->for($user)
+            ->created()
+            ->state([
                 'field_name' => 'product',
-                'old_value' => null,
                 'new_value' => [
                     'name' => $product->name,
                     'sku' => $product->sku,
@@ -177,87 +114,96 @@ final class ProductHistoryExampleSeeder extends Seeder
                     'status' => 'published',
                 ],
                 'description' => 'Initial product import from supplier ERP.',
-                'metadata' => ['source' => 'erp_sync', 'channel' => 'b2b_import'],
+                'metadata' => ['source' => 'erp_sync', 'channel' => 'b2b_import'] + $baseMetadata,
                 'created_at' => Carbon::create(2024, 10, 1, 8, 0),
-            ],
-            [
-                'action' => 'price_changed',
-                'field_name' => 'price',
+                'updated_at' => Carbon::create(2024, 10, 1, 8, 0),
+            ])
+            ->create();
+
+        ProductHistory::factory()
+            ->for($product)
+            ->for($user)
+            ->priceChanged()
+            ->state([
                 'old_value' => 5.49,
                 'new_value' => 5.19,
                 'description' => 'Autumn promotion applied for seasonal campaign.',
-                'metadata' => ['reason' => 'autumn_campaign', 'change_percentage' => -5.46],
+                'metadata' => ['reason' => 'autumn_campaign', 'change_percentage' => -5.46] + $baseMetadata,
                 'created_at' => Carbon::create(2024, 10, 15, 9, 30),
-            ],
-            [
-                'action' => 'stock_updated',
-                'field_name' => 'stock_quantity',
+                'updated_at' => Carbon::create(2024, 10, 15, 9, 30),
+            ])
+            ->create();
+
+        ProductHistory::factory()
+            ->for($product)
+            ->for($user)
+            ->stockUpdated()
+            ->state([
                 'old_value' => 150,
                 'new_value' => 220,
                 'description' => 'Warehouse replenishment processed.',
-                'metadata' => ['stock_change' => 70, 'reason' => 'restock', 'supplier' => 'StatyBae Logistics'],
+                'metadata' => ['stock_change' => 70, 'reason' => 'restock', 'supplier' => 'StatyBae Logistics'] + $baseMetadata,
                 'created_at' => Carbon::create(2024, 11, 2, 14, 10),
-            ],
-            [
-                'action' => 'updated',
+                'updated_at' => Carbon::create(2024, 11, 2, 14, 10),
+            ])
+            ->create();
+
+        ProductHistory::factory()
+            ->for($product)
+            ->for($user)
+            ->updated()
+            ->state([
                 'field_name' => 'description',
                 'old_value' => $product->description,
                 'new_value' => $product->description.' Papildytas informacija apie dažomumą.',
                 'description' => 'Description enriched with paintability details.',
-                'metadata' => ['reason' => 'seo_optimization'],
+                'metadata' => ['reason' => 'seo_optimization'] + $baseMetadata,
                 'created_at' => Carbon::create(2024, 12, 5, 10, 5),
-            ],
-            [
-                'action' => 'status_changed',
-                'field_name' => 'status',
+                'updated_at' => Carbon::create(2024, 12, 5, 10, 5),
+            ])
+            ->create();
+
+        ProductHistory::factory()
+            ->for($product)
+            ->for($user)
+            ->statusChanged()
+            ->state([
                 'old_value' => 'published',
                 'new_value' => 'draft',
                 'description' => 'Temporarily disabled due to packaging update.',
-                'metadata' => ['reason' => 'packaging_update'],
+                'metadata' => ['reason' => 'packaging_update'] + $baseMetadata,
                 'created_at' => Carbon::create(2025, 1, 15, 8, 45),
-            ],
-            [
-                'action' => 'status_changed',
-                'field_name' => 'status',
+                'updated_at' => Carbon::create(2025, 1, 15, 8, 45),
+            ])
+            ->create();
+
+        ProductHistory::factory()
+            ->for($product)
+            ->for($user)
+            ->statusChanged()
+            ->state([
                 'old_value' => 'draft',
                 'new_value' => 'published',
                 'description' => 'Re-enabled after packaging update approval.',
-                'metadata' => ['reason' => 'packaging_approved'],
+                'metadata' => ['reason' => 'packaging_approved'] + $baseMetadata,
                 'created_at' => Carbon::create(2025, 1, 28, 16, 30),
-            ],
-            [
-                'action' => 'updated',
+                'updated_at' => Carbon::create(2025, 1, 28, 16, 30),
+            ])
+            ->create();
+
+        ProductHistory::factory()
+            ->for($product)
+            ->for($user)
+            ->updated()
+            ->state([
                 'field_name' => 'is_visible',
                 'old_value' => true,
                 'new_value' => true,
                 'description' => 'Visibility confirmed for new packaging batch.',
-                'metadata' => ['reason' => 'quality_assurance'],
+                'metadata' => ['reason' => 'quality_assurance'] + $baseMetadata,
                 'created_at' => Carbon::create(2025, 1, 28, 16, 35),
-            ],
-        ];
-
-        foreach ($timeline as $entry) {
-            ProductHistory::query()->updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'action' => $entry['action'],
-                    'field_name' => $entry['field_name'],
-                    'created_at' => $entry['created_at'],
-                ],
-                [
-                    'user_id' => $user->id,
-                    'old_value' => $entry['old_value'] ?? null,
-                    'new_value' => $entry['new_value'] ?? null,
-                    'description' => $entry['description'] ?? null,
-                    'ip_address' => '192.168.1.10',
-                    'user_agent' => 'Seeder/1.0 (+https://statybaecommerse.prus.dev)',
-                    'metadata' => array_merge($baseMetadata, $entry['metadata'] ?? []),
-                    'causer_type' => User::class,
-                    'causer_id' => $user->id,
-                    'created_at' => $entry['created_at'],
-                    'updated_at' => $entry['created_at'],
-                ]
-            );
-        }
+                'updated_at' => Carbon::create(2025, 1, 28, 16, 35),
+            ])
+            ->create();
     }
 }

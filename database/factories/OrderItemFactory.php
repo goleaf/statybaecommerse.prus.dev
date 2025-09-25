@@ -23,12 +23,10 @@ final class OrderItemFactory extends Factory
         $unitPrice = $this->faker->randomFloat(2, 1, 100);
         $total = $quantity * $unitPrice;
 
-        $variant = $this->faker->boolean(30) ? ProductVariant::factory()->create() : null;
-
         return [
             'order_id' => Order::factory(),
             'product_id' => Product::factory(),
-            'product_variant_id' => $variant?->id,
+            'product_variant_id' => null,
             'name' => $this->faker->words(3, true),
             'sku' => $this->faker->unique()->bothify('SKU-####'),
             'quantity' => $quantity,

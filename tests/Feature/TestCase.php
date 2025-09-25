@@ -3,3 +3,4 @@
 namespace Tests\Feature;
 
 abstract class TestCase extends \Tests\TestCase {}
+

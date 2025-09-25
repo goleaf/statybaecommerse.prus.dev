@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 final class EnumValueResourceTest extends TestCase
 {
@@ -28,7 +27,8 @@ final class EnumValueResourceTest extends TestCase
     {
         EnumValue::factory()->count(3)->create();
 
-        $this->get('/admin/enum-values')
+        $this
+            ->get('/admin/enum-values')
             ->assertOk()
             ->assertSee('Enum Values');
     }
@@ -88,7 +88,8 @@ final class EnumValueResourceTest extends TestCase
     {
         $enumValue = EnumValue::factory()->create();
 
-        $this->get("/admin/enum-values/{$enumValue->id}")
+        $this
+            ->get("/admin/enum-values/{$enumValue->id}")
             ->assertOk()
             ->assertSee($enumValue->name);
     }
@@ -113,7 +114,8 @@ final class EnumValueResourceTest extends TestCase
         EnumValue::factory()->create(['type' => 'product_status']);
         EnumValue::factory()->create(['type' => 'order_status']);
 
-        $this->get('/admin/enum-values?tableFilters[type][value]=product_status')
+        $this
+            ->get('/admin/enum-values?tableFilters[type][value]=product_status')
             ->assertOk()
             ->assertSee('product_status')
             ->assertDontSee('order_status');
@@ -124,7 +126,8 @@ final class EnumValueResourceTest extends TestCase
         EnumValue::factory()->create(['is_active' => true]);
         EnumValue::factory()->create(['is_active' => false]);
 
-        $this->get('/admin/enum-values?tableFilters[is_active][value]=1')
+        $this
+            ->get('/admin/enum-values?tableFilters[is_active][value]=1')
             ->assertOk();
     }
 

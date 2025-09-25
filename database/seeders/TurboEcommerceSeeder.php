@@ -9,10 +9,10 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
@@ -20,11 +20,11 @@ use Illuminate\Support\Str;
 /**
  * An ultra-fast, idempotent, and scalable seeder for large product catalogs.
  *
- * - Bulk upserts products by SKU
- * - Attaches brands, categories, and attributes in chunks
- * - Seeds translations for all supported locales
- * - Generates local placeholder images (GD) via LocalImageGeneratorService
- * - Avoids model events and N+1 where possible
+ * - Uses model factories exclusively with relationships
+ * - Attaches brands, categories, and attributes using Eloquent relationships
+ * - Seeds translations for all supported locales using factory relationships
+ * - Generates local placeholder images via LocalImageGeneratorService
+ * - Leverages model events and relationships for data integrity
  */
 final class TurboEcommerceSeeder extends Seeder
 {
@@ -76,8 +76,8 @@ final class TurboEcommerceSeeder extends Seeder
 
         // Snapshot needed references
         $locales = $this->supportedLocales();
-        $brandIds = Brand::query()->enabled()->pluck('id')->values();
-        $categoryIds = Category::query()->active()->pluck('id')->values();
+        $brands = Brand::query()->enabled()->get();
+        $categories = Category::query()->active()->get();
 
         // Attributes and their values
         $attributes = Attribute::query()->enabled()->with(['values' => function ($q) {
@@ -87,14 +87,14 @@ final class TurboEcommerceSeeder extends Seeder
         // Prepare a shared pool of images used across all products
         $this->buildSharedImagePool(100);
 
-        // Generate products per brand in fast upserted chunks with timeout protection
+        // Generate products per brand using factories with timeout protection
         $timeout = now()->addMinutes(60); // 60 minute timeout for seeder operations
 
-        LazyCollection::make($brandIds->chunk(100))
+        LazyCollection::make($brands->chunk(10))
             ->takeUntilTimeout($timeout)
-            ->each(function ($brandChunk) use ($categoryIds, $attributes, $locales) {
-                foreach ($brandChunk as $brandId) {
-                    $this->seedProductsForBrand((int) $brandId, $categoryIds, $attributes, $locales);
+            ->each(function ($brandChunk) use ($categories, $attributes, $locales) {
+                foreach ($brandChunk as $brand) {
+                    $this->seedProductsForBrand($brand, $categories, $attributes, $locales);
                 }
             });
 
@@ -120,278 +120,208 @@ final class TurboEcommerceSeeder extends Seeder
     }
 
     /**
-     * Seed products for a given brand with relations, translations and images
+     * Seed products for a given brand with relations, translations and images using factories
      */
-    private function seedProductsForBrand(int $brandId, $categoryIds, $attributes, array $locales): void
+    private function seedProductsForBrand(Brand $brand, $categories, $attributes, array $locales): void
     {
-        $current = Product::query()->where('brand_id', $brandId)->count();
+        $current = $brand->products()->count();
         $missing = max(0, $this->productsPerBrand - $current);
         if ($missing === 0) {
             return;
         }
 
-        $this->command?->info("— Brand {$brandId}: creating {$missing} products");
+        $this->command?->info("— Brand {$brand->id}: creating {$missing} products");
 
         $namePoolLt = $this->ltNamePool();
 
-        // Create in chunks with upsert by SKU to be idempotent
-        $createdSkuBatches = [];
-        $now = now();
-
+        // Create products in chunks using factories
         for ($offset = 0; $offset < $missing; $offset += $this->chunkSize) {
             $batchSize = (int) min($this->chunkSize, $missing - $offset);
-            $rows = [];
-            $skus = [];
+            $products = collect();
 
             for ($i = 0; $i < $batchSize; $i++) {
                 $nameLt = $namePoolLt[array_rand($namePoolLt)];
-                $sku = 'PRD-'.strtoupper(Str::random(10));
-                $slug = Str::slug($nameLt.'-'.Str::random(6));
                 $price = mt_rand(500, 250000) / 100;  // 5.00 - 2500.00
 
-                $rows[] = [
-                    'name' => $nameLt,  // base/default locale copy
-                    'slug' => $slug,
-                    'description' => '—',
-                    'short_description' => '—',
-                    'sku' => $sku,
-                    'price' => $price,
-                    'sale_price' => (mt_rand(0, 100) < 20) ? round($price * 0.85, 2) : null,
-                    'manage_stock' => (mt_rand(0, 100) < 85),
-                    'stock_quantity' => mt_rand(0, 500),
-                    'low_stock_threshold' => mt_rand(3, 25),
-                    'weight' => mt_rand(10, 2500) / 100,
-                    'length' => mt_rand(10, 3000) / 10,
-                    'width' => mt_rand(10, 3000) / 10,
-                    'height' => mt_rand(10, 1500) / 10,
-                    'is_visible' => true,
-                    'is_featured' => (mt_rand(0, 100) < 10),
-                    'published_at' => $now,
-                    'seo_title' => $nameLt,
-                    'seo_description' => '—',
-                    'brand_id' => $brandId,
-                    'status' => 'published',
-                    'type' => 'simple',
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-                $skus[] = $sku;
+                // Create product using factory with brand relationship
+                $product = Product::factory()
+                    ->for($brand, 'brand')
+                    ->create([
+                        'name' => $nameLt,
+                        'slug' => Str::slug($nameLt . '-' . Str::random(6)),
+                        'description' => '—',
+                        'short_description' => '—',
+                        'sku' => 'PRD-' . strtoupper(Str::random(10)),
+                        'price' => $price,
+                        'sale_price' => (mt_rand(0, 100) < 20) ? round($price * 0.85, 2) : null,
+                        'manage_stock' => (mt_rand(0, 100) < 85),
+                        'stock_quantity' => mt_rand(0, 500),
+                        'low_stock_threshold' => mt_rand(3, 25),
+                        'weight' => mt_rand(10, 2500) / 100,
+                        'length' => mt_rand(10, 3000) / 10,
+                        'width' => mt_rand(10, 3000) / 10,
+                        'height' => mt_rand(10, 1500) / 10,
+                        'is_visible' => true,
+                        'is_featured' => (mt_rand(0, 100) < 10),
+                        'published_at' => now(),
+                        'seo_title' => $nameLt,
+                        'seo_description' => '—',
+                        'status' => 'published',
+                        'type' => 'simple',
+                    ]);
+
+                $products->push($product);
             }
 
-            // Upsert by SKU to avoid duplicates and stay fast
-            DB::table('products')->upsert(
-                $rows,
-                ['sku'],
-                [
-                    'name', 'slug', 'description', 'short_description', 'price', 'sale_price', 'manage_stock', 'stock_quantity',
-                    'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_visible', 'is_featured', 'published_at',
-                    'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'updated_at',
-                ]
-            );
+            // Attach categories using Eloquent relationships
+            $this->attachCategories($products, $categories);
 
-            $createdSkuBatches[] = $skus;
+            // Attach attributes using Eloquent relationships
+            $this->attachAttributes($products, $attributes);
+
+            // Seed translations for all locales using factories
+            $this->seedProductTranslations($products, $locales);
+
+            // Ensure images per product using shared image pool
+            $this->ensureImagesForProducts($products);
         }
-
-        // Resolve product IDs for the new/updated SKUs
-        $allSkus = array_merge(...$createdSkuBatches);
-        $productIdBySku = DB::table('products')->whereIn('sku', $allSkus)->pluck('id', 'sku');
-        $productIds = collect($allSkus)->map(fn ($s) => (int) ($productIdBySku[$s] ?? 0))->filter()->values();
-
-        if ($productIds->isEmpty()) {
-            return;
-        }
-
-        // Attach categories in bulk
-        $this->attachCategories($productIds, $categoryIds);
-
-        // Attach attributes in bulk
-        $this->attachAttributes($productIds, $attributes);
-
-        // Seed translations for all locales
-        $this->seedProductTranslations($productIds, $locales);
-
-        // Ensure images per product using shared image pool (chunked)
-        $this->ensureImagesForProducts($productIds);
     }
 
-    private function attachCategories($productIds, $categoryIds): void
+    private function attachCategories($products, $categories): void
     {
-        if (empty($categoryIds)) {
+        if ($categories->isEmpty()) {
             return;
         }
 
-        $now = now();
-        $rows = [];
-        foreach ($productIds as $pid) {
-            $attach = collect($categoryIds)->random(min($this->categoriesPerProduct, count($categoryIds)))->all();
-            foreach ($attach as $cid) {
-                $rows[] = [
-                    'product_id' => (int) $pid,
-                    'category_id' => (int) $cid,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-            }
+        foreach ($products as $product) {
+            $categoriesToAttach = $categories->random(min($this->categoriesPerProduct, $categories->count()));
+            
+            // Use Eloquent relationship to attach categories
+            $product->categories()->syncWithoutDetaching($categoriesToAttach->pluck('id'));
         }
-
-        // Use LazyCollection with timeout for bulk category attachments
-        $timeout = now()->addMinutes(5); // 5 minute timeout for category attachments
-
-        LazyCollection::make(array_chunk($rows, 2000))
-            ->takeUntilTimeout($timeout)
-            ->each(function ($chunk) {
-                DB::table('product_categories')->insertOrIgnore($chunk);
-            });
     }
 
-    private function attachAttributes($productIds, $attributes): void
+    private function attachAttributes($products, $attributes): void
     {
         if ($attributes->isEmpty()) {
             return;
         }
 
-        $now = now();
-        $rows = [];
-        foreach ($productIds as $pid) {
+        foreach ($products as $product) {
             $count = mt_rand($this->attributesPerProductMin, $this->attributesPerProductMax);
             $picked = $attributes->shuffle()->take($count);
+            
+            $attributeData = [];
             foreach ($picked as $attr) {
                 /** @var Attribute $attr */
                 $vals = $attr->values->where('is_enabled', true);
                 $val = $vals->isNotEmpty() ? $vals->random() : null;
-                if (! $val) {
-                    continue;
+                if ($val) {
+                    $attributeData[$attr->id] = ['attribute_value_id' => $val->id];
                 }
-                $rows[] = [
-                    'product_id' => (int) $pid,
-                    'attribute_id' => (int) $attr->id,
-                    'attribute_value_id' => (int) $val->id,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
+            }
+
+            // Use Eloquent relationship to attach attributes
+            if (!empty($attributeData)) {
+                $product->attributes()->sync($attributeData);
             }
         }
-
-        // Use LazyCollection with timeout for bulk attribute attachments
-        $timeout = now()->addMinutes(5); // 5 minute timeout for attribute attachments
-
-        LazyCollection::make(array_chunk($rows, 2000))
-            ->takeUntilTimeout($timeout)
-            ->each(function ($chunk) {
-                DB::table('product_attributes')->insertOrIgnore($chunk);
-            });
     }
 
-    private function seedProductTranslations($productIds, array $locales): void
+    private function seedProductTranslations($products, array $locales): void
     {
         if (empty($locales)) {
             return;
         }
 
-        $now = now();
-        $base = DB::table('products')->whereIn('id', $productIds)->select(['id', 'name', 'slug'])->get();
-
-        $rows = [];
-        foreach ($base as $row) {
-            foreach ($locales as $loc) {
-                $rows[] = [
-                    'product_id' => (int) $row->id,
-                    'locale' => (string) $loc,
-                    'name' => $this->translateLike($row->name, $loc),
-                    'slug' => Str::slug($this->translateLike($row->name, $loc).'-'.substr($row->slug, -6)),
-                    'summary' => $this->translateLike('Profesionalus įrankis', $loc),
-                    'description' => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $loc),
-                    'seo_title' => $this->translateLike($row->name, $loc),
-                    'seo_description' => $this->translateLike('Pirkite geriausia kaina. Greitas pristatymas.', $loc),
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
+        foreach ($products as $product) {
+            foreach ($locales as $locale) {
+                // Create translation using factory with relationship
+                $product->translations()->firstOrCreate(
+                    ['locale' => $locale],
+                    ProductTranslation::factory()
+                        ->for($product, 'product')
+                        ->make([
+                            'locale' => $locale,
+                            'name' => $this->translateLike($product->name, $locale),
+                            'slug' => Str::slug($this->translateLike($product->name, $locale) . '-' . substr($product->slug, -6)),
+                            'summary' => $this->translateLike('Profesionalus įrankis', $locale),
+                            'description' => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
+                            'seo_title' => $this->translateLike($product->name, $locale),
+                            'seo_description' => $this->translateLike('Pirkite geriausia kaina. Greitas pristatymas.', $locale),
+                        ])
+                        ->toArray()
+                );
             }
         }
-
-        // Use LazyCollection with timeout for bulk translation seeding
-        $timeout = now()->addMinutes(10); // 10 minute timeout for translation seeding
-
-        LazyCollection::make(array_chunk($rows, 2000))
-            ->takeUntilTimeout($timeout)
-            ->each(function ($chunk) {
-                DB::table('product_translations')->upsert(
-                    $chunk,
-                    ['product_id', 'locale'],
-                    ['name', 'slug', 'summary', 'description', 'seo_title', 'seo_description', 'updated_at']
-                );
-            });
     }
 
-    private function ensureImagesForProducts($productIds): void
+    private function ensureImagesForProducts($products): void
     {
         // Ensure pool is available
         if (empty($this->sharedImagePool)) {
             $this->buildSharedImagePool(100);
         }
 
-        $ids = collect($productIds)->chunk(100);
-        foreach ($ids as $chunk) {
-            /** @var \Illuminate\Support\Collection<int, Product> $products */
-            $products = Product::query()->whereIn('id', $chunk)->with(['images'])->get();
+        foreach ($products as $product) {
+            try {
+                $current = $product->images()->count();
+                $target = $this->minImagesPerProduct === $this->maxImagesPerProduct
+                    ? $this->minImagesPerProduct
+                    : random_int($this->minImagesPerProduct, $this->maxImagesPerProduct);
+                $toAdd = max(0, $target - $current);
 
-            foreach ($products as $product) {
-                try {
-                    $current = (int) $product->images()->count();
-                    $target = $this->minImagesPerProduct === $this->maxImagesPerProduct
-                        ? $this->minImagesPerProduct
-                        : random_int($this->minImagesPerProduct, $this->maxImagesPerProduct);
-                    $toAdd = max(0, $target - $current);
-
-                    if ($toAdd > 0) {
-                        $picks = $toAdd === 1
-                            ? [Arr::random($this->sharedImagePool)]
-                            : Arr::random($this->sharedImagePool, $toAdd);
-                        foreach ($picks as $index => $path) {
-                            if (! $path || ! file_exists($path)) {
-                                continue;
-                            }
-                            ProductImage::query()->create([
-                                'product_id' => $product->id,
-                                'path' => 'storage/shared_product_images/'.basename($path),
+                if ($toAdd > 0) {
+                    $picks = $toAdd === 1
+                        ? [Arr::random($this->sharedImagePool)]
+                        : Arr::random($this->sharedImagePool, $toAdd);
+                    
+                    foreach ($picks as $index => $path) {
+                        if (!$path || !file_exists($path)) {
+                            continue;
+                        }
+                        
+                        // Create product image using factory with relationship
+                        ProductImage::factory()
+                            ->for($product, 'product')
+                            ->create([
+                                'path' => 'storage/shared_product_images/' . basename($path),
                                 'alt_text' => $product->name,
                                 'sort_order' => $current + $index + 1,
                             ]);
-                        }
-                        $current += $toAdd;
                     }
-
-                    if ($current > $this->maxImagesPerProduct) {
-                        $excess = $current - $this->maxImagesPerProduct;
-                        $toDelete = $product->images()->orderByDesc('id')->limit($excess)->get();
-                        foreach ($toDelete as $img) {
-                            try {
-                                $img->delete();
-                            } catch (\Throwable $e) {  /* ignore */
-                            }
-                        }
-                    }
-                } catch (\Throwable $e) {
-                    Log::warning('Turbo image ensure failed', [
-                        'product_id' => $product->id,
-                        'error' => $e->getMessage(),
-                    ]);
+                    $current += $toAdd;
                 }
+
+                if ($current > $this->maxImagesPerProduct) {
+                    $excess = $current - $this->maxImagesPerProduct;
+                    $toDelete = $product->images()->orderByDesc('id')->limit($excess)->get();
+                    foreach ($toDelete as $img) {
+                        try {
+                            $img->delete();
+                        } catch (\Throwable $e) {  /* ignore */
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Turbo image ensure failed', [
+                    'product_id' => $product->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
     }
 
     private function buildSharedImagePool(int $count = 100): void
     {
-        if (! is_dir($this->sharedImagePoolDir)) {
+        if (!is_dir($this->sharedImagePoolDir)) {
             @mkdir($this->sharedImagePoolDir, 0755, true);
         }
 
         // If directory already has enough images, reuse them
-        $existing = glob($this->sharedImagePoolDir.DIRECTORY_SEPARATOR.'pool_image_*.webp') ?: [];
+        $existing = glob($this->sharedImagePoolDir . DIRECTORY_SEPARATOR . 'pool_image_*.webp') ?: [];
         if (count($existing) >= $count) {
             $this->sharedImagePool = array_values($existing);
-
             return;
         }
 
@@ -402,18 +332,18 @@ final class TurboEcommerceSeeder extends Seeder
         $generated = [];
         for ($i = 1; $i <= $needed; $i++) {
             try {
-                $name = 'Sample Product Image '.($i + count($existing));
+                $name = 'Sample Product Image ' . ($i + count($existing));
                 $file = $this->imageGen->generateWebPImage(
                     text: $name,
                     width: 600,
                     height: 600,
                     backgroundColor: null,
                     textColor: '#FFFFFF',
-                    filename: 'pool_image_'.str_pad((string) ($i + count($existing)), 3, '0', STR_PAD_LEFT)
+                    filename: 'pool_image_' . str_pad((string) ($i + count($existing)), 3, '0', STR_PAD_LEFT)
                 );
 
                 // Move into pool directory if generated elsewhere
-                $dest = $this->sharedImagePoolDir.DIRECTORY_SEPARATOR.basename($file);
+                $dest = $this->sharedImagePoolDir . DIRECTORY_SEPARATOR . basename($file);
                 if ($file !== $dest) {
                     @rename($file, $dest);
                 }
@@ -453,10 +383,10 @@ final class TurboEcommerceSeeder extends Seeder
         // Lightweight pseudo-translation to avoid network calls but ensure per-locale difference
         return match ($locale) {
             'lt' => $text,
-            'en' => $text.' (EN)',
-            'ru' => $text.' (RU)',
-            'de' => $text.' (DE)',
-            default => $text.' ('.strtoupper($locale).')',
+            'en' => $text . ' (EN)',
+            'ru' => $text . ' (RU)',
+            'de' => $text . ' (DE)',
+            default => $text . ' (' . strtoupper($locale) . ')',
         };
     }
 

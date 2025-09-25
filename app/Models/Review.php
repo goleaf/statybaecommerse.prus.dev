@@ -104,6 +104,7 @@ final class Review extends Model
     }
 
     // Alias for clarity: a review's author is a customer (User)
+
     /**
      * Handle author functionality with proper error handling.
      */
@@ -241,6 +242,7 @@ final class Review extends Model
     }
 
     // Advanced Translation Methods
+
     /**
      * Handle getTranslatedTitle functionality with proper error handling.
      */
@@ -258,6 +260,7 @@ final class Review extends Model
     }
 
     // Scope for translated reviews
+
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
@@ -273,6 +276,7 @@ final class Review extends Model
     }
 
     // Translation Management Methods
+
     /**
      * Handle getAvailableLocales functionality with proper error handling.
      */
@@ -322,6 +326,7 @@ final class Review extends Model
     }
 
     // Helper Methods
+
     /**
      * Handle getFullDisplayName functionality with proper error handling.
      */
@@ -374,6 +379,7 @@ final class Review extends Model
     }
 
     // Additional helper methods
+
     /**
      * Handle getStatus functionality with proper error handling.
      */
@@ -515,7 +521,7 @@ final class Review extends Model
 
     public function getDaysOldAttribute(): int
     {
-        return $this->created_at ? $this->created_at->diffInDays(now()) : 0;
+        return (int) ($this->created_at ? $this->created_at->diffInDays(now()) : 0);
     }
 
     public function getReviewerTypeAttribute(): string

@@ -64,7 +64,7 @@ class ApiRoutesTest extends TestCase
         DiscountCode::factory()->count(3)->create();
 
         // Create referrals
-        Referral::factory()->count(3)->create(['user_id' => $this->user->id]);
+        Referral::factory()->count(3)->create(['referrer_id' => $this->user->id]);
     }
 
     /**
@@ -126,14 +126,14 @@ class ApiRoutesTest extends TestCase
         // Test validate discount code
         $response = $this->post('/api/discount-codes/validate', [
             'code' => $discountCode->code,
-            'amount' => 100.00,
+            'amount' => 100.0,
         ]);
         $response->assertStatus(200);
 
         // Test apply discount code
         $response = $this->post('/api/discount-codes/apply', [
             'code' => $discountCode->code,
-            'amount' => 100.00,
+            'amount' => 100.0,
         ]);
         $response->assertStatus(200);
 
@@ -160,14 +160,14 @@ class ApiRoutesTest extends TestCase
         // Test validate with invalid code
         $response = $this->post('/api/discount-codes/validate', [
             'code' => 'INVALID_CODE',
-            'amount' => 100.00,
+            'amount' => 100.0,
         ]);
         $response->assertStatus(400);
 
         // Test apply with invalid code
         $response = $this->post('/api/discount-codes/apply', [
             'code' => 'INVALID_CODE',
-            'amount' => 100.00,
+            'amount' => 100.0,
         ]);
         $response->assertStatus(400);
 
@@ -454,7 +454,7 @@ class ApiRoutesTest extends TestCase
         for ($i = 0; $i < 10; $i++) {
             $response = $this->post('/api/discount-codes/validate', [
                 'code' => $discountCode->code,
-                'amount' => 100.00,
+                'amount' => 100.0,
             ]);
             $response->assertStatus(200);
         }

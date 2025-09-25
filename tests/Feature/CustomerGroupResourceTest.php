@@ -10,13 +10,12 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
+
 /**
  * CustomerGroupResourceTest
  *
  * Comprehensive test suite for CustomerGroupResource functionality including CRUD operations, filters, and relationships.
  */
-use Tests\TestCase;
-
 final class CustomerGroupResourceTest extends TestCase
 {
     use RefreshDatabase;
@@ -46,8 +45,8 @@ final class CustomerGroupResourceTest extends TestCase
             'code' => 'TEST_GROUP',
             'description' => 'Test customer group description',
             'slug' => 'test-customer-group',
-            'discount_percentage' => 10.00,
-            'discount_fixed' => 5.00,
+            'discount_percentage' => 10.0,
+            'discount_fixed' => 5.0,
             'has_special_pricing' => true,
             'has_volume_discounts' => false,
             'can_view_prices' => true,
@@ -295,7 +294,7 @@ final class CustomerGroupResourceTest extends TestCase
             ->fillForm([
                 'name' => 'Test Customer Group',
                 'code' => 'TEST',
-                'discount_percentage' => 150.00,
+                'discount_percentage' => 150.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['discount_percentage' => 'max']);
@@ -319,7 +318,7 @@ final class CustomerGroupResourceTest extends TestCase
             ->fillForm([
                 'name' => 'Test Customer Group',
                 'code' => 'TEST',
-                'discount_fixed' => -10.00,
+                'discount_fixed' => -10.0,
             ])
             ->call('create')
             ->assertHasFormErrors(['discount_fixed' => 'min']);
@@ -337,8 +336,8 @@ final class CustomerGroupResourceTest extends TestCase
 
     public function test_customer_group_scope_with_discount(): void
     {
-        CustomerGroup::factory()->create(['discount_percentage' => 10.00]);
-        CustomerGroup::factory()->create(['discount_percentage' => 0.00]);
+        CustomerGroup::factory()->create(['discount_percentage' => 10.0]);
+        CustomerGroup::factory()->create(['discount_percentage' => 0.0]);
 
         $discountGroups = CustomerGroup::withDiscount()->get();
         $this->assertCount(1, $discountGroups);
@@ -348,11 +347,11 @@ final class CustomerGroupResourceTest extends TestCase
     public function test_customer_group_helper_methods(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'discount_percentage' => 15.00,
+            'discount_percentage' => 15.0,
             'is_enabled' => true,
         ]);
 
-        $this->assertEquals(15.00, $customerGroup->discount_percentage);
+        $this->assertEquals(15.0, $customerGroup->discount_percentage);
         $this->assertTrue($customerGroup->hasDiscountRate());
         $this->assertTrue($customerGroup->is_active);
     }
@@ -471,12 +470,12 @@ final class CustomerGroupResourceTest extends TestCase
     public function test_customer_group_discount_calculation(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'discount_percentage' => 10.00,
-            'discount_fixed' => 5.00,
+            'discount_percentage' => 10.0,
+            'discount_fixed' => 5.0,
         ]);
 
-        $this->assertEquals(10.00, $customerGroup->discount_percentage);
-        $this->assertEquals(5.00, $customerGroup->discount_fixed);
+        $this->assertEquals(10.0, $customerGroup->discount_percentage);
+        $this->assertEquals(5.0, $customerGroup->discount_fixed);
     }
 
     public function test_customer_group_sort_order(): void

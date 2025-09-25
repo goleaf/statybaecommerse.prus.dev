@@ -23,7 +23,6 @@ final class NewsCommentFactory extends Factory
             'content' => fake()->paragraph(),
             'is_approved' => true,
             'is_visible' => true,
-            'is_active' => true,
         ];
     }
 

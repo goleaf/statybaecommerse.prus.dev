@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use App\Filament\Resources\ReferralResource\Pages\CreateReferral;
+declare(strict_types=1);
+
 use App\Filament\Resources\ReferralResource;
+use App\Filament\Resources\ReferralResource\Pages\CreateReferral;
 use App\Models\Referral;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,11 +52,11 @@ it('loads view and edit pages', function () {
     ]);
 
     $this
-        ->get(ReferralResource::getUrl('view', ['record' => $referral]))
+        ->get(ReferralResource::getUrl('view', ['record' => $referral->getRouteKey()]))
         ->assertOk();
 
     $this
-        ->get(ReferralResource::getUrl('edit', ['record' => $referral]))
+        ->get(ReferralResource::getUrl('edit', ['record' => $referral->getRouteKey()]))
         ->assertOk();
 });
 

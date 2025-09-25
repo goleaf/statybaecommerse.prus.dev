@@ -12,7 +12,6 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class ComprehensiveProductVariantSeeder extends Seeder
@@ -22,11 +21,9 @@ final class ComprehensiveProductVariantSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::transaction(function () {
-            $this->createAttributes();
-            $this->createProductsWithVariants();
-            $this->createVariantAttributeValues();
-        });
+        $this->createAttributes();
+        $this->createProductsWithVariants();
+        $this->createVariantAttributeValues();
     }
 
     private function createAttributes(): void

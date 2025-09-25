@@ -6,7 +6,6 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -21,14 +20,8 @@ final class SimpleAdminSeeder extends Seeder
     {
         $this->command->info('🔐 Creating Super Admin User...');
 
-        // Create or get the super admin role
-        $superAdminRole = Role::firstOrCreate([
-            'name' => 'super-admin',
-            'guard_name' => 'web',
-        ]);
-
-        // Create basic permissions
-        $permissions = [
+        // Create basic permissions using factory
+        $permissionNames = [
             'access_admin_panel',
             'manage_all_users',
             'manage_all_orders',
@@ -37,30 +30,33 @@ final class SimpleAdminSeeder extends Seeder
             'super_admin_access',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate([
-                'name' => $permission,
+        $permissions = collect($permissionNames)->map(function ($permissionName) {
+            return Permission::factory()->create([
+                'name' => $permissionName,
                 'guard_name' => 'web',
             ]);
-        }
+        });
+
+        // Create super admin role using factory
+        $superAdminRole = Role::factory()->create([
+            'name' => 'super-admin',
+            'guard_name' => 'web',
+        ]);
 
         // Assign permissions to super admin role
-        $superAdminRole->syncPermissions(Permission::all());
+        $superAdminRole->syncPermissions($permissions);
 
-        // Create or update the super admin user
-        $admin = User::updateOrCreate(
-            ['email' => 'admin@example.com'],
-            [
+        // Create super admin user using factory
+        $admin = User::factory()
+            ->admin()
+            ->state([
                 'name' => 'Super Administrator',
                 'email' => 'admin@example.com',
-                'password' => Hash::make('password'),
+                'password' => 'password', // Factory will handle hashing
                 'email_verified_at' => now(),
-                'is_admin' => true,
                 'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        );
+            ])
+            ->create();
 
         // Assign super admin role to user
         $admin->assignRole($superAdminRole);

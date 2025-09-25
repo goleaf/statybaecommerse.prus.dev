@@ -8,7 +8,6 @@ use App\Models\Legal;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\TestCase;
 
 class LegalResourceTest extends TestCase
 {
@@ -33,7 +32,8 @@ class LegalResourceTest extends TestCase
             'is_required' => true,
         ]);
 
-        $this->get('/admin/legals')
+        $this
+            ->get('/admin/legals')
             ->assertOk()
             ->assertSee('privacy-policy')
             ->assertSee('Privatumo politika');
@@ -41,7 +41,8 @@ class LegalResourceTest extends TestCase
 
     public function test_can_create_legal_document(): void
     {
-        $this->get('/admin/legals/create')
+        $this
+            ->get('/admin/legals/create')
             ->assertOk();
 
         $this->post('/admin/legals', [
@@ -69,7 +70,8 @@ class LegalResourceTest extends TestCase
             'type' => 'privacy_policy',
         ]);
 
-        $this->get("/admin/legals/{$legal->id}")
+        $this
+            ->get("/admin/legals/{$legal->id}")
             ->assertOk()
             ->assertSee('privacy-policy');
     }
@@ -82,7 +84,8 @@ class LegalResourceTest extends TestCase
             'is_enabled' => true,
         ]);
 
-        $this->get("/admin/legals/{$legal->id}/edit")
+        $this
+            ->get("/admin/legals/{$legal->id}/edit")
             ->assertOk();
 
         $this->put("/admin/legals/{$legal->id}", [
@@ -105,7 +108,8 @@ class LegalResourceTest extends TestCase
     {
         $legal = Legal::factory()->create();
 
-        $this->delete("/admin/legals/{$legal->id}")
+        $this
+            ->delete("/admin/legals/{$legal->id}")
             ->assertRedirect();
 
         $this->assertDatabaseMissing('legals', [
@@ -125,7 +129,8 @@ class LegalResourceTest extends TestCase
             'key' => 'terms-of-use',
         ]);
 
-        $this->get('/admin/legals?type=privacy_policy')
+        $this
+            ->get('/admin/legals?type=privacy_policy')
             ->assertOk()
             ->assertSee('privacy-policy')
             ->assertDontSee('terms-of-use');
@@ -143,7 +148,8 @@ class LegalResourceTest extends TestCase
             'key' => 'disabled-doc',
         ]);
 
-        $this->get('/admin/legals?is_enabled=1')
+        $this
+            ->get('/admin/legals?is_enabled=1')
             ->assertOk()
             ->assertSee('enabled-doc')
             ->assertDontSee('disabled-doc');
@@ -161,7 +167,8 @@ class LegalResourceTest extends TestCase
             'key' => 'optional-doc',
         ]);
 
-        $this->get('/admin/legals?is_required=1')
+        $this
+            ->get('/admin/legals?is_required=1')
             ->assertOk()
             ->assertSee('required-doc')
             ->assertDontSee('optional-doc');
@@ -179,7 +186,8 @@ class LegalResourceTest extends TestCase
             'key' => 'draft-doc',
         ]);
 
-        $this->get('/admin/legals?published_at=1')
+        $this
+            ->get('/admin/legals?published_at=1')
             ->assertOk()
             ->assertSee('published-doc')
             ->assertDontSee('draft-doc');

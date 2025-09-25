@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components\Product;
 
-use App\Models\Product;
 use App\Models\Review;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,14 +12,11 @@ final class Reviews extends Component
 {
     use WithPagination;
 
-    public Product $product;
-
     public int $productId;
 
     public function mount(int $productId): void
     {
         $this->productId = $productId;
-        $this->product = Product::findOrFail($productId);
     }
 
     public function getReviewsProperty()

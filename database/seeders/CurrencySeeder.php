@@ -5,20 +5,15 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Currency;
-use App\Models\Translations\CurrencyTranslation;
 use Illuminate\Database\Seeder;
 
 final class CurrencySeeder extends Seeder
 {
     public function run(): void
     {
-        // Clear existing currencies and translations
-        // CurrencyTranslation::query()->delete();
-        // Currency::query()->delete();
-
         $currencies = [
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Euro',
                     'lt' => 'Euras',
                 ],
@@ -30,7 +25,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'US Dollar',
                     'lt' => 'JAV doleris',
                 ],
@@ -42,7 +37,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'British Pound Sterling',
                     'lt' => 'Svaras sterlingų',
                 ],
@@ -54,7 +49,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Japanese Yen',
                     'lt' => 'Japonijos jena',
                 ],
@@ -66,7 +61,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 0,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Swiss Franc',
                     'lt' => 'Šveicarijos frankas',
                 ],
@@ -78,7 +73,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Canadian Dollar',
                     'lt' => 'Kanados doleris',
                 ],
@@ -90,7 +85,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Australian Dollar',
                     'lt' => 'Australijos doleris',
                 ],
@@ -102,7 +97,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Chinese Yuan',
                     'lt' => 'Kinijos juanis',
                 ],
@@ -114,7 +109,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Swedish Krona',
                     'lt' => 'Švedijos krona',
                 ],
@@ -126,7 +121,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Norwegian Krone',
                     'lt' => 'Norvegijos krona',
                 ],
@@ -138,7 +133,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Danish Krone',
                     'lt' => 'Danijos krona',
                 ],
@@ -150,7 +145,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Polish Zloty',
                     'lt' => 'Lenkijos zlotas',
                 ],
@@ -162,7 +157,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Czech Koruna',
                     'lt' => 'Čekijos krona',
                 ],
@@ -174,7 +169,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 2,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Hungarian Forint',
                     'lt' => 'Vengrijos forintas',
                 ],
@@ -186,7 +181,7 @@ final class CurrencySeeder extends Seeder
                 'decimal_places' => 0,
             ],
             [
-                'name' => [
+                'translations' => [
                     'en' => 'Russian Ruble',
                     'lt' => 'Rusijos rublis',
                 ],
@@ -202,25 +197,20 @@ final class CurrencySeeder extends Seeder
         $locales = $this->supportedLocales();
 
         foreach ($currencies as $currencyData) {
-            $translations = $currencyData['name'] ?? [];
-            // Set a default name from translations or use code as fallback
-            $defaultName = $translations['en'] ?? $currencyData['code'];
-            unset($currencyData['name']);  // Remove the translations array
-            $currencyData['name'] = $defaultName;  // Set the default name
+            $translations = $currencyData['translations'] ?? [];
+            unset($currencyData['translations']);
+            
+            // Set translatable name field using Spatie's HasTranslations
+            $currencyData['name'] = $translations;
 
-            $currency = Currency::updateOrCreate(
-                ['code' => $currencyData['code']],
-                $currencyData
-            );
-
-            // Create translations for each locale
-            foreach ($locales as $locale) {
-                CurrencyTranslation::updateOrCreate([
-                    'currency_id' => $currency->id,
-                    'locale' => $locale,
-                ], [
-                    'name' => $translations[$locale] ?? $currencyData['code'],
-                ]);
+            // Check if currency already exists to maintain idempotency
+            $existingCurrency = Currency::withoutGlobalScopes()->where('code', $currencyData['code'])->first();
+            
+            if (!$existingCurrency) {
+                /** @var Currency $currency */
+                $currency = Currency::factory()
+                    ->state($currencyData)
+                    ->create();
             }
         }
 

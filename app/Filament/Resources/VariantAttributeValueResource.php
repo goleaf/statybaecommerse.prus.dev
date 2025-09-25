@@ -14,16 +14,17 @@ use App\Models\VariantAttributeValue;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -290,6 +291,7 @@ final class VariantAttributeValueResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('toggle_filterable')
                     ->label(fn (VariantAttributeValue $record): string => $record->is_filterable ? __('admin.variant_attribute_values.make_not_filterable') : __('admin.variant_attribute_values.make_filterable'))
                     ->icon(fn (VariantAttributeValue $record): string => $record->is_filterable ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -380,7 +382,7 @@ final class VariantAttributeValueResource extends Resource
                         ->requiresConfirmation(),
                     BulkAction::make('update_sort_order')
                         ->label(__('admin.variant_attribute_values.update_sort_order'))
-                        ->icon('heroicon-o-arrow-up-down')
+                        ->icon('heroicon-o-arrows-up-down')
                         ->color('info')
                         ->form([
                             TextInput::make('sort_order')

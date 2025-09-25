@@ -161,30 +161,52 @@ final class ComprehensiveOrderSeeder extends Seeder
         $invoiceTemplate = DocumentTemplate::where('type', 'invoice')->first();
         $receiptTemplate = DocumentTemplate::where('type', 'receipt')->first();
 
-        DB::transaction(function () use ($startDate, $endDate, $count, $users, $products, $zones, $invoiceTemplate, $receiptTemplate) {
-            for ($i = 0; $i < $count; $i++) {
-                // Random date within the period
-                $orderDate = Carbon::createFromTimestamp(
-                    fake()->numberBetween($startDate->timestamp, $endDate->timestamp)
-                );
+        for ($i = 0; $i < $count; $i++) {
+            // Random date within the period
+            $orderDate = Carbon::createFromTimestamp(
+                fake()->numberBetween($startDate->timestamp, $endDate->timestamp)
+            );
 
-                // Create order
-                $order = $this->createOrder($orderDate, $users, $zones);
+            // Create order using factory
+            $order = Order::factory()
+                ->for($users->random())
+                ->state([
+                    'created_at' => $orderDate,
+                    'updated_at' => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
+                    'status' => fake()->randomElement($this->orderStatuses),
+                    'payment_method' => fake()->randomElement($this->paymentMethods),
+                    'currency' => 'EUR',
+                    'locale' => 'lt',
+                ])
+                ->create();
 
-                // Create order items
-                $this->createOrderItems($order, $products);
-
-                // Create shipping information
-                $this->createOrderShipping($order);
-
-                // Generate documents
-                $this->generateOrderDocuments($order, $invoiceTemplate, $receiptTemplate);
-
-                if (($i + 1) % 50 === 0) {
-                    $this->command->info('Generated '.($i + 1).' orders...');
-                }
+            // Create order items using factory
+            $itemCount = fake()->numberBetween(1, 5);
+            $selectedProducts = $products->random($itemCount);
+            
+            foreach ($selectedProducts as $product) {
+                OrderItem::factory()
+                    ->for($order)
+                    ->for($product)
+                    ->create();
             }
-        });
+
+            // Create shipping information using factory
+            OrderShipping::factory()
+                ->for($order)
+                ->state([
+                    'carrier' => fake()->randomElement($this->shippingCarriers),
+                    'service' => fake()->randomElement($this->shippingServices),
+                ])
+                ->create();
+
+            // Generate documents using factory
+            $this->generateOrderDocuments($order, $invoiceTemplate, $receiptTemplate);
+
+            if (($i + 1) % 50 === 0) {
+                $this->command->info('Generated '.($i + 1).' orders...');
+            }
+        }
     }
 
     private function createOrder(Carbon $orderDate, $users, $zones): Order
@@ -307,42 +329,46 @@ final class ComprehensiveOrderSeeder extends Seeder
         }
 
         try {
-            // Generate invoice for all orders except cancelled
+            // Generate invoice for all orders except cancelled using factory
             if ($order->status !== 'cancelled') {
                 $invoiceVariables = $this->extractOrderVariables($order, 'invoice');
 
-                Document::create([
-                    'document_template_id' => $invoiceTemplate->id,
-                    'title' => "Sąskaita faktūra #{$order->number}",
-                    'content' => $this->processTemplate($invoiceTemplate->content, $invoiceVariables),
-                    'variables' => $invoiceVariables,
-                    'status' => 'published',
-                    'format' => 'pdf',
-                    'file_path' => "documents/invoices/invoice-{$order->number}.pdf",
-                    'documentable_type' => Order::class,
-                    'documentable_id' => $order->id,
-                    'created_by' => 1,  // Admin user
-                    'generated_at' => $order->created_at->addMinutes(fake()->numberBetween(5, 60)),
-                ]);
+                Document::factory()
+                    ->for($invoiceTemplate, 'documentTemplate')
+                    ->state([
+                        'title' => "Sąskaita faktūra #{$order->number}",
+                        'content' => $this->processTemplate($invoiceTemplate->content, $invoiceVariables),
+                        'variables' => $invoiceVariables,
+                        'status' => 'published',
+                        'format' => 'pdf',
+                        'file_path' => "documents/invoices/invoice-{$order->number}.pdf",
+                        'documentable_type' => Order::class,
+                        'documentable_id' => $order->id,
+                        'created_by' => 1,
+                        'generated_at' => $order->created_at->addMinutes(fake()->numberBetween(5, 60)),
+                    ])
+                    ->create();
             }
 
-            // Generate receipt for paid orders
+            // Generate receipt for paid orders using factory
             if (in_array($order->payment_status, ['paid'])) {
                 $receiptVariables = $this->extractOrderVariables($order, 'receipt');
 
-                Document::create([
-                    'document_template_id' => $receiptTemplate->id,
-                    'title' => "Kvitas #{$order->number}",
-                    'content' => $this->processTemplate($receiptTemplate->content, $receiptVariables),
-                    'variables' => $receiptVariables,
-                    'status' => 'published',
-                    'format' => 'pdf',
-                    'file_path' => "documents/receipts/receipt-{$order->number}.pdf",
-                    'documentable_type' => Order::class,
-                    'documentable_id' => $order->id,
-                    'created_by' => 1,  // Admin user
-                    'generated_at' => $order->created_at->addMinutes(fake()->numberBetween(10, 120)),
-                ]);
+                Document::factory()
+                    ->for($receiptTemplate, 'documentTemplate')
+                    ->state([
+                        'title' => "Kvitas #{$order->number}",
+                        'content' => $this->processTemplate($receiptTemplate->content, $receiptVariables),
+                        'variables' => $receiptVariables,
+                        'status' => 'published',
+                        'format' => 'pdf',
+                        'file_path' => "documents/receipts/receipt-{$order->number}.pdf",
+                        'documentable_type' => Order::class,
+                        'documentable_id' => $order->id,
+                        'created_by' => 1,
+                        'generated_at' => $order->created_at->addMinutes(fake()->numberBetween(10, 120)),
+                    ])
+                    ->create();
             }
         } catch (\Exception $e) {
             Log::warning("Failed to generate documents for order {$order->number}: ".$e->getMessage());

@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Models\Coupon;
 use Illuminate\Database\Seeder;
 
-class CouponSeeder extends Seeder
+final class CouponSeeder extends Seeder
 {
     public function run(): void
     {
@@ -95,10 +95,14 @@ class CouponSeeder extends Seeder
         ];
 
         foreach ($data as $row) {
-            Coupon::updateOrCreate(
-                ['code' => $row['code']],
-                $row
-            );
+            // Check if coupon already exists to maintain idempotency
+            $existingCoupon = Coupon::where('code', $row['code'])->first();
+            
+            if (!$existingCoupon) {
+                Coupon::factory()
+                    ->state($row)
+                    ->create();
+            }
         }
     }
 }

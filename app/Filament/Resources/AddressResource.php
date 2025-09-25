@@ -21,6 +21,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -84,10 +86,10 @@ final class AddressResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            \Filament\Forms\Components\Section::make(__('translations.address_information'))
+        return $schema->schema([
+            SchemaSection::make(__('translations.address_information'))
                 ->schema([
-                    \Filament\Forms\Components\Grid::make(2)->schema([
+                    SchemaGrid::make(2)->schema([
                         Select::make('user_id')
                             ->label(__('translations.user'))
                             ->relationship('user', 'name')
@@ -100,7 +102,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->default(AddressType::SHIPPING),
                     ]),
-                    \Filament\Forms\Components\Grid::make(2)->schema([
+                    SchemaGrid::make(2)->schema([
                         TextInput::make('first_name')
                             ->label(__('translations.first_name'))
                             ->maxLength(255),
@@ -108,7 +110,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.last_name'))
                             ->maxLength(255),
                     ]),
-                    \Filament\Forms\Components\Grid::make(2)->schema([
+                    SchemaGrid::make(2)->schema([
                         TextInput::make('company_name')
                             ->label(__('translations.company'))
                             ->maxLength(255),
@@ -117,7 +119,7 @@ final class AddressResource extends Resource
                             ->maxLength(50),
                     ]),
                 ]),
-            \Filament\Forms\Components\Section::make(__('translations.address_details'))
+            SchemaSection::make(__('translations.address_details'))
                 ->schema([
                     TextInput::make('address_line_1')
                         ->label(__('translations.address_line_1'))
@@ -126,7 +128,7 @@ final class AddressResource extends Resource
                     TextInput::make('address_line_2')
                         ->label(__('translations.address_line_2'))
                         ->maxLength(255),
-                    \Filament\Forms\Components\Grid::make(3)->schema([
+                    SchemaGrid::make(3)->schema([
                         TextInput::make('apartment')
                             ->label(__('translations.apartment'))
                             ->maxLength(100),
@@ -137,7 +139,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.building'))
                             ->maxLength(100),
                     ]),
-                    \Filament\Forms\Components\Grid::make(3)->schema([
+                    SchemaGrid::make(3)->schema([
                         TextInput::make('city')
                             ->label(__('translations.city'))
                             ->required()
@@ -150,23 +152,24 @@ final class AddressResource extends Resource
                             ->required()
                             ->maxLength(20),
                     ]),
-                    \Filament\Forms\Components\Grid::make(2)->schema([
+                    SchemaGrid::make(2)->schema([
                         Select::make('country_code')
                             ->label(__('translations.country'))
                             ->options(Country::all()->pluck('name', 'cca2'))
                             ->searchable()
                             ->default('LT')
-                            ->required(),
+                            ->required(fn (string $context): bool => $context === 'create'),
                         Select::make('city_id')
                             ->label(__('translations.city_id'))
                             ->relationship('cityById', 'name')
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->dehydrated(false),
                     ]),
                 ]),
-            \Filament\Forms\Components\Section::make(__('translations.contact_information'))
+            SchemaSection::make(__('translations.contact_information'))
                 ->schema([
-                    \Filament\Forms\Components\Grid::make(2)->schema([
+                    SchemaGrid::make(2)->schema([
                         TextInput::make('phone')
                             ->label(__('translations.phone'))
                             ->tel()
@@ -180,7 +183,7 @@ final class AddressResource extends Resource
                         ->label(__('translations.landmark'))
                         ->maxLength(255),
                 ]),
-            \Filament\Forms\Components\Section::make(__('translations.additional_information'))
+            SchemaSection::make(__('translations.additional_information'))
                 ->schema([
                     Textarea::make('notes')
                         ->label(__('translations.notes'))
@@ -193,9 +196,9 @@ final class AddressResource extends Resource
                         ->rows(3)
                         ->columnSpanFull(),
                 ]),
-            \Filament\Forms\Components\Section::make(__('translations.settings'))
+            SchemaSection::make(__('translations.settings'))
                 ->schema([
-                    \Filament\Forms\Components\Grid::make(2)->schema([
+                    SchemaGrid::make(2)->schema([
                         Toggle::make('is_default')
                             ->label(__('translations.is_default'))
                             ->helperText(__('translations.is_default_help')),
@@ -204,7 +207,7 @@ final class AddressResource extends Resource
                             ->default(true)
                             ->helperText(__('translations.is_active_help')),
                     ]),
-                    \Filament\Forms\Components\Grid::make(2)->schema([
+                    SchemaGrid::make(2)->schema([
                         Toggle::make('is_billing')
                             ->label(__('translations.is_billing'))
                             ->helperText(__('translations.is_billing_help')),

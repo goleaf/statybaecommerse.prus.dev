@@ -1,35 +1,34 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
-use App\Models\Partner;
-use App\Models\ProductVariant;
 use App\Models\VariantInventory;
+use BackedEnum;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
+use Illuminate\Support\Collection;
 use UnitEnum;
 
 final class VariantStockResource extends Resource
@@ -43,39 +42,40 @@ final class VariantStockResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Section::make('Stock Details')
+            SchemaSection::make('Stock Details')
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('variant_id')
                                 ->label('Variant')
-                                ->relationship('variant', 'name', modifyQueryUsing: fn(Builder $q) => $q->with('product'))
+                                ->relationship('variant', 'name')
                                 ->required()
                                 ->searchable()
                                 ->preload(),
                             Select::make('location_id')
                                 ->label('Location')
-                                ->relationship('location', 'name')
+                                ->options(fn () => Location::query()->pluck('code', 'id'))
                                 ->required()
+                                ->native(false)
                                 ->searchable()
                                 ->preload(),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('stock')->numeric()->required(),
                             TextInput::make('reserved')->numeric()->default(0),
                             TextInput::make('incoming')->numeric()->default(0),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('threshold')->numeric()->default(0),
                             TextInput::make('reorder_point')->numeric()->default(0),
                             TextInput::make('max_stock_level')->numeric()->default(0),
                         ]),
                 ]),
-            Section::make('Procurement')
+            SchemaSection::make('Procurement')
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('cost_per_unit')->numeric()->step(0.01),
                             Select::make('supplier_id')
@@ -85,7 +85,7 @@ final class VariantStockResource extends Resource
                                 ->preload(),
                             TextInput::make('batch_number'),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             DatePicker::make('expiry_date'),
                             Select::make('status')
@@ -97,13 +97,18 @@ final class VariantStockResource extends Resource
                                 ])
                                 ->default('active'),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_tracked')->default(true),
                         ]),
                     Textarea::make('notes')->columnSpanFull(),
                 ]),
         ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 
     public static function table(Table $table): Table
@@ -117,7 +122,7 @@ final class VariantStockResource extends Resource
                 TextColumn::make('reserved')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('available_stock')
                     ->label('Available')
-                    ->getStateUsing(fn(VariantInventory $record): int => max(0, (int) $record->stock - (int) $record->reserved))
+                    ->getStateUsing(fn (VariantInventory $record): int => max(0, (int) $record->stock - (int) $record->reserved))
                     ->sortable(),
                 BadgeColumn::make('status')->colors([
                     'success' => 'active',
@@ -125,22 +130,27 @@ final class VariantStockResource extends Resource
                     'danger' => 'discontinued',
                 ]),
             ])
+            ->deferLoading(false)
+            ->deferFilters(false)
             ->filters([
                 SelectFilter::make('location_id')->relationship('location', 'name')->label('Location')->searchable(),
                 Filter::make('low_stock')
                     ->label('Low stock')
-                    ->query(fn(Builder $query): Builder => $query->whereColumn('stock', '<=', 'threshold')),
+                    ->query(fn (Builder $query): Builder => $query->whereColumn('stock', '<=', 'threshold')),
             ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
-                \Filament\Tables\Actions\Action::make('reserve_stock')
+                \Filament\Actions\Action::make('reserve_stock')
                     ->label('Reserve stock')
                     ->form([
                         TextInput::make('quantity')->numeric()->required()->minValue(1),
                     ])
-                    ->action(function (VariantInventory $record, array $data): void {
+                    ->action(function (array $data, ?VariantInventory $record): void {
+                        if (! $record) {
+                            return;
+                        }
                         $quantity = (int) ($data['quantity'] ?? 0);
                         if ($quantity <= 0) {
                             return;
@@ -152,12 +162,15 @@ final class VariantStockResource extends Resource
                         $record->available = max(0, $record->stock - $record->reserved);
                         $record->save();
                     }),
-                \Filament\Tables\Actions\Action::make('unreserve_stock')
+                \Filament\Actions\Action::make('unreserve_stock')
                     ->label('Unreserve stock')
                     ->form([
                         TextInput::make('quantity')->numeric()->required()->minValue(1),
                     ])
-                    ->action(function (VariantInventory $record, array $data): void {
+                    ->action(function (array $data, ?VariantInventory $record): void {
+                        if (! $record) {
+                            return;
+                        }
                         $quantity = (int) ($data['quantity'] ?? 0);
                         if ($quantity <= 0) {
                             return;
@@ -178,7 +191,7 @@ final class VariantStockResource extends Resource
                                 'adjustment' => 'adjustment',
                             ])->required(),
                         ])
-                        ->action(function (array $records, array $data): void {
+                        ->action(function (Collection $records, array $data): void {
                             $qty = (int) ($data['quantity'] ?? 0);
                             if ($qty <= 0) {
                                 return;
@@ -190,7 +203,7 @@ final class VariantStockResource extends Resource
                                 $record->save();
                             }
                         }),
-                    DeleteBulkAction::make(),
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -212,6 +225,7 @@ final class VariantStockResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         $count = VariantInventory::query()
+            ->withoutGlobalScopes()
             ->whereColumn('stock', '<=', 'threshold')
             ->count();
 
@@ -220,11 +234,11 @@ final class VariantStockResource extends Resource
 
     public static function getNavigationBadgeColor(): ?string
     {
-        $hasOut = VariantInventory::query()->where('stock', '=', 0)->exists();
+        $hasOut = VariantInventory::query()->withoutGlobalScopes()->where('stock', '=', 0)->exists();
         if ($hasOut) {
             return 'danger';
         }
-        $hasLow = VariantInventory::query()->whereColumn('stock', '<=', 'threshold')->exists();
+        $hasLow = VariantInventory::query()->withoutGlobalScopes()->whereColumn('stock', '<=', 'threshold')->exists();
         if ($hasLow) {
             return 'warning';
         }

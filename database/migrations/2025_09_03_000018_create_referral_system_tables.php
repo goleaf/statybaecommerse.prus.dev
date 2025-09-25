@@ -69,18 +69,18 @@ return new class extends Migration
             $table->foreignId('referrer_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('referred_id')->constrained('users')->cascadeOnDelete();
             $table->string('referral_code', 20)->unique();
-            $table->string('status')->default('pending'); // pending, completed, expired
+            $table->string('status')->default('pending');  // pending, completed, expired
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->json('metadata')->nullable();
 
             // Additional tracking fields
-            $table->string('source')->nullable(); // website, email, social, etc.
-            $table->string('campaign')->nullable(); // campaign name
-            $table->string('utm_source')->nullable(); // UTM tracking
+            $table->string('source')->nullable();  // website, email, social, etc.
+            $table->string('campaign')->nullable();  // campaign name
+            $table->string('utm_source')->nullable();  // UTM tracking
             $table->string('utm_medium')->nullable();
             $table->string('utm_campaign')->nullable();
-            $table->string('ip_address', 45)->nullable(); // IPv6 support
+            $table->string('ip_address', 45)->nullable();  // IPv6 support
             $table->text('user_agent')->nullable();
 
             $table->timestamps();
@@ -99,13 +99,13 @@ return new class extends Migration
         // Create referral_rewards table
         Schema::create('referral_rewards', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('referral_id')->constrained('referrals')->cascadeOnDelete();
+            $table->foreignId('referral_id')->nullable()->constrained('referrals')->nullOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('order_id')->nullable()->constrained('orders');
-            $table->string('type'); // referrer_bonus, referred_discount
+            $table->string('type');  // referrer_bonus, referred_discount
             $table->decimal('amount', 12, 2);
             $table->string('currency_code', 3)->default('EUR');
-            $table->string('status')->default('pending'); // pending, applied, expired
+            $table->string('status')->default('pending');  // pending, applied, expired
             $table->timestamp('applied_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->json('metadata')->nullable();

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -25,9 +26,11 @@ use Illuminate\Database\Eloquent\Model;
 #[ScopedBy([ActiveScope::class])]
 final class NotificationTemplate extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['name', 'slug', 'type', 'event', 'subject', 'content', 'variables', 'is_active'];
 
-    protected $casts = ['subject' => 'json', 'content' => 'json', 'variables' => 'json', 'is_active' => 'boolean'];
+    protected $casts = ['is_active' => 'boolean'];
 
     /**
      * Handle getLocalizedSubject functionality with proper error handling.

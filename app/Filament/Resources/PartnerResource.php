@@ -1,14 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use UnitEnum;
 
 final class PartnerResource extends Resource
@@ -25,7 +31,7 @@ final class PartnerResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('admin.partners.sections.basic_information'))
+                \Filament\Schemas\Components\Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.partners.name'))
@@ -45,7 +51,7 @@ final class PartnerResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.partners.sections.contact_information'))
+                \Filament\Schemas\Components\Section::make(__('admin.partners.sections.contact_information'))
                     ->schema([
                         Forms\Components\TextInput::make('contact_email')
                             ->label(__('admin.partners.contact_email'))
@@ -57,7 +63,7 @@ final class PartnerResource extends Resource
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.partners.sections.financial_settings'))
+                \Filament\Schemas\Components\Section::make(__('admin.partners.sections.financial_settings'))
                     ->schema([
                         Forms\Components\TextInput::make('discount_rate')
                             ->label(__('admin.partners.discount_rate'))
@@ -73,7 +79,7 @@ final class PartnerResource extends Resource
                             ->step(0.0001),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.partners.sections.media'))
+                \Filament\Schemas\Components\Section::make(__('admin.partners.sections.media'))
                     ->schema([
                         Forms\Components\FileUpload::make('logo')
                             ->label(__('admin.partners.logo'))
@@ -131,12 +137,12 @@ final class PartnerResource extends Resource
                     ->label(__('admin.partners.is_enabled')),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

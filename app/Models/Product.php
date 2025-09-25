@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
@@ -13,19 +11,19 @@ use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Product
@@ -78,7 +76,7 @@ final class Product extends Model implements HasMedia
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'sku', 'price', 'sale_price', 'stock_quantity', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Product {$eventName}")->useLogName('product');
+        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'sku', 'price', 'sale_price', 'stock_quantity', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "Product {$eventName}")->useLogName('product');
     }
 
     /**
@@ -111,7 +109,7 @@ final class Product extends Model implements HasMedia
      */
     public function isInStock(): bool
     {
-        if (! $this->manage_stock) {
+        if (!$this->manage_stock) {
             return true;
             // Always in stock if not tracking
         }
@@ -124,7 +122,7 @@ final class Product extends Model implements HasMedia
      */
     public function isLowStock(): bool
     {
-        if (! $this->manage_stock) {
+        if (!$this->manage_stock) {
             return false;
             // Never low stock if not tracking
         }
@@ -137,7 +135,7 @@ final class Product extends Model implements HasMedia
      */
     public function getStockStatus(): string
     {
-        if (! $this->manage_stock) {
+        if (!$this->manage_stock) {
             return 'not_tracked';
         }
         if ($this->isOutOfStock()) {
@@ -195,7 +193,7 @@ final class Product extends Model implements HasMedia
      */
     public function getDiscountPercentageAttribute(): float
     {
-        if (! $this->compare_price || $this->compare_price <= $this->price) {
+        if (!$this->compare_price || $this->compare_price <= $this->price) {
             return 0.0;
         }
 
@@ -207,7 +205,7 @@ final class Product extends Model implements HasMedia
      */
     public function getProfitMarginAttribute(): float
     {
-        if (! $this->cost_price || $this->cost_price <= 0) {
+        if (!$this->cost_price || $this->cost_price <= 0) {
             return 0.0;
         }
 
@@ -219,7 +217,7 @@ final class Product extends Model implements HasMedia
      */
     public function getMarkupPercentageAttribute(): float
     {
-        if (! $this->cost_price || $this->cost_price <= 0) {
+        if (!$this->cost_price || $this->cost_price <= 0) {
             return 0.0;
         }
 
@@ -279,7 +277,7 @@ final class Product extends Model implements HasMedia
      */
     public function decreaseStock(int $quantity): bool
     {
-        if (! $this->manage_stock) {
+        if (!$this->manage_stock) {
             return true;
             // Always allow if not tracking
         }
@@ -307,7 +305,7 @@ final class Product extends Model implements HasMedia
      */
     public function availableQuantity(): int
     {
-        if (! $this->manage_stock) {
+        if (!$this->manage_stock) {
             return 999;
             // Unlimited when not managing stock
         }
@@ -546,7 +544,8 @@ final class Product extends Model implements HasMedia
      */
     public function attributes(): BelongsToMany
     {
-        return $this->belongsToMany(Attribute::class, 'product_attributes', 'product_id', 'attribute_id')
+        return $this
+            ->belongsToMany(Attribute::class, 'product_attributes', 'product_id', 'attribute_id')
             ->withPivot('attribute_value_id')
             ->withTimestamps();
     }
@@ -896,7 +895,7 @@ final class Product extends Model implements HasMedia
      */
     public function isBelowMinimumQuantity(): bool
     {
-        if (! $this->manage_stock) {
+        if (!$this->manage_stock) {
             return false;
         }
 
@@ -967,7 +966,7 @@ final class Product extends Model implements HasMedia
     public function getAllImageSizes(): array
     {
         $img = $this->images()->orderBy('sort_order')->first();
-        if (! $img) {
+        if (!$img) {
             return [];
         }
         $url = $this->resolvePublicUrl($img->path);
@@ -984,7 +983,7 @@ final class Product extends Model implements HasMedia
         if (empty($images)) {
             return ['src' => null, 'srcset' => '', 'sizes' => '', 'alt' => $this->name];
         }
-        $srcset = [$images['xs'] ?? null ? $images['xs'].' 150w' : null, $images['sm'] ?? null ? $images['sm'].' 300w' : null, $images['md'] ?? null ? $images['md'].' 500w' : null, $images['lg'] ?? null ? $images['lg'].' 800w' : null, $images['xl'] ?? null ? $images['xl'].' 1200w' : null];
+        $srcset = [$images['xs'] ?? null ? $images['xs'] . ' 150w' : null, $images['sm'] ?? null ? $images['sm'] . ' 300w' : null, $images['md'] ?? null ? $images['md'] . ' 500w' : null, $images['lg'] ?? null ? $images['lg'] . ' 800w' : null, $images['xl'] ?? null ? $images['xl'] . ' 1200w' : null];
 
         return ['src' => $images[$defaultSize] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];
     }
@@ -1007,6 +1006,7 @@ final class Product extends Model implements HasMedia
 
     // Media library removed for product images in favor of product_images table
     // Media conversions removed
+
     /**
      * Handle resolvePublicUrl functionality with proper error handling.
      */
@@ -1024,6 +1024,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Translation methods
+
     /**
      * Handle getTranslatedName functionality with proper error handling.
      */
@@ -1081,6 +1082,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Scope for translated products
+
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
@@ -1096,6 +1098,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Get all available locales for this product
+
     /**
      * Handle getAvailableLocales functionality with proper error handling.
      */
@@ -1105,6 +1108,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Check if product has translation for specific locale
+
     /**
      * Handle hasTranslationFor functionality with proper error handling.
      */
@@ -1114,6 +1118,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Get or create translation for locale
+
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
      *
@@ -1125,6 +1130,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Update translation for specific locale
+
     /**
      * Handle updateTranslation functionality with proper error handling.
      */
@@ -1136,6 +1142,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Delete translation for specific locale
+
     /**
      * Handle deleteTranslation functionality with proper error handling.
      */
@@ -1145,6 +1152,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Related products methods
+
     /**
      * Handle getRelatedProducts functionality with proper error handling.
      *
@@ -1154,12 +1162,12 @@ final class Product extends Model implements HasMedia
     {
         $categoryIds = $this->categories->pluck('id')->toArray();
         $brandId = $this->brand_id;
-        if (empty($categoryIds) && ! $brandId) {
+        if (empty($categoryIds) && !$brandId) {
             return collect();
         }
         $query = Product::published()->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations']);
         // First try to get products from same categories
-        if (! empty($categoryIds)) {
+        if (!empty($categoryIds)) {
             $query->whereHas('categories', function ($q) use ($categoryIds) {
                 $q->whereIn('category_id', $categoryIds);
             });
@@ -1209,7 +1217,7 @@ final class Product extends Model implements HasMedia
      */
     public function getRelatedProductsByBrand(int $limit = 4): \Illuminate\Database\Eloquent\Collection
     {
-        if (! $this->brand_id) {
+        if (!$this->brand_id) {
             return collect();
         }
 
@@ -1224,7 +1232,7 @@ final class Product extends Model implements HasMedia
     public function getRelatedProductsByPriceRange(float $priceRange = 0.2, int $limit = 4): \Illuminate\Database\Eloquent\Collection
     {
         $currentPrice = $this->getPrice()?->value?->amount ?? $this->price;
-        if (! $currentPrice) {
+        if (!$currentPrice) {
             return collect();
         }
         $minPrice = $currentPrice * (1 - $priceRange);
@@ -1236,6 +1244,7 @@ final class Product extends Model implements HasMedia
     }
 
     // Advanced Helper Methods
+
     /**
      * Handle getProductInfo functionality with proper error handling.
      */
@@ -1293,12 +1302,13 @@ final class Product extends Model implements HasMedia
     }
 
     // Additional helper methods
+
     /**
      * Handle getDiscountPercentage functionality with proper error handling.
      */
     public function getDiscountPercentage(): ?float
     {
-        if (! $this->sale_price || ! $this->price) {
+        if (!$this->sale_price || !$this->price) {
             return null;
         }
 
@@ -1310,7 +1320,7 @@ final class Product extends Model implements HasMedia
      */
     public function getProfitMargin(): ?float
     {
-        if (! $this->cost_price || ! $this->price) {
+        if (!$this->cost_price || !$this->price) {
             return null;
         }
 
@@ -1322,7 +1332,7 @@ final class Product extends Model implements HasMedia
      */
     public function getMarkupPercentage(): ?float
     {
-        if (! $this->cost_price || ! $this->price) {
+        if (!$this->cost_price || !$this->price) {
             return null;
         }
 
@@ -1334,7 +1344,7 @@ final class Product extends Model implements HasMedia
      */
     public function getDimensions(): ?string
     {
-        if (! $this->length || ! $this->width || ! $this->height) {
+        if (!$this->length || !$this->width || !$this->height) {
             return null;
         }
 
@@ -1346,7 +1356,7 @@ final class Product extends Model implements HasMedia
      */
     public function getVolume(): ?float
     {
-        if (! $this->length || ! $this->width || ! $this->height) {
+        if (!$this->length || !$this->width || !$this->height) {
             return null;
         }
 
@@ -1386,7 +1396,7 @@ final class Product extends Model implements HasMedia
         $name = $this->getTranslatedName($locale);
         $sku = $this->sku ? " ({$this->sku})" : '';
 
-        return $name.$sku;
+        return $name . $sku;
     }
 
     /**
@@ -1395,7 +1405,7 @@ final class Product extends Model implements HasMedia
     public function getFormattedPrice(): string
     {
         $price = $this->getPrice();
-        if (! $price || ! $price->value) {
+        if (!$price || !$price->value) {
             return app_money_format($this->price ?? 0);
         }
 
@@ -1408,7 +1418,7 @@ final class Product extends Model implements HasMedia
     public function getFormattedComparePrice(): string
     {
         $price = $this->getPrice();
-        if (! $price || ! $price->compare) {
+        if (!$price || !$price->compare) {
             return app_money_format($this->compare_price ?? 0);
         }
 

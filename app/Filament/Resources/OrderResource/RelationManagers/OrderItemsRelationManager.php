@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
@@ -9,13 +11,13 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
-use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
@@ -23,8 +25,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -124,16 +124,15 @@ final class OrderItemsRelationManager extends RelationManager
                                     ->prefixIcon('heroicon-o-tag'),
                                 Placeholder::make('total')
                                     ->label(__('orders.total'))
-                                    ->content(function (Forms\Get $get): string {
+                                    ->content(function ($get): string {
                                         $unitPrice = (float) $get('unit_price') ?? 0;
                                         $quantity = (int) $get('quantity') ?? 1;
                                         $discount = (float) $get('discount_amount') ?? 0;
 
                                         $total = ($unitPrice * $quantity) - $discount;
 
-                                        return '€' . number_format($total, 2);
-                                    })
-                                    ->prefixIcon('heroicon-o-banknotes'),
+                                        return '€'.number_format($total, 2);
+                                    }),
                             ]),
                         Hidden::make('product_id')
                             ->required(),
@@ -142,7 +141,7 @@ final class OrderItemsRelationManager extends RelationManager
                         Hidden::make('sku')
                             ->required(),
                         Hidden::make('total')
-                            ->default(function (Forms\Get $get): float {
+                            ->default(function ($get): float {
                                 $unitPrice = (float) $get('unit_price') ?? 0;
                                 $quantity = (int) $get('quantity') ?? 1;
                                 $discount = (float) $get('discount_amount') ?? 0;
@@ -211,7 +210,7 @@ final class OrderItemsRelationManager extends RelationManager
                         'success' => 'completed',
                         'danger' => 'cancelled',
                     ])
-                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.item_statuses.{$state}") : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.item_statuses.{$state}") : '-'),
                 TextColumn::make('created_at')
                     ->label(__('orders.fields.created_at'))
                     ->dateTime()
@@ -231,8 +230,8 @@ final class OrderItemsRelationManager extends RelationManager
                 TernaryFilter::make('has_discount')
                     ->label(__('orders.filters.has_discount'))
                     ->queries(
-                        true: fn(Builder $query) => $query->where('discount_amount', '>', 0),
-                        false: fn(Builder $query) => $query->where('discount_amount', '=', 0),
+                        true: fn (Builder $query) => $query->where('discount_amount', '>', 0),
+                        false: fn (Builder $query) => $query->where('discount_amount', '=', 0),
                     ),
             ])
             ->headerActions([
@@ -242,9 +241,9 @@ final class OrderItemsRelationManager extends RelationManager
                     ->color('primary'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                \Filament\Actions\EditAction::make()
                     ->color('warning'),
-                Tables\Actions\DeleteAction::make()
+                \Filament\Actions\DeleteAction::make()
                     ->color('danger'),
                 Action::make('duplicate_item')
                     ->label(__('orders.duplicate_item'))
@@ -301,5 +300,10 @@ final class OrderItemsRelationManager extends RelationManager
             ])
             ->defaultSort('created_at', 'desc')
             ->striped();
+    }
+
+    public function isReadOnly(): bool
+    {
+        return false;
     }
 }

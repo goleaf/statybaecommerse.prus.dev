@@ -7,6 +7,7 @@ namespace App\Livewire\Pages;
 use App\Livewire\Concerns\WithCart;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Review;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -32,11 +33,8 @@ final class SingleProduct extends Component
      */
     public function mount(Product $product): void
     {
-        // Ensure product is visible and load relationships
-        if (! $product->is_visible) {
-            abort(404);
-        }
-        // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
+        abort_if(! $product->is_visible, 404);
+
         $product->loadMissing([
             'brand.translations',
             'categories.translations',
@@ -50,10 +48,10 @@ final class SingleProduct extends Component
             'documents',
             'attributes.values',
         ]);
+
         $this->product = $product;
-        // Track product view for recommendations
+
         $this->trackProductView();
-        // Track product view in history
         $this->trackProductViewHistory();
     }
 
@@ -72,7 +70,19 @@ final class SingleProduct extends Component
         session(['recently_viewed' => $viewedProducts]);
         // Track analytics event if analytics is enabled
         if (class_exists(\App\Models\AnalyticsEvent::class)) {
-            \App\Models\AnalyticsEvent::create(['event_type' => 'product_view', 'event_data' => ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'product_category' => $this->product->categories->pluck('name')->join(', '), 'user_id' => auth()->id(), 'session_id' => session()->getId(), 'referrer' => request()->header('referer')], 'user_id' => auth()->id(), 'session_id' => session()->getId()]);
+            \App\Models\AnalyticsEvent::create([
+                'event_type' => 'product_view',
+                'event_data' => [
+                    'product_id' => $this->product->id,
+                    'product_name' => $this->product->name,
+                    'product_category' => $this->product->categories->pluck('name')->join(', '),
+                    'user_id' => auth()->id(),
+                    'session_id' => session()->getId(),
+                    'referrer' => request()->header('referer'),
+                ],
+                'user_id' => auth()->id(),
+                'session_id' => session()->getId(),
+            ]);
         }
     }
 
@@ -164,7 +174,9 @@ final class SingleProduct extends Component
             $this->product->loadMissing(['attributes.values']);
         }
 
-        return $this->product->attributes
+        return $this
+            ->product
+            ->attributes
             ->map(function ($attribute): array {
                 $valueId = $attribute->pivot->attribute_value_id ?? null;
                 $value = null;
@@ -192,7 +204,9 @@ final class SingleProduct extends Component
             $this->product->loadMissing(['variants.media', 'variants.values.attribute', 'variants.prices.currency']);
         }
 
-        return $this->product->variants
+        return $this
+            ->product
+            ->variants
             ->map(function (ProductVariant $variant): array {
                 $price = $variant->getPrice();
                 $currentCurrency = function_exists('current_currency') ? current_currency() : null;
@@ -210,7 +224,8 @@ final class SingleProduct extends Component
                     ?: ($variant->getFirstMediaUrl(config('media.storage.collection_name'), 'small')
                         ?: $variant->getFirstMediaUrl(config('media.storage.collection_name')));
 
-                $attributes = $variant->values
+                $attributes = $variant
+                    ->values
                     ->map(function ($value): array {
                         return [
                             'attribute' => $value->attribute->trans('name') ?? $value->attribute->name,
@@ -235,10 +250,29 @@ final class SingleProduct extends Component
     }
 
     #[Computed]
+    public function recentHistories(): \Illuminate\Support\Collection
+    {
+        return $this->product->recentHistories()->limit(4)->get();
+    }
+
+    #[Computed]
+    public function recentApprovedReviewsLimited(): \Illuminate\Support\Collection
+    {
+        return Review::query()
+            ->where('product_id', $this->product->id)
+            ->when(method_exists(Review::query()->getModel(), 'scopeApproved'), fn ($q) => $q->approved())
+            ->latest('id')
+            ->limit(5)
+            ->get(['title', 'content', 'rating', 'created_at']);
+    }
+
+    #[Computed]
     public function productQuickFacts(): array
     {
         $brandName = $this->product->brand?->trans('name') ?? $this->product->brand?->name;
-        $categoryNames = $this->product->categories
+        $categoryNames = $this
+            ->product
+            ->categories
             ->map(fn ($category) => $category->trans('name') ?? $category->name)
             ->filter()
             ->implode(', ');
@@ -261,6 +295,10 @@ final class SingleProduct extends Component
      */
     public function render()
     {
+        if (! $this->product->is_visible) {
+            abort(404);
+        }
+
         return view('livewire.pages.single-product', ['relatedProducts' => $this->relatedProducts])->layout('components.layouts.base', ['title' => $this->product->name]);
     }
 
