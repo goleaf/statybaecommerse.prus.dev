@@ -40,7 +40,10 @@ final class NotificationTemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    /**
+     * @var UnitEnum|string|null
+     */
+    protected static $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {

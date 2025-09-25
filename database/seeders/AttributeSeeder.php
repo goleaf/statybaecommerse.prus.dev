@@ -90,8 +90,8 @@ final class AttributeSeeder extends Seeder
         $attributes->each(function (array $definition): void {
             $existing = Attribute::query()->firstWhere('slug', $definition['slug']);
 
-            $attribute = $existing
-                ? tap($existing)->update([
+            if ($existing) {
+                $existing->fill([
                     'name' => $definition['translations']['lt'],
                     'type' => $definition['type'],
                     'is_required' => false,
@@ -99,8 +99,10 @@ final class AttributeSeeder extends Seeder
                     'is_searchable' => true,
                     'is_enabled' => true,
                     'sort_order' => $definition['sort_order'],
-                ])
-                : Attribute::factory()->create([
+                ])->save();
+                $attribute = $existing->refresh();
+            } else {
+                $attribute = Attribute::factory()->create([
                     'slug' => $definition['slug'],
                     'name' => $definition['translations']['lt'],
                     'type' => $definition['type'],
@@ -110,6 +112,7 @@ final class AttributeSeeder extends Seeder
                     'is_enabled' => true,
                     'sort_order' => $definition['sort_order'],
                 ]);
+            }
 
             foreach ($definition['translations'] as $locale => $name) {
                 $translation = AttributeTranslation::query()->firstOrNew([

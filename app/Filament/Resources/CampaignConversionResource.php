@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignConversion;
@@ -23,6 +24,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use UnitEnum;
 
 /**
  * CampaignConversionResource
@@ -33,7 +35,11 @@ final class CampaignConversionResource extends Resource
 {
     protected static ?string $model = CampaignConversion::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-bolt';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-rocket-launch';
+
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Campaigns;
 
     public static function getNavigationLabel(): string
     {

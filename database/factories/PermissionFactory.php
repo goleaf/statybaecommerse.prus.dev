@@ -25,5 +25,3 @@ final class PermissionFactory extends Factory
         ];
     }
 }
-
-

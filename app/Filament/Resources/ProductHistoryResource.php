@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
@@ -21,27 +22,16 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
-use UnitEnum;
 
 final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-clock';
-    }
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-clock';
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    public static function getNavigationGroup(): \UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 11;
 
