@@ -7,7 +7,6 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\User;
-use Filament\Facades\Filament;
 use Filament\Schemas\Schema;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,10 +19,7 @@ final class ProductResourceFrontendTest extends TestCase
     {
         parent::setUp();
 
-        $panel = Filament::getPanel('admin');
-        $this->assertNotNull($panel, 'The admin panel must be registered for Filament tests.');
-
-        Filament::setCurrentPanel($panel);
+        $this->resolveAdminPanel();
 
         $this->actingAs(User::factory()->admin()->create());
     }

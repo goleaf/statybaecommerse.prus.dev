@@ -10,7 +10,6 @@ use App\Filament\Resources\ProductHistoryResource\Pages\ListProductHistories;
 use App\Models\Product;
 use App\Models\ProductHistory;
 use App\Models\User;
-use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
@@ -28,10 +27,7 @@ final class ProductHistoryResourceTest extends TestCase
     {
         parent::setUp();
 
-        $panel = Filament::getPanel('admin');
-        $this->assertNotNull($panel, 'The admin panel must be registered for Filament tests.');
-
-        Filament::setCurrentPanel($panel);
+        $this->resolveAdminPanel();
 
         config(['app.locale' => 'en', 'app.fallback_locale' => 'en']);
         app()->setLocale('en');

@@ -10,7 +10,6 @@ use App\Filament\Resources\ProductComparisonResource\Pages\ListProductComparison
 use App\Models\Product;
 use App\Models\ProductComparison;
 use App\Models\User;
-use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -27,10 +26,7 @@ final class ProductComparisonResourceTest extends TestCase
     {
         parent::setUp();
 
-        $panel = Filament::getPanel('admin');
-        $this->assertNotNull($panel, 'The admin panel must be registered for Filament tests.');
-
-        Filament::setCurrentPanel($panel);
+        $this->resolveAdminPanel();
 
         config(['app.locale' => 'en', 'app.fallback_locale' => 'en']);
         app()->setLocale('en');

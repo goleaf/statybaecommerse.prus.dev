@@ -10,7 +10,6 @@ use App\Filament\Resources\ProductImageResource\Pages\ListProductImages;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\User;
-use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -29,10 +28,7 @@ final class ProductImageResourceTest extends TestCase
     {
         parent::setUp();
 
-        $panel = Filament::getPanel('admin');
-        $this->assertNotNull($panel, 'The admin panel must be registered for Filament tests.');
-
-        Filament::setCurrentPanel($panel);
+        $this->resolveAdminPanel();
 
         config(['app.locale' => 'en', 'app.fallback_locale' => 'en']);
         app()->setLocale('en');

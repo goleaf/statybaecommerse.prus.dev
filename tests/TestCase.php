@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Filament\Facades\Filament;
+use Filament\Panel;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Config;
 
@@ -44,5 +46,18 @@ abstract class TestCase extends BaseTestCase
         }
 
         parent::tearDown();
+    }
+
+    protected function resolveAdminPanel(): Panel
+    {
+        $panel = Filament::getPanel('admin');
+
+        if (! $panel instanceof Panel) {
+            self::fail('The admin panel must be registered for Filament tests.');
+        }
+
+        Filament::setCurrentPanel($panel);
+
+        return $panel;
     }
 }
