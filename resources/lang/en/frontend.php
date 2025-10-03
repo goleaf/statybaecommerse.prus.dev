@@ -315,6 +315,7 @@ return [
         'message_placeholder' => 'Additional information about your needs...',
         'cancel' => 'Cancel',
         'submit_request' => 'Submit Request',
+        'request_success' => 'Your request has been sent successfully. Our specialists will contact you soon.',
         'cannot_add_to_cart' => 'Cannot Add to Cart',
         'request_required' => 'This product requires a request before purchase',
         'cannot_add_to_cart_message' => 'This product requires a request before purchase. Use the request form below.',
