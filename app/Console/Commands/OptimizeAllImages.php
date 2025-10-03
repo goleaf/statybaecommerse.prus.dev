@@ -82,8 +82,8 @@ final class OptimizeAllImages extends Command
         $this->info('🔄 Regenerating all images from scratch...');
 
         // Clear all existing media
-        $this->warn('⚠️  This will delete all existing images and regenerate them!');
-        if (! $this->confirm('Are you sure you want to continue?')) {
+        $this->warn('⚠️  This will reset the database using migrate:fresh --seed and regenerate all images!');
+        if (! $this->confirm('Are you sure you want to reset the database and reseed all data?')) {
             $this->info('Operation cancelled.');
 
             return;
@@ -92,22 +92,12 @@ final class OptimizeAllImages extends Command
         // Delete all media files
         Media::query()->delete();
 
-        // Run seeders to regenerate images
-        $this->call('db:seed', [
-            '--class' => 'RealProductImagesSeeder',
+        // Reset database and run all default seeders in a single command
+        $this->call('migrate:fresh', [
+            '--seed' => true,
         ]);
 
-        $this->call('db:seed', [
-            '--class' => 'CategorySeeder',
-        ]);
-
-        $this->call('db:seed', [
-            '--class' => 'BrandSeeder',
-        ]);
-
-        $this->call('db:seed', [
-            '--class' => 'CollectionSeeder',
-        ]);
+        $this->info('✅ Database reseeded and images regenerated.');
     }
 
     private function optimizeAllImages(): void
