@@ -174,26 +174,91 @@ final class SingleProduct extends Component
             $this->product->loadMissing(['attributes.values']);
         }
 
-        return $this
+        if (! $this->product->relationLoaded('variants')) {
+            $this->product->loadMissing(['variants.values.attribute']);
+        }
+
+        $variantFeatures = collect();
+
+        $variantFeatures = $this
+            ->product
+            ->variants
+            ->flatMap(function (ProductVariant $variant) {
+                if (! $variant->relationLoaded('values')) {
+                    $variant->loadMissing(['values.attribute']);
+                }
+
+                return $variant
+                    ->values
+                    ->map(function ($value): array {
+                        $attribute = $value->attribute;
+
+                        return [
+                            'id' => $attribute?->id,
+                            'label' => $attribute?->trans('name') ?? $attribute?->name,
+                            'value' => $value->trans('value') ?? $value->value,
+                            'icon' => $attribute?->icon,
+                            'color' => $attribute?->color,
+                        ];
+                    });
+            })
+            ->filter(fn (array $feature) => filled($feature['id']) && filled($feature['value']))
+            ->groupBy('id')
+            ->map(function ($group): array {
+                $first = $group->first();
+
+                return [
+                    'id' => $first['id'],
+                    'label' => $first['label'],
+                    'value' => $group->pluck('value')->filter()->unique()->implode(', '),
+                    'icon' => $first['icon'],
+                    'color' => $first['color'],
+                ];
+            });
+
+        $variantFeaturesById = $variantFeatures->keyBy('id');
+
+        $productFeatures = $this
             ->product
             ->attributes
-            ->map(function ($attribute): array {
-                $valueId = $attribute->pivot->attribute_value_id ?? null;
+            ->map(function ($attribute) use ($variantFeaturesById): array {
                 $value = null;
+                $valueId = $attribute->pivot->attribute_value_id ?? null;
 
                 if ($valueId) {
                     $valueModel = $attribute->values->firstWhere('id', $valueId);
                     $value = $valueModel ? ($valueModel->trans('value') ?? $valueModel->value) : null;
                 }
 
+                if (! filled($value) && $variantFeaturesById->has($attribute->id)) {
+                    $value = $variantFeaturesById->get($attribute->id)['value'];
+                }
+
+                $icon = $attribute->icon;
+                $color = $attribute->color;
+
+                if ($variantFeaturesById->has($attribute->id)) {
+                    $variantFeature = $variantFeaturesById->get($attribute->id);
+                    $icon = $icon ?: $variantFeature['icon'];
+                    $color = $color ?: $variantFeature['color'];
+                }
+
                 return [
                     'id' => $attribute->id,
                     'label' => $attribute->trans('name') ?? $attribute->name,
                     'value' => $value,
-                    'icon' => $attribute->icon,
+                    'icon' => $icon,
+                    'color' => $color,
                 ];
             })
             ->filter(fn (array $feature) => filled($feature['value']))
+            ->keyBy('id');
+
+        $combined = $productFeatures->union($variantFeaturesById);
+
+        return $combined
+            ->filter(fn (array $feature) => filled($feature['value']))
+            ->sortBy('label', SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
     }
 
