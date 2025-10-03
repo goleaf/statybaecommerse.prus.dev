@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Product;
+use App\Models\VariantImage;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 /**
@@ -28,6 +30,22 @@ final class ProductImageGallery extends Component
 
     public string $imageSize = 'lg';
 
+    public ?int $activeVariantId = null;
+
+    /**
+     * Cached gallery images for the base product.
+     *
+     * @var array<int, array<string, mixed>>
+     */
+    public array $productImages = [];
+
+    /**
+     * Variant specific image cache keyed by variant ID.
+     *
+     * @var array<int, array<int, array<string, mixed>>>
+     */
+    public array $variantImageCache = [];
+
     /**
      * Initialize the Livewire component with parameters.
      */
@@ -35,6 +53,7 @@ final class ProductImageGallery extends Component
     {
         $this->product = $product;
         $this->imageSize = $imageSize;
+        $this->productImages = $product->getGalleryImages();
     }
 
     /**
@@ -43,7 +62,20 @@ final class ProductImageGallery extends Component
     #[Computed]
     public function images(): array
     {
-        return $this->product->getGalleryImages();
+        if ($this->activeVariantId) {
+            $variantImages = $this->variantImageCache[$this->activeVariantId]
+                ?? $this->loadVariantImages($this->activeVariantId);
+
+            if (! empty($variantImages)) {
+                return $variantImages;
+            }
+        }
+
+        if (empty($this->productImages)) {
+            $this->productImages = $this->product->getGalleryImages();
+        }
+
+        return $this->productImages;
     }
 
     /**
@@ -96,6 +128,48 @@ final class ProductImageGallery extends Component
     public function toggleLightbox(): void
     {
         $this->showLightbox = ! $this->showLightbox;
+    }
+
+    #[On('variant.selected')]
+    public function updateForVariant(?int $variantId): void
+    {
+        $this->activeVariantId = $variantId;
+        $this->currentImageIndex = 0;
+    }
+
+    protected function loadVariantImages(int $variantId): array
+    {
+        $variant = $this->product
+            ->variants()
+            ->with(['images' => fn($query) => $query->orderBy('sort_order')])
+            ->find($variantId);
+
+        if (! $variant) {
+            return [];
+        }
+
+        $images = $variant->images
+            ->sortBy('sort_order')
+            ->values()
+            ->map(function (VariantImage $image) use ($variant) {
+                $full = $image->image_url;
+                $thumb = $image->thumbnail_url ?? $full;
+
+                return [
+                    'original' => $full,
+                    'xl' => $full,
+                    'lg' => $full,
+                    'md' => $full,
+                    'sm' => $full,
+                    'xs' => $thumb,
+                    'alt' => $image->formatted_alt_text ?? $variant->display_name ?? $this->product->name,
+                    'title' => $variant->display_name ?? $variant->name ?? $this->product->name,
+                    'generated' => false,
+                ];
+            })
+            ->toArray();
+
+        return $this->variantImageCache[$variantId] = $images;
     }
 
     /**
