@@ -13,6 +13,11 @@ return [
     'advanced_options' => 'Papildomi nustatymai',
     // Form Fields
     'category' => 'Kategorija',
+    'category_name' => 'Kategorijos pavadinimas',
+    'category_slug' => 'Kategorijos URL dalis',
+    'category_description' => 'Kategorijos aprašymas',
+    'category_icon' => 'Kategorijos piktograma',
+    'category_color' => 'Kategorijos spalva',
     'key' => 'Raktas',
     'key_help' => 'Unikalus nustatymo raktas (pvz., app.name)',
     'key_copied' => 'Raktas nukopijuotas',

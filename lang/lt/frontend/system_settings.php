@@ -12,6 +12,7 @@ return [
     'all_categories' => 'Visos kategorijos',
     'all_groups' => 'Visos grupės',
     // Sections
+    'categories' => 'Kategorijos',
     'all_settings' => 'Visi nustatymai',
     'settings' => 'nustatymai',
     'view_category' => 'Žiūrėti kategoriją',
