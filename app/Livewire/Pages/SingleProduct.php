@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -28,6 +29,10 @@ final class SingleProduct extends Component
 
     public int $quantity = 1;
 
+    protected SupportCollection $recentHistoriesCollection;
+
+    protected SupportCollection $recentApprovedReviewsCollection;
+
     /**
      * Initialize the Livewire component with parameters.
      */
@@ -35,21 +40,48 @@ final class SingleProduct extends Component
     {
         abort_if(! $product->is_visible, 404);
 
-        $product->loadMissing([
-            'brand.translations',
-            'categories.translations',
-            'media',
-            'variants.media',
-            'variants.values.attribute',
-            'variants.prices.currency',
-            'reviews',
-            'translations',
-            'histories',
-            'documents',
-            'attributes.values',
-        ]);
+        $product = Product::query()
+            ->whereKey($product)
+            ->with([
+                'brand.translations',
+                'categories.translations',
+                'translations',
+                'media',
+                'documents',
+                'attributes' => fn ($query) => $query->with([
+                    'translations',
+                    'values' => fn ($valueQuery) => $valueQuery->with('translations'),
+                ]),
+                'variants' => fn ($variantQuery) => $variantQuery->with([
+                    'media',
+                    'prices.currency',
+                    'values' => fn ($valueQuery) => $valueQuery->with([
+                        'translations',
+                        'attribute.translations',
+                    ]),
+                ]),
+            ])
+            ->withCount([
+                'reviews as approved_reviews_count' => fn ($query) => $query->approved(),
+            ])
+            ->withAvg([
+                'reviews as approved_reviews_avg_rating' => fn ($query) => $query->approved(),
+            ], 'rating')
+            ->firstOrFail();
 
         $this->product = $product;
+
+        $this->recentHistoriesCollection = $this->product
+            ->recentHistories()
+            ->orderByDesc('created_at')
+            ->limit(4)
+            ->get(['id', 'product_id', 'action', 'field_name', 'old_value', 'new_value', 'description', 'created_at']);
+
+        $this->recentApprovedReviewsCollection = $this->product
+            ->reviews()
+            ->latest('id')
+            ->limit(5)
+            ->get(['id', 'product_id', 'title', 'content', 'rating', 'created_at']);
 
         $this->trackProductView();
         $this->trackProductViewHistory();
@@ -315,20 +347,15 @@ final class SingleProduct extends Component
     }
 
     #[Computed]
-    public function recentHistories(): \Illuminate\Support\Collection
+    public function recentHistories(): SupportCollection
     {
-        return $this->product->recentHistories()->limit(4)->get();
+        return $this->recentHistoriesCollection;
     }
 
     #[Computed]
-    public function recentApprovedReviewsLimited(): \Illuminate\Support\Collection
+    public function recentApprovedReviewsLimited(): SupportCollection
     {
-        return Review::query()
-            ->where('product_id', $this->product->id)
-            ->when(method_exists(Review::query()->getModel(), 'scopeApproved'), fn ($q) => $q->approved())
-            ->latest('id')
-            ->limit(5)
-            ->get(['title', 'content', 'rating', 'created_at']);
+        return $this->recentApprovedReviewsCollection;
     }
 
     #[Computed]
