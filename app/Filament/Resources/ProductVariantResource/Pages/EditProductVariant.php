@@ -44,6 +44,16 @@ final class EditProductVariant extends EditRecord
             ->body(__('product_variants.messages.updated_successfully_description'));
     }
 
+    protected function afterSave(): void
+    {
+        parent::afterSave();
+
+        ProductVariantResource::syncVariantAttributeRelations(
+            $this->record,
+            data_get($this->form->getState(), 'attributeValueSelections', []),
+        );
+    }
+
     protected function mutateFormDataBeforeSave(array $data): array
     {
         // Update SKU if size or suffix changed
