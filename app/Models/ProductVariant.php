@@ -591,19 +591,23 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function getCurrentPrice(): float
     {
+        $basePrice = (float) $this->price;
+        $comparePrice = $this->compare_price !== null ? (float) $this->compare_price : null;
+        $promotionalPrice = $this->promotional_price !== null ? (float) $this->promotional_price : null;
+
         // Check if variant is on sale and within sale period
         if ($this->is_on_sale && $this->isCurrentlyOnSale()) {
-            if ($this->promotional_price && $this->promotional_price > 0) {
-                return $this->promotional_price;
+            if ($promotionalPrice !== null && $promotionalPrice > 0) {
+                return $promotionalPrice;
             }
 
             // Apply sale discount if no promotional price set
-            if ($this->compare_price && $this->compare_price > $this->price) {
-                return $this->price;
+            if ($comparePrice !== null && $comparePrice > $basePrice) {
+                return $basePrice;
             }
         }
 
-        return $this->price;
+        return $basePrice;
     }
 
     /**
