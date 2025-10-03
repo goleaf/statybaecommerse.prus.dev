@@ -17,6 +17,28 @@ final class ProductPage extends Component
 
     public Collection $recentlyViewed;
 
+    public Collection $productImages;
+
+    public array $priceRange = ['min' => 0.0, 'max' => 0.0];
+
+    public string $stockStatus = 'out_of_stock';
+
+    public string $stockMessage = '';
+
+    public Collection $productVariants;
+
+    public Collection $productAttributes;
+
+    public Collection $productReviews;
+
+    public Collection $productCategories;
+
+    public ?Brand $productBrand = null;
+
+    public float $productRating = 0.0;
+
+    public int $productReviewsCount = 0;
+
     public bool $showImageModal = false;
 
     public int $selectedImageIndex = 0;
@@ -25,7 +47,42 @@ final class ProductPage extends Component
 
     public function mount(Product $product): void
     {
+        $product->load([
+            'media',
+            'variants' => fn ($query) => $query
+                ->with(['images', 'attributes.attribute'])
+                ->enabled()
+                ->orderBy('position'),
+            'categories' => fn ($query) => $query
+                ->enabled()
+                ->visible(),
+            'attributes' => fn ($query) => $query
+                ->with('values')
+                ->enabled()
+                ->orderBy('sort_order'),
+            'brand',
+            'reviews',
+        ]);
+
         $this->product = $product;
+
+        $this->productVariants = $product->variants ?? collect();
+        $this->productAttributes = $product->relationLoaded('attributes')
+            ? $product->attributes
+            : $product->attributes()->with('values')->enabled()->orderBy('sort_order')->get();
+        $this->productCategories = $product->categories ?? collect();
+        $this->productBrand = $product->brand;
+        $this->productReviews = $product->reviews ?? collect();
+        $this->productReviewsCount = $this->productReviews->count();
+        $this->productRating = $this->productReviewsCount > 0
+            ? (float) ($this->productReviews->avg('rating') ?? 0.0)
+            : 0.0;
+
+        $this->productImages = $this->resolveProductImages();
+        $this->priceRange = $this->resolvePriceRange();
+        $this->stockStatus = $this->resolveStockStatus();
+        $this->stockMessage = $this->resolveStockMessage();
+
         $this->loadRelatedProducts();
         $this->loadRecentlyViewed();
         $this->trackProductView();
@@ -33,14 +90,25 @@ final class ProductPage extends Component
 
     public function loadRelatedProducts(): void
     {
-        $this->relatedProducts = Product::where('id', '!=', $this->product->id)
+        $query = Product::where('id', '!=', $this->product->id)
             ->whereHas('categories', function ($query) {
-                $query->whereIn('categories.id', $this->product->categories->pluck('id'));
+                $query->whereIn('categories.id', $this->productCategories->pluck('id'));
             })
-            ->orWhere('brand_id', $this->product->brand_id)
-            ->enabled()
-            ->visible()
-            ->published()
+            ->orWhere('brand_id', $this->product->brand_id);
+
+        if (method_exists(Product::class, 'scopeEnabled')) {
+            $query->enabled();
+        }
+
+        if (method_exists(Product::class, 'scopeVisible')) {
+            $query->visible();
+        }
+
+        if (method_exists(Product::class, 'scopePublished')) {
+            $query->published();
+        }
+
+        $this->relatedProducts = $query
             ->with(['variants', 'brand', 'categories'])
             ->limit(4)
             ->get();
@@ -52,11 +120,22 @@ final class ProductPage extends Component
         $recentlyViewedIds = session('recently_viewed', []);
 
         if (! empty($recentlyViewedIds)) {
-            $this->recentlyViewed = Product::whereIn('id', $recentlyViewedIds)
-                ->where('id', '!=', $this->product->id)
-                ->enabled()
-                ->visible()
-                ->published()
+            $query = Product::whereIn('id', $recentlyViewedIds)
+                ->where('id', '!=', $this->product->id);
+
+            if (method_exists(Product::class, 'scopeEnabled')) {
+                $query->enabled();
+            }
+
+            if (method_exists(Product::class, 'scopeVisible')) {
+                $query->visible();
+            }
+
+            if (method_exists(Product::class, 'scopePublished')) {
+                $query->published();
+            }
+
+            $this->recentlyViewed = $query
                 ->with(['variants', 'brand'])
                 ->limit(4)
                 ->get();
@@ -99,59 +178,111 @@ final class ProductPage extends Component
 
     public function getProductImages(): Collection
     {
-        $images = collect();
-
-        // Get main product images
-        if ($this->product->hasMedia('images')) {
-            $images = $images->merge($this->product->getMedia('images'));
-        }
-
-        // Get variant images
-        $variantImages = $this->product->variants()
-            ->with('images')
-            ->get()
-            ->pluck('images')
-            ->flatten();
-
-        $images = $images->merge($variantImages);
-
-        return $images->unique('id');
+        return $this->productImages;
     }
 
     public function getProductPriceRange(): array
     {
-        $variants = $this->product->variants()->enabled()->get();
-
-        if ($variants->isEmpty()) {
-            return [
-                'min' => $this->product->price ?? 0,
-                'max' => $this->product->price ?? 0,
-            ];
-        }
-
-        $prices = $variants->pluck('final_price');
-
-        return [
-            'min' => $prices->min(),
-            'max' => $prices->max(),
-        ];
+        return $this->priceRange;
     }
 
     public function getProductStockStatus(): string
     {
-        $variants = $this->product->variants()->enabled()->get();
+        return $this->stockStatus;
+    }
 
-        if ($variants->isEmpty()) {
+    public function getProductStockMessage(): string
+    {
+        return $this->stockMessage;
+    }
+
+    public function getProductCategories(): Collection
+    {
+        return $this->productCategories;
+    }
+
+    public function getProductBrand(): ?Brand
+    {
+        return $this->productBrand;
+    }
+
+    public function getProductVariants(): Collection
+    {
+        return $this->productVariants;
+    }
+
+    public function getProductAttributes(): Collection
+    {
+        return $this->productAttributes;
+    }
+
+    public function getProductReviews(): Collection
+    {
+        return $this->productReviews;
+    }
+
+    public function getProductRating(): float
+    {
+        return $this->productRating;
+    }
+
+    public function getProductReviewsCount(): int
+    {
+        return $this->productReviewsCount;
+    }
+
+    private function resolveProductImages(): Collection
+    {
+        $images = collect();
+
+        if ($this->product->hasMedia('images')) {
+            $images = $images->merge($this->product->getMedia('images'));
+        }
+
+        $variantImages = $this->productVariants
+            ->pluck('images')
+            ->filter()
+            ->flatten();
+
+        return $images->merge($variantImages)->unique('id')->values();
+    }
+
+    private function resolvePriceRange(): array
+    {
+        if ($this->productVariants->isEmpty()) {
+            $price = $this->product->price ?? 0;
+
+            return ['min' => $price, 'max' => $price];
+        }
+
+        $prices = $this->productVariants
+            ->pluck('final_price')
+            ->filter(fn ($price) => $price !== null);
+
+        if ($prices->isEmpty()) {
+            $price = $this->product->price ?? 0;
+
+            return ['min' => $price, 'max' => $price];
+        }
+
+        return ['min' => $prices->min(), 'max' => $prices->max()];
+    }
+
+    private function resolveStockStatus(): string
+    {
+        if ($this->productVariants->isEmpty()) {
             return $this->product->is_in_stock ? 'in_stock' : 'out_of_stock';
         }
 
-        $inStockVariants = $variants->filter(fn ($variant) => $variant->isAvailableForPurchase());
+        $inStockVariants = $this->productVariants
+            ->filter(fn ($variant) => $variant->isAvailableForPurchase());
 
         if ($inStockVariants->isEmpty()) {
             return 'out_of_stock';
         }
 
-        $lowStockVariants = $inStockVariants->filter(fn ($variant) => $variant->is_low_stock);
+        $lowStockVariants = $inStockVariants
+            ->filter(fn ($variant) => $variant->is_low_stock);
 
         if ($lowStockVariants->count() === $inStockVariants->count()) {
             return 'low_stock';
@@ -160,66 +291,14 @@ final class ProductPage extends Component
         return 'in_stock';
     }
 
-    public function getProductStockMessage(): string
+    private function resolveStockMessage(): string
     {
-        $status = $this->getProductStockStatus();
-
-        return match ($status) {
+        return match ($this->stockStatus) {
             'in_stock' => __('products.messages.in_stock'),
             'low_stock' => __('products.messages.low_stock'),
             'out_of_stock' => __('products.messages.out_of_stock'),
             default => __('products.messages.unknown_stock'),
         };
-    }
-
-    public function getProductCategories(): Collection
-    {
-        return $this->product->categories()->enabled()->visible()->get();
-    }
-
-    public function getProductBrand(): ?Brand
-    {
-        return $this->product->brand;
-    }
-
-    public function getProductVariants(): Collection
-    {
-        return $this->product->variants()
-            ->with(['attributes.attribute', 'images'])
-            ->enabled()
-            ->orderBy('position')
-            ->get();
-    }
-
-    public function getProductAttributes(): Collection
-    {
-        return $this->product->attributes()
-            ->with('values')
-            ->enabled()
-            ->orderBy('sort_order')
-            ->get();
-    }
-
-    public function getProductReviews(): Collection
-    {
-        // Assuming you have a reviews relationship
-        return $this->product->reviews ?? collect();
-    }
-
-    public function getProductRating(): float
-    {
-        $reviews = $this->getProductReviews();
-
-        if ($reviews->isEmpty()) {
-            return 0.0;
-        }
-
-        return $reviews->avg('rating') ?? 0.0;
-    }
-
-    public function getProductReviewsCount(): int
-    {
-        return $this->getProductReviews()->count();
     }
 
     public function shareProduct(): void

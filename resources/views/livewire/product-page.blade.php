@@ -8,7 +8,7 @@
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                 </svg>
             </li>
-            @foreach($this->getProductCategories() as $category)
+            @foreach($productCategories as $category)
                 <li><a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug ?? $category]) }}" class="hover:text-gray-700">{{ $category->name }}</a></li>
                 <li class="flex items-center">
                     <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
@@ -24,10 +24,10 @@
         <!-- Product Images -->
         <div class="product-images">
             <div class="main-image mb-4">
-                @if($this->getProductImages()->isNotEmpty())
+                @if($productImages->isNotEmpty())
                     <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer" 
                          wire:click="openImageModal(0)">
-                        <img src="{{ $this->getProductImages()->first()->getUrl() }}" 
+                        <img src="{{ $productImages->first()->getUrl() }}"
                              alt="{{ $product->name }}"
                              class="w-full h-full object-cover hover:scale-105 transition-transform duration-200">
                     </div>
@@ -40,9 +40,9 @@
                 @endif
             </div>
 
-            @if($this->getProductImages()->count() > 1)
+            @if($productImages->count() > 1)
                 <div class="thumbnail-images grid grid-cols-4 gap-2">
-                    @foreach($this->getProductImages()->take(4) as $index => $image)
+                    @foreach($productImages->take(4) as $index => $image)
                         <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all duration-200"
                              wire:click="openImageModal({{ $index }})">
                             <img src="{{ $image->getUrl('thumb') }}" 
@@ -57,26 +57,26 @@
         <!-- Product Information -->
         <div class="product-info">
             <div class="mb-4">
-                @if($this->getProductBrand())
-                    <p class="text-sm text-gray-600 mb-2">{{ $this->getProductBrand()->name }}</p>
+                @if($productBrand)
+                    <p class="text-sm text-gray-600 mb-2">{{ $productBrand->name }}</p>
                 @endif
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->name }}</h1>
                 <p class="text-sm text-gray-500">SKU: {{ $product->sku }}</p>
             </div>
 
             <!-- Rating -->
-            @if($this->getProductReviewsCount() > 0)
+            @if($productReviewsCount > 0)
                 <div class="rating mb-4">
                     <div class="flex items-center">
                         <div class="flex items-center">
                             @for($i = 1; $i <= 5; $i++)
-                                <svg class="w-5 h-5 {{ $i <= $this->getProductRating() ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-5 h-5 {{ $i <= $productRating ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                 </svg>
                             @endfor
                         </div>
                         <span class="ml-2 text-sm text-gray-600">
-                            {{ number_format($this->getProductRating(), 1) }} ({{ $this->getProductReviewsCount() }} {{ __('products.reviews') }})
+                            {{ number_format($productRating, 1) }} ({{ $productReviewsCount }} {{ __('products.reviews') }})
                         </span>
                     </div>
                 </div>
@@ -84,10 +84,6 @@
 
             <!-- Price -->
             <div class="price mb-6">
-                @php
-                    $priceRange = $this->getProductPriceRange();
-                @endphp
-                
                 @if($priceRange['min'] === $priceRange['max'])
                     <span class="text-3xl font-bold text-gray-900">€{{ number_format($priceRange['min'], 2) }}</span>
                 @else
@@ -106,11 +102,11 @@
             <!-- Stock Status -->
             <div class="stock-status mb-6">
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                    {{ $this->getProductStockStatus() === 'in_stock' ? 'bg-green-100 text-green-800' : '' }}
-                    {{ $this->getProductStockStatus() === 'low_stock' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                    {{ $this->getProductStockStatus() === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
+                    {{ $stockStatus === 'in_stock' ? 'bg-green-100 text-green-800' : '' }}
+                    {{ $stockStatus === 'low_stock' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                    {{ $stockStatus === 'out_of_stock' ? 'bg-red-100 text-red-800' : '' }}
                 ">
-                    {{ $this->getProductStockMessage() }}
+                    {{ $stockMessage }}
                 </span>
             </div>
 
@@ -122,7 +118,7 @@
             @endif
 
             <!-- Variant Selector -->
-            @if($product->type === 'variable' && $this->getProductVariants()->isNotEmpty())
+            @if($product->type === 'variable' && $productVariants->isNotEmpty())
                 <div class="variant-selector mb-6">
                     <livewire:product-variant-selector :product="$product" />
                 </div>
@@ -192,7 +188,7 @@
                         <button type="button" wire:click="setActiveTab('reviews')"
                                 class="py-2 px-1 border-b-2 font-medium text-sm
                                     {{ $activeTab === 'reviews' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                            {{ __('products.tabs.reviews') }} ({{ $this->getProductReviewsCount() }})
+                            {{ __('products.tabs.reviews') }} ({{ $productReviewsCount }})
                         </button>
                     </nav>
                 </div>
@@ -204,9 +200,9 @@
                         </div>
                     @elseif($activeTab === 'specifications')
                         <div class="specifications">
-                            @if($this->getProductAttributes()->isNotEmpty())
+                            @if($productAttributes->isNotEmpty())
                                 <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                                    @foreach($this->getProductAttributes() as $attribute)
+                                    @foreach($productAttributes as $attribute)
                                         <div>
                                             <dt class="text-sm font-medium text-gray-500">{{ $attribute->name }}</dt>
                                             <dd class="mt-1 text-sm text-gray-900">
@@ -221,7 +217,7 @@
                         </div>
                     @elseif($activeTab === 'reviews')
                         <div class="reviews">
-                            @if($this->getProductReviewsCount() > 0)
+                            @if($productReviewsCount > 0)
                                 <!-- Reviews content here -->
                                 <p class="text-gray-500">{{ __('products.messages.reviews_coming_soon') }}</p>
                             @else
@@ -306,8 +302,8 @@
                 
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        @if($this->getProductImages()->isNotEmpty())
-                            <img src="{{ $this->getProductImages()->get($selectedImageIndex)->getUrl() }}" 
+                        @if($productImages->isNotEmpty())
+                            <img src="{{ $productImages->get($selectedImageIndex)->getUrl() }}"
                                  alt="{{ $product->name }}"
                                  class="w-full h-auto">
                         @endif
