@@ -167,15 +167,38 @@
                             @else
                                 <div class="grid gap-4 sm:grid-cols-2">
                                     @foreach ($this->attributeFeatures as $feature)
+                                        @php
+                                            $iconComponent = $feature['icon'] ?? null;
+                                            $iconColor = $feature['color'] ?? null;
+                                            $resolvedIcon = null;
+
+                                            if ($iconComponent) {
+                                                if (\Illuminate\Support\Str::startsWith($iconComponent, 'heroicon-')) {
+                                                    $resolvedIcon = $iconComponent;
+                                                } elseif (! \Illuminate\Support\Str::contains($iconComponent, '::')) {
+                                                    $resolvedIcon = 'heroicon-o-' . $iconComponent;
+                                                }
+                                            }
+                                        @endphp
                                         <div
-                                             class="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+                                             class="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white/70 p-4 shadow-sm">
                                             <div
-                                                 class="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">
-                                                <x-heroicon-o-check-badge class="h-5 w-5 text-emerald-500" />
+                                                 class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50">
+                                                @if ($resolvedIcon)
+                                                    <x-dynamic-component :component="$resolvedIcon"
+                                                                         class="h-5 w-5"
+                                                                         @if ($iconColor) style="color: {{ $iconColor }}" @endif />
+                                                @elseif ($iconComponent)
+                                                    <span class="text-sm font-semibold text-slate-600"
+                                                          @if ($iconColor) style="color: {{ $iconColor }}" @endif>
+                                                        {{ $iconComponent }}
+                                                    </span>
+                                                @else
+                                                    <x-heroicon-o-check-badge class="h-5 w-5 text-primary-500" />
+                                                @endif
                                             </div>
                                             <div class="space-y-1">
-                                                <p class="text-sm font-semibold text-slate-900">{{ $feature['label'] }}
-                                                </p>
+                                                <p class="text-sm font-semibold text-slate-900">{{ $feature['label'] }}</p>
                                                 <p class="text-sm text-slate-600">{{ $feature['value'] }}</p>
                                             </div>
                                         </div>
