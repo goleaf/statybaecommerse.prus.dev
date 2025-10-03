@@ -373,6 +373,8 @@
     "translations.today": "Šiandien",
     "translations.this_week": "Šią savaitę",
     "translations.this_month": "Šį mėnesį",
+    "admin.models.zone": "Zona",
+    "admin.models.zones": "Zonos",
     "admin.fields.name_lt": "Pavadinimas (LT)",
     "admin.fields.name_en": "Pavadinimas (EN)",
     "admin.fields.slug": "Nuoroda",
