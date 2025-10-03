@@ -14,6 +14,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         Config::set('database.default', 'sqlite');
         Config::set('database.connections.sqlite.database', ':memory:');
+        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');

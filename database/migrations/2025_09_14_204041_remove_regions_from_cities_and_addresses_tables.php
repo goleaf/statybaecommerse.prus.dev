@@ -11,18 +11,28 @@ return new class extends Migration
 {
     public function up(): void
     {
+        $driver = Schema::getConnection()->getDriverName();
+
         // Remove region_id from cities table
         if (Schema::hasTable('cities') && Schema::hasColumn('cities', 'region_id')) {
-            try {
-                DB::statement('ALTER TABLE `cities` DROP FOREIGN KEY `cities_region_id_foreign`');
-            } catch (\Throwable $e) {
-                // Foreign key might not exist
-            }
+            if ($driver !== 'sqlite') {
+                try {
+                    DB::statement('ALTER TABLE `cities` DROP FOREIGN KEY `cities_region_id_foreign`');
+                } catch (\Throwable $e) {
+                    // Foreign key might not exist
+                }
 
-            try {
-                DB::statement('ALTER TABLE `cities` DROP INDEX `cities_region_id_is_enabled_index`');
-            } catch (\Throwable $e) {
-                // Index might not exist
+                try {
+                    DB::statement('ALTER TABLE `cities` DROP INDEX `cities_region_id_is_enabled_index`');
+                } catch (\Throwable $e) {
+                    // Index might not exist
+                }
+            } else {
+                try {
+                    DB::statement('DROP INDEX IF EXISTS "cities_region_id_is_enabled_index"');
+                } catch (\Throwable $e) {
+                    // Index might not exist
+                }
             }
 
             Schema::table('cities', function (Blueprint $table) {
