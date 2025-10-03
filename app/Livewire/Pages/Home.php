@@ -2,16 +2,22 @@
 
 namespace App\Livewire\Pages;
 
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 final class Home extends Component
 {
+    use WithCart;
+    use WithNotifications;
+
     #[Computed]
     public function stats(): array
     {
@@ -28,10 +34,82 @@ final class Home extends Component
         });
     }
 
+    #[Computed]
+    public function featuredProducts(): Collection
+    {
+        $locale = app()->getLocale();
+
+        return Cache::remember("home:featured:{$locale}", 60, static function (): Collection {
+            return Product::query()
+                ->withoutGlobalScopes()
+                ->where('is_visible', true)
+                ->where('is_featured', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->latest('published_at')
+                ->limit(8)
+                ->get();
+        });
+    }
+
+    #[Computed]
+    public function latestProducts(): Collection
+    {
+        $locale = app()->getLocale();
+
+        return Cache::remember("home:latest-products:{$locale}", 60, static function (): Collection {
+            return Product::query()
+                ->withoutGlobalScopes()
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->latest('created_at')
+                ->limit(8)
+                ->get();
+        });
+    }
+
+    #[Computed]
+    public function latestReviews(): Collection
+    {
+        $locale = app()->getLocale();
+
+        return Cache::remember("home:latest-reviews:{$locale}", 60, static function (): Collection {
+            return Review::query()
+                ->where('is_approved', true)
+                ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
+                ->latest('created_at')
+                ->limit(6)
+                ->get();
+        });
+    }
+
+    public function addToCart(int $productId): void
+    {
+        $product = Product::query()
+            ->withoutGlobalScopes()
+            ->whereKey($productId)
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->first();
+
+        if (! $product || ($product->stock_quantity ?? 0) < 1) {
+            $this->notifyWarning(__('This product is currently unavailable.'));
+
+            return;
+        }
+
+        $this->persistCartItem($product);
+    }
+
     public function render()
     {
         return view('livewire.pages.home', [
             'stats' => $this->stats,
+            'featuredProducts' => $this->featuredProducts,
+            'latestProducts' => $this->latestProducts,
+            'latestReviews' => $this->latestReviews,
         ])->layout('components.layouts.base', [
             'title' => __('Home') . ' - ' . config('app.name'),
         ]);

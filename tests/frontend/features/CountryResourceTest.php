@@ -122,7 +122,7 @@ final class CountryResourceTest extends TestCase
         ]);
     }
 
-    public function test_country_resource_table_filters_work(): void
+    public function test_country_resource_table_filters_cover_default_flag(): void
     {
         Country::factory()->create(['is_active' => true, 'is_eu_member' => true]);
         Country::factory()->create(['is_active' => false, 'is_eu_member' => false]);
@@ -138,7 +138,7 @@ final class CountryResourceTest extends TestCase
             ->assertCanSeeTableRecords(Country::where('is_eu_member', true)->get());
     }
 
-    public function test_country_resource_table_search_works(): void
+    public function test_country_resource_table_search_handles_multiple_records(): void
     {
         Country::factory()->create(['name' => 'Lithuania']);
         Country::factory()->create(['name' => 'Germany']);
