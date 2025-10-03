@@ -7,6 +7,8 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Enums\NavigationIcon;
 use App\Filament\Resources\ProductVariantResource\Pages;
+use App\Models\Attribute;
+use App\Models\AttributeValue;
 use App\Models\ProductVariant;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -26,6 +28,8 @@ use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -251,15 +255,54 @@ final class ProductVariantResource extends Resource
                             ->schema([
                                 Section::make('Variant Attributes')
                                     ->schema([
-                                        Repeater::make('attributes')
+                                        Repeater::make('attributeValueSelections')
                                             ->label(__('product_variants.fields.attributes'))
+                                            ->statePath('attributeValueSelections')
+                                            ->default(fn (?ProductVariant $record): array => $record
+                                                ? $record->attributes()
+                                                    ->withPivot('attribute_id')
+                                                    ->get()
+                                                    ->map(fn (AttributeValue $value): array => [
+                                                        'attribute_id' => $value->pivot->attribute_id,
+                                                        'attribute_value_id' => $value->getKey(),
+                                                    ])
+                                                    ->values()
+                                                    ->all()
+                                                : [])
+                                            ->dehydrated(false)
                                             ->schema([
-                                                TextInput::make('name')
+                                                Select::make('attribute_id')
                                                     ->label(__('product_variants.fields.attribute_name'))
-                                                    ->required(),
-                                                TextInput::make('value')
+                                                    ->options(fn () => Attribute::query()
+                                                        ->orderBy('name')
+                                                        ->pluck('name', 'id'))
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->reactive()
+                                                    ->required()
+                                                    ->afterStateUpdated(fn (Set $set): void => $set('attribute_value_id', null)),
+                                                Select::make('attribute_value_id')
                                                     ->label(__('product_variants.fields.attribute_value'))
-                                                    ->required(),
+                                                    ->options(function (Get $get) {
+                                                        $attributeId = $get('attribute_id');
+
+                                                        if (blank($attributeId)) {
+                                                            return [];
+                                                        }
+
+                                                        return AttributeValue::query()
+                                                            ->where('attribute_id', $attributeId)
+                                                            ->orderBy('sort_order')
+                                                            ->get()
+                                                            ->mapWithKeys(fn (AttributeValue $value): array => [
+                                                                $value->getKey() => $value->display_value ?? $value->value,
+                                                            ])
+                                                            ->all();
+                                                    })
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->required()
+                                                    ->disabled(fn (Get $get): bool => blank($get('attribute_id'))),
                                             ])
                                             ->columns(2),
                                     ]),
@@ -274,6 +317,77 @@ final class ProductVariantResource extends Resource
                     ])
                     ->columnSpanFull(),
             ]);
+    }
+
+    public static function syncVariantAttributeRelations(ProductVariant $variant, array $selections): void
+    {
+        $processedSelections = collect($selections)
+            ->map(fn ($selection): array => [
+                'attribute_id' => data_get($selection, 'attribute_id'),
+                'attribute_value_id' => data_get($selection, 'attribute_value_id'),
+            ])
+            ->filter(fn (array $selection): bool => filled($selection['attribute_id']) && filled($selection['attribute_value_id']))
+            ->values();
+
+        if ($processedSelections->isEmpty()) {
+            $variant->attributes()->detach();
+            $variant->variantAttributeValues()->delete();
+
+            return;
+        }
+
+        $attributeValues = AttributeValue::query()
+            ->with('attribute')
+            ->whereIn('id', $processedSelections->pluck('attribute_value_id')->all())
+            ->get()
+            ->keyBy(fn (AttributeValue $value) => $value->getKey());
+
+        $pivotData = [];
+        $variantAttributeValues = [];
+
+        foreach ($processedSelections as $index => $selection) {
+            $attributeValue = $attributeValues->get($selection['attribute_value_id']);
+
+            if (! $attributeValue) {
+                continue;
+            }
+
+            $attribute = $attributeValue->attribute;
+            $attributeId = $attribute?->getKey() ?? (int) $selection['attribute_id'];
+
+            $pivotData[$attributeValue->getKey()] = [
+                'attribute_id' => $attributeId,
+            ];
+
+            $variantAttributeValues[] = [
+                'variant_id' => $variant->getKey(),
+                'attribute_id' => $attributeId,
+                'attribute_name' => $attribute?->name,
+                'attribute_value' => $attributeValue->value,
+                'attribute_value_display' => $attributeValue->display_value ?? $attributeValue->value,
+                'attribute_value_lt' => $attributeValue->getTranslation('value', 'lt', false) ?? $attributeValue->value,
+                'attribute_value_en' => $attributeValue->getTranslation('value', 'en', false) ?? $attributeValue->value,
+                'attribute_value_slug' => $attributeValue->slug,
+                'sort_order' => $index,
+                'is_filterable' => (bool) ($attribute?->is_filterable ?? true),
+                'is_searchable' => (bool) ($attribute?->is_searchable ?? true),
+            ];
+        }
+
+        if (empty($pivotData)) {
+            $variant->attributes()->detach();
+            $variant->variantAttributeValues()->delete();
+
+            return;
+        }
+
+        $variant->attributes()->sync($pivotData);
+
+        $variant->variantAttributeValues()->delete();
+
+        if (! empty($variantAttributeValues)) {
+            $variant->variantAttributeValues()->createMany($variantAttributeValues);
+        }
     }
 
     public static function table(Table $table): Table

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\AttributeValue;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
@@ -157,7 +158,9 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function attributes(): BelongsToMany
     {
-        return $this->belongsToMany(AttributeValue::class, 'product_variant_attributes', 'variant_id', 'attribute_value_id');
+        return $this->belongsToMany(AttributeValue::class, 'product_variant_attributes', 'variant_id', 'attribute_value_id')
+            ->withPivot('attribute_id')
+            ->withTimestamps();
     }
 
     /**
