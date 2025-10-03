@@ -13,33 +13,43 @@
             :preload-image="(string) ($ogImage ?: '')" />
 @endsection
 
+@php
+    $breadcrumbDisplayItems = \App\Support\Breadcrumbs\ProductBreadcrumbBuilder::display($product);
+    $breadcrumbSchemaItems = \App\Support\Breadcrumbs\ProductBreadcrumbBuilder::schemaFromDisplay($breadcrumbDisplayItems);
+@endphp
+
 <div class="bg-white">
     <div class="pb-16 pt-6 sm:pb-24">
         <nav aria-label="Breadcrumb" class="mx-auto max-w-8xl px-4">
             <ol role="list" class="flex items-center space-x-4">
-                <li>
-                    <div class="flex items-center">
-                        <a href="#"
-                           class="mr-4 text-sm font-medium text-gray-900">{{ __('breadcrumbs.department') }}</a>
-                        <svg viewBox="0 0 6 20" aria-hidden="true" class="h-5 w-auto text-gray-300">
-                            <path d="M4.878 4.34H3.551L.27 16.532h1.327l3.281-12.19z" fill="currentColor" />
-                        </svg>
-                    </div>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <a href="#"
-                           class="mr-4 text-sm font-medium text-gray-900">{{ __('breadcrumbs.category') }}</a>
-                        <svg viewBox="0 0 6 20" aria-hidden="true" class="h-5 w-auto text-gray-300">
-                            <path d="M4.878 4.34H3.551L.27 16.532h1.327l3.281-12.19z" fill="currentColor" />
-                        </svg>
-                    </div>
-                </li>
-                <li class="text-sm">
-                    <span aria-current="page" class="font-medium text-gray-500">
-                        {{ $product->name }}
-                    </span>
-                </li>
+                @php($lastBreadcrumbIndex = count($breadcrumbDisplayItems) - 1)
+                @foreach($breadcrumbDisplayItems as $index => $breadcrumb)
+                    <li @class(['text-sm' => $index === $lastBreadcrumbIndex])>
+                        <div class="flex items-center">
+                            @if($index === $lastBreadcrumbIndex)
+                                <span aria-current="page" class="font-medium text-gray-500">
+                                    {{ $breadcrumb['label'] }}
+                                </span>
+                            @else
+                                @if($breadcrumb['url'])
+                                    <a href="{{ $breadcrumb['url'] }}" class="mr-4 text-sm font-medium text-gray-900">
+                                        {{ $breadcrumb['label'] }}
+                                    </a>
+                                @else
+                                    <span class="mr-4 text-sm font-medium text-gray-900">
+                                        {{ $breadcrumb['label'] }}
+                                    </span>
+                                @endif
+                            @endif
+
+                            @if($index !== $lastBreadcrumbIndex)
+                                <svg viewBox="0 0 6 20" aria-hidden="true" class="h-5 w-auto text-gray-300">
+                                    <path d="M4.878 4.34H3.551L.27 16.532h1.327l3.281-12.19z" fill="currentColor" />
+                                </svg>
+                            @endif
+                        </div>
+                    </li>
+                @endforeach
             </ol>
         </nav>
         <x-container class="mt-8 max-w-2xl">
@@ -181,40 +191,6 @@
             }
         }
 
-        // Basic breadcrumb items (department -> category -> product). Replace placeholders if real data exists.
-        $breadcrumbItems = [
-            [
-                '@type' => 'ListItem',
-                'position' => 1,
-                'name' => __('breadcrumbs.department'),
-                'item' => url('/'),
-            ],
-        ];
-        $position = 2;
-        // If a category relation exists, include it
-        try {
-            if (isset($product->categories) && $product->categories->first()) {
-                $cat = $product->categories->first();
-                $breadcrumbItems[] = [
-                    '@type' => 'ListItem',
-                    'position' => $position++,
-                    'name' => $cat->trans('name') ?? $cat->name,
-                    'item' => route('localized.categories.show', [
-                        'locale' => app()->getLocale(),
-                        'category' => $cat->trans('slug') ?? $cat->slug,
-                    ]),
-                ];
-            }
-        } catch (Throwable $e) {
-            // ignore if relation missing
-        }
-        $breadcrumbItems[] = [
-            '@type' => 'ListItem',
-            'position' => $position,
-            'name' => $product->trans('name') ?? $product->name,
-            'item' => $productUrl,
-        ];
-
         $productSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'Product',
@@ -239,6 +215,6 @@
         {!! json_encode($productSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
     </script>
     <script type="application/ld+json">
-        {!! json_encode(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $breadcrumbItems], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
+        {!! json_encode(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $breadcrumbSchemaItems], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
     </script>
 @endpush
