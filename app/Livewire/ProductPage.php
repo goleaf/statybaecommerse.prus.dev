@@ -39,10 +39,6 @@ final class ProductPage extends Component
 
     public int $productReviewsCount = 0;
 
-    public bool $showImageModal = false;
-
-    public int $selectedImageIndex = 0;
-
     public string $activeTab = 'description';
 
     public string $productRouteKey = '';
@@ -177,17 +173,6 @@ final class ProductPage extends Component
         $recentlyViewed = array_slice($recentlyViewed, 0, 10);
 
         session(['recently_viewed' => $recentlyViewed]);
-    }
-
-    public function openImageModal(int $index): void
-    {
-        $this->selectedImageIndex = $index;
-        $this->showImageModal = true;
-    }
-
-    public function closeImageModal(): void
-    {
-        $this->showImageModal = false;
     }
 
     public function setActiveTab(string $tab): void
