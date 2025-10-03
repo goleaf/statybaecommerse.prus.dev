@@ -828,6 +828,18 @@ final class Product extends Model implements HasMedia
      */
     public function getAverageRatingAttribute(): float
     {
+        if (array_key_exists('approved_reviews_avg_rating', $this->attributes)) {
+            $rating = $this->attributes['approved_reviews_avg_rating'];
+
+            return $rating !== null ? (float) $rating : 0.0;
+        }
+
+        if ($this->relationLoaded('reviews')) {
+            $rating = $this->getRelation('reviews')->avg('rating');
+
+            return $rating !== null ? (float) $rating : 0.0;
+        }
+
         $rating = $this->reviews()->approved()->avg('rating');
 
         return $rating ? (float) $rating : 0.0;
@@ -838,6 +850,14 @@ final class Product extends Model implements HasMedia
      */
     public function getReviewsCountAttribute(): int
     {
+        if (array_key_exists('approved_reviews_count', $this->attributes)) {
+            return (int) $this->attributes['approved_reviews_count'];
+        }
+
+        if ($this->relationLoaded('reviews')) {
+            return $this->getRelation('reviews')->count();
+        }
+
         return $this->reviews()->approved()->count();
     }
 
