@@ -260,10 +260,12 @@ final class ProductVariantSelector extends Component
         $this->recordAddToCart();
 
         // Dispatch event to add to cart
-        $this->dispatch('add-to-cart', [
-            'variant_id' => $this->selectedVariant->id,
-            'quantity' => $this->quantity,
-        ]);
+        $this->dispatch(
+            'add-to-cart',
+            productId: (int) $this->product->getKey(),
+            quantity: $this->quantity,
+            variantId: (int) $this->selectedVariant->getKey()
+        );
 
         $this->dispatch('show-success', message: __('product_variants.messages.added_to_cart'));
     }

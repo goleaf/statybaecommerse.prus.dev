@@ -56,7 +56,7 @@ final class ProductCardExtended extends Component
      */
     public function addToCart(): void
     {
-        $this->dispatch('add-to-cart', ['product_id' => $this->product->id, 'quantity' => 1]);
+        $this->dispatch('add-to-cart', productId: $this->product->id, quantity: 1);
         // Track analytics
         AnalyticsEvent::track('add_to_cart', ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'product_price' => $this->product->price]);
         $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_cart', ['name' => $this->product->name])]);
