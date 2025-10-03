@@ -25,6 +25,16 @@ final class CreateProductVariant extends CreateRecord
             ->body(__('product_variants.messages.created_successfully_description'));
     }
 
+    protected function afterCreate(): void
+    {
+        parent::afterCreate();
+
+        ProductVariantResource::syncVariantAttributeRelations(
+            $this->record,
+            data_get($this->form->getState(), 'attributeValueSelections', []),
+        );
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Generate SKU if not provided
