@@ -10,16 +10,15 @@ trait CreatesApplication
     public function createApplication(): Application
     {
         $envPath = __DIR__ . '/../.env';
+
         if (! file_exists($envPath)) {
-            file_put_contents($envPath, implode(PHP_EOL, [
-                'APP_NAME="StatybaEcommerce"',
-                'APP_ENV=testing',
-                'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
-                'APP_DEBUG=true',
-                'LOG_CHANNEL=stack',
-                'DB_CONNECTION=sqlite',
-                'DB_DATABASE=:memory:',
-            ]).PHP_EOL);
+            file_put_contents($envPath, '');
+
+            register_shutdown_function(static function () use ($envPath): void {
+                if (file_exists($envPath)) {
+                    unlink($envPath);
+                }
+            });
         }
 
         $app = require __DIR__ . '/../bootstrap/app.php';
