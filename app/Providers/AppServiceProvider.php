@@ -133,8 +133,10 @@ class AppServiceProvider extends ServiceProvider
                 ]);
         });
 
-        // Configure document service global variables for e-commerce
-        $this->configureDocumentVariables();
+        // Configure document service global variables for e-commerce (skip during console commands)
+        if (! $this->app->runningInConsole() && ! \in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+            $this->configureDocumentVariables();
+        }
 
         // Testing-only response assertion macros to support Filament table tests
         if ($this->app->environment('testing')) {
@@ -192,11 +194,27 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureDocumentVariables(): void
     {
-        $service = app(DocumentService::class);
+        if (! $this->shouldConfigureDocumentVariables()) {
+            return;
+        }
+
+        try {
+            $service = app(DocumentService::class);
+            $availableVariables = $service->getAvailableVariables();
+        } catch (\Throwable $exception) {
+            if ($this->app->runningInConsole()) {
+                // During console bootstrap (e.g. migrations, tests) the cache tables may not be available yet.
+                return;
+            }
+
+            report($exception);
+
+            return;
+        }
 
         // Register global e-commerce variables
         config([
-            'documents.global_variables' => array_merge($service->getAvailableVariables(), [
+            'documents.global_variables' => array_merge($availableVariables, [
                 // Company information
                 '$COMPANY_NAME' => config('app.name', 'E-Commerce Store'),
                 '$COMPANY_ADDRESS' => config('app.company_address', ''),
@@ -293,5 +311,14 @@ class AppServiceProvider extends ServiceProvider
             } catch (\Throwable $e) {
             }
         }
+    }
+
+    private function shouldConfigureDocumentVariables(): bool
+    {
+        if (\in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+            return false;
+        }
+
+        return ! $this->app->runningInConsole();
     }
 }

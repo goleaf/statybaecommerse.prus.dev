@@ -11,6 +11,7 @@ use App\Models\Review;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 /**
@@ -29,9 +30,33 @@ final class SingleProduct extends Component
 
     public int $quantity = 1;
 
-    protected SupportCollection $recentHistoriesCollection;
+    public ?int $activeVariantId = null;
 
-    protected SupportCollection $recentApprovedReviewsCollection;
+    /**
+     * Structured pricing summary for the currently selected context (product or variant).
+     *
+     * @var array{current: float|null, compare: float|null, discount: float|null, currency: string|null}
+     */
+    public array $pricingSummary = [
+        'current' => null,
+        'compare' => null,
+        'discount' => null,
+        'currency' => null,
+    ];
+
+    /**
+     * Inventory summary for the active product context.
+     *
+     * @var array{reserved: int|null, available: int|null}
+     */
+    public array $inventorySummary = [
+        'reserved' => null,
+        'available' => null,
+    ];
+
+    protected ?SupportCollection $recentHistoriesCollection = null;
+
+    protected ?SupportCollection $recentApprovedReviewsCollection = null;
 
     /**
      * Initialize the Livewire component with parameters.
@@ -55,10 +80,7 @@ final class SingleProduct extends Component
                 'variants' => fn ($variantQuery) => $variantQuery->with([
                     'media',
                     'prices.currency',
-                    'values' => fn ($valueQuery) => $valueQuery->with([
-                        'translations',
-                        'attribute.translations',
-                    ]),
+                    'variantAttributeValues.attribute.translations',
                 ]),
             ])
             ->withCount([
@@ -85,6 +107,9 @@ final class SingleProduct extends Component
 
         $this->trackProductView();
         $this->trackProductViewHistory();
+
+        $this->activeVariantId = $this->determineDefaultVariantId();
+        $this->refreshVariantState($this->activeVariantId);
     }
 
     /**
@@ -207,7 +232,7 @@ final class SingleProduct extends Component
         }
 
         if (! $this->product->relationLoaded('variants')) {
-            $this->product->loadMissing(['variants.values.attribute']);
+            $this->product->loadMissing(['variants.variantAttributeValues.attribute']);
         }
 
         $variantFeatures = collect();
@@ -216,19 +241,19 @@ final class SingleProduct extends Component
             ->product
             ->variants
             ->flatMap(function (ProductVariant $variant) {
-                if (! $variant->relationLoaded('values')) {
-                    $variant->loadMissing(['values.attribute']);
+                if (! $variant->relationLoaded('variantAttributeValues')) {
+                    $variant->loadMissing(['variantAttributeValues.attribute']);
                 }
 
                 return $variant
-                    ->values
+                    ->variantAttributeValues
                     ->map(function ($value): array {
                         $attribute = $value->attribute;
 
                         return [
                             'id' => $attribute?->id,
-                            'label' => $attribute?->trans('name') ?? $attribute?->name,
-                            'value' => $value->trans('value') ?? $value->value,
+                            'label' => $attribute?->trans('name') ?? $attribute?->name ?? $value->attribute_name,
+                            'value' => $value->getLocalizedValue(),
                             'icon' => $attribute?->icon,
                             'color' => $attribute?->color,
                         ];
@@ -298,7 +323,7 @@ final class SingleProduct extends Component
     public function variantMatrix(): \Illuminate\Support\Collection
     {
         if (! $this->product->relationLoaded('variants')) {
-            $this->product->loadMissing(['variants.media', 'variants.values.attribute', 'variants.prices.currency']);
+            $this->product->loadMissing(['variants.media', 'variants.variantAttributeValues.attribute', 'variants.prices.currency']);
         }
 
         return $this
@@ -322,11 +347,13 @@ final class SingleProduct extends Component
                         ?: $variant->getFirstMediaUrl(config('media.storage.collection_name')));
 
                 $attributes = $variant
-                    ->values
+                    ->variantAttributeValues
                     ->map(function ($value): array {
+                        $attribute = $value->attribute;
+
                         return [
-                            'attribute' => $value->attribute->trans('name') ?? $value->attribute->name,
-                            'value' => $value->trans('value') ?? $value->value,
+                            'attribute' => $attribute?->trans('name') ?? $attribute?->name ?? $value->attribute_name,
+                            'value' => $value->getLocalizedValue(),
                         ];
                     })
                     ->values();
@@ -349,13 +376,170 @@ final class SingleProduct extends Component
     #[Computed]
     public function recentHistories(): SupportCollection
     {
-        return $this->recentHistoriesCollection;
+        return $this->recentHistoriesCollection ??= collect();
     }
 
     #[Computed]
     public function recentApprovedReviewsLimited(): SupportCollection
     {
-        return $this->recentApprovedReviewsCollection;
+        return $this->recentApprovedReviewsCollection ??= collect();
+    }
+
+    #[On('variant.selected')]
+    public function handleVariantSelected(?int $variantId): void
+    {
+        $this->refreshVariantState($variantId);
+    }
+
+    protected function determineDefaultVariantId(): ?int
+    {
+        if (! isset($this->product) || ! $this->product->relationLoaded('variants')) {
+            return null;
+        }
+
+        $variants = $this->product->variants;
+
+        if ($variants->isEmpty()) {
+            return null;
+        }
+
+        $defaultVariant = $variants->firstWhere('is_default_variant', true)
+            ?? $variants->firstWhere('is_default', true)
+            ?? $variants->first();
+
+        return $defaultVariant?->id;
+    }
+
+    protected function refreshVariantState(?int $variantId): void
+    {
+        $variant = $this->resolveVariantById($variantId);
+
+        $this->activeVariantId = $variant?->id;
+        $this->pricingSummary = $this->buildPricingSummary($variant);
+        $this->inventorySummary = $this->buildInventorySummary($variant);
+        $this->updateStockState($variant);
+    }
+
+    protected function resolveVariantById(?int $variantId): ?ProductVariant
+    {
+        if (! $variantId) {
+            return null;
+        }
+
+        $variants = $this->product->relationLoaded('variants')
+            ? $this->product->variants
+            : collect();
+
+        $variant = $variants->firstWhere('id', $variantId);
+
+        if ($variant) {
+            return $variant;
+        }
+
+        $variant = $this->product
+            ->variants()
+            ->with(['variantAttributeValues.attribute', 'prices.currency', 'images'])
+            ->find($variantId);
+
+        if ($variant && $this->product->relationLoaded('variants')) {
+            $this->product->setRelation(
+                'variants',
+                $this->product->variants->push($variant)->unique('id')->values()
+            );
+        }
+
+        return $variant;
+    }
+
+    protected function buildPricingSummary(?ProductVariant $variant = null): array
+    {
+        $currency = function_exists('current_currency') ? current_currency() : null;
+
+        if ($variant) {
+            $priceData = $variant->getPrice();
+            $current = $priceData?->value ?? ($variant->price !== null ? (float) $variant->price : null);
+            $compare = $priceData?->compare ?? ($variant->compare_price !== null ? (float) $variant->compare_price : null);
+            $discount = $priceData?->percentage;
+
+            if ($discount === null && $compare && $current && $compare > $current) {
+                $discount = round((($compare - $current) / $compare) * 100);
+            }
+
+            return [
+                'current' => $current,
+                'compare' => $compare,
+                'discount' => $discount,
+                'currency' => $currency,
+            ];
+        }
+
+        $priceData = $this->product->getPrice();
+        $current = $priceData?->value ?? ($this->product->price !== null ? (float) $this->product->price : null);
+        $compare = $priceData?->compare ?? ($this->product->compare_price !== null ? (float) $this->product->compare_price : null);
+        $discount = $priceData?->percentage;
+
+        if ($discount === null && $compare && $current && $compare > $current) {
+            $discount = round((($compare - $current) / $compare) * 100);
+        }
+
+        return [
+            'current' => $current,
+            'compare' => $compare,
+            'discount' => $discount,
+            'currency' => $currency,
+        ];
+    }
+
+    protected function buildInventorySummary(?ProductVariant $variant = null): array
+    {
+        if ($variant) {
+            return [
+                'reserved' => $variant->reservedQuantity(),
+                'available' => $variant->availableQuantity(),
+            ];
+        }
+
+        return [
+            'reserved' => method_exists($this->product, 'reservedQuantity') ? $this->product->reservedQuantity() : null,
+            'available' => method_exists($this->product, 'availableQuantity') ? $this->product->availableQuantity() : null,
+        ];
+    }
+
+    protected function updateStockState(?ProductVariant $variant = null): void
+    {
+        if ($variant) {
+            $available = $variant->availableQuantity();
+            $threshold = (int) ($variant->low_stock_threshold ?? 0);
+
+            if ($available <= 0) {
+                $this->stockStatus = 'out_of_stock';
+                $this->stockMessage = __('product_variants.messages.out_of_stock');
+
+                return;
+            }
+
+            if ($threshold > 0 && $available <= $threshold) {
+                $this->stockStatus = 'low_stock';
+                $this->stockMessage = __('product_variants.messages.low_stock', ['quantity' => $available]);
+
+                return;
+            }
+
+            $this->stockStatus = 'in_stock';
+            $this->stockMessage = __('product_variants.messages.in_stock', ['quantity' => $available]);
+
+            return;
+        }
+
+        if ($this->product->relationLoaded('variants') && $this->product->variants->isNotEmpty()) {
+            $this->stockStatus = 'unavailable';
+            $this->stockMessage = __('product_variants.messages.select_variant');
+
+            return;
+        }
+
+        $this->stockStatus = $this->resolveStockStatus();
+        $this->stockMessage = $this->resolveStockMessage();
     }
 
     #[Computed]

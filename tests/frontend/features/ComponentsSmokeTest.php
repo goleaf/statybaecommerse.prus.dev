@@ -49,7 +49,7 @@ $livewireComponents = [
     \App\Livewire\Components\Product\ReviewForm::class,
     \App\Livewire\Components\Product\Reviews::class,
     \App\Livewire\Components\Brand\Products::class,
-    \App\Livewire\Components\VariantsSelector::class,
+    \App\Livewire\ProductVariantSelector::class,
     \App\Livewire\Components\CheckoutWizard::class,
     \App\Livewire\Components\Checkout\Shipping::class,
     \App\Livewire\Components\Checkout\Payment::class,
