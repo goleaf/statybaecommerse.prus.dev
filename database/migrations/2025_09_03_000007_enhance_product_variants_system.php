@@ -79,6 +79,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('attribute_id');
                 $table->unsignedBigInteger('attribute_value_id');
                 $table->timestamps();
+                $table->softDeletes();
 
                 $table->foreign('variant_id')->references('id')->on('product_variants')->onDelete('cascade');
                 $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
@@ -93,18 +94,27 @@ return new class extends Migration
             Schema::create('variant_pricing_rules', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
-                $table->string('rule_name');
-                $table->string('rule_type')->default('size_based');  // size_based, quantity_based, customer_group_based
-                $table->json('conditions');  // Rule conditions
-                $table->json('pricing_modifiers');  // Price modifiers
-                $table->boolean('is_active')->default(true);
+                $table->unsignedBigInteger('product_variant_id')->nullable();
+                $table->unsignedBigInteger('customer_group_id')->nullable();
+                $table->string('name');
+                $table->string('type')->default('percentage');
+                $table->decimal('value', 10, 2)->default(0);
+                $table->unsignedInteger('min_quantity')->nullable();
+                $table->unsignedInteger('max_quantity')->nullable();
                 $table->integer('priority')->default(0);
-                $table->timestamp('starts_at')->nullable();
-                $table->timestamp('ends_at')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_cumulative')->default(false);
+                $table->timestamp('valid_from')->nullable();
+                $table->timestamp('valid_until')->nullable();
+                $table->text('description')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
 
                 $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-                $table->index(['product_id', 'rule_type', 'is_active']);
+                $table->foreign('product_variant_id')->references('id')->on('product_variants')->onDelete('cascade');
+                $table->foreign('customer_group_id')->references('id')->on('customer_groups')->onDelete('set null');
+                $table->index(['product_id', 'type', 'is_active']);
+                $table->index(['product_variant_id', 'is_active']);
                 $table->index(['priority']);
             });
         }
