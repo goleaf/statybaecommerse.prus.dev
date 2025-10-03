@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Translations\BrandTranslation;
 use App\Models\Brand;
+use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
 
 final class BrandSeeder extends Seeder
@@ -23,7 +23,10 @@ final class BrandSeeder extends Seeder
             ['name' => 'Kärcher', 'featured' => false],
         ]);
 
-        $definitions->each(function (array $definition): void {
+        /** @var LocalImageGeneratorService $imageGenerator */
+        $imageGenerator = app(LocalImageGeneratorService::class);
+
+        $definitions->each(function (array $definition) use ($imageGenerator): void {
             $slug = str($definition['name'])->slug()->toString();
 
             // Check if brand already exists to maintain idempotency
@@ -61,7 +64,39 @@ final class BrandSeeder extends Seeder
                         'seo_description' => "Reliable {$definition['name']} tools for construction projects.",
                     ],
                 ]);
+
+                $this->attachGeneratedLogo($brand, $imageGenerator);
+            } else {
+                $this->attachGeneratedLogo($existingBrand, $imageGenerator);
             }
         });
+    }
+
+    private function attachGeneratedLogo(Brand $brand, LocalImageGeneratorService $imageGenerator): void
+    {
+        if ($brand->hasMedia('logo')) {
+            return;
+        }
+
+        try {
+            $logoPath = $imageGenerator->generateBrandLogo($brand->name);
+
+            if (!file_exists($logoPath)) {
+                return;
+            }
+
+            $brand
+                ->addMedia($logoPath)
+                ->withCustomProperties(['source' => 'local_generated'])
+                ->usingName($brand->name . ' Logo')
+                ->usingFileName(str($brand->slug)->slug()->toString() . '-logo.webp')
+                ->toMediaCollection('logo');
+        } catch (\Throwable $e) {
+            report($e);
+        } finally {
+            if (isset($logoPath) && file_exists($logoPath)) {
+                @unlink($logoPath);
+            }
+        }
     }
 }
