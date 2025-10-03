@@ -55,7 +55,7 @@ final class TurboEcommerceSeeder extends Seeder
         $this->imageGen = app(LocalImageGeneratorService::class);
         $this->sharedImagePoolDir = storage_path('app/temp/shared_product_images');
 
-        $this->productsPerBrand = (int) env('SEED_PRODUCTS_PER_BRAND', 100);
+        $this->productsPerBrand = max(100, (int) env('SEED_PRODUCTS_PER_BRAND', 100));
         $this->categoriesPerProduct = (int) env('SEED_CATEGORIES_PER_PRODUCT', 3);
         $this->attributesPerProductMin = (int) env('SEED_ATTRS_PER_PRODUCT_MIN', 3);
         $this->attributesPerProductMax = (int) env('SEED_ATTRS_PER_PRODUCT_MAX', 6);
