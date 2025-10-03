@@ -111,10 +111,10 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function reservedQuantity(): int
     {
-        $variantId = Number::parseFloat($this->id);
-        $sum = Number::parseFloat(DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum('vi.reserved'));
+        $variantId = Number::parseFloat((string) $this->id);
+        $sum = Number::parseFloat((string) DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum('vi.reserved'));
 
-        return max($sum, 0);
+        return (int) max($sum, 0);
     }
 
     /**
@@ -122,10 +122,10 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function availableQuantity(): int
     {
-        $variantId = Number::parseFloat($this->id);
-        $sum = Number::parseFloat(DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END')));
+        $variantId = Number::parseFloat((string) $this->id);
+        $sum = Number::parseFloat((string) DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId)->sum(DB::raw('CASE WHEN (vi.stock - vi.reserved) > 0 THEN (vi.stock - vi.reserved) ELSE 0 END')));
 
-        return max($sum, 0);
+        return (int) max($sum, 0);
     }
 
     /**

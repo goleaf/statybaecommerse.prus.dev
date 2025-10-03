@@ -108,11 +108,49 @@ final class ProductVariantSelector extends Component
         $this->showVariantDetails = $matchingVariant !== null;
     }
 
+    public function onVariantSelected(?int $variantId): void
+    {
+        if ($variantId === null) {
+            $this->resetVariantSelection();
+
+            return;
+        }
+
+        $variant = $this->variants->firstWhere('id', $variantId);
+
+        if (! $variant) {
+            $this->resetVariantSelection();
+
+            return;
+        }
+
+        $this->selectedVariant = $variant;
+        $this->selectedAttributes = $this->getVariantAttributes($variant);
+        $this->showVariantDetails = true;
+        $this->quantity = 1;
+
+        $this->recordVariantClick();
+    }
+
+    private function resetVariantSelection(): void
+    {
+        $this->selectedVariant = null;
+        $this->selectedAttributes = [];
+        $this->showVariantDetails = false;
+        $this->quantity = 1;
+    }
+
     public function getVariantAttributes(ProductVariant $variant): array
     {
         $attributes = [];
 
-        foreach ($variant->attributes as $attributeValue) {
+        $attributeValues = $variant->getRelationValue('attributes');
+
+        if ($attributeValues === null) {
+            $attributeValues = $variant->attributes()->with('attribute')->get();
+        }
+
+        foreach ($attributeValues as $attributeValue) {
             $attributes[$attributeValue->attribute->slug] = $attributeValue->value;
         }
 
@@ -220,19 +258,23 @@ final class ProductVariantSelector extends Component
 
     public function getVariantPrice(): float
     {
-        return $this->selectedVariant ? $this->selectedVariant->getCurrentPrice() : 0;
+        return $this->selectedVariant ? (float) $this->selectedVariant->getCurrentPrice() : 0.0;
     }
 
     public function getVariantOriginalPrice(): float
     {
-        return $this->selectedVariant ? $this->selectedVariant->price : 0;
+        return $this->selectedVariant ? (float) $this->selectedVariant->price : 0.0;
     }
 
     public function getVariantPromotionalPrice(): ?float
     {
-        return $this->selectedVariant && $this->selectedVariant->isCurrentlyOnSale()
-            ? $this->selectedVariant->promotional_price
-            : null;
+        if (! $this->selectedVariant || ! $this->selectedVariant->isCurrentlyOnSale()) {
+            return null;
+        }
+
+        $promotionalPrice = $this->selectedVariant->promotional_price;
+
+        return $promotionalPrice !== null ? (float) $promotionalPrice : null;
     }
 
     public function isVariantOnSale(): bool
@@ -363,6 +405,8 @@ final class ProductVariantSelector extends Component
 
     public function render()
     {
-        return view('livewire.product-variant-selector');
+        return view('livewire.product-variant-selector', [
+            'attributes' => $this->variantAttributes,
+        ]);
     }
 }
