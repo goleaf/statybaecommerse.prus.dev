@@ -22,12 +22,29 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         <!-- Product Images -->
-        <div class="product-images">
+        <div class="product-images"
+             x-data="{
+                images: @js($productImages->map(fn($image) => [
+                    'full' => $image->getUrl(),
+                    'thumb' => method_exists($image, 'hasGeneratedConversion') && $image->hasGeneratedConversion('thumb')
+                        ? $image->getUrl('thumb')
+                        : $image->getUrl(),
+                ])->values()),
+                selectedImageIndex: 0,
+                showModal: false
+            }"
+             x-cloak>
             <div class="main-image mb-4">
                 @if($productImages->isNotEmpty())
-                    <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer" 
-                         wire:click="openImageModal(0)">
+                    <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
+                         @click="showModal = true"
+                         @keydown.enter.prevent="showModal = true"
+                         @keydown.space.prevent="showModal = true"
+                         role="button"
+                         tabindex="0"
+                    >
                         <img src="{{ $productImages->first()->getUrl() }}"
+                             x-bind:src="images.length ? images[selectedImageIndex].full : '{{ $productImages->first()->getUrl() }}'"
                              alt="{{ $product->name }}"
                              class="w-full h-full object-cover hover:scale-105 transition-transform duration-200">
                     </div>
@@ -43,15 +60,44 @@
             @if($productImages->count() > 1)
                 <div class="thumbnail-images grid grid-cols-4 gap-2">
                     @foreach($productImages->take(4) as $index => $image)
-                        <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all duration-200"
-                             wire:click="openImageModal({{ $index }})">
-                            <img src="{{ $image->getUrl('thumb') }}" 
+                        <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer transition-all duration-200"
+                             @click="selectedImageIndex = {{ $index }}"
+                             :class="selectedImageIndex === {{ $index }} ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-500'">
+                            <img src="{{ $image->getUrl('thumb') }}"
                                  alt="{{ $product->name }}"
                                  class="w-full h-full object-cover">
                         </div>
                     @endforeach
                 </div>
             @endif
+
+            <div class="fixed inset-0 z-50 overflow-y-auto"
+                 x-show="showModal && images.length"
+                 x-transition.opacity
+                 @click.self="showModal = false"
+                 @keydown.escape.window="showModal = false"
+                 style="display: none;">
+                <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full"
+                         x-transition.scale>
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <img src="{{ $productImages->first()->getUrl() }}"
+                                 x-bind:src="images.length ? images[selectedImageIndex].full : '{{ $productImages->first()->getUrl() }}'"
+                                 alt="{{ $product->name }}"
+                                 class="w-full h-auto">
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button type="button"
+                                    @click="showModal = false"
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                {{ __('common.close') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Product Information -->
@@ -294,28 +340,4 @@
         </div>
     @endif
 
-    <!-- Image Modal -->
-    @if($showImageModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" wire:click="closeImageModal">
-            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeImageModal"></div>
-                
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        @if($productImages->isNotEmpty())
-                            <img src="{{ $productImages->get($selectedImageIndex)->getUrl() }}"
-                                 alt="{{ $product->name }}"
-                                 class="w-full h-auto">
-                        @endif
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="button" wire:click="closeImageModal"
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            {{ __('common.close') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
 </div>
