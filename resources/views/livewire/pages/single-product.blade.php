@@ -435,14 +435,7 @@
                     @endif
 
                     @if ((bool) (config('app-features.features.review') ?? true))
-                        <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
-                            <div class="space-y-6 p-6 lg:p-8">
-                                <h2 class="text-lg font-semibold text-slate-900">
-                                    {{ __('product_page.customer_feedback') }}</h2>
-                                <livewire:components.product.reviews :productId="$product->id" />
-                                <livewire:components.product.review-form :productId="$product->id" />
-                            </div>
-                        </section>
+                        <livewire:components.product-reviews :product="$product" />
                     @endif
                 </div>
 
