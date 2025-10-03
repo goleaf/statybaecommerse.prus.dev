@@ -306,6 +306,7 @@ return [
         'message_placeholder' => 'Papildoma informacija apie jūsų poreikius...',
         'cancel' => 'Atšaukti',
         'submit_request' => 'Pateikti užklausą',
+        'request_success' => 'Jūsų užklausa sėkmingai išsiųsta. Susisieksime su jumis artimiausiu metu.',
         'cannot_add_to_cart' => 'Negalima pridėti į krepšelį',
         'request_required' => 'Šis produktas reikalauja užklausos prieš pirkimą',
         'cannot_add_to_cart_message' => 'Šis produktas reikalauja užklausos prieš pirkimą. Naudokite užklausos formą žemiau.',
