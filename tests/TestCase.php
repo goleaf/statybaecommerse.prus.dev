@@ -13,6 +13,8 @@ abstract class TestCase extends BaseTestCase
 
     private bool $createdEnvFile = false;
 
+    private ?Panel $resolvedAdminPanel = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -41,6 +43,12 @@ abstract class TestCase extends BaseTestCase
 
     protected function tearDown(): void
     {
+        if ($this->resolvedAdminPanel instanceof Panel) {
+            Filament::setCurrentPanel(null);
+            Filament::setServingStatus(false);
+            $this->resolvedAdminPanel = null;
+        }
+
         if ($this->createdEnvFile && file_exists(base_path('.env'))) {
             unlink(base_path('.env'));
         }
@@ -50,6 +58,12 @@ abstract class TestCase extends BaseTestCase
 
     protected function resolveAdminPanel(): Panel
     {
+        if ($this->resolvedAdminPanel instanceof Panel) {
+            Filament::setCurrentPanel($this->resolvedAdminPanel);
+
+            return $this->resolvedAdminPanel;
+        }
+
         $panel = Filament::getPanel('admin');
 
         if (! $panel instanceof Panel) {
@@ -57,6 +71,9 @@ abstract class TestCase extends BaseTestCase
         }
 
         Filament::setCurrentPanel($panel);
+        Filament::setServingStatus(true);
+
+        $this->resolvedAdminPanel = $panel;
 
         return $panel;
     }
