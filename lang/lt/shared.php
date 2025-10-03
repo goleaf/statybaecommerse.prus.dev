@@ -78,6 +78,7 @@ return [
     'no_orders' => 'Užsakymų nėra',
     'start_shopping' => 'Pradėti apsipirkimą',
     'browse_products' => 'Naršyti produktus',
+    'categories' => 'Kategorijos',
     'try_different_search' => 'Pabandykite kitą paiešką',
     // Loading States
     'loading' => 'Kraunama...',
