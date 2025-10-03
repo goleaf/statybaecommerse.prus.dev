@@ -11,6 +11,19 @@ uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend');
 uses(RefreshDatabase::class)->in('Feature', 'Unit', 'admin', 'frontend');
 
 beforeAll(function () {
+    $envPath = base_path('.env');
+    if (! file_exists($envPath)) {
+        file_put_contents($envPath, implode(PHP_EOL, [
+            'APP_NAME="StatybaEcommerce"',
+            'APP_ENV=testing',
+            'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
+            'APP_DEBUG=true',
+            'LOG_CHANNEL=stack',
+            'DB_CONNECTION=sqlite',
+            'DB_DATABASE=:memory:',
+        ]).PHP_EOL);
+    }
+
     config()->set('database.default', 'sqlite');
     config()->set('database.connections.sqlite.database', ':memory:');
 
