@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -34,7 +32,7 @@ final class NotificationResourceTest extends TestCase
         $notification = Notification::factory()->create([
             'notifiable_id' => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'type' => 'App\\Notifications\\TestNotification',
+            'type' => 'App\Notifications\TestNotification',
             'data' => [
                 'title' => 'Test Notification',
                 'body' => 'Test body',
