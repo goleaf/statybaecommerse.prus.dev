@@ -50,16 +50,27 @@
                     ->values();
                 $averageRating = round((float) ($product->average_rating ?? 0), 1);
                 $reviewCount = (int) ($product->reviews_count ?? 0);
-                $priceData = $product->getPrice();
-                $currentCurrency = function_exists('current_currency') ? current_currency() : null;
-                $currentPrice = $priceData?->value?->amount ?? $product->price;
-                $comparePrice = $priceData?->compare?->amount ?? $product->compare_price;
-                $discountPercent = $priceData?->percentage ?? null;
+                $pricing = $pricingSummary;
+                $currentCurrency = $pricing['currency'] ?? (function_exists('current_currency') ? current_currency() : null);
+                $currentPrice = $pricing['current'] ?? null;
+                $comparePrice = $pricing['compare'] ?? null;
+                $discountPercent = $pricing['discount'] ?? null;
+                $inventorySnapshot = $inventorySummary;
+                $availableQuantity = $inventorySnapshot['available'] ?? $product->availableQuantity();
+                $reservedQuantity = $inventorySnapshot['reserved'] ?? $product->reservedQuantity();
                 $shortDescription = $product->trans('short_description') ?? $product->short_description;
                 $recentHistories = $this->recentHistories;
                 $contactUrl = Route::has('contact')
                     ? route('contact', ['locale' => app()->getLocale()])
                     : 'mailto:' . (config('mail.from.address') ?? 'info@example.com');
+                $activeStockStatus = $stockStatus ?? 'out_of_stock';
+                $activeStockMessage = $stockMessage ?? '';
+                $stockToneClass = match ($activeStockStatus) {
+                    'in_stock' => 'text-emerald-600',
+                    'low_stock' => 'text-amber-600',
+                    'out_of_stock' => 'text-rose-600',
+                    default => 'text-slate-500',
+                };
             @endphp
 
             <div class="grid gap-10 lg:grid-cols-12">
@@ -134,12 +145,17 @@
                                             @endif
                                         </p>
                                     @endif
+                                    @if ($activeStockMessage)
+                                        <p class="text-sm font-medium {{ $stockToneClass }}">
+                                            {{ $activeStockMessage }}
+                                        </p>
+                                    @endif
                                 </div>
                                 <div class="sm:text-right">
                                     <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
                                         {{ __('translations.available') }}</p>
                                     <p class="text-lg font-semibold text-slate-900">
-                                        {{ $product->availableQuantity() }}
+                                        {{ \Illuminate\Support\Number::format((float) $availableQuantity) }}
                                     </p>
                                 </div>
                             </div>
@@ -464,15 +480,15 @@
                             <div class="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
                                 <span class="inline-flex items-center gap-1">
                                     <span class="text-slate-500">{{ __('translations.reserved') }}:</span>
-                                    <span class="text-slate-900">{{ \Illuminate\Support\Number::format((float) $product->reservedQuantity()) }}</span>
+                                    <span class="text-slate-900">{{ \Illuminate\Support\Number::format((float) $reservedQuantity) }}</span>
                                 </span>
                                 <span class="inline-flex items-center gap-1">
                                     <span class="text-slate-500">{{ __('translations.available') }}:</span>
-                                    <span class="text-slate-900">{{ \Illuminate\Support\Number::format((float) $product->availableQuantity()) }}</span>
+                                    <span class="text-slate-900">{{ \Illuminate\Support\Number::format((float) $availableQuantity) }}</span>
                                 </span>
                             </div>
                             <div class="variant-selector-card">
-                                <livewire:components.variants-selector :product="$product" />
+                                <livewire:product-variant-selector :product="$product" />
                             </div>
                         </div>
                     </section>

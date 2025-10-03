@@ -89,7 +89,7 @@ final class DocumentService
      */
     public function getAvailableVariables(): array
     {
-        return Cache::remember('document_variables_'.app()->getLocale(), 3600, function () {
+        $resolver = function (): array {
             return [
                 // Global variables
                 '$COMPANY_NAME' => config('app.name'),
@@ -111,7 +111,21 @@ final class DocumentService
                 '$BRAND_NAME' => 'Brand name',
                 '$CATEGORY_NAME' => 'Category name',
             ];
-        });
+        };
+
+        $storeName = config('documents.cache_store', 'array');
+
+        try {
+            return Cache::store($storeName)->remember('document_variables_'.app()->getLocale(), 3600, $resolver);
+        } catch (\Throwable $exception) {
+            if (app()->runningInConsole()) {
+                return $resolver();
+            }
+
+            report($exception);
+
+            return $resolver();
+        }
     }
 
     /**
