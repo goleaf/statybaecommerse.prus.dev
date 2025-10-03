@@ -11,7 +11,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use Tests\TestCase;
 
 final class NormalSettingTranslationResourceTest extends TestCase
 {

@@ -12,7 +12,6 @@ use App\Models\NewsTag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\TestCase;
 
 final class NewsResourceTest extends TestCase
 {
