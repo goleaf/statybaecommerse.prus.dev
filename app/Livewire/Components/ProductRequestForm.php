@@ -84,7 +84,7 @@ final class ProductRequestForm extends Component
         $this->resetForm();
         $this->showForm = false;
         // Show success message
-        session()->flash('request_success', 'Jūsų užklausa sėkmingai išsiųsta. Susisieksime su jumis artimiausiu metu.');
+        session()->flash('request_success', __('frontend.product.request_success'));
         // Dispatch event to refresh parent component
         $this->dispatch('request-submitted');
     }
