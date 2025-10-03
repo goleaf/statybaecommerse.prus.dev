@@ -15,19 +15,35 @@ trait WithCart
 {
     public function addToCart(int $productId, int $quantity = 1): void
     {
-        $product = Product::findOrFail($productId);
+        $product = Product::query()->findOrFail($productId);
+
         if ($product->stock_quantity < $quantity) {
             $this->notifyError(__('Not enough stock available'));
 
             return;
         }
+
+        $this->persistCartItem($product, $quantity);
+    }
+
+    protected function persistCartItem(Product $product, int $quantity = 1): void
+    {
         $cartItems = session()->get('cart', []);
-        if (isset($cartItems[$productId])) {
-            $cartItems[$productId]['quantity'] += $quantity;
+
+        if (isset($cartItems[$product->getKey()])) {
+            $cartItems[$product->getKey()]['quantity'] += $quantity;
         } else {
-            $cartItems[$productId] = ['name' => $product->name, 'price' => $product->price, 'quantity' => $quantity, 'image' => $product->getFirstMediaUrl('images'), 'sku' => $product->sku];
+            $cartItems[$product->getKey()] = [
+                'name' => $product->name,
+                'price' => $product->price,
+                'quantity' => $quantity,
+                'image' => $product->getFirstMediaUrl('images'),
+                'sku' => $product->sku,
+            ];
         }
+
         session()->put('cart', $cartItems);
+
         $this->dispatch('cart-updated');
         $this->notifySuccess(__('Product added to cart'));
     }
