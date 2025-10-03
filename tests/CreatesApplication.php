@@ -9,6 +9,18 @@ trait CreatesApplication
 {
     public function createApplication(): Application
     {
+        $envPath = __DIR__ . '/../.env';
+
+        if (! file_exists($envPath)) {
+            file_put_contents($envPath, '');
+
+            register_shutdown_function(static function () use ($envPath): void {
+                if (file_exists($envPath)) {
+                    unlink($envPath);
+                }
+            });
+        }
+
         $app = require __DIR__ . '/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();

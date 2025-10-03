@@ -9,9 +9,19 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
+    private bool $createdEnvFile = false;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        if (! file_exists(base_path('.env'))) {
+            file_put_contents(base_path('.env'), '');
+            $this->createdEnvFile = true;
+        } else {
+            $this->createdEnvFile = false;
+        }
+
         Config::set('database.default', 'sqlite');
         Config::set('database.connections.sqlite.database', ':memory:');
         Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
@@ -25,5 +35,14 @@ abstract class TestCase extends BaseTestCase
             \Spatie\Permission\Middleware\RoleMiddleware::class,
             \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->createdEnvFile && file_exists(base_path('.env'))) {
+            unlink(base_path('.env'));
+        }
+
+        parent::tearDown();
     }
 }
