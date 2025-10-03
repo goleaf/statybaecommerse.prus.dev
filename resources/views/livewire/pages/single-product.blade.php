@@ -530,18 +530,7 @@
                         </div>
                     </section>
 
-                    <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
-                        <div class="space-y-4 p-6 lg:p-8">
-                            <h2 class="text-base font-semibold text-slate-900">
-                                {{ __('product_page.need_tailored_offer') }}</h2>
-                            <p class="text-sm text-slate-600">{{ __('product_page.tailored_offer_desc') }}</p>
-                            <a href="{{ $contactUrl }}"
-                               class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">
-                                <x-heroicon-o-phone class="mr-2 h-4 w-4" />
-                                {{ __('translations.contact_us') }}
-                            </a>
-                        </div>
-                    </section>
+                    <livewire:components.product-request-form :product="$product" />
                 </div>
             </div>
 

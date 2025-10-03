@@ -1,145 +1,143 @@
-<div>
+<div class="space-y-4">
     @if (session('request_success'))
-        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
             {{ session('request_success') }}
         </div>
     @endif
 
-    @if ($product->is_requestable)
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-medium text-blue-900">
-                        {{ __('frontend.product.request_info_title') }}
-                    </h3>
-                    <p class="text-blue-700 mt-1">
-                        {{ __('frontend.product.request_info_description') }}
-                    </p>
-                    @if ($product->request_message)
-                        <p class="text-blue-600 mt-2 text-sm">
-                            {{ $product->request_message }}
-                        </p>
-                    @endif
-                </div>
-                <button 
-                    wire:click="toggleForm"
-                    wire:confirm="{{ __('translations.confirm_toggle_product_request_form') }}"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                    {{ $showForm ? __('frontend.product.cancel_request') : __('frontend.product.request_product') }}
-                </button>
-            </div>
+    <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
+        <div class="space-y-4 p-6 lg:p-8">
+            <h2 class="text-base font-semibold text-slate-900">
+                {{ __('product_page.need_tailored_offer') }}
+            </h2>
+            <p class="text-sm text-slate-600">
+                {{ __('product_page.tailored_offer_desc') }}
+            </p>
+            @if ($product->request_message)
+                <p class="text-xs text-slate-500">
+                    {{ $product->request_message }}
+                </p>
+            @endif
+            <button
+                type="button"
+                wire:click="toggleForm"
+                class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            >
+                <x-heroicon-o-phone class="mr-2 h-4 w-4" />
+                {{ $showForm ? __('frontend.product.cancel') : __('translations.contact_specialists_cta') }}
+            </button>
         </div>
+    </section>
 
-        @if ($showForm)
-            <div class="bg-white border border-gray-200 rounded-lg p-6">
-                <h4 class="text-lg font-medium text-gray-900 mb-4">
+    @if ($showForm)
+        <section class="rounded-3xl border border-slate-100 bg-white shadow-sm">
+            <div class="p-6 lg:p-8">
+                <h3 class="text-base font-semibold text-slate-900">
                     {{ __('frontend.product.request_form_title') }}
-                </h4>
+                </h3>
 
-                <form wire:submit.prevent="submitRequest">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form wire:submit.prevent="submitRequest" class="mt-6 space-y-6">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="name" class="mb-1 block text-sm font-medium text-slate-700">
                                 {{ __('frontend.product.name') }} <span class="text-red-500">*</span>
                             </label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 id="name"
                                 wire:model="name"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror"
+                                class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 @error('name') border-red-500 focus:ring-red-200 @enderror"
                                 required
                             >
                             @error('name')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="email" class="mb-1 block text-sm font-medium text-slate-700">
                                 {{ __('frontend.product.email') }} <span class="text-red-500">*</span>
                             </label>
-                            <input 
-                                type="email" 
+                            <input
+                                type="email"
                                 id="email"
                                 wire:model="email"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('email') border-red-500 @enderror"
+                                class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 @error('email') border-red-500 focus:ring-red-200 @enderror"
                                 required
                             >
                             @error('email')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="phone" class="mb-1 block text-sm font-medium text-slate-700">
                                 {{ __('frontend.product.phone') }}
                             </label>
-                            <input 
-                                type="tel" 
+                            <input
+                                type="tel"
                                 id="phone"
                                 wire:model="phone"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('phone') border-red-500 @enderror"
+                                class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 @error('phone') border-red-500 focus:ring-red-200 @enderror"
                             >
                             @error('phone')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="requested_quantity" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="requested_quantity" class="mb-1 block text-sm font-medium text-slate-700">
                                 {{ __('frontend.product.requested_quantity') }} <span class="text-red-500">*</span>
                             </label>
-                            <input 
-                                type="number" 
+                            <input
+                                type="number"
                                 id="requested_quantity"
                                 wire:model="requested_quantity"
                                 min="1"
                                 max="999"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('requested_quantity') border-red-500 @enderror"
+                                class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 @error('requested_quantity') border-red-500 focus:ring-red-200 @enderror"
                                 required
                             >
                             @error('requested_quantity')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <label for="message" class="block text-sm font-medium text-gray-700 mb-1">
+                    <div>
+                        <label for="message" class="mb-1 block text-sm font-medium text-slate-700">
                             {{ __('frontend.product.message') }}
                         </label>
-                        <textarea 
+                        <textarea
                             id="message"
                             wire:model="message"
                             rows="4"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('message') border-red-500 @enderror"
+                            class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 @error('message') border-red-500 focus:ring-red-200 @enderror"
                             placeholder="{{ __('frontend.product.message_placeholder') }}"
                         ></textarea>
                         @error('message')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="mt-6 flex justify-end space-x-3">
-                        <button 
+                    <div class="flex justify-end gap-3">
+                        <button
                             type="button"
                             wire:click="toggleForm"
-                            wire:confirm="{{ __('translations.confirm_toggle_product_request_form') }}"
-                            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                            class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                         >
                             {{ __('frontend.product.cancel') }}
                         </button>
-                        <button 
+                        <button
                             type="submit"
-                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                            class="inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                         >
                             {{ __('frontend.product.submit_request') }}
                         </button>
                     </div>
                 </form>
             </div>
-        @endif
+        </section>
     @endif
 </div>
 
