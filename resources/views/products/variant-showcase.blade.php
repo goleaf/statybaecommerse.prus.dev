@@ -40,7 +40,7 @@
                                 €{{ number_format($product->price, 2) }}
                             </span>
                             <span class="text-sm text-gray-500">
-                                {{ $product->variants()->count() }} {{ __('product_variants.showcase.variants_count') }}
+                                {{ data_get($product, 'variant_counts.total_variants', $product->variants->count()) }} {{ __('product_variants.showcase.variants_count') }}
                             </span>
                         </div>
                     </div>
@@ -104,7 +104,15 @@
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-blue-600">{{ __('product_variants.showcase.total_variants') }}</p>
-                                <p class="text-2xl font-bold text-blue-900">{{ $selectedProduct->variants()->count() }}</p>
+                                @php
+                                    $variantCounts = data_get($selectedProduct, 'variant_counts', [
+                                        'total_variants' => $selectedProduct->variants->count(),
+                                        'in_stock' => $selectedProduct->variants->where('available_quantity', '>', 0)->count(),
+                                        'low_stock' => $selectedProduct->variants->filter(fn ($variant) => $variant->track_inventory && (int) $variant->available_quantity <= (int) $variant->low_stock_threshold)->count(),
+                                        'out_of_stock' => $selectedProduct->variants->filter(fn ($variant) => $variant->track_inventory && (int) $variant->available_quantity <= 0)->count(),
+                                    ]);
+                                @endphp
+                                <p class="text-2xl font-bold text-blue-900">{{ $variantCounts['total_variants'] }}</p>
                             </div>
                         </div>
                     </div>
@@ -119,7 +127,7 @@
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-green-600">{{ __('product_variants.showcase.in_stock') }}</p>
-                                <p class="text-2xl font-bold text-green-900">{{ $selectedProduct->variants()->inStock()->count() }}</p>
+                                <p class="text-2xl font-bold text-green-900">{{ $variantCounts['in_stock'] }}</p>
                             </div>
                         </div>
                     </div>
@@ -134,7 +142,7 @@
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-yellow-600">{{ __('product_variants.showcase.low_stock') }}</p>
-                                <p class="text-2xl font-bold text-yellow-900">{{ $selectedProduct->variants()->lowStock()->count() }}</p>
+                                <p class="text-2xl font-bold text-yellow-900">{{ $variantCounts['low_stock'] }}</p>
                             </div>
                         </div>
                     </div>
@@ -149,7 +157,7 @@
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-red-600">{{ __('product_variants.showcase.out_of_stock') }}</p>
-                                <p class="text-2xl font-bold text-red-900">{{ $selectedProduct->variants()->outOfStock()->count() }}</p>
+                                <p class="text-2xl font-bold text-red-900">{{ $variantCounts['out_of_stock'] }}</p>
                             </div>
                         </div>
                     </div>

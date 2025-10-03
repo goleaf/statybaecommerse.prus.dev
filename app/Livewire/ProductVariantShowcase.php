@@ -28,6 +28,13 @@ final class ProductVariantShowcase extends Component
 
     public array $comparisonVariants = [];
 
+    public array $variantCounts = [
+        'total_variants' => 0,
+        'in_stock' => 0,
+        'low_stock' => 0,
+        'out_of_stock' => 0,
+    ];
+
     public function mount(): void
     {
         $this->loadProducts();
@@ -39,6 +46,10 @@ final class ProductVariantShowcase extends Component
             ->where('is_visible', true)
             ->where('status', 'published')
             ->get();
+
+        $this->products->each(function (Product $product): void {
+            $product->setAttribute('variant_counts', $this->calculateVariantCounts($product->variants));
+        });
     }
 
     public function selectProduct(int $productId): void
@@ -51,12 +62,28 @@ final class ProductVariantShowcase extends Component
     public function loadProductVariants(): void
     {
         if (! $this->selectedProduct) {
+            $this->productVariants = collect();
+            $this->variantCounts = [
+                'total_variants' => 0,
+                'in_stock' => 0,
+                'low_stock' => 0,
+                'out_of_stock' => 0,
+            ];
+
             return;
         }
 
-        $this->productVariants = $this->selectedProduct->variants()
-            ->with(['variantAttributeValues.attribute', 'variantAttributeValues.attributeValue'])
-            ->get();
+        $this->selectedProduct->loadMissing([
+            'variants.variantAttributeValues.attribute',
+            'variants.variantAttributeValues.attributeValue',
+        ]);
+
+        $this->productVariants = $this->selectedProduct->variants;
+
+        $this->selectedProduct->setRelation('variants', $this->productVariants);
+
+        $this->variantCounts = $this->calculateVariantCounts($this->productVariants);
+        $this->selectedProduct->setAttribute('variant_counts', $this->variantCounts);
 
         $this->productAttributes = Attribute::whereHas('attributeValues', function ($query) {
             $query->whereHas('variantAttributeValues', function ($q) {
@@ -138,7 +165,7 @@ final class ProductVariantShowcase extends Component
 
     public function getVariantPrice(ProductVariant $variant): float
     {
-        return $variant->getCurrentPrice();
+        return (float) $variant->getCurrentPrice();
     }
 
     public function getVariantOriginalPrice(ProductVariant $variant): ?float
@@ -160,7 +187,21 @@ final class ProductVariantShowcase extends Component
 
     public function getVariantStockStatus(ProductVariant $variant): string
     {
-        return $variant->getStockStatus();
+        if (! $variant->track_inventory) {
+            return 'not_tracked';
+        }
+
+        $available = (int) $variant->available_quantity;
+
+        if ($available <= 0) {
+            return 'out_of_stock';
+        }
+
+        if ($available <= (int) $variant->low_stock_threshold) {
+            return 'low_stock';
+        }
+
+        return 'in_stock';
     }
 
     public function getVariantBadges(ProductVariant $variant): array
@@ -195,10 +236,7 @@ final class ProductVariantShowcase extends Component
         $variants = $this->productVariants;
 
         return [
-            'total_variants' => $variants->count(),
-            'in_stock' => $variants->where('available_quantity', '>', 0)->count(),
-            'low_stock' => $variants->whereColumn('available_quantity', '<=', 'low_stock_threshold')->where('track_inventory', true)->count(),
-            'out_of_stock' => $variants->where('available_quantity', '<=', 0)->where('track_inventory', true)->count(),
+            ...$this->variantCounts,
             'on_sale' => $variants->where('is_on_sale', true)->count(),
             'featured' => $variants->where('is_featured', true)->count(),
             'new' => $variants->where('is_new', true)->count(),
@@ -235,5 +273,27 @@ final class ProductVariantShowcase extends Component
     public function render()
     {
         return view('livewire.product-variant-showcase');
+    }
+
+    private function calculateVariantCounts(Collection $variants): array
+    {
+        return [
+            'total_variants' => $variants->count(),
+            'in_stock' => $variants->filter(fn (ProductVariant $variant) => (int) $variant->available_quantity > 0)->count(),
+            'low_stock' => $variants->filter(function (ProductVariant $variant) {
+                if (! $variant->track_inventory) {
+                    return false;
+                }
+
+                return (int) $variant->available_quantity <= (int) $variant->low_stock_threshold;
+            })->count(),
+            'out_of_stock' => $variants->filter(function (ProductVariant $variant) {
+                if (! $variant->track_inventory) {
+                    return false;
+                }
+
+                return (int) $variant->available_quantity <= 0;
+            })->count(),
+        ];
     }
 }
