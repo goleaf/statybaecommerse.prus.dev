@@ -745,6 +745,8 @@ return [
     'already_reviewed_product' => 'You have already reviewed this product.',
     'review_submitted_for_approval' => 'Your review has been submitted and is pending approval.',
     'reviews_count' => '{1} :count review|[2,*] :count reviews',
+    'average_rating' => 'Average rating',
+    'rating_distribution' => 'Rating distribution',
     'no_reviews_yet' => 'No reviews yet',
     'be_first_to_review' => 'Be the first to share your thoughts about this product.',
     // Address translations
