@@ -2,10 +2,12 @@
 
 return [
     'meta' => [
+        'title' => 'Kolekcijos',
         'description' => 'Atraskite kruopščiai atrinktas produktų kolekcijas kiekvienai nuotaikai ir progai.',
     ],
     'hero' => [
         'badge' => 'Kuruotos kolekcijos',
+        'title' => 'Kolekcijos kiekvienai istorijai',
         'subtitle' => 'Naršykite paruoštus produktų rinkinius, kuriuos sudarė Statybae komanda, ir raskite tobulą derinį per kelias sekundes.',
     ],
     'empty' => [
@@ -16,7 +18,9 @@ return [
         'view_collection' => 'Peržiūrėti kolekciją',
         'view_product' => 'Peržiūrėti produktą',
     ],
-    'products' => [],
+    'products' => [
+        'title' => 'Produktai kolekcijoje :name',
+    ],
     'types' => [
         'automatic' => 'Automatinė',
         'manual' => 'Rankinė',

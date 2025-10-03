@@ -62,6 +62,8 @@ return [
         'orders' => 'Užsakymai',
         'addresses' => 'Adresai',
         'countries' => 'Šalys',
+        'categories' => 'Kategorijos',
+        'brands' => 'Prekės ženklai',
         'news' => 'Naujienos',
         'locations' => 'Vietos',
         'referrals' => 'Rekomendacijos',
@@ -298,6 +300,10 @@ return [
     // Header and navigation translations
     'header' => [
         'search_placeholder' => 'Ieškoti produktų...',
+        'categories' => 'Kategorijos',
+        'collections' => 'Kolekcijos',
+        'brands' => 'Prekės ženklai',
+        'support_centre' => 'Pagalbos centras',
         'login' => 'Prisijungti',
         'cart' => 'Krepšelis',
         'items_in_cart' => 'prekių krepšelyje, peržiūrėti krepšelį',
@@ -314,6 +320,7 @@ return [
     ],
     // Categories page translations
     'categories' => [
+        'title' => 'Kategorijos',
         'catalogue_overview' => 'Katalogo apžvalga',
         'description' => 'Atraskite kiekvieną StatyBae Commerce skyrių',
         'subtitle' => 'Naršykite struktūrizuotas kategorijas, kurias paruošė mūsų prekių specialistai, kad padėtų profesionalams ir savo rankomis dirbantiems entuziastams greičiau rasti tinkamas medžiagas.',

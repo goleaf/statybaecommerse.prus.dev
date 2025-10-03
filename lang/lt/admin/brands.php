@@ -42,6 +42,7 @@ return [
         'translations' => 'Vertimai',
         'locale' => 'Kalbos kodas',
         'products_count' => 'Produktų skaičius',
+        'active_products_count' => 'Aktyvių produktų skaičius',
         'translations_count' => 'Vertimų skaičius',
         'created_at' => 'Sukurta',
         'updated_at' => 'Atnaujinta',
@@ -91,7 +92,9 @@ return [
 
     'notifications' => [
         'created' => 'Prekės ženklas sėkmingai sukurtas',
+        'created_description' => 'Prekės ženklas „:name“ sėkmingai sukurtas.',
         'updated' => 'Prekės ženklas sėkmingai atnaujintas',
+        'updated_description' => 'Prekės ženklas „:name“ sėkmingai atnaujintas.',
         'deleted' => 'Prekės ženklas sėkmingai ištrintas',
     ],
 

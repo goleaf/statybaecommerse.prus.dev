@@ -28,11 +28,15 @@ return [
         'explore_store_sections' => 'Tyrinėkite visus mūsų parduotuvės skyrius',
         'browse_categories_description' => 'Peržiūrėkite visą kategorijų sąrašą su vizualiais kortelėmis, kad greitai rastumėte reikiamus produktus.',
         'all_categories' => 'Visos kategorijos',
+        'collections_selections' => 'Kolekcijos ir rinkiniai',
+        'current_collections' => 'Dabartinės įkvėpimo kolekcijos ir paruošti rinkiniai',
+        'collections_description' => 'Kiekviena kolekcija pateikta vizualiai: pasirinkite nuotaiką, sezoną ar stilių ir iškart raskite produktus.',
         'all_collections' => 'Visos kolekcijos',
     ],
     // Category page sidebar & controls
     'advanced_filters' => 'Išplėstiniai filtrai',
     'filters' => 'Filtrai',
+    'categories' => 'Kategorijos',
     'products' => 'Produktai',
     'newest' => 'Naujausi',
     'oldest' => 'Seniausi',
@@ -308,6 +312,10 @@ return [
     'coverage' => 'padengimas',
     'have_images' => 'turi paveikslėlių',
     // Category Information
+    'category_information' => 'Kategorijos informacija',
+    'category_images' => 'Kategorijos paveikslėliai',
+    'category_image' => 'Kategorijos paveikslėlis',
+    'category_banner' => 'Kategorijos baneris',
     'category_image_help' => 'Įkelkite kategorijos paveikslėlį. Bus automatiškai konvertuojamas į WebP formatą su keliais skyrų dydžiais.',
     'category_banner_help' => 'Įkelkite kategorijos banerį. Bus automatiškai konvertuojamas į WebP formatą su keliais skyrų dydžiais.',
     'parent_category' => 'Tėvinė kategorija',
@@ -317,6 +325,8 @@ return [
     'detach_child' => 'Atsieti',
     'bulk_detach' => 'Masinis atsiejimas',
     // Collection Information
+    'collection_information' => 'Kolekcijos informacija',
+    'collection_rules' => 'Kolekcijos taisyklės',
     'collection_rules_help' => 'JSON sąlygos automatinei kolekcijai',
     'max_products' => 'Maksimalus produktų skaičius',
     'max_products_help' => 'Maksimalus produktų skaičius šioje kolekcijoje (palikite tuščią neribotam skaičiui)',
@@ -385,6 +395,7 @@ return [
             'budget' => 'Biudžetas',
             'budget_limit' => 'Biudžeto limitas',
             'channel_id' => 'Kanalas',
+            'zone_id' => 'Zona',
             'display_priority' => 'Rodymo prioritetas',
             'max_uses' => 'Maksimalus naudojimas',
             'subject' => 'Tema',
@@ -395,7 +406,7 @@ return [
             'banner_alt_text' => 'Banerio alt tekstas',
             'target_audience' => 'Tikslinė auditorija',
             'target_categories' => 'Tikslinės kategorijos',
-            'target_products' => 'Tikslinių produktai',
+            'target_products' => 'Tiksliniai produktai',
             'target_customer_groups' => 'Tikslinės klientų grupės',
             'is_featured' => 'Išskirtinis',
             'send_notifications' => 'Siųsti pranešimus',
@@ -575,6 +586,7 @@ return [
     'parent_category' => 'Tėvinė kategorija',
     'visible' => 'Matoma',
     // Collection Information
+    'collection_type' => 'Kolekcijos tipas',
     'automatic_collection' => 'Automatinė kolekcija',
     'manual_collection' => 'Rankinė kolekcija',
     'conditions' => 'Sąlygos',
@@ -593,6 +605,7 @@ return [
     'roles_permissions' => 'Vaidmenys ir leidimai',
     // Currency & Zone
     'currency_information' => 'Valiutos informacija',
+    'zone_information' => 'Zonos informacija',
     'country_information' => 'Šalies informacija',
     // Discount & Coupon
     'discount_information' => 'Nuolaidos informacija',
@@ -747,6 +760,10 @@ return [
     'currency_settings' => 'Valiutos nustatymai',
     'currency_information' => 'Valiutos informacija',
     'currency_name_help' => 'Valiutos pavadinimas rodymui (pvz., Euras, JAV doleris)',
+    // Zones
+    'zone_settings' => 'Zonos nustatymai',
+    'zone_information' => 'Zonos informacija',
+    'zone_description_help' => 'Aprašykite geografinę arba pristatymo zoną',
     // Locations
     'location_information' => 'Vietos informacija',
     'location_address' => 'Vietos adresas',
