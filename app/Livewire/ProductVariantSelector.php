@@ -71,8 +71,14 @@ final class ProductVariantSelector extends Component
         }
 
         if ($defaultVariant) {
+            $previousVariantId = $this->selectedVariant?->id;
+
             $this->selectedVariant = $defaultVariant;
             $this->selectedAttributes = $this->getVariantAttributes($defaultVariant);
+
+            if ($defaultVariant->id !== $previousVariantId) {
+                $this->dispatch('variant.selected', variantId: $defaultVariant->id);
+            }
         }
     }
 
@@ -104,8 +110,14 @@ final class ProductVariantSelector extends Component
             return true;
         });
 
+        $previousVariantId = $this->selectedVariant?->id;
+
         $this->selectedVariant = $matchingVariant;
         $this->showVariantDetails = $matchingVariant !== null;
+
+        if ($matchingVariant && $matchingVariant->id !== $previousVariantId) {
+            $this->dispatch('variant.selected', variantId: $matchingVariant->id);
+        }
     }
 
     public function getVariantAttributes(ProductVariant $variant): array
