@@ -1,14 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Livewire;
 
 use App\Models\Brand;
 use App\Models\Product;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 final class ProductPage extends Component
@@ -53,14 +51,14 @@ final class ProductPage extends Component
     {
         $product->load([
             'media',
-            'variants' => fn ($query) => $query
+            'variants' => fn($query) => $query
                 ->with(['images', 'attributes.attribute'])
                 ->enabled()
                 ->orderBy('position'),
-            'categories' => fn ($query) => $query
+            'categories' => fn($query) => $query
                 ->enabled()
                 ->visible(),
-            'attributes' => fn ($query) => $query
+            'attributes' => fn($query) => $query
                 ->with('values')
                 ->enabled()
                 ->orderBy('sort_order'),
@@ -140,7 +138,7 @@ final class ProductPage extends Component
         // Load recently viewed products from session
         $recentlyViewedIds = session('recently_viewed', []);
 
-        if (! empty($recentlyViewedIds)) {
+        if (!empty($recentlyViewedIds)) {
             $query = Product::whereIn('id', $recentlyViewedIds)
                 ->where('id', '!=', $this->product->id);
 
@@ -170,7 +168,7 @@ final class ProductPage extends Component
         $recentlyViewed = session('recently_viewed', []);
 
         // Remove current product if it exists
-        $recentlyViewed = array_filter($recentlyViewed, fn ($id) => $id !== $this->product->id);
+        $recentlyViewed = array_filter($recentlyViewed, fn($id) => $id !== $this->product->id);
 
         // Add current product to the beginning
         array_unshift($recentlyViewed, $this->product->id);
@@ -260,7 +258,8 @@ final class ProductPage extends Component
             $images = $images->merge($this->product->getMedia('images'));
         }
 
-        $variantImages = $this->productVariants
+        $variantImages = $this
+            ->productVariants
             ->pluck('images')
             ->filter()
             ->flatten();
@@ -276,9 +275,10 @@ final class ProductPage extends Component
             return ['min' => $price, 'max' => $price];
         }
 
-        $prices = $this->productVariants
+        $prices = $this
+            ->productVariants
             ->pluck('final_price')
-            ->filter(fn ($price) => $price !== null);
+            ->filter(fn($price) => $price !== null);
 
         if ($prices->isEmpty()) {
             $price = $this->product->price ?? 0;
@@ -295,15 +295,16 @@ final class ProductPage extends Component
             return $this->product->is_in_stock ? 'in_stock' : 'out_of_stock';
         }
 
-        $inStockVariants = $this->productVariants
-            ->filter(fn ($variant) => $variant->isAvailableForPurchase());
+        $inStockVariants = $this
+            ->productVariants
+            ->filter(fn($variant) => $variant->isAvailableForPurchase());
 
         if ($inStockVariants->isEmpty()) {
             return 'out_of_stock';
         }
 
         $lowStockVariants = $inStockVariants
-            ->filter(fn ($variant) => $variant->is_low_stock);
+            ->filter(fn($variant) => $variant->is_low_stock);
 
         if ($lowStockVariants->count() === $inStockVariants->count()) {
             return 'low_stock';
@@ -343,7 +344,7 @@ final class ProductPage extends Component
             }
         }
 
-        if (! $shareUrl && Route::has('frontend.products.show')) {
+        if (!$shareUrl && Route::has('frontend.products.show')) {
             try {
                 $shareUrl = route('frontend.products.show', ['product' => $routeKey]);
             } catch (UrlGenerationException) {
@@ -351,7 +352,7 @@ final class ProductPage extends Component
             }
         }
 
-        if (! $shareUrl && Route::has('products.show')) {
+        if (!$shareUrl && Route::has('products.show')) {
             try {
                 $shareUrl = route('products.show', ['product' => $routeKey]);
             } catch (UrlGenerationException) {
@@ -361,7 +362,7 @@ final class ProductPage extends Component
 
         $shareUrl ??= url(sprintf('/products/%s', $routeKey));
 
-        if ($routeKey && ! str_contains($shareUrl, (string) $routeKey)) {
+        if ($routeKey && !str_contains($shareUrl, (string) $routeKey)) {
             $shareUrl = url(sprintf('/products/%s', $routeKey));
         }
 
