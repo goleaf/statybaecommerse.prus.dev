@@ -40,6 +40,8 @@ class DatabaseSeeder extends Seeder
             AttributeValueSeeder::class,
             // High‑performance product seeding with attributes, relations, translations, and local images
             TurboEcommerceSeeder::class,
+            // Replace placeholder assets with generated WebP images
+            RealProductImagesSeeder::class,
             LocationSeeder::class,
             InventorySeeder::class,
             VariantInventorySeeder::class,
