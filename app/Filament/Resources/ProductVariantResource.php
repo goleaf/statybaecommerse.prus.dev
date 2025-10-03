@@ -280,7 +280,9 @@ final class ProductVariantResource extends Resource
                                                     ->preload()
                                                     ->reactive()
                                                     ->required()
-                                                    ->afterStateUpdated(fn (Set $set): void => $set('attribute_value_id', null)),
+                                                    ->afterStateUpdated(function (Set $set): void {
+                                                        $set('attribute_value_id', null);
+                                                    }),
                                                 Select::make('attribute_value_id')
                                                     ->label(__('product_variants.fields.attribute_value'))
                                                     ->options(function (Get $get) {
