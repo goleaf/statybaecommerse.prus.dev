@@ -90,8 +90,20 @@ class RouteTest extends TestCase
         Category::factory()->create();
 
         // Create products
-        Product::factory()->create();
-        Product::factory()->create();
+        Product::factory()->create([
+            'status' => 'published',
+            'is_visible' => true,
+            'published_at' => now()->subDay(),
+            'stock_quantity' => 25,
+            'manage_stock' => true,
+        ]);
+        Product::factory()->create([
+            'status' => 'published',
+            'is_visible' => true,
+            'published_at' => now()->subHours(2),
+            'stock_quantity' => 12,
+            'manage_stock' => true,
+        ]);
 
         // Create brands
         \App\Models\Brand::factory()->create();
@@ -235,14 +247,15 @@ class RouteTest extends TestCase
      */
     public function test_product_routes(): void
     {
-        $product = Product::first();
+        $product = Product::query()->first();
+        $this->assertNotNull($product);
 
         // Test product catalog
         $response = $this->get('/products');
         $response->assertStatus(200);
 
         // Test single product
-        $response = $this->get("/products/{$product->id}");
+        $response = $this->get("/products/{$product->slug}");
         $response->assertStatus(200);
 
         // Test product history
@@ -716,8 +729,9 @@ class RouteTest extends TestCase
         $response = $this->get('/lt/products');
         $response->assertStatus(200);
 
-        $product = Product::first();
-        $response = $this->get("/lt/products/{$product->id}");
+        $product = Product::query()->first();
+        $this->assertNotNull($product);
+        $response = $this->get("/lt/products/{$product->slug}");
         $response->assertStatus(200);
 
         $response = $this->get("/lt/products/{$product->id}/history");

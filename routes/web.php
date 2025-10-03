@@ -403,7 +403,7 @@ Route::get('/', function () {
 // Backward-compatible redirect
 Route::get('/home', fn() => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
-Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
+Route::get('/products/{product:slug}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('products.show');
 Route::get('/products/{product}/history', Pages\ProductHistoryPage::class)->name('products.history');
 
 // Product Request routes (authenticated users only)

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 final class ProductController extends Controller
 {
@@ -15,9 +17,24 @@ final class ProductController extends Controller
         return response()->json(['message' => 'Product listing not implemented yet']);
     }
 
-    public function show(string $id)
+    public function show(Product $product): View
     {
-        // TODO: Implement product details
-        return response()->json(['message' => 'Product details not implemented yet', 'id' => $id]);
+        $product->loadMissing([
+            'brand',
+            'categories',
+            'media',
+            'reviews',
+            'attributes.values',
+            'variants' => static function ($query): void {
+                $query->with([
+                    'images',
+                    'attributes.attribute',
+                ]);
+            },
+        ]);
+
+        return view('products.show', [
+            'product' => $product,
+        ]);
     }
 }
