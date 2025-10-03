@@ -742,6 +742,8 @@ return [
     'already_reviewed_product' => 'Jūs jau atsiliepėte apie šį produktą.',
     'review_submitted_for_approval' => 'Jūsų atsiliepimas pateiktas ir laukia patvirtinimo.',
     'reviews_count' => '{1} :count atsiliepimas|{2,3,4} :count atsiliepimai|[5,*] :count atsiliepimų',
+    'average_rating' => 'Vidutinis įvertinimas',
+    'rating_distribution' => 'Įvertinimų pasiskirstymas',
     'no_reviews_yet' => 'Atsiliepimų dar nėra',
     'be_first_to_review' => 'Būkite pirmi pasidalinti mintimis apie šį produktą.',
     // Address translations
