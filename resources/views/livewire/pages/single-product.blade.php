@@ -468,6 +468,16 @@
                                     {{ __('product_page.quality_guarantee') }}
                                 </p>
                             </div>
+                            <div class="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
+                                <span class="inline-flex items-center gap-1">
+                                    <span class="text-slate-500">{{ __('translations.reserved') }}:</span>
+                                    <span class="text-slate-900">{{ \Illuminate\Support\Number::format((float) $product->reservedQuantity()) }}</span>
+                                </span>
+                                <span class="inline-flex items-center gap-1">
+                                    <span class="text-slate-500">{{ __('translations.available') }}:</span>
+                                    <span class="text-slate-900">{{ \Illuminate\Support\Number::format((float) $product->availableQuantity()) }}</span>
+                                </span>
+                            </div>
                             <div class="variant-selector-card">
                                 <livewire:components.variants-selector :product="$product" />
                             </div>
