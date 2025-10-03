@@ -324,6 +324,7 @@ return [
         'not_enough_stock' => 'Not enough stock',
     ],
     'buttons' => [
+        'back_to_product' => 'Back to Product',
         'back_to_products' => 'Back to Products',
         'back_to_categories' => 'Back to Categories',
         'back_to_brands' => 'Back to Brands',
@@ -335,12 +336,20 @@ return [
     // Product page specific translations
     'products' => [
         'description' => 'High quality product for professionals and enthusiasts.',
+        'history' => 'History',
         'view_history' => 'View History',
         'history_title' => 'Product History',
+        'history_description' => 'Explore every update made to :product, including pricing, stock and status adjustments.',
         'recent_changes' => 'Recent Changes',
         'view_full_history' => 'View Full History',
+        'per_page' => 'Per page',
+        'change_history' => 'Change History',
+        'no_history' => 'No history yet',
+        'no_history_description' => 'Updates for this product will appear here as soon as they happen.',
         'measurements_specifications' => 'Measurements and specifications',
         'category' => 'Category',
+        'sku' => 'SKU',
+        'brand' => 'Brand',
         'height' => 'Height',
         'width' => 'Width',
         'depth' => 'Depth',

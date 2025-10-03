@@ -315,6 +315,7 @@ return [
         'not_enough_stock' => 'Nepakanka atsargų',
     ],
     'buttons' => [
+        'back_to_product' => 'Grįžti į produktą',
         'back_to_products' => 'Grįžti į produktus',
         'back_to_categories' => 'Grįžti į kategorijas',
         'back_to_brands' => 'Grįžti į prekės ženklus',
@@ -325,12 +326,20 @@ return [
     // Product page specific translations
     'products' => [
         'description' => 'Aukštos kokybės produktas profesionalams ir mėgėjams.',
+        'history' => 'Istorija',
         'view_history' => 'Peržiūrėti istoriją',
         'history_title' => 'Produkto istorija',
+        'history_description' => 'Peržiūrėkite kiekvieną produkto :product pakeitimą, įskaitant kainą, likučius ir būsenas.',
         'recent_changes' => 'Paskutiniai pakeitimai',
         'view_full_history' => 'Peržiūrėti pilną istoriją',
+        'per_page' => 'Per puslapį',
+        'change_history' => 'Pakeitimų istorija',
+        'no_history' => 'Pakeitimų dar nėra',
+        'no_history_description' => 'Vos tik šiam produktui bus atlikti pakeitimai, jie bus matomi čia.',
         'measurements_specifications' => 'Matmenys ir specifikacijos',
         'category' => 'Kategorija',
+        'sku' => 'SKU',
+        'brand' => 'Prekės ženklas',
         'height' => 'Aukštis',
         'width' => 'Plotis',
         'depth' => 'Gylis',
