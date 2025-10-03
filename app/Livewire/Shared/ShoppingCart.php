@@ -6,6 +6,7 @@ namespace App\Livewire\Shared;
 
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
@@ -34,19 +35,93 @@ final class ShoppingCart extends Component
      * Handle addToCart functionality with proper error handling.
      */
     #[On('add-to-cart')]
-    public function addToCart(int $productId, int $quantity = 1): void
+    public function addToCart(int $productId, int $quantity = 1, ?int $variantId = null): void
     {
         $product = Product::findOrFail($productId);
+        $variant = null;
+
+        if ($variantId !== null) {
+            $variant = ProductVariant::query()
+                ->where('product_id', $productId)
+                ->findOrFail($variantId);
+        }
+
         $sessionId = Session::getId();
-        $cartItem = CartItem::where('session_id', $sessionId)->where('product_id', $productId)->first();
+        $unitPrice = $variant
+            ? (float) $variant->getCurrentPrice()
+            : (float) ($product->sale_price ?? $product->price);
+
+        $cartItemQuery = CartItem::query()
+            ->where('session_id', $sessionId)
+            ->where('product_id', $productId);
+
+        if ($variant) {
+            $cartItemQuery->where('variant_id', $variant->id);
+        } else {
+            $cartItemQuery->whereNull('variant_id');
+        }
+
+        $cartItem = $cartItemQuery->first();
+
         if ($cartItem) {
             $newQuantity = $cartItem->quantity + $quantity;
-            $unitPrice = (float) ($cartItem->unit_price ?? $product->sale_price ?? $product->price);
-            $cartItem->update(['quantity' => $newQuantity, 'unit_price' => $unitPrice, 'total_price' => round($unitPrice * $newQuantity, 2)]);
+
+            $cartItem->update([
+                'quantity' => $newQuantity,
+                'unit_price' => $unitPrice,
+                'price' => $unitPrice,
+                'total_price' => round($unitPrice * $newQuantity, 2),
+            ]);
         } else {
-            $unitPrice = (float) ($product->sale_price ?? $product->price);
-            CartItem::create(['session_id' => $sessionId, 'user_id' => auth()->id(), 'product_id' => $productId, 'quantity' => $quantity, 'unit_price' => $unitPrice, 'total_price' => round($unitPrice * $quantity, 2), 'product_snapshot' => ['name' => $product->name, 'price' => $unitPrice, 'sku' => $product->sku ?? null]]);
+            $variantAttributes = [];
+            $snapshotName = $product->name;
+
+            if ($variant) {
+                $snapshotName = $variant->name ?? $product->name;
+
+                $attributeValues = $variant->attributes()->with('attribute')->get();
+
+                if ($attributeValues->isNotEmpty()) {
+                    $variantAttributes = $attributeValues
+                        ->mapWithKeys(fn($value): array => [
+                            $value->attribute->name => $value->value,
+                        ])
+                        ->toArray();
+
+                    $snapshotName .= ' ('.collect($variantAttributes)
+                        ->map(fn($value, $key) => sprintf('%s: %s', $key, $value))
+                        ->implode(', ').')';
+                }
+            }
+
+            $productSnapshot = [
+                'name' => $snapshotName,
+                'price' => $unitPrice,
+                'sku' => $variant?->sku ?? $product->sku ?? null,
+            ];
+
+            if ($variant) {
+                $productSnapshot['variant_id'] = $variant->id;
+
+                if (! empty($variantAttributes)) {
+                    $productSnapshot['variant_attributes'] = $variantAttributes;
+                }
+            }
+
+            CartItem::create([
+                'session_id' => $sessionId,
+                'user_id' => auth()->id(),
+                'product_id' => $productId,
+                'variant_id' => $variant?->id,
+                'product_variant_id' => $variant?->id,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'total_price' => round($unitPrice * $quantity, 2),
+                'price' => $unitPrice,
+                'product_snapshot' => $productSnapshot,
+            ]);
         }
+
         $this->dispatch('cart-updated');
     }
 
