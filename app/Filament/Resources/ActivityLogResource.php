@@ -65,6 +65,10 @@ final class ActivityLogResource extends Resource
                 TextColumn::make('description')
                     ->label(__('Description'))
                     ->limit(50),
+                TextColumn::make('causer.name')
+                    ->label(__('Causer'))
+                    ->default(__('System'))
+                    ->sortable(),
                 TextColumn::make('subject_type')
                     ->label(__('Subject Type'))
                     ->formatStateUsing(fn($state) => class_basename((string) $state))
@@ -108,8 +112,12 @@ final class ActivityLogResource extends Resource
             ->actions([
                 Action::make('view_details')
                     ->label(__('View details'))
-                    ->modalHeading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) $record->description)
-                    ->modalSubheading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) ($record->causer->name ?? 'System'))
+                    ->modalHeading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) ($record->description ?? __('Activity details')))
+                    ->modalSubheading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) ($record->causer?->name ?? __('System')))
+                    ->modalContent(fn(\Spatie\Activitylog\Models\Activity $record) => view(
+                        'filament.resources.activity-log-resource.components.activity-details',
+                        ['activity' => $record->loadMissing('causer', 'subject')]
+                    ))
                     ->modalSubmitActionLabel(__('Close')),
             ])
             ->defaultSort('created_at', 'desc');
