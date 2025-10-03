@@ -98,6 +98,6 @@ final class ProductReviews extends Component
         $averageRating = Review::where('product_id', $this->product->id)->approved()->avg('rating');
         $ratingDistribution = Review::where('product_id', $this->product->id)->approved()->selectRaw('rating, COUNT(*) as count')->groupBy('rating')->orderBy('rating', 'desc')->pluck('count', 'rating')->toArray();
 
-        return view('livewire.components.product-reviews', ['reviews' => $reviews, 'averageRating' => round($averageRating, 1), 'totalReviews' => $reviews->total(), 'ratingDistribution' => $ratingDistribution]);
+        return view('livewire.components.product-reviews', ['reviews' => $reviews, 'averageRating' => round((float) $averageRating, 1), 'totalReviews' => $reviews->total(), 'ratingDistribution' => $ratingDistribution]);
     }
 }
