@@ -43,6 +43,10 @@ class AppServiceProvider extends ServiceProvider
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
+        if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
+            class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
+        }
+
         // Aliases for Filament resource Livewire components used in tests
         if ($this->app->environment('testing')) {
             Livewire::component('filament.admin.resources.product-comparisons.index', \App\Filament\Resources\ProductComparisonResource\Pages\ListProductComparisons::class);
