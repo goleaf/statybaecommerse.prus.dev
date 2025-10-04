@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -20,40 +20,31 @@ class SimplifiedStatsWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    protected ?array $chartData = null;
+
+    protected ?Carbon $referenceTime = null;
+
     public function getStats(): array
     {
-        $now = Carbon::now();
-        $lastMonth = $now->copy()->subMonth();
+        $stats = $this->getSummaryStats();
 
-        // === CORE BUSINESS METRICS ===
-        $totalRevenue = Order::where('status', '!=', 'cancelled')->sum('total');
-        $lastMonthRevenue = Order::where('status', '!=', 'cancelled')
-            ->where('created_at', '>=', $lastMonth)
-            ->sum('total');
+        $totalRevenue = $stats['orders']['total_revenue'];
+        $lastMonthRevenue = $stats['orders']['last_month_revenue'];
+        $totalOrders = $stats['orders']['total_orders'];
+        $lastMonthOrders = $stats['orders']['last_month_orders'];
+        $totalUsers = $stats['users']['total_users'];
+        $newUsersThisMonth = $stats['users']['new_users_this_month'];
+        $totalProducts = $stats['products']['total_products'];
+        $activeProducts = $stats['products']['active_products'];
+        $totalCategories = $stats['catalog']['total_categories'];
+        $totalBrands = $stats['catalog']['total_brands'];
+        $totalReviews = $stats['reviews']['total_reviews'];
+        $approvedReviews = $stats['reviews']['approved_reviews'];
+        $avgRating = $stats['reviews']['avg_rating'];
+
         $revenueGrowth = $lastMonthRevenue > 0 ? (($totalRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100 : 0;
-
-        $totalOrders = Order::count();
-        $lastMonthOrders = Order::where('created_at', '>=', $lastMonth)->count();
         $orderGrowth = $lastMonthOrders > 0 ? (($totalOrders - $lastMonthOrders) / $lastMonthOrders) * 100 : 0;
-
-        $totalUsers = User::count();
-        $newUsersThisMonth = User::where('created_at', '>=', $lastMonth)->count();
         $userGrowth = $newUsersThisMonth > 0 ? ($newUsersThisMonth / max($totalUsers - $newUsersThisMonth, 1)) * 100 : 0;
-
-        // === PRODUCT ECOSYSTEM ===
-        $totalProducts = Product::count();
-        $activeProducts = Product::where('is_visible', true)->count();
-
-        // === CATEGORIES & BRANDS ===
-        $totalCategories = Category::count();
-        $totalBrands = Brand::count();
-
-        // === REVIEWS & RATINGS ===
-        $totalReviews = Review::count();
-        $approvedReviews = Review::where('is_approved', true)->count();
-        $avgRating = Review::where('is_approved', true)->avg('rating') ?? 0;
-
-        // === CALCULATED METRICS ===
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
 
         return [
@@ -111,27 +102,140 @@ class SimplifiedStatsWidget extends BaseWidget
 
     public function getRevenueChart(): array
     {
-        $data = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
-            $revenue = Order::where('status', '!=', 'cancelled')
-                ->whereDate('created_at', $date)
-                ->sum('total');
-            $data[] = $revenue;
-        }
-
-        return $data;
+        return $this->getChartData()['revenue'];
     }
 
     public function getOrdersChart(): array
     {
-        $data = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
-            $orders = Order::whereDate('created_at', $date)->count();
-            $data[] = $orders;
+        return $this->getChartData()['orders'];
+    }
+
+    protected function getChartData(): array
+    {
+        if ($this->chartData !== null) {
+            return $this->chartData;
         }
 
-        return $data;
+        $now = $this->getReferenceTime();
+        $startDate = $now->copy()->subDays(6)->startOfDay();
+        $endDate = $now->copy()->endOfDay();
+
+        $cacheKey = sprintf(
+            'dashboard.simplified-stats.chart.%s.%s',
+            $startDate->toDateString(),
+            $endDate->toDateString()
+        );
+
+        $chartData = Cache::remember($cacheKey, 60, function () use ($startDate, $endDate, $now) {
+            $dateKeys = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $dateKeys[] = $now->copy()->subDays($i)->toDateString();
+            }
+
+            $orderStats = Order::query()
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->selectRaw('DATE(created_at) as date, SUM(CASE WHEN status != ? THEN total ELSE 0 END) as revenue, COUNT(*) as total_orders', ['cancelled'])
+                ->groupBy('date')
+                ->get()
+                ->mapWithKeys(static function ($row) {
+                    return [
+                        $row->date => [
+                            'revenue' => (float) $row->revenue,
+                            'orders' => (int) $row->total_orders,
+                        ],
+                    ];
+                })
+                ->all();
+
+            $revenueChart = [];
+            $ordersChart = [];
+
+            foreach ($dateKeys as $date) {
+                $dailyStats = $orderStats[$date] ?? null;
+                $revenueChart[] = $dailyStats['revenue'] ?? 0.0;
+                $ordersChart[] = $dailyStats['orders'] ?? 0;
+            }
+
+            return [
+                'revenue' => $revenueChart,
+                'orders' => $ordersChart,
+            ];
+        });
+
+        return $this->chartData = $chartData;
+    }
+
+    protected function getSummaryStats(): array
+    {
+        $now = $this->getReferenceTime();
+        $lastMonth = $now->copy()->subMonth();
+
+        return Cache::remember('dashboard.simplified-stats.summary', 60, function () use ($lastMonth) {
+            $orderStats = Order::query()
+                ->selectRaw('
+                    SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
+                    SUM(CASE WHEN status != ? AND created_at >= ? THEN total ELSE 0 END) as last_month_revenue,
+                    COUNT(*) as total_orders,
+                    SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as last_month_orders
+                ', ['cancelled', 'cancelled', $lastMonth, $lastMonth])
+                ->toBase()
+                ->first();
+
+            $userStats = User::query()
+                ->selectRaw('
+                    COUNT(*) as total_users,
+                    SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as new_users_this_month
+                ', [$lastMonth])
+                ->toBase()
+                ->first();
+
+            $productStats = Product::query()
+                ->selectRaw('
+                    COUNT(*) as total_products,
+                    SUM(CASE WHEN is_visible = 1 THEN 1 ELSE 0 END) as active_products
+                ')
+                ->toBase()
+                ->first();
+
+            $reviewStats = Review::query()
+                ->selectRaw('
+                    COUNT(*) as total_reviews,
+                    SUM(CASE WHEN is_approved = 1 THEN 1 ELSE 0 END) as approved_reviews,
+                    AVG(CASE WHEN is_approved = 1 THEN rating END) as avg_rating
+                ')
+                ->toBase()
+                ->first();
+
+            return [
+                'orders' => [
+                    'total_revenue' => (float) ($orderStats->total_revenue ?? 0),
+                    'last_month_revenue' => (float) ($orderStats->last_month_revenue ?? 0),
+                    'total_orders' => (int) ($orderStats->total_orders ?? 0),
+                    'last_month_orders' => (int) ($orderStats->last_month_orders ?? 0),
+                ],
+                'users' => [
+                    'total_users' => (int) ($userStats->total_users ?? 0),
+                    'new_users_this_month' => (int) ($userStats->new_users_this_month ?? 0),
+                ],
+                'products' => [
+                    'total_products' => (int) ($productStats->total_products ?? 0),
+                    'active_products' => (int) ($productStats->active_products ?? 0),
+                ],
+                'catalog' => [
+                    'total_categories' => (int) DB::table('categories')->count(),
+                    'total_brands' => (int) DB::table('brands')->count(),
+                ],
+                'reviews' => [
+                    'total_reviews' => (int) ($reviewStats->total_reviews ?? 0),
+                    'approved_reviews' => (int) ($reviewStats->approved_reviews ?? 0),
+                    'avg_rating' => (float) ($reviewStats->avg_rating ?? 0),
+                ],
+            ];
+        });
+    }
+
+    protected function getReferenceTime(): Carbon
+    {
+        return $this->referenceTime ??= Carbon::now();
     }
 }
