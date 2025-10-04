@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class SystemSettingDependencyResource extends Resource
 {
@@ -63,9 +64,9 @@ final class SystemSettingDependencyResource extends Resource
         return __('admin.system_setting_dependencies.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('admin.system_setting_dependencies.basic_information'))
                 ->description(__('admin.system_setting_dependencies.basic_information_description'))
                 ->schema([

@@ -22,12 +22,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use BackedEnum;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-clock';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
@@ -48,9 +50,9 @@ final class ProductHistoryResource extends Resource
         return __('product_history.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('product_history.basic_information'))
                 ->columns(2)
                 ->schema([

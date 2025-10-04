@@ -36,12 +36,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class ReviewResource extends Resource
 {
     protected static ?string $model = Review::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
@@ -64,9 +66,9 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('reviews.sections.basic_info'))
                     ->description(__('reviews.sections.basic_info_description'))

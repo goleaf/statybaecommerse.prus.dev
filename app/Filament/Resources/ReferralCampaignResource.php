@@ -25,12 +25,14 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class ReferralCampaignResource extends Resource
 {
     protected static ?string $model = ReferralCampaign::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-megaphone';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 14;
 
@@ -56,9 +58,9 @@ final class ReferralCampaignResource extends Resource
         return __('admin.referral_campaigns.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('admin.referral_campaigns.basic_information'))
                     ->schema([

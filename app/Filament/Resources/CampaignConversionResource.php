@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -26,6 +25,7 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use BackedEnum;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * CampaignConversionResource
@@ -36,7 +36,8 @@ final class CampaignConversionResource extends Resource
 {
     protected static ?string $model = CampaignConversion::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rocket-launch';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-rocket-launch';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
 
@@ -63,9 +64,9 @@ final class CampaignConversionResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('campaign_conversions.basic_information'))
                 ->schema([
                     Grid::make(2)

@@ -13,21 +13,23 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class NewsCategoryResource extends Resource
 {
     protected static ?string $model = NewsCategory::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'News';
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return NewsCategoryForm::configure($schema);
+        return NewsCategoryForm::configure($form);
     }
 
     public static function table(Table $table): Table

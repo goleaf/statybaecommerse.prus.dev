@@ -14,12 +14,14 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
@@ -55,9 +57,9 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema;
+        return $form;
     }
 
     public static function table(Table $table): Table

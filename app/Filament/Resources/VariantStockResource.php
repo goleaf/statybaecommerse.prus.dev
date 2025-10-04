@@ -30,18 +30,20 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class VariantStockResource extends Resource
 {
     protected static ?string $model = VariantInventory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             SchemaSection::make('Stock Details')
                 ->schema([
                     SchemaGrid::make(2)

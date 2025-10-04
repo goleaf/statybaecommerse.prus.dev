@@ -44,6 +44,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * ProductVariantResource
@@ -83,9 +84,9 @@ final class ProductVariantResource extends Resource
         return 'Products';
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Tabs::make('Variant Information')
                     ->tabs([

@@ -1,9 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -30,6 +27,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * SliderResource
@@ -40,7 +38,8 @@ final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
      * @var UnitEnum|string|null
@@ -75,9 +74,9 @@ final class SliderResource extends Resource
         return __('sliders.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('sliders.basic_information'))
                 ->schema([
                     Grid::make(2)

@@ -57,7 +57,7 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('cart_items.basic_information'))
