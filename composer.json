@@ -15,6 +15,8 @@
         "bezhansalleh/filament-shield": "^4.0",
         "dutchcodingcompany/filament-socialite": "*",
         "filament/filament": "^4.0",
+        "filament/forms": "^4.0",
+        "filament/tables": "^4.0",
         "filament/infolists": "*",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
         "kenepa/resource-lock": "^4.0",

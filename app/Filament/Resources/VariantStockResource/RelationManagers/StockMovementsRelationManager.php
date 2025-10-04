@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantStockResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -11,7 +13,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -30,9 +31,9 @@ class StockMovementsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Stock Movements';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 TextInput::make('quantity')
                     ->label(__('inventory.quantity'))

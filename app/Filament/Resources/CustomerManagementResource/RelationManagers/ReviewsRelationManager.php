@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -14,7 +16,6 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -22,9 +23,9 @@ class ReviewsRelationManager extends RelationManager
 {
     protected static string $relationship = 'reviews';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 TextInput::make('id')
                     ->required()
@@ -32,9 +33,9 @@ class ReviewsRelationManager extends RelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->components([
                 TextEntry::make('id'),
             ]);
