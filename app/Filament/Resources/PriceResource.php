@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class PriceResource extends Resource
 {
@@ -24,9 +25,9 @@ final class PriceResource extends Resource
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 SchemaSection::make(__('admin.prices.basic_information'))
                     ->schema([

@@ -14,16 +14,18 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Forms\Form;
 
 class ProductSimilarityResource extends Resource
 {
     protected static ?string $model = ProductSimilarity::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return ProductSimilarityForm::configure($schema);
+        return ProductSimilarityForm::configure($form);
     }
 
     public static function table(Table $table): Table

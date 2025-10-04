@@ -28,6 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Filament\Forms\Form;
 
 final class CampaignResource extends Resource
 {
@@ -57,9 +58,9 @@ final class CampaignResource extends Resource
         return __('campaigns.models.campaign');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             SchemaSection::make(__('campaigns.sections.basic_information'))
                 ->schema([
                     SchemaGrid::make(2)

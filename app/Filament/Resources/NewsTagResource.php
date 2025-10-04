@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -36,6 +35,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class NewsTagResource extends Resource
 {
@@ -63,9 +63,9 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
                 ->schema([
                     TextInput::make('name')

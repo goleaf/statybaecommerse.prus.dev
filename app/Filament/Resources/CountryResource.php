@@ -29,6 +29,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Form;
 
 final class CountryResource extends Resource
 {
@@ -59,9 +60,9 @@ final class CountryResource extends Resource
         return __('countries.models.countries');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('countries.sections.basic_info'))
                     ->schema([

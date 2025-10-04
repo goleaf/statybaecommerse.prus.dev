@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -70,9 +69,9 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
                     Tab::make(__('admin.collection_rules.form.tabs.basic_information'))

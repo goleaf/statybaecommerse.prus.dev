@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -38,6 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * VariantImageResource
@@ -48,7 +48,8 @@ final class VariantImageResource extends Resource
 {
     protected static ?string $model = VariantImage::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-photo';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
@@ -72,9 +73,9 @@ final class VariantImageResource extends Resource
         return __('admin.variant_images.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->components([
             Section::make(__('admin.variant_images.basic_information'))
                 ->schema([
                     Grid::make(2)

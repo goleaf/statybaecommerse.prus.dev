@@ -24,6 +24,7 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * RecommendationAnalyticsResource
@@ -63,9 +64,9 @@ final class RecommendationAnalyticsResource extends Resource
         return __('admin.recommendation_analytics.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 SchemaSection::make(__('admin.recommendation_analytics.basic_information'))
                     ->schema([

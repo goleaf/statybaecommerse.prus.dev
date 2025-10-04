@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources\NotificationTemplates;
 
@@ -17,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Filament\Forms\Form;
 
 class NotificationTemplateResource extends Resource
 {
@@ -27,9 +27,9 @@ class NotificationTemplateResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return NotificationTemplateForm::configure($schema);
+        return NotificationTemplateForm::configure($form);
     }
 
     public static function table(Table $table): Table

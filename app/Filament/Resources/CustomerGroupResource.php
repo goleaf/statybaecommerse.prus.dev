@@ -27,6 +27,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Forms\Form;
 
 final class CustomerGroupResource extends Resource
 {
@@ -51,9 +52,9 @@ final class CustomerGroupResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('customer_groups.basic_information'))
                 ->schema([
                     Grid::make(2)

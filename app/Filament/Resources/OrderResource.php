@@ -35,6 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * OrderResource
@@ -99,9 +100,9 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('orders.sections.order_details'))
                 ->description(__('orders.sections.customer_information'))
                 ->icon('heroicon-o-information-circle')

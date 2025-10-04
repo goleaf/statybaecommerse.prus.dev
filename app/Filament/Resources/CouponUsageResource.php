@@ -33,6 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Form;
 
 final class CouponUsageResource extends Resource
 {
@@ -48,9 +49,9 @@ final class CouponUsageResource extends Resource
         return __('admin.coupon_usages.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->components([
             Tabs::make('coupon_usage_tabs')
                 ->tabs([
                     Tab::make(__('admin.coupon_usages.form.tabs.basic_information'))

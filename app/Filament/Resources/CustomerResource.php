@@ -77,9 +77,9 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('customers.basic_information'))
                 ->schema([
                     Grid::make(2)

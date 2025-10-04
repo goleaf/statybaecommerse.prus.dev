@@ -14,16 +14,18 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use BackedEnum;
+use Filament\Forms\Form;
 
 class RecommendationAnalyticsResource extends Resource
 {
     protected static ?string $model = RecommendationAnalytics::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return RecommendationAnalyticsForm::configure($schema);
+        return RecommendationAnalyticsForm::configure($form);
     }
 
     public static function table(Table $table): Table

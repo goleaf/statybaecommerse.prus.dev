@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -31,6 +30,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * StockResource
@@ -62,9 +62,9 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('inventory.product_information'))
                 ->schema([
                     Grid::make(2)

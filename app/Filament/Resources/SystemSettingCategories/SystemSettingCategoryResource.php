@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategories;
 
@@ -19,16 +18,18 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Form;
 
 class SystemSettingCategoryResource extends Resource
 {
     protected static ?string $model = SystemSettingCategory::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return SystemSettingCategoryForm::configure($schema);
+        return SystemSettingCategoryForm::configure($form);
     }
 
     public static function table(Table $table): Table
