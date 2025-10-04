@@ -36,6 +36,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Forms\Form;
 
 /**
  * AddressResource
@@ -84,9 +85,9 @@ final class AddressResource extends Resource
     /**
      * Configure the Filament form schema with Filament v4 Schema class
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             SchemaSection::make(__('translations.address_information'))
                 ->schema([
                     SchemaGrid::make(2)->schema([

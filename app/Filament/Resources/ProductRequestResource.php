@@ -18,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class ProductRequestResource extends Resource
 {
@@ -47,9 +48,9 @@ final class ProductRequestResource extends Resource
         return __('product_requests.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')

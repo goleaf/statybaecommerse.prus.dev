@@ -1,9 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -37,6 +34,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * VariantAttributeValueResource
@@ -47,7 +45,8 @@ final class VariantAttributeValueResource extends Resource
 {
     protected static ?string $model = VariantAttributeValue::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-tag';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
@@ -68,9 +67,9 @@ final class VariantAttributeValueResource extends Resource
         return __('admin.variant_attribute_values.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->components([
             Section::make(__('admin.variant_attribute_values.basic_information'))
                 ->schema([
                     Grid::make(2)

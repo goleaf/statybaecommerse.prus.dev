@@ -23,6 +23,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * ProductComparisonResource
@@ -71,9 +72,9 @@ final class ProductComparisonResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             SchemaSection::make(__('product_comparisons.basic_information'))
                 ->components([
                     Grid::make(2)->components([

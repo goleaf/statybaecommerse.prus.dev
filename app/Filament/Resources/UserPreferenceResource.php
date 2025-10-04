@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -29,6 +28,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * UserPreferenceResource
@@ -39,7 +39,8 @@ final class UserPreferenceResource extends Resource
 {
     protected static ?string $model = UserPreference::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
@@ -60,9 +61,9 @@ final class UserPreferenceResource extends Resource
         return __('admin.user_preferences.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Select::make('user_id')
                     ->label(__('admin.user_preferences.user'))

@@ -40,6 +40,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class SeoDataResource extends Resource
 {
@@ -62,9 +63,9 @@ final class SeoDataResource extends Resource
         return __('seo_data.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->columns(3)
             ->schema([
                 Section::make(__('seo_data.sections.basic_info'))

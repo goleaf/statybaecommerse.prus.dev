@@ -32,6 +32,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class NewsCategoryResource extends Resource
 {
@@ -53,9 +54,9 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Categories';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('news_categories.sections.category_information'))
                 ->schema([
                     TextInput::make('name')

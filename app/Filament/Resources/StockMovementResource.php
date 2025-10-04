@@ -1,9 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -27,6 +24,7 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * StockMovementResource
@@ -35,7 +33,8 @@ use UnitEnum;
  */
 final class StockMovementResource extends Resource
 {
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     /**
      * @var UnitEnum|string|null
@@ -66,9 +65,9 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('stock_movement.sections.basic_information'))
                 ->components([
                     Grid::make(2)

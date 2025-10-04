@@ -34,6 +34,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Filament\Forms\Form;
 
 final class CampaignScheduleResource extends Resource
 {
@@ -58,9 +59,9 @@ final class CampaignScheduleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->components([
             Tabs::make('campaign_schedule_tabs')
                 ->tabs([
                     Tab::make(__('admin.campaign_schedules.form.tabs.basic_information'))

@@ -16,16 +16,18 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Forms\Form;
 
 class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return SettingForm::configure($schema);
+        return SettingForm::configure($form);
     }
 
     public static function table(Table $table): Table

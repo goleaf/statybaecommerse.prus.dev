@@ -30,6 +30,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class AdminUserResource extends Resource
 {
@@ -66,9 +67,9 @@ final class AdminUserResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             SchemaSection::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
                     SchemaGrid::make(2)

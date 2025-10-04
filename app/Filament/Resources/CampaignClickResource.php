@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -34,6 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class CampaignClickResource extends Resource
 {
@@ -71,9 +71,9 @@ final class CampaignClickResource extends Resource
      * @param  Forms\Form  $schema
      * @return Forms\Form
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
                     Grid::make(2)

@@ -19,6 +19,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class NormalSettingResource extends Resource
 {
@@ -45,9 +46,9 @@ final class NormalSettingResource extends Resource
         return __('normal_settings.navigation');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Tabs::make(__('normal_settings.tabs'))
                 ->tabs([
                     Tab::make(__('normal_settings.basic_information'))

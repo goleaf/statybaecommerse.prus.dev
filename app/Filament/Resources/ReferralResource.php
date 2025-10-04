@@ -23,12 +23,14 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class ReferralResource extends Resource
 {
     protected static ?string $model = Referral::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-share';
 
     protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
@@ -36,9 +38,9 @@ final class ReferralResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Section::make('Referral Details')
                     ->columns(2)

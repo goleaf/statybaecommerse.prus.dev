@@ -23,6 +23,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use BackedEnum;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * MenuItemResource
@@ -35,7 +36,8 @@ final class MenuItemResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 5;
 
@@ -56,9 +58,9 @@ final class MenuItemResource extends Resource
         return __('admin.menu_items.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 FormSection::make(__('admin.menu_items.basic_information'))
                     ->schema([

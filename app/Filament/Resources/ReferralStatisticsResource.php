@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class ReferralStatisticsResource extends Resource
 {
@@ -63,9 +64,9 @@ final class ReferralStatisticsResource extends Resource
         return __('referral_statistics.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->columns(3)
             ->schema([
                 Section::make(__('referral_statistics.sections.basic_info'))

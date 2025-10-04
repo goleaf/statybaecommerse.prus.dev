@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * WishlistItemResource
@@ -102,9 +103,9 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 FormSection::make(__('admin.wishlist_items.sections.basic_info'))
                     ->description(__('admin.wishlist_items.sections.basic_info_description'))
