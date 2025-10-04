@@ -9,11 +9,11 @@ use App\Models\PartnerTier;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
+
 use Filament\Forms\Form;
 
 final class PartnerTierResource extends Resource

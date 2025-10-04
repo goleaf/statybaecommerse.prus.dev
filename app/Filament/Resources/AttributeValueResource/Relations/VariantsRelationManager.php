@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeValueResource\Relations;
 
+use Filament\Forms\Form;
+
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,9 +23,9 @@ class VariantsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Variants';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()

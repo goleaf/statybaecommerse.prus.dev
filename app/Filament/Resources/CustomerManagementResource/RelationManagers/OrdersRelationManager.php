@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use Filament\Actions\AssociateAction;
@@ -24,7 +26,6 @@ use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -37,9 +38,9 @@ class OrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Section::make(__('orders.basic_information'))
                     ->schema([
@@ -95,9 +96,9 @@ class OrdersRelationManager extends RelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $form): Schema
     {
-        return $schema
+        return $form
             ->components([
                 InfolistSection::make(__('orders.basic_information'))
                     ->schema([

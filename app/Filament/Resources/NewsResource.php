@@ -11,12 +11,12 @@ use BackedEnum;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 use Filament\Forms\Form;
 
 class NewsResource extends Resource
