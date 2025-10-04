@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -36,6 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * VariantAnalyticsResource
@@ -46,7 +46,8 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
@@ -67,9 +68,9 @@ final class VariantAnalyticsResource extends Resource
         return __('admin.variant_analytics.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Tabs::make(__('admin.variant_analytics.tabs'))
                     ->tabs([

@@ -38,6 +38,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class ReportResource extends Resource
 {
@@ -78,9 +79,9 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->columns(3)
             ->schema([
                 Section::make(__('reports.sections.basic_info'))

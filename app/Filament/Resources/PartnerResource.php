@@ -17,20 +17,22 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-user-group';
 
     protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 \Filament\Schemas\Components\Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([

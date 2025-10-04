@@ -11,12 +11,14 @@ use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class VariantPriceHistoryResource extends Resource
 {
     protected static ?string $model = VariantPriceHistory::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-currency-euro';
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
 
@@ -27,9 +29,9 @@ final class VariantPriceHistoryResource extends Resource
         return 'System';
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Select::make('variant_id')
                     ->relationship('variant', 'name')

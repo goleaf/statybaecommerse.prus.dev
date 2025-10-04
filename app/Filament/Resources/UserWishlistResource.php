@@ -1,9 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -30,6 +27,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * UserWishlistResource
@@ -67,9 +65,9 @@ final class UserWishlistResource extends Resource
         return __('admin.user_wishlists.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Select::make('user_id')
                     ->label(__('admin.user_wishlists.user'))

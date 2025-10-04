@@ -16,12 +16,14 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     /**
      * @var UnitEnum|string|null
@@ -30,9 +32,9 @@ final class SliderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return SliderForm::configure($schema);
+        return SliderForm::configure($form);
     }
 
     public static function table(Table $table): Table

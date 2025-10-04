@@ -40,6 +40,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Forms\Form;
 
 /**
  * SystemSettingTranslationResource
@@ -54,7 +55,8 @@ final class SystemSettingTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
@@ -73,9 +75,9 @@ final class SystemSettingTranslationResource extends Resource
         return __('admin.system_setting_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Tabs::make('Translation Details')
                     ->tabs([

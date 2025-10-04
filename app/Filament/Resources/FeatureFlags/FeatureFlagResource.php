@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources\FeatureFlags;
 
@@ -17,16 +16,18 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use BackedEnum;
 use UnitEnum;
+use Filament\Forms\Form;
 
 class FeatureFlagResource extends Resource
 {
     protected static ?string $model = FeatureFlag::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return FeatureFlagForm::configure($schema);
+        return FeatureFlagForm::configure($form);
     }
 
     public static function table(Table $table): Table

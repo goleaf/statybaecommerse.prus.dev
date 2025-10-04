@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -39,6 +38,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class NewsImageResource extends Resource
 {
@@ -71,9 +71,9 @@ final class NewsImageResource extends Resource
         return __('admin.news_images.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Tabs::make(__('admin.news_images.tabs'))
                     ->tabs([

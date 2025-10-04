@@ -31,12 +31,14 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Forms\Form;
 
 final class ReferralRewardResource extends Resource
 {
     protected static ?string $model = ReferralReward::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-gift';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
@@ -44,9 +46,9 @@ final class ReferralRewardResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)

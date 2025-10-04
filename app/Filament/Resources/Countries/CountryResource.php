@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Form;
 
 /**
  * CountryResource
@@ -40,9 +41,9 @@ final class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return CountryForm::configure($schema);
+        return CountryForm::configure($form);
     }
 
     public static function table(Table $table): Table
