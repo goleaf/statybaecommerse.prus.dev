@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -21,7 +22,7 @@ class CodeRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
