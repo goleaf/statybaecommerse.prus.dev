@@ -10,9 +10,9 @@ use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;
 use App\Filament\Resources\NewsCategories\Tables\NewsCategoriesTable;
 use App\Models\NewsCategory;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use UnitEnum;
+
 use Filament\Forms\Form;
 
 final class NewsCategoryResource extends Resource

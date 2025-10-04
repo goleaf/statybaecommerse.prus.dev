@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -20,9 +21,9 @@ final class ConditionsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Conditions';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Select::make('type')
                     ->options([

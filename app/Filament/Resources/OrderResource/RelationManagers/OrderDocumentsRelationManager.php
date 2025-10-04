@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use App\Models\Document;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -22,7 +24,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -55,9 +56,9 @@ final class OrderDocumentsRelationManager extends RelationManager
     /**
      * Configure the form schema for order documents.
      */
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('orders.document_information'))
                     ->description(__('orders.document_information_description'))

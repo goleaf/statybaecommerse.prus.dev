@@ -11,9 +11,9 @@ use App\Filament\Resources\ProductSimilarities\Schemas\ProductSimilarityForm;
 use App\Filament\Resources\ProductSimilarities\Tables\ProductSimilaritiesTable;
 use App\Models\ProductSimilarity;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+
 use Filament\Forms\Form;
 
 class ProductSimilarityResource extends Resource

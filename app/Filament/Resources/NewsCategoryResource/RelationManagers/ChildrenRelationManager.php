@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use App\Models\NewsCategory;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -21,7 +22,7 @@ final class ChildrenRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Sub Categories';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $form
             ->schema([

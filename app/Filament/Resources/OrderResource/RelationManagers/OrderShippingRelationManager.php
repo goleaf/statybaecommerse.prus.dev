@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use App\Models\OrderShipping;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -18,7 +20,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -51,9 +52,9 @@ final class OrderShippingRelationManager extends RelationManager
     /**
      * Configure the form schema for order shipping.
      */
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))

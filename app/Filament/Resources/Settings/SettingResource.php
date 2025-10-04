@@ -13,9 +13,9 @@ use App\Filament\Resources\Settings\Schemas\SettingForm;
 use App\Filament\Resources\Settings\Tables\SettingsTable;
 use App\Models\Setting;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+
 use Filament\Forms\Form;
 
 class SettingResource extends Resource

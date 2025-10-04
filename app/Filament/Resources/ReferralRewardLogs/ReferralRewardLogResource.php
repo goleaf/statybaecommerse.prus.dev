@@ -11,9 +11,9 @@ use App\Filament\Resources\ReferralRewardLogs\Schemas\ReferralRewardLogForm;
 use App\Filament\Resources\ReferralRewardLogs\Tables\ReferralRewardLogsTable;
 use App\Models\ReferralRewardLog;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+
 use Filament\Forms\Form;
 
 class ReferralRewardLogResource extends Resource

@@ -11,11 +11,11 @@ use App\Filament\Resources\EmailCampaigns\Schemas\EmailCampaignForm;
 use App\Filament\Resources\EmailCampaigns\Tables\EmailCampaignsTable;
 use App\Models\EmailCampaign;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use BackedEnum;
 use UnitEnum;
+
 use Filament\Forms\Form;
 
 class EmailCampaignResource extends Resource

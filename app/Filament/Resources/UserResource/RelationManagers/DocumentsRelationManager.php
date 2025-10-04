@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
+use Filament\Forms\Form;
+
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -19,9 +20,9 @@ final class DocumentsRelationManager extends RelationManager
 
     protected static ?string $title = 'admin.sections.documents';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Forms\Components\TextInput::make('title')
                     ->required()

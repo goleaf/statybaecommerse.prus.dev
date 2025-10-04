@@ -12,10 +12,10 @@ use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Models\Slider;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
+
 use Filament\Forms\Form;
 
 final class SliderResource extends Resource
