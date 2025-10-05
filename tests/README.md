@@ -70,6 +70,20 @@ tests/
 php artisan test
 ```
 
+### Scan for missing `RefreshDatabase`
+```bash
+php artisan tests:check-refresh-database --path=tests/Feature --fail-on-find
+```
+
+You can also run the Composer shortcut:
+
+```bash
+composer tests:check-refresh
+```
+
+The command surfaces feature tests that omit database refresh traits yet appear to create records (e.g., via factories or HTTP
+requests), mirroring the workflow described in [Laravel News](https://laravel-news.com/find-feature-tests-creating-database-records-without-refreshing-the-database-in-laravel).
+
 ### Run specific test categories
 ```bash
 # Admin tests
