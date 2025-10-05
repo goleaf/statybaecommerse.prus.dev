@@ -5,6 +5,8 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 
+require_once __DIR__ . '/../app/Support/filament_compat.php';
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
