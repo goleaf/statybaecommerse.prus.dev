@@ -39,6 +39,13 @@ return [
     'newsletter_subscribe' => 'Prenumeruoti',
     'newsletter_success' => 'Sėkmingai prenumeruota naujienlaiškiui',
     'newsletter_error' => 'Įvyko klaida prenumeruojant naujienlaiškiui',
+    'podcast' => [
+        'section_title' => 'Klausykite tinklalaidės',
+        'section_description' => 'Sužinokite daugiau iš susijusio Laravel News tinklalaidės epizodo.',
+        'listen_cta' => 'Atverti epizodą Transistor platformoje',
+        'embed_title' => 'Laravel News tinklalaidės grotuvas',
+        'field_help' => 'Įklijuokite viešą Transistor bendrinimo nuorodą (https://share.transistor.fm/s/...), ir grotuvas bus įterptas automatiškai.',
+    ],
     // Admin form fields
     'basic_information' => 'Pagrindinė informacija',
     'media' => 'Medija',
@@ -122,6 +129,7 @@ return [
         'meta_title' => 'Meta pavadinimas',
         'meta_description' => 'Meta aprašymas',
         'meta_keywords' => 'Meta raktažodžiai',
+        'podcast_url' => 'Tinklalaidės bendrinimo nuoroda',
         'categories' => 'Kategorijos',
         'tags' => 'Žymės',
         'view_count' => 'Peržiūrų skaičius',
