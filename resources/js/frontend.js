@@ -349,29 +349,187 @@ function initializeFilters() {
 
 // Infinite scroll for product listings
 function initializeInfiniteScroll() {
-    const loadMoreButton = document.querySelector('[data-load-more]');
+    const scrollers = document.querySelectorAll('[data-infinite-scroll]');
 
-    if (loadMoreButton) {
-        loadMoreButton.addEventListener('click', function () {
-            const nextPage = parseInt(this.dataset.page) + 1;
-            const url = this.dataset.url;
-
-            fetch(`${url}?page=${nextPage}`)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newProducts = doc.querySelectorAll('.product-card');
-
-                    const container = document.querySelector('[data-products-container]');
-                    newProducts.forEach(product => {
-                        container.appendChild(product);
-                    });
-
-                    this.dataset.page = nextPage;
-                });
-        });
+    if (scrollers.length === 0) {
+        return;
     }
+
+    scrollers.forEach(root => {
+        if (root.dataset.infiniteScrollInitialized === 'true') {
+            return;
+        }
+
+        const itemsContainer = root.querySelector('[data-infinite-scroll-items]');
+        const controls = root.querySelector('[data-infinite-scroll-controls]');
+        const loader = root.querySelector('[data-infinite-scroll-loader]');
+        const trigger = root.querySelector('[data-infinite-scroll-trigger]');
+        const endMessage = root.querySelector('[data-infinite-scroll-end]');
+        const fallback = root.querySelector('[data-infinite-scroll-fallback]');
+        const status = root.querySelector('[data-infinite-scroll-status]');
+
+        if (!itemsContainer || !controls) {
+            return;
+        }
+
+        let nextPageUrl = root.dataset.nextPageUrl || '';
+        let isLoading = false;
+        let observer = null;
+        const loaderText = loader ? loader.textContent.trim() : '';
+
+        const announce = message => {
+            if (status) {
+                status.textContent = message;
+            }
+        };
+
+        const setLoaderVisible = visible => {
+            if (!loader) {
+                return;
+            }
+
+            loader.hidden = !visible;
+            loader.classList.toggle('hidden', !visible);
+        };
+
+        const setTriggerVisible = visible => {
+            if (!trigger) {
+                return;
+            }
+
+            trigger.classList.toggle('hidden', !visible);
+            trigger.disabled = !visible;
+            trigger.setAttribute('aria-hidden', (!visible).toString());
+            trigger.setAttribute('tabindex', visible ? '0' : '-1');
+        };
+
+        const showEndMessage = () => {
+            if (endMessage) {
+                endMessage.classList.remove('hidden');
+            }
+        };
+
+        const hideEndMessage = () => {
+            if (endMessage) {
+                endMessage.classList.add('hidden');
+            }
+        };
+
+        const resetFallback = () => {
+            if (fallback) {
+                fallback.classList.remove('hidden');
+            }
+        };
+
+        const hideFallback = () => {
+            if (fallback) {
+                fallback.classList.add('hidden');
+            }
+        };
+
+        const loadMore = () => {
+            if (!nextPageUrl || isLoading) {
+                return;
+            }
+
+            isLoading = true;
+            setLoaderVisible(true);
+            hideEndMessage();
+            announce(loaderText);
+
+            fetch(nextPageUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-Infinite-Scroll': '1'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load additional results.');
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+                    if (typeof data?.html === 'string') {
+                        const fragment = document.createElement('div');
+                        fragment.innerHTML = data.html;
+
+                        Array.from(fragment.children).forEach(child => {
+                            if (child.nodeType === Node.ELEMENT_NODE) {
+                                itemsContainer.appendChild(child);
+                            }
+                        });
+                    }
+
+                    nextPageUrl = data?.next_page_url ?? '';
+                    root.dataset.nextPageUrl = nextPageUrl;
+
+                    if (data?.has_more) {
+                        setTriggerVisible(false);
+                    } else {
+                        showEndMessage();
+                        observer?.disconnect();
+                    }
+
+                    hideFallback();
+                    root.dispatchEvent(new CustomEvent('infinite-scroll:appended', {
+                        detail: {
+                            context: root.dataset.infiniteScrollContext || null,
+                            hasMore: Boolean(nextPageUrl),
+                            meta: data?.meta ?? null
+                        }
+                    }));
+                    announce('');
+                })
+                .catch(error => {
+                    console.error('Infinite scroll error:', error);
+                    resetFallback();
+                    setTriggerVisible(true);
+                    announce(error.message || 'Unable to load more results.');
+                })
+                .finally(() => {
+                    isLoading = false;
+                    setLoaderVisible(false);
+                });
+        };
+
+        if (trigger) {
+            trigger.addEventListener('click', () => loadMore());
+        }
+
+        if (fallback) {
+            hideFallback();
+        }
+
+        if (!nextPageUrl) {
+            setTriggerVisible(false);
+            showEndMessage();
+            root.dataset.infiniteScrollInitialized = 'true';
+
+            return;
+        }
+
+        if ('IntersectionObserver' in window) {
+            observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadMore();
+                    }
+                });
+            }, {
+                rootMargin: '0px 0px 200px 0px'
+            });
+
+            observer.observe(controls);
+            setTriggerVisible(false);
+        } else {
+            setTriggerVisible(true);
+        }
+
+        root.dataset.infiniteScrollInitialized = 'true';
+    });
 }
 
 // Accessibility enhancements
