@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament;
 
+use Filament\Enums\UserMenuPosition;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -19,6 +20,8 @@ class AdminPanelProvider extends PanelProvider
                 ->id('admin')
                 ->path('/admin')
                 ->login()
+                ->topbar(false)
+                ->userMenu(position: UserMenuPosition::Sidebar)
                 ->colors([
                     'primary' => Color::Blue,
                 ])
@@ -56,6 +59,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('/admin')
             ->login()
+            ->topbar(false)
+            ->userMenu(position: UserMenuPosition::Sidebar)
             ->colors([
                 'primary' => Color::Blue,
             ])

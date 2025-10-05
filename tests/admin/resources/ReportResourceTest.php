@@ -155,4 +155,21 @@ final class ReportResourceTest extends TestCase
             ->callTableAction('generate', $report)
             ->assertHasNoTableActionErrors();
     }
+
+    public function test_view_report_uses_table_repeaters_and_empty_states(): void
+    {
+        $report = Report::factory()->create([
+            'filters' => [],
+            'settings' => [],
+            'metadata' => [],
+        ]);
+
+        Livewire::test(\App\Filament\Resources\ReportResource\Pages\ViewReport::class, [
+            'record' => $report->getRouteKey(),
+        ])
+            ->assertSeeHtml('fi-in-table-repeatable')
+            ->assertSee(__('reports.placeholders.no_filters'))
+            ->assertSee(__('reports.placeholders.no_settings'))
+            ->assertSee(__('reports.placeholders.no_metadata'));
+    }
 }
