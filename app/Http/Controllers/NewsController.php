@@ -8,6 +8,7 @@ use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\NewsTag;
 use App\Services\PaginationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -21,7 +22,7 @@ final class NewsController extends Controller
     /**
      * Display a listing of the resource with pagination and filtering.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
         $query = News::published()->with(['categories', 'tags', 'images'])->withCount('comments');
         // Search functionality
@@ -42,12 +43,29 @@ final class NewsController extends Controller
             $query->featured();
         }
         $news = PaginationService::paginateWithContext($query->orderBy('published_at', 'desc'), 'news');
+        $news = $news->appends($request->except('page'));
         $categories = NewsCategory::visible()->with('translations')->get();
         $tags = NewsTag::visible()->with('translations')->get();
         $featuredNews = News::published()->featured()->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->limit(3)->get()->skipWhile(function ($news) {
             // Skip news items that are not properly configured for display
             return empty($news->title) || empty($news->slug) || ! $news->is_published || empty($news->getFirstMediaUrl('images'));
         });
+
+        if ($request->wantsJson()) {
+            $itemsView = view('news.partials.grid-items', ['newsItems' => $news])->render();
+
+            return response()->json([
+                'html' => $itemsView,
+                'next_page_url' => $news->nextPageUrl(),
+                'has_more' => $news->hasMorePages(),
+                'meta' => [
+                    'current_page' => $news->currentPage(),
+                    'last_page' => $news->lastPage(),
+                    'per_page' => $news->perPage(),
+                    'total' => $news->total(),
+                ],
+            ]);
+        }
 
         return view('news.index', compact('news', 'categories', 'tags', 'featuredNews'));
     }
