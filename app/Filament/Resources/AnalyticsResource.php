@@ -21,7 +21,7 @@ final class AnalyticsResource extends Resource
     protected static ?string $model = Order::class;
 
     /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
