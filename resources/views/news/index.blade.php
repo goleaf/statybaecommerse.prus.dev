@@ -124,54 +124,44 @@
 
     <!-- News Grid -->
     @if($news->count() > 0)
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach($news as $article)
-        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            @if($article->images->where('is_featured', true)->first())
-            <div class="aspect-w-16 aspect-h-9">
-                <img src="{{ $article->images->where('is_featured', true)->first()->url }}" 
-                     alt="{{ $article->images->where('is_featured', true)->first()->alt_text }}"
-                     class="w-full h-48 object-cover">
-            </div>
-            @endif
-            <div class="p-6">
-                <div class="flex flex-wrap gap-2 mb-3">
-                    @foreach($article->categories as $category)
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                        {{ $category->name }}
-                    </span>
-                    @endforeach
-                    @if($article->is_featured)
-                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                        {{ __('news.featured_news') }}
-                    </span>
-                    @endif
-                </div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
-                    <a href="{{ route('news.show', $article->slug) }}" class="hover:text-blue-600">
-                        {{ $article->title }}
-                    </a>
-                </h3>
-                <p class="text-gray-600 mb-4 line-clamp-3">{{ $article->summary }}</p>
-                <div class="flex items-center justify-between text-sm text-gray-500">
-                    <div class="flex items-center space-x-4">
-                        <span>{{ $article->author_name }}</span>
-                        <span>{{ $article->published_at->format('Y-m-d') }}</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span>{{ $article->view_count }} {{ __('news.view_count') }}</span>
-                        <span>{{ $article->comments_count }} {{ __('news.comments') }}</span>
-                    </div>
-                </div>
-            </div>
-        </article>
-        @endforeach
-    </div>
+    @php
+        $hasMoreNews = $news->hasMorePages();
+    @endphp
+    <section
+        data-infinite-scroll
+        data-next-page-url="{{ $news->nextPageUrl() ? e($news->nextPageUrl()) : '' }}"
+        data-infinite-scroll-context="news"
+        class="space-y-8"
+    >
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-infinite-scroll-items>
+            @include('news.partials.grid-items', ['newsItems' => $news])
+        </div>
 
-    <!-- Pagination -->
-    <div class="mt-8">
-        <x-perfect-pagination :paginator="$news->appends(request()->query())" />
-    </div>
+        <div class="flex flex-col items-center gap-4" data-infinite-scroll-controls>
+            <div class="flex items-center gap-3 text-sm text-gray-500" data-infinite-scroll-loader hidden>
+                <span class="h-5 w-5 rounded-full border-2 border-blue-500 border-t-transparent animate-spin"></span>
+                <span>{{ __('news.loading_more') }}</span>
+            </div>
+
+            <button
+                type="button"
+                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed {{ $hasMoreNews ? '' : 'hidden' }}"
+                data-infinite-scroll-trigger
+            >
+                {{ __('news.load_more') }}
+            </button>
+
+            <p class="text-sm text-gray-500 hidden" data-infinite-scroll-end>
+                {{ __('news.end_of_results') }}
+            </p>
+
+            <div data-infinite-scroll-fallback class="w-full">
+                <x-perfect-pagination :paginator="$news->appends(request()->query())" />
+            </div>
+
+            <div class="sr-only" aria-live="polite" data-infinite-scroll-status></div>
+        </div>
+    </section>
     @else
     <div class="text-center py-12">
         <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ __('news.no_news_found') }}</h3>
