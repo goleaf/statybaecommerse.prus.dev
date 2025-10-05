@@ -85,6 +85,15 @@ class TranslationsRelationManager extends RelationManager
                                 'h3',
                                 'blockquote',
                                 'codeBlock',
+                                'grid',
+                                'gridDelete',
+                                'textColor',
+                            ])
+                            ->textColors([
+                                'primary' => '#1d4ed8',
+                                'emerald' => '#047857',
+                                'amber' => '#f59e0b',
+                                'slate' => '#475569',
                             ])
                             ->helperText('The main content of this legal document'),
 

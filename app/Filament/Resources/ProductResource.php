@@ -131,6 +131,15 @@ final class ProductResource extends Resource
                                                 'link',
                                                 'bulletList',
                                                 'orderedList',
+                                                'grid',
+                                                'gridDelete',
+                                                'textColor',
+                                            ])
+                                            ->textColors([
+                                                'primary' => '#1d4ed8',
+                                                'emerald' => '#047857',
+                                                'amber' => '#f59e0b',
+                                                'slate' => '#475569',
                                             ]),
                                         Textarea::make('short_description')
                                             ->label(__('products.fields.short_description'))
