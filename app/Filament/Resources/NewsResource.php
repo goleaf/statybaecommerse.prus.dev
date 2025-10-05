@@ -9,6 +9,7 @@ use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -16,8 +17,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
-use Filament\Forms\Form;
 
 class NewsResource extends Resource
 {
@@ -93,6 +92,20 @@ class NewsResource extends Resource
                         ->maxLength(255),
                 ])
                 ->columns(1),
+            Forms\Components\Section::make(__('news.podcast.section_title'))
+                ->description(__('news.podcast.section_description'))
+                ->collapsible()
+                ->collapsed()
+                ->schema([
+                    Forms\Components\TextInput::make('meta_data.podcast_url')
+                        ->label(__('news.fields.podcast_url'))
+                        ->placeholder('https://share.transistor.fm/s/...')
+                        ->maxLength(2048)
+                        ->url()
+                        ->nullable()
+                        ->dehydrateStateUsing(static fn (?string $state): ?string => filled($state) ? trim($state) : null)
+                        ->helperText(__('news.podcast.field_help')),
+                ]),
             Forms\Components\Section::make('Categories & Tags')
                 ->schema([
                     Forms\Components\Select::make('categories')

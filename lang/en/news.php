@@ -42,6 +42,13 @@ return [
     'newsletter_subscribe' => 'Subscribe',
     'newsletter_success' => 'Successfully subscribed to newsletter',
     'newsletter_error' => 'Error subscribing to newsletter',
+    'podcast' => [
+        'section_title' => 'Listen to the podcast',
+        'section_description' => 'Tune into the related Laravel News Podcast episode for more insights.',
+        'listen_cta' => 'Open episode on Transistor',
+        'embed_title' => 'Laravel News Podcast player',
+        'field_help' => 'Use the public Transistor share link (https://share.transistor.fm/s/...) and the player will be embedded automatically.',
+    ],
     // Admin form fields
     'basic_information' => 'Basic Information',
     'media' => 'Media',
@@ -125,6 +132,7 @@ return [
         'meta_title' => 'Meta Title',
         'meta_description' => 'Meta Description',
         'meta_keywords' => 'Meta Keywords',
+        'podcast_url' => 'Podcast share URL',
         'categories' => 'Categories',
         'tags' => 'Tags',
         'view_count' => 'View Count',
