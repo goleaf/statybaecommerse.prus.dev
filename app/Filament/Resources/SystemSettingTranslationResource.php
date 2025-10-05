@@ -171,6 +171,15 @@ final class SystemSettingTranslationResource extends Resource
                                         'h3',
                                         'blockquote',
                                         'codeBlock',
+                                        'grid',
+                                        'gridDelete',
+                                        'textColor',
+                                    ])
+                                    ->textColors([
+                                        'primary' => '#1d4ed8',
+                                        'emerald' => '#047857',
+                                        'amber' => '#f59e0b',
+                                        'slate' => '#475569',
                                     ])
                                     ->helperText(__('admin.system_setting_translations.rich_description_help'))
                                     ->columnSpanFull(),

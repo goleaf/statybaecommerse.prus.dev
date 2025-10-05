@@ -108,6 +108,15 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 'link',
                                 'bulletList',
                                 'orderedList',
+                                'grid',
+                                'gridDelete',
+                                'textColor',
+                            ])
+                            ->textColors([
+                                'primary' => '#1d4ed8',
+                                'emerald' => '#047857',
+                                'amber' => '#f59e0b',
+                                'slate' => '#475569',
                             ]),
                         Grid::make(2)->components([
                             TextInput::make('button_text')

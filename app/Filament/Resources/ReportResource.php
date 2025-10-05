@@ -23,9 +23,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\EmptyState;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -508,8 +510,17 @@ final class ReportResource extends Resource
                 Section::make(__('reports.sections.advanced'))
                     ->collapsible()
                     ->schema([
+                        EmptyState::make(__('reports.placeholders.no_filters'))
+                            ->icon('heroicon-o-funnel')
+                            ->description(__('translations.add_filter'))
+                            ->hidden(fn (?Report $record): bool => filled($record?->filters))
+                            ->columnSpanFull(),
                         RepeatableEntry::make('filters')
                             ->label(__('reports.fields.filters'))
+                            ->table([
+                                TableColumn::make(__('reports.fields.filter_key')),
+                                TableColumn::make(__('reports.fields.filter_value')),
+                            ])
                             ->schema([
                                 TextEntry::make('key')
                                     ->label(__('reports.fields.filter_key')),
@@ -517,8 +528,17 @@ final class ReportResource extends Resource
                                     ->label(__('reports.fields.filter_value')),
                             ])
                             ->placeholder(__('reports.placeholders.no_filters')),
+                        EmptyState::make(__('reports.placeholders.no_settings'))
+                            ->icon('heroicon-o-cog-6-tooth')
+                            ->description(__('translations.add_config_parameter'))
+                            ->hidden(fn (?Report $record): bool => filled($record?->settings))
+                            ->columnSpanFull(),
                         RepeatableEntry::make('settings')
                             ->label(__('reports.fields.settings'))
+                            ->table([
+                                TableColumn::make(__('reports.fields.setting_key')),
+                                TableColumn::make(__('reports.fields.setting_value')),
+                            ])
                             ->schema([
                                 TextEntry::make('key')
                                     ->label(__('reports.fields.setting_key')),
@@ -526,8 +546,17 @@ final class ReportResource extends Resource
                                     ->label(__('reports.fields.setting_value')),
                             ])
                             ->placeholder(__('reports.placeholders.no_settings')),
+                        EmptyState::make(__('reports.placeholders.no_metadata'))
+                            ->icon('heroicon-o-document-text')
+                            ->description(__('translations.add_metadata'))
+                            ->hidden(fn (?Report $record): bool => filled($record?->metadata))
+                            ->columnSpanFull(),
                         RepeatableEntry::make('metadata')
                             ->label(__('reports.fields.metadata'))
+                            ->table([
+                                TableColumn::make(__('reports.fields.metadata_key')),
+                                TableColumn::make(__('reports.fields.metadata_value')),
+                            ])
                             ->schema([
                                 TextEntry::make('key')
                                     ->label(__('reports.fields.metadata_key')),
