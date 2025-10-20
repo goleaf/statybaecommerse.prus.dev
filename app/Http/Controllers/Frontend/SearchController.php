@@ -35,7 +35,12 @@ final class SearchController extends Controller
                     $q->where('name', 'like', "%{$query}%")
                         ->orWhere('description', 'like', "%{$query}%");
                 })
-                ->paginate(20);
+                ->paginate(20)
+                ->appends([
+                    'q' => $query,
+                    'category' => $category,
+                ])
+                ->withPath(route('frontend.search.index'));
         }
 
         $categories = Category::where('is_active', true)->get();
@@ -62,7 +67,7 @@ final class SearchController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
-                    'url' => route('products.show', $product->slug),
+                    'url' => route('frontend.products.show', $product),
                 ];
             });
 
