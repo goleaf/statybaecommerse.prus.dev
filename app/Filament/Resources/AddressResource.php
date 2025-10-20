@@ -8,13 +8,8 @@ use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
 use App\Models\Country;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -22,9 +17,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -37,10 +36,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-
-if (! class_exists(Form::class) && class_exists(Schema::class)) {
-    class_alias(Schema::class, Form::class);
-}
 
 /**
  * AddressResource
@@ -92,9 +87,9 @@ final class AddressResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            SchemaSection::make(__('translations.address_information'))
+            Section::make(__('translations.address_information'))
                 ->schema([
-                    SchemaGrid::make(2)->schema([
+                    Grid::make(2)->schema([
                         Select::make('user_id')
                             ->label(__('translations.user'))
                             ->relationship('user', 'name')
@@ -107,7 +102,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->default(AddressType::SHIPPING),
                     ]),
-                    SchemaGrid::make(2)->schema([
+                    Grid::make(2)->schema([
                         TextInput::make('first_name')
                             ->label(__('translations.first_name'))
                             ->maxLength(255),
@@ -115,7 +110,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.last_name'))
                             ->maxLength(255),
                     ]),
-                    SchemaGrid::make(2)->schema([
+                    Grid::make(2)->schema([
                         TextInput::make('company_name')
                             ->label(__('translations.company'))
                             ->maxLength(255),
@@ -124,7 +119,7 @@ final class AddressResource extends Resource
                             ->maxLength(50),
                     ]),
                 ]),
-            SchemaSection::make(__('translations.address_details'))
+            Section::make(__('translations.address_details'))
                 ->schema([
                     TextInput::make('address_line_1')
                         ->label(__('translations.address_line_1'))
@@ -133,7 +128,7 @@ final class AddressResource extends Resource
                     TextInput::make('address_line_2')
                         ->label(__('translations.address_line_2'))
                         ->maxLength(255),
-                    SchemaGrid::make(3)->schema([
+                    Grid::make(3)->schema([
                         TextInput::make('apartment')
                             ->label(__('translations.apartment'))
                             ->maxLength(100),
@@ -144,7 +139,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.building'))
                             ->maxLength(100),
                     ]),
-                    SchemaGrid::make(3)->schema([
+                    Grid::make(3)->schema([
                         TextInput::make('city')
                             ->label(__('translations.city'))
                             ->required()
@@ -157,10 +152,10 @@ final class AddressResource extends Resource
                             ->required()
                             ->maxLength(20),
                     ]),
-                    SchemaGrid::make(2)->schema([
+                    Grid::make(2)->schema([
                         Select::make('country_code')
                             ->label(__('translations.country'))
-                            ->options(Country::all()->pluck('name', 'cca2'))
+                            ->options(fn (): array => Country::query()->orderBy('name')->pluck('name', 'cca2')->all())
                             ->searchable()
                             ->default('LT')
                             ->required(fn (string $context): bool => $context === 'create'),
@@ -172,9 +167,9 @@ final class AddressResource extends Resource
                             ->dehydrated(false),
                     ]),
                 ]),
-            SchemaSection::make(__('translations.contact_information'))
+            Section::make(__('translations.contact_information'))
                 ->schema([
-                    SchemaGrid::make(2)->schema([
+                    Grid::make(2)->schema([
                         TextInput::make('phone')
                             ->label(__('translations.phone'))
                             ->tel()
@@ -188,7 +183,7 @@ final class AddressResource extends Resource
                         ->label(__('translations.landmark'))
                         ->maxLength(255),
                 ]),
-            SchemaSection::make(__('translations.additional_information'))
+            Section::make(__('translations.additional_information'))
                 ->schema([
                     Textarea::make('notes')
                         ->label(__('translations.notes'))
@@ -201,9 +196,9 @@ final class AddressResource extends Resource
                         ->rows(3)
                         ->columnSpanFull(),
                 ]),
-            SchemaSection::make(__('translations.settings'))
+            Section::make(__('translations.settings'))
                 ->schema([
-                    SchemaGrid::make(2)->schema([
+                    Grid::make(2)->schema([
                         Toggle::make('is_default')
                             ->label(__('translations.is_default'))
                             ->helperText(__('translations.is_default_help')),
@@ -212,7 +207,7 @@ final class AddressResource extends Resource
                             ->default(true)
                             ->helperText(__('translations.is_active_help')),
                     ]),
-                    SchemaGrid::make(2)->schema([
+                    Grid::make(2)->schema([
                         Toggle::make('is_billing')
                             ->label(__('translations.is_billing'))
                             ->helperText(__('translations.is_billing_help')),
@@ -244,15 +239,27 @@ final class AddressResource extends Resource
                     ->searchable(['first_name', 'last_name', 'company_name']),
                 TextColumn::make('type')
                     ->label(__('translations.type'))
-                    ->formatStateUsing(fn ($state) => $state->label())
+                    ->formatStateUsing(function ($state): string {
+                        $enumState = $state instanceof AddressType
+                            ? $state
+                            : AddressType::tryFrom((string) $state);
+
+                        return $enumState?->label() ?? (string) $state;
+                    })
                     ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        AddressType::SHIPPING => 'primary',
-                        AddressType::BILLING => 'success',
-                        AddressType::HOME => 'warning',
-                        AddressType::WORK => 'info',
-                        AddressType::OTHER => 'secondary',
-                        default => 'gray',
+                    ->color(function ($state): string {
+                        $enumState = $state instanceof AddressType
+                            ? $state
+                            : AddressType::tryFrom((string) $state);
+
+                        return match ($enumState) {
+                            AddressType::SHIPPING => 'primary',
+                            AddressType::BILLING  => 'success',
+                            AddressType::HOME     => 'warning',
+                            AddressType::WORK     => 'info',
+                            AddressType::OTHER    => 'secondary',
+                            default               => 'gray',
+                        };
                     }),
                 TextColumn::make('full_address')
                     ->label(__('translations.address'))
@@ -305,7 +312,7 @@ final class AddressResource extends Resource
                 SelectFilter::make('type')
                     ->options(AddressType::options()),
                 SelectFilter::make('country_code')
-                    ->options(Country::all()->pluck('name', 'cca2')),
+                    ->options(fn (): array => Country::query()->orderBy('name')->pluck('name', 'cca2')->all()),
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
                     ->preload(),
@@ -340,7 +347,7 @@ final class AddressResource extends Resource
                     ->label(__('translations.set_as_default'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->action(function (Address $record) {
+                    ->action(function (Address $record): void {
                         $record->setAsDefault();
                         Notification::make()
                             ->title(__('translations.address_set_as_default'))
@@ -352,7 +359,7 @@ final class AddressResource extends Resource
                     ->label(__('translations.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('gray')
-                    ->action(function (Address $record) {
+                    ->action(function (Address $record): void {
                         $newAddress = $record->replicate();
                         $newAddress->is_default = false;
                         $newAddress->save();
@@ -365,7 +372,7 @@ final class AddressResource extends Resource
                     ->label(fn (Address $record) => $record->is_active ? __('translations.deactivate') : __('translations.activate'))
                     ->icon(fn (Address $record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                     ->color(fn (Address $record) => $record->is_active ? 'danger' : 'success')
-                    ->action(function (Address $record) {
+                    ->action(function (Address $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('translations.address_activated') : __('translations.address_deactivated'))
@@ -385,7 +392,7 @@ final class AddressResource extends Resource
                         ->label(__('translations.activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('translations.addresses_activated'))
@@ -396,7 +403,7 @@ final class AddressResource extends Resource
                         ->label(__('translations.deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('translations.addresses_deactivated'))
@@ -407,7 +414,7 @@ final class AddressResource extends Resource
                         ->label(__('translations.set_as_billing'))
                         ->icon('heroicon-o-credit-card')
                         ->color('info')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_billing' => true]);
                             Notification::make()
                                 ->title(__('translations.addresses_set_as_billing'))
@@ -418,7 +425,7 @@ final class AddressResource extends Resource
                         ->label(__('translations.set_as_shipping'))
                         ->icon('heroicon-o-truck')
                         ->color('warning')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_shipping' => true]);
                             Notification::make()
                                 ->title(__('translations.addresses_set_as_shipping'))
@@ -429,7 +436,7 @@ final class AddressResource extends Resource
                         ->label(__('translations.export'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('gray')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             // Export logic would go here
                             Notification::make()
                                 ->title(__('translations.addresses_exported'))
@@ -442,7 +449,7 @@ final class AddressResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->poll('30s')  // Auto-refresh every 30 seconds
             ->striped()
-            ->paginated([10, 25, 50, 100])
+            ->paginationPageOptions([10, 25, 50, 100])
             ->reorderable('sort_order')
             ->searchable()
             ->persistSearchInSession()
@@ -466,10 +473,10 @@ final class AddressResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAddresses::route('/'),
+            'index'  => Pages\ListAddresses::route('/'),
             'create' => Pages\CreateAddress::route('/create'),
-            'view' => Pages\ViewAddress::route('/{record}'),
-            'edit' => Pages\EditAddress::route('/{record}/edit'),
+            'view'   => Pages\ViewAddress::route('/{record}'),
+            'edit'   => Pages\EditAddress::route('/{record}/edit'),
         ];
     }
 
@@ -518,9 +525,9 @@ final class AddressResource extends Resource
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
-            __('translations.user') => $record->user->name,
-            __('translations.type') => $record->type_label,
-            __('translations.city') => $record->city,
+            __('translations.user')    => $record->user->name,
+            __('translations.type')    => $record->type_label,
+            __('translations.city')    => $record->city,
             __('translations.country') => $record->country?->name,
         ];
     }
