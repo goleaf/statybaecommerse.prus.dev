@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::get('/v1/search', SearchController::class)->name('api.search.aggregate');
 
 // Autocomplete search endpoint for AutocompleteSelect component
 Route::post('/autocomplete-search', function (Request $request) {
