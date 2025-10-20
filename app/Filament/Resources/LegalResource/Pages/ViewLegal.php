@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Resources\LegalResource\Pages;
 
 use App\Filament\Resources\LegalResource;
+use App\Models\Legal;
 use Filament\Actions;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section as InfoSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewLegal extends ViewRecord
 {
