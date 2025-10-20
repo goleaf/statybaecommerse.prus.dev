@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -19,7 +20,7 @@ final class OrdersRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 Forms\Components\TextInput::make('order_number')
                     ->label(__('Order Number'))
                     ->required()
@@ -27,11 +28,11 @@ final class OrdersRelationManager extends RelationManager
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'pending' => __('Pending'),
+                        'pending'    => __('Pending'),
                         'processing' => __('Processing'),
-                        'shipped' => __('Shipped'),
-                        'delivered' => __('Delivered'),
-                        'cancelled' => __('Cancelled'),
+                        'shipped'    => __('Shipped'),
+                        'delivered'  => __('Delivered'),
+                        'cancelled'  => __('Cancelled'),
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('total')
@@ -60,12 +61,12 @@ final class OrdersRelationManager extends RelationManager
                     ->label(__('Status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
+                        'pending'    => 'warning',
                         'processing' => 'info',
-                        'shipped' => 'primary',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
+                        'shipped'    => 'primary',
+                        'delivered'  => 'success',
+                        'cancelled'  => 'danger',
+                        default      => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('Total'))
@@ -80,11 +81,11 @@ final class OrdersRelationManager extends RelationManager
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'pending' => __('Pending'),
+                        'pending'    => __('Pending'),
                         'processing' => __('Processing'),
-                        'shipped' => __('Shipped'),
-                        'delivered' => __('Delivered'),
-                        'cancelled' => __('Cancelled'),
+                        'shipped'    => __('Shipped'),
+                        'delivered'  => __('Delivered'),
+                        'cancelled'  => __('Cancelled'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])
@@ -92,7 +93,7 @@ final class OrdersRelationManager extends RelationManager
                 Tables\Actions\AttachAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 Tables\Actions\DetachAction::make(),
             ])
             ->bulkActions([

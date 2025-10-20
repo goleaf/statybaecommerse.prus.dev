@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -19,7 +20,7 @@ final class UsersRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 Forms\Components\TextInput::make('name')
                     ->label(__('Name'))
                     ->required()
@@ -33,7 +34,7 @@ final class UsersRelationManager extends RelationManager
                     ->label(__('Type'))
                     ->options([
                         'customer' => __('Customer'),
-                        'admin' => __('Admin'),
+                        'admin'    => __('Admin'),
                     ])
                     ->required(),
             ]);
@@ -58,8 +59,8 @@ final class UsersRelationManager extends RelationManager
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'customer' => 'success',
-                        'admin' => 'primary',
-                        default => 'gray',
+                        'admin'    => 'primary',
+                        default    => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Created At'))
@@ -71,7 +72,7 @@ final class UsersRelationManager extends RelationManager
                     ->label(__('Type'))
                     ->options([
                         'customer' => __('Customer'),
-                        'admin' => __('Admin'),
+                        'admin'    => __('Admin'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])
@@ -79,7 +80,7 @@ final class UsersRelationManager extends RelationManager
                 Tables\Actions\AttachAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 Tables\Actions\DetachAction::make(),
             ])
             ->bulkActions([
