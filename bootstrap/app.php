@@ -1,9 +1,14 @@
 <?php
 
+use App\Exceptions\Domain\DomainException;
+use App\Http\Middleware\AttachCorrelationId;
+use App\Services\TranslationService;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 require_once __DIR__ . '/../app/Support/filament_compat.php';
 
@@ -25,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(AttachCorrelationId::class);
         $middleware->append(App\Http\Middleware\SetLocale::class);
         $middleware->append(App\Http\Middleware\SetFilamentLocale::class);
         // Handle user impersonation for admin support
@@ -39,7 +45,34 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (DomainException $exception, Request $request) {
+            $availableLocales = TranslationService::getAvailableLocales();
+            $preferred = $request->getPreferredLanguage($availableLocales);
+            $locale = is_string($preferred) && $preferred !== ''
+                ? $preferred
+                : (is_string(app()->getLocale()) && app()->getLocale() !== ''
+                    ? app()->getLocale()
+                    : TranslationService::getDefaultLocale());
+
+            if (! in_array($locale, $availableLocales, true)) {
+                $locale = TranslationService::getDefaultLocale();
+            }
+
+            app()->setLocale($locale);
+
+            $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
+
+            $correlationId = $request->attributes->get('correlation_id')
+                ?? (app()->bound('request_correlation_id')
+                    ? (string) app()->make('request_correlation_id')
+                    : Str::uuid()->toString());
+
+            return response()->json([
+                'code' => $exception->errorCode(),
+                'message' => $message,
+                'correlation_id' => $correlationId,
+            ], $exception->status());
+        });
     })
     ->withProviders([
         App\Providers\AuthServiceProvider::class,
