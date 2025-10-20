@@ -2,6 +2,15 @@
 
 return [
     'title' => 'Pranešimai',
+    'single' => 'Pranešimas',
+    'plural' => 'Pranešimai',
+    'sections' => [
+        'basic_information' => 'Pagrindinė informacija',
+        'media' => 'Medija',
+        'seo' => 'SEO',
+        'settings' => 'Nustatymai',
+    ],
+    'add_tag' => 'Pridėti žymą',
     'create_title' => 'Sukurti pranešimą',
     'edit_title' => 'Redaguoti pranešimą',
     'view_title' => 'Peržiūrėti pranešimą',
@@ -12,6 +21,10 @@ return [
         'content' => 'Turinys',
         'excerpt' => 'Santrauka',
         'status' => 'Būsena',
+        'moderation_state' => 'Moderavimo būsena',
+        'submitted_for_review_at' => 'Pateikta peržiūrai',
+        'approved_at' => 'Patvirtinta',
+        'approved_by' => 'Patvirtino',
         'published_at' => 'Publikuota',
         'user_id' => 'Autorius',
         'meta_title' => 'Meta pavadinimas',
@@ -19,12 +32,19 @@ return [
         'featured' => 'Rekomenduojamas',
         'images' => 'Pagrindinis paveikslėlis',
         'gallery' => 'Galerijos paveikslėliai',
+        'tags' => 'Žymos',
+        'is_pinned' => 'Prisegtas',
+        'allow_comments' => 'Leisti komentarus',
+        'created_at' => 'Sukurta',
     ],
     'status' => [
         'draft' => 'Juodraštis',
+        'review' => 'Peržiūroje',
         'published' => 'Publikuotas',
         'archived' => 'Archyvuotas',
     ],
+
+    'status_managed_by_workflow' => 'Būseną valdo moderavimo procesas.',
     'actions' => [
         'create' => 'Sukurti',
         'edit' => 'Redaguoti',
@@ -35,6 +55,20 @@ return [
         'archive' => 'Archyvuoti',
         'feature' => 'Rekomenduoti',
         'unfeature' => 'Nerekomenduoti',
+    ],
+
+    'approvals' => [
+        'notes' => 'Pastabos',
+        'notes_help' => 'Pasidalykite sprendimo kontekstu (neprivaloma).',
+        'decided_at' => 'Sprendimo data',
+        'reviewer' => 'Peržiūrėtojas',
+        'decision' => 'Sprendimas',
+        'decisions' => [
+            'approved' => 'Patvirtinta',
+            'returned' => 'Grąžinta į juodraštį',
+        ],
+        'empty_heading' => 'Patvirtinimų kol kas nėra',
+        'empty_description' => 'Peržiūros istorija bus rodoma čia, kai tik bus priimtas sprendimas.',
     ],
     'messages' => [
         'created' => 'Pranešimas sėkmingai sukurtas',
@@ -55,6 +89,8 @@ return [
         'all_posts' => 'Visi pranešimai',
         'featured_only' => 'Tik rekomenduojami',
         'not_featured' => 'Nerekomenduojami',
+        'pinned_only' => 'Tik prisegti',
+        'not_pinned' => 'Ne prisegti',
     ],
     'widgets' => [
         'total_posts' => 'Iš viso pranešimų',

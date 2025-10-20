@@ -4,12 +4,24 @@ return [
     // Basic fields
     'title' => 'Straipsniai',
     'post' => 'Straipsnis',
+    'single' => 'Straipsnis',
+    'plural' => 'Straipsniai',
+    'sections' => [
+        'basic_information' => 'Pagrindinė informacija',
+        'media' => 'Medija',
+        'seo' => 'SEO',
+        'settings' => 'Nustatymai',
+    ],
     'fields' => [
         'title' => 'Pavadinimas',
         'slug' => 'Slug',
         'content' => 'Turinys',
         'excerpt' => 'Santrauka',
         'status' => 'Būsena',
+        'moderation_state' => 'Moderavimo būsena',
+        'submitted_for_review_at' => 'Pateikta peržiūrai',
+        'approved_at' => 'Patvirtinta',
+        'approved_by' => 'Patvirtino',
         'published_at' => 'Publikuota',
         'featured' => 'Išskirtinis',
         'is_pinned' => 'Prisegtas',
@@ -30,11 +42,16 @@ return [
     // Status
     'status' => [
         'draft' => 'Juodraštis',
+        'review' => 'Peržiūroje',
         'published' => 'Publikuotas',
         'archived' => 'Archyvuotas',
     ],
 
+    'status_managed_by_workflow' => 'Būseną valdo moderavimo procesas.',
+
     // Actions
+    'add_tag' => 'Pridėti žymą',
+
     'actions' => [
         'publish' => 'Publikuoti',
         'unpublish' => 'Nepublikuoti',
@@ -43,6 +60,20 @@ return [
         'unfeature' => 'Neišskirti',
         'pin' => 'Prisegti',
         'unpin' => 'Atsegti',
+    ],
+
+    'approvals' => [
+        'notes' => 'Pastabos',
+        'notes_help' => 'Pasidalykite sprendimo kontekstu (neprivaloma).',
+        'decided_at' => 'Sprendimo data',
+        'reviewer' => 'Peržiūrėtojas',
+        'decision' => 'Sprendimas',
+        'decisions' => [
+            'approved' => 'Patvirtinta',
+            'returned' => 'Grąžinta į juodraštį',
+        ],
+        'empty_heading' => 'Patvirtinimų kol kas nėra',
+        'empty_description' => 'Peržiūros istorija bus rodoma čia, kai tik bus priimtas sprendimas.',
     ],
 
     // Filters
@@ -55,6 +86,8 @@ return [
         'author' => 'Autorius',
         'published_from' => 'Publikuota nuo',
         'published_until' => 'Publikuota iki',
+        'pinned_only' => 'Tik prisegti',
+        'not_pinned' => 'Ne prisegti',
     ],
 
     // SEO

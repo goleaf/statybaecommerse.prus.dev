@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ModerationState;
 use App\Models\News;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,6 +19,10 @@ final class NewsFactory extends Factory
     {
         return [
             'is_visible' => true,
+            'moderation_state' => ModerationState::Published->value,
+            'submitted_for_review_at' => now()->subDays(fake()->numberBetween(2, 5)),
+            'approved_at' => now()->subDay(),
+            'approved_by_id' => null,
             'published_at' => now()->subDays(fake()->numberBetween(0, 30)),
             'author_name' => fake()->name(),
         ];
