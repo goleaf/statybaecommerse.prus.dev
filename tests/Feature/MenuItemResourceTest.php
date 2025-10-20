@@ -8,6 +8,7 @@ use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class MenuItemResourceTest extends TestCase
@@ -19,7 +20,7 @@ class MenuItemResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -28,9 +29,9 @@ class MenuItemResourceTest extends TestCase
     {
         $menu = Menu::factory()->create(['name' => 'Main Menu']);
         $menuItem = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
-            'label' => 'Home',
-            'url' => '/',
+            'menu_id'    => $menu->id,
+            'label'      => 'Home',
+            'url'        => '/',
             'is_visible' => true,
         ]);
 
@@ -68,21 +69,21 @@ class MenuItemResourceTest extends TestCase
             ->assertOk();
 
         $this->post('/admin/menu-items', [
-            'menu_id' => $menu->id,
-            'label' => 'About Us',
-            'url' => '/about',
+            'menu_id'    => $menu->id,
+            'label'      => 'About Us',
+            'url'        => '/about',
             'route_name' => 'about',
-            'icon' => 'heroicon-o-information-circle',
+            'icon'       => 'heroicon-o-information-circle',
             'sort_order' => 1,
             'is_visible' => true,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('menu_items', [
-            'menu_id' => $menu->id,
-            'label' => 'About Us',
-            'url' => '/about',
+            'menu_id'    => $menu->id,
+            'label'      => 'About Us',
+            'url'        => '/about',
             'route_name' => 'about',
-            'icon' => 'heroicon-o-information-circle',
+            'icon'       => 'heroicon-o-information-circle',
             'sort_order' => 1,
             'is_visible' => true,
         ]);
@@ -93,7 +94,7 @@ class MenuItemResourceTest extends TestCase
         $menu = Menu::factory()->create();
         $menuItem = MenuItem::factory()->create([
             'menu_id' => $menu->id,
-            'label' => 'Contact',
+            'label'   => 'Contact',
         ]);
 
         $this
@@ -107,7 +108,7 @@ class MenuItemResourceTest extends TestCase
         $menu = Menu::factory()->create();
         $menuItem = MenuItem::factory()->create([
             'menu_id' => $menu->id,
-            'label' => 'Services',
+            'label'   => 'Services',
         ]);
 
         $this
@@ -115,21 +116,21 @@ class MenuItemResourceTest extends TestCase
             ->assertOk();
 
         $this->put("/admin/menu-items/{$menuItem->id}", [
-            'menu_id' => $menu->id,
-            'label' => 'Our Services',
-            'url' => '/services',
+            'menu_id'    => $menu->id,
+            'label'      => 'Our Services',
+            'url'        => '/services',
             'route_name' => 'services',
-            'icon' => 'heroicon-o-briefcase',
+            'icon'       => 'heroicon-o-briefcase',
             'sort_order' => 2,
             'is_visible' => false,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('menu_items', [
-            'id' => $menuItem->id,
-            'label' => 'Our Services',
-            'url' => '/services',
+            'id'         => $menuItem->id,
+            'label'      => 'Our Services',
+            'url'        => '/services',
             'route_name' => 'services',
-            'icon' => 'heroicon-o-briefcase',
+            'icon'       => 'heroicon-o-briefcase',
             'sort_order' => 2,
             'is_visible' => false,
         ]);
@@ -158,16 +159,16 @@ class MenuItemResourceTest extends TestCase
 
         MenuItem::factory()->create([
             'menu_id' => $menu1->id,
-            'label' => 'Home',
+            'label'   => 'Home',
         ]);
 
         MenuItem::factory()->create([
             'menu_id' => $menu2->id,
-            'label' => 'Privacy Policy',
+            'label'   => 'Privacy Policy',
         ]);
 
         $this
-            ->get('/admin/menu-items?menu_id='.$menu1->id)
+            ->get('/admin/menu-items?menu_id=' . $menu1->id)
             ->assertOk()
             ->assertSee('Home')
             ->assertDontSee('Privacy Policy');
@@ -178,23 +179,23 @@ class MenuItemResourceTest extends TestCase
         $menu = Menu::factory()->create();
         $parentItem = MenuItem::factory()->create([
             'menu_id' => $menu->id,
-            'label' => 'Products',
+            'label'   => 'Products',
         ]);
 
         MenuItem::factory()->create([
-            'menu_id' => $menu->id,
+            'menu_id'   => $menu->id,
             'parent_id' => $parentItem->id,
-            'label' => 'Electronics',
+            'label'     => 'Electronics',
         ]);
 
         MenuItem::factory()->create([
-            'menu_id' => $menu->id,
+            'menu_id'   => $menu->id,
             'parent_id' => null,
-            'label' => 'About',
+            'label'     => 'About',
         ]);
 
         $this
-            ->get('/admin/menu-items?parent_id='.$parentItem->id)
+            ->get('/admin/menu-items?parent_id=' . $parentItem->id)
             ->assertOk()
             ->assertSee('Electronics')
             ->assertDontSee('About');
@@ -205,14 +206,14 @@ class MenuItemResourceTest extends TestCase
         $menu = Menu::factory()->create();
 
         MenuItem::factory()->create([
-            'menu_id' => $menu->id,
-            'label' => 'Visible Item',
+            'menu_id'    => $menu->id,
+            'label'      => 'Visible Item',
             'is_visible' => true,
         ]);
 
         MenuItem::factory()->create([
-            'menu_id' => $menu->id,
-            'label' => 'Hidden Item',
+            'menu_id'    => $menu->id,
+            'label'      => 'Hidden Item',
             'is_visible' => false,
         ]);
 
@@ -228,19 +229,19 @@ class MenuItemResourceTest extends TestCase
         $menu = Menu::factory()->create();
         $parent = MenuItem::factory()->create([
             'menu_id' => $menu->id,
-            'label' => 'Products',
+            'label'   => 'Products',
         ]);
 
         $child1 = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
+            'menu_id'   => $menu->id,
             'parent_id' => $parent->id,
-            'label' => 'Electronics',
+            'label'     => 'Electronics',
         ]);
 
         $child2 = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
+            'menu_id'   => $menu->id,
             'parent_id' => $parent->id,
-            'label' => 'Clothing',
+            'label'     => 'Clothing',
         ]);
 
         // Test parent relationship
@@ -258,7 +259,7 @@ class MenuItemResourceTest extends TestCase
     {
         $menu = Menu::factory()->create();
         $menuItem = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
+            'menu_id'      => $menu->id,
             'route_params' => ['id' => 1, 'slug' => 'test'],
         ]);
 
@@ -270,7 +271,7 @@ class MenuItemResourceTest extends TestCase
     {
         $menu = Menu::factory()->create();
         $menuItem = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
+            'menu_id'    => $menu->id,
             'sort_order' => 5,
         ]);
 
@@ -282,7 +283,7 @@ class MenuItemResourceTest extends TestCase
     {
         $menu = Menu::factory()->create();
         $menuItem = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
+            'menu_id'    => $menu->id,
             'is_visible' => true,
         ]);
 
@@ -296,46 +297,46 @@ class MenuItemResourceTest extends TestCase
 
         // Create parent item
         $parent = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
-            'label' => 'Products',
+            'menu_id'    => $menu->id,
+            'label'      => 'Products',
             'sort_order' => 1,
         ]);
 
         // Create child items
         $child1 = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
-            'parent_id' => $parent->id,
-            'label' => 'Electronics',
+            'menu_id'    => $menu->id,
+            'parent_id'  => $parent->id,
+            'label'      => 'Electronics',
             'sort_order' => 1,
         ]);
 
         $child2 = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
-            'parent_id' => $parent->id,
-            'label' => 'Clothing',
+            'menu_id'    => $menu->id,
+            'parent_id'  => $parent->id,
+            'label'      => 'Clothing',
             'sort_order' => 2,
         ]);
 
         // Create grandchild
         $grandchild = MenuItem::factory()->create([
-            'menu_id' => $menu->id,
-            'parent_id' => $child1->id,
-            'label' => 'Smartphones',
+            'menu_id'    => $menu->id,
+            'parent_id'  => $child1->id,
+            'label'      => 'Smartphones',
             'sort_order' => 1,
         ]);
 
         $this->assertDatabaseHas('menu_items', [
-            'id' => $parent->id,
+            'id'        => $parent->id,
             'parent_id' => null,
         ]);
 
         $this->assertDatabaseHas('menu_items', [
-            'id' => $child1->id,
+            'id'        => $child1->id,
             'parent_id' => $parent->id,
         ]);
 
         $this->assertDatabaseHas('menu_items', [
-            'id' => $grandchild->id,
+            'id'        => $grandchild->id,
             'parent_id' => $child1->id,
         ]);
     }
@@ -352,7 +353,7 @@ class MenuItemResourceTest extends TestCase
         // Test valid data
         $this->post('/admin/menu-items', [
             'menu_id' => $menu->id,
-            'label' => 'Valid Item',
+            'label'   => 'Valid Item',
         ])->assertRedirect();
     }
 
@@ -363,15 +364,66 @@ class MenuItemResourceTest extends TestCase
         // Test invalid URL
         $this->post('/admin/menu-items', [
             'menu_id' => $menu->id,
-            'label' => 'Invalid URL',
-            'url' => 'not-a-valid-url',
+            'label'   => 'Invalid URL',
+            'url'     => 'not-a-valid-url',
         ])->assertSessionHasErrors(['url']);
 
         // Test valid URL
         $this->post('/admin/menu-items', [
             'menu_id' => $menu->id,
-            'label' => 'Valid URL',
-            'url' => 'https://example.com',
+            'label'   => 'Valid URL',
+            'url'     => 'https://example.com',
         ])->assertRedirect();
+    }
+
+    public function test_hidden_menu_items_and_inactive_menus_are_editable_in_filament(): void
+    {
+        $inactiveMenu = Menu::factory()->create([
+            'name'      => 'Inactive Menu',
+            'is_active' => false,
+        ]);
+
+        $hiddenParent = MenuItem::factory()->create([
+            'menu_id'    => $inactiveMenu->id,
+            'label'      => 'Hidden Parent',
+            'is_visible' => false,
+        ]);
+
+        $hiddenChild = MenuItem::factory()->create([
+            'menu_id'    => $inactiveMenu->id,
+            'parent_id'  => $hiddenParent->id,
+            'label'      => 'Hidden Child',
+            'is_visible' => false,
+        ]);
+
+        Livewire::test(\App\Filament\Resources\MenuItemResource\Pages\ListMenuItems::class)
+            ->assertCanSeeTableRecords([$hiddenChild])
+            ->filterTable('menu_id', $inactiveMenu->id)
+            ->assertCanSeeTableRecords([$hiddenChild])
+            ->filterTable('parent_id', $hiddenParent->id)
+            ->assertCanSeeTableRecords([$hiddenChild]);
+
+        Livewire::test(\App\Filament\Resources\MenuItemResource\Pages\EditMenuItem::class, [
+            'record' => $hiddenChild->getRouteKey(),
+        ])
+            ->assertFormSet([
+                'menu_id'    => $inactiveMenu->id,
+                'parent_id'  => $hiddenParent->id,
+                'label'      => 'Hidden Child',
+                'is_visible' => false,
+            ])
+            ->fillForm([
+                'label' => 'Updated Hidden Child',
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('menu_items', [
+            'id'         => $hiddenChild->id,
+            'label'      => 'Updated Hidden Child',
+            'menu_id'    => $inactiveMenu->id,
+            'parent_id'  => $hiddenParent->id,
+            'is_visible' => false,
+        ]);
     }
 }
