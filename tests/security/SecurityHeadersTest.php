@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\AddSecurityHeaders;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -10,7 +10,7 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 it('adds the expected security headers to responses', function (): void {
-    $middleware = app(SecurityHeaders::class);
+    $middleware = app(AddSecurityHeaders::class);
     $request = Request::create('/security-headers-test', 'GET');
 
     $response = $middleware->handle($request, static fn () => new Response('ok'));
@@ -31,12 +31,12 @@ it('adds the expected security headers to responses', function (): void {
 });
 
 it('allows customizing CSP directives via configuration', function (): void {
-    config()->set('security-headers.content_security_policy.script-src', [
+    config()->set('security.headers.content_security_policy.script-src', [
         "'self'",
         'https://trusted.cdn.example',
     ]);
 
-    $middleware = app(SecurityHeaders::class);
+    $middleware = app(AddSecurityHeaders::class);
     $request = Request::create('/security-headers-custom', 'GET');
 
     $response = $middleware->handle($request, static fn () => new Response('ok'));

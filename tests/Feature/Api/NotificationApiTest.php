@@ -66,8 +66,8 @@ final class NotificationApiTest extends TestCase
         $user = User::factory()->create();
         Notification::factory()->count(2)->forUser($user)->create();
 
-        $originalLimit = config('api.rate_limits.notifications');
-        config(['api.rate_limits.notifications' => 1]);
+        $originalLimit = config('security.rate_limiting.api.notifications');
+        config(['security.rate_limiting.api.notifications' => 1]);
         RateLimiter::clear('user:'.$user->id.'|notifications');
 
         Sanctum::actingAs($user, ['notifications.read']);
@@ -78,7 +78,7 @@ final class NotificationApiTest extends TestCase
         $secondResponse = $this->getJson(route('api.v1.notifications.index'));
         $secondResponse->assertStatus(429);
 
-        config(['api.rate_limits.notifications' => $originalLimit]);
+        config(['security.rate_limiting.api.notifications' => $originalLimit]);
         RateLimiter::clear('user:'.$user->id.'|notifications');
     }
 }
