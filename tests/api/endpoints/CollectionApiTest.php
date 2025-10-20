@@ -7,10 +7,12 @@ namespace Tests\Feature;
 use App\Models\Collection;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\AssertsAgainstOpenApi;
 use Tests\TestCase;
 
 final class CollectionApiTest extends TestCase
 {
+    use AssertsAgainstOpenApi;
     use RefreshDatabase;
 
     public function test_collections_api_returns_json(): void
@@ -34,6 +36,8 @@ final class CollectionApiTest extends TestCase
                     ],
                 ],
             ]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_search_functionality(): void
@@ -52,6 +56,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => 'Summer Collection'])
             ->assertJsonMissing(['name' => 'Winter Collection']);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_by_type_manual(): void
@@ -70,6 +76,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $manualCollection->name])
             ->assertJsonMissing(['name' => $automaticCollection->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/by-type/{type}');
     }
 
     public function test_collections_api_by_type_automatic(): void
@@ -88,6 +96,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $automaticCollection->name])
             ->assertJsonMissing(['name' => $manualCollection->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/by-type/{type}');
     }
 
     public function test_collections_api_with_products(): void
@@ -103,6 +113,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $collectionWithProducts->name])
             ->assertJsonMissing(['name' => $collectionWithoutProducts->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/with-products');
     }
 
     public function test_collections_api_popular(): void
@@ -122,6 +134,8 @@ final class CollectionApiTest extends TestCase
                     ],
                 ],
             ]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/popular');
     }
 
     public function test_collections_api_statistics(): void
@@ -147,6 +161,8 @@ final class CollectionApiTest extends TestCase
                 'automatic_collections' => 2,
                 'manual_collections' => 1,
             ]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/statistics');
     }
 
     public function test_collection_products_api(): void
@@ -172,6 +188,8 @@ final class CollectionApiTest extends TestCase
                 ],
             ])
             ->assertJsonFragment(['name' => $product->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_pagination(): void
@@ -188,6 +206,8 @@ final class CollectionApiTest extends TestCase
                 'links',
                 'meta',
             ]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_with_brand_filter(): void
@@ -201,6 +221,8 @@ final class CollectionApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonFragment(['name' => $product->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_with_category_filter(): void
@@ -215,6 +237,8 @@ final class CollectionApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonFragment(['name' => $product->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_with_price_filter(): void
@@ -226,6 +250,8 @@ final class CollectionApiTest extends TestCase
         $response = $this->getJson("/collections/{$collection->slug}/products?price_min=100&price_max=500");
 
         $response->assertOk();
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_with_sorting(): void
@@ -238,6 +264,8 @@ final class CollectionApiTest extends TestCase
         $response = $this->getJson("/collections/{$collection->slug}/products?sort=name_asc");
 
         $response->assertOk();
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_empty_collection(): void
@@ -247,7 +275,10 @@ final class CollectionApiTest extends TestCase
         $response = $this->getJson("/collections/{$collection->slug}/products");
 
         $response->assertOk()
-            ->assertJsonCount(0, 'data');
+            ->assertJsonCount(0, 'data')
+            ->assertExactJson($this->jsonFixture('api/collections/products-empty.json'));
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_hidden_collection_returns_404(): void
@@ -256,7 +287,10 @@ final class CollectionApiTest extends TestCase
 
         $response = $this->getJson("/collections/{$collection->slug}/products");
 
-        $response->assertNotFound();
+        $response->assertNotFound()
+            ->assertExactJson($this->jsonFixture('api/errors/not-found.json'));
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_inactive_collection_returns_404(): void
@@ -265,7 +299,10 @@ final class CollectionApiTest extends TestCase
 
         $response = $this->getJson("/collections/{$collection->slug}/products");
 
-        $response->assertNotFound();
+        $response->assertNotFound()
+            ->assertExactJson($this->jsonFixture('api/errors/not-found.json'));
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collections_api_returns_only_visible_collections(): void
@@ -278,6 +315,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $visibleCollection->name])
             ->assertJsonMissing(['name' => $hiddenCollection->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_returns_only_active_collections(): void
@@ -290,6 +329,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $activeCollection->name])
             ->assertJsonMissing(['name' => $inactiveCollection->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_with_limit_parameter(): void
@@ -300,6 +341,8 @@ final class CollectionApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonCount(5, 'data');
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_with_offset_parameter(): void
@@ -310,6 +353,8 @@ final class CollectionApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonCount(5, 'data');
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_with_display_type_filter(): void
@@ -322,6 +367,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $gridCollection->name])
             ->assertJsonMissing(['name' => $listCollection->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_with_products_count_filter(): void
@@ -337,5 +384,29 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $collectionWithProducts->name])
             ->assertJsonMissing(['name' => $collectionWithoutProducts->name]);
+
+        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function jsonFixture(string $relativePath): array
+    {
+        $path = base_path('tests/Fixtures/'.$relativePath);
+
+        if (! is_file($path)) {
+            self::fail(sprintf('The JSON fixture %s could not be found.', $relativePath));
+        }
+
+        $contents = file_get_contents($path);
+        if ($contents === false) {
+            self::fail(sprintf('The JSON fixture %s could not be read.', $relativePath));
+        }
+
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+
+        return $decoded;
     }
 }
