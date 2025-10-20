@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\Cart\CartLifecycleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -27,7 +28,7 @@ final class CheckoutController extends Controller
         ]);
     }
 
-    public function process(Request $request): RedirectResponse
+    public function process(Request $request, CartLifecycleService $cartLifecycleService): RedirectResponse
     {
         $items = $this->getCartItems($request);
         if ($items->isEmpty()) {
@@ -72,12 +73,16 @@ final class CheckoutController extends Controller
                     'total' => $item->calculateSubtotal(),
                     'notes' => $item->notes,
                 ]);
-
-                $item->forceDelete();
             }
 
             return $order;
         });
+
+        $cartLifecycleService->clearAfterCheckout(
+            $request->user()?->id,
+            $request->session()->getId(),
+            $order->payment_status ?? null
+        );
 
         $request->session()->put('checkout.last_order_id', $order->getKey());
 
@@ -98,8 +103,10 @@ final class CheckoutController extends Controller
         ]);
     }
 
-    public function cancel(): View
+    public function cancel(Request $request, CartLifecycleService $cartLifecycleService): View
     {
+        $cartLifecycleService->clearForAbandonedCheckout($request->user()?->id, $request->session()->getId());
+
         return view('frontend.checkout.cancel');
     }
 
