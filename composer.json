@@ -15,10 +15,7 @@
         "bezhansalleh/filament-shield": "^4.0",
         "dutchcodingcompany/filament-socialite": "^3.0",
         "filament/filament": "^4.1",
-        "filament/forms": "^4.1",
-        "filament/infolists": "^4.1",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
-        "filament/tables": "^4.1",
         "kenepa/resource-lock": "^4.0",
         "lara-zeus/bolt": "^4.0.5",
         "laravel/framework": "^12.0",
@@ -49,11 +46,11 @@
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "pestphp/pest": "^4.0",
-        "pestphp/pest-plugin-laravel": "^4.0",
-        "pestphp/pest-plugin-livewire": "^4.0",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest-plugin-livewire": "^3.0",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^12.3"
+        "phpunit/phpunit": "^11.5"
     },
     "autoload": {
         "psr-4": {
@@ -230,6 +227,9 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform": {
+            "php": "8.2.999"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
