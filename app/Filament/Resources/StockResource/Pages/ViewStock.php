@@ -18,4 +18,14 @@ class ViewStock extends ViewRecord
             Actions\EditAction::make(),
         ];
     }
+
+    protected function getBreadcrumb(): string
+    {
+        return (string) data_get($this->record, 'product_name', '');
+    }
+
+    protected function getTitle(): string
+    {
+        return (string) data_get($this->record, 'product_name', '');
+    }
 }

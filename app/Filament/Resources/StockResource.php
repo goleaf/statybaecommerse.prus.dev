@@ -92,6 +92,7 @@ final class StockResource extends Resource
                     TextInput::make('product_name')
                         ->label(__('inventory.product_name'))
                         ->maxLength(255)
+                        ->dehydrated(false)
                         ->disabled(),
                 ]),
             Section::make(__('inventory.stock_information'))

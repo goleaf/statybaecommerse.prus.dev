@@ -33,6 +33,8 @@ final class Inventory extends Model
 
     protected $fillable = ['product_id', 'location_id', 'quantity', 'reserved', 'incoming', 'threshold', 'is_tracked'];
 
+    protected $appends = ['product_name'];
+
     /**
      * Handle casts functionality with proper error handling.
      */
@@ -83,6 +85,11 @@ final class Inventory extends Model
     public function getAvailableQuantityAttribute(): int
     {
         return max(0, $this->quantity - $this->reserved);
+    }
+
+    public function getProductNameAttribute(): string
+    {
+        return $this->product?->name ?? '';
     }
 
     /**
