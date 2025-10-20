@@ -6,11 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -20,6 +15,11 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -27,10 +27,18 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class CustomerGroupResource extends Resource
 {
     protected static ?string $model = CustomerGroup::class;
+
+    protected static UnitEnum|string|null $navigationGroup = null;
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return self::$navigationGroup ?? __('navigation.groups.customers');
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -140,10 +148,10 @@ final class CustomerGroupResource extends Resource
                             Select::make('type')
                                 ->label(__('customer_groups.type'))
                                 ->options([
-                                    'regular' => __('customer_groups.types.regular'),
-                                    'vip' => __('customer_groups.types.vip'),
+                                    'regular'   => __('customer_groups.types.regular'),
+                                    'vip'       => __('customer_groups.types.vip'),
                                     'wholesale' => __('customer_groups.types.wholesale'),
-                                    'retail' => __('customer_groups.types.retail'),
+                                    'retail'    => __('customer_groups.types.retail'),
                                     'corporate' => __('customer_groups.types.corporate'),
                                 ])
                                 ->default('regular'),
@@ -173,17 +181,17 @@ final class CustomerGroupResource extends Resource
                     ->label(__('customer_groups.type'))
                     ->formatStateUsing(fn (string $state): string => __("customer_groups.types.{$state}"))
                     ->color(fn (string $state): string => match ($state) {
-                        'regular' => 'blue',
-                        'vip' => 'gold',
+                        'regular'   => 'blue',
+                        'vip'       => 'gold',
                         'wholesale' => 'green',
-                        'retail' => 'purple',
+                        'retail'    => 'purple',
                         'corporate' => 'orange',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 TextColumn::make('discount_percentage')
                     ->label(__('customer_groups.discount_percentage'))
                     ->numeric()
-                    ->formatStateUsing(fn ($state): string => $state ? $state.'%' : '-')
+                    ->formatStateUsing(fn ($state): string => $state ? $state . '%' : '-')
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('discount_fixed')
@@ -225,10 +233,10 @@ final class CustomerGroupResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'regular' => __('customer_groups.types.regular'),
-                        'vip' => __('customer_groups.types.vip'),
+                        'regular'   => __('customer_groups.types.regular'),
+                        'vip'       => __('customer_groups.types.vip'),
                         'wholesale' => __('customer_groups.types.wholesale'),
-                        'retail' => __('customer_groups.types.retail'),
+                        'retail'    => __('customer_groups.types.retail'),
                         'corporate' => __('customer_groups.types.corporate'),
                     ]),
                 TernaryFilter::make('is_active')
@@ -328,10 +336,10 @@ final class CustomerGroupResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomerGroups::route('/'),
+            'index'  => Pages\ListCustomerGroups::route('/'),
             'create' => Pages\CreateCustomerGroup::route('/create'),
-            'view' => Pages\ViewCustomerGroup::route('/{record}'),
-            'edit' => Pages\EditCustomerGroup::route('/{record}/edit'),
+            'view'   => Pages\ViewCustomerGroup::route('/{record}'),
+            'edit'   => Pages\EditCustomerGroup::route('/{record}/edit'),
         ];
     }
 }
