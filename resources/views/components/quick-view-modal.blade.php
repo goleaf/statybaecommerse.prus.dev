@@ -327,10 +327,11 @@
                 this.loading = true;
 
                 try {
-                    const response = await fetch('/cart/add', {
+                    const response = await fetch('/cart/items', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                                 'content')
                         },
