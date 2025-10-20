@@ -2,7 +2,7 @@
 <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-label="{{ __('Notifications') }}"></div>
 
 {{-- Notification Handler Script --}}
-<script>
+<script nonce="{{ csp_nonce() }}">
 document.addEventListener('livewire:init', () => {
     Livewire.on('notify', (event) => {
         const notification = event[0] || event;

@@ -194,7 +194,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     function productGallery() {
         return {
             images: {{ $images->map(function ($img) {return ['url' => $img->url ?? $img, 'alt' => $img->alt ?? 'Product Image'];})->toJson() }},

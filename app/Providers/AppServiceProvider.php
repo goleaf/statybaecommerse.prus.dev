@@ -15,6 +15,7 @@ use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
 use App\Support\Health\HealthReporter;
+use App\Support\Security\CspNonce;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
 use App\View\Creators\CartDataCreator;
@@ -37,6 +38,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -46,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
+        $this->app->scoped(CspNonce::class, fn (): CspNonce => new CspNonce());
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -64,6 +67,14 @@ class AppServiceProvider extends ServiceProvider
 
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
+
+        if (method_exists(Livewire::class, 'useCspNonce')) {
+            Livewire::useCspNonce(static fn (): string => csp_nonce());
+        }
+
+        if (method_exists(Vite::class, 'useCspNonce')) {
+            Vite::useCspNonce(static fn (): string => csp_nonce());
+        }
 
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);

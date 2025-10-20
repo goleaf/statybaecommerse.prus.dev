@@ -218,7 +218,7 @@ title(__('users.wishlist'));
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
 // Wishlist Functions
 function removeFromWishlist(itemId) {
     if (confirm('{{ __("users.confirm_remove_from_wishlist") }}')) {

@@ -484,7 +484,7 @@
 @endsection
 
 @push('scripts')
-<script>
+<script nonce="{{ csp_nonce() }}">
 function toggleAdvancedFilters() {
     const advancedFilters = document.getElementById('advancedFilters');
     const toggleButton = document.querySelector('[onclick="toggleAdvancedFilters()"]');

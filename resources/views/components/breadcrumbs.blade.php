@@ -31,7 +31,7 @@
         }
     @endphp
     @if (!empty($ldItems))
-        <script type="application/ld+json">
+        <script nonce="{{ csp_nonce() }}" type="application/ld+json">
         {!! json_encode(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $ldItems], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
         </script>
     @endif
