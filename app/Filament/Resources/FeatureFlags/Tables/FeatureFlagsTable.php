@@ -57,9 +57,15 @@ class FeatureFlagsTable
                     ->searchable(),
                 TextColumn::make('approval_status')
                     ->searchable(),
-                TextColumn::make('created_by')
+                TextColumn::make('creator.name')
+                    ->label(__('system.created_by'))
+                    ->formatStateUsing(fn (?string $state): string => $state ?? '—')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                TextColumn::make('updated_by')
+                TextColumn::make('updater.name')
+                    ->label(__('system.updated_by'))
+                    ->formatStateUsing(fn (?string $state): string => $state ?? '—')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 TextColumn::make('last_activated')
                     ->dateTime()

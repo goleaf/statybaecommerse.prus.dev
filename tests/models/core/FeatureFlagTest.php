@@ -269,20 +269,30 @@ class FeatureFlagTest extends TestCase
 
     public function test_feature_flag_can_have_created_by(): void
     {
-        $featureFlag = FeatureFlag::factory()->create([
-            'created_by' => 'admin',
-        ]);
+        $user = User::factory()->create();
+        $featureFlag = FeatureFlag::factory()->create();
 
-        $this->assertEquals('admin', $featureFlag->created_by);
+        $featureFlag->creator()->associate($user);
+        $featureFlag->save();
+
+        $featureFlag->refresh();
+
+        $this->assertSame($user->id, $featureFlag->created_by);
+        $this->assertTrue($featureFlag->creator->is($user));
     }
 
     public function test_feature_flag_can_have_updated_by(): void
     {
-        $featureFlag = FeatureFlag::factory()->create([
-            'updated_by' => 'developer',
-        ]);
+        $user = User::factory()->create();
+        $featureFlag = FeatureFlag::factory()->create();
 
-        $this->assertEquals('developer', $featureFlag->updated_by);
+        $featureFlag->updater()->associate($user);
+        $featureFlag->save();
+
+        $featureFlag->refresh();
+
+        $this->assertSame($user->id, $featureFlag->updated_by);
+        $this->assertTrue($featureFlag->updater->is($user));
     }
 
     public function test_feature_flag_can_have_last_activated(): void
