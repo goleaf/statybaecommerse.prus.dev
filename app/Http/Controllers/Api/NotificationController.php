@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\NotificationIndexRequest;
+use App\Http\Requests\Api\NotificationMutationRequest;
+use App\Http\Requests\Api\NotificationSearchRequest;
+use App\Http\Requests\Api\NotificationShowRequest;
+use App\Http\Requests\Api\NotificationStatsRequest;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -27,12 +31,13 @@ final class NotificationController extends Controller
     /**
      * Display a listing of the resource with pagination and filtering.
      */
-    public function index(Request $request): JsonResponse
+    public function index(NotificationIndexRequest $request): JsonResponse
     {
         $user = Auth::user();
-        $perPage = (int) $request->get('per_page', 25);
-        $type = $request->get('type');
-        $read = $request->get('read') !== null ? (bool) $request->get('read') : null;
+        $validated = $request->validated();
+        $perPage = (int) ($validated['per_page'] ?? 25);
+        $type = $validated['type'] ?? null;
+        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
         $notifications = $this->notificationService->getUserNotifications($user, $perPage, $type, $read);
 
         return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
@@ -41,7 +46,7 @@ final class NotificationController extends Controller
     /**
      * Handle stats functionality with proper error handling.
      */
-    public function stats(): JsonResponse
+    public function stats(NotificationStatsRequest $request): JsonResponse
     {
         $user = Auth::user();
         $stats = $this->notificationService->getUserNotificationStats($user);
@@ -52,7 +57,7 @@ final class NotificationController extends Controller
     /**
      * Handle markAsRead functionality with proper error handling.
      */
-    public function markAsRead(Notification $notification): JsonResponse
+    public function markAsRead(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
         $user = Auth::user();
         // Ensure the notification belongs to the authenticated user
@@ -67,7 +72,7 @@ final class NotificationController extends Controller
     /**
      * Handle markAsUnread functionality with proper error handling.
      */
-    public function markAsUnread(Notification $notification): JsonResponse
+    public function markAsUnread(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
         $user = Auth::user();
         // Ensure the notification belongs to the authenticated user
@@ -82,7 +87,7 @@ final class NotificationController extends Controller
     /**
      * Handle markAllAsRead functionality with proper error handling.
      */
-    public function markAllAsRead(): JsonResponse
+    public function markAllAsRead(NotificationMutationRequest $request): JsonResponse
     {
         $user = Auth::user();
         $count = $this->notificationService->markAllAsReadForUser($user);
@@ -93,7 +98,7 @@ final class NotificationController extends Controller
     /**
      * Handle markAllAsUnread functionality with proper error handling.
      */
-    public function markAllAsUnread(): JsonResponse
+    public function markAllAsUnread(NotificationMutationRequest $request): JsonResponse
     {
         $user = Auth::user();
         $count = $this->notificationService->markAllAsUnreadForUser($user);
@@ -104,7 +109,7 @@ final class NotificationController extends Controller
     /**
      * Display the specified resource with related data.
      */
-    public function show(Notification $notification): JsonResponse
+    public function show(NotificationShowRequest $request, Notification $notification): JsonResponse
     {
         $user = Auth::user();
         // Ensure the notification belongs to the authenticated user
@@ -118,7 +123,7 @@ final class NotificationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Notification $notification): JsonResponse
+    public function destroy(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
         $user = Auth::user();
         // Ensure the notification belongs to the authenticated user
@@ -133,16 +138,14 @@ final class NotificationController extends Controller
     /**
      * Handle search functionality with proper error handling.
      */
-    public function search(Request $request): JsonResponse
+    public function search(NotificationSearchRequest $request): JsonResponse
     {
         $user = Auth::user();
-        $query = $request->get('q');
-        $type = $request->get('type');
-        $read = $request->get('read') !== null ? (bool) $request->get('read') : null;
-        $perPage = (int) $request->get('per_page', 25);
-        if (empty($query)) {
-            return response()->json(['success' => false, 'message' => 'Search query is required'], 400);
-        }
+        $validated = $request->validated();
+        $query = $validated['q'];
+        $type = $validated['type'] ?? null;
+        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
+        $perPage = (int) ($validated['per_page'] ?? 25);
         $notifications = $this->notificationService->searchNotifications($query, $user, $type, $read, $perPage);
 
         return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
