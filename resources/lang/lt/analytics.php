@@ -30,6 +30,7 @@ return [
     'items' => 'Prekės',
     'total' => 'Suma',
     'created' => 'Sukurta',
+    'updated' => 'Atnaujinta',
     // Summary Labels
     'total_revenue' => 'Bendros pajamos',
     'avg_order_value' => 'Vidutinė užsakymo vertė',

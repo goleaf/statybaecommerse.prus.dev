@@ -188,7 +188,7 @@ it('can access analytics with proper permissions', function () {
 });
 
 it('displays correct labels and translations', function () {
-    expect(AnalyticsResource::getNavigationLabel())->toBe(__('analytics.analytics'));
+    expect(AnalyticsResource::getNavigationLabel())->toBe(__('analytics.analytics_dashboard'));
     expect(AnalyticsResource::getModelLabel())->toBe(__('analytics.analytics'));
     expect(AnalyticsResource::getPluralModelLabel())->toBe(__('analytics.analytics'));
 });

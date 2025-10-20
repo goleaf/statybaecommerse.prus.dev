@@ -30,6 +30,7 @@ return [
     'items' => 'Items',
     'total' => 'Total',
     'created' => 'Created',
+    'updated' => 'Updated',
     // Summary Labels
     'total_revenue' => 'Total Revenue',
     'avg_order_value' => 'Avg Order Value',
