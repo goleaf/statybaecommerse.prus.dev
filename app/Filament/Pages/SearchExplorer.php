@@ -7,16 +7,14 @@ namespace App\Filament\Pages;
 use App\Data\SearchQueryData;
 use App\Services\SearchService;
 use BackedEnum;
+use UnitEnum;
 use Filament\Pages\Page;
 
 final class SearchExplorer extends Page
 {
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    protected static ?string $navigationGroup = 'Search';
+    protected static UnitEnum|string|null $navigationGroup = 'Search';
 
     protected static ?string $title = 'Search Explorer';
 
