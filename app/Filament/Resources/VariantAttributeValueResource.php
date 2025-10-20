@@ -16,14 +16,16 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -33,6 +35,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -67,7 +70,7 @@ final class VariantAttributeValueResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Section::make(__('admin.variant_attribute_values.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -79,12 +82,17 @@ final class VariantAttributeValueResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, $set) {
-                                    if ($state) {
-                                        $variant = ProductVariant::find($state);
-                                        if ($variant) {
-                                            $set('variant_name', $variant->name);
-                                        }
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if (! $state) {
+                                        $set('variant_name', null);
+
+                                        return;
+                                    }
+
+                                    $variant = ProductVariant::find($state);
+
+                                    if ($variant) {
+                                        $set('variant_name', $variant->name);
                                     }
                                 }),
                             TextInput::make('variant_name')
@@ -101,12 +109,17 @@ final class VariantAttributeValueResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, $set) {
-                                    if ($state) {
-                                        $attribute = Attribute::find($state);
-                                        if ($attribute) {
-                                            $set('attribute_name', $attribute->name);
-                                        }
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if (! $state) {
+                                        $set('attribute_name', null);
+
+                                        return;
+                                    }
+
+                                    $attribute = Attribute::find($state);
+
+                                    if ($attribute) {
+                                        $set('attribute_name', $attribute->name);
                                     }
                                 }),
                             TextInput::make('attribute_name')
@@ -124,10 +137,12 @@ final class VariantAttributeValueResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(function ($state, $set) {
-                                    if ($state) {
-                                        $set('attribute_value_slug', \Str::slug($state));
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if (! $state) {
+                                        return;
                                     }
+
+                                    $set('attribute_value_slug', Str::slug($state));
                                 }),
                             TextInput::make('attribute_value_display')
                                 ->label(__('admin.variant_attribute_values.attribute_value_display'))
@@ -181,7 +196,7 @@ final class VariantAttributeValueResource extends Resource
                     ->label(__('admin.variant_attribute_values.variant'))
                     ->sortable()
                     ->searchable()
-                    ->weight('bold')
+                    ->weight(FontWeight::Bold)
                     ->copyable(),
                 TextColumn::make('attribute.name')
                     ->label(__('admin.variant_attribute_values.attribute'))
@@ -197,7 +212,7 @@ final class VariantAttributeValueResource extends Resource
                     ->label(__('admin.variant_attribute_values.attribute_value'))
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
+                    ->weight(FontWeight::Bold)
                     ->copyable()
                     ->limit(50),
                 TextColumn::make('attribute_value_display')
@@ -260,10 +275,18 @@ final class VariantAttributeValueResource extends Resource
                     ->preload(),
                 Filter::make('has_translations')
                     ->label(__('admin.variant_attribute_values.has_translations'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('attribute_value_lt')->orWhereNotNull('attribute_value_en')),
+                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $subQuery): void {
+                        $subQuery
+                            ->whereNotNull('attribute_value_lt')
+                            ->orWhereNotNull('attribute_value_en');
+                    })),
                 Filter::make('missing_translations')
                     ->label(__('admin.variant_attribute_values.missing_translations'))
-                    ->query(fn (Builder $query): Builder => $query->whereNull('attribute_value_lt')->orWhereNull('attribute_value_en')),
+                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $subQuery): void {
+                        $subQuery
+                            ->whereNull('attribute_value_lt')
+                            ->orWhereNull('attribute_value_en');
+                    })),
                 TernaryFilter::make('is_filterable')
                     ->label(__('admin.variant_attribute_values.is_filterable'))
                     ->trueLabel(__('admin.variant_attribute_values.filterable_only'))
