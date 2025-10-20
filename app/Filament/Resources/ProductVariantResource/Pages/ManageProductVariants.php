@@ -9,6 +9,7 @@ use App\Filament\Widgets\VariantAnalyticsWidget;
 use App\Filament\Widgets\VariantPerformanceChart;
 use App\Filament\Widgets\VariantPriceWidget;
 use App\Filament\Widgets\VariantStockWidget;
+use App\Models\ProductVariant;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -26,21 +27,21 @@ final class ManageProductVariants extends ManageRecords
                 ->label(__('product_variants.actions.bulk_price_update'))
                 ->icon('heroicon-o-currency-euro')
                 ->color('warning')
-                ->action(function () {
+                ->action(function (): void {
                     // This will be handled by the bulk action in the table
                 }),
             Actions\Action::make('export_variants')
                 ->label(__('product_variants.actions.export'))
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->action(function () {
+                ->action(function (): void {
                     // Export functionality
                 }),
             Actions\Action::make('import_variants')
                 ->label(__('product_variants.actions.import'))
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('info')
-                ->action(function () {
+                ->action(function (): void {
                     // Import functionality
                 }),
         ];
