@@ -7,6 +7,7 @@ namespace App\Filament\Resources\NewsImages;
 use App\Filament\Resources\NewsImages\Pages\CreateNewsImage;
 use App\Filament\Resources\NewsImages\Pages\EditNewsImage;
 use App\Filament\Resources\NewsImages\Pages\ListNewsImages;
+use App\Filament\Resources\NewsImages\Pages\ViewNewsImage;
 use App\Models\NewsImage;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
@@ -79,10 +80,10 @@ class NewsImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListNewsImages::route('/'),
+            'index'  => ListNewsImages::route('/'),
             'create' => CreateNewsImage::route('/create'),
-            // 'view' page does not exist; removing mapping to avoid errors
-            'edit' => EditNewsImage::route('/{record}/edit'),
+            'view'   => ViewNewsImage::route('/{record}'),
+            'edit'   => EditNewsImage::route('/{record}/edit'),
         ];
     }
 }
