@@ -151,23 +151,6 @@ return new class extends Migration
             });
         }
 
-        // Enhanced API Management
-        if (! Schema::hasTable('api_keys')) {
-            Schema::create('api_keys', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name');
-                $table->string('key')->unique();
-                $table->string('secret')->nullable();
-                $table->json('permissions')->nullable(); // scoped permissions
-                $table->json('rate_limits')->nullable(); // custom rate limits
-                $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
-                $table->timestamp('last_used_at')->nullable();
-                $table->timestamp('expires_at')->nullable();
-                $table->boolean('is_active')->default(true);
-                $table->timestamps();
-            });
-        }
-
         // Enhanced Multi-tenant Support
         if (! Schema::hasTable('tenants')) {
             Schema::create('tenants', function (Blueprint $table): void {
