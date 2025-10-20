@@ -64,7 +64,49 @@
       "additionalProperties": true,
       "properties": {
         "query": {
-          "type": ["string", "null"]
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "page": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "per_page": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "sort": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["key", "direction"],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "direction": {
+                        "type": "string",
+                        "enum": ["asc", "desc"]
+                      }
+                    }
+                  }
+                },
+                "filters": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          ]
         },
         "total": {
           "type": ["integer", "null"],
