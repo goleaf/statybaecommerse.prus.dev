@@ -4,37 +4,30 @@ declare(strict_types=1);
 
 namespace App\Support;
 
-/**
- * Application-wide error code definitions for consistent API and UI messaging.
- */
 final class ErrorCodes
 {
-    /**
-     * Code for resources that cannot be found (HTTP 404).
-     */
-    public const NOT_FOUND = 'error.not_found';
+    public const ORDER_NOT_FOUND = 'orders.not_found';
 
-    /**
-     * Code for unexpected server failures (HTTP 500).
-     */
-    public const SERVER_ERROR = 'error.server';
+    public const INVENTORY_INSUFFICIENT = 'inventory.insufficient';
 
-    /**
-     * Code for validation failures when provided data is invalid.
-     */
-    public const VALIDATION_FAILED = 'error.validation';
+    public const VALIDATION_FAILED = 'validation.failed';
 
-    /**
-     * Code for requests made without proper authentication.
-     */
-    public const UNAUTHORIZED = 'error.unauthorized';
+    public const HTTP_NOT_FOUND = 'http.not_found';
 
-    /**
-     * Code for requests that are authenticated but lack permission.
-     */
-    public const FORBIDDEN = 'error.forbidden';
+    public const HTTP_METHOD_NOT_ALLOWED = 'http.method_not_allowed';
 
-    private function __construct()
+    public const HTTP_FORBIDDEN = 'http.forbidden';
+
+    public const HTTP_UNAUTHORIZED = 'http.unauthorized';
+
+    public const HTTP_TOO_MANY_REQUESTS = 'http.too_many_requests';
+
+    public const HTTP_BAD_REQUEST = 'http.bad_request';
+
+    public const INTERNAL_SERVER_ERROR = 'internal.server_error';
+
+    public static function messageKey(string $code): string
     {
+        return 'errors.'.$code;
     }
 }

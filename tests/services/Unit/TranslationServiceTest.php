@@ -7,8 +7,8 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('normalizes dotted keys to underscores', function () {
-    expect(TranslationService::normalizeKey('a.b.c'))->toBe('a_b_c');
+it('returns the key unchanged when normalizing', function () {
+    expect(TranslationService::normalizeKey('a.b.c'))->toBe('a.b.c');
 });
 
 it('returns available locales from csv or array config', function () {
@@ -30,10 +30,9 @@ it('checks supported locale and default/fallback locales', function () {
         ->and(TranslationService::getFallbackLocale())->toBe('en');
 });
 
-it('get/choice resolve using normalized keys when translation missing', function () {
+it('get/choice return the provided key when translation is missing', function () {
     $key = 'frontend.title';
-    $normalized = TranslationService::normalizeKey($key);
 
-    expect(TranslationService::get($key))->toBe($normalized)
-        ->and(TranslationService::choice('messages.item', 2))->toBe('messages_item');
+    expect(TranslationService::get($key))->toBe($key)
+        ->and(TranslationService::choice('messages.item', 2))->toBe('messages.item');
 });
