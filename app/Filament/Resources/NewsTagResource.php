@@ -166,7 +166,11 @@ final class NewsTagResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
+                        return mb_strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
                 BadgeColumn::make('color')
