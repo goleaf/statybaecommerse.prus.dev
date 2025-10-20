@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Filament\Components\LiveNotificationFeed;
+use App\Models\ApiKey;
 use App\Services\DocumentService;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
@@ -12,14 +13,17 @@ use App\View\Creators\LocalizationCreator;
 use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
@@ -63,6 +67,47 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Throwable $e) {
             // Safe fallback if Number is unavailable
         }
+
+        RateLimiter::for('partner-api', function (Request $request) {
+            $apiKey = $request->attributes->get('partner.api_key');
+
+            if (! $apiKey instanceof ApiKey) {
+                $header = trim((string) $request->header('X-Api-Key', ''));
+
+                if ($header !== '') {
+                    $apiKey = ApiKey::query()
+                        ->active()
+                        ->where('key', $header)
+                        ->first();
+                }
+            }
+
+            $signature = $apiKey instanceof ApiKey
+                ? 'partner-api:'.$apiKey->getKey()
+                : 'partner-api:anonymous:'.sha1($request->header('X-Api-Key', '').'|'.$request->ip());
+
+            $limit = $apiKey instanceof ApiKey
+                ? $apiKey->toRateLimit()
+                : Limit::perMinute(60);
+
+            return $limit
+                ->by($signature)
+                ->response(static function (Request $request, array $headers) use ($apiKey) {
+                    $message = $apiKey instanceof ApiKey
+                        ? 'Too many requests for this partner API key.'
+                        : 'Too many partner API requests.';
+
+                    $payload = ['message' => $message];
+
+                    if (isset($headers['Retry-After'])) {
+                        $payload['retry_after'] = (int) $headers['Retry-After'];
+                    }
+
+                    return response()
+                        ->json($payload, 429)
+                        ->withHeaders($headers);
+                });
+        });
 
         // Legacy Shopper components removed - using native Filament resources
 

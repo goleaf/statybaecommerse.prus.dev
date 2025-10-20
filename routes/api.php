@@ -51,3 +51,15 @@ Route::post('/autocomplete-search', function (Request $request) {
         return response()->json(['results' => []], 500);
     }
 })->name('api.autocomplete.search');
+
+Route::prefix('partner')
+    ->middleware(['partner.api', 'throttle:partner-api'])
+    ->as('partner.api.')
+    ->group(function (): void {
+        Route::get('/status', function (Request $request) {
+            return response()->json([
+                'message' => 'Partner API ready.',
+                'abilities' => $request->partnerApiAbilities(),
+            ]);
+        })->name('status');
+    });
