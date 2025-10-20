@@ -15,6 +15,8 @@
         'label' => __('Go Back'),
         'type' => 'back',
     ],
+    'supportTitle' => __('Need directions?'),
+    'supportDescription' => __('Share the reference ID below with our support team and we\'ll help you get to the right place.'),
     'links' => [
         [
             'label' => __('Browse Categories'),

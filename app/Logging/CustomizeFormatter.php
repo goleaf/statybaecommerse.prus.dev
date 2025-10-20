@@ -9,6 +9,8 @@ use Monolog\Logger;
 
 final class CustomizeFormatter
 {
+    private const DATE_FORMAT = 'Y-m-d\TH:i:s.vP';
+
     public function __invoke(Logger $logger): void
     {
         foreach ($logger->getHandlers() as $handler) {
@@ -20,7 +22,10 @@ final class CustomizeFormatter
 
     private function createFormatter(): JsonFormatter
     {
-        $formatter = new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true);
+        $formatter = new JsonFormatter(JsonFormatter::BATCH_MODE_NEWLINES, true);
+        $formatter->addJsonEncodeOption(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $formatter->setDateFormat(self::DATE_FORMAT);
+        $formatter->setMaxNormalizeDepth(5);
         $formatter->includeStacktraces();
 
         return $formatter;
