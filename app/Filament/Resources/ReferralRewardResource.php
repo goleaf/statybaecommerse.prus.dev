@@ -7,14 +7,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -22,15 +17,21 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use UnitEnum;
 
 final class ReferralRewardResource extends Resource
@@ -48,7 +49,7 @@ final class ReferralRewardResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
                     ->schema([
@@ -74,9 +75,9 @@ final class ReferralRewardResource extends Resource
                             ->label(__('referral_rewards.fields.type'))
                             ->options([
                                 'discount' => __('referral_rewards.types.discount'),
-                                'credit' => __('referral_rewards.types.credit'),
-                                'points' => __('referral_rewards.types.points'),
-                                'gift' => __('referral_rewards.types.gift'),
+                                'credit'   => __('referral_rewards.types.credit'),
+                                'points'   => __('referral_rewards.types.points'),
+                                'gift'     => __('referral_rewards.types.gift'),
                             ])
                             ->required(),
                         TextInput::make('amount')
@@ -92,9 +93,9 @@ final class ReferralRewardResource extends Resource
                         Select::make('status')
                             ->label(__('referral_rewards.fields.status'))
                             ->options([
-                                'pending' => __('referral_rewards.status.pending'),
-                                'applied' => __('referral_rewards.status.applied'),
-                                'expired' => __('referral_rewards.status.expired'),
+                                'pending'   => __('referral_rewards.status.pending'),
+                                'applied'   => __('referral_rewards.status.applied'),
+                                'expired'   => __('referral_rewards.status.expired'),
                                 'cancelled' => __('referral_rewards.status.cancelled'),
                             ])
                             ->required(),
@@ -203,16 +204,16 @@ final class ReferralRewardResource extends Resource
                     ->label(__('referral_rewards.filters.type'))
                     ->options([
                         'discount' => __('referral_rewards.types.discount'),
-                        'credit' => __('referral_rewards.types.credit'),
-                        'points' => __('referral_rewards.types.points'),
-                        'gift' => __('referral_rewards.types.gift'),
+                        'credit'   => __('referral_rewards.types.credit'),
+                        'points'   => __('referral_rewards.types.points'),
+                        'gift'     => __('referral_rewards.types.gift'),
                     ]),
                 SelectFilter::make('status')
                     ->label(__('referral_rewards.filters.status'))
                     ->options([
-                        'pending' => __('referral_rewards.status.pending'),
-                        'applied' => __('referral_rewards.status.applied'),
-                        'expired' => __('referral_rewards.status.expired'),
+                        'pending'   => __('referral_rewards.status.pending'),
+                        'applied'   => __('referral_rewards.status.applied'),
+                        'expired'   => __('referral_rewards.status.expired'),
                         'cancelled' => __('referral_rewards.status.cancelled'),
                     ]),
                 SelectFilter::make('referral_id')
@@ -239,7 +240,7 @@ final class ReferralRewardResource extends Resource
                     BulkAction::make('apply')
                         ->label(__('referral_rewards.actions.apply_selected'))
                         ->requiresConfirmation()
-                        ->action(function ($records): void {
+                        ->action(function (Collection $records): void {
                             foreach ($records as $record) {
                                 if ($record instanceof ReferralReward) {
                                     $record->apply();
@@ -249,7 +250,7 @@ final class ReferralRewardResource extends Resource
                     BulkAction::make('expire')
                         ->label(__('referral_rewards.actions.expire_selected'))
                         ->requiresConfirmation()
-                        ->action(function ($records): void {
+                        ->action(function (Collection $records): void {
                             foreach ($records as $record) {
                                 if ($record instanceof ReferralReward) {
                                     $record->markAsExpired();
@@ -289,10 +290,10 @@ final class ReferralRewardResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralRewards::route('/'),
+            'index'  => Pages\ListReferralRewards::route('/'),
             'create' => Pages\CreateReferralReward::route('/create'),
-            'view' => Pages\ViewReferralReward::route('/{record}'),
-            'edit' => Pages\EditReferralReward::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralReward::route('/{record}'),
+            'edit'   => Pages\EditReferralReward::route('/{record}/edit'),
         ];
     }
 
