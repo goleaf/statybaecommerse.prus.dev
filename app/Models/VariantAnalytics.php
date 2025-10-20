@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -139,9 +140,13 @@ final class VariantAnalytics extends Model
         string|\DateTime $date,
         array $data = []
     ): self {
+        $normalizedDate = $date instanceof \DateTimeInterface
+            ? CarbonImmutable::parse($date->format('Y-m-d'))
+            : CarbonImmutable::parse($date);
+
         $defaultData = [
             'variant_id' => $variantId,
-            'date' => $date,
+            'date' => $normalizedDate,
             'views' => $data['views'] ?? 0,
             'clicks' => $data['clicks'] ?? 0,
             'add_to_cart' => $data['add_to_cart'] ?? 0,
@@ -151,7 +156,7 @@ final class VariantAnalytics extends Model
         ];
 
         return self::updateOrCreate(
-            ['variant_id' => $variantId, 'date' => $date],
+            ['variant_id' => $variantId, 'date' => $normalizedDate],
             $defaultData
         );
     }
