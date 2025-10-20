@@ -13,9 +13,6 @@ use App\Services\Export\Exporters\OrderExport;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
-
-uses(TestCase::class);
 
 test('it queues and processes exports', function (): void {
     config()->set('filesystems.default', 'public');
