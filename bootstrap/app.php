@@ -24,7 +24,23 @@ use Throwable;
 
 require_once __DIR__.'/../app/Support/filament_compat.php';
 
-return Application::configure(basePath: dirname(__DIR__))
+$providers = [
+    App\Providers\AuthServiceProvider::class,
+    App\Providers\ApiServiceProvider::class,
+];
+
+$appEnvironment = (string) env('APP_ENV', 'production');
+$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
+
+if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
+    $providers[] = App\Providers\HorizonServiceProvider::class;
+}
+
+$providers[] = App\Providers\LocaleServiceProvider::class;
+$providers[] = App\Providers\Filament\AdminPanelProvider::class;
+$providers[] = SecurityServiceProvider::class;
+
+$application = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -297,23 +313,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->header('Content-Language', $locale);
         });
     })
-    ->withProviders(function (): array {
-        $providers = [
-            App\Providers\AuthServiceProvider::class,
-            App\Providers\ApiServiceProvider::class,
-        ];
+    ->withProviders($providers);
 
-        $appEnvironment = (string) env('APP_ENV', 'production');
-        $queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
+$app = $application->create();
 
-        if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-            $providers[] = App\Providers\HorizonServiceProvider::class;
-        }
+if ($app->runningInConsole()) {
+    $app->instance('request', Request::create('/', 'GET'));
+}
 
-        $providers[] = App\Providers\LocaleServiceProvider::class;
-        $providers[] = App\Providers\Filament\AdminPanelProvider::class;
-        $providers[] = SecurityServiceProvider::class;
-
-        return $providers;
-    })
-    ->create();
+return $app;

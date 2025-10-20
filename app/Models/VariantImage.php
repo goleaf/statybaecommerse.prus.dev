@@ -43,8 +43,12 @@ final class VariantImage extends Model implements HasMedia
         'variant_id',
         'image_path',
         'alt_text',
+        'description',
         'sort_order',
         'is_primary',
+        'is_active',
+        'file_size',
+        'dimensions',
     ];
 
     protected function casts(): array
@@ -52,8 +56,14 @@ final class VariantImage extends Model implements HasMedia
         return [
             'sort_order' => 'integer',
             'is_primary' => 'boolean',
+            'is_active' => 'boolean',
+            'file_size' => 'integer',
         ];
     }
+
+    protected $attributes = [
+        'is_active' => true,
+    ];
 
     protected $appends = [
         'image_url',

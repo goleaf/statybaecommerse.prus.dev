@@ -12,6 +12,7 @@ use App\Filament\Resources\VariantImageResource\Pages\ViewVariantImage;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\VariantImage;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -66,7 +67,7 @@ class VariantImageResourceTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        Storage::fake('public');
+        Storage::fake(SecureStorage::disk());
 
         $imageFile = UploadedFile::fake()->image('test-image.jpg', 800, 600);
 
@@ -90,6 +91,37 @@ class VariantImageResourceTest extends TestCase
             'is_primary' => false,
             'is_active' => true,
         ]);
+    }
+
+    public function test_metadata_is_populated_for_uploaded_images(): void
+    {
+        $this->actingAs($this->user);
+
+        Storage::fake(SecureStorage::disk());
+
+        $imageFile = UploadedFile::fake()->image('meta-image.jpg', 320, 240);
+
+        Livewire::test(CreateVariantImage::class)
+            ->fillForm([
+                'variant_id' => $this->productVariant->id,
+                'image_path' => $imageFile,
+                'alt_text' => 'Metadata Image',
+                'description' => 'Image with metadata',
+                'sort_order' => 3,
+                'is_primary' => false,
+                'is_active' => true,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $createdImage = VariantImage::query()
+            ->where('variant_id', $this->productVariant->id)
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($createdImage);
+        $this->assertNotNull($createdImage->file_size);
+        $this->assertSame('320×240', $createdImage->dimensions);
     }
 
     public function test_can_edit_variant_image(): void
