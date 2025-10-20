@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend');
+uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
 
-uses(RefreshDatabase::class)->in('Feature', 'Unit', 'admin', 'frontend');
+uses(RefreshDatabase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
 
 beforeAll(function () {
     $envPath = base_path('.env');
