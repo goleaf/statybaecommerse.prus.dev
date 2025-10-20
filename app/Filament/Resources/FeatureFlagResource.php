@@ -6,7 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use Filament\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -294,7 +294,7 @@ final class FeatureFlagResource extends Resource
             ->actions([
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make(),
+                TableDeleteAction::make(),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
