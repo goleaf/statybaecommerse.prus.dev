@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignScheduleResource\Pages;
-use App\Models\Campaign;
 use App\Models\CampaignSchedule;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -21,9 +18,12 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -60,15 +60,15 @@ final class CampaignScheduleResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Tabs::make('campaign_schedule_tabs')
                 ->tabs([
                     Tab::make(__('admin.campaign_schedules.form.tabs.basic_information'))
                         ->icon('heroicon-o-information-circle')
                         ->schema([
-                            SchemaSection::make(__('admin.campaign_schedules.form.sections.basic_information'))
+                            Section::make(__('admin.campaign_schedules.form.sections.basic_information'))
                                 ->schema([
-                                    SchemaGrid::make(2)
+                                    Grid::make(2)
                                         ->schema([
                                             Select::make('campaign_id')
                                                 ->label(__('admin.campaign_schedules.form.fields.campaign'))
@@ -81,16 +81,16 @@ final class CampaignScheduleResource extends Resource
                                             Select::make('schedule_type')
                                                 ->label(__('admin.campaign_schedules.form.fields.schedule_type'))
                                                 ->options([
-                                                    'once' => __('admin.campaign_schedules.schedule_types.once'),
-                                                    'daily' => __('admin.campaign_schedules.schedule_types.daily'),
-                                                    'weekly' => __('admin.campaign_schedules.schedule_types.weekly'),
+                                                    'once'    => __('admin.campaign_schedules.schedule_types.once'),
+                                                    'daily'   => __('admin.campaign_schedules.schedule_types.daily'),
+                                                    'weekly'  => __('admin.campaign_schedules.schedule_types.weekly'),
                                                     'monthly' => __('admin.campaign_schedules.schedule_types.monthly'),
-                                                    'custom' => __('admin.campaign_schedules.schedule_types.custom'),
+                                                    'custom'  => __('admin.campaign_schedules.schedule_types.custom'),
                                                 ])
                                                 ->required()
                                                 ->columnSpan(1),
                                         ]),
-                                    SchemaGrid::make(2)
+                                    Grid::make(2)
                                         ->schema([
                                             DateTimePicker::make('next_run_at')
                                                 ->label(__('admin.campaign_schedules.form.fields.next_run_at'))
@@ -110,7 +110,7 @@ final class CampaignScheduleResource extends Resource
                     Tab::make(__('admin.campaign_schedules.form.tabs.schedule_config'))
                         ->icon('heroicon-o-cog-6-tooth')
                         ->schema([
-                            SchemaSection::make(__('admin.campaign_schedules.form.sections.schedule_config'))
+                            Section::make(__('admin.campaign_schedules.form.sections.schedule_config'))
                                 ->schema([
                                     KeyValue::make('schedule_config')
                                         ->label(__('admin.campaign_schedules.form.fields.schedule_config'))
@@ -123,7 +123,7 @@ final class CampaignScheduleResource extends Resource
                     Tab::make(__('admin.campaign_schedules.form.tabs.campaign_details'))
                         ->icon('heroicon-o-megaphone')
                         ->schema([
-                            SchemaSection::make(__('admin.campaign_schedules.form.sections.campaign_details'))
+                            Section::make(__('admin.campaign_schedules.form.sections.campaign_details'))
                                 ->schema([
                                     Placeholder::make('campaign_name')
                                         ->label(__('admin.campaign_schedules.form.fields.campaign_name'))
@@ -161,19 +161,19 @@ final class CampaignScheduleResource extends Resource
                 BadgeColumn::make('schedule_type')
                     ->label(__('admin.campaign_schedules.form.fields.schedule_type'))
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'once' => __('admin.campaign_schedules.schedule_types.once'),
-                        'daily' => __('admin.campaign_schedules.schedule_types.daily'),
-                        'weekly' => __('admin.campaign_schedules.schedule_types.weekly'),
+                        'once'    => __('admin.campaign_schedules.schedule_types.once'),
+                        'daily'   => __('admin.campaign_schedules.schedule_types.daily'),
+                        'weekly'  => __('admin.campaign_schedules.schedule_types.weekly'),
                         'monthly' => __('admin.campaign_schedules.schedule_types.monthly'),
-                        'custom' => __('admin.campaign_schedules.schedule_types.custom'),
-                        default => $state,
+                        'custom'  => __('admin.campaign_schedules.schedule_types.custom'),
+                        default   => $state,
                     })
                     ->colors([
                         'primary' => 'once',
                         'success' => 'daily',
                         'warning' => 'weekly',
-                        'info' => 'monthly',
-                        'danger' => 'custom',
+                        'info'    => 'monthly',
+                        'danger'  => 'custom',
                     ]),
                 TextColumn::make('next_run_at')
                     ->label(__('admin.campaign_schedules.form.fields.next_run_at'))
@@ -205,7 +205,7 @@ final class CampaignScheduleResource extends Resource
                     ->colors([
                         'success' => fn ($state) => $state === __('admin.campaign_schedules.status.scheduled'),
                         'warning' => fn ($state) => $state === __('admin.campaign_schedules.status.ready'),
-                        'danger' => fn ($state) => $state === __('admin.campaign_schedules.status.inactive'),
+                        'danger'  => fn ($state) => $state === __('admin.campaign_schedules.status.inactive'),
                     ]),
             ])
             ->filters([
@@ -217,11 +217,11 @@ final class CampaignScheduleResource extends Resource
                 SelectFilter::make('schedule_type')
                     ->label(__('admin.campaign_schedules.filters.schedule_type'))
                     ->options([
-                        'once' => __('admin.campaign_schedules.schedule_types.once'),
-                        'daily' => __('admin.campaign_schedules.schedule_types.daily'),
-                        'weekly' => __('admin.campaign_schedules.schedule_types.weekly'),
+                        'once'    => __('admin.campaign_schedules.schedule_types.once'),
+                        'daily'   => __('admin.campaign_schedules.schedule_types.daily'),
+                        'weekly'  => __('admin.campaign_schedules.schedule_types.weekly'),
                         'monthly' => __('admin.campaign_schedules.schedule_types.monthly'),
-                        'custom' => __('admin.campaign_schedules.schedule_types.custom'),
+                        'custom'  => __('admin.campaign_schedules.schedule_types.custom'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->label(__('admin.campaign_schedules.filters.is_active')),
@@ -236,7 +236,7 @@ final class CampaignScheduleResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('activate')
+                Action::make('activate')
                     ->label(__('admin.campaign_schedules.actions.activate'))
                     ->icon('heroicon-o-play')
                     ->color('success')
@@ -247,7 +247,7 @@ final class CampaignScheduleResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableBulkAction::make('deactivate')
+                Action::make('deactivate')
                     ->label(__('admin.campaign_schedules.actions.deactivate'))
                     ->icon('heroicon-o-pause')
                     ->color('warning')
@@ -258,7 +258,7 @@ final class CampaignScheduleResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableBulkAction::make('run_now')
+                Action::make('run_now')
                     ->label(__('admin.campaign_schedules.actions.run_now'))
                     ->icon('heroicon-o-play-circle')
                     ->color('info')
@@ -315,10 +315,10 @@ final class CampaignScheduleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaignSchedules::route('/'),
+            'index'  => Pages\ListCampaignSchedules::route('/'),
             'create' => Pages\CreateCampaignSchedule::route('/create'),
-            'view' => Pages\ViewCampaignSchedule::route('/{record}'),
-            'edit' => Pages\EditCampaignSchedule::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaignSchedule::route('/{record}'),
+            'edit'   => Pages\EditCampaignSchedule::route('/{record}/edit'),
         ];
     }
 }
