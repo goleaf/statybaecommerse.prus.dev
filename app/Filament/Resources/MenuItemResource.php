@@ -128,6 +128,12 @@ final class MenuItemResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if ($state === null || $state === '') {
+                            return null;
+                        }
+
+                        $state = (string) $state;
+
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('route_name')
