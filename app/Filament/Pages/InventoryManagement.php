@@ -22,9 +22,9 @@ final class InventoryManagement extends Page implements HasTable
     /**
      * @var string|BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static ?string $navigationGroup = 'Products';
+    protected static \UnitEnum|string|null $navigationGroup = 'Products';
 
     public static function getSlug(?\Filament\Panel $panel = null): string
     {
