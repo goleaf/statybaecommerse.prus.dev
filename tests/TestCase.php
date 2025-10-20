@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests;
 
@@ -6,6 +8,7 @@ use Filament\Facades\Filament;
 use Filament\Panel;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Lang;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -32,6 +35,10 @@ abstract class TestCase extends BaseTestCase
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
+
+        // Ensure JSON translations from lang/*.json are available during tests
+        Lang::addJsonPath(lang_path());
+        Lang::addJsonPath(resource_path('lang'));
         $this->withoutMiddleware([
             \App\Http\Middleware\ZoneDetector::class,
             \App\Http\Middleware\SetLocale::class,
