@@ -13,16 +13,20 @@ final class ProductPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        return $user instanceof AdminUser
-            ? AuthorizationMatrix::check('products', 'viewAny', $user)
-            : (bool) ($user->is_admin ?? false);
+        if (! $user instanceof AdminUser) {
+            return false;
+        }
+
+        return AuthorizationMatrix::check('products', 'viewAny', $user);
     }
 
     public function view(AdminUser|User $user, Product $product): bool
     {
-        return $user instanceof AdminUser
-            ? AuthorizationMatrix::check('products', 'view', $user)
-            : (bool) ($user->is_admin ?? false);
+        if (! $user instanceof AdminUser) {
+            return false;
+        }
+
+        return AuthorizationMatrix::check('products', 'view', $user);
     }
 
     public function create(AdminUser $user): bool

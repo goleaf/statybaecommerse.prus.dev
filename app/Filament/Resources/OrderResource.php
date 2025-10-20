@@ -37,9 +37,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 /**
@@ -71,6 +73,41 @@ final class OrderResource extends Resource
     public static function shouldRegisterNavigation(): bool
     {
         return AuthorizationMatrix::check('orders', 'viewAny');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'viewAny');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'view');
+    }
+
+    public static function canCreate(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'create');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'update');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'delete');
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'delete');
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'update');
     }
 
     public static function getNavigationIcon(): string|\BackedEnum|null
@@ -442,6 +479,7 @@ final class OrderResource extends Resource
                                 fn (Builder $query, $amount): Builder => $query->where('total', '<=', $amount),
                             );
                     }),
+                TrashedFilter::make(),
             ])
             ->actions([
                 ViewAction::make()
