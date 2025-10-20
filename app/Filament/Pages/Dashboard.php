@@ -12,8 +12,10 @@ class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-home';
+    public static function getNavigationIcon(): string|BackedEnum|null
+    {
+        return 'heroicon-o-home';
+    }
 
     protected static ?string $title = 'Dashboard';
 
