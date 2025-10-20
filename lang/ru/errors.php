@@ -19,4 +19,10 @@ return [
 
     // @translators: Указывает, что у вошедшего пользователя нет прав для действия.
     ErrorCodes::FORBIDDEN => 'Доступ запрещён',
+
+    // @translators: Показывается, когда заказ с указанным номером не найден.
+    ErrorCodes::ORDER_NOT_FOUND => 'Заказ :order не найден.',
+
+    // @translators: Сообщает о недостаточном количестве товара для указанного SKU.
+    ErrorCodes::INVENTORY_INSUFFICIENT => 'Недостаточно запасов для артикула :sku.',
 ];
