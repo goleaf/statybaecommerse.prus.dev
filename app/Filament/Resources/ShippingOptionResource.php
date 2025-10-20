@@ -11,6 +11,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -18,8 +20,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -71,9 +71,9 @@ final class ShippingOptionResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.shipping_options.basic_information'))
+                Section::make(__('admin.shipping_options.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('admin.shipping_options.name'))
@@ -106,9 +106,9 @@ final class ShippingOptionResource extends Resource
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
-                SchemaSection::make(__('admin.shipping_options.pricing'))
+                Section::make(__('admin.shipping_options.pricing'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('price')
                                     ->label(__('admin.shipping_options.price'))
@@ -127,9 +127,9 @@ final class ShippingOptionResource extends Resource
                                     ->required(),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.shipping_options.constraints'))
+                Section::make(__('admin.shipping_options.constraints'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('min_weight')
                                     ->label(__('admin.shipping_options.min_weight'))
@@ -153,9 +153,9 @@ final class ShippingOptionResource extends Resource
                                     ->step(0.01),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.shipping_options.delivery'))
+                Section::make(__('admin.shipping_options.delivery'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('estimated_days_min')
                                     ->label(__('admin.shipping_options.estimated_days_min'))
@@ -169,9 +169,9 @@ final class ShippingOptionResource extends Resource
                                     ->minValue(1),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.shipping_options.status'))
+                Section::make(__('admin.shipping_options.status'))
                     ->schema([
-                        SchemaGrid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Toggle::make('is_enabled')
                                     ->label(__('admin.shipping_options.is_enabled'))
@@ -220,9 +220,11 @@ final class ShippingOptionResource extends Resource
                     ->sortable(),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
-                    ->formatStateUsing(fn ($record) => $record->estimated_days_min && $record->estimated_days_max
-                        ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
-                        : '-'),
+                    ->formatStateUsing(
+                        fn ($state, ShippingOption $record): string => $record->estimated_days_min && $record->estimated_days_max
+                            ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
+                            : '-'
+                    ),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled'))
                     ->boolean(),
