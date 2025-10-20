@@ -76,6 +76,7 @@ return [
                     'campaign_name' => 'Campaign Name',
                     'campaign_status' => 'Campaign Status',
                     'campaign_type' => 'Campaign Type',
+                    'status' => 'Status',
                     'schedule_type' => 'Schedule Type',
                     'schedule_status' => 'Schedule Status',
                     'schedule_config' => 'Schedule Configuration',
