@@ -13,7 +13,7 @@ class AdminDashboard extends BaseDashboard
     /**
      * @var string|BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-home';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected string $view = 'filament.pages.admin-dashboard';
 

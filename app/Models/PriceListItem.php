@@ -34,7 +34,7 @@ final class PriceListItem extends Model
 
     protected $table = 'price_list_items';
 
-    protected $fillable = ['price_list_id', 'product_id', 'variant_id', 'net_amount', 'compare_amount', 'name', 'description', 'notes', 'is_active', 'priority', 'min_quantity', 'max_quantity', 'valid_from', 'valid_until'];
+    protected $fillable = ['price_list_id', 'product_id', 'variant_id', 'net_amount', 'compare_amount', 'name', 'description', 'notes', 'is_active', 'is_featured', 'priority', 'min_quantity', 'max_quantity', 'valid_from', 'valid_until'];
 
     public array $translatable = ['name', 'description', 'notes'];
 
@@ -43,7 +43,7 @@ final class PriceListItem extends Model
      */
     protected function casts(): array
     {
-        return ['net_amount' => 'decimal:4', 'compare_amount' => 'decimal:4', 'is_active' => 'boolean', 'priority' => 'integer', 'min_quantity' => 'integer', 'max_quantity' => 'integer', 'valid_from' => 'datetime', 'valid_until' => 'datetime'];
+        return ['net_amount' => 'decimal:4', 'compare_amount' => 'decimal:4', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'priority' => 'integer', 'min_quantity' => 'integer', 'max_quantity' => 'integer', 'valid_from' => 'datetime', 'valid_until' => 'datetime'];
     }
 
     /**
