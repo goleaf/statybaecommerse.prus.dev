@@ -14,7 +14,6 @@ use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -122,32 +121,24 @@ final class CustomerManagementResource extends Resource
                             Select::make('gender')
                                 ->label(__('customers.gender'))
                                 ->options([
-                                    'male' => __('customers.genders.male'),
+                                    'male'   => __('customers.genders.male'),
                                     'female' => __('customers.genders.female'),
-                                    'other' => __('customers.genders.other'),
+                                    'other'  => __('customers.genders.other'),
                                 ]),
                         ]),
-                ]),
-            Section::make(__('customers.address_information'))
-                ->components([
-                    KeyValue::make('address')
-                        ->label(__('customers.address'))
-                        ->keyLabel(__('customers.address_field'))
-                        ->valueLabel(__('customers.address_value'))
-                        ->addActionLabel(__('customers.add_address_field')),
                 ]),
             Section::make(__('customers.preferences'))
                 ->components([
                     Grid::make(2)
                         ->components([
-                            Select::make('preferred_language')
+                            Select::make('preferred_locale')
                                 ->label(__('customers.preferred_language'))
                                 ->options([
                                     'lt' => __('customers.languages.lt'),
                                     'en' => __('customers.languages.en'),
                                 ])
                                 ->default('lt'),
-                            Select::make('preferred_currency')
+                            Select::make('preferences->preferred_currency')
                                 ->label(__('customers.preferred_currency'))
                                 ->options([
                                     'EUR' => 'EUR (€)',
@@ -157,10 +148,10 @@ final class CustomerManagementResource extends Resource
                         ]),
                     Grid::make(2)
                         ->components([
-                            Toggle::make('newsletter_subscription')
+                            Toggle::make('notification_preferences->newsletter_subscription')
                                 ->label(__('customers.newsletter_subscription'))
                                 ->default(false),
-                            Toggle::make('sms_notifications')
+                            Toggle::make('notification_preferences->sms_notifications')
                                 ->label(__('customers.sms_notifications'))
                                 ->default(false),
                         ]),
@@ -343,10 +334,10 @@ final class CustomerManagementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomers::route('/'),
+            'index'  => Pages\ListCustomers::route('/'),
             'create' => Pages\CreateCustomer::route('/create'),
-            'view' => Pages\ViewCustomer::route('/{record}'),
-            'edit' => Pages\EditCustomer::route('/{record}/edit'),
+            'view'   => Pages\ViewCustomer::route('/{record}'),
+            'edit'   => Pages\EditCustomer::route('/{record}/edit'),
         ];
     }
 }
