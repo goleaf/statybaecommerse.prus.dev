@@ -157,19 +157,7 @@ final class SystemSettingDependencyResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        if ($state === null) {
-                            return null;
-                        }
-
-                        if (! is_string($state)) {
-                            if (! is_scalar($state)) {
-                                return null;
-                            }
-
-                            $state = (string) $state;
-                        }
-
-                        if ($state === '') {
+                        if (! is_string($state) || $state === '') {
                             return null;
                         }
 
@@ -336,7 +324,7 @@ final class SystemSettingDependencyResource extends Resource
                         ->icon('heroicon-o-document-duplicate')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            $records->each(function (SystemSettingDependency $record) {
+                            $records->each(function (SystemSettingDependency $record): void {
                                 $newRecord = $record->replicate();
                                 $newRecord->condition = $record->condition . ' (Copy)';
                                 $newRecord->is_active = false;
