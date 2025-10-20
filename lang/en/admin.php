@@ -70,6 +70,17 @@ return [
         'description' => 'Description',
         'button_text' => 'Button Text',
     ],
+    'inventory' => [
+        'actions' => [
+            'create' => 'Create inventory record',
+        ],
+        'tabs' => [
+            'all' => 'All inventory',
+            'in_stock' => 'In stock',
+            'low_stock' => 'Low stock',
+            'out_of_stock' => 'Out of stock',
+        ],
+    ],
     'variant_combinations' => [
         'navigation_label' => 'Variant Combinations',
         'plural_model_label' => 'Variant Combinations',
