@@ -328,7 +328,7 @@ class AttributeValueControllerTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'meta_data' => [
+            'metadata' => [
                 'created_by' => 'admin',
                 'version' => '1.0',
                 'tags' => ['red', 'color'],
