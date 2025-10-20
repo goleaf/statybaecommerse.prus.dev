@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Exceptions\Domain\DomainException;
-use App\Http\Middleware\AttachCorrelationId;
 use App\Http\Middleware\AddSecurityHeaders;
+use App\Http\Middleware\AttachCorrelationId;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
 use App\Support\ApiErrorResponse;
@@ -14,6 +16,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -22,13 +25,29 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
-require_once __DIR__.'/../app/Support/filament_compat.php';
+require_once __DIR__ . '/../app/Support/filament_compat.php';
+
+$appEnvironment = (string) env('APP_ENV', 'production');
+$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
+
+$providers = [
+    App\Providers\AuthServiceProvider::class,
+    App\Providers\ApiServiceProvider::class,
+];
+
+if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
+    $providers[] = App\Providers\HorizonServiceProvider::class;
+}
+
+$providers[] = App\Providers\LocaleServiceProvider::class;
+$providers[] = App\Providers\Filament\AdminPanelProvider::class;
+$providers[] = SecurityServiceProvider::class;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function (): void {
             Route::middleware('web')
@@ -50,11 +69,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(AddSecurityHeaders::class);
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
-            'role' => Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission' => Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'permissions' => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role'               => Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission'         => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'permissions'        => Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            'localize' => App\Http\Middleware\SetLocale::class,
+            'localize'           => App\Http\Middleware\SetLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -67,19 +86,19 @@ return Application::configure(basePath: dirname(__DIR__))
             $traceId = RequestContext::resolveTraceId($request);
 
             Log::withContext([
-                'trace_id' => $traceId,
+                'trace_id'       => $traceId,
                 'correlation_id' => $traceId,
-                'locale' => $locale,
-                'error_code' => $exception->errorCode(),
-                'request_path' => $request->path(),
+                'locale'         => $locale,
+                'error_code'     => $exception->errorCode(),
+                'request_path'   => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
             Log::warning('Domain exception rendered.', [
-                'exception' => $exception::class,
-                'status' => $exception->status(),
+                'exception'       => $exception::class,
+                'status'          => $exception->status(),
                 'translation_key' => $exception->translationKey(),
-                'context' => $exception->context(),
+                'context'         => $exception->context(),
             ]);
 
             $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
@@ -104,10 +123,10 @@ return Application::configure(basePath: dirname(__DIR__))
             $traceId = RequestContext::resolveTraceId($request);
 
             Log::withContext([
-                'trace_id' => $traceId,
+                'trace_id'       => $traceId,
                 'correlation_id' => $traceId,
-                'locale' => $locale,
-                'request_path' => $request->path(),
+                'locale'         => $locale,
+                'request_path'   => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
@@ -117,9 +136,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             $violations = collect($exception->errors())
                 ->map(static fn (array $messages, string $field): array => [
-                    'field' => $field,
+                    'field'    => $field,
                     'messages' => array_values($messages),
-                    'reason' => $messages[0] ?? 'Invalid value.',
+                    'reason'   => $messages[0] ?? 'Invalid value.',
                 ])
                 ->values()
                 ->all();
@@ -144,10 +163,10 @@ return Application::configure(basePath: dirname(__DIR__))
             $traceId = RequestContext::resolveTraceId($request);
 
             Log::withContext([
-                'trace_id' => $traceId,
+                'trace_id'       => $traceId,
                 'correlation_id' => $traceId,
-                'locale' => $locale,
-                'request_path' => $request->path(),
+                'locale'         => $locale,
+                'request_path'   => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
@@ -180,10 +199,10 @@ return Application::configure(basePath: dirname(__DIR__))
             $traceId = RequestContext::resolveTraceId($request);
 
             Log::withContext([
-                'trace_id' => $traceId,
+                'trace_id'       => $traceId,
                 'correlation_id' => $traceId,
-                'locale' => $locale,
-                'request_path' => $request->path(),
+                'locale'         => $locale,
+                'request_path'   => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
@@ -217,10 +236,10 @@ return Application::configure(basePath: dirname(__DIR__))
             $correlationHeader = RequestContext::correlationHeader();
 
             $context = [
-                'trace_id' => $traceId,
+                'trace_id'       => $traceId,
                 'correlation_id' => $traceId,
-                'locale' => $locale,
-                'request_path' => $request->path(),
+                'locale'         => $locale,
+                'request_path'   => $request->path(),
                 'request_method' => $request->method(),
             ];
 
@@ -230,16 +249,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 if ($throwable instanceof HttpExceptionInterface) {
                     $status = $throwable->getStatusCode();
                     $code = match ($status) {
-                        401 => ErrorCodes::UNAUTHORIZED,
-                        403 => ErrorCodes::FORBIDDEN,
-                        404 => ErrorCodes::NOT_FOUND,
+                        401     => ErrorCodes::UNAUTHORIZED,
+                        403     => ErrorCodes::FORBIDDEN,
+                        404     => ErrorCodes::NOT_FOUND,
                         default => ErrorCodes::SERVER_ERROR,
                     };
 
                     Log::notice('HTTP exception rendered.', [
                         'exception' => $throwable::class,
-                        'status' => $status,
-                        'headers' => $throwable->getHeaders(),
+                        'status'    => $status,
+                        'headers'   => $throwable->getHeaders(),
                     ]);
 
                     $detail = $throwable->getMessage() !== ''
@@ -265,7 +284,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 Log::error('Unhandled exception rendered.', [
                     'exception' => $throwable::class,
-                    'message' => $throwable->getMessage(),
+                    'message'   => $throwable->getMessage(),
                 ]);
 
                 $message = Lang::get('errors.messages.server_error', [], $locale);
@@ -285,35 +304,65 @@ return Application::configure(basePath: dirname(__DIR__))
 
             Log::error('Unhandled exception rendered.', [
                 'exception' => $throwable::class,
-                'message' => $throwable->getMessage(),
+                'message'   => $throwable->getMessage(),
             ]);
 
             return response()
                 ->view('errors.unexpected', [
-                    'traceId' => $traceId,
+                    'traceId'       => $traceId,
                     'correlationId' => $traceId,
                 ], 500)
                 ->header($correlationHeader, $traceId)
                 ->header('Content-Language', $locale);
         });
     })
-    ->withProviders(function (): array {
-        $providers = [
-            App\Providers\AuthServiceProvider::class,
-            App\Providers\ApiServiceProvider::class,
-        ];
-
-        $appEnvironment = (string) env('APP_ENV', 'production');
-        $queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
-
-        if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-            $providers[] = App\Providers\HorizonServiceProvider::class;
+    ->withSingletons([
+        Request::class => static fn (): Request => Request::capture(),
+        'request'      => static fn (): Request => Request::capture(),
+    ])
+    ->registered(function (Application $app) use ($providers): void {
+        if (! $app->bound('request')) {
+            $app->instance('request', Request::capture());
         }
 
-        $providers[] = App\Providers\LocaleServiceProvider::class;
-        $providers[] = App\Providers\Filament\AdminPanelProvider::class;
-        $providers[] = SecurityServiceProvider::class;
+        $app->make('request');
 
-        return $providers;
+        $app->singleton('url', function ($app): UrlGenerator {
+            $routes = $app['router']->getRoutes();
+
+            $request = $app->bound('request')
+                ? $app->make('request')
+                : Request::capture();
+
+            if (! $app->bound('request')) {
+                $app->instance('request', $request);
+            }
+
+            $url = new UrlGenerator(
+                $routes,
+                $request,
+                $app['config']['app.asset_url']
+            );
+
+            $url->setSessionResolver(static function () use ($app) {
+                return $app['session'] ?? null;
+            });
+
+            $url->setKeyResolver(static function () use ($app) {
+                $config = $app->make('config');
+
+                return [$config->get('app.key'), ...($config->get('app.previous_keys') ?? [])];
+            });
+
+            $app->rebinding('routes', static function ($app, $routes): void {
+                $app['url']->setRoutes($routes);
+            });
+
+            return $url;
+        });
+
+        foreach ($providers as $provider) {
+            $app->register($provider);
+        }
     })
     ->create();
