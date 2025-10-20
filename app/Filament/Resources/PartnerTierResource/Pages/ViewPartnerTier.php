@@ -8,7 +8,7 @@ use App\Filament\Resources\PartnerTierResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewPartnerTier extends ViewRecord
+final class ViewPartnerTier extends ViewRecord
 {
     protected static string $resource = PartnerTierResource::class;
 
