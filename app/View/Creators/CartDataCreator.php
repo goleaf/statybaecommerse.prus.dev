@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\View\Creators;
 
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Session;
 
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Session;
  */
 final class CartDataCreator
 {
+    public function __construct(private readonly PriceCalculator $priceCalculator) {}
+
     /**
      * Create the view creator.
      */
@@ -41,6 +44,7 @@ final class CartDataCreator
      */
     private function getCartData(): array
     {
+        /** @var array<int, array<string, mixed>> $cart */
         $cart = Session::get('cart', []);
 
         if (empty($cart)) {
@@ -56,47 +60,41 @@ final class CartDataCreator
         }
 
         $items = [];
-        $subtotal = 0;
         $count = 0;
 
         foreach ($cart as $item) {
-            $itemTotal = ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
-            $subtotal += $itemTotal;
-            $count += $item['quantity'] ?? 0;
+            $priceRaw = $item['price'] ?? 0.0;
+            $quantityRaw = $item['quantity'] ?? 0;
+            $price = is_numeric($priceRaw) ? (float) $priceRaw : 0.0;
+            $quantity = is_numeric($quantityRaw) ? (int) $quantityRaw : 0;
+            $lineTotal = $this->priceCalculator->round($price * $quantity);
+            $count += $quantity;
 
             $items[] = [
                 'id' => $item['id'] ?? null,
                 'product_id' => $item['product_id'] ?? null,
                 'variant_id' => $item['variant_id'] ?? null,
                 'name' => $item['name'] ?? '',
-                'price' => $item['price'] ?? 0,
-                'quantity' => $item['quantity'] ?? 0,
-                'total' => $itemTotal,
+                'price' => $this->priceCalculator->round($price),
+                'quantity' => $quantity,
+                'total' => $lineTotal,
                 'image' => $item['image'] ?? null,
                 'attributes' => $item['attributes'] ?? [],
             ];
         }
 
-        // Calculate tax (simplified - in real app this would be more complex)
-        $taxRate = config('shared.tax.default_rate', 0.21); // 21% VAT
-        $tax = $subtotal * $taxRate;
-
-        // Calculate shipping (simplified)
-        $shipping = $subtotal > 50 ? 0 : 5.99; // Free shipping over €50
-
-        // Get discount from session
-        $discount = Session::get('cart_discount', 0);
-
-        $total = $subtotal + $tax + $shipping - $discount;
+        $discount = (float) Session::get('cart_discount', 0.0);
+        $breakdown = $this->priceCalculator->calculate($items, $discount);
 
         return [
             'items' => $items,
             'count' => $count,
-            'subtotal' => round($subtotal, 2),
-            'tax' => round($tax, 2),
-            'shipping' => round($shipping, 2),
-            'discount' => round($discount, 2),
-            'total' => round($total, 2),
+            'subtotal' => $breakdown->subtotal,
+            'tax' => $breakdown->tax,
+            'shipping' => $breakdown->shipping,
+            'discount' => $breakdown->discount,
+            'total' => $breakdown->total,
+            'formatted_totals' => $breakdown->formatted(),
         ];
     }
 }

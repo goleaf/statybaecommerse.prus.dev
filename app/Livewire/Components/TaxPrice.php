@@ -63,9 +63,15 @@ class TaxPrice extends Component
     #[Computed]
     public function taxBreakdown(): array
     {
-        $taxRate = app(\App\Services\Taxes\TaxCalculator::class)->getTaxRate(null);
+        $calculator = app(\App\Services\Taxes\TaxCalculator::class);
+        $taxRatePercent = $calculator->getTaxRate(null);
+        $taxRateDecimal = $calculator->getTaxRate(null, false);
 
-        return ['tax_rate' => $taxRate, 'tax_amount' => $this->taxAmount, 'taxable_amount' => $this->taxAmount / ($taxRate / 100)];
+        return [
+            'tax_rate' => $taxRatePercent,
+            'tax_amount' => $this->taxAmount,
+            'taxable_amount' => $taxRateDecimal > 0 ? $this->taxAmount / $taxRateDecimal : 0.0,
+        ];
     }
 
     /**

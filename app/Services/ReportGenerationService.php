@@ -8,6 +8,7 @@ use App\Models\AnalyticsEvent;
 use App\Models\Product;
 use App\Models\Report;
 use App\Models\User;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\Log;
  */
 final class ReportGenerationService
 {
+    public function __construct(private readonly PriceCalculator $priceCalculator) {}
+
     /**
      * Handle generateSalesReport functionality with proper error handling.
      */
@@ -57,7 +60,24 @@ final class ReportGenerationService
         }
         Log::info('Sales report generated', ['processed_events' => $processedCount, 'total_revenue' => $totalRevenue, 'days_covered' => count($salesData), 'timeout_reached' => now()->greaterThan($timeout)]);
 
-        return ['summary' => ['total_revenue' => $totalRevenue, 'total_transactions' => $processedCount, 'days_covered' => count($salesData), 'processed_events' => $processedCount], 'daily_data' => array_values($salesData)];
+        foreach ($salesData as &$day) {
+            $day['revenue'] = $this->priceCalculator->round((float) $day['revenue']);
+            $day['revenue_formatted'] = $this->priceCalculator->formatAmount($day['revenue']);
+        }
+        unset($day);
+
+        $roundedTotal = $this->priceCalculator->round($totalRevenue);
+
+        return [
+            'summary' => [
+                'total_revenue' => $roundedTotal,
+                'total_revenue_formatted' => $this->priceCalculator->formatAmount($roundedTotal),
+                'total_transactions' => $processedCount,
+                'days_covered' => count($salesData),
+                'processed_events' => $processedCount,
+            ],
+            'daily_data' => array_values($salesData),
+        ];
     }
 
     /**

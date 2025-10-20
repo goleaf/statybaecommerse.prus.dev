@@ -12,15 +12,44 @@ namespace App\Services\Taxes;
 final class TaxCalculator
 {
     /**
-     * Handle compute functionality with proper error handling.
+     * Calculate tax for a taxable amount using configured or overridden rates.
      */
-    public function compute(float $amount): float
+    public function compute(float $amount, ?string $zone = null, ?float $overrideRate = null): float
     {
-        $rate = (float) config('tax.default_rate', 0);
-        if ($rate <= 0 || $amount <= 0) {
+        $rate = $this->resolveRate($zone, $overrideRate);
+        if ($rate <= 0.0 || $amount <= 0.0) {
             return 0.0;
         }
 
-        return round($amount * ($rate / 100), 2);
+        return round($amount * $rate, (int) config('pricing.rounding_precision', 2));
+    }
+
+    /**
+     * Retrieve the tax rate for a zone.
+     */
+    public function getTaxRate(?string $zone = null, bool $asPercent = true): float
+    {
+        $rate = $this->resolveRate($zone, null);
+
+        return $asPercent ? $rate * 100 : $rate;
+    }
+
+    private function resolveRate(?string $zone, ?float $overrideRate): float
+    {
+        if ($overrideRate !== null) {
+            return $this->normalizeRate($overrideRate);
+        }
+
+        $zones = config('tax.zones', []);
+        if ($zone !== null && array_key_exists($zone, $zones)) {
+            return $this->normalizeRate((float) $zones[$zone]);
+        }
+
+        return $this->normalizeRate((float) config('tax.default_rate', 0));
+    }
+
+    private function normalizeRate(float $rate): float
+    {
+        return $rate > 1 ? $rate / 100 : $rate;
     }
 }
