@@ -238,7 +238,7 @@ final class ReferralCodeResource extends Resource
                         'user'  => 'user',
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        $value = $data['value'] ?? null;
+                        $value = $data['source'] ?? $data['value'] ?? null;
 
                         return $value ? $query->where('source', $value) : $query;
                     }),
