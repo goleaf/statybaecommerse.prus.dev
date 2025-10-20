@@ -16,6 +16,8 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\DemonstrateTimeoutCommand::class,
         \App\Console\Commands\GenerateReportsCommand::class,
         \App\Console\Commands\CheckRefreshDatabaseCommand::class,
+        \App\Console\Commands\BackupPrepareCommand::class,
+        \App\Console\Commands\BackupVerifyCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -39,6 +41,20 @@ final class Kernel extends ConsoleKernel
             ->onSuccess(function () {
                 \Log::info('Weekly code style fix completed successfully');
             });
+
+        if ($prepareCron = config('backup.schedule.prepare')) {
+            $schedule
+                ->command('backup:prepare')
+                ->cron($prepareCron)
+                ->withoutOverlapping();
+        }
+
+        if ($verifyCron = config('backup.schedule.verify')) {
+            $schedule
+                ->command('backup:verify')
+                ->cron($verifyCron)
+                ->withoutOverlapping();
+        }
     }
 
     protected function commands(): void
