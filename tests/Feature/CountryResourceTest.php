@@ -5,10 +5,17 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\CountryResource;
+use App\Filament\Resources\CountryResource\Widgets\CountriesByRegionWidget;
+use App\Filament\Resources\CountryResource\Widgets\CountriesOverviewWidget;
+use App\Filament\Resources\CountryResource\Widgets\CountriesStatsWidget;
+use App\Filament\Resources\CountryResource\Widgets\CountriesWithVatWidget;
+use App\Filament\Resources\CountryResource\Widgets\CountryDetailsWidget;
+use App\Filament\Resources\CountryResource\Widgets\EuMembersWidget;
 use App\Models\Country;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use ReflectionClass;
 use Tests\TestCase;
 
 final class CountryResourceTest extends TestCase
@@ -20,7 +27,7 @@ final class CountryResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -33,24 +40,51 @@ final class CountryResourceTest extends TestCase
             ->assertCanSeeTableRecords($countries);
     }
 
+    public function test_country_resource_registers_widgets(): void
+    {
+        $component = Livewire::test(CountryResource\Pages\ListCountries::class);
+
+        $reflection = new ReflectionClass($component->instance());
+
+        $headerMethod = $reflection->getMethod('getHeaderWidgets');
+        $headerMethod->setAccessible(true);
+        $headerWidgets = $headerMethod->invoke($component->instance());
+
+        $this->assertSame([
+            CountriesOverviewWidget::class,
+            CountriesStatsWidget::class,
+            CountriesByRegionWidget::class,
+        ], $headerWidgets);
+
+        $footerMethod = $reflection->getMethod('getFooterWidgets');
+        $footerMethod->setAccessible(true);
+        $footerWidgets = $footerMethod->invoke($component->instance());
+
+        $this->assertSame([
+            CountriesWithVatWidget::class,
+            EuMembersWidget::class,
+            CountryDetailsWidget::class,
+        ], $footerWidgets);
+    }
+
     public function test_can_create_country(): void
     {
         $countryData = [
-            'name' => 'Test Country',
-            'name_official' => 'Official Test Country',
-            'cca2' => 'TC',
-            'cca3' => 'TCO',
-            'ccn3' => '123',
-            'iso_code' => 'TC-001',
-            'region' => 'Test Region',
-            'subregion' => 'Test Subregion',
-            'currency_code' => 'TCD',
-            'currency_symbol' => 'T$',
+            'name'               => 'Test Country',
+            'name_official'      => 'Official Test Country',
+            'cca2'               => 'TC',
+            'cca3'               => 'TCO',
+            'ccn3'               => '123',
+            'iso_code'           => 'TC-001',
+            'region'             => 'Test Region',
+            'subregion'          => 'Test Subregion',
+            'currency_code'      => 'TCD',
+            'currency_symbol'    => 'T$',
             'phone_calling_code' => '+123',
-            'is_active' => true,
-            'is_eu_member' => false,
-            'requires_vat' => true,
-            'vat_rate' => 20.0,
+            'is_active'          => true,
+            'is_eu_member'       => false,
+            'requires_vat'       => true,
+            'vat_rate'           => 20.0,
         ];
 
         Livewire::test(CountryResource\Pages\CreateCountry::class)
@@ -265,8 +299,8 @@ final class CountryResourceTest extends TestCase
     {
         Livewire::test(CountryResource\Pages\CreateCountry::class)
             ->fillForm([
-                'name' => 'Test Country',
-                'cca2' => 'TC',
+                'name'     => 'Test Country',
+                'cca2'     => 'TC',
                 'vat_rate' => 'invalid',
             ])
             ->call('create')
@@ -277,8 +311,8 @@ final class CountryResourceTest extends TestCase
     {
         Livewire::test(CountryResource\Pages\CreateCountry::class)
             ->fillForm([
-                'name' => 'Test Country',
-                'cca2' => 'TC',
+                'name'     => 'Test Country',
+                'cca2'     => 'TC',
                 'vat_rate' => 150.0,
             ])
             ->call('create')
@@ -289,7 +323,7 @@ final class CountryResourceTest extends TestCase
     {
         $country = Country::factory()->create();
         $country->cities()->create([
-            'name' => 'Test City',
+            'name'       => 'Test City',
             'country_id' => $country->id,
         ]);
 
@@ -301,8 +335,8 @@ final class CountryResourceTest extends TestCase
     {
         $country = Country::factory()->create();
         $country->addresses()->create([
-            'street' => 'Test Street',
-            'city' => 'Test City',
+            'street'       => 'Test Street',
+            'city'         => 'Test City',
             'country_code' => $country->cca2,
         ]);
 
@@ -313,8 +347,8 @@ final class CountryResourceTest extends TestCase
     public function test_country_global_search(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
+            'name'   => 'Lithuania',
+            'cca2'   => 'LT',
             'region' => 'Europe',
         ]);
 
@@ -389,10 +423,10 @@ final class CountryResourceTest extends TestCase
     public function test_country_helper_methods(): void
     {
         $country = Country::factory()->create([
-            'is_active' => true,
+            'is_active'    => true,
             'is_eu_member' => true,
             'requires_vat' => true,
-            'vat_rate' => 20.0,
+            'vat_rate'     => 20.0,
         ]);
 
         $this->assertTrue($country->isActive());
@@ -405,7 +439,7 @@ final class CountryResourceTest extends TestCase
     public function test_country_display_name(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
+            'name'               => 'Lithuania',
             'phone_calling_code' => '370',
         ]);
 
@@ -415,7 +449,7 @@ final class CountryResourceTest extends TestCase
     public function test_country_coordinates(): void
     {
         $country = Country::factory()->create([
-            'latitude' => 54.6872,
+            'latitude'  => 54.6872,
             'longitude' => 25.2797,
         ]);
 
@@ -427,11 +461,11 @@ final class CountryResourceTest extends TestCase
     public function test_country_economic_info(): void
     {
         $country = Country::factory()->create([
-            'currency_code' => 'EUR',
+            'currency_code'   => 'EUR',
             'currency_symbol' => '€',
-            'requires_vat' => true,
-            'vat_rate' => 21.0,
-            'is_eu_member' => true,
+            'requires_vat'    => true,
+            'vat_rate'        => 21.0,
+            'is_eu_member'    => true,
         ]);
 
         $economicInfo = $country->getEconomicInfo();
@@ -445,11 +479,11 @@ final class CountryResourceTest extends TestCase
     public function test_country_geographic_info(): void
     {
         $country = Country::factory()->create([
-            'region' => 'Europe',
+            'region'    => 'Europe',
             'subregion' => 'Northern Europe',
-            'latitude' => 54.6872,
+            'latitude'  => 54.6872,
             'longitude' => 25.2797,
-            'timezone' => 'Europe/Vilnius',
+            'timezone'  => 'Europe/Vilnius',
         ]);
 
         $geographicInfo = $country->getGeographicInfo();
