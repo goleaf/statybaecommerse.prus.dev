@@ -9,6 +9,9 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 final class Kernel extends ConsoleKernel
 {
+    /**
+     * @var array<int, class-string<\Illuminate\Console\Command>>
+     */
     protected $commands = [
         \App\Console\Commands\FixCodeStyleCommand::class,
         \App\Console\Commands\ValidateCodeStyleCommand::class,
@@ -16,6 +19,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\DemonstrateTimeoutCommand::class,
         \App\Console\Commands\GenerateReportsCommand::class,
         \App\Console\Commands\CheckRefreshDatabaseCommand::class,
+        \App\Console\Commands\DbAuditIndexesCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
