@@ -11,6 +11,7 @@ use App\Observers\ProductObserver;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -1181,15 +1182,32 @@ final class Product extends Model implements HasMedia
      */
     private function resolvePublicUrl(string $path): string
     {
-        // Assume stored under public disk or public path
-        $prefixes = ['http://', 'https://', '/'];
-        foreach ($prefixes as $prefix) {
+        if ($path === '') {
+            return $path;
+        }
+
+        $absolutePrefixes = ['http://', 'https://'];
+        foreach ($absolutePrefixes as $prefix) {
             if (str_starts_with($path, $prefix)) {
                 return $path;
             }
         }
 
-        return asset(trim($path, '/'));
+        if (str_starts_with($path, '/')) {
+            return asset(ltrim($path, '/'));
+        }
+
+        $defaultDisk = config('filesystems.default', 'public');
+        $disksToCheck = array_unique([$defaultDisk, 'public']);
+
+        foreach ($disksToCheck as $disk) {
+            if (Storage::disk($disk)->exists($path)) {
+                return Storage::disk($disk)->url($path);
+            }
+        }
+
+        // Fall back to the public disk URL even if the file is missing so the UI has a consistent path format
+        return Storage::disk('public')->url($path);
     }
 
     // Translation methods
