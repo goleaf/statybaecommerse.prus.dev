@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('product_images')) {
+            return;
+        }
+
         DB::table('product_images')
             ->select('id', 'path')
             ->orderBy('id')
@@ -41,6 +46,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('product_images')) {
+            return;
+        }
+
         DB::table('product_images')
             ->select('id', 'path')
             ->orderBy('id')
