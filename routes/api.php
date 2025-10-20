@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuditLogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -51,3 +52,5 @@ Route::post('/autocomplete-search', function (Request $request) {
         return response()->json(['results' => []], 500);
     }
 })->name('api.autocomplete.search');
+
+Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('api.audit-logs.index');

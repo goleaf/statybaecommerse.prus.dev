@@ -64,6 +64,22 @@ return [
     'related_model_id' => 'Related Model ID',
     'metadata' => 'Metadata',
     'add_variable' => 'Add Variable',
+    'audit' => [
+        'title' => 'Audit Trail',
+        'action' => 'Action',
+        'performed_by' => 'Performed By',
+        'logged_at' => 'Logged At',
+        'before' => 'Before',
+        'after' => 'After',
+        'empty' => 'No audit entries recorded yet.',
+        'system' => 'System',
+    ],
+    'audit_actions' => [
+        'created' => 'Created',
+        'updated' => 'Updated',
+        'deleted' => 'Deleted',
+        'restored' => 'Restored',
+    ],
 
     // Document Actions
     'generate' => 'Generate Document',
