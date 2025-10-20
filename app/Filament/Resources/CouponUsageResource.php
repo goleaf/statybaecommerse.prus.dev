@@ -23,6 +23,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -33,6 +34,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Number;
 
 final class CouponUsageResource extends Resource
 {
@@ -107,7 +109,13 @@ final class CouponUsageResource extends Resource
                                         ->content(fn (?Model $record) => $record?->user?->email ?? '-'),
                                     Placeholder::make('order_total')
                                         ->label(__('admin.coupon_usages.form.fields.order_total'))
-                                        ->content(fn (?Model $record) => $record?->order ? '€'.number_format($record->order->total_amount, 2) : '-'),
+                                        ->content(fn (?Model $record): string => $record?->order
+                                            ? Number::currency(
+                                                (float) $record->order->total,
+                                                $record->order->currency ?? 'EUR',
+                                                locale: app()->getLocale(),
+                                            )
+                                            : '-'),
                                     Textarea::make('notes')
                                         ->label(__('admin.coupon_usages.form.fields.notes'))
                                         ->rows(3),
@@ -143,11 +151,11 @@ final class CouponUsageResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('usage_period')
                     ->label(__('admin.coupon_usages.form.fields.usage_period'))
-                    ->formatStateUsing(fn (CouponUsage $record) => $record->usage_period)
+                    ->state(fn (CouponUsage $record): string => $record->usage_period)
                     ->colors([
-                        'success' => fn ($state) => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')], true),
-                        'warning' => fn ($state) => $state === __('admin.coupon_usages.periods.this_month'),
-                        'danger' => fn ($state) => $state === __('admin.coupon_usages.periods.older'),
+                        'success' => fn (?string $state): bool => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')], true),
+                        'warning' => fn (?string $state): bool => $state === __('admin.coupon_usages.periods.this_month'),
+                        'danger'  => fn (?string $state): bool => $state === __('admin.coupon_usages.periods.older'),
                     ]),
             ])
             ->filters([
@@ -197,14 +205,16 @@ final class CouponUsageResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('export_usage_report')
+                Action::make('export_usage_report')
                     ->label(__('admin.coupon_usages.actions.export_usage_report'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('info')
-                    ->action(fn (CouponUsage $record) => FilamentNotification::make()
-                        ->title(__('admin.coupon_usages.usage_report_exported_successfully'))
-                        ->success()
-                        ->send()),
+                    ->action(function (CouponUsage $record): void {
+                        FilamentNotification::make()
+                            ->title(__('admin.coupon_usages.usage_report_exported_successfully'))
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -213,10 +223,12 @@ final class CouponUsageResource extends Resource
                         ->label(__('admin.coupon_usages.actions.export_bulk_report'))
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('info')
-                        ->action(fn (EloquentCollection $records) => FilamentNotification::make()
-                            ->title(__('admin.coupon_usages.bulk_report_exported_successfully'))
-                            ->success()
-                            ->send()),
+                        ->action(function (EloquentCollection $records): void {
+                            FilamentNotification::make()
+                                ->title(__('admin.coupon_usages.bulk_report_exported_successfully'))
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ])
             ->defaultSort('used_at', 'desc');
@@ -230,10 +242,10 @@ final class CouponUsageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCouponUsages::route('/'),
+            'index'  => Pages\ListCouponUsages::route('/'),
             'create' => Pages\CreateCouponUsage::route('/create'),
-            'view' => Pages\ViewCouponUsage::route('/{record}'),
-            'edit' => Pages\EditCouponUsage::route('/{record}/edit'),
+            'view'   => Pages\ViewCouponUsage::route('/{record}'),
+            'edit'   => Pages\EditCouponUsage::route('/{record}/edit'),
         ];
     }
 }
