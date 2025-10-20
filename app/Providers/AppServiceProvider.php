@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Console\Commands\ProfiledSeedCommand;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Services\DocumentService;
 use App\View\Creators\CartDataCreator;
@@ -35,6 +36,10 @@ class AppServiceProvider extends ServiceProvider
                 \App\Console\Commands\ImportPrices::class,
                 \App\Console\Commands\ImportInventory::class,
             ]);
+
+            $this->app->extend('command.seed', static function ($command, $app) {
+                return \tap(new ProfiledSeedCommand($app['db']), static fn ($seedCommand) => $seedCommand->setLaravel($app));
+            });
         }
     }
 
