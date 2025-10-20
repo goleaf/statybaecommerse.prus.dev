@@ -1,13 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\StatusScope;
+use App\Observers\AttributionObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Document
@@ -23,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([AttributionObserver::class])]
 #[ScopedBy([StatusScope::class])]
 final class Document extends Model
 {
@@ -78,6 +84,14 @@ final class Document extends Model
     }
 
     /**
+     * Handle auditLogs functionality with proper error handling.
+     */
+    public function auditLogs(): MorphMany
+    {
+        return $this->morphMany(AuditLog::class, 'entity')->latest('created_at');
+    }
+
+    /**
      * Handle creator functionality with proper error handling.
      */
     public function creator(): BelongsTo
@@ -106,11 +120,11 @@ final class Document extends Model
      */
     public function getFileUrl(): ?string
     {
-        if (!$this->file_path) {
+        if (! $this->file_path) {
             return null;
         }
 
-        return asset('storage/' . $this->file_path);
+        return asset('storage/'.$this->file_path);
     }
 
     /**
