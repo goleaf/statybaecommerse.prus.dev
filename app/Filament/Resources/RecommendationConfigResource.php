@@ -8,14 +8,14 @@ use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -64,11 +64,11 @@ final class RecommendationConfigResource extends Resource
                                 ->options([
                                     'collaborative' => 'collaborative',
                                     'content_based' => 'content_based',
-                                    'hybrid' => 'hybrid',
-                                    'popularity' => 'popularity',
-                                    'trending' => 'trending',
-                                    'cross_sell' => 'cross_sell',
-                                    'up_sell' => 'up_sell',
+                                    'hybrid'        => 'hybrid',
+                                    'popularity'    => 'popularity',
+                                    'trending'      => 'trending',
+                                    'cross_sell'    => 'cross_sell',
+                                    'up_sell'       => 'up_sell',
                                 ])
                                 ->required()
                                 ->native(false),
@@ -164,11 +164,11 @@ final class RecommendationConfigResource extends Resource
                     ->options([
                         'collaborative' => 'collaborative',
                         'content_based' => 'content_based',
-                        'hybrid' => 'hybrid',
-                        'popularity' => 'popularity',
-                        'trending' => 'trending',
-                        'cross_sell' => 'cross_sell',
-                        'up_sell' => 'up_sell',
+                        'hybrid'        => 'hybrid',
+                        'popularity'    => 'popularity',
+                        'trending'      => 'trending',
+                        'cross_sell'    => 'cross_sell',
+                        'up_sell'       => 'up_sell',
                     ]),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_config.fields.is_active')),
