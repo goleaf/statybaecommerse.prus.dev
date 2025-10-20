@@ -13,7 +13,6 @@ use App\Models\UserBehavior;
 use App\Models\UserProductInteraction;
 use App\Services\RecommendationService;
 use BackedEnum;
-use UnitEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
@@ -29,7 +28,7 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?string $slug = 'recommendation-system-management';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    protected static string|UnitEnum|null $navigationGroup = 'Analytics';
 
     protected static ?int $navigationSort = 40;
 
