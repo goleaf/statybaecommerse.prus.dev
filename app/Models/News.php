@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ModerationState;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
@@ -13,10 +14,15 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\NewsApproval;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * News
@@ -38,27 +44,91 @@ final class News extends Model
 {
     use HasFactory;
     use HasTranslations;
+    use LogsActivity;
 
     protected $table = 'news';
 
-    protected $fillable = ['is_visible', 'is_featured', 'published_at', 'author_name', 'author_email', 'view_count', 'meta_data'];
+    protected $fillable = [
+        'is_visible',
+        'is_featured',
+        'moderation_state',
+        'submitted_for_review_at',
+        'approved_at',
+        'approved_by_id',
+        'published_at',
+        'author_name',
+        'author_email',
+        'view_count',
+        'meta_data',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_visible' => 'boolean', 'is_featured' => 'boolean', 'published_at' => 'datetime', 'view_count' => 'integer', 'meta_data' => 'array'];
+        return [
+            'is_visible' => 'boolean',
+            'is_featured' => 'boolean',
+            'moderation_state' => ModerationState::class,
+            'submitted_for_review_at' => 'datetime',
+            'approved_at' => 'datetime',
+            'approved_by_id' => 'integer',
+            'published_at' => 'datetime',
+            'view_count' => 'integer',
+            'meta_data' => 'array',
+        ];
     }
 
     protected string $translationModel = \App\Models\Translations\NewsTranslation::class;
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by_id');
+    }
+
+    public function approvals(): HasMany
+    {
+        return $this->hasMany(NewsApproval::class);
+    }
+
+    public function latestApproval(): HasOne
+    {
+        return $this->approvals()->one()->latestOfMany('decided_at');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'moderation_state',
+                'submitted_for_review_at',
+                'approved_at',
+                'approved_by_id',
+                'is_visible',
+                'is_featured',
+                'published_at',
+                'author_name',
+                'author_email',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
 
     /**
      * Handle isPublished functionality with proper error handling.
      */
     public function isPublished(): bool
     {
-        return (bool) $this->is_visible && (bool) $this->published_at && $this->published_at <= now();
+        return $this->moderation_state === ModerationState::Published
+            && (bool) $this->is_visible
+            && (bool) $this->published_at
+            && $this->published_at <= now();
+    }
+
+    public function getIsPublishedAttribute(): bool
+    {
+        return $this->isPublished();
     }
 
     /**
@@ -130,7 +200,10 @@ final class News extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('is_visible', true)->where('published_at', '<=', now());
+        return $query
+            ->where('moderation_state', ModerationState::Published->value)
+            ->where('is_visible', true)
+            ->where('published_at', '<=', now());
     }
 
     /**

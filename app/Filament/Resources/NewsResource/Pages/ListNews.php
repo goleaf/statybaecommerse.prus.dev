@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\Pages;
 
+use App\Enums\ModerationState;
 use App\Filament\Resources\NewsResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -25,12 +26,15 @@ final class ListNews extends ListRecords
     {
         return [
             'all' => Tab::make(__('news.tabs.all')),
-            'published' => Tab::make(__('news.tabs.published'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_published', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_published', true)->count()),
             'draft' => Tab::make(__('news.tabs.draft'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_published', false))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_published', false)->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Draft->value))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Draft->value)->count()),
+            'review' => Tab::make(__('news.tabs.review'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Review->value))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Review->value)->count()),
+            'published' => Tab::make(__('news.tabs.published'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Published->value))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Published->value)->count()),
             'featured' => Tab::make(__('news.tabs.featured'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_featured', true))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ModerationState;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -36,7 +37,11 @@ final class PostFactory extends Factory
                 'lt' => fake()->sentence(10),
                 'en' => fake()->sentence(10),
             ],
-            'status' => fake()->randomElement(['draft', 'published', 'archived']),
+            'status' => 'draft',
+            'moderation_state' => ModerationState::Draft->value,
+            'submitted_for_review_at' => null,
+            'approved_at' => null,
+            'approved_by_id' => null,
             'published_at' => fake()->optional(0.7)->dateTimeBetween('-1 year', 'now'),
             'user_id' => User::factory(),
             'meta_title' => fake()->sentence(3),
@@ -67,6 +72,10 @@ final class PostFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'published',
+            'moderation_state' => ModerationState::Published->value,
+            'submitted_for_review_at' => $attributes['submitted_for_review_at'] ?? now(),
+            'approved_at' => now(),
+            'approved_by_id' => $attributes['user_id'] ?? User::factory(),
             'published_at' => fake()->dateTimeBetween('-1 year', 'now'),
         ]);
     }
@@ -75,7 +84,11 @@ final class PostFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'draft',
+            'moderation_state' => ModerationState::Draft->value,
             'published_at' => null,
+            'submitted_for_review_at' => null,
+            'approved_at' => null,
+            'approved_by_id' => null,
         ]);
     }
 
@@ -83,6 +96,9 @@ final class PostFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'archived',
+            'moderation_state' => ModerationState::Draft->value,
+            'approved_at' => null,
+            'approved_by_id' => null,
         ]);
     }
 
