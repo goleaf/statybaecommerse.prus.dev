@@ -37,11 +37,13 @@ use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
@@ -68,6 +70,18 @@ class AppServiceProvider extends ServiceProvider
 
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
+
+        if (! Testable::hasMacro('assertCanSeeFormData')) {
+            Testable::macro('assertCanSeeFormData', function (array $data): Testable {
+                foreach (Arr::dot($data) as $value) {
+                    if (is_scalar($value) && $value !== null) {
+                        $this->assertSee((string) $value, escape: false);
+                    }
+                }
+
+                return $this;
+            });
+        }
 
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
