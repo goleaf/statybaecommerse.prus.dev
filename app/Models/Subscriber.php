@@ -31,9 +31,39 @@ final class Subscriber extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'email', 'first_name', 'last_name', 'phone', 'company', 'job_title', 'interests', 'source', 'status', 'subscribed_at', 'unsubscribed_at', 'last_email_sent_at', 'email_count', 'metadata'];
+    protected $fillable = [
+        'user_id',
+        'email',
+        'first_name',
+        'last_name',
+        'phone',
+        'company',
+        'job_title',
+        'interests',
+        'source',
+        'status',
+        'is_verified',
+        'accepts_marketing',
+        'newsletter_subscription',
+        'subscribed_at',
+        'unsubscribed_at',
+        'unsubscribe_reason',
+        'last_email_sent_at',
+        'email_count',
+        'metadata',
+    ];
 
-    protected $casts = ['interests' => 'array', 'metadata' => 'array', 'subscribed_at' => 'datetime', 'unsubscribed_at' => 'datetime', 'last_email_sent_at' => 'datetime', 'email_count' => 'integer'];
+    protected $casts = [
+        'interests' => 'array',
+        'metadata' => 'array',
+        'subscribed_at' => 'datetime',
+        'unsubscribed_at' => 'datetime',
+        'last_email_sent_at' => 'datetime',
+        'email_count' => 'integer',
+        'is_verified' => 'boolean',
+        'accepts_marketing' => 'boolean',
+        'newsletter_subscription' => 'boolean',
+    ];
 
     /**
      * Boot the service provider or trait functionality.
@@ -62,7 +92,9 @@ final class Subscriber extends Model
      */
     public function scopeInactive(Builder $query): Builder
     {
-        return $query->where('status', 'inactive');
+        return $query
+            ->withoutGlobalScope(ActiveScope::class)
+            ->where('status', 'inactive');
     }
 
     /**
@@ -70,7 +102,9 @@ final class Subscriber extends Model
      */
     public function scopeUnsubscribed(Builder $query): Builder
     {
-        return $query->where('status', 'unsubscribed');
+        return $query
+            ->withoutGlobalScope(ActiveScope::class)
+            ->where('status', 'unsubscribed');
     }
 
     /**
@@ -78,7 +112,9 @@ final class Subscriber extends Model
      */
     public function scopeBySource(Builder $query, string $source): Builder
     {
-        return $query->where('source', $source);
+        return $query
+            ->withoutGlobalScope(ActiveScope::class)
+            ->where('source', $source);
     }
 
     /**
@@ -86,7 +122,9 @@ final class Subscriber extends Model
      */
     public function scopeWithInterests(Builder $query, array $interests): Builder
     {
-        return $query->whereJsonContains('interests', $interests);
+        return $query
+            ->withoutGlobalScope(ActiveScope::class)
+            ->whereJsonContains('interests', $interests);
     }
 
     /**
@@ -94,7 +132,9 @@ final class Subscriber extends Model
      */
     public function scopeRecent(Builder $query, int $days = 30): Builder
     {
-        return $query->where('subscribed_at', '>=', now()->subDays($days));
+        return $query
+            ->withoutGlobalScope(ActiveScope::class)
+            ->where('subscribed_at', '>=', now()->subDays($days));
     }
 
     // Accessors & Mutators
@@ -210,7 +250,9 @@ final class Subscriber extends Model
      */
     public static function findByEmail(string $email): ?self
     {
-        return self::where('email', $email)->first();
+        return self::withoutGlobalScope(ActiveScope::class)
+            ->where('email', $email)
+            ->first();
     }
 
     /**
