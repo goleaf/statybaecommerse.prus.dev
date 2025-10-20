@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Policies;
 
@@ -74,7 +76,7 @@ final class AddressPolicy
             return true;
         }
 
-        return ($user->is_admin ?? false);
+        return $user->is_admin ?? false;
     }
 
     /**
@@ -86,6 +88,6 @@ final class AddressPolicy
             return true;
         }
 
-        return ($user->is_admin ?? false);
+        return $user->is_admin ?? false;
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -42,6 +44,7 @@ final class ReportFactory extends Factory
             'last_generated_at' => fake()->optional(0.7)->dateTimeBetween('-30 days', 'now'),
             'generated_by' => function () {
                 $userIds = User::pluck('id')->toArray();
+
                 return empty($userIds) ? null : fake()->randomElement($userIds);
             },
             'view_count' => fake()->numberBetween(0, 1000),
@@ -61,21 +64,21 @@ final class ReportFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
         ]);
     }
 
     public function public(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_public' => true,
         ]);
     }
 
     public function scheduled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_scheduled' => true,
             'schedule_frequency' => fake()->randomElement(['daily', 'weekly', 'monthly']),
         ]);
@@ -83,7 +86,7 @@ final class ReportFactory extends Factory
 
     public function generated(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'last_generated_at' => now(),
             'generated_by' => User::factory(),
         ]);
@@ -91,7 +94,7 @@ final class ReportFactory extends Factory
 
     public function popular(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'view_count' => fake()->numberBetween(500, 5000),
             'download_count' => fake()->numberBetween(50, 500),
         ]);

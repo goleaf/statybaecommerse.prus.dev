@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use const JSON_THROW_ON_ERROR;
+
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use OpenApi\Generator;
@@ -11,7 +13,6 @@ use Psr\Log\AbstractLogger;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 use Throwable;
-use const JSON_THROW_ON_ERROR;
 
 final class GenerateApiSpecCommand extends Command
 {
@@ -96,7 +97,7 @@ final class GenerateApiSpecCommand extends Command
     }
 
     /**
-     * @param array<int, string> $paths
+     * @param  array<int, string>  $paths
      * @return array<string, mixed>
      */
     private function generateFromAnnotations(array $paths): array
@@ -104,18 +105,19 @@ final class GenerateApiSpecCommand extends Command
         /** @var array<int, array{level: string, message: string}> $messages */
         $messages = [];
 
-        $logger = new class($messages) extends AbstractLogger {
+        $logger = new class($messages) extends AbstractLogger
+        {
             /**
              * @var array<int, array{level: string, message: string}>
              */
             private $messagesRef;
 
             /**
-             * @param array<int, array{level: string, message: string}> $messages
+             * @param  array<int, array{level: string, message: string}>  $messages
              */
             public function __construct(array &$messages)
             {
-                $this->messagesRef =& $messages;
+                $this->messagesRef = &$messages;
             }
 
             public function log($level, $message, array $context = []): void
@@ -141,7 +143,7 @@ final class GenerateApiSpecCommand extends Command
     }
 
     /**
-     * @param array<int, array{level: string, message: string}> $messages
+     * @param  array<int, array{level: string, message: string}>  $messages
      */
     private function assertNoGenerationWarnings(array $messages): void
     {
@@ -164,7 +166,7 @@ final class GenerateApiSpecCommand extends Command
     }
 
     /**
-     * @param array<int, array{level: string, message: string}> $messages
+     * @param  array<int, array{level: string, message: string}>  $messages
      * @return array<int, string>
      */
     private function formatMessages(array $messages): array
@@ -205,8 +207,8 @@ final class GenerateApiSpecCommand extends Command
     }
 
     /**
-     * @param array<string, mixed> $base
-     * @param array<string, mixed> $merge
+     * @param  array<string, mixed>  $base
+     * @param  array<string, mixed>  $merge
      * @return array<string, mixed>
      */
     private function mergeSpec(array $base, array $merge): array
@@ -225,7 +227,7 @@ final class GenerateApiSpecCommand extends Command
     }
 
     /**
-     * @param array<string, mixed> $specData
+     * @param  array<string, mixed>  $specData
      */
     private function writeOutputFiles(array $specData): void
     {

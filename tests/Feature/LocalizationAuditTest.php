@@ -17,7 +17,7 @@ final class LocalizationAuditTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem = new Filesystem();
+        $this->filesystem = new Filesystem;
     }
 
     protected function tearDown(): void
@@ -125,8 +125,8 @@ final class LocalizationAuditTest extends TestCase
     }
 
     /**
-     * @param array<mixed> $php
-     * @param array<mixed> $json
+     * @param  array<mixed>  $php
+     * @param  array<mixed>  $json
      */
     private function writeLocale(string $locale, array $php, array $json = []): void
     {

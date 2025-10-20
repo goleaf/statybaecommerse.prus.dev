@@ -29,7 +29,7 @@ final class FilamentDiagnosticsCommand extends Command
 
     public function handle(): int
     {
-        $filesystem = new Filesystem();
+        $filesystem = new Filesystem;
 
         $modelNames = $this->gatherModelNames($filesystem);
         $resourceFiles = $this->gatherResourceFiles($filesystem);
@@ -143,8 +143,8 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @param array<int, string> $resourcesUsingOldForm
-     * @param array<int, string> $resourcesUsingNewSchema
+     * @param  array<int, string>  $resourcesUsingOldForm
+     * @param  array<int, string>  $resourcesUsingNewSchema
      */
     private function recordFormUsage(string $fileName, string $content, array &$resourcesUsingOldForm, array &$resourcesUsingNewSchema): void
     {
@@ -160,7 +160,7 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @param array<int, string> $resourcesWithNavigationIssues
+     * @param  array<int, string>  $resourcesWithNavigationIssues
      */
     private function recordNavigationIssues(string $fileName, string $content, array &$resourcesWithNavigationIssues): void
     {
@@ -174,13 +174,13 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @param array<int, string> $modelsWithResources
-     * @param array<int, string> $modelsWithoutResources
-     * @param array<int, string> $emptyResources
-     * @param array<int, string> $resourcesWithSyntaxIssues
-     * @param array<int, string> $resourcesUsingOldForm
-     * @param array<int, string> $resourcesUsingNewSchema
-     * @param array<int, string> $resourcesWithNavigationIssues
+     * @param  array<int, string>  $modelsWithResources
+     * @param  array<int, string>  $modelsWithoutResources
+     * @param  array<int, string>  $emptyResources
+     * @param  array<int, string>  $resourcesWithSyntaxIssues
+     * @param  array<int, string>  $resourcesUsingOldForm
+     * @param  array<int, string>  $resourcesUsingNewSchema
+     * @param  array<int, string>  $resourcesWithNavigationIssues
      */
     private function renderSummary(
         array $modelsWithResources,
@@ -209,7 +209,7 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @param array<int, string> $items
+     * @param  array<int, string>  $items
      */
     private function listIssues(string $label, array $items): void
     {
@@ -229,7 +229,7 @@ final class FilamentDiagnosticsCommand extends Command
      */
     private function scanFilamentPages(): Collection
     {
-        $filesystem = new Filesystem();
+        $filesystem = new Filesystem;
         $issues = collect();
 
         if (! $filesystem->isDirectory(app_path('Filament/Resources'))) {
@@ -247,10 +247,12 @@ final class FilamentDiagnosticsCommand extends Command
                         $reflection = new ReflectionProperty($pageClass, 'resource');
                         if ($reflection->isStatic() && ! $reflection->isInitialized()) {
                             $issues->push($pageClass.' has an uninitialised static $resource property.');
+
                             continue;
                         }
                     } catch (ReflectionException $e) {
                         $issues->push($pageClass.' does not define a static $resource property: '.$e->getMessage());
+
                         continue;
                     }
 

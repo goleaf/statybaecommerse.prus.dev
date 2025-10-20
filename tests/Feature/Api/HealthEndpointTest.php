@@ -48,7 +48,8 @@ final class HealthEndpointTest extends TestCase
 
     public function test_ready_endpoint_returns_service_unavailable_on_failed_check(): void
     {
-        $fakeReporter = new class implements HealthReporterContract {
+        $fakeReporter = new class implements HealthReporterContract
+        {
             public function report(bool $includeQueue = false): array
             {
                 return [

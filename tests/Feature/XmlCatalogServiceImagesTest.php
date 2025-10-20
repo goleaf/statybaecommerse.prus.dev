@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Models\Product;
 use App\Services\XmlCatalogService;
@@ -7,9 +9,9 @@ use Illuminate\Support\Facades\Storage;
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 it('imports images from data uri and http url when download_images=true', function (): void {
-  Storage::fake('public');
+    Storage::fake('public');
 
-  $xml = <<<'XML'
+    $xml = <<<'XML'
     <catalog>
       <categories>
         <category>
@@ -36,11 +38,11 @@ it('imports images from data uri and http url when download_images=true', functi
     </catalog>
     XML;
 
-  $path = base_path('storage/images-fixture.xml');
-  file_put_contents($path, $xml);
-  $service = app(XmlCatalogService::class);
-  $res = $service->import($path, ['only' => 'all', 'download_images' => true]);
+    $path = base_path('storage/images-fixture.xml');
+    file_put_contents($path, $xml);
+    $service = app(XmlCatalogService::class);
+    $res = $service->import($path, ['only' => 'all', 'download_images' => true]);
 
-  // Bypass global scopes that hide unpublished records in tests
-  expect(Product::withoutGlobalScopes()->where('sku', 'PIC-1')->exists())->toBeTrue();
+    // Bypass global scopes that hide unpublished records in tests
+    expect(Product::withoutGlobalScopes()->where('sku', 'PIC-1')->exists())->toBeTrue();
 });

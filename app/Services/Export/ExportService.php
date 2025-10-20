@@ -12,7 +12,6 @@ use App\Notifications\ExportFailedNotification;
 use App\Notifications\ExportReadyNotification;
 use App\Services\Export\Contracts\Exportable;
 use App\Services\Export\Contracts\ExportWriter;
-use App\Services\Export\ExportColumn;
 use App\Services\Export\Writers\CsvExportWriter;
 use App\Services\Export\Writers\PdfExportWriter;
 use App\Services\Export\Writers\XlsxExportWriter;
