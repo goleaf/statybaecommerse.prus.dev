@@ -8,13 +8,14 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\Shared\CacheService as SharedCacheService;
+use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -61,13 +62,13 @@ final class ProductCatalogue extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:catalogue:categories:{$locale}", 300, function (): array {
+        return app(SharedCacheService::class)->rememberLong("home:catalogue:categories:{$locale}", function (): array {
             return Category::query()
                 ->where('is_visible', true)
                 ->orderBy('name')
                 ->pluck('name', 'id')
                 ->toArray();
-        });
+        }, 300, CacheTagHelper::categories());
     }
 
     #[Computed]

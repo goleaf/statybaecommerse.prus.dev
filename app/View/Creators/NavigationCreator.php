@@ -7,6 +7,7 @@ namespace App\View\Creators;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Services\Shared\CacheService;
+use App\Support\Cache\CacheTagHelper;
 use Illuminate\Contracts\View\View;
 
 /**
@@ -77,7 +78,9 @@ final class NavigationCreator
                 ->limit(8)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
-                ->collect()
+                ->collect(),
+            null,
+            CacheTagHelper::categories()
         );
     }
 
@@ -98,7 +101,9 @@ final class NavigationCreator
                 ->limit(6)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
-                ->collect()
+                ->collect(),
+            null,
+            CacheTagHelper::brands()
         );
     }
 
@@ -146,7 +151,9 @@ final class NavigationCreator
                         ];
                     }),
                 ];
-            }
+            },
+            null,
+            CacheTagHelper::merge(CacheTagHelper::categories(), CacheTagHelper::brands())
         );
     }
 }
