@@ -135,10 +135,7 @@ final class AttributeValueResource extends Resource
                         ->schema([
                             Select::make('valueable_type')
                                 ->label(__('attribute_values.valueable_type'))
-                                ->options([
-                                    'product' => __('attribute_values.types.product'),
-                                    'product_variant' => __('attribute_values.types.product_variant'),
-                                ])
+                                ->options(self::getValueableTypeOptions())
                                 ->live()
                                 ->afterStateUpdated(function ($state, Forms\Set $set) {
                                     $set('valueable_id', null);
@@ -147,9 +144,9 @@ final class AttributeValueResource extends Resource
                                 ->label(__('attribute_values.valueable_item'))
                                 ->options(function (\Filament\Forms\Get $get) {
                                     $type = $get('valueable_type');
-                                    if ($type === 'product') {
+                                    if ($type === Product::class) {
                                         return Product::pluck('name', 'id');
-                                    } elseif ($type === 'product_variant') {
+                                    } elseif ($type === ProductVariant::class) {
                                         return ProductVariant::pluck('name', 'id');
                                     }
 
@@ -256,24 +253,30 @@ final class AttributeValueResource extends Resource
                     ->copyMessageDuration(1500),
                 BadgeColumn::make('valueable_type')
                     ->label(__('attribute_values.type'))
-                    ->formatStateUsing(fn (string $state): string => __("attribute_values.types.{$state}"))
+                    ->formatStateUsing(fn (?string $state): string => self::getValueableTypeLabel($state))
                     ->colors([
-                        'success' => 'product',
-                        'warning' => 'product_variant',
+                        'success' => Product::class,
+                        'warning' => ProductVariant::class,
                     ])
                     ->icons([
-                        'heroicon-o-cube' => 'product',
-                        'heroicon-o-squares-2x2' => 'product_variant',
+                        'heroicon-o-cube' => Product::class,
+                        'heroicon-o-squares-2x2' => ProductVariant::class,
                     ]),
                 TextColumn::make('valueable.name')
                     ->label(__('attribute_values.item'))
                     ->limit(50)
                     ->searchable()
                     ->sortable()
-                    ->url(fn (AttributeValue $record): string => match ($record->valueable_type) {
-                        'product' => route('filament.admin.resources.products.view', $record->valueable_id),
-                        'product_variant' => route('filament.admin.resources.product-variants.view', $record->valueable_id),
-                        default => '#',
+                    ->url(function (AttributeValue $record): string {
+                        if (! $record->valueable_type || ! $record->valueable_id) {
+                            return '#';
+                        }
+
+                        return match ($record->valueable_type) {
+                            Product::class => route('filament.admin.resources.products.view', $record->valueable_id),
+                            ProductVariant::class => route('filament.admin.resources.product-variants.view', $record->valueable_id),
+                            default => '#',
+                        };
                     })
                     ->openUrlInNewTab(),
                 TextColumn::make('value')
@@ -353,10 +356,7 @@ final class AttributeValueResource extends Resource
                     ->multiple(),
                 SelectFilter::make('valueable_type')
                     ->label(__('attribute_values.valueable_type'))
-                    ->options([
-                        'product' => __('attribute_values.types.product'),
-                        'product_variant' => __('attribute_values.types.product_variant'),
-                    ])
+                    ->options(self::getValueableTypeOptions())
                     ->multiple(),
                 TernaryFilter::make('is_active')
                     ->label(__('attribute_values.is_active'))
@@ -444,11 +444,22 @@ final class AttributeValueResource extends Resource
                     ->visible(fn (AttributeValue $record): bool => ! $record->is_default)
                     ->action(function (AttributeValue $record): void {
                         // Remove default from other values for the same attribute and item
-                        AttributeValue::where('attribute_id', $record->attribute_id)
-                            ->where('valueable_type', $record->valueable_type)
-                            ->where('valueable_id', $record->valueable_id)
-                            ->where('is_default', true)
-                            ->update(['is_default' => false]);
+                        $query = AttributeValue::query()
+                            ->where('attribute_id', $record->attribute_id);
+
+                        if ($record->valueable_type) {
+                            $query->where('valueable_type', $record->valueable_type);
+                        } else {
+                            $query->whereNull('valueable_type');
+                        }
+
+                        if ($record->valueable_id) {
+                            $query->where('valueable_id', $record->valueable_id);
+                        } else {
+                            $query->whereNull('valueable_id');
+                        }
+
+                        $query->where('is_default', true)->update(['is_default' => false]);
 
                         // Set this value as default
                         $record->update(['is_default' => true]);
@@ -580,5 +591,22 @@ final class AttributeValueResource extends Resource
             'view' => Pages\ViewAttributeValue::route('/{record}'),
             'edit' => Pages\EditAttributeValue::route('/{record}/edit'),
         ];
+    }
+
+    private static function getValueableTypeOptions(): array
+    {
+        return [
+            Product::class => __('attribute_values.types.product'),
+            ProductVariant::class => __('attribute_values.types.product_variant'),
+        ];
+    }
+
+    private static function getValueableTypeLabel(?string $type): string
+    {
+        return match ($type) {
+            Product::class => __('attribute_values.types.product'),
+            ProductVariant::class => __('attribute_values.types.product_variant'),
+            default => '—',
+        };
     }
 }

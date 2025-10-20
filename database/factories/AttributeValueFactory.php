@@ -22,11 +22,15 @@ final class AttributeValueFactory extends Factory
             'attribute_id' => fn () => \App\Models\Attribute::factory(),
             'value' => $value,
             'slug' => str($value)->slug()->toString(),
+            'attribute_value_type' => 'text',
+            'valueable_type' => null,
+            'valueable_id' => null,
             'color_code' => $this->faker->boolean(40) ? $this->faker->hexColor() : null,
             'sort_order' => $this->faker->numberBetween(0, 50),
             'is_enabled' => true,
             'is_active' => true,
             'is_default' => false,
+            'is_searchable' => false,
             'display_value' => str($value)->headline()->toString(),
         ];
     }
