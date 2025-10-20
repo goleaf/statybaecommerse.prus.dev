@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -139,7 +141,7 @@ final class ProductVariantSeeder extends Seeder
     {
         // Use existing brand instead of creating a new one
         $brand = Brand::query()->firstWhere('slug', 'fashion-brand');
-        if (!$brand) {
+        if (! $brand) {
             $existingBrands = Brand::query()->enabled()->get();
             if ($existingBrands->isNotEmpty()) {
                 $brand = $existingBrands->first();
@@ -260,8 +262,8 @@ final class ProductVariantSeeder extends Seeder
                 $variant = ProductVariant::factory()
                     ->for($product)
                     ->state([
-                        'name' => $productData['name'] . ' - ' . $variantData['size'],
-                        'sku' => $product->sku . '-' . $variantData['size'],
+                        'name' => $productData['name'].' - '.$variantData['size'],
+                        'sku' => $product->sku.'-'.$variantData['size'],
                         'price' => $productData['base_price'] + $variantData['price_modifier'],
                         'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
                         'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,

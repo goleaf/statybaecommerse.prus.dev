@@ -312,7 +312,6 @@ final class Attribute extends Model
         $this->attributes['slug'] = $value ?: Str::slug($this->name);
     }
 
-
     /**
      * Handle setMetaDataAttribute functionality with proper error handling.
      *

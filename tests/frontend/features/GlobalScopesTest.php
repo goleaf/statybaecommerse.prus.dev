@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\Scopes\VisibleScope;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
@@ -13,6 +14,7 @@ use App\Models\News;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\Scopes\VisibleScope;
 use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

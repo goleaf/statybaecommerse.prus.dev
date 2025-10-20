@@ -28,7 +28,7 @@ final class TestAnalyticsSimpleCommand extends Command
 
             $this->line('User created successfully');
 
-            $event = new AnalyticsEvent();
+            $event = new AnalyticsEvent;
             $event->event_name = 'Test Event';
             $event->event_type = 'page_view';
             $event->user_id = $user->id;

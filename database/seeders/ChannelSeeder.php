@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -12,7 +14,7 @@ final class ChannelSeeder extends Seeder
         // Check if default channel already exists to maintain idempotency
         $existingChannel = Channel::where('slug', 'default')->first();
 
-        if (!$existingChannel) {
+        if (! $existingChannel) {
             // Create default channel using factory with specific attributes
             Channel::factory()
                 ->state([

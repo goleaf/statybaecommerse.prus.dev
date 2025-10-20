@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -11,6 +13,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -28,8 +31,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-
-use Filament\Forms\Form;
 
 final class CountryResource extends Resource
 {
@@ -270,10 +271,10 @@ final class CountryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 BadgeColumn::make('is_active')
                     ->label(__('countries.fields.is_active'))
-                    ->getStateUsing(fn($record) => $record->is_active ? __('countries.statuses.active') : __('countries.statuses.inactive'))
+                    ->getStateUsing(fn ($record) => $record->is_active ? __('countries.statuses.active') : __('countries.statuses.inactive'))
                     ->colors([
-                        'success' => fn($state) => $state === __('countries.statuses.active'),
-                        'danger' => fn($state) => $state === __('countries.statuses.inactive'),
+                        'success' => fn ($state) => $state === __('countries.statuses.active'),
+                        'danger' => fn ($state) => $state === __('countries.statuses.inactive'),
                     ])
                     ->toggleable(),
                 TextColumn::make('cities_count')
@@ -295,11 +296,11 @@ final class CountryResource extends Resource
             ->filters([
                 SelectFilter::make('region')
                     ->label(__('countries.filters.region'))
-                    ->options(fn() => Country::distinct()->pluck('region', 'region')->filter())
+                    ->options(fn () => Country::distinct()->pluck('region', 'region')->filter())
                     ->searchable(),
                 SelectFilter::make('subregion')
                     ->label(__('countries.filters.subregion'))
-                    ->options(fn() => Country::distinct()->pluck('subregion', 'subregion')->filter())
+                    ->options(fn () => Country::distinct()->pluck('subregion', 'subregion')->filter())
                     ->searchable(),
                 TernaryFilter::make('is_eu_member')
                     ->label(__('countries.filters.eu_member'))
@@ -312,7 +313,7 @@ final class CountryResource extends Resource
                     ->boolean(),
                 SelectFilter::make('currency_code')
                     ->label(__('countries.filters.currency_code'))
-                    ->options(fn() => Country::distinct()->pluck('currency_code', 'currency_code')->filter())
+                    ->options(fn () => Country::distinct()->pluck('currency_code', 'currency_code')->filter())
                     ->searchable(),
                 Filter::make('created_at')
                     ->form([
@@ -325,11 +326,11 @@ final class CountryResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -348,7 +349,7 @@ final class CountryResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn(Country $record) => !$record->is_active),
+                        ->visible(fn (Country $record) => ! $record->is_active),
                     Action::make('deactivate')
                         ->label(__('countries.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
@@ -360,7 +361,7 @@ final class CountryResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn(Country $record) => $record->is_active),
+                        ->visible(fn (Country $record) => $record->is_active),
                 ]),
             ])
             ->bulkActions([

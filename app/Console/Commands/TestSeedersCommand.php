@@ -17,7 +17,7 @@ final class TestSeedersCommand extends Command
         $this->info('Testing NotificationSeeder...');
 
         try {
-            $seeder = new \Database\Seeders\NotificationSeeder();
+            $seeder = new \Database\Seeders\NotificationSeeder;
             $seeder->run();
             $this->info('✅ NotificationSeeder completed successfully');
         } catch (\Throwable $exception) {
@@ -28,7 +28,7 @@ final class TestSeedersCommand extends Command
         $this->info('Testing OrderSeeder...');
 
         try {
-            $seeder = new \Database\Seeders\OrderSeeder();
+            $seeder = new \Database\Seeders\OrderSeeder;
             $seeder->run();
             $this->info('✅ OrderSeeder completed successfully');
         } catch (\Throwable $exception) {
@@ -39,7 +39,7 @@ final class TestSeedersCommand extends Command
         $this->info('Testing PartnerSeeder...');
 
         try {
-            $seeder = new \Database\Seeders\PartnerSeeder();
+            $seeder = new \Database\Seeders\PartnerSeeder;
             $seeder->run();
             $this->info('✅ PartnerSeeder completed successfully');
         } catch (\Throwable $exception) {

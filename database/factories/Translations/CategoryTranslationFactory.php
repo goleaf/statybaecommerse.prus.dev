@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories\Translations;
 
-use App\Models\Translations\CategoryTranslation;
 use App\Models\Category;
+use App\Models\Translations\CategoryTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,7 +25,7 @@ final class CategoryTranslationFactory extends Factory
             'name' => $name,
             'slug' => $this->faker->unique()->slug(),
             'description' => $this->faker->paragraph(),
-            'seo_title' => $name . ' | ' . $this->faker->company(),
+            'seo_title' => $name.' | '.$this->faker->company(),
             'seo_description' => $this->faker->sentence(12),
             'meta_keywords' => $this->faker->words(3),
         ];
@@ -31,14 +33,14 @@ final class CategoryTranslationFactory extends Factory
 
     public function forCategory(Category $category): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'category_id' => $category->id,
         ]);
     }
 
     public function forLocale(string $locale): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => $locale,
         ]);
     }

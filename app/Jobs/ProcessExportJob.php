@@ -18,9 +18,7 @@ final class ProcessExportJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public readonly int $exportId)
-    {
-    }
+    public function __construct(public readonly int $exportId) {}
 
     public function handle(ExportService $service): void
     {

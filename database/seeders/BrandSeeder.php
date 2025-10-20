@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -32,13 +34,13 @@ final class BrandSeeder extends Seeder
             // Check if brand already exists to maintain idempotency
             $existingBrand = Brand::withoutGlobalScopes()->where('slug', $slug)->first();
 
-            if (!$existingBrand) {
+            if (! $existingBrand) {
                 /** @var Brand $brand */
                 $brand = Brand::factory()->create([
                     'name' => $definition['name'],
                     'slug' => $slug,
                     'description' => "{$definition['name']} profesionalūs statybos įrankiai ir sprendimai.",
-                    'website' => 'https://' . $slug . '.lt',
+                    'website' => 'https://'.$slug.'.lt',
                     'is_enabled' => true,
                     'is_featured' => $definition['featured'],
                     'seo_title' => $definition['name'],
@@ -57,10 +59,10 @@ final class BrandSeeder extends Seeder
                     ],
                     [
                         'locale' => 'en',
-                        'name' => $definition['name'] . ' (EN)',
-                        'slug' => $slug . '-en',
+                        'name' => $definition['name'].' (EN)',
+                        'slug' => $slug.'-en',
                         'description' => "Professional {$definition['name']} tools for the European market.",
-                        'seo_title' => $definition['name'] . ' (EN)',
+                        'seo_title' => $definition['name'].' (EN)',
                         'seo_description' => "Reliable {$definition['name']} tools for construction projects.",
                     ],
                 ]);
@@ -81,15 +83,15 @@ final class BrandSeeder extends Seeder
         try {
             $logoPath = $imageGenerator->generateBrandLogo($brand->name);
 
-            if (!file_exists($logoPath)) {
+            if (! file_exists($logoPath)) {
                 return;
             }
 
             $brand
                 ->addMedia($logoPath)
                 ->withCustomProperties(['source' => 'local_generated'])
-                ->usingName($brand->name . ' Logo')
-                ->usingFileName(str($brand->slug)->slug()->toString() . '-logo.webp')
+                ->usingName($brand->name.' Logo')
+                ->usingFileName(str($brand->slug)->slug()->toString().'-logo.webp')
                 ->toMediaCollection('logo');
         } catch (\Throwable $e) {
             report($e);
