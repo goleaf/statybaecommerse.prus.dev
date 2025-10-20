@@ -7,31 +7,26 @@ use App\Models\Category;
 use App\Models\DocumentTemplate;
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\AdminAuthorizationSeeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
-    // Create all necessary permissions
-    $permissions = [
-        'view_admin_panel', 'view_any_product', 'view_any_user', 'view_any_order',
-        'view_any_brand', 'view_any_category', 'view_any_document_template',
-        'create_product', 'edit_product', 'delete_product',
-        'create_brand', 'edit_brand', 'delete_brand',
-        'create_category', 'edit_category', 'delete_category',
-    ];
+    $this->seed(AdminAuthorizationSeeder::class);
 
-    foreach ($permissions as $permission) {
+    $extraPermissions = ['view_any_document_template'];
+
+    foreach ($extraPermissions as $permission) {
         Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
     }
 
-    // Create admin role with all permissions
-    $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
-    $adminRole->syncPermissions($permissions);
+    $adminRole = Role::findByName('administrator', 'web');
+    $adminRole->givePermissionTo($extraPermissions);
 
-    // Create admin user
     $this->admin = User::factory()->create([
         'name' => 'Test Admin',
         'email' => 'admin@test.com',
+        'is_admin' => true,
     ]);
     $this->admin->assignRole($adminRole);
 });

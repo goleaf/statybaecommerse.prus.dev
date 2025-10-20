@@ -3,27 +3,18 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Spatie\Permission\Models\Permission;
+use Database\Seeders\AdminAuthorizationSeeder;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function (): void {
-    $permissions = [
-        'view_admin_panel',
-        'view_any_product',
-        'view_any_brand',
-        'view_any_category',
-    ];
+    $this->seed(AdminAuthorizationSeeder::class);
 
-    foreach ($permissions as $name) {
-        Permission::firstOrCreate(['name' => $name, 'guard_name' => 'web']);
-    }
-
-    $role = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-    $role->syncPermissions($permissions);
+    $role = Role::findByName('admin', 'web');
 
     $this->adminUser = User::factory()->create([
         'email' => 'admin@admin.com',
         'name' => 'Admin User',
+        'is_admin' => true,
     ]);
 
     $this->adminUser->assignRole($role);
