@@ -232,13 +232,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'sales' => 'success',
-                        'inventory' => 'info',
-                        'customer' => 'warning',
-                        'product' => 'primary',
-                        'financial' => 'danger',
-                        'analytics' => 'secondary',
-                        'custom' => 'gray',
+                        'success' => ['sales'],
+                        'info' => ['inventory'],
+                        'warning' => ['customer'],
+                        'primary' => ['product'],
+                        'danger' => ['financial'],
+                        'secondary' => ['analytics'],
+                        'gray' => ['custom'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
                 BadgeColumn::make('category')
@@ -246,13 +246,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'sales' => 'success',
-                        'marketing' => 'info',
-                        'operations' => 'warning',
-                        'finance' => 'danger',
-                        'customer_service' => 'primary',
-                        'inventory' => 'secondary',
-                        'analytics' => 'gray',
+                        'success' => ['sales'],
+                        'info' => ['marketing'],
+                        'warning' => ['operations'],
+                        'danger' => ['finance'],
+                        'primary' => ['customer_service'],
+                        'secondary' => ['inventory'],
+                        'gray' => ['analytics'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
                 TextColumn::make('generator.name')
