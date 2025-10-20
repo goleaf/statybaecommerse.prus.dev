@@ -1,0 +1,7 @@
+bootstrap/
+node_modules/
+public/
+storage/
+vendor/
+resources/lang/
+resources/views/

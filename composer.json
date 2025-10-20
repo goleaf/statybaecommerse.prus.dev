@@ -108,6 +108,7 @@
         "serve": "@php artisan serve --ansi",
         "lint:php": "vendor/bin/pint --test",
         "fix:php": "vendor/bin/pint -v",
+        "format": "vendor/bin/pint",
         "analyze": "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G",
         "rector": "vendor/bin/rector process --ansi",
         "blade:format": "php artisan view:clear && php artisan view:cache",
