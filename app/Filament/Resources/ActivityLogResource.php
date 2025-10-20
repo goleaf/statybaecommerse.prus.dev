@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -11,7 +14,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Spatie\Activitylog\Models\Activity;
-use BackedEnum;
 use UnitEnum;
 
 final class ActivityLogResource extends Resource
@@ -71,7 +73,7 @@ final class ActivityLogResource extends Resource
                     ->sortable(),
                 TextColumn::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->formatStateUsing(fn($state) => class_basename((string) $state))
+                    ->formatStateUsing(fn ($state) => class_basename((string) $state))
                     ->sortable(),
                 TextColumn::make('event')
                     ->label(__('Event'))
@@ -84,7 +86,7 @@ final class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_name')
                     ->label(__('Log Name'))
-                    ->options(fn(): array => \Spatie\Activitylog\Models\Activity::query()
+                    ->options(fn (): array => \Spatie\Activitylog\Models\Activity::query()
                         ->select('log_name')
                         ->whereNotNull('log_name')
                         ->distinct()
@@ -92,7 +94,7 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 SelectFilter::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->options(fn(): array => \Spatie\Activitylog\Models\Activity::query()
+                    ->options(fn (): array => \Spatie\Activitylog\Models\Activity::query()
                         ->select('subject_type')
                         ->whereNotNull('subject_type')
                         ->distinct()
@@ -105,16 +107,16 @@ final class ActivityLogResource extends Resource
                     ])
                     ->query(function ($query, array $data) {
                         return $query
-                            ->when($data['created_from'] ?? null, fn($q, $date) => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'] ?? null, fn($q, $date) => $q->whereDate('created_at', '<=', $date));
+                            ->when($data['created_from'] ?? null, fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['created_until'] ?? null, fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
                     }),
             ])
             ->actions([
                 Action::make('view_details')
                     ->label(__('View details'))
-                    ->modalHeading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) ($record->description ?? __('Activity details')))
-                    ->modalSubheading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) ($record->causer?->name ?? __('System')))
-                    ->modalContent(fn(\Spatie\Activitylog\Models\Activity $record) => view(
+                    ->modalHeading(fn (\Spatie\Activitylog\Models\Activity $record) => (string) ($record->description ?? __('Activity details')))
+                    ->modalSubheading(fn (\Spatie\Activitylog\Models\Activity $record) => (string) ($record->causer?->name ?? __('System')))
+                    ->modalContent(fn (\Spatie\Activitylog\Models\Activity $record) => view(
                         'filament.resources.activity-log-resource.components.activity-details',
                         ['activity' => $record->loadMissing('causer', 'subject')]
                     ))

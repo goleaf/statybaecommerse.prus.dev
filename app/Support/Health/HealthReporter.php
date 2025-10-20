@@ -120,7 +120,7 @@ final class HealthReporter implements HealthReporterContract
     }
 
     /**
-     * @param array<string, array{status: string, latency_ms: float, message?: string}> $checks
+     * @param  array<string, array{status: string, latency_ms: float, message?: string}>  $checks
      */
     private function evaluateStatus(array $checks): string
     {
@@ -134,9 +134,8 @@ final class HealthReporter implements HealthReporterContract
     }
 
     /**
-     * @param float $startedAt microtime(true) value
-     * @param array{connection: string, driver: string}|null $meta
-     *
+     * @param  float  $startedAt  microtime(true) value
+     * @param  array{connection: string, driver: string}|null  $meta
      * @return array{status: string, latency_ms: float, message?: string, meta?: array{connection: string, driver: string}}
      */
     private function formatResult(float $startedAt, ?Throwable $exception = null, ?array $meta = null): array

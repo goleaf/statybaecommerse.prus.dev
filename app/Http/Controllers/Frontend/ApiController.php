@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\UserWishlist;
@@ -16,9 +15,7 @@ use Illuminate\Http\Request;
 
 final class ApiController extends Controller
 {
-    public function __construct(private readonly CartService $cartService)
-    {
-    }
+    public function __construct(private readonly CartService $cartService) {}
 
     public function searchProducts(Request $request): JsonResponse
     {

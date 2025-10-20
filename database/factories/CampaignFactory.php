@@ -1,9 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
 use App\Models\Campaign;
-use App\Models\Channel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +23,7 @@ final class CampaignFactory extends Factory
         $slug = $baseSlug;
         $counter = 1;
         while (\App\Models\Campaign::where('slug', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $counter;
+            $slug = $baseSlug.'-'.$counter;
             $counter++;
         }
 
@@ -36,6 +37,7 @@ final class CampaignFactory extends Factory
                 if ($existingChannels->isNotEmpty()) {
                     return $existingChannels->random()->id;
                 }
+
                 return \App\Models\Channel::factory();
             },
             'zone_id' => null,
@@ -55,7 +57,7 @@ final class CampaignFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'ends_at' => $this->faker->dateTimeBetween('now', '+2 months'),
@@ -64,7 +66,7 @@ final class CampaignFactory extends Factory
 
     public function scheduled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'scheduled',
             'starts_at' => $this->faker->dateTimeBetween('now', '+1 month'),
             'ends_at' => $this->faker->dateTimeBetween('+1 month', '+3 months'),
@@ -73,7 +75,7 @@ final class CampaignFactory extends Factory
 
     public function expired(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-3 months', '-1 month'),
             'ends_at' => $this->faker->dateTimeBetween('-1 month', '-1 week'),
@@ -82,7 +84,7 @@ final class CampaignFactory extends Factory
 
     public function draft(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'draft',
             'starts_at' => null,
             'ends_at' => null,
@@ -91,14 +93,14 @@ final class CampaignFactory extends Factory
 
     public function featured(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_featured' => true,
         ]);
     }
 
     public function email(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
                 'type' => 'email',
                 'subject' => $this->faker->sentence(6),
@@ -109,7 +111,7 @@ final class CampaignFactory extends Factory
 
     public function banner(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
                 'type' => 'banner',
                 'banner_image' => $this->faker->imageUrl(1200, 600, 'business'),
@@ -122,7 +124,7 @@ final class CampaignFactory extends Factory
 
     public function social(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
                 'type' => 'social',
                 'social_media_ready' => true,
@@ -134,7 +136,7 @@ final class CampaignFactory extends Factory
 
     public function highPerformance(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
                 'total_views' => $this->faker->numberBetween(50000, 200000),
                 'total_clicks' => $this->faker->numberBetween(5000, 20000),
@@ -147,7 +149,7 @@ final class CampaignFactory extends Factory
 
     public function lowPerformance(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
                 'total_views' => $this->faker->numberBetween(0, 1000),
                 'total_clicks' => $this->faker->numberBetween(0, 50),

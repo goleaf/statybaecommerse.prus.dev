@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * SystemSettingDependency
@@ -198,7 +200,7 @@ final class SystemSettingDependency extends Model
      */
     public function isConditionMet(): bool
     {
-        if (!$this->dependsOn) {
+        if (! $this->dependsOn) {
             return false;
         }
         $dependencyValue = $this->dependsOn->value;
@@ -210,9 +212,9 @@ final class SystemSettingDependency extends Model
             'greater_than' => $dependencyValue > $condition['value'],
             'less_than' => $dependencyValue < $condition['value'],
             'contains' => str_contains($dependencyValue, $condition['value']),
-            'not_contains' => !str_contains($dependencyValue, $condition['value']),
+            'not_contains' => ! str_contains($dependencyValue, $condition['value']),
             'in' => in_array($dependencyValue, $condition['value'] ?? []),
-            'not_in' => !in_array($dependencyValue, $condition['value'] ?? []),
+            'not_in' => ! in_array($dependencyValue, $condition['value'] ?? []),
             default => false,
         };
     }

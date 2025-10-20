@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -53,7 +55,7 @@ final class ProductImageSeeder extends Seeder
                 $this->createImageForProduct(
                     $product,
                     'gallery',
-                    'Gallery image ' . ($i + 1),
+                    'Gallery image '.($i + 1),
                     $i + 2
                 );
                 $createdImages++;
@@ -66,7 +68,7 @@ final class ProductImageSeeder extends Seeder
                     $this->createImageForProduct(
                         $product,
                         'lifestyle',
-                        'Lifestyle image ' . ($i + 1),
+                        'Lifestyle image '.($i + 1),
                         $createdImages + $i + 1
                     );
                     $createdImages++;
@@ -80,7 +82,7 @@ final class ProductImageSeeder extends Seeder
                     $this->createImageForProduct(
                         $product,
                         'technical',
-                        'Technical image ' . ($i + 1),
+                        'Technical image '.($i + 1),
                         $createdImages + $i + 1
                     );
                     $createdImages++;
@@ -203,7 +205,7 @@ final class ProductImageSeeder extends Seeder
         $fullPath = storage_path("app/public/{$path}");
         $directory = dirname($fullPath);
 
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 

@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceListResource\Pages;
-use BackedEnum;
 use App\Models\PriceList;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -15,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -22,11 +25,8 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * PriceListResource
@@ -107,9 +107,9 @@ final class PriceListResource extends Resource
                         ])
                         ->defaultItems(1)
                         ->addActionLabel(__('price_lists.add_tier'))
-                        ->visible(fn(Forms\Get $get): bool => $get('pricing_type') === 'tiered'),
+                        ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'tiered'),
                 ])
-                ->visible(fn(Forms\Get $get): bool => $get('pricing_type') === 'tiered'),
+                ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'tiered'),
             Section::make(__('price_lists.volume_pricing'))
                 ->schema([
                     Repeater::make('volume_tiers')
@@ -130,9 +130,9 @@ final class PriceListResource extends Resource
                         ])
                         ->defaultItems(1)
                         ->addActionLabel(__('price_lists.add_tier'))
-                        ->visible(fn(Forms\Get $get): bool => $get('pricing_type') === 'volume'),
+                        ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'volume'),
                 ])
-                ->visible(fn(Forms\Get $get): bool => $get('pricing_type') === 'volume'),
+                ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'volume'),
             Section::make(__('price_lists.settings'))
                 ->schema([
                     Toggle::make('is_active')
@@ -162,7 +162,7 @@ final class PriceListResource extends Resource
                 TextColumn::make('pricing_type')
                     ->label(__('price_lists.pricing_type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'fixed' => 'success',
                         'tiered' => 'info',
                         'volume' => 'warning',
@@ -233,11 +233,11 @@ final class PriceListResource extends Resource
                         return $query
                             ->when(
                                 $data['valid_from_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('valid_from', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('valid_from', '>=', $date),
                             )
                             ->when(
                                 $data['valid_from_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('valid_from', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('valid_from', '<=', $date),
                             );
                     }),
             ])
