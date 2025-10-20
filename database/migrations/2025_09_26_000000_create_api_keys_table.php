@@ -6,9 +6,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
+        Schema::dropIfExists('api_keys');
+
         Schema::create('api_keys', function (Blueprint $table): void {
             $table->id();
             $table->string('key', 64)->unique();
