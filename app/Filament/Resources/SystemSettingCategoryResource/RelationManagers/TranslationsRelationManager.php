@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -11,11 +16,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -77,14 +77,14 @@ final class TranslationsRelationManager extends RelationManager
                     ->label(__('system_setting_categories.translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'info',
-                        'en' => 'success',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
-                        'it' => 'secondary',
-                        'pl' => 'gray',
-                        'ru' => 'dark',
+                        'lt'    => 'info',
+                        'en'    => 'success',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
+                        'it'    => 'secondary',
+                        'pl'    => 'gray',
+                        'ru'    => 'dark',
                         default => 'gray',
                     })
                     ->sortable(),
@@ -94,20 +94,16 @@ final class TranslationsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 50 ? $state : null;
-                    }),
+                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 50)
+                        ? $state
+                        : null),
 
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.translations.description'))
                     ->limit(100)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 100 ? $state : null;
-                    })
+                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 100)
+                        ? $state
+                        : null)
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
