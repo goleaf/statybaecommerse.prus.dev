@@ -101,7 +101,7 @@ final class SliderResource extends Resource
                         ->label(__('sliders.image'))
                         ->image()
                         ->directory('sliders')
-                        ->visibility('public')
+                        ->visibility('private')
                         ->columnSpanFull(),
                 ]),
             Section::make(__('sliders.appearance'))

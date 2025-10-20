@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -53,7 +54,7 @@ final class GenerateStockExport implements ShouldQueue
      */
     public function handle(): void
     {
-        $disk = Storage::disk('public');
+        $disk = Storage::disk(SecureStorage::disk());
         if (! $disk->exists('exports')) {
             $disk->makeDirectory('exports');
         }

@@ -18,7 +18,7 @@ final class SignedExportDownloadController extends Controller
     {
         abort_if($export->status !== ExportStatus::Completed, 404);
 
-        $disk = $export->artifact_disk ?? config('filesystems.exports_disk', 'public');
+        $disk = $export->artifact_disk ?? config('media-security.disk', 'secure-media');
         $path = $export->artifact_path;
 
         abort_if(! $path || ! Storage::disk($disk)->exists($path), 404);

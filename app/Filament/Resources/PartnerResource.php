@@ -86,12 +86,12 @@ final class PartnerResource extends Resource
                             ->label(__('admin.partners.logo'))
                             ->image()
                             ->directory('partner-logos')
-                            ->visibility('public'),
+                            ->visibility('private'),
                         Forms\Components\FileUpload::make('banner')
                             ->label(__('admin.partners.banner'))
                             ->image()
                             ->directory('partner-banners')
-                            ->visibility('public'),
+                            ->visibility('private'),
                     ])
                     ->columns(2),
             ]);

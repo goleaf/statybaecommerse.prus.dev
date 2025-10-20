@@ -135,7 +135,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->label(__('translations.slider_image'))
                             ->image()
                             ->directory('sliders/images')
-                            ->visibility('public')
+                            ->visibility('private')
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 '16:9',
@@ -147,7 +147,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->label(__('translations.mobile_image'))
                             ->image()
                             ->directory('sliders/mobile')
-                            ->visibility('public')
+                            ->visibility('private')
                             ->imageEditor()
                             ->maxSize(2048),  // 2MB
                     ])

@@ -30,7 +30,7 @@ final class ImagesRelationManager extends RelationManager
                     ->maxSize(10240)
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                     ->directory('products/images')
-                    ->visibility('public'),
+                    ->visibility('private'),
                 Forms\Components\TextInput::make('alt_text')
                     ->label(__('products.images.alt_text'))
                     ->maxLength(255)

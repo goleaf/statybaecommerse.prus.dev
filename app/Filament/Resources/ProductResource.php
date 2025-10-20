@@ -245,7 +245,7 @@ final class ProductResource extends Resource
                                             ->image()
                                             ->multiple()
                                             ->directory('products')
-                                            ->visibility('public')
+                                            ->visibility('private')
                                             ->reorderable()
                                             ->appendFiles(),
                                     ]),

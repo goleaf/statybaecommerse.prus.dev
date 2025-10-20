@@ -145,7 +145,7 @@ title(__('users.orders'));
                                         <div class="flex-shrink-0">
                                             @if ($item->productVariant && $item->productVariant->product && $item->productVariant->product->featured_image)
                                                 <img
-                                                     src="{{ Storage::disk('public')->url($item->productVariant->product->featured_image) }}"
+                                                     src="{{ $item->productVariant->product->featured_image ? \App\Support\Storage\SecureStorage::temporarySignedUrl($item->productVariant->product->featured_image) : '' }}"
                                                      alt="{{ $item->productVariant->product->name }}"
                                                      class="h-16 w-16 rounded-md object-cover">
                                             @else

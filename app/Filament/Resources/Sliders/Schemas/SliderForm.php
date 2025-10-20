@@ -55,7 +55,7 @@ final class SliderForm
                                 '1:1',
                             ])
                             ->directory('sliders/images')
-                            ->visibility('public')
+                            ->visibility('private')
                             ->maxSize(5120)  // 5MB
                             ->columnSpanFull(),
                     ])

@@ -14,6 +14,8 @@ use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
+use App\Support\Storage\SecureStorage;
+use App\Support\Uploads\SecureUploadHandler;
 use App\Support\Health\HealthReporter;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
@@ -69,6 +71,34 @@ class AppServiceProvider extends ServiceProvider
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
         }
 
+        if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
+            \Filament\Forms\Components\FileUpload::configureUsing(
+                static function (\Filament\Forms\Components\FileUpload $component): void {
+                    SecureUploadHandler::configure($component);
+                }
+            );
+        }
+
+        if (class_exists(\Filament\Tables\Columns\ImageColumn::class)) {
+            \Filament\Tables\Columns\ImageColumn::configureUsing(
+                static function (\Filament\Tables\Columns\ImageColumn $column): void {
+                    $column->formatStateUsing(
+                        static function ($state): ?string {
+                            if (! is_string($state) || $state === '') {
+                                return $state;
+                            }
+
+                            if (filter_var($state, FILTER_VALIDATE_URL)) {
+                                return $state;
+                            }
+
+                            return SecureStorage::temporarySignedUrl($state);
+                        }
+                    );
+                }
+            );
+        }
+
         // Aliases for Filament resource Livewire components used in tests
         if ($this->app->environment('testing')) {
             Livewire::component('filament.admin.resources.product-comparisons.index', \App\Filament\Resources\ProductComparisonResource\Pages\ListProductComparisons::class);
@@ -118,7 +148,7 @@ class AppServiceProvider extends ServiceProvider
             $schedule->call(function (): void {
                 // Rotate exports older than 7 days with timeout protection
                 $timeout = now()->addMinutes(3);  // 3 minute timeout for export rotation
-                $disk = \Storage::disk('public');
+                $disk = \Storage::disk(SecureStorage::disk());
                 $dir = 'exports';
                 if ($disk->exists($dir)) {
                     $files = collect($disk->files($dir))

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Services\ImportExport\ProviderRegistry;
+use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -27,7 +28,7 @@ final class DataImportExport extends Page
 
     public ?bool $downloadImages = true;
 
-    public ?string $exportPath = 'storage/catalog-export.xml';
+    public ?string $exportPath = 'catalog-export.xml';
 
     public $file;
 
@@ -90,7 +91,7 @@ final class DataImportExport extends Page
 
                         return;
                     }
-                    $abs = Storage::disk('public')->path($path);
+                    $abs = Storage::disk(SecureStorage::disk())->path($path);
                     $res = $provider->import($abs, ['only' => $this->only ?? 'all', 'download_images' => (bool) $this->downloadImages]);
                     $this->notify('success', __('translations.import_finished'));
                     $this->dispatch('imported', created: $res['categories']['created'] + $res['products']['created']);
@@ -104,8 +105,11 @@ final class DataImportExport extends Page
 
                         return;
                     }
-                    $out = $this->exportPath ?? 'storage/catalog-export.xml';
-                    $provider->export(base_path($out), ['only' => $this->only ?? 'all']);
+                    $targetPath = $this->exportPath ?? 'catalog-export.xml';
+                    $provider->export(
+                        Storage::disk(SecureStorage::disk())->path($targetPath),
+                        ['only' => $this->only ?? 'all']
+                    );
                     $this->notify('success', __('translations.export_finished'));
                 }),
         ];

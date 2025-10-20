@@ -155,7 +155,7 @@ final class BrandResource extends Resource
                             '4:3',
                         ])
                         ->directory('brands/logos')
-                        ->visibility('public'),
+                        ->visibility('private'),
                     FileUpload::make('banner')
                         ->label(__('brands.banner'))
                         ->image()
@@ -164,7 +164,7 @@ final class BrandResource extends Resource
                             '21:9',
                         ])
                         ->directory('brands/banners')
-                        ->visibility('public'),
+                        ->visibility('private'),
                 ]),
             Section::make(__('brands.seo'))
                 ->schema([
