@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountResource\Pages;
+use App\Filament\Resources\DiscountResource\RelationManagers\CodesRelationManager;
+use App\Filament\Resources\DiscountResource\RelationManagers\ConditionsRelationManager;
+use App\Filament\Resources\DiscountResource\RelationManagers\RedemptionsRelationManager;
 use App\Models\Discount;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -56,7 +59,9 @@ final class DiscountResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            CodesRelationManager::class,
+            ConditionsRelationManager::class,
+            RedemptionsRelationManager::class,
         ];
     }
 
