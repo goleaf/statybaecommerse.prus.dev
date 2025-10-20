@@ -12,22 +12,16 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Number;
 use UnitEnum;
 
 final class PartnerTierResource extends Resource
 {
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-star';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+
     protected static ?string $model = PartnerTier::class;
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-star';
-    }
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Marketing';
-    }
 
     protected static ?int $navigationSort = 2;
 
@@ -68,6 +62,7 @@ final class PartnerTierResource extends Resource
                             ->label(__('admin.partner_tiers.minimum_order_value'))
                             ->suffix('€')
                             ->numeric()
+                            ->minValue(0)
                             ->step(0.01),
                     ])
                     ->columns(3),
@@ -105,12 +100,29 @@ final class PartnerTierResource extends Resource
                     ->boolean(),
                 Tables\Columns\TextColumn::make('discount_rate')
                     ->label(__('admin.partner_tiers.discount_rate'))
-                    ->suffix('%')
+                    ->formatStateUsing(
+                        fn (?float $value): ?string => $value === null
+                            ? null
+                            : Number::format($value, precision: 2) . '%'
+                    )
                     ->sortable(),
                 Tables\Columns\TextColumn::make('commission_rate')
                     ->label(__('admin.partner_tiers.commission_rate'))
-                    ->suffix('%')
+                    ->formatStateUsing(
+                        fn (?float $value): ?string => $value === null
+                            ? null
+                            : Number::format($value, precision: 2) . '%'
+                    )
                     ->sortable(),
+                Tables\Columns\TextColumn::make('minimum_order_value')
+                    ->label(__('admin.partner_tiers.minimum_order_value'))
+                    ->formatStateUsing(
+                        fn (?float $value): ?string => $value === null
+                            ? null
+                            : Number::currency($value, 'EUR', locale: app()->getLocale())
+                    )
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->dateTime()
@@ -143,10 +155,10 @@ final class PartnerTierResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPartnerTiers::route('/'),
+            'index'  => Pages\ListPartnerTiers::route('/'),
             'create' => Pages\CreatePartnerTier::route('/create'),
-            'view' => Pages\ViewPartnerTier::route('/{record}'),
-            'edit' => Pages\EditPartnerTier::route('/{record}/edit'),
+            'view'   => Pages\ViewPartnerTier::route('/{record}'),
+            'edit'   => Pages\EditPartnerTier::route('/{record}/edit'),
         ];
     }
 }
