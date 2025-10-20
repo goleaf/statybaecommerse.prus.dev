@@ -9,7 +9,12 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 final class Kernel extends ConsoleKernel
 {
+    /**
+     * @var array<int, class-string>
+     */
     protected $commands = [
+        \App\Console\Commands\BackupPrepareCommand::class,
+        \App\Console\Commands\BackupVerifyCommand::class,
         \App\Console\Commands\FixCodeStyleCommand::class,
         \App\Console\Commands\ValidateCodeStyleCommand::class,
         \App\Console\Commands\CodeStyleWatchCommand::class,
@@ -39,6 +44,24 @@ final class Kernel extends ConsoleKernel
             ->onSuccess(function () {
                 \Log::info('Weekly code style fix completed successfully');
             });
+
+        $prepareSchedule = config('backup.schedule.prepare');
+        if (is_string($prepareSchedule) && $prepareSchedule !== '') {
+            $schedule
+                ->command('backup:prepare')
+                ->cron($prepareSchedule)
+                ->withoutOverlapping()
+                ->runInBackground();
+        }
+
+        $verifySchedule = config('backup.schedule.verify');
+        if (is_string($verifySchedule) && $verifySchedule !== '') {
+            $schedule
+                ->command('backup:verify')
+                ->cron($verifySchedule)
+                ->withoutOverlapping()
+                ->runInBackground();
+        }
     }
 
     protected function commands(): void
