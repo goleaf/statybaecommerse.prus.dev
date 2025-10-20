@@ -26,6 +26,10 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
    make setup
    ```
    Installs Composer and npm dependencies, copies `.env`, prepares the SQLite database, and links storage.
+   After you tweak environment values, rebuild the configuration cache so Laravel sees the changes:
+   ```bash
+   php artisan config:cache
+   ```
 2. **Reset the database and seed demo data**
    ```bash
    composer seed:fresh
