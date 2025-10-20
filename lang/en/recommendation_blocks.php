@@ -45,10 +45,21 @@ return [
         'inactive_only' => 'Inactive Only',
     ],
 
+    'tabs' => [
+        'all' => 'All',
+        'active' => 'Active',
+        'featured' => 'Featured',
+        'related' => 'Related',
+        'similar' => 'Similar',
+        'trending' => 'Trending',
+        'recent' => 'Recent',
+    ],
+
     'actions' => [
         'activate' => 'Activate',
         'deactivate' => 'Deactivate',
         'set_default' => 'Set as Default',
+        'toggle_active' => 'Toggle active status',
         'activated_successfully' => 'Activated successfully',
         'deactivated_successfully' => 'Deactivated successfully',
         'set_as_default_successfully' => 'Set as default successfully',

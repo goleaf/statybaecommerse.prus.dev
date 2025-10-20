@@ -45,10 +45,21 @@ return [
         'inactive_only' => 'Tik neaktyvūs',
     ],
 
+    'tabs' => [
+        'all' => 'Visi',
+        'active' => 'Aktyvūs',
+        'featured' => 'Išskirtiniai',
+        'related' => 'Susiję',
+        'similar' => 'Panašūs',
+        'trending' => 'Populiarūs',
+        'recent' => 'Naujausi',
+    ],
+
     'actions' => [
         'activate' => 'Aktyvuoti',
         'deactivate' => 'Deaktyvuoti',
         'set_default' => 'Nustatyti kaip pagrindinį',
+        'toggle_active' => 'Perjungti aktyvumą',
         'activated_successfully' => 'Sėkmingai aktyvuota',
         'deactivated_successfully' => 'Sėkmingai deaktyvuota',
         'set_as_default_successfully' => 'Sėkmingai nustatyta kaip pagrindinis',
