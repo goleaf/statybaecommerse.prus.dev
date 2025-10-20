@@ -115,7 +115,11 @@ final class ReferralCodeUsageLogResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 30 ? $state : null;
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
+                        return strlen((string) $state) > 30 ? $state : null;
                     }),
                 TextColumn::make('user_agent')
                     ->label(__('admin.referral_code_usage_logs.user_agent'))
@@ -123,7 +127,11 @@ final class ReferralCodeUsageLogResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
+                        return strlen((string) $state) > 50 ? $state : null;
                     }),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
