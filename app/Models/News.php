@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
+use App\Services\Security\HtmlContentSanitizer;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -145,7 +146,7 @@ final class News extends Model
      */
     public function scopeByCategory(Builder $query, int $categoryId): Builder
     {
-        return $query->whereHas('categories', function (Builder $q) use ($categoryId) {
+        return $query->whereHas('categories', function (Builder $q) use ($categoryId): void {
             $q->where('news_category_id', $categoryId);
         });
     }
@@ -155,7 +156,7 @@ final class News extends Model
      */
     public function scopeByTag(Builder $query, int $tagId): Builder
     {
-        return $query->whereHas('tags', function (Builder $q) use ($tagId) {
+        return $query->whereHas('tags', function (Builder $q) use ($tagId): void {
             $q->where('news_tag_id', $tagId);
         });
     }
@@ -165,7 +166,7 @@ final class News extends Model
      */
     public function scopeSearch(Builder $query, string $search): Builder
     {
-        return $query->whereHas('translations', function (Builder $q) use ($search) {
+        return $query->whereHas('translations', function (Builder $q) use ($search): void {
             $q->where('title', 'like', "%{$search}%")->orWhere('summary', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%");
         });
     }
@@ -207,7 +208,12 @@ final class News extends Model
      */
     public function getContentAttribute(): ?string
     {
-        return $this->getTranslation('content', app()->getLocale());
+        $content = $this->getTranslation('content', app()->getLocale());
+        if ($content === null || ! is_string($content)) {
+            return null;
+        }
+
+        return app(HtmlContentSanitizer::class)->sanitize($content);
     }
 
     /**
