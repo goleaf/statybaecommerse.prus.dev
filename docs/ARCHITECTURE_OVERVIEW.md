@@ -57,4 +57,4 @@ Laravel 12 provides the HTTP kernel, queue worker, and scheduler. Filament v4 su
 - Run `make analyse` before committing to combine Pint (style) and PHPStan (static analysis).
 - Horizon dashboard available at `/horizon` when running the queue worker.
 - Dusk/browser tests require `php artisan serve` + ChromeDriver; see `docs/TEST_ORGANIZATION_SUMMARY.md` for patterns.
-- Explore domain history and project evolution through the curated summaries in `docs/` — start with `docs/PROJECT_HANDOVER_DOCUMENTATION.md` and `docs/COMPANY_RESOURCE_ANALYSIS.md`.
+- Explore domain history and project evolution through the curated summaries in `docs/` — start with `docs/PROJECT_HANDOVER_DOCUMENTATION.md` and `docs/analysis/COMPANY_RESOURCE_ANALYSIS.md`.
