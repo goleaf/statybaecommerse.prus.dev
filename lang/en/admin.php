@@ -71,6 +71,7 @@ return [
         'button_text' => 'Button Text',
     ],
     'menu_items' => require __DIR__ . '/admin/menu_items.php',
+    'product_history' => require __DIR__ . '/admin/product_history.php',
     'variant_combinations' => [
         'navigation_label' => 'Variant Combinations',
         'plural_model_label' => 'Variant Combinations',
@@ -406,5 +407,8 @@ return [
         'view' => 'View',
         'edit' => 'Edit',
         'delete_selected' => 'Delete Selected',
+        'none' => 'None',
+        'yes' => 'Yes',
+        'no' => 'No',
     ],
 ];
