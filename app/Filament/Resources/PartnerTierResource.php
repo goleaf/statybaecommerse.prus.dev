@@ -12,19 +12,17 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
-use UnitEnum;
 
 final class PartnerTierResource extends Resource
 {
+    /**
+     * Navigation icon identifier displayed in the Filament sidebar (string or BackedEnum).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+
     protected static ?string $model = PartnerTier::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-star';
-    }
-
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Marketing';
     }
@@ -143,10 +141,10 @@ final class PartnerTierResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPartnerTiers::route('/'),
+            'index'  => Pages\ListPartnerTiers::route('/'),
             'create' => Pages\CreatePartnerTier::route('/create'),
-            'view' => Pages\ViewPartnerTier::route('/{record}'),
-            'edit' => Pages\EditPartnerTier::route('/{record}/edit'),
+            'view'   => Pages\ViewPartnerTier::route('/{record}'),
+            'edit'   => Pages\EditPartnerTier::route('/{record}/edit'),
         ];
     }
 }
