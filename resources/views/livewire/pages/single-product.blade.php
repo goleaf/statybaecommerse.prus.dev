@@ -228,10 +228,12 @@
                         <div class="space-y-6 p-6 lg:p-8">
                             <h2 class="text-lg font-semibold text-slate-900">
                                 {{ __('product_page.detailed_description') }}</h2>
-                            <div class="prose prose-slate max-w-none text-slate-700">
-                                {!! $product->trans('description') ??
-                                    ($product->description ?? '<p>' . __('product_page.no_description') . '</p>') !!}
-                            </div>
+                            <x-sanitized-html
+                                class="prose prose-slate max-w-none text-slate-700"
+                                :content="$product->trans('description') ?? (
+                                    $product->description ?? '<p>' . __('product_page.no_description') . '</p>'
+                                )"
+                            />
                         </div>
                     </section>
 

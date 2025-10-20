@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\RelationManagers;
 
+use App\Support\Html\HtmlSanitizer;
 use Filament\Forms\Form;
 
 use Filament\Forms\Components\Grid;
@@ -205,5 +206,23 @@ class TranslationsRelationManager extends RelationManager
                     ->label('Add Translation')
                     ->icon('heroicon-o-plus'),
             ]);
+    }
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        /** @var HtmlSanitizer $sanitizer */
+        $sanitizer = app(HtmlSanitizer::class);
+        $data['content'] = $sanitizer->sanitize($data['content'] ?? '');
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        /** @var HtmlSanitizer $sanitizer */
+        $sanitizer = app(HtmlSanitizer::class);
+        $data['content'] = $sanitizer->sanitize($data['content'] ?? '');
+
+        return $data;
     }
 }
