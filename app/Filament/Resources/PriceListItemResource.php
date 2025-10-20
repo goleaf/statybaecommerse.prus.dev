@@ -12,6 +12,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -167,6 +168,7 @@ final class PriceListItemResource extends Resource
                                     ->default(true),
                                 Toggle::make('is_featured')
                                     ->label(__('price_list_items.is_featured'))
+                                    ->default(false)
                                     ->helperText(__('price_list_items.is_featured_help')),
                             ]),
                     ]),
@@ -295,7 +297,7 @@ final class PriceListItemResource extends Resource
                     ->toggle(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (PriceListItem $record): string => $record->is_active ? __('price_list_items.deactivate') : __('price_list_items.activate'))

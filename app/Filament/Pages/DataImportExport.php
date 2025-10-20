@@ -23,7 +23,7 @@ final class DataImportExport extends Page
     /**
      * @var string|BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 
