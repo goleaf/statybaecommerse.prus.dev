@@ -9,6 +9,7 @@ use Filament\Panel;
 use Illuminate\Contracts\Translation\Loader as TranslationLoader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
 abstract class TestCase extends BaseTestCase
@@ -37,6 +38,7 @@ abstract class TestCase extends BaseTestCase
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
         $this->refreshTranslationLoader();
+        app()->instance('request', Request::create('/'));
         $this->withoutMiddleware([
             \App\Http\Middleware\ZoneDetector::class,
             \App\Http\Middleware\SetLocale::class,
