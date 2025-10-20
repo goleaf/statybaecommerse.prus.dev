@@ -205,13 +205,12 @@ final class CampaignClickResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('campaign_name')
+                TextColumn::make('campaign.name')
                     ->label(__('campaign_clicks.campaign_name'))
                     ->searchable()
-                    ->sortable()
                     ->weight('bold')
                     ->limit(50),
-                TextColumn::make('campaign_code')
+                TextColumn::make('campaign.code')
                     ->label(__('campaign_clicks.campaign_code'))
                     ->copyable()
                     ->badge()
@@ -263,16 +262,6 @@ final class CampaignClickResource extends Resource
                     ->label(__('campaign_clicks.clicked_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->label(__('campaign_clicks.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->label(__('campaign_clicks.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('campaign_id')
@@ -349,7 +338,7 @@ final class CampaignClickResource extends Resource
                         ->requiresConfirmation(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('clicked_at', 'desc');
     }
 
     /**
