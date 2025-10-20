@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
@@ -18,6 +19,7 @@ use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
 use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
+use App\Support\Health\HealthReporter;
 use App\View\Creators\UserDataCreator;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -36,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \App\Console\Commands\ImportProducts::class,
