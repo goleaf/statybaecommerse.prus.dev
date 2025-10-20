@@ -25,6 +25,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -165,16 +166,25 @@ final class ReferralCodeResource extends Resource
             ])
             ->filters([
                 // Alias filter expected by tests
-                SelectFilter::make('active')
+                TernaryFilter::make('active')
                     ->label(__('referral.filters.is_active'))
-                    ->options(['1' => 'active', '0' => 'inactive'])
+                    ->attribute('is_active')
+                    ->trueLabel('active')
+                    ->falseLabel('inactive')
                     ->query(function (Builder $query, array $data): Builder {
-                        $value = $data['value'] ?? null;
-                        if ($value === null) {
-                            return $query;
-                        }
+                        $rawState = $data['value'] ?? null;
 
-                        return $query->where('is_active', $value === '1');
+                        $shouldShowActive = match (true) {
+                            is_bool($rawState) => $rawState,
+                            $rawState === null => true,
+                            default => filter_var(
+                                $rawState,
+                                FILTER_VALIDATE_BOOLEAN,
+                                FILTER_NULL_ON_FAILURE,
+                            ) ?? true,
+                        };
+
+                        return $query->where('is_active', $shouldShowActive);
                     }),
                 // Keep reward type filter
                 SelectFilter::make('by_reward_type')
