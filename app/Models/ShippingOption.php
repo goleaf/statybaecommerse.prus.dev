@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // use Illuminate\Database\Eloquent\SoftDeletes;
@@ -32,6 +33,7 @@ final class ShippingOption extends Model
         'service_type',
         'price',
         'currency_code',
+        'zone_id',
         'is_enabled',
         'is_default',
         'sort_order',
@@ -71,6 +73,11 @@ final class ShippingOption extends Model
         return $this->hasMany(Order::class, 'shipping_option_id');
     }
 
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
     /**
      * Handle scopeEnabled functionality with proper error handling.
      */
@@ -93,6 +100,11 @@ final class ShippingOption extends Model
     public function scopeByCarrier(Builder $query, string $carrier): Builder
     {
         return $query->where('carrier_name', $carrier);
+    }
+
+    public function scopeByZone(Builder $query, int|string $zoneId): Builder
+    {
+        return $query->where('zone_id', $zoneId);
     }
 
     /**
