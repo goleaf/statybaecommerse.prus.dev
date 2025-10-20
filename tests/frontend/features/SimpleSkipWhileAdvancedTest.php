@@ -164,7 +164,7 @@ final class SimpleSkipWhileAdvancedTest extends TestCase
 
     public function test_skipwhile_with_search_service(): void
     {
-        $service = new SearchService;
+        $service = app(SearchService::class);
 
         // Test that the service returns an array (basic functionality test)
         $results = $service->search('test');
