@@ -25,6 +25,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\BackupVerifyCommand::class,
         \App\Console\Commands\I18nAuditCommand::class,
         \App\Console\Commands\ValidateContractCommand::class,
+        \App\Console\Commands\ReconcileInventoryCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -92,6 +93,13 @@ final class Kernel extends ConsoleKernel
                     \Log::error('Scheduled backup:verify command failed');
                 });
         }
+
+        $schedule
+            ->command('inventory:reconcile')
+            ->everyFifteenMinutes()
+            ->onOneServer()
+            ->withoutOverlapping()
+            ->runInBackground();
     }
 
     protected function commands(): void
