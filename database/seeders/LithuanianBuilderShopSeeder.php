@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\AuthorizationRole;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Order;
@@ -50,17 +51,17 @@ class LithuanianBuilderShopSeeder extends Seeder
 
     private function createRolesAndPermissions(): void
     {
-        $roleNames = ['admin', 'manager'];
+        $roles = [AuthorizationRole::ADMIN, AuthorizationRole::MANAGER];
 
-        foreach ($roleNames as $roleName) {
-            $permissions = AuthorizationMatrix::permissionsForRole($roleName);
+        foreach ($roles as $role) {
+            $permissions = AuthorizationMatrix::permissionsForRole($role);
 
             foreach ($permissions as $permission) {
                 Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
             }
 
-            $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
-            $role->syncPermissions($permissions);
+            $roleModel = Role::firstOrCreate(['name' => $role->value, 'guard_name' => 'web']);
+            $roleModel->syncPermissions($permissions);
         }
 
         $additionalPermissions = ['view_reports'];
@@ -68,8 +69,8 @@ class LithuanianBuilderShopSeeder extends Seeder
         foreach ($additionalPermissions as $permission) {
             $permissionModel = Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
 
-            foreach ($roleNames as $roleName) {
-                Role::findByName($roleName, 'web')->givePermissionTo($permissionModel);
+            foreach ($roles as $role) {
+                Role::findByName($role->value, 'web')->givePermissionTo($permissionModel);
             }
         }
     }
@@ -87,7 +88,7 @@ class LithuanianBuilderShopSeeder extends Seeder
                 'preferred_locale' => 'lt',
             ]
         );
-        $admin->assignRole('admin');
+        $admin->assignRole(AuthorizationRole::ADMIN->value);
 
         $manager = User::firstOrCreate(
             ['email' => 'manager@statybaecommerse.lt'],
@@ -100,7 +101,7 @@ class LithuanianBuilderShopSeeder extends Seeder
                 'preferred_locale' => 'lt',
             ]
         );
-        $manager->assignRole('manager');
+        $manager->assignRole(AuthorizationRole::MANAGER->value);
     }
 
     private function createMainCategories(): array

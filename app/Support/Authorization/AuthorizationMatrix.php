@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Authorization;
 
+use App\Enums\AuthorizationRole;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -66,10 +67,18 @@ final class AuthorizationMatrix
 
     /**
      * Resolve all permissions defined in the matrix.
+     *
+     * @return array<int, string>
      */
     public static function allPermissions(): array
     {
-        $abilities = collect(config(sprintf('%s.abilities', self::CONFIG_KEY), []))
+        $configuredAbilities = config(sprintf('%s.abilities', self::CONFIG_KEY), []);
+
+        if (! is_array($configuredAbilities)) {
+            return [];
+        }
+
+        $abilities = collect($configuredAbilities)
             ->filter(fn ($group) => is_array($group))
             ->flatMap(fn (array $group) => array_values(array_filter($group, fn ($permission) => is_string($permission) && $permission !== '')))
             ->unique()
@@ -81,11 +90,18 @@ final class AuthorizationMatrix
 
     /**
      * Fetch the flattened permission list for a given role, expanding wildcards.
+     *
+     * @return array<int, string>
      */
-    public static function permissionsForRole(string $role): array
+    public static function permissionsForRole(AuthorizationRole $role): array
     {
-        $roles = self::roles();
-        $permissions = $roles[$role] ?? [];
+        $roles = config(sprintf('%s.roles', self::CONFIG_KEY), []);
+
+        if (! is_array($roles)) {
+            return [];
+        }
+
+        $permissions = $roles[$role->value] ?? [];
 
         if (! is_array($permissions)) {
             return [];
@@ -95,26 +111,63 @@ final class AuthorizationMatrix
             return self::allPermissions();
         }
 
-        return Collection::make($permissions)
+        return array_values(Collection::make($permissions)
             ->filter(fn ($permission) => is_string($permission) && $permission !== '')
             ->unique()
             ->values()
-            ->all();
+            ->all());
     }
 
     /**
-     * Expose all role definitions.
+     * Expose all role definitions paired with their configured permissions.
+     *
+     * @return array<int, array{role: AuthorizationRole, permissions: array<int, string>}>
      */
     public static function roles(): array
     {
-        return config(sprintf('%s.roles', self::CONFIG_KEY), []);
+        $roleDefinitions = [];
+        $configuredRoles = config(sprintf('%s.roles', self::CONFIG_KEY), []);
+
+        if (! is_array($configuredRoles)) {
+            return [];
+        }
+
+        foreach ($configuredRoles as $role => $permissions) {
+            if (! is_string($role)) {
+                continue;
+            }
+
+            $enum = AuthorizationRole::tryFrom($role);
+
+            if ($enum === null) {
+                continue;
+            }
+
+            $roleDefinitions[] = [
+                'role' => $enum,
+                'permissions' => Collection::make(is_array($permissions) ? $permissions : [])
+                    ->filter(fn ($permission) => is_string($permission) && $permission !== '')
+                    ->values()
+                    ->all(),
+            ];
+        }
+
+        return $roleDefinitions;
     }
 
     /**
      * Expose guard names that should receive seeded permissions.
+     *
+     * @return array<int, string>
      */
     public static function guardNames(): array
     {
-        return config(sprintf('%s.guards', self::CONFIG_KEY), []);
+        $guards = config(sprintf('%s.guards', self::CONFIG_KEY), []);
+
+        if (! is_array($guards)) {
+            return [];
+        }
+
+        return array_values(array_filter($guards, fn ($guard) => is_string($guard) && $guard !== ''));
     }
 }
