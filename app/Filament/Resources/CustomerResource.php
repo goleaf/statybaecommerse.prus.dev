@@ -13,6 +13,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,8 +22,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -120,7 +120,7 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $set('city_id', null);
                                     }
@@ -131,7 +131,7 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->modifyOptionsQueryUsing(function (Builder $query, Forms\Get $get) {
+                                ->modifyOptionsQueryUsing(function (Builder $query, Forms\Get $get): void {
                                     $countryId = $get('country_id');
                                     if ($countryId) {
                                         $query->where('country_id', $countryId);
@@ -302,10 +302,10 @@ final class CustomerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomers::route('/'),
+            'index'  => Pages\ListCustomers::route('/'),
             'create' => Pages\CreateCustomer::route('/create'),
-            'view' => Pages\ViewCustomer::route('/{record}'),
-            'edit' => Pages\EditCustomer::route('/{record}/edit'),
+            'view'   => Pages\ViewCustomer::route('/{record}'),
+            'edit'   => Pages\EditCustomer::route('/{record}/edit'),
         ];
     }
 }
