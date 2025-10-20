@@ -61,11 +61,16 @@
 
                     $targetUrl ??= url('/' . ltrim($locale, '/'));
                 @endphp
-                <a href="{{ $targetUrl }}"
-                   class="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
-                    <span class="text-lg">{{ $localeFlags[$locale] ?? '🌐' }}</span>
-                    <span>{{ $localeNames[$locale] ?? strtoupper($locale) }}</span>
-                </a>
+                <form method="POST" action="{{ route('locale.switch') }}">
+                    @csrf
+                    <input type="hidden" name="locale" value="{{ $locale }}">
+                    <input type="hidden" name="redirect_to" value="{{ $targetUrl }}">
+                    <button type="submit"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
+                        <span class="text-lg">{{ $localeFlags[$locale] ?? '🌐' }}</span>
+                        <span>{{ $localeNames[$locale] ?? strtoupper($locale) }}</span>
+                    </button>
+                </form>
             @endif
         @endforeach
     </div>
