@@ -7,7 +7,9 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
+use App\Observers\CategoryObserver;
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,6 +38,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([CategoryObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
 final class Category extends Model implements HasMedia
 {
