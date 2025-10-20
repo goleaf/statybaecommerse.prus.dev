@@ -45,6 +45,10 @@ final class PlaceholderResolver
             return $this->cache[$key];
         }
 
+        if (Media::getConnectionResolver() === null) {
+            return $this->cache[$key] = null;
+        }
+
         $query = Media::query();
 
         if (isset($definition['uuid']) && is_string($definition['uuid']) && $definition['uuid'] !== '') {

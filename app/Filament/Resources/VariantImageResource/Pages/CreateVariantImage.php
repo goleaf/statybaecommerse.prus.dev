@@ -10,4 +10,9 @@ use Filament\Resources\Pages\CreateRecord;
 final class CreateVariantImage extends CreateRecord
 {
     protected static string $resource = VariantImageResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        return VariantImageResource::populateFileMetadata($data);
+    }
 }

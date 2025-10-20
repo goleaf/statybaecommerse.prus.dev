@@ -20,8 +20,12 @@ final class VariantImageFactory extends Factory
             'variant_id' => \App\Models\ProductVariant::factory(),
             'image_path' => $this->faker->imageUrl(800, 600, 'products'),
             'alt_text' => $this->faker->sentence(3),
+            'description' => $this->faker->optional()->sentence(10),
             'sort_order' => $this->faker->numberBetween(0, 100),
             'is_primary' => $this->faker->boolean(20),  // 20% chance of being primary
+            'is_active' => $this->faker->boolean(90),
+            'file_size' => $this->faker->numberBetween(50_000, 5_000_000),
+            'dimensions' => sprintf('%dx%d', 800, 600),
         ];
     }
 
