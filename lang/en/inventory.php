@@ -4,6 +4,8 @@ return [
     // Basic inventory terms
     'title' => 'Inventory Management',
     'subtitle' => 'Monitor and manage your product inventory',
+    'single' => 'Inventory',
+    'plural' => 'Inventories',
     'total_products' => 'Total Products',
     'in_stock' => 'In Stock',
     'low_stock' => 'Low Stock',
