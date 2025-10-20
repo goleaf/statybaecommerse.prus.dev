@@ -47,6 +47,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 use Filament\Forms\Form;
@@ -73,6 +74,31 @@ final class ProductResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Product::class);
+    }
+
+    public static function canView(Product $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Product::class);
+    }
+
+    public static function canEdit(Product $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Product $record): bool
+    {
+        return Gate::allows('delete', $record);
+    }
 
     public static function getNavigationLabel(): string
     {
