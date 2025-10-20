@@ -482,7 +482,15 @@ final class ReportResource extends Resource
                             ->boolean(),
                         TextEntry::make('schedule_frequency')
                             ->label(__('reports.fields.schedule_frequency'))
-                            ->formatStateUsing(fn (string $state): string => __("reports.frequencies.{$state}"))
+                            ->formatStateUsing(
+                                function (?string $state): ?string {
+                                    if (blank($state)) {
+                                        return null;
+                                    }
+
+                                    return __("reports.frequencies.{$state}");
+                                }
+                            )
                             ->placeholder(__('reports.placeholders.no_schedule')),
                     ])
                     ->columns(2),
