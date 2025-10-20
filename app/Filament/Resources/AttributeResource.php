@@ -8,7 +8,9 @@ use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
 use BackedEnum;
 use Filament\Actions;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -16,28 +18,21 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Products';
     }
@@ -63,7 +58,7 @@ final class AttributeResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Section::make(__('attributes.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -215,7 +210,7 @@ final class AttributeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(\App\Models\Attribute::query()->withoutGlobalScopes())
+            ->query(Attribute::query()->withoutGlobalScopes())
             ->deferLoading(false)
             ->columns([
                 TextColumn::make('name')
@@ -230,8 +225,8 @@ final class AttributeResource extends Resource
                     ->color('gray'),
                 TextColumn::make('type')
                     ->label(__('attributes.type'))
-                    ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
-                    ->color(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("attributes.types.{$state}") : __('attributes.none'))
+                    ->color(fn (?string $state): string => match ($state) {
                         'text'        => 'blue',
                         'number'      => 'green',
                         'select'      => 'purple',
@@ -241,6 +236,7 @@ final class AttributeResource extends Resource
                         'datetime'    => 'indigo',
                         'color'       => 'red',
                         'file'        => 'gray',
+                        'image'       => 'cyan',
                         'url'         => 'teal',
                         default       => 'gray',
                     }),
