@@ -18,11 +18,16 @@
 /public/storage
 /storage/*.key
 /storage/app/coverage/
+/storage/app/backups/
 /storage/pail
 /vendor
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Backup archives
+*.sql.gz
+*.tar
 
 # PHPDoc generated files
 /docs/html/
