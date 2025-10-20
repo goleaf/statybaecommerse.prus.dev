@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Filament\Components\LiveNotificationFeed;
+use App\Models\DiscountCode;
+use App\Models\DiscountRedemption;
+use App\Models\Document;
+use App\Models\EmailCampaign;
+use App\Models\SystemSetting;
+use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
@@ -40,6 +46,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->registerModelObservers();
+
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
@@ -170,6 +178,17 @@ class AppServiceProvider extends ServiceProvider
                 // ignore macro registration failures
             }
         }
+    }
+
+    private function registerModelObservers(): void
+    {
+        $observer = UserAttributionObserver::class;
+
+        DiscountCode::observe($observer);
+        DiscountRedemption::observe($observer);
+        Document::observe($observer);
+        EmailCampaign::observe($observer);
+        SystemSetting::observe($observer);
     }
 
     /**
