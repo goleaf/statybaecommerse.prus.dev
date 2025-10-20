@@ -51,6 +51,7 @@ final class News extends Model
     protected $fillable = [
         'is_visible',
         'is_featured',
+        'is_breaking',
         'moderation_state',
         'submitted_for_review_at',
         'approved_at',
@@ -70,6 +71,7 @@ final class News extends Model
         return [
             'is_visible' => 'boolean',
             'is_featured' => 'boolean',
+            'is_breaking' => 'boolean',
             'moderation_state' => ModerationState::class,
             'submitted_for_review_at' => 'datetime',
             'approved_at' => 'datetime',
@@ -107,6 +109,7 @@ final class News extends Model
                 'approved_by_id',
                 'is_visible',
                 'is_featured',
+                'is_breaking',
                 'published_at',
                 'author_name',
                 'author_email',
