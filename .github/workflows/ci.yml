@@ -56,3 +56,26 @@ jobs:
 
       - name: Run PHP 9 readiness doctor
         run: php artisan app:doctor --no-interaction
+
+  docs-size:
+    name: Documentation Asset Size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure documentation files stay under 2MB
+        run: |
+          set -euo pipefail
+          if [ ! -d docs ]; then
+            exit 0
+          fi
+
+          # Find any files larger than 2MB inside /docs
+          offending_files=$(find docs -type f -size +2M)
+
+          if [ -n "${offending_files}" ]; then
+            echo "The following documentation files exceed 2MB:" >&2
+            echo "${offending_files}" >&2
+            exit 1
+          fi
