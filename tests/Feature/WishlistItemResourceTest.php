@@ -135,6 +135,21 @@ class WishlistItemResourceTest extends TestCase
     /**
      * @test
      */
+    public function wishlist_user_placeholder_updates_when_wishlist_changes(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(\App\Filament\Resources\WishlistItemResource\Pages\CreateWishlistItem::class)
+            ->assertFormFieldExists('wishlist_id')
+            ->fillForm([
+                'wishlist_id' => $this->wishlist->id,
+            ])
+            ->assertSee($this->regularUser->name);
+    }
+
+    /**
+     * @test
+     */
     public function admin_can_edit_wishlist_item(): void
     {
         $this->actingAs($this->adminUser);
