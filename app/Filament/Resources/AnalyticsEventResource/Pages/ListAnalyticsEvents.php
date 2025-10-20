@@ -6,8 +6,8 @@ namespace App\Filament\Resources\AnalyticsEventResource\Pages;
 
 use App\Filament\Resources\AnalyticsEventResource;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListAnalyticsEvents extends ListRecords
@@ -24,7 +24,7 @@ final class ListAnalyticsEvents extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('analytics_events.tabs.all')),
+            'all'        => Tab::make(__('analytics_events.tabs.all')),
             'page_views' => Tab::make(__('analytics_events.tabs.page_views'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('event_type', 'page_view'))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('event_type', 'page_view')->count()),

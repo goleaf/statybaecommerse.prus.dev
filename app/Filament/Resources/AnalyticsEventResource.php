@@ -14,16 +14,17 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -64,7 +65,7 @@ final class AnalyticsEventResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Section::make(__('analytics_events.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -77,27 +78,27 @@ final class AnalyticsEventResource extends Resource
                             Select::make('event_type')
                                 ->label(__('analytics_events.event_type'))
                                 ->options([
-                                    'page_view' => __('analytics_events.types.page_view'),
-                                    'click' => __('analytics_events.types.click'),
+                                    'page_view'   => __('analytics_events.types.page_view'),
+                                    'click'       => __('analytics_events.types.click'),
                                     'form_submit' => __('analytics_events.types.form_submit'),
-                                    'purchase' => __('analytics_events.types.purchase'),
-                                    'signup' => __('analytics_events.types.signup'),
-                                    'login' => __('analytics_events.types.login'),
-                                    'logout' => __('analytics_events.types.logout'),
-                                    'search' => __('analytics_events.types.search'),
-                                    'download' => __('analytics_events.types.download'),
-                                    'custom' => __('analytics_events.types.custom'),
+                                    'purchase'    => __('analytics_events.types.purchase'),
+                                    'signup'      => __('analytics_events.types.signup'),
+                                    'login'       => __('analytics_events.types.login'),
+                                    'logout'      => __('analytics_events.types.logout'),
+                                    'search'      => __('analytics_events.types.search'),
+                                    'download'    => __('analytics_events.types.download'),
+                                    'custom'      => __('analytics_events.types.custom'),
                                     // Extended set to avoid validation issues on edit
-                                    'product_view' => __('analytics_events.types.product_view'),
-                                    'add_to_cart' => __('analytics_events.types.add_to_cart'),
-                                    'remove_from_cart' => __('analytics_events.types.remove_from_cart'),
-                                    'user_register' => __('analytics_events.types.user_register'),
-                                    'user_login' => __('analytics_events.types.user_login'),
-                                    'user_logout' => __('analytics_events.types.user_logout'),
+                                    'product_view'      => __('analytics_events.types.product_view'),
+                                    'add_to_cart'       => __('analytics_events.types.add_to_cart'),
+                                    'remove_from_cart'  => __('analytics_events.types.remove_from_cart'),
+                                    'user_register'     => __('analytics_events.types.user_register'),
+                                    'user_login'        => __('analytics_events.types.user_login'),
+                                    'user_logout'       => __('analytics_events.types.user_logout'),
                                     'newsletter_signup' => __('analytics_events.types.newsletter_signup'),
-                                    'contact_form' => __('analytics_events.types.contact_form'),
-                                    'video_play' => __('analytics_events.types.video_play'),
-                                    'social_share' => __('analytics_events.types.social_share'),
+                                    'contact_form'      => __('analytics_events.types.contact_form'),
+                                    'video_play'        => __('analytics_events.types.video_play'),
+                                    'social_share'      => __('analytics_events.types.social_share'),
                                 ])
                                 ->default('custom'),
                         ]),
@@ -116,7 +117,7 @@ final class AnalyticsEventResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, \Filament\Schemas\Components\Utilities\Set $set) {
+                        ->afterStateUpdated(function ($state, Set $set): void {
                             if ($state) {
                                 $user = User::find($state);
                                 if ($user) {
@@ -234,17 +235,17 @@ final class AnalyticsEventResource extends Resource
                     ->formatStateUsing(fn (string $state): string => __("analytics_events.types.{$state}"))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'page_view' => 'blue',
-                        'click' => 'green',
+                        'page_view'   => 'blue',
+                        'click'       => 'green',
                         'form_submit' => 'purple',
-                        'purchase' => 'orange',
-                        'signup' => 'pink',
-                        'login' => 'indigo',
-                        'logout' => 'gray',
-                        'search' => 'teal',
-                        'download' => 'yellow',
-                        'custom' => 'gray',
-                        default => 'gray',
+                        'purchase'    => 'orange',
+                        'signup'      => 'pink',
+                        'login'       => 'indigo',
+                        'logout'      => 'gray',
+                        'search'      => 'teal',
+                        'download'    => 'yellow',
+                        'custom'      => 'gray',
+                        default       => 'gray',
                     }),
                 TextColumn::make('user.name')
                     ->label(__('analytics_events.user'))
@@ -300,16 +301,16 @@ final class AnalyticsEventResource extends Resource
             ->filters([
                 SelectFilter::make('event_type')
                     ->options([
-                        'page_view' => __('analytics_events.types.page_view'),
-                        'click' => __('analytics_events.types.click'),
+                        'page_view'   => __('analytics_events.types.page_view'),
+                        'click'       => __('analytics_events.types.click'),
                         'form_submit' => __('analytics_events.types.form_submit'),
-                        'purchase' => __('analytics_events.types.purchase'),
-                        'signup' => __('analytics_events.types.signup'),
-                        'login' => __('analytics_events.types.login'),
-                        'logout' => __('analytics_events.types.logout'),
-                        'search' => __('analytics_events.types.search'),
-                        'download' => __('analytics_events.types.download'),
-                        'custom' => __('analytics_events.types.custom'),
+                        'purchase'    => __('analytics_events.types.purchase'),
+                        'signup'      => __('analytics_events.types.signup'),
+                        'login'       => __('analytics_events.types.login'),
+                        'logout'      => __('analytics_events.types.logout'),
+                        'search'      => __('analytics_events.types.search'),
+                        'download'    => __('analytics_events.types.download'),
+                        'custom'      => __('analytics_events.types.custom'),
                     ]),
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
@@ -453,10 +454,10 @@ final class AnalyticsEventResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAnalyticsEvents::route('/'),
+            'index'  => Pages\ListAnalyticsEvents::route('/'),
             'create' => Pages\CreateAnalyticsEvent::route('/create'),
-            'view' => Pages\ViewAnalyticsEvent::route('/{record}'),
-            'edit' => Pages\EditAnalyticsEvent::route('/{record}/edit'),
+            'view'   => Pages\ViewAnalyticsEvent::route('/{record}'),
+            'edit'   => Pages\EditAnalyticsEvent::route('/{record}/edit'),
         ];
     }
 }
