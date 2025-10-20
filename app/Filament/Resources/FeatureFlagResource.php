@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -19,6 +18,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TableEditAction;
 use Filament\Tables\Actions\ViewAction as TableViewAction;
@@ -134,20 +134,20 @@ final class FeatureFlagResource extends Resource
                             Select::make('environment')
                                 ->label(__('feature_flags.environment'))
                                 ->options([
-                                    'local' => 'Local',
-                                    'staging' => 'Staging',
+                                    'local'      => 'Local',
+                                    'staging'    => 'Staging',
                                     'production' => 'Production',
                                 ])
                                 ->nullable(),
                             Select::make('category')
                                 ->label(__('feature_flags.category'))
                                 ->options([
-                                    'ui' => 'UI/UX',
+                                    'ui'          => 'UI/UX',
                                     'performance' => 'Performance',
-                                    'security' => 'Security',
-                                    'analytics' => 'Analytics',
-                                    'payment' => 'Payment',
-                                    'shipping' => 'Shipping',
+                                    'security'    => 'Security',
+                                    'analytics'   => 'Analytics',
+                                    'payment'     => 'Payment',
+                                    'shipping'    => 'Shipping',
                                 ])
                                 ->nullable(),
                         ]),
@@ -202,22 +202,22 @@ final class FeatureFlagResource extends Resource
                     ->label(__('feature_flags.category'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'ui' => 'info',
+                        'ui'          => 'info',
                         'performance' => 'success',
-                        'security' => 'danger',
-                        'analytics' => 'warning',
-                        'payment' => 'primary',
-                        'shipping' => 'secondary',
-                        default => 'gray',
+                        'security'    => 'danger',
+                        'analytics'   => 'warning',
+                        'payment'     => 'primary',
+                        'shipping'    => 'secondary',
+                        default       => 'gray',
                     }),
                 TextColumn::make('environment')
                     ->label(__('feature_flags.environment'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'local' => 'gray',
-                        'staging' => 'warning',
+                        'local'      => 'gray',
+                        'staging'    => 'warning',
                         'production' => 'success',
-                        default => 'gray',
+                        default      => 'gray',
                     }),
                 IconColumn::make('is_active')
                     ->label(__('feature_flags.is_active'))
@@ -270,18 +270,18 @@ final class FeatureFlagResource extends Resource
                 SelectFilter::make('category')
                     ->label(__('feature_flags.category'))
                     ->options([
-                        'ui' => 'UI/UX',
+                        'ui'          => 'UI/UX',
                         'performance' => 'Performance',
-                        'security' => 'Security',
-                        'analytics' => 'Analytics',
-                        'payment' => 'Payment',
-                        'shipping' => 'Shipping',
+                        'security'    => 'Security',
+                        'analytics'   => 'Analytics',
+                        'payment'     => 'Payment',
+                        'shipping'    => 'Shipping',
                     ]),
                 SelectFilter::make('environment')
                     ->label(__('feature_flags.environment'))
                     ->options([
-                        'local' => 'Local',
-                        'staging' => 'Staging',
+                        'local'      => 'Local',
+                        'staging'    => 'Staging',
                         'production' => 'Production',
                     ]),
                 TernaryFilter::make('is_active')
@@ -294,7 +294,7 @@ final class FeatureFlagResource extends Resource
             ->actions([
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make(),
+                TableDeleteAction::make(),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
@@ -320,10 +320,10 @@ final class FeatureFlagResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFeatureFlags::route('/'),
+            'index'  => Pages\ListFeatureFlags::route('/'),
             'create' => Pages\CreateFeatureFlag::route('/create'),
-            'view' => Pages\ViewFeatureFlag::route('/{record}'),
-            'edit' => Pages\EditFeatureFlag::route('/{record}/edit'),
+            'view'   => Pages\ViewFeatureFlag::route('/{record}'),
+            'edit'   => Pages\EditFeatureFlag::route('/{record}/edit'),
         ];
     }
 }
