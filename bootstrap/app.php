@@ -1,8 +1,10 @@
 <?php
 
+use App\Support\ApiErrorResponse;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 require_once __DIR__ . '/../app/Support/filament_compat.php';
@@ -39,7 +41,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Throwable $exception, Request $request) {
+            if (! $request->expectsJson()) {
+                return null;
+            }
+
+            return ApiErrorResponse::fromThrowable($exception, $request);
+        });
     })
     ->withProviders([
         App\Providers\AuthServiceProvider::class,
