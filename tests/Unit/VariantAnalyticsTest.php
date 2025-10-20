@@ -7,6 +7,7 @@ namespace Tests\Unit;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 final class VariantAnalyticsTest extends TestCase
@@ -266,6 +267,34 @@ final class VariantAnalyticsTest extends TestCase
 
         // Verify the record was actually updated, not created new
         $this->assertDatabaseCount('variant_analytics', 1);
+    }
+
+    public function test_record_analytics_normalizes_numeric_timestamp_dates(): void
+    {
+        // Arrange
+        $variant = ProductVariant::factory()->create();
+        $timestamp = Carbon::create(2024, 5, 1, 12)->timestamp;
+
+        // Act
+        $analytics = VariantAnalytics::recordAnalytics($variant->id, $timestamp);
+
+        // Assert
+        $this->assertEquals('2024-05-01', $analytics->date->toDateString());
+    }
+
+    public function test_record_analytics_uses_current_date_when_input_is_null(): void
+    {
+        // Arrange
+        $variant = ProductVariant::factory()->create();
+        Carbon::setTestNow(Carbon::create(2024, 6, 15, 9));
+
+        // Act
+        $analytics = VariantAnalytics::recordAnalytics($variant->id, null);
+
+        // Assert
+        $this->assertEquals('2024-06-15', $analytics->date->toDateString());
+
+        Carbon::setTestNow();
     }
 
     public function test_increment_metric_updates_correctly(): void
