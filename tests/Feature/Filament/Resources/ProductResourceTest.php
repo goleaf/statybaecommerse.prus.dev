@@ -8,10 +8,15 @@ use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\Pages\CreateProduct;
 use App\Filament\Resources\ProductResource\Pages\EditProduct;
 use App\Filament\Resources\ProductResource\Pages\ListProducts;
+use App\Jobs\ProcessExportJob;
 use App\Models\Brand;
+use App\Models\Export;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -149,6 +154,31 @@ final class ProductResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertSoftDeleted('products', ['id' => $product->id]);
+    }
+
+    public function test_can_queue_product_export(): void
+    {
+        config()->set('filesystems.default', 'public');
+        Storage::fake('public');
+        Notification::fake();
+        Bus::fake();
+
+        $products = Product::factory()->count(2)->create();
+
+        Livewire::test(ListProducts::class)
+            ->call('loadTable')
+            ->callTableBulkAction('export_selected', $products, [
+                'format' => 'xlsx',
+                'columns' => ['sku', 'name'],
+            ])
+            ->assertHasNoTableBulkActionErrors();
+
+        $export = Export::query()->latest()->first();
+
+        $this->assertNotNull($export);
+        $this->assertSame('xlsx', $export->format);
+
+        Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
     }
 
     public function test_can_bulk_feature_products(): void
