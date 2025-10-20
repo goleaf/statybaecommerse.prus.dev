@@ -24,7 +24,7 @@ final class SlidersTable
                     ->getStateUsing(function ($record): ?string {
                         return $record->getFirstMedia('slider_images')?->getUrl('thumb');
                     })
-                    ->defaultImageUrl('/images/placeholder-slider.png')
+                    ->defaultImageUrl('/images/placeholder-slider.svg')
                     ->size(60)
                     ->square(),
                 TextColumn::make('title')

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">Slider placeholder</title>
+  <desc id="desc">Gray gradient background with diagonal stripes and slider icon</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#f3f4f6" />
+      <stop offset="100%" stop-color="#e5e7eb" />
+    </linearGradient>
+    <pattern id="stripes" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="20" height="40" fill="rgba(255,255,255,0.4)" />
+    </pattern>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)" />
+  <rect width="1200" height="600" fill="url(#stripes)" opacity="0.35" />
+  <g transform="translate(600 300)" fill="#9ca3af">
+    <circle r="140" fill="none" stroke="#9ca3af" stroke-width="16" />
+    <rect x="-220" y="-18" width="440" height="36" rx="18" fill="#d1d5db" />
+    <circle cx="110" r="36" fill="#9ca3af" />
+  </g>
+  <text x="600" y="470" text-anchor="middle" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="52" font-weight="600" fill="#6b7280">
+    Slider image placeholder
+  </text>
+</svg>
