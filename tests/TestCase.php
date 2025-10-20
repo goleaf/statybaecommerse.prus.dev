@@ -4,6 +4,8 @@ namespace Tests;
 
 use Filament\Facades\Filament;
 use Filament\Panel;
+use Illuminate\Contracts\Translation\Loader as TranslationLoader;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Config;
 
@@ -32,6 +34,7 @@ abstract class TestCase extends BaseTestCase
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
+        $this->refreshTranslationLoader();
         $this->withoutMiddleware([
             \App\Http\Middleware\ZoneDetector::class,
             \App\Http\Middleware\SetLocale::class,
@@ -76,5 +79,57 @@ abstract class TestCase extends BaseTestCase
         $this->resolvedAdminPanel = $panel;
 
         return $panel;
+    }
+
+    /**
+     * Ensure JSON translation files remain available during tests.
+     */
+    private function refreshTranslationLoader(): void
+    {
+        /** @var TranslatorContract $translator */
+        $translator = app('translator');
+
+        if (method_exists($translator, 'getLoader')) {
+            $loader = $translator->getLoader();
+
+            if ($loader instanceof TranslationLoader && method_exists($loader, 'addJsonPath')) {
+                $loader->addJsonPath(lang_path());
+            }
+        }
+
+        if (method_exists($translator, 'setLoaded')) {
+            $translator->setLoaded([]);
+        } elseif (method_exists($translator, 'flushLoadedTranslations')) {
+            $translator->flushLoadedTranslations();
+        }
+
+        $defaultLocale = (string) config('app.locale', 'en');
+        $fallbackLocale = (string) config('app.fallback_locale', 'en');
+
+        app()->setLocale($defaultLocale);
+        $translator->setLocale($defaultLocale);
+        $translator->setFallback($fallbackLocale);
+
+        if (method_exists($translator, 'load')) {
+            foreach ($this->supportedLocalesForTesting() as $locale) {
+                $translator->load('*', 'json', $locale);
+            }
+        }
+    }
+
+    /**
+     * Resolve all locales that should be considered during tests.
+     *
+     * @return array<int, string>
+     */
+    private function supportedLocalesForTesting(): array
+    {
+        $configured = config('shared.localization.supported_locales', []);
+        $appConfigured = array_filter(array_map('trim', explode(',', (string) config('app.supported_locales', ''))));
+        $fallback = (string) config('app.fallback_locale', '');
+
+        $locales = array_filter(array_merge($configured, $appConfigured, [$fallback]));
+
+        return array_values(array_unique($locales));
     }
 }
