@@ -119,7 +119,6 @@ final class RecommendationCacheResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('block.name')
@@ -137,6 +136,10 @@ final class RecommendationCacheResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
 
                         return strlen($state) > 30 ? $state : null;
                     }),
