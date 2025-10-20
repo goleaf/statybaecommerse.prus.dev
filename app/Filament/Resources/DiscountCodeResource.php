@@ -12,6 +12,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -22,28 +23,25 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class DiscountCodeResource extends Resource
 {
     protected static ?string $model = DiscountCode::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    /**
+     * @var BackedEnum|string|null Icon displayed in the Filament navigation.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+
+    public static function getNavigationGroup(): string
     {
         return 'Marketing';
-    }
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
     }
 
     /**
@@ -96,12 +94,13 @@ final class DiscountCodeResource extends Resource
                             Select::make('type')
                                 ->label(__('discount_codes.type'))
                                 ->options([
-                                    'percentage' => __('discount_codes.types.percentage'),
-                                    'fixed' => __('discount_codes.types.fixed'),
+                                    'percentage'    => __('discount_codes.types.percentage'),
+                                    'fixed'         => __('discount_codes.types.fixed'),
                                     'free_shipping' => __('discount_codes.types.free_shipping'),
-                                    'buy_x_get_y' => __('discount_codes.types.buy_x_get_y'),
+                                    'buy_x_get_y'   => __('discount_codes.types.buy_x_get_y'),
                                 ])
                                 ->default('percentage')
+                                ->required()
                                 ->live(),
                             TextInput::make('value')
                                 ->label(__('discount_codes.value'))
@@ -228,22 +227,22 @@ final class DiscountCodeResource extends Resource
                     ->label(__('discount_codes.type'))
                     ->formatStateUsing(fn (string $state): string => __("discount_codes.types.{$state}"))
                     ->color(fn (string $state): string => match ($state) {
-                        'percentage' => 'green',
-                        'fixed' => 'blue',
+                        'percentage'    => 'green',
+                        'fixed'         => 'blue',
                         'free_shipping' => 'purple',
-                        'buy_x_get_y' => 'orange',
-                        default => 'gray',
+                        'buy_x_get_y'   => 'orange',
+                        default         => 'gray',
                     }),
                 TextColumn::make('value')
                     ->label(__('discount_codes.value'))
                     ->formatStateUsing(function ($state, $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
+                            return $state . '%';
                         } elseif ($record->type === 'free_shipping') {
                             return __('discount_codes.free_shipping');
                         }
 
-                        return '€'.number_format($state, 2);
+                        return '€' . number_format($state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -299,10 +298,10 @@ final class DiscountCodeResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'percentage' => __('discount_codes.types.percentage'),
-                        'fixed' => __('discount_codes.types.fixed'),
+                        'percentage'    => __('discount_codes.types.percentage'),
+                        'fixed'         => __('discount_codes.types.fixed'),
                         'free_shipping' => __('discount_codes.types.free_shipping'),
-                        'buy_x_get_y' => __('discount_codes.types.buy_x_get_y'),
+                        'buy_x_get_y'   => __('discount_codes.types.buy_x_get_y'),
                     ]),
                 SelectFilter::make('customer_group_id')
                     ->relationship('customerGroup', 'name')
@@ -324,7 +323,7 @@ final class DiscountCodeResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (DiscountCode $record): string => $record->is_active ? __('discount_codes.deactivate') : __('discount_codes.activate'))
@@ -344,8 +343,8 @@ final class DiscountCodeResource extends Resource
                     ->color('info')
                     ->action(function (DiscountCode $record): void {
                         $newDiscountCode = $record->replicate();
-                        $newDiscountCode->code = $record->code.'_copy_'.time();
-                        $newDiscountCode->name = $record->name.' (Copy)';
+                        $newDiscountCode->code = $record->code . '_copy_' . time();
+                        $newDiscountCode->name = $record->name . ' (Copy)';
                         $newDiscountCode->used_count = 0;
                         $newDiscountCode->save();
 
@@ -404,10 +403,10 @@ final class DiscountCodeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDiscountCodes::route('/'),
+            'index'  => Pages\ListDiscountCodes::route('/'),
             'create' => Pages\CreateDiscountCode::route('/create'),
-            'view' => Pages\ViewDiscountCode::route('/{record}'),
-            'edit' => Pages\EditDiscountCode::route('/{record}/edit'),
+            'view'   => Pages\ViewDiscountCode::route('/{record}'),
+            'edit'   => Pages\EditDiscountCode::route('/{record}/edit'),
         ];
     }
 }

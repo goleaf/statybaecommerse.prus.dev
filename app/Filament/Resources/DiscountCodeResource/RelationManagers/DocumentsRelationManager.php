@@ -7,6 +7,7 @@ namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -22,7 +23,7 @@ final class DocumentsRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 Forms\Components\Select::make('template_id')
                     ->label(__('Template'))
                     ->relationship('template', 'name')
@@ -36,16 +37,16 @@ final class DocumentsRelationManager extends RelationManager
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'draft' => __('Draft'),
+                        'draft'     => __('Draft'),
                         'generated' => __('Generated'),
-                        'sent' => __('Sent'),
+                        'sent'      => __('Sent'),
                     ])
                     ->required(),
                 Forms\Components\Select::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ])
                     ->required(),
             ]);
@@ -69,17 +70,17 @@ final class DocumentsRelationManager extends RelationManager
                     ->label(__('Status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'draft' => 'warning',
+                        'draft'     => 'warning',
                         'generated' => 'success',
-                        'sent' => 'info',
-                        default => 'gray',
+                        'sent'      => 'info',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('format')
                     ->label(__('Format'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'html' => 'primary',
-                        'pdf' => 'danger',
+                        'html'  => 'primary',
+                        'pdf'   => 'danger',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('generated_at')
@@ -91,15 +92,15 @@ final class DocumentsRelationManager extends RelationManager
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'draft' => __('Draft'),
+                        'draft'     => __('Draft'),
                         'generated' => __('Generated'),
-                        'sent' => __('Sent'),
+                        'sent'      => __('Sent'),
                     ]),
                 Tables\Filters\SelectFilter::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])
@@ -107,7 +108,7 @@ final class DocumentsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
