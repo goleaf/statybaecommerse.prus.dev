@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -176,6 +177,24 @@ final class NewsCommentResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
+                Action::make('toggle_approval')
+                    ->label(fn (NewsComment $record): string => $record->is_approved
+                        ? __('admin.news_comments.disapprove')
+                        : __('admin.news_comments.approve'))
+                    ->icon(fn (NewsComment $record): string => $record->is_approved
+                        ? 'heroicon-o-x-mark'
+                        : 'heroicon-o-check')
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (NewsComment $record): string => $record->is_approved
+                        ? __('admin.news_comments.confirm_disapprove_heading')
+                        : __('admin.news_comments.confirm_approve_heading'))
+                    ->modalDescription(fn (NewsComment $record): string => $record->is_approved
+                        ? __('admin.news_comments.confirm_disapprove_description')
+                        : __('admin.news_comments.confirm_approve_description'))
+                    ->action(function (NewsComment $record): void {
+                        $record->is_approved = ! $record->is_approved;
+                        $record->save();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
