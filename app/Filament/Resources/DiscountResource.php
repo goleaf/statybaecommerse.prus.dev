@@ -9,6 +9,7 @@ use App\Models\Discount;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class DiscountResource extends Resource
@@ -57,5 +58,33 @@ final class DiscountResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function duplicateDiscount(Discount $discount): Discount
+    {
+        $newDiscount = $discount->replicate();
+
+        $newDiscount->name = sprintf('%s (Copy)', $discount->name);
+        $newDiscount->slug = self::generateDuplicateSlug($discount->name);
+        $newDiscount->status = 'draft';
+        $newDiscount->usage_count = 0;
+
+        $newDiscount->save();
+
+        return $newDiscount;
+    }
+
+    private static function generateDuplicateSlug(string $name): string
+    {
+        $baseSlug = Str::slug($name) ?: 'discount';
+        $candidate = $baseSlug.'-copy';
+        $suffix = 2;
+
+        while (Discount::withoutGlobalScopes()->withTrashed()->where('slug', $candidate)->exists()) {
+            $candidate = sprintf('%s-copy-%d', $baseSlug, $suffix);
+            $suffix++;
+        }
+
+        return $candidate;
     }
 }
