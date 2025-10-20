@@ -7,6 +7,7 @@ namespace Database\Factories\Translations;
 use App\Models\NewsTag;
 use App\Models\Translations\NewsTagTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<NewsTagTranslation>
@@ -23,6 +24,7 @@ final class NewsTagTranslationFactory extends Factory
             'news_tag_id' => NewsTag::factory(),
             'locale' => fake()->randomElement(['lt', 'en']),
             'name' => $name,
+            'slug' => Str::slug($name),
             'description' => fake()->sentence(),
         ];
     }

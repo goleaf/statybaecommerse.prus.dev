@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\NewsTag;
+use App\Models\Translations\NewsTagTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\NewsTag>
@@ -16,7 +18,12 @@ final class NewsTagFactory extends Factory
 
     public function definition(): array
     {
+        $name = $this->faker->unique()->words(2, true);
+
         return [
+            'name' => $name,
+            'slug' => Str::slug($name),
+            'description' => $this->faker->sentence(),
             'is_visible' => $this->faker->boolean(80),  // 80% chance of being visible
             'color' => $this->faker->randomElement([
                 '#3B82F6',  // Blue
@@ -32,6 +39,31 @@ final class NewsTagFactory extends Factory
             ]),
             'sort_order' => $this->faker->numberBetween(0, 100),
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (NewsTag $newsTag): void {
+            $translations = [
+                'lt' => [
+                    'name' => $newsTag->name,
+                    'slug' => $newsTag->slug,
+                    'description' => $newsTag->description,
+                ],
+                'en' => [
+                    'name' => $newsTag->name,
+                    'slug' => $newsTag->slug,
+                    'description' => $newsTag->description,
+                ],
+            ];
+
+            foreach ($translations as $locale => $payload) {
+                NewsTagTranslation::query()->updateOrCreate([
+                    'news_tag_id' => $newsTag->id,
+                    'locale' => $locale,
+                ], $payload);
+            }
+        });
     }
 
     public function active(): static

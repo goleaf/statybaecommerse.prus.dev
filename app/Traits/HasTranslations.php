@@ -56,6 +56,29 @@ trait HasTranslations
         return $this->{$field} ?? null;
     }
 
+    public function getTranslation(string $field, string $locale, bool $useFallbackLocale = true): mixed
+    {
+        $value = $this->trans($field, $locale);
+
+        if ($value !== null && $value !== '') {
+            return $value;
+        }
+
+        if ($useFallbackLocale) {
+            $fallbackLocale = config('app.fallback_locale', config('app.locale'));
+
+            if ($fallbackLocale && $fallbackLocale !== $locale) {
+                $fallbackValue = $this->trans($field, $fallbackLocale);
+
+                if ($fallbackValue !== null && $fallbackValue !== '') {
+                    return $fallbackValue;
+                }
+            }
+        }
+
+        return $this->getAttributeFromArray($field) ?? null;
+    }
+
     protected function translationModelClass(): string
     {
         // Expect model to define translation model via property
