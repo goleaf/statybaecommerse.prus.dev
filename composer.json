@@ -23,6 +23,7 @@
         "lara-zeus/bolt": "^4.0.5",
         "laravel/framework": "^12.0",
         "laravel/horizon": "^5.33",
+        "laravel/sanctum": "^4.2",
         "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",
         "livewire/volt": "^1.0",
