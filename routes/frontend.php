@@ -94,6 +94,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/coupons', [App\Http\Controllers\Frontend\DiscountController::class, 'coupons'])->name('coupons');
         Route::post('/apply-coupon', [App\Http\Controllers\Frontend\DiscountController::class, 'applyCoupon'])->name('apply-coupon');
         Route::post('/remove-coupon', [App\Http\Controllers\Frontend\DiscountController::class, 'removeCoupon'])->name('remove-coupon');
+        Route::get('/{discount:slug}', [App\Http\Controllers\Frontend\DiscountController::class, 'show'])->name('show');
     });
 
     // Collections
