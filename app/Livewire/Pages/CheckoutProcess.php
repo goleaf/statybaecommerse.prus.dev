@@ -7,6 +7,7 @@ namespace App\Livewire\Pages;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\Cart\CartLifecycleService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -149,7 +150,7 @@ final class CheckoutProcess extends Component
         DB::transaction(function () use ($cartItems) {
             $order = $this->createOrder($cartItems);
             $this->createOrderItems($order, $cartItems);
-            $this->clearCart();
+            app(CartLifecycleService::class)->clearAfterCheckout(auth()->id(), Session::getId());
             session()->flash('order_number', $order->number);
             $this->redirect(route('order.confirmation', $order->number));
         });
@@ -190,14 +191,6 @@ final class CheckoutProcess extends Component
     private function getCartItems()
     {
         return CartItem::with('product')->where('session_id', Session::getId())->get();
-    }
-
-    /**
-     * Handle clearCart functionality with proper error handling.
-     */
-    private function clearCart(): void
-    {
-        CartItem::where('session_id', Session::getId())->delete();
     }
 
     /**
