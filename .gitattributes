@@ -9,3 +9,13 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+/tests export-ignore
+/doc export-ignore
+/docs export-ignore
+/docs-test-import export-ignore
+/build export-ignore
+/scripts export-ignore
+/phpunit.xml export-ignore
+/phpstan.neon export-ignore
+/rector.php export-ignore
+/Makefile export-ignore
