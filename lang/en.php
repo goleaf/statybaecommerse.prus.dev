@@ -2,6 +2,8 @@
 
 return [
     // Common
+    'exceptions_orders_not_found' => 'Order :order could not be found.',
+    'exceptions_inventory_insufficient' => 'Inventory for SKU :sku is unavailable.',
     'common' => [
         'back_to_list' => 'Back to List',
         'back_to_list_tooltip' => 'Return to the list view',

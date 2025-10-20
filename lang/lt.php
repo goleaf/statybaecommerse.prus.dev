@@ -2,6 +2,8 @@
 
 return [
     // Common
+    'exceptions_orders_not_found' => 'Užsakymas :order nerastas.',
+    'exceptions_inventory_insufficient' => 'Atsargų SKU :sku nepakanka.',
     'common' => [
         'back_to_list' => 'Grįžti į sąrašą',
         'back_to_list_tooltip' => 'Grįžti į sąrašo rodinį',
