@@ -34,6 +34,24 @@ jobs:
           mkdir -p build
           mkdir -p storage/app/coverage
 
+      - name: Generate API specification
+        run: php artisan api:spec
+
+      - name: Ensure OpenAPI spec is committed
+        run: |
+          git diff -- public/openapi.json public/openapi.yaml
+          git diff --exit-code -- public/openapi.json public/openapi.yaml || \
+            (echo "::error::OpenAPI spec files are out of date. Run 'php artisan api:spec' locally and commit the changes." && exit 1)
+
+      - name: Upload OpenAPI spec artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-spec
+          path: |
+            public/openapi.json
+            public/openapi.yaml
+
       - name: Run test suite
         run: composer test:ci
 
