@@ -230,24 +230,24 @@
         return {
             loading: false,
 
-            async updateQuantity(productId, newQuantity) {
+            async updateQuantity(itemId, newQuantity) {
                 if (newQuantity < 1) {
-                    this.removeItem(productId);
+                    this.removeItem(itemId);
                     return;
                 }
 
                 this.loading = true;
 
                 try {
-                    const response = await fetch('/cart/update', {
-                        method: 'POST',
+                    const response = await fetch(`/cart/items/${itemId}`, {
+                        method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                                 'content')
                         },
                         body: JSON.stringify({
-                            product_id: productId,
                             quantity: newQuantity
                         })
                     });
@@ -266,7 +266,7 @@
                 }
             },
 
-            async removeItem(productId) {
+            async removeItem(itemId) {
                 if (!confirm('{{ __('Are you sure you want to remove this item from your cart?') }}')) {
                     return;
                 }
@@ -274,16 +274,14 @@
                 this.loading = true;
 
                 try {
-                    const response = await fetch('/cart/remove', {
-                        method: 'POST',
+                    const response = await fetch(`/cart/items/${itemId}`, {
+                        method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                                 'content')
-                        },
-                        body: JSON.stringify({
-                            product_id: productId
-                        })
+                        }
                     });
 
                     if (response.ok) {
