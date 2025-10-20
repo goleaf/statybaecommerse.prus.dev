@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use BackedEnum;
+use UnitEnum;
 use Filament\Pages\Page;
 
 final class AdvancedReports extends Page
 {
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static ?string $navigationGroup = 'Analytics';
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
     protected static ?string $title = 'Advanced Reports';
 

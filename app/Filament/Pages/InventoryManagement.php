@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Product;
 use BackedEnum;
+use UnitEnum;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -19,12 +20,9 @@ final class InventoryManagement extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static ?string $navigationGroup = 'Products';
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     public static function getSlug(?\Filament\Panel $panel = null): string
     {
