@@ -12,6 +12,36 @@ final class CacheKeys
     public const TTL_SIX_HOURS = 21600;
     public const TTL_ONE_DAY = 86400;
 
+    public static function productTotalCount(): string
+    {
+        return 'product:aggregate:count';
+    }
+
+    public static function userTotalCount(): string
+    {
+        return 'user:aggregate:count';
+    }
+
+    public static function dashboardMetric(string $metric, string $locale): string
+    {
+        return sprintf('dashboard:metrics:%s:%s', $metric, $locale);
+    }
+
+    public static function productAggregateTag(): string
+    {
+        return 'product:aggregate';
+    }
+
+    public static function userAggregateTag(): string
+    {
+        return 'user:aggregate';
+    }
+
+    public static function orderAggregateTag(): string
+    {
+        return 'order:aggregate';
+    }
+
     public static function homeStats(string $locale): string
     {
         return self::homeKey('stats', $locale);
