@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 final class Kernel extends ConsoleKernel
 {
+    /** @var array<int, class-string<Command>> */
     protected $commands = [
+        \App\Console\Commands\BackupPrepareCommand::class,
+        \App\Console\Commands\BackupVerifyCommand::class,
         \App\Console\Commands\FixCodeStyleCommand::class,
         \App\Console\Commands\ValidateCodeStyleCommand::class,
         \App\Console\Commands\CodeStyleWatchCommand::class,
@@ -26,7 +30,7 @@ final class Kernel extends ConsoleKernel
             ->dailyAt('02:00')
             ->withoutOverlapping()
             ->runInBackground()
-            ->onFailure(function () {
+            ->onFailure(function (): void {
                 \Log::error('Daily code style validation failed');
             });
 
@@ -36,7 +40,7 @@ final class Kernel extends ConsoleKernel
             ->weeklyOn(0, '03:00')
             ->withoutOverlapping()
             ->runInBackground()
-            ->onSuccess(function () {
+            ->onSuccess(function (): void {
                 \Log::info('Weekly code style fix completed successfully');
             });
     }
