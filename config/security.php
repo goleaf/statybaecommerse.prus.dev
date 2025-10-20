@@ -56,8 +56,28 @@ return [
     'rate_limiting' => [
         'api' => [
             'default' => (int) env('API_RATE_LIMIT_DEFAULT', 60),
-            'notifications' => (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60),
-            'autocomplete' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30),
+            'read' => [
+                'per_user' => (int) env('API_RATE_LIMIT_READ_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT', 60)),
+                'per_ip' => (int) env('API_RATE_LIMIT_READ_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT', 60)),
+            ],
+            'write' => [
+                'per_user' => (int) env('API_RATE_LIMIT_WRITE_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT', 60)),
+                'per_ip' => (int) env('API_RATE_LIMIT_WRITE_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT', 60)),
+            ],
+            'notifications' => [
+                'read' => [
+                    'per_user' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_READ_PER_USER', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
+                    'per_ip' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_READ_PER_IP', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
+                ],
+                'write' => [
+                    'per_user' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_WRITE_PER_USER', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
+                    'per_ip' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_WRITE_PER_IP', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
+                ],
+            ],
+            'autocomplete' => [
+                'per_user' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_PER_USER', (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30)),
+                'per_ip' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_PER_IP', (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30)),
+            ],
         ],
         'auth' => [
             'login' => [
