@@ -157,6 +157,22 @@ final class SystemSettingDependencyResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if ($state === null) {
+                            return null;
+                        }
+
+                        if (! is_string($state)) {
+                            if (! is_scalar($state)) {
+                                return null;
+                            }
+
+                            $state = (string) $state;
+                        }
+
+                        if ($state === '') {
+                            return null;
+                        }
+
                         return strlen($state) > 50 ? $state : null;
                     })
                     ->searchable()
@@ -265,7 +281,7 @@ final class SystemSettingDependencyResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingDependency $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->condition = $record->condition.' (Copy)';
+                        $newRecord->condition = $record->condition . ' (Copy)';
                         $newRecord->is_active = false;
                         $newRecord->save();
 
@@ -322,7 +338,7 @@ final class SystemSettingDependencyResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each(function (SystemSettingDependency $record) {
                                 $newRecord = $record->replicate();
-                                $newRecord->condition = $record->condition.' (Copy)';
+                                $newRecord->condition = $record->condition . ' (Copy)';
                                 $newRecord->is_active = false;
                                 $newRecord->save();
                             });
@@ -350,10 +366,10 @@ final class SystemSettingDependencyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettingDependencies::route('/'),
+            'index'  => Pages\ListSystemSettingDependencies::route('/'),
             'create' => Pages\CreateSystemSettingDependency::route('/create'),
-            'view' => Pages\ViewSystemSettingDependency::route('/{record}'),
-            'edit' => Pages\EditSystemSettingDependency::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingDependency::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingDependency::route('/{record}/edit'),
         ];
     }
 }
