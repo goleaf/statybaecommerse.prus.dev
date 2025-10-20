@@ -30,6 +30,7 @@ return [
             'documentable_type' => 'Related Model Type',
             'documentable_id' => 'Related Model ID',
             'created_by' => 'Created By',
+            'updated_by' => 'Updated By',
             'created_at' => 'Created At',
             'generated_at' => 'Generated At',
             'file_path' => 'File Path',
