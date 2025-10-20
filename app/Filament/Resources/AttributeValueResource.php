@@ -29,8 +29,8 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -98,9 +98,9 @@ final class AttributeValueResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            SchemaSection::make(__('attribute_values.basic_information'))
+            Section::make(__('attribute_values.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Select::make('attribute_id')
                                 ->label(__('attribute_values.attribute'))
@@ -131,7 +131,7 @@ final class AttributeValueResource extends Resource
                                 ])
                                 ->required(),
                         ]),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Select::make('valueable_type')
                                 ->label(__('attribute_values.valueable_type'))
@@ -159,9 +159,9 @@ final class AttributeValueResource extends Resource
                                 ->searchable(),
                         ]),
                 ]),
-            SchemaSection::make(__('attribute_values.value_information'))
+            Section::make(__('attribute_values.value_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('value')
                                 ->label(__('attribute_values.value'))
@@ -191,9 +191,9 @@ final class AttributeValueResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            SchemaSection::make(__('attribute_values.settings'))
+            Section::make(__('attribute_values.settings'))
                 ->schema([
-                    SchemaGrid::make(3)
+                    Grid::make(3)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('attribute_values.is_active'))
@@ -207,7 +207,7 @@ final class AttributeValueResource extends Resource
                                 ->default(false)
                                 ->helperText(__('attribute_values.is_searchable_help')),
                         ]),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('attribute_values.sort_order'))
@@ -221,7 +221,7 @@ final class AttributeValueResource extends Resource
                                 ->helperText(__('attributes.color_help')),
                         ]),
                 ]),
-            SchemaSection::make(__('attributes.meta_data'))
+            Section::make(__('attributes.meta_data'))
                 ->schema([
                     KeyValue::make('metadata')
                         ->label(__('attributes.meta_data'))
@@ -268,7 +268,6 @@ final class AttributeValueResource extends Resource
                 TextColumn::make('valueable.name')
                     ->label(__('attribute_values.item'))
                     ->limit(50)
-                    ->searchable()
                     ->sortable()
                     ->url(fn (AttributeValue $record): string => match ($record->valueable_type) {
                         'product' => route('filament.admin.resources.products.view', $record->valueable_id),
