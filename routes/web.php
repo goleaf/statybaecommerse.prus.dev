@@ -5,15 +5,17 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\NewsCommentController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SecureMediaDownloadController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
 // Include frontend routes
-require __DIR__.'/frontend.php';
+require __DIR__ . '/frontend.php';
 
 // Include admin routes
-require __DIR__.'/admin.php';
+require __DIR__ . '/admin.php';
 
 Route::middleware(['web', 'signed'])
     ->get('/secure-media/{encodedPath}', SecureMediaDownloadController::class)
@@ -28,6 +30,14 @@ Route::middleware(['web'])->group(function () {
 
     // Product Variants Showcase
     Route::get('/variant-showcase', App\Livewire\ProductVariantShowcase::class)->name('variant-showcase');
+
+    Route::prefix('news')->name('news.')->group(function (): void {
+        Route::get('/', [NewsController::class, 'index'])->name('index');
+        Route::get('/category/{slug}', [NewsController::class, 'category'])->name('category');
+        Route::get('/tag/{slug}', [NewsController::class, 'tag'])->name('tag');
+        Route::get('/{slug}', [NewsController::class, 'show'])->name('show');
+        Route::post('/{slug}/comments', [NewsCommentController::class, 'store'])->name('comments.store');
+    });
     // Campaign Frontend Routes
     Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\CampaignController::class, 'index'])->name('index');
@@ -226,25 +236,25 @@ Route::middleware(['web'])->group(function () {
     // Discount resource HTTP helpers for tests
     Route::post('/admin/discounts', function (\Illuminate\Http\Request $request) {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'in:percentage,fixed,free_shipping,bogo'],
-            'value' => ['required', 'numeric', 'min:0'],
-            'starts_at' => ['required', 'date'],
-            'ends_at' => ['nullable', 'date', 'after:starts_at'],
-            'is_active' => ['nullable', 'boolean'],
+            'type'        => ['required', 'in:percentage,fixed,free_shipping,bogo'],
+            'value'       => ['required', 'numeric', 'min:0'],
+            'starts_at'   => ['required', 'date'],
+            'ends_at'     => ['nullable', 'date', 'after:starts_at'],
+            'is_active'   => ['nullable', 'boolean'],
         ]);
 
         Discount::query()->create([
-            'name' => $data['name'],
-            'slug' => str($data['name'])->slug()->toString(),
+            'name'        => $data['name'],
+            'slug'        => str($data['name'])->slug()->toString(),
             'description' => $data['description'] ?? null,
-            'type' => $data['type'],
-            'value' => (float) $data['value'],
-            'starts_at' => $data['starts_at'],
-            'ends_at' => $data['ends_at'] ?? null,
-            'is_active' => (bool) ($data['is_active'] ?? true),
-            'is_enabled' => (bool) ($data['is_active'] ?? true),
+            'type'        => $data['type'],
+            'value'       => (float) $data['value'],
+            'starts_at'   => $data['starts_at'],
+            'ends_at'     => $data['ends_at'] ?? null,
+            'is_active'   => (bool) ($data['is_active'] ?? true),
+            'is_enabled'  => (bool) ($data['is_active'] ?? true),
         ]);
 
         return redirect('/admin/discounts');
@@ -252,25 +262,25 @@ Route::middleware(['web'])->group(function () {
 
     Route::post('/admin/discounts/create', function (\Illuminate\Http\Request $request) {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'in:percentage,fixed,free_shipping,bogo'],
-            'value' => ['required', 'numeric', 'min:0'],
-            'starts_at' => ['required', 'date'],
-            'ends_at' => ['nullable', 'date', 'after:starts_at'],
-            'is_active' => ['nullable', 'boolean'],
+            'type'        => ['required', 'in:percentage,fixed,free_shipping,bogo'],
+            'value'       => ['required', 'numeric', 'min:0'],
+            'starts_at'   => ['required', 'date'],
+            'ends_at'     => ['nullable', 'date', 'after:starts_at'],
+            'is_active'   => ['nullable', 'boolean'],
         ]);
 
         Discount::query()->create([
-            'name' => $data['name'],
-            'slug' => str($data['name'])->slug()->toString(),
+            'name'        => $data['name'],
+            'slug'        => str($data['name'])->slug()->toString(),
             'description' => $data['description'] ?? null,
-            'type' => $data['type'],
-            'value' => (float) $data['value'],
-            'starts_at' => $data['starts_at'],
-            'ends_at' => $data['ends_at'] ?? null,
-            'is_active' => (bool) ($data['is_active'] ?? true),
-            'is_enabled' => (bool) ($data['is_active'] ?? true),
+            'type'        => $data['type'],
+            'value'       => (float) $data['value'],
+            'starts_at'   => $data['starts_at'],
+            'ends_at'     => $data['ends_at'] ?? null,
+            'is_active'   => (bool) ($data['is_active'] ?? true),
+            'is_enabled'  => (bool) ($data['is_active'] ?? true),
         ]);
 
         return redirect('/admin/discounts');
@@ -278,54 +288,54 @@ Route::middleware(['web'])->group(function () {
 
     Route::put('/admin/discounts/{record}', function (\Illuminate\Http\Request $request, Discount $record) {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'in:percentage,fixed,free_shipping,bogo'],
-            'value' => ['required', 'numeric', 'min:0'],
-            'starts_at' => ['required', 'date'],
-            'ends_at' => ['nullable', 'date', 'after:starts_at'],
-            'is_active' => ['nullable', 'boolean'],
+            'type'        => ['required', 'in:percentage,fixed,free_shipping,bogo'],
+            'value'       => ['required', 'numeric', 'min:0'],
+            'starts_at'   => ['required', 'date'],
+            'ends_at'     => ['nullable', 'date', 'after:starts_at'],
+            'is_active'   => ['nullable', 'boolean'],
         ]);
 
         $record->update([
-            'name' => $data['name'],
-            'slug' => $record->slug ?? str($data['name'])->slug()->toString(),
+            'name'        => $data['name'],
+            'slug'        => $record->slug ?? str($data['name'])->slug()->toString(),
             'description' => $data['description'] ?? null,
-            'type' => $data['type'],
-            'value' => (float) $data['value'],
-            'starts_at' => $data['starts_at'],
-            'ends_at' => $data['ends_at'] ?? null,
-            'is_active' => (bool) ($data['is_active'] ?? $record->is_active),
-            'is_enabled' => (bool) ($data['is_active'] ?? $record->is_enabled),
+            'type'        => $data['type'],
+            'value'       => (float) $data['value'],
+            'starts_at'   => $data['starts_at'],
+            'ends_at'     => $data['ends_at'] ?? null,
+            'is_active'   => (bool) ($data['is_active'] ?? $record->is_active),
+            'is_enabled'  => (bool) ($data['is_active'] ?? $record->is_enabled),
         ]);
 
-        return redirect('/admin/discounts/'.$record->getKey().'/edit');
+        return redirect('/admin/discounts/' . $record->getKey() . '/edit');
     })->name('filament.admin.resources.discounts.update');
 
     Route::put('/admin/discounts/{record}/edit', function (\Illuminate\Http\Request $request, Discount $record) {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'in:percentage,fixed,free_shipping,bogo'],
-            'value' => ['required', 'numeric', 'min:0'],
-            'starts_at' => ['required', 'date'],
-            'ends_at' => ['nullable', 'date', 'after:starts_at'],
-            'is_active' => ['nullable', 'boolean'],
+            'type'        => ['required', 'in:percentage,fixed,free_shipping,bogo'],
+            'value'       => ['required', 'numeric', 'min:0'],
+            'starts_at'   => ['required', 'date'],
+            'ends_at'     => ['nullable', 'date', 'after:starts_at'],
+            'is_active'   => ['nullable', 'boolean'],
         ]);
 
         $record->update([
-            'name' => $data['name'],
-            'slug' => $record->slug ?? str($data['name'])->slug()->toString(),
+            'name'        => $data['name'],
+            'slug'        => $record->slug ?? str($data['name'])->slug()->toString(),
             'description' => $data['description'] ?? null,
-            'type' => $data['type'],
-            'value' => (float) $data['value'],
-            'starts_at' => $data['starts_at'],
-            'ends_at' => $data['ends_at'] ?? null,
-            'is_active' => (bool) ($data['is_active'] ?? $record->is_active),
-            'is_enabled' => (bool) ($data['is_active'] ?? $record->is_enabled),
+            'type'        => $data['type'],
+            'value'       => (float) $data['value'],
+            'starts_at'   => $data['starts_at'],
+            'ends_at'     => $data['ends_at'] ?? null,
+            'is_active'   => (bool) ($data['is_active'] ?? $record->is_active),
+            'is_enabled'  => (bool) ($data['is_active'] ?? $record->is_enabled),
         ]);
 
-        return redirect('/admin/discounts/'.$record->getKey().'/edit');
+        return redirect('/admin/discounts/' . $record->getKey() . '/edit');
     });
 
     Route::delete('/admin/discounts/{record}', function (Discount $record) {
@@ -389,7 +399,7 @@ Route::get('/', function () {
         : array_filter(array_map('trim', explode(',', (string) $supported)));
     $locale = $locales[0] ?? config('app.locale', 'en');
 
-    return redirect('/'.$locale);
+    return redirect('/' . $locale);
 })->name('home');
 // Backward-compatible redirect
 Route::get('/home', fn () => redirect()->route('home'));
@@ -407,7 +417,7 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
 Route::get('/products/{product}/gallery', function ($product) {
-    return redirect('/'.app()->getLocale().'/products/'.$product.'/gallery');
+    return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
 })->name('products.gallery');
 // Alias for legacy route names - handled by route model binding
 Route::get('/product/{product}', function ($product) {
@@ -418,17 +428,17 @@ Route::get('/product/{product}', function ($product) {
 })->name('product.show');
 
 Route::get('/categories', function () {
-    return redirect('/'.app()->getLocale().'/categories');
+    return redirect('/' . app()->getLocale() . '/categories');
 })->name('categories.index');
 Route::get('/categories/{category}', function ($category) {
-    return redirect('/'.app()->getLocale().'/categories/'.$category);
+    return redirect('/' . app()->getLocale() . '/categories/' . $category);
 })->name('categories.show');
 // Brands
 Route::get('/brands', function () {
-    return redirect('/'.app()->getLocale().'/brands');
+    return redirect('/' . app()->getLocale() . '/brands');
 })->name('brands.index');
 Route::get('/brands/{brand}', function ($brand) {
-    return redirect('/'.app()->getLocale().'/brands/'.$brand);
+    return redirect('/' . app()->getLocale() . '/brands/' . $brand);
 })->name('brands.show');
 // Collection routes
 Route::prefix('collections')->name('collections.')->group(function () {
@@ -444,7 +454,7 @@ Route::prefix('collections')->name('collections.')->group(function () {
 });
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
 Route::get('/search', function () {
-    return redirect('/'.app()->getLocale().'/search');
+    return redirect('/' . app()->getLocale() . '/search');
 })->name('search');
 // Legal pages
 Route::prefix('legal')->name('legal.')->group(function () {
@@ -460,7 +470,7 @@ Route::prefix('legal')->name('legal.')->group(function () {
 
 // Legacy legal route
 Route::get('/legal/{slug}', function ($slug) {
-    return redirect('/'.app()->getLocale().'/legal/'.$slug);
+    return redirect('/' . app()->getLocale() . '/legal/' . $slug);
 })->name('legal.show.legacy');
 
 // Cpanel routes
@@ -468,11 +478,11 @@ Route::get('/cpanel/login', function () {
     return response('Cpanel Login Page', 200);
 })->name('cpanel.login');
 Route::get('/cpanel/{path?}', function ($path = null) {
-    return response('Cpanel Page: '.($path ?? 'index'), 200);
+    return response('Cpanel Page: ' . ($path ?? 'index'), 200);
 })->where('path', '.*')->name('cpanel.any');
 
 // Auth routes
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // Authenticated routes
 Route::middleware('auth')->group(function (): void {
@@ -708,7 +718,7 @@ Route::middleware('auth')->group(function (): void {
 
 // Locations pages
 Route::get('/locations', function () {
-    return redirect('/'.app()->getLocale().'/locations');
+    return redirect('/' . app()->getLocale() . '/locations');
 })->name('locations.index');
 // Primary Livewire route uses {slug}
 Route::get('/locations/{slug}', App\Livewire\Pages\Location\Show::class)->name('locations.view');
@@ -759,11 +769,22 @@ Route::prefix('{locale}')
         // Brand index
         Route::get('/brands', \App\Livewire\Pages\Brand\Index::class)->name('localized.brands.index');
 
-        // News localized routes (define both variants within locale group)
-        Route::get('/news', \App\Livewire\Pages\News\Index::class)->name('localized.news.index.en');
-        Route::get('/news/{slug}', \App\Livewire\Pages\News\Show::class)->name('localized.news.show.en');
-        Route::get('/naujienos', \App\Livewire\Pages\News\Index::class)->name('localized.news.index.lt');
-        Route::get('/naujienos/{slug}', \App\Livewire\Pages\News\Show::class)->name('localized.news.show.lt');
+        // News localized routes
+        Route::prefix('news')->group(function (): void {
+            Route::get('/', [NewsController::class, 'index'])->name('localized.news.index');
+            Route::get('/category/{slug}', [NewsController::class, 'category'])->name('localized.news.category');
+            Route::get('/tag/{slug}', [NewsController::class, 'tag'])->name('localized.news.tag');
+            Route::get('/{slug}', [NewsController::class, 'show'])->name('localized.news.show');
+            Route::post('/{slug}/comments', [NewsCommentController::class, 'store'])->name('localized.news.comments.store');
+        });
+
+        Route::prefix('naujienos')->group(function (): void {
+            Route::get('/', [NewsController::class, 'index'])->name('localized.news.index.lt');
+            Route::get('/category/{slug}', [NewsController::class, 'category'])->name('localized.news.category.lt');
+            Route::get('/tag/{slug}', [NewsController::class, 'tag'])->name('localized.news.tag.lt');
+            Route::get('/{slug}', [NewsController::class, 'show'])->name('localized.news.show.lt');
+            Route::post('/{slug}/comments', [NewsCommentController::class, 'store'])->name('localized.news.comments.store.lt');
+        });
 
         // Brand show
         Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('localized.brands.show');
@@ -783,7 +804,7 @@ Route::prefix('{locale}')
             return redirect('/cpanel/login');
         })->name('localized.cpanel');
         Route::get('/cpanel/{path?}', function ($locale, $path = null) {
-            return redirect('/cpanel/'.($path ?? ''));
+            return redirect('/cpanel/' . ($path ?? ''));
         })->where('path', '.*')->name('localized.cpanel.any');
 
         // Order confirmation by number (must be authed in tests)
@@ -809,17 +830,17 @@ Route::middleware('auth')->group(function (): void {
     // Store
     Route::post('/admin/news', function (\Illuminate\Http\Request $request) {
         $data = $request->validate([
-            'is_visible' => ['nullable', 'boolean'],
+            'is_visible'   => ['nullable', 'boolean'],
             'published_at' => ['nullable', 'date'],
-            'author_name' => ['nullable', 'string', 'max:255'],
+            'author_name'  => ['nullable', 'string', 'max:255'],
             'translations' => ['nullable', 'array'],
         ]);
 
         /** @var \App\Models\News $news */
         $news = \App\Models\News::query()->create([
-            'is_visible' => (bool) ($data['is_visible'] ?? true),
+            'is_visible'   => (bool) ($data['is_visible'] ?? true),
             'published_at' => $data['published_at'] ?? null,
-            'author_name' => $data['author_name'] ?? null,
+            'author_name'  => $data['author_name'] ?? null,
         ]);
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
@@ -833,14 +854,14 @@ Route::middleware('auth')->group(function (): void {
             \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
                 [
                     'news_id' => $news->id,
-                    'locale' => $locale,
+                    'locale'  => $locale,
                 ],
                 [
-                    'title' => $t['title'] ?? null,
-                    'slug' => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
-                    'summary' => $t['summary'] ?? null,
-                    'content' => $t['content'] ?? null,
-                    'seo_title' => $t['seo_title'] ?? null,
+                    'title'           => $t['title'] ?? null,
+                    'slug'            => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
+                    'summary'         => $t['summary'] ?? null,
+                    'content'         => $t['content'] ?? null,
+                    'seo_title'       => $t['seo_title'] ?? null,
                     'seo_description' => $t['seo_description'] ?? null,
                 ]
             );
@@ -852,16 +873,16 @@ Route::middleware('auth')->group(function (): void {
     // Update
     Route::put('/admin/news/{record}', function (\Illuminate\Http\Request $request, \App\Models\News $record) {
         $data = $request->validate([
-            'is_visible' => ['nullable', 'boolean'],
+            'is_visible'   => ['nullable', 'boolean'],
             'published_at' => ['nullable', 'date'],
-            'author_name' => ['nullable', 'string', 'max:255'],
+            'author_name'  => ['nullable', 'string', 'max:255'],
             'translations' => ['nullable', 'array'],
         ]);
 
         $record->update(array_filter([
-            'is_visible' => $data['is_visible'] ?? $record->is_visible,
+            'is_visible'   => $data['is_visible'] ?? $record->is_visible,
             'published_at' => $data['published_at'] ?? $record->published_at,
-            'author_name' => $data['author_name'] ?? $record->author_name,
+            'author_name'  => $data['author_name'] ?? $record->author_name,
         ], fn ($v) => ! is_null($v)));
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
@@ -875,14 +896,14 @@ Route::middleware('auth')->group(function (): void {
             \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
                 [
                     'news_id' => $record->id,
-                    'locale' => $locale,
+                    'locale'  => $locale,
                 ],
                 [
-                    'title' => $t['title'] ?? null,
-                    'slug' => $t['slug'] ?? null,
-                    'summary' => $t['summary'] ?? null,
-                    'content' => $t['content'] ?? null,
-                    'seo_title' => $t['seo_title'] ?? null,
+                    'title'           => $t['title'] ?? null,
+                    'slug'            => $t['slug'] ?? null,
+                    'summary'         => $t['summary'] ?? null,
+                    'content'         => $t['content'] ?? null,
+                    'seo_title'       => $t['seo_title'] ?? null,
                     'seo_description' => $t['seo_description'] ?? null,
                 ]
             );
@@ -984,17 +1005,17 @@ Route::middleware('auth')->group(function (): void {
     // Store
     Route::post('/admin/news', function (\Illuminate\Http\Request $request) {
         $data = $request->validate([
-            'is_visible' => ['nullable', 'boolean'],
+            'is_visible'   => ['nullable', 'boolean'],
             'published_at' => ['nullable', 'date'],
-            'author_name' => ['nullable', 'string', 'max:255'],
+            'author_name'  => ['nullable', 'string', 'max:255'],
             'translations' => ['nullable', 'array'],
         ]);
 
         /** @var \App\Models\News $news */
         $news = \App\Models\News::query()->create([
-            'is_visible' => (bool) ($data['is_visible'] ?? true),
+            'is_visible'   => (bool) ($data['is_visible'] ?? true),
             'published_at' => $data['published_at'] ?? null,
-            'author_name' => $data['author_name'] ?? null,
+            'author_name'  => $data['author_name'] ?? null,
         ]);
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
@@ -1008,14 +1029,14 @@ Route::middleware('auth')->group(function (): void {
             \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
                 [
                     'news_id' => $news->id,
-                    'locale' => $locale,
+                    'locale'  => $locale,
                 ],
                 [
-                    'title' => $t['title'] ?? null,
-                    'slug' => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
-                    'summary' => $t['summary'] ?? null,
-                    'content' => $t['content'] ?? null,
-                    'seo_title' => $t['seo_title'] ?? null,
+                    'title'           => $t['title'] ?? null,
+                    'slug'            => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
+                    'summary'         => $t['summary'] ?? null,
+                    'content'         => $t['content'] ?? null,
+                    'seo_title'       => $t['seo_title'] ?? null,
                     'seo_description' => $t['seo_description'] ?? null,
                 ]
             );
@@ -1027,16 +1048,16 @@ Route::middleware('auth')->group(function (): void {
     // Update
     Route::put('/admin/news/{record}', function (\Illuminate\Http\Request $request, \App\Models\News $record) {
         $data = $request->validate([
-            'is_visible' => ['nullable', 'boolean'],
+            'is_visible'   => ['nullable', 'boolean'],
             'published_at' => ['nullable', 'date'],
-            'author_name' => ['nullable', 'string', 'max:255'],
+            'author_name'  => ['nullable', 'string', 'max:255'],
             'translations' => ['nullable', 'array'],
         ]);
 
         $record->update(array_filter([
-            'is_visible' => $data['is_visible'] ?? $record->is_visible,
+            'is_visible'   => $data['is_visible'] ?? $record->is_visible,
             'published_at' => $data['published_at'] ?? $record->published_at,
-            'author_name' => $data['author_name'] ?? $record->author_name,
+            'author_name'  => $data['author_name'] ?? $record->author_name,
         ], fn ($v) => ! is_null($v)));
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
@@ -1050,14 +1071,14 @@ Route::middleware('auth')->group(function (): void {
             \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
                 [
                     'news_id' => $record->id,
-                    'locale' => $locale,
+                    'locale'  => $locale,
                 ],
                 [
-                    'title' => $t['title'] ?? null,
-                    'slug' => $t['slug'] ?? null,
-                    'summary' => $t['summary'] ?? null,
-                    'content' => $t['content'] ?? null,
-                    'seo_title' => $t['seo_title'] ?? null,
+                    'title'           => $t['title'] ?? null,
+                    'slug'            => $t['slug'] ?? null,
+                    'summary'         => $t['summary'] ?? null,
+                    'content'         => $t['content'] ?? null,
+                    'seo_title'       => $t['seo_title'] ?? null,
                     'seo_description' => $t['seo_description'] ?? null,
                 ]
             );
