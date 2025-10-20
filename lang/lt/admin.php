@@ -70,6 +70,7 @@ return [
         'description' => 'Aprašymas',
         'button_text' => 'Mygtuko tekstas',
     ],
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'variant_combinations' => [
         'navigation_label' => 'Variantų kombinacijos',
         'plural_model_label' => 'Variantų kombinacijos',
