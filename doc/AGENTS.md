@@ -1,6 +1,12 @@
 # Project Automation & Filament Standards
 
-This repository mixes Laravel 11 and Filament v4 code. Use the following guardrails whenever you touch files within this repo (scope: entire project).
+This repository mixes Laravel 12 and Filament v4 code. Use the following guardrails whenever you touch files within this repo (scope: entire project).
+
+## Quick orientation
+
+- **Primary domains**: construction-product catalogues, marketing/news content, recommendation & referral systems, and multilingual storefront flows.
+- **Key directories**: `app/Filament` (admin resources/widgets), `app/Services` (business logic), `app/Data` (DTOs), `database/seeders` (multilingual fixtures), `resources/views` (Blade + Volt storefront), and `scripts/*.mjs` (Playwright/e2e diagnostics).
+- **Getting unstuck**: skim `README.md`, `docs/ARCHITECTURE_OVERVIEW.md`, and `docs/INDEX.md` for entry points; queue and cache nuances live in `docs/CachePolicy.md`.
 
 ## Workflow Expectations
 
