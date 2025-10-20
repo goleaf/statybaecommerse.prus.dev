@@ -5,12 +5,17 @@ declare(strict_types=1);
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    Storage::fake(config('media-library.disk_name'));
+
     $this->user = User::factory()->create();
     $this->post = Post::factory()->published()->create(['user_id' => $this->user->id]);
+    attachPostMedia($this->post);
 });
 
 it('can display posts index page', function () {
@@ -24,6 +29,7 @@ it('can display posts index page', function () {
 
 it('can display featured posts page', function () {
     $featuredPost = Post::factory()->featured()->published()->create(['user_id' => $this->user->id]);
+    attachPostMedia($featuredPost);
 
     $response = $this->get(route('posts.featured'));
 
@@ -48,6 +54,7 @@ it('can search posts', function () {
         'title' => 'Unique Searchable Title',
         'user_id' => $this->user->id,
     ]);
+    attachPostMedia($searchablePost);
 
     $response = $this->get(route('posts.search', ['q' => 'Unique Searchable']));
 
@@ -60,6 +67,7 @@ it('can search posts', function () {
 it('can filter posts by author', function () {
     $anotherUser = User::factory()->create();
     $anotherPost = Post::factory()->published()->create(['user_id' => $anotherUser->id]);
+    attachPostMedia($anotherPost);
 
     $response = $this->get(route('posts.by-author', $this->user->id));
 
@@ -80,6 +88,7 @@ it('increments views count when viewing post', function () {
 
 it('does not show draft posts on index', function () {
     $draftPost = Post::factory()->draft()->create(['user_id' => $this->user->id]);
+    attachPostMedia($draftPost, 0);
 
     $response = $this->get(route('posts.index'));
 
@@ -90,6 +99,7 @@ it('does not show draft posts on index', function () {
 
 it('does not show archived posts on index', function () {
     $archivedPost = Post::factory()->archived()->create(['user_id' => $this->user->id]);
+    attachPostMedia($archivedPost, 0);
 
     $response = $this->get(route('posts.index'));
 
@@ -100,6 +110,7 @@ it('does not show archived posts on index', function () {
 
 it('returns 404 for draft post show page', function () {
     $draftPost = Post::factory()->draft()->create(['user_id' => $this->user->id]);
+    attachPostMedia($draftPost);
 
     $response = $this->get(route('posts.show', $draftPost));
 
@@ -108,6 +119,7 @@ it('returns 404 for draft post show page', function () {
 
 it('returns 404 for archived post show page', function () {
     $archivedPost = Post::factory()->archived()->create(['user_id' => $this->user->id]);
+    attachPostMedia($archivedPost);
 
     $response = $this->get(route('posts.show', $archivedPost));
 
@@ -117,6 +129,8 @@ it('returns 404 for archived post show page', function () {
 it('can filter posts by featured status', function () {
     $featuredPost = Post::factory()->featured()->published()->create(['user_id' => $this->user->id]);
     $regularPost = Post::factory()->published()->create(['featured' => false, 'user_id' => $this->user->id]);
+    attachPostMedia($featuredPost);
+    attachPostMedia($regularPost);
 
     $response = $this->get(route('posts.index', ['featured' => true]));
 
@@ -129,6 +143,7 @@ it('can filter posts by featured status', function () {
 it('can filter posts by author on index', function () {
     $anotherUser = User::factory()->create();
     $anotherPost = Post::factory()->published()->create(['user_id' => $anotherUser->id]);
+    attachPostMedia($anotherPost);
 
     $response = $this->get(route('posts.index', ['author' => $this->user->id]));
 
@@ -143,6 +158,7 @@ it('can search posts by title', function () {
         'title' => 'Searchable Title',
         'user_id' => $this->user->id,
     ]);
+    attachPostMedia($searchablePost);
 
     $response = $this->get(route('posts.index', ['search' => 'Searchable']));
 
@@ -156,6 +172,7 @@ it('can search posts by excerpt', function () {
         'excerpt' => 'Searchable excerpt content',
         'user_id' => $this->user->id,
     ]);
+    attachPostMedia($searchablePost);
 
     $response = $this->get(route('posts.index', ['search' => 'Searchable excerpt']));
 
@@ -169,6 +186,7 @@ it('can search posts by content', function () {
         'content' => 'Searchable content text',
         'user_id' => $this->user->id,
     ]);
+    attachPostMedia($searchablePost);
 
     $response = $this->get(route('posts.index', ['search' => 'Searchable content']));
 
@@ -179,6 +197,7 @@ it('can search posts by content', function () {
 
 it('shows related posts on post show page', function () {
     $relatedPost = Post::factory()->published()->create(['user_id' => $this->user->id]);
+    attachPostMedia($relatedPost);
 
     $response = $this->get(route('posts.show', $this->post));
 
@@ -193,6 +212,7 @@ it('shows post meta information', function () {
         'meta_description' => 'Custom meta description',
         'user_id' => $this->user->id,
     ]);
+    attachPostMedia($post);
 
     $response = $this->get(route('posts.show', $post));
 
@@ -207,6 +227,7 @@ it('shows post tags if available', function () {
         'tags' => 'tag1, tag2, tag3',
         'user_id' => $this->user->id,
     ]);
+    attachPostMedia($post);
 
     $response = $this->get(route('posts.show', $post));
 
@@ -219,6 +240,7 @@ it('shows post tags if available', function () {
 
 it('shows featured badge for featured posts', function () {
     $featuredPost = Post::factory()->featured()->published()->create(['user_id' => $this->user->id]);
+    attachPostMedia($featuredPost);
 
     $response = $this->get(route('posts.show', $featuredPost));
 
@@ -234,6 +256,7 @@ it('shows post statistics', function () {
         'comments_count' => 10,
         'user_id' => $this->user->id,
     ]);
+    attachPostMedia($post);
 
     $response = $this->get(route('posts.show', $post));
 
@@ -243,3 +266,24 @@ it('shows post statistics', function () {
         ->assertSee('25')
         ->assertSee('10');
 });
+
+function attachPostMedia(Post $post, int $galleryCount = 3): void
+{
+    if ($post->getMedia('images')->isEmpty()) {
+        $post
+            ->addMedia(UploadedFile::fake()->image("post-{$post->id}-featured.jpg", 1200, 630))
+            ->toMediaCollection('images');
+    }
+
+    $existingGalleryCount = $post->getMedia('gallery')->count();
+
+    if ($galleryCount <= $existingGalleryCount) {
+        return;
+    }
+
+    foreach (range($existingGalleryCount + 1, $galleryCount) as $index) {
+        $post
+            ->addMedia(UploadedFile::fake()->image("post-{$post->id}-gallery-{$index}.jpg", 800, 600))
+            ->toMediaCollection('gallery');
+    }
+}
