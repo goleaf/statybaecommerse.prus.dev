@@ -274,8 +274,9 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    @if($item['image'])
-                                        <img class="h-10 w-10 rounded-lg object-cover" src="{{ $item['image'] }}" alt="{{ $item['name'] }}">
+                                    @php($image = $item['main_image'] ?? $item['thumbnail'] ?? ($item['image'] ?? null))
+                                    @if($image)
+                                        <img class="h-10 w-10 rounded-lg object-cover" src="{{ $image }}" alt="{{ $item['name'] }}">
                                     @else
                                         <div class="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
                                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
