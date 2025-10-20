@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
+use App\Infrastructure\Product\Repositories\EloquentProductRepository;
 use App\Services\DocumentService;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
@@ -36,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
                 \App\Console\Commands\ImportInventory::class,
             ]);
         }
+
+        $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
     }
 
     public function boot(): void
