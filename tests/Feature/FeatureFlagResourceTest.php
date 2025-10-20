@@ -223,4 +223,62 @@ final class FeatureFlagResourceTest extends TestCase
             ]);
         }
     }
+
+    public function test_feature_flags_resource_can_create_feature_flag(): void
+    {
+        $featureFlagData = [
+            'name' => 'Another Feature',
+            'key' => 'another_feature',
+            'description' => 'Another feature flag',
+            'is_active' => true,
+            'is_enabled' => false,
+            'is_global' => false,
+            'environment' => 'staging',
+            'category' => 'backend',
+            'priority' => 10,
+        ];
+
+        Livewire::test('App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag')
+            ->fillForm($featureFlagData)
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('feature_flags', [
+            'name' => 'Another Feature',
+            'key' => 'another_feature',
+            'created_by' => $this->adminUser->id,
+            'created_by_name' => $this->adminUser->name,
+            'updated_by' => $this->adminUser->id,
+            'updated_by_name' => $this->adminUser->name,
+        ]);
+    }
+
+    public function test_feature_flags_resource_invalid_key_validation(): void
+    {
+        Livewire::test('App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag')
+            ->fillForm([
+                'name' => 'Invalid Feature',
+                'key' => 'invalid key!',
+                'is_active' => true,
+                'is_enabled' => false,
+                'is_global' => false,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['key']);
+    }
+
+    public function test_feature_flags_resource_duplicate_key_validation_on_edit(): void
+    {
+        FeatureFlag::factory()->create(['key' => 'existing_key']);
+        $featureFlag = FeatureFlag::factory()->create(['key' => 'original_key']);
+
+        Livewire::test('App\Filament\Resources\FeatureFlags\Pages\EditFeatureFlag', [
+            'record' => $featureFlag->getRouteKey(),
+        ])
+            ->fillForm([
+                'key' => 'existing_key',
+            ])
+            ->call('save')
+            ->assertHasFormErrors(['key']);
+    }
 }
