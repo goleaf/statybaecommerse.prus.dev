@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Models\DiscountCode;
@@ -48,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
+        $this->app->bind(DocumentServiceContract::class, DocumentService::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([
