@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
+use App\Repositories\MenuRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,24 +17,19 @@ use Illuminate\Http\Request;
  */
 final class MenuController extends Controller
 {
+    public function __construct(private readonly MenuRepository $menus)
+    {
+    }
+
     /**
      * Display a listing of the resource with pagination and filtering.
      */
     public function index(Request $request): JsonResponse
     {
         $location = $request->get('location');
-        $query = Menu::with(['allItems' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order');
-        }]);
-        if ($location) {
-            $query->where('location', $location);
-        }
-        $timeout = now()->addSeconds(5);
-        // 5 second timeout for menu loading
-        $menus = $query->where('is_active', true)->cursor()->takeUntilTimeout($timeout)->collect()->skipWhile(function ($menu) {
-            // Skip menus that are not properly configured for display
-            return empty($menu->name) || empty($menu->key) || ! $menu->is_active || empty($menu->allItems);
-        });
+        $menus = $this->menus->getActiveMenus($location)->filter(function (Menu $menu) {
+            return ! empty($menu->name) && ! empty($menu->key) && $menu->allItems->isNotEmpty();
+        })->values();
 
         return response()->json(['success' => true, 'data' => $menus->map(function ($menu) {
             return ['id' => $menu->id, 'key' => $menu->key, 'name' => $menu->name, 'location' => $menu->location, 'items' => $this->formatMenuItems($menu->allItems)];
@@ -45,9 +41,7 @@ final class MenuController extends Controller
      */
     public function show(string $key): JsonResponse
     {
-        $menu = Menu::with(['allItems' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order');
-        }])->where('key', $key)->where('is_active', true)->first();
+        $menu = $this->menus->findActiveMenuByKey($key);
         if (! $menu) {
             return response()->json(['success' => false, 'message' => __('api.menu_not_found')], 404);
         }
@@ -60,9 +54,7 @@ final class MenuController extends Controller
      */
     public function byLocation(string $location): JsonResponse
     {
-        $menu = Menu::with(['allItems' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order');
-        }])->where('location', $location)->where('is_active', true)->first();
+        $menu = $this->menus->findActiveMenuByLocation($location);
         if (! $menu) {
             return response()->json(['success' => false, 'message' => __('api.menu_not_found_for_location')], 404);
         }

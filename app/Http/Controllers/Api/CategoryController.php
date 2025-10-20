@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Repositories\CategoryRepository;
 use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,17 +22,16 @@ final class CategoryController extends Controller
 {
     use HandlesContentNegotiation;
 
+    public function __construct(private readonly CategoryRepository $categories)
+    {
+    }
+
     /**
      * Handle tree functionality with proper error handling.
      */
     public function tree(Request $request): JsonResponse|View|Response
     {
-        $categories = Category::query()->where('is_visible', true)->with(['children' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order')->orderBy('name');
-        }])->whereNull('parent_id')->orderBy('sort_order')->orderBy('name')->get()->skipWhile(function (Category $category) {
-            // Skip categories that are not properly configured
-            return empty($category->name) || ! $category->is_visible || empty($category->slug);
-        });
+        $categories = $this->categories->getVisibleTree();
 
         return $this->handleCategoryContentNegotiation($request, $categories);
     }
@@ -43,13 +43,7 @@ final class CategoryController extends Controller
     {
         $perPage = min((int) $request->get('per_page', 20), 100);
         $search = $request->get('search');
-        $query = Category::query()->where('is_visible', true)->withCount('products');
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-        $categories = $query->orderBy('sort_order')->orderBy('name')->paginate($perPage);
+        $categories = $this->categories->paginateVisible(['search' => $search], $perPage);
 
         return $this->handleCategoryContentNegotiation($request, $categories);
     }
@@ -59,7 +53,7 @@ final class CategoryController extends Controller
      */
     public function show(Request $request, Category $category): JsonResponse|View|Response
     {
-        $category->load(['children', 'parent']);
+        $category = $this->categories->loadForShow($category);
         $data = ['category' => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'parent' => $category->parent ? ['id' => $category->parent->id, 'name' => $category->parent->name, 'slug' => $category->parent->slug] : null, 'children' => $category->children->map(function ($child) {
             return ['id' => $child->id, 'name' => $child->name, 'slug' => $child->slug, 'description' => $child->description];
         })->toArray(), 'url' => route('category.show', $category->slug), 'product_count' => $category->products_count ?? 0]];

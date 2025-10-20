@@ -12,6 +12,7 @@ use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -272,6 +273,15 @@ final class Product extends Model implements HasMedia
     {
         // This would need to be implemented based on order items
         return 0.0;
+    }
+
+    public function getCategoryAttribute(): ?Category
+    {
+        if (! $this->relationLoaded('categories')) {
+            return null;
+        }
+
+        return $this->getRelation('categories')->first();
     }
 
     /**
@@ -737,6 +747,53 @@ final class Product extends Model implements HasMedia
     public function scopeVisible($query)
     {
         return $query->where('is_visible', true);
+    }
+
+    public function scopeReadyForCatalog(Builder $query): Builder
+    {
+        return $query
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
+            ->whereNotNull('price')
+            ->where('price', '>', 0);
+    }
+
+    public function scopeSearchTerm(Builder $query, string $term): Builder
+    {
+        return $query->where(function (Builder $builder) use ($term): void {
+            $builder->where('name', 'like', "%{$term}%")
+                ->orWhere('description', 'like', "%{$term}%")
+                ->orWhere('sku', 'like', "%{$term}%");
+        });
+    }
+
+    public function scopeWithCatalogRelations(Builder $query): Builder
+    {
+        return $query->with([
+            'brand:id,name,slug',
+            'categories:id,name,slug',
+            'media',
+        ]);
+    }
+
+    public function scopeWithSearchRelations(Builder $query): Builder
+    {
+        return $query->with([
+            'brand:id,name,slug',
+            'categories:id,name,slug',
+        ]);
+    }
+
+    public function scopeWithShowRelations(Builder $query): Builder
+    {
+        return $query->with([
+            'brand:id,name,slug',
+            'categories:id,name,slug',
+            'media',
+            'variants',
+        ]);
     }
 
     /**
