@@ -48,17 +48,8 @@ final class AdminPanelProvider extends PanelProvider
                 'info' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->resources([
-                \App\Filament\Resources\SystemSettingResource::class,
-            ])
-            ->pages([
-                \App\Filament\Pages\Dashboard::class,
-                \App\Filament\Pages\SliderAnalytics::class,
-                \App\Filament\Pages\SliderManagement::class,
-                \App\Filament\Pages\InventoryManagement::class,
-                \App\Filament\Pages\AdvancedReports::class,
-                \App\Filament\Pages\UserImpersonation::class,
-            ])
+            ->resources(config('filament.navigation.resources', []))
+            ->pages(config('filament.navigation.pages', []))
             ->widgets([
                 AccountWidget::class,
             ])
@@ -90,16 +81,7 @@ final class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts()
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
-            ->navigationGroups([
-                NavigationGroup::make()->label(__('admin.navigation.dashboard'))->icon('heroicon-o-home'),
-                NavigationGroup::make()->label(__('admin.navigation.commerce'))->icon('heroicon-o-shopping-bag'),
-                NavigationGroup::make()->label(__('admin.navigation.products'))->icon('heroicon-o-cube'),
-                NavigationGroup::make()->label(__('admin.navigation.marketing'))->icon('heroicon-o-megaphone'),
-                NavigationGroup::make()->label(__('admin.navigation.content'))->icon('heroicon-o-document-text'),
-                NavigationGroup::make()->label(__('admin.navigation.analytics'))->icon('heroicon-o-chart-bar'),
-                NavigationGroup::make()->label(__('admin.navigation.system'))->icon('heroicon-o-cog-6-tooth'),
-                NavigationGroup::make()->label('Recommendation System')->icon('heroicon-o-sparkles'),
-            ])
+            ->navigationGroups($this->configuredNavigationGroups())
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
@@ -118,5 +100,30 @@ final class AdminPanelProvider extends PanelProvider
             // Remove custom Vite theme to ensure default Filament styles load
             // ->viteTheme('resources/css/filament-enhancements.css')
             ->spa();
+    }
+
+    /**
+     * Build Filament navigation groups from configuration.
+     *
+     * @return array<int, NavigationGroup>
+     */
+    private function configuredNavigationGroups(): array
+    {
+        return collect(config('filament.navigation.groups', []))
+            ->map(static function (array $group): NavigationGroup {
+                $navigationGroup = NavigationGroup::make()
+                    ->label(__($group['label'] ?? ''));
+
+                if (! empty($group['icon'])) {
+                    $navigationGroup->icon($group['icon']);
+                }
+
+                if (($group['collapsed'] ?? false) === true) {
+                    $navigationGroup->collapsed();
+                }
+
+                return $navigationGroup;
+            })
+            ->all();
     }
 }

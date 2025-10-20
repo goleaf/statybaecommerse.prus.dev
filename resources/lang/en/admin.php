@@ -5,6 +5,7 @@ return array (
   array (
     'dashboard' => 'Dashboard',
     'catalog' => 'Catalog',
+    'commerce' => 'Commerce',
     'orders' => 'Orders',
     'customers' => 'Customers',
     'marketing' => 'Marketing',
