@@ -8,20 +8,22 @@ use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -74,7 +76,7 @@ final class CartItemResource extends Resource
                                 ->relationship('product', 'name')
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Set $set) {
                                     if ($state) {
                                         $product = Product::find($state);
                                         if ($product) {
@@ -91,7 +93,7 @@ final class CartItemResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Set $set) {
                             if ($state) {
                                 $variant = ProductVariant::find($state);
                                 if ($variant) {
@@ -115,7 +117,7 @@ final class CartItemResource extends Resource
                                 ->minValue(1)
                                 ->default(1)
                                 ->required()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
@@ -146,7 +148,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $unitPrice = (float) $state;
                                     $quantity = (int) $get('quantity');
                                     $total = $unitPrice * $quantity;
@@ -158,7 +160,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $get('quantity');
                                     $discount = (float) $state;
