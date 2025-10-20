@@ -27,7 +27,6 @@ class Checkout extends Component
     public function mount(): void
     {
         $this->sessionKey = session()->getId();
-        // @phpstan-ignore-next-line
         if (CartFacade::session($this->sessionKey)->isEmpty()) {
             if (session()->exists('checkout')) {
                 session()->forget('checkout');
@@ -43,7 +42,6 @@ class Checkout extends Component
     {
         return view('livewire.pages.checkout', [
             'items' => CartFacade::session($this->sessionKey)->getContent(),
-            // @phpstan-ignore-line
             'subtotal' => CartFacade::session($this->sessionKey)->getSubTotal(),
         ])->title(__('Proceed to checkout'));
     }
