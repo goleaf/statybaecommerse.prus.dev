@@ -70,6 +70,7 @@ return [
         'description' => 'Description',
         'button_text' => 'Button Text',
     ],
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'variant_combinations' => [
         'navigation_label' => 'Variant Combinations',
         'plural_model_label' => 'Variant Combinations',
