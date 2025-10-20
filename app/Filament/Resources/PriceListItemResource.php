@@ -290,7 +290,10 @@ final class PriceListItemResource extends Resource
                 Filter::make('has_discount')
                     ->label(__('price_list_items.has_discount'))
                     ->query(fn (Builder $query): Builder => $query->where(function (Builder $query): void {
-                        $query->whereNotNull('compare_amount')->where('compare_amount', '>', 0);
+                        $query
+                            ->whereNotNull('compare_amount')
+                            ->whereNotNull('net_amount')
+                            ->whereColumn('compare_amount', '>', 'net_amount');
                     }))
                     ->toggle(),
             ])
@@ -396,10 +399,10 @@ final class PriceListItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPriceListItems::route('/'),
+            'index'  => Pages\ListPriceListItems::route('/'),
             'create' => Pages\CreatePriceListItem::route('/create'),
-            'view' => Pages\ViewPriceListItem::route('/{record}'),
-            'edit' => Pages\EditPriceListItem::route('/{record}/edit'),
+            'view'   => Pages\ViewPriceListItem::route('/{record}'),
+            'edit'   => Pages\EditPriceListItem::route('/{record}/edit'),
         ];
     }
 }
