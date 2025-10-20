@@ -155,5 +155,6 @@
     "admin.help.zone_countries": "Страны, входящие в эту зону",
     "admin.widgets.recent_orders": "Недавние заказы",
     "admin.widgets.low_stock_alerts": "Предупреждения о низком остатке",
-    "analytics.orders_overview": "Обзор заказов"
+    "analytics.orders_overview": "Обзор заказов",
+    "inventory.export_job_queued": "Экспорт поставлен в очередь. Файл скоро появится на странице экспорта."
 }
