@@ -16,7 +16,7 @@ class ListCampaignViews extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('campaign_views.tabs.all')),
+            'all'   => Tab::make(__('campaign_views.tabs.all')),
             'today' => Tab::make(__('campaign_views.tabs.today'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereDate('created_at', today()))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->whereDate('created_at', today())->count()),
@@ -26,12 +26,12 @@ class ListCampaignViews extends ListRecords
             'this_month' => Tab::make(__('campaign_views.tabs.this_month'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count()),
-            'registered_users' => Tab::make(__('campaign_views.tabs.registered_users'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('user_id'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereNotNull('user_id')->count()),
+            'registered_customers' => Tab::make(__('campaign_views.tabs.registered_customers'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('customer_id'))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereNotNull('customer_id')->count()),
             'guests' => Tab::make(__('campaign_views.tabs.guests'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('user_id'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereNull('user_id')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('customer_id'))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereNull('customer_id')->count()),
         ];
     }
 }

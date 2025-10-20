@@ -50,7 +50,7 @@ final class CampaignViewResource extends Resource
     {
         return $form
             ->schema([
-                Tabs::make(__('campaign_views.tabs'))
+                Tabs::make(__('campaign_views.tabs_label'))
                     ->tabs([
                         Tab::make(__('campaign_views.basic_information'))
                             ->icon('heroicon-o-information-circle')
@@ -61,11 +61,12 @@ final class CampaignViewResource extends Resource
                                     ->required()
                                     ->searchable()
                                     ->preload(),
-                                Select::make('user_id')
-                                    ->label(__('campaign_views.user'))
-                                    ->relationship('user', 'name')
+                                Select::make('customer_id')
+                                    ->label(__('campaign_views.customer'))
+                                    ->relationship('customer', 'name')
                                     ->searchable()
-                                    ->preload(),
+                                    ->preload()
+                                    ->placeholder(__('campaign_views.guest')),
                                 TextInput::make('ip_address')
                                     ->label(__('campaign_views.ip_address'))
                                     ->ip()
@@ -94,8 +95,8 @@ final class CampaignViewResource extends Resource
                     ->label(__('campaign_views.campaign'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('user.name')
-                    ->label(__('campaign_views.user'))
+                TextColumn::make('customer.name')
+                    ->label(__('campaign_views.customer'))
                     ->searchable()
                     ->sortable()
                     ->placeholder(__('campaign_views.guest')),
@@ -143,9 +144,9 @@ final class CampaignViewResource extends Resource
                     ->relationship('campaign', 'name')
                     ->searchable()
                     ->preload(),
-                SelectFilter::make('user_id')
-                    ->label(__('campaign_views.user'))
-                    ->relationship('user', 'name')
+                SelectFilter::make('customer_id')
+                    ->label(__('campaign_views.customer'))
+                    ->relationship('customer', 'name')
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('ip_address')
@@ -176,7 +177,7 @@ final class CampaignViewResource extends Resource
     {
         return [
             'index' => Pages\ListCampaignViews::route('/'),
-            'view' => Pages\ViewCampaignView::route('/{record}'),
+            'view'  => Pages\ViewCampaignView::route('/{record}'),
         ];
     }
 }
