@@ -7,14 +7,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -22,30 +18,28 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-folder';
-    }
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 2;
 
@@ -80,7 +74,11 @@ final class CollectionResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                ->afterStateUpdated(function ($state, Forms\Set $set, $operation): void {
+                                    if ($operation === 'create' && filled($state)) {
+                                        $set('slug', Str::slug($state));
+                                    }
+                                }),
                             TextInput::make('slug')
                                 ->label(__('collections.slug'))
                                 ->unique(ignoreRecord: true)
@@ -143,12 +141,12 @@ final class CollectionResource extends Resource
                     Select::make('sort_order')
                         ->label(__('collections.sort_order'))
                         ->options([
-                            'manual' => __('collections.sort_orders.manual'),
-                            'name_asc' => __('collections.sort_orders.name_asc'),
-                            'name_desc' => __('collections.sort_orders.name_desc'),
-                            'price_asc' => __('collections.sort_orders.price_asc'),
-                            'price_desc' => __('collections.sort_orders.price_desc'),
-                            'created_asc' => __('collections.sort_orders.created_asc'),
+                            'manual'       => __('collections.sort_orders.manual'),
+                            'name_asc'     => __('collections.sort_orders.name_asc'),
+                            'name_desc'    => __('collections.sort_orders.name_desc'),
+                            'price_asc'    => __('collections.sort_orders.price_asc'),
+                            'price_desc'   => __('collections.sort_orders.price_desc'),
+                            'created_asc'  => __('collections.sort_orders.created_asc'),
                             'created_desc' => __('collections.sort_orders.created_desc'),
                         ])
                         ->default('manual'),
@@ -185,7 +183,9 @@ final class CollectionResource extends Resource
                     ->sortable(),
                 TextColumn::make('sort_order')
                     ->label(__('collections.sort_order'))
-                    ->formatStateUsing(fn (string $state): string => __("collections.sort_orders.{$state}")),
+                    ->formatStateUsing(fn (?string $state): string => $state
+                        ? __('collections.sort_orders.' . $state)
+                        : __('collections.sort_orders.manual')),
                 IconColumn::make('is_active')
                     ->label(__('collections.is_active'))
                     ->boolean(),
@@ -292,10 +292,10 @@ final class CollectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCollections::route('/'),
+            'index'  => Pages\ListCollections::route('/'),
             'create' => Pages\CreateCollection::route('/create'),
-            'view' => Pages\ViewCollection::route('/{record}'),
-            'edit' => Pages\EditCollection::route('/{record}/edit'),
+            'view'   => Pages\ViewCollection::route('/{record}'),
+            'edit'   => Pages\EditCollection::route('/{record}/edit'),
         ];
     }
 }
