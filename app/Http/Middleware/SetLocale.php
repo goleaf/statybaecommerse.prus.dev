@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Services\TranslationService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -18,28 +19,39 @@ final class SetLocale
         // Allow explicit override via query (?locale=xx)
         $queryLocale = $request->query('locale');
 
-        // Get locale from query, session (both keys), cookie, or user preference
-        $locale = $routeLocale
-            ?? $queryLocale
-            ?? Session::get('locale')
-            ?? Session::get('app.locale')
-            ?? $request->cookie('app_locale')
-            ?? (auth()->check() ? auth()->user()->preferred_locale ?? null : null)
-            ?? config('app.locale', 'lt');
+        $supportedLocales = array_values(array_filter(
+            TranslationService::getAvailableLocales(),
+            static fn ($value) => is_string($value) && $value !== ''
+        ));
 
-        // Validate locale against configured supported locales
-        $supported = config('app.supported_locales', ['lt', 'en']);
-        $supportedLocales = is_array($supported)
-            ? $supported
-            : array_filter(array_map('trim', explode(',', (string) $supported)));
-        $supportedLocales = array_map('trim', $supportedLocales);
+        $headerLocale = $request->getPreferredLanguage($supportedLocales);
 
-        if (! in_array($locale, $supportedLocales, true)) {
-            $locale = (string) (config('app.locale', 'lt'));
+        $candidates = [
+            $routeLocale,
+            $queryLocale,
+            Session::get('locale'),
+            Session::get('app.locale'),
+            $request->cookie('app_locale'),
+            auth()->check() ? auth()->user()->preferred_locale ?? null : null,
+            $headerLocale,
+        ];
+
+        $locale = null;
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && $candidate !== '' && in_array($candidate, $supportedLocales, true)) {
+                $locale = $candidate;
+                break;
+            }
+        }
+
+        if ($locale === null) {
+            $locale = TranslationService::getDefaultLocale();
         }
 
         // Set application locale
         App::setLocale($locale);
+        App::setFallbackLocale(TranslationService::getFallbackLocale());
+        $request->attributes->set('resolved_locale', $locale);
 
         // Store in session and cookie for persistence
         Session::put('locale', $locale);
