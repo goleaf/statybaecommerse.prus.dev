@@ -14,59 +14,59 @@ final class NormalSettingSeeder extends Seeder
     {
         $settings = [
             [
-                'group' => 'general',
-                'key' => 'site_name',
-                'type' => 'text',
-                'value' => 'Statyba E‑Commerce',
-                'description' => 'Public site display name',
-                'is_public' => true,
-                'is_encrypted' => false,
+                'group'            => 'general',
+                'key'              => 'site_name',
+                'type'             => NormalSetting::TYPE_STRING,
+                'value'            => 'Statyba E‑Commerce',
+                'description'      => 'Public site display name',
+                'is_public'        => true,
+                'is_encrypted'     => false,
                 'validation_rules' => ['required', 'string', 'max:255'],
-                'sort_order' => 0,
+                'sort_order'       => 0,
             ],
             [
-                'group' => 'general',
-                'key' => 'default_locale',
-                'type' => 'text',
-                'value' => 'lt',
-                'description' => 'Default locale code',
-                'is_public' => true,
-                'is_encrypted' => false,
+                'group'            => 'general',
+                'key'              => 'default_locale',
+                'type'             => NormalSetting::TYPE_STRING,
+                'value'            => 'lt',
+                'description'      => 'Default locale code',
+                'is_public'        => true,
+                'is_encrypted'     => false,
                 'validation_rules' => ['required', 'string', 'max:10'],
-                'sort_order' => 1,
+                'sort_order'       => 1,
             ],
             [
-                'group' => 'ecommerce',
-                'key' => 'default_currency',
-                'type' => 'text',
-                'value' => 'EUR',
-                'description' => 'Default currency code',
-                'is_public' => true,
-                'is_encrypted' => false,
+                'group'            => 'ecommerce',
+                'key'              => 'default_currency',
+                'type'             => NormalSetting::TYPE_STRING,
+                'value'            => 'EUR',
+                'description'      => 'Default currency code',
+                'is_public'        => true,
+                'is_encrypted'     => false,
                 'validation_rules' => ['required', 'string', 'size:3'],
-                'sort_order' => 0,
+                'sort_order'       => 0,
             ],
             [
-                'group' => 'shipping',
-                'key' => 'free_shipping_threshold',
-                'type' => 'number',
-                'value' => 100,
-                'description' => 'Order total to qualify for free shipping',
-                'is_public' => true,
-                'is_encrypted' => false,
+                'group'            => 'shipping',
+                'key'              => 'free_shipping_threshold',
+                'type'             => NormalSetting::TYPE_INTEGER,
+                'value'            => 100,
+                'description'      => 'Order total to qualify for free shipping',
+                'is_public'        => true,
+                'is_encrypted'     => false,
                 'validation_rules' => ['numeric', 'min:0'],
-                'sort_order' => 0,
+                'sort_order'       => 0,
             ],
             [
-                'group' => 'security',
-                'key' => 'maintenance_mode',
-                'type' => 'boolean',
-                'value' => false,
-                'description' => 'Enable maintenance mode',
-                'is_public' => false,
-                'is_encrypted' => false,
+                'group'            => 'security',
+                'key'              => 'maintenance_mode',
+                'type'             => NormalSetting::TYPE_BOOLEAN,
+                'value'            => false,
+                'description'      => 'Enable maintenance mode',
+                'is_public'        => false,
+                'is_encrypted'     => false,
                 'validation_rules' => ['boolean'],
-                'sort_order' => 0,
+                'sort_order'       => 0,
             ],
         ];
 
@@ -74,8 +74,16 @@ final class NormalSettingSeeder extends Seeder
 
         foreach ($settings as $data) {
             /** @var array{group:string,key:string} $data */
-            $payload = $data;
-            $payload['value'] = json_encode($data['value']);
+            $payload = [
+                'group'            => $data['group'],
+                'type'             => $data['type'],
+                'value'            => $data['value'],
+                'description'      => $data['description'],
+                'is_public'        => $data['is_public'],
+                'is_encrypted'     => $data['is_encrypted'],
+                'validation_rules' => $data['validation_rules'],
+                'sort_order'       => $data['sort_order'],
+            ];
 
             $setting = NormalSetting::query()->updateOrCreate(
                 ['group' => $data['group'], 'key' => $data['key']],
@@ -86,16 +94,16 @@ final class NormalSettingSeeder extends Seeder
             foreach ($locales as $locale) {
                 NormalSettingTranslation::updateOrCreate([
                     'enhanced_setting_id' => $setting->id,
-                    'locale' => $locale,
+                    'locale'              => $locale,
                 ], [
-                    'description' => $this->getTranslatedDescription($data['description'], $locale),
+                    'description'  => $this->getTranslatedDescription($data['description'], $locale),
                     'display_name' => $this->getTranslatedDisplayName($data['key'], $locale),
-                    'help_text' => $this->getTranslatedHelpText($data['key'], $locale),
+                    'help_text'    => $this->getTranslatedHelpText($data['key'], $locale),
                 ]);
             }
         }
 
-        $this->command?->info('NormalSettingSeeder: seeded settings with translations (locales: '.implode(',', $locales).').');
+        $this->command?->info('NormalSettingSeeder: seeded settings with translations (locales: ' . implode(',', $locales) . ').');
     }
 
     private function supportedLocales(): array

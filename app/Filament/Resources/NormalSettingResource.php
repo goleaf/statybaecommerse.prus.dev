@@ -69,13 +69,7 @@ final class NormalSettingResource extends Resource
                                 ->rows(3),
                             Select::make('type')
                                 ->label(__('normal_settings.type'))
-                                ->options([
-                                    'string' => __('normal_settings.types.string'),
-                                    'integer' => __('normal_settings.types.integer'),
-                                    'boolean' => __('normal_settings.types.boolean'),
-                                    'array' => __('normal_settings.types.array'),
-                                    'json' => __('normal_settings.types.json'),
-                                ])
+                                ->options(self::typeOptions())
                                 ->required()
                                 ->native(false),
                         ]),
@@ -156,13 +150,7 @@ final class NormalSettingResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('normal_settings.type'))
-                    ->options([
-                        'string' => __('normal_settings.types.string'),
-                        'integer' => __('normal_settings.types.integer'),
-                        'boolean' => __('normal_settings.types.boolean'),
-                        'array' => __('normal_settings.types.array'),
-                        'json' => __('normal_settings.types.json'),
-                    ]),
+                    ->options(self::typeOptions()),
                 TernaryFilter::make('is_public')
                     ->label(__('normal_settings.is_public'))
                     ->nullable(),
@@ -178,9 +166,23 @@ final class NormalSettingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNormalSettings::route('/'),
+            'index'  => Pages\ListNormalSettings::route('/'),
             'create' => Pages\CreateNormalSetting::route('/create'),
-            'edit' => Pages\EditNormalSetting::route('/{record}/edit'),
+            'edit'   => Pages\EditNormalSetting::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function typeOptions(): array
+    {
+        $options = [];
+
+        foreach (NormalSetting::CANONICAL_TYPES as $type) {
+            $options[$type] = __('normal_settings.types.' . $type);
+        }
+
+        return $options;
     }
 }
