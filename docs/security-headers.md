@@ -25,10 +25,12 @@ return [
             // Existing directives
             'script-src' => [
                 "'self'",
-                "'unsafe-inline'",
-                "'unsafe-eval'",
+                '@nonce',
                 'https://unpkg.com',
                 'https://cdn.example.com', // New script host
+            ],
+            'script-src-attr' => [
+                "'unsafe-inline'",
             ],
             'img-src' => [
                 "'self'",

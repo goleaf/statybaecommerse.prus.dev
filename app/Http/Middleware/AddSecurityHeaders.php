@@ -7,7 +7,11 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class AddSecurityHeaders
 {
@@ -15,6 +19,8 @@ final class AddSecurityHeaders
 
     public function handle(Request $request, Closure $next): Response
     {
+        $nonce = $this->prepareNonce($request);
+
         /** @var Response $response */
         $response = $next($request);
 
@@ -23,9 +29,29 @@ final class AddSecurityHeaders
         }
 
         $this->applyStaticHeaders($response);
-        $this->applyContentSecurityPolicy($response);
+        $this->applyContentSecurityPolicy($response, $nonce);
+        $this->injectNonceIntoResponse($response, $nonce);
 
         return $response;
+    }
+
+    private function prepareNonce(Request $request): string
+    {
+        $nonce = $request->attributes->get('csp_nonce');
+
+        if (! is_string($nonce) || $nonce === '') {
+            $nonce = $this->generateNonce();
+            $request->attributes->set('csp_nonce', $nonce);
+        }
+
+        View::share('cspNonce', $nonce);
+
+        return $nonce;
+    }
+
+    private function generateNonce(): string
+    {
+        return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
     }
 
     private function applyStaticHeaders(Response $response): void
@@ -50,7 +76,7 @@ final class AddSecurityHeaders
         }
     }
 
-    private function applyContentSecurityPolicy(Response $response): void
+    private function applyContentSecurityPolicy(Response $response, string $nonce): void
     {
         $directives = $this->config->get('security.headers.content_security_policy', []);
         if (! is_array($directives) || $directives === []) {
@@ -68,7 +94,7 @@ final class AddSecurityHeaders
                 continue;
             }
 
-            $sources = $this->normaliseSources($values);
+            $sources = $this->normaliseSources($values, $nonce);
             if ($sources === []) {
                 continue;
             }
@@ -83,11 +109,43 @@ final class AddSecurityHeaders
         $response->headers->set('Content-Security-Policy', implode('; ', $compiled));
     }
 
+    private function injectNonceIntoResponse(Response $response, string $nonce): void
+    {
+        if ($response instanceof BinaryFileResponse || $response instanceof StreamedResponse) {
+            return;
+        }
+
+        $contentType = $response->headers->get('Content-Type');
+        if (! is_string($contentType) || ! Str::contains(Str::lower($contentType), 'text/html')) {
+            return;
+        }
+
+        $content = $response->getContent();
+        if (! is_string($content) || $content === '') {
+            return;
+        }
+
+        $scriptPattern = '/<script(?![^>]*\bsrc=)(?![^>]*\bnonce=)([^>]*)>/i';
+        $stylePattern = '/<style(?![^>]*\bnonce=)([^>]*)>/i';
+
+        $updated = preg_replace($scriptPattern, '<script$1 nonce="'.$nonce.'">', $content);
+        if ($updated === null) {
+            return;
+        }
+
+        $updated = preg_replace($stylePattern, '<style$1 nonce="'.$nonce.'">', $updated);
+        if ($updated === null) {
+            return;
+        }
+
+        $response->setContent($updated);
+    }
+
     /**
      * @param  array<mixed, mixed>|string  $values
      * @return array<int, string>
      */
-    private function normaliseSources(array|string $values): array
+    private function normaliseSources(array|string $values, string $nonce): array
     {
         if (is_string($values)) {
             $values = [$values];
@@ -97,6 +155,12 @@ final class AddSecurityHeaders
 
         foreach ($values as $value) {
             if (! is_string($value) || $value === '') {
+                continue;
+            }
+
+            if ($value === '@nonce') {
+                $sources[] = "'nonce-{$nonce}'";
+
                 continue;
             }
 

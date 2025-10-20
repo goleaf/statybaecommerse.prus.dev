@@ -24,8 +24,10 @@ it('adds the expected security headers to responses', function (): void {
     $csp = $response->headers->get('Content-Security-Policy');
     expect($csp)->toBeString()
         ->and($csp)->toContain("default-src 'self'")
-        ->and($csp)->toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com")
-        ->and($csp)->toContain("style-src 'self' 'unsafe-inline' https://fonts.bunny.net https://unpkg.com")
+        ->and($csp)->toMatch("/script-src 'self' 'nonce-[^']+' https:\\/\\/unpkg\\.com/")
+        ->and($csp)->toContain("script-src-attr 'unsafe-inline'")
+        ->and($csp)->toMatch("/style-src 'self' 'nonce-[^']+' https:\\/\\/fonts\\.bunny\\.net https:\\/\\/unpkg\\.com/")
+        ->and($csp)->toContain("style-src-attr 'unsafe-inline'")
         ->and($csp)->toContain("font-src 'self' https://fonts.bunny.net data:")
         ->and($csp)->toContain("img-src 'self' data: blob:");
 });
