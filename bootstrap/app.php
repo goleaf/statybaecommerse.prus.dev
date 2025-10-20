@@ -1,9 +1,22 @@
 <?php
 
+use App\Exceptions\CodeStyleException;
+use App\Support\ErrorCodes;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 require_once __DIR__ . '/../app/Support/filament_compat.php';
 
@@ -39,7 +52,80 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $resolveCorrelationId = static function (Request $request): string {
+            $correlationId = $request->attributes->get('correlation_id');
+
+            if (! is_string($correlationId) || $correlationId === '') {
+                $correlationId = (string) Str::uuid();
+                $request->attributes->set('correlation_id', $correlationId);
+            }
+
+            return $correlationId;
+        };
+
+        $exceptions->report(function (\Throwable $throwable) use ($resolveCorrelationId): void {
+            $request = request();
+            $correlationId = $request instanceof Request
+                ? $resolveCorrelationId($request)
+                : (string) Str::uuid();
+
+            Log::error($throwable->getMessage(), [
+                'exception' => $throwable,
+                'correlation_id' => $correlationId,
+            ]);
+        });
+
+        $exceptions->render(function (\Throwable $throwable, Request $request) use ($resolveCorrelationId) {
+            if (! $request->expectsJson() && ! $request->wantsJson()) {
+                return null;
+            }
+
+            $correlationId = $resolveCorrelationId($request);
+
+            [$status, $code] = match (true) {
+                $throwable instanceof ValidationException => [422, ErrorCodes::VALIDATION_FAILED],
+                $throwable instanceof AuthenticationException => [401, ErrorCodes::AUTHENTICATION_FAILED],
+                $throwable instanceof AuthorizationException => [403, ErrorCodes::AUTHORIZATION_FAILED],
+                $throwable instanceof ModelNotFoundException => [404, ErrorCodes::MODEL_NOT_FOUND],
+                $throwable instanceof NotFoundHttpException => [404, ErrorCodes::ROUTE_NOT_FOUND],
+                $throwable instanceof MethodNotAllowedHttpException => [405, ErrorCodes::METHOD_NOT_ALLOWED],
+                $throwable instanceof TooManyRequestsHttpException => [429, ErrorCodes::TOO_MANY_REQUESTS],
+                $throwable instanceof CodeStyleException => [422, ErrorCodes::CODE_STYLE_VIOLATION],
+                $throwable instanceof HttpExceptionInterface => [
+                    $throwable->getStatusCode(),
+                    match ($throwable->getStatusCode()) {
+                        503 => ErrorCodes::SERVICE_UNAVAILABLE,
+                        404 => ErrorCodes::ROUTE_NOT_FOUND,
+                        405 => ErrorCodes::METHOD_NOT_ALLOWED,
+                        401 => ErrorCodes::AUTHENTICATION_FAILED,
+                        403 => ErrorCodes::AUTHORIZATION_FAILED,
+                        429 => ErrorCodes::TOO_MANY_REQUESTS,
+                        default => ErrorCodes::UNKNOWN_ERROR,
+                    },
+                ],
+                $throwable instanceof \RuntimeException => [500, ErrorCodes::RUNTIME_ERROR],
+                default => [500, ErrorCodes::UNKNOWN_ERROR],
+            };
+
+            $messageKey = "errors.$code";
+            $message = trans($messageKey);
+
+            if ($message === $messageKey) {
+                $fallbackKey = 'errors.' . ErrorCodes::UNKNOWN_ERROR;
+                $fallback = trans($fallbackKey);
+                $message = $fallback === $fallbackKey
+                    ? __('An unexpected error occurred.')
+                    : $fallback;
+            }
+
+            return response()->json([
+                'error' => [
+                    'code' => $code,
+                    'message' => $message,
+                    'correlation_id' => $correlationId,
+                ],
+            ], $status);
+        });
     })
     ->withProviders([
         App\Providers\AuthServiceProvider::class,
