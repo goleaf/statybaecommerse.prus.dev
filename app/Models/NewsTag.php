@@ -35,14 +35,18 @@ final class NewsTag extends Model
 
     protected $table = 'news_tags';
 
-    protected $fillable = ['is_visible', 'color', 'sort_order'];
+    protected $fillable = ['name', 'slug', 'description', 'is_visible', 'is_active', 'color', 'sort_order'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_visible' => 'boolean', 'sort_order' => 'integer'];
+        return [
+            'is_visible' => 'boolean',
+            'is_active' => 'boolean',
+            'sort_order' => 'integer',
+        ];
     }
 
     protected string $translationModel = \App\Models\Translations\NewsTagTranslation::class;

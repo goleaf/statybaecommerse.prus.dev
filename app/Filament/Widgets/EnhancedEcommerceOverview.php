@@ -12,7 +12,6 @@ use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use UnitEnum;
-
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
