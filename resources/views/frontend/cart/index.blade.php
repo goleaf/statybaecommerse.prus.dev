@@ -97,7 +97,24 @@
                                 <dt>{{ __('Subtotal') }}:</dt>
                                 <dd class="font-semibold text-gray-900 dark:text-white">{{ $summary['formatted_subtotal'] }}</dd>
                             </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ __('Taxes and shipping calculated during checkout.') }}</div>
+                            <div class="flex items-center justify-end gap-3 text-sm text-gray-600 dark:text-gray-300">
+                                <dt>{{ __('Tax') }}:</dt>
+                                <dd class="font-semibold text-gray-900 dark:text-white">{{ $summary['formatted_tax_amount'] }}</dd>
+                            </div>
+                            <div class="flex items-center justify-end gap-3 text-sm text-gray-600 dark:text-gray-300">
+                                <dt>{{ __('Shipping') }}:</dt>
+                                <dd class="font-semibold text-gray-900 dark:text-white">{{ $summary['formatted_shipping_amount'] }}</dd>
+                            </div>
+                            @if(($summary['discount_amount'] ?? 0) > 0)
+                                <div class="flex items-center justify-end gap-3 text-sm text-green-600 dark:text-green-400">
+                                    <dt>{{ __('Discount') }}:</dt>
+                                    <dd class="font-semibold">-{{ $summary['formatted_discount_amount'] }}</dd>
+                                </div>
+                            @endif
+                            <div class="flex items-center justify-end gap-3 text-base font-semibold text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">
+                                <dt>{{ __('Total') }}:</dt>
+                                <dd>{{ $summary['formatted_total'] }}</dd>
+                            </div>
                         </dl>
                     </div>
 
