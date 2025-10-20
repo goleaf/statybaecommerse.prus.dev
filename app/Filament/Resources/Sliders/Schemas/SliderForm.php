@@ -95,6 +95,30 @@ final class SliderForm
                             ]),
                     ])
                     ->collapsible(),
+                Section::make(__('admin.sliders.settings'))
+                    ->description(__('admin.sliders.settings_description'))
+                    ->components([
+                        Grid::make(3)
+                            ->components([
+                                Toggle::make('settings.autoplay')
+                                    ->label(__('admin.sliders.settings_autoplay'))
+                                    ->default(true)
+                                    ->columnSpan(1),
+                                TextInput::make('settings.interval')
+                                    ->label(__('admin.sliders.settings_interval'))
+                                    ->numeric()
+                                    ->default(5000)
+                                    ->minValue(1000)
+                                    ->step(500)
+                                    ->required()
+                                    ->columnSpan(1),
+                                Toggle::make('settings.show_indicators')
+                                    ->label(__('admin.sliders.settings_show_indicators'))
+                                    ->default(true)
+                                    ->columnSpan(1),
+                            ]),
+                    ])
+                    ->collapsible(),
                 Section::make(__('admin.sliders.status'))
                     ->description(__('admin.sliders.status_description'))
                     ->components([
