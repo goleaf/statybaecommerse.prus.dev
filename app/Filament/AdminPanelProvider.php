@@ -33,48 +33,7 @@ class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        if ($this->isTestingEnvironment()) {
-            return $panel
-                ->default()
-                ->id('admin')
-                ->path('/admin')
-                ->login()
-                ->topbar(false)
-                ->userMenu(position: UserMenuPosition::Sidebar)
-                ->colors([
-                    'primary' => Color::Blue,
-                ])
-                ->resources([
-                    \App\Filament\Resources\ApiKeyResource::class,
-                    \App\Filament\Resources\OrderShippingResource::class,
-                    \App\Filament\Resources\PartnerResource::class,
-                    \App\Filament\Resources\PartnerTierResource::class,
-                    \App\Filament\Resources\PriceListItemResource::class,
-                    \App\Filament\Resources\ProductResource::class,
-                    \App\Filament\Resources\ProductVariantResource::class,
-                    \App\Filament\Resources\PostResource::class,
-                    \App\Filament\Resources\RecommendationAnalyticsResource::class,
-                    \App\Filament\Resources\RecommendationConfigResource::class,
-                    \App\Filament\Resources\NotificationResource::class,
-                    \App\Filament\Resources\UserBehaviorResource::class,
-                ])
-                ->pages([])
-                ->widgets([
-                    StatsOverviewWidget::class,
-                ])
-                ->middleware([
-                    \Illuminate\Session\Middleware\StartSession::class,
-                    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-                    \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
-                    \Illuminate\Routing\Middleware\SubstituteBindings::class,
-                    \Illuminate\Auth\Middleware\Authenticate::class,
-                ])
-                ->authMiddleware([
-                    \Illuminate\Auth\Middleware\Authenticate::class,
-                ]);
-        }
-
-        return $panel
+        $panel = $panel
             ->default()
             ->id('admin')
             ->path('/admin')
@@ -83,7 +42,13 @@ class AdminPanelProvider extends PanelProvider
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->colors([
                 'primary' => Color::Blue,
-            ])
+            ]);
+
+        if ($this->isTestingEnvironment()) {
+            return $panel;
+        }
+
+        return $panel
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
