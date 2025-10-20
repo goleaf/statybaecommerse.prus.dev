@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
@@ -87,11 +88,11 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 60)]
     public function realTimeStats(): array
     {
-        return Cache::remember(CacheKeys::dashboardStats($this->timeRange), CacheKeys::TTL_MINUTE, function () {
+        return TagAwareCache::remember(CacheKeys::dashboardStats($this->timeRange), CacheKeys::TTL_MINUTE, function () {
             $timeCondition = $this->getTimeCondition();
 
             return ['products' => ['total' => Product::where('is_visible', true)->count(), 'new_today' => Product::where('is_visible', true)->where($timeCondition)->count(), 'featured' => Product::where('is_featured', true)->where('is_visible', true)->count(), 'low_stock' => Product::where('stock_quantity', '<', 10)->where('is_visible', true)->count()], 'orders' => ['total' => Order::count(), 'today' => Order::where($timeCondition)->count(), 'pending' => Order::where('status', 'pending')->count(), 'completed' => Order::where('status', 'completed')->count(), 'revenue' => Order::where('status', 'completed')->where($timeCondition)->sum('total_amount')], 'users' => ['total' => User::count(), 'new_today' => User::where($timeCondition)->count(), 'active' => User::where('last_activity_at', '>=', now()->subHours(24))->count()], 'reviews' => ['total' => Review::where('is_approved', true)->count(), 'today' => Review::where('is_approved', true)->where($timeCondition)->count(), 'pending' => Review::where('is_approved', false)->count(), 'avg_rating' => Review::where('is_approved', true)->avg('rating') ?? 0]];
-        });
+        }, [CacheKeys::dashboardTag()]);
     }
 
     /**
@@ -100,11 +101,11 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 120)]
     public function liveActivity(): array
     {
-        return Cache::remember(CacheKeys::dashboardActivity($this->timeRange), CacheKeys::TTL_TWO_MINUTES, function () {
+        return TagAwareCache::remember(CacheKeys::dashboardActivity($this->timeRange), CacheKeys::TTL_TWO_MINUTES, function () {
             $timeCondition = $this->getTimeCondition();
 
             return ['recent_orders' => Order::with(['user'])->where($timeCondition)->orderBy('created_at', 'desc')->limit(5)->get()->map(fn ($order) => ['id' => $order->id, 'user_name' => $order->user?->name ?? 'Guest', 'total' => $order->total_amount, 'status' => $order->status, 'created_at' => $order->created_at->diffForHumans()]), 'recent_reviews' => Review::with(['product', 'user'])->where('is_approved', true)->where($timeCondition)->orderBy('created_at', 'desc')->limit(5)->get()->map(fn ($review) => ['id' => $review->id, 'product_name' => $review->product?->name ?? 'Unknown', 'user_name' => $review->user?->name ?? 'Anonymous', 'rating' => $review->rating, 'created_at' => $review->created_at->diffForHumans()]), 'popular_products' => Product::with(['brand'])->where('is_visible', true)->whereHas('reviews')->withCount('reviews')->orderBy('reviews_count', 'desc')->limit(5)->get()->map(fn ($product) => ['id' => $product->id, 'name' => $product->name, 'brand' => $product->brand?->name, 'reviews_count' => $product->reviews_count, 'price' => $product->price])];
-        });
+        }, [CacheKeys::dashboardTag()]);
     }
 
     /**
@@ -113,7 +114,7 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 300)]
     public function performanceMetrics(): array
     {
-        return Cache::remember(CacheKeys::dashboardPerformance($this->timeRange), CacheKeys::TTL_FIVE_MINUTES, function () {
+        return TagAwareCache::remember(CacheKeys::dashboardPerformance($this->timeRange), CacheKeys::TTL_FIVE_MINUTES, function () {
             return [
                 'page_views' => rand(1000, 5000),
                 // Mock data - replace with real analytics
@@ -122,7 +123,7 @@ final class LiveDashboard extends Component
                 'conversion_rate' => rand(2, 8),
                 'top_pages' => [['page' => 'Home', 'views' => rand(500, 2000)], ['page' => 'Products', 'views' => rand(300, 1500)], ['page' => 'Categories', 'views' => rand(200, 1000)]],
             ];
-        });
+        }, [CacheKeys::dashboardTag()]);
     }
 
     /**
@@ -154,6 +155,7 @@ final class LiveDashboard extends Component
      */
     private function clearCache(): void
     {
+        TagAwareCache::flush([CacheKeys::dashboardTag()]);
         Cache::forget(CacheKeys::dashboardStats($this->timeRange));
         Cache::forget(CacheKeys::dashboardActivity($this->timeRange));
         Cache::forget(CacheKeys::dashboardPerformance($this->timeRange));

@@ -7,7 +7,9 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
+use App\Observers\ProductVariantObserver;
 use App\Traits\HasProductPricing;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -37,6 +39,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([ProductVariantObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class, StatusScope::class])]
 final class ProductVariant extends Model implements HasMedia
 {

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Category;
-use Illuminate\Support\Facades\Cache;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -25,7 +26,7 @@ final class MobileCategoryMenu extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("mobile_category_tree:{$locale}", now()->addMinutes(30), function () {
+        return TagAwareCache::remember("mobile_category_tree:{$locale}", now()->addMinutes(30), function () {
             $roots = Category::query()->withProductCounts()->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale()), 'children' => function ($q) {
                 $q->withProductCounts()->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])->visible()->ordered()->limit(10);
                 // Limit for mobile
@@ -36,7 +37,7 @@ final class MobileCategoryMenu extends Component
                     return ['id' => $child->id, 'slug' => method_exists($child, 'trans') ? $child->trans('slug') ?? $child->slug : $child->slug, 'name' => method_exists($child, 'trans') ? $child->trans('name') ?? $child->name : $child->name, 'products_count' => $child->products_count ?? 0];
                 })->toArray()];
             })->toArray();
-        });
+        }, [CacheKeys::homeTag()]);
     }
 
     /**

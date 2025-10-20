@@ -6,8 +6,8 @@ namespace App\Livewire;
 
 use App\Models\Slider;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -25,13 +25,18 @@ final class HomeSlider extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeSliders($locale), CacheKeys::TTL_FIVE_MINUTES, function () use ($locale) {
-            return Slider::query()
-                ->with(['translations' => fn ($q) => $q->where('locale', $locale)])
-                ->active()
-                ->ordered()
-                ->get();
-        });
+        return TagAwareCache::remember(
+            CacheKeys::homeSliders($locale),
+            CacheKeys::TTL_FIVE_MINUTES,
+            function () use ($locale) {
+                return Slider::query()
+                    ->with(['translations' => fn ($q) => $q->where('locale', $locale)])
+                    ->active()
+                    ->ordered()
+                    ->get();
+            },
+            [CacheKeys::homeTag()]
+        );
     }
 
     public function nextSlide(): void

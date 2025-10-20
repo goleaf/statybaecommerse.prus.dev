@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Category;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use App\Support\FeatureState;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -33,7 +34,7 @@ class Navigation extends Component
         $locale = app()->getLocale();
         $cacheKey = "nav:categories:roots:{$locale}";
 
-        return Cache::remember($cacheKey, now()->addMinutes(30), function () {
+        return TagAwareCache::remember($cacheKey, now()->addMinutes(30), function () {
             $query = Category::query();
             if (method_exists(Category::class, 'isRoot')) {
                 $query = $query->isRoot();
@@ -48,7 +49,7 @@ class Navigation extends Component
             }
 
             return $query->orderBy('position')->get();
-        });
+        }, [CacheKeys::homeTag()]);
     }
 
     /**
