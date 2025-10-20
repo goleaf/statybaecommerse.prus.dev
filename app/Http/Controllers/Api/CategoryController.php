@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Support\Contracts\Entities\CategoryContract;
 use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,7 +34,9 @@ final class CategoryController extends Controller
             return empty($category->name) || ! $category->is_visible || empty($category->slug);
         });
 
-        return $this->handleCategoryContentNegotiation($request, $categories);
+        $payload = CategoryContract::forCollection($categories, ['context' => 'tree']);
+
+        return $this->respondWithContract($request, $payload);
     }
 
     /**
@@ -51,7 +54,9 @@ final class CategoryController extends Controller
         }
         $categories = $query->orderBy('sort_order')->orderBy('name')->paginate($perPage);
 
-        return $this->handleCategoryContentNegotiation($request, $categories);
+        $payload = CategoryContract::forCollection($categories);
+
+        return $this->respondWithContract($request, $payload);
     }
 
     /**
@@ -60,10 +65,8 @@ final class CategoryController extends Controller
     public function show(Request $request, Category $category): JsonResponse|View|Response
     {
         $category->load(['children', 'parent']);
-        $data = ['category' => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'parent' => $category->parent ? ['id' => $category->parent->id, 'name' => $category->parent->name, 'slug' => $category->parent->slug] : null, 'children' => $category->children->map(function ($child) {
-            return ['id' => $child->id, 'name' => $child->name, 'slug' => $child->slug, 'description' => $child->description];
-        })->toArray(), 'url' => route('category.show', $category->slug), 'product_count' => $category->products_count ?? 0]];
+        $payload = CategoryContract::forCategory($category);
 
-        return $this->handleContentNegotiation($request, $data);
+        return $this->respondWithContract($request, $payload);
     }
 }
