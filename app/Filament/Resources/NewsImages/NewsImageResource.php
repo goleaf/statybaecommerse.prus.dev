@@ -10,7 +10,11 @@ use App\Filament\Resources\NewsImages\Pages\ListNewsImages;
 use App\Models\NewsImage;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -35,13 +39,60 @@ class NewsImageResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('alt_text')
-                    ->label('Alt Text')
-                    ->maxLength(255),
-                FileUpload::make('image')
-                    ->label('Image')
-                    ->image()
-                    ->required(),
+                Grid::make(2)
+                    ->schema([
+                        Select::make('news_id')
+                            ->label('News Item')
+                            ->relationship('news', 'title')
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->helperText('Select the news article this image belongs to.'),
+                        Toggle::make('is_featured')
+                            ->label('Featured Image')
+                            ->default(false)
+                            ->helperText('Mark this image as featured to highlight it in listings.'),
+                        FileUpload::make('file_path')
+                            ->label('Image File')
+                            ->image()
+                            ->directory('news-images')
+                            ->visibility('private')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                            ->required()
+                            ->columnSpanFull()
+                            ->helperText('Upload a JPG, PNG, GIF, or WEBP file. Stored privately.'),
+                        TextInput::make('alt_text')
+                            ->label('Alt Text')
+                            ->maxLength(255)
+                            ->helperText('Describe the image for accessibility (max 255 characters).'),
+                        TextInput::make('sort_order')
+                            ->label('Sort Order')
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(0)
+                            ->required()
+                            ->helperText('Controls display order; must be a number zero or greater.'),
+                        Textarea::make('caption')
+                            ->label('Caption')
+                            ->rows(3)
+                            ->columnSpanFull()
+                            ->maxLength(500)
+                            ->helperText('Optional caption shown with the image (max 500 characters).'),
+                        TextInput::make('file_size')
+                            ->label('File Size (bytes)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->helperText('Optional: populate with the file size in bytes if known.'),
+                        TextInput::make('mime_type')
+                            ->label('MIME Type')
+                            ->maxLength(255)
+                            ->helperText('Optional MIME type value (e.g., image/jpeg).'),
+                        Textarea::make('dimensions')
+                            ->label('Dimensions')
+                            ->rows(2)
+                            ->columnSpanFull()
+                            ->helperText('Optional JSON object storing width/height, e.g., {"width":800,"height":600}.'),
+                    ]),
             ]);
     }
 
