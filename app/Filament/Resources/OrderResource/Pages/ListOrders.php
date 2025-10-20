@@ -14,6 +14,10 @@ final class ListOrders extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! OrderResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make(),
         ];

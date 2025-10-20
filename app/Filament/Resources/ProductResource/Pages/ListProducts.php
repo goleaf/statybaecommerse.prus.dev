@@ -16,6 +16,10 @@ final class ListProducts extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! ProductResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make(),
         ];

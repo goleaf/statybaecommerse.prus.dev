@@ -14,6 +14,10 @@ final class ListBrands extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! BrandResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make(),
         ];

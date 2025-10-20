@@ -7,12 +7,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Actions\Action as PageAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
@@ -435,15 +437,18 @@ final class OrderResource extends Resource
             ])
             ->actions([
                 ViewAction::make()
-                    ->color('info'),
+                    ->color('info')
+                    ->visible(fn (Order $record): bool => static::authorizeOrder($record, 'view')),
                 EditAction::make()
-                    ->color('warning'),
-                \Filament\Tables\Actions\DeleteAction::make(),
+                    ->color('warning')
+                    ->visible(fn (Order $record): bool => static::authorizeOrder($record, 'update')),
+                DeleteAction::make()
+                    ->visible(fn (Order $record): bool => static::authorizeOrder($record, 'delete')),
                 Action::make('mark_processing')
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')
                     ->color('primary')
-                    ->visible(fn (Order $record): bool => $record->status === 'pending')
+                    ->visible(fn (Order $record): bool => $record->status === 'pending' && static::authorizeOrder($record, 'update'))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'processing']);
                         Notification::make()
@@ -456,7 +461,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn (Order $record): bool => $record->status === 'processing')
+                    ->visible(fn (Order $record): bool => $record->status === 'processing' && static::authorizeOrder($record, 'update'))
                     ->action(function (Order $record): void {
                         $record->update([
                             'status' => 'shipped',
@@ -472,7 +477,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Order $record): bool => $record->status === 'shipped')
+                    ->visible(fn (Order $record): bool => $record->status === 'shipped' && static::authorizeOrder($record, 'update'))
                     ->action(function (Order $record): void {
                         $record->update([
                             'status' => 'delivered',
@@ -488,7 +493,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.cancel_order'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Order $record): bool => in_array($record->status, ['pending', 'processing']))
+                    ->visible(fn (Order $record): bool => in_array($record->status, ['pending', 'processing'], true) && static::authorizeOrder($record, 'update'))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'cancelled']);
                         Notification::make()
@@ -501,7 +506,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.refund_order'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('secondary')
-                    ->visible(fn (Order $record): bool => in_array($record->status, ['delivered', 'completed']))
+                    ->visible(fn (Order $record): bool => in_array($record->status, ['delivered', 'completed'], true) && static::authorizeOrder($record, 'update'))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'refunded']);
                         Notification::make()
@@ -513,7 +518,8 @@ final class OrderResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => static::authorizeOrder(null, 'delete')),
                     BulkAction::make('mark_processing')
                         ->label(__('orders.bulk_mark_processing'))
                         ->icon('heroicon-o-cog')
@@ -525,7 +531,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => static::authorizeOrder(null, 'update')),
                     BulkAction::make('mark_shipped')
                         ->label(__('orders.bulk_mark_shipped'))
                         ->icon('heroicon-o-truck')
@@ -540,7 +547,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => static::authorizeOrder(null, 'update')),
                     BulkAction::make('mark_delivered')
                         ->label(__('orders.bulk_mark_delivered'))
                         ->icon('heroicon-o-check-circle')
@@ -555,7 +563,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => static::authorizeOrder(null, 'update')),
                     BulkAction::make('cancel_orders')
                         ->label(__('orders.bulk_cancel'))
                         ->icon('heroicon-o-x-circle')
@@ -567,7 +576,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => static::authorizeOrder(null, 'update')),
                     BulkAction::make('export_orders')
                         ->label(__('orders.export'))
                         ->icon('heroicon-o-arrow-down-tray')
@@ -578,13 +588,49 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
-                ]),
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => static::authorizeOrder(null, 'viewAny')),
+                ])->visible(fn (): bool => static::authorizeOrder(null, 'update') || static::authorizeOrder(null, 'delete') || static::authorizeOrder(null, 'viewAny')),
             ])
             ->defaultSort('created_at', 'desc')
             ->poll('30s')
             ->striped()
             ->paginated([10, 25, 50, 100]);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::authorizeOrder(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeOrder(null, 'create');
+    }
+
+    public static function canView(Order $record): bool
+    {
+        return static::authorizeOrder($record, 'view');
+    }
+
+    public static function canEdit(Order $record): bool
+    {
+        return static::authorizeOrder($record, 'update');
+    }
+
+    public static function canDelete(Order $record): bool
+    {
+        return static::authorizeOrder($record, 'delete');
+    }
+
+    public static function canRestore(Order $record): bool
+    {
+        return static::authorizeOrder($record, 'restore');
     }
 
     /**
@@ -632,23 +678,40 @@ final class OrderResource extends Resource
         $actions = [];
 
         try {
-            $actions[] = Action::make('view')
-                ->label(__('orders.actions.view'))
-                ->icon('heroicon-o-eye')
-                ->url(self::getUrl('view', ['record' => $record]));
+            if ($record instanceof Order && static::canView($record)) {
+                $actions[] = PageAction::make('view')
+                    ->label(__('orders.actions.view'))
+                    ->icon('heroicon-o-eye')
+                    ->url(self::getUrl('view', ['record' => $record]));
+            }
         } catch (\Exception $e) {
             // Route might not exist, skip this action
         }
 
         try {
-            $actions[] = Action::make('edit')
-                ->label(__('orders.actions.edit'))
-                ->icon('heroicon-o-pencil')
-                ->url(self::getUrl('edit', ['record' => $record]));
+            if ($record instanceof Order && static::canEdit($record)) {
+                $actions[] = PageAction::make('edit')
+                    ->label(__('orders.actions.edit'))
+                    ->icon('heroicon-o-pencil')
+                    ->url(self::getUrl('edit', ['record' => $record]));
+            }
         } catch (\Exception $e) {
             // Route might not exist, skip this action
         }
 
         return $actions;
+    }
+
+    private static function authorizeOrder(?Order $order, string $ability): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $order instanceof Order
+            ? $user->can($ability, $order)
+            : $user->can($ability, Order::class);
     }
 }

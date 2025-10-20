@@ -14,6 +14,10 @@ final class ListCategories extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! CategoryResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make(),
         ];
