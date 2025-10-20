@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -82,7 +83,14 @@ final class AnalyticsResource extends Resource
                         'cancelled' => 'Cancelled',
                     ]),
                 Filter::make('created_at')
-                    ->form([])
+                    ->form([
+                        DatePicker::make('created_from')
+                            ->label(__('analytics.from_date'))
+                            ->placeholder(__('analytics.from_date')),
+                        DatePicker::make('created_until')
+                            ->label(__('analytics.until_date'))
+                            ->placeholder(__('analytics.until_date')),
+                    ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when($data['created_from'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
