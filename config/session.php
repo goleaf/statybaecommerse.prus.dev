@@ -34,7 +34,7 @@ return [
 
     'lifetime' => (int) env('SESSION_LIFETIME', 120),
 
-    'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
+    'expire_on_close' => filter_var((string) env('SESSION_EXPIRE_ON_CLOSE', 'false'), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +47,7 @@ return [
     |
     */
 
-    'encrypt' => env('SESSION_ENCRYPT', false),
+    'encrypt' => filter_var((string) env('SESSION_ENCRYPT', 'false'), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------
@@ -169,7 +169,10 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => match ($secure = env('SESSION_SECURE_COOKIE')) {
+        null => null,
+        default => filter_var((string) $secure, FILTER_VALIDATE_BOOLEAN),
+    },
 
     /*
     |--------------------------------------------------------------------------
@@ -182,7 +185,7 @@ return [
     |
     */
 
-    'http_only' => env('SESSION_HTTP_ONLY', true),
+    'http_only' => filter_var((string) env('SESSION_HTTP_ONLY', 'true'), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------
@@ -212,6 +215,6 @@ return [
     |
     */
 
-    'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
+    'partitioned' => filter_var((string) env('SESSION_PARTITIONED_COOKIE', 'false'), FILTER_VALIDATE_BOOLEAN),
 
 ];
