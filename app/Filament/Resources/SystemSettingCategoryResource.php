@@ -16,16 +16,17 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -88,24 +89,24 @@ final class SystemSettingCategoryResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('system_setting_categories.basic_information'))
+                Section::make(__('system_setting_categories.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('system_setting_categories.name'))
                                     ->required()
                                     ->maxLength(255)
                                     ->live()
-                                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state)))
+                                    ->afterStateUpdated(fn (?string $state, Set $set) => $set('slug', Str::slug((string) $state)))
                                     ->helperText(__('system_setting_categories.name_help')),
                                 TextInput::make('slug')
                                     ->label(__('system_setting_categories.slug'))
-                                    ->rules(fn (SchemaGet $get) => [empty($get('name')) ? 'required' : 'nullable'])
+                                    ->rules(fn (Get $get) => [blank($get('name')) ? 'required' : 'nullable'])
                                     ->unique(SystemSettingCategory::class, 'slug', ignoreRecord: true)
                                     // Allow empty slug; it will be generated from name on submit
                                     ->maxLength(255)
-                                    ->dehydrateStateUsing(fn ($state, callable $get) => $state ?: Str::slug((string) $get('name')))
+                                    ->dehydrateStateUsing(fn (?string $state, Get $get) => $state ?: Str::slug((string) $get('name')))
                                     ->helperText(__('system_setting_categories.slug_help')),
                             ]),
                         Textarea::make('description')
@@ -113,9 +114,9 @@ final class SystemSettingCategoryResource extends Resource
                             ->rows(3)
                             ->helperText(__('system_setting_categories.description_help')),
                     ]),
-                SchemaSection::make(__('system_setting_categories.appearance'))
+                Section::make(__('system_setting_categories.appearance'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('icon')
                                     ->label(__('system_setting_categories.icon'))
@@ -127,7 +128,7 @@ final class SystemSettingCategoryResource extends Resource
                                     ->helperText(__('system_setting_categories.color_help')),
                             ]),
                     ]),
-                SchemaSection::make(__('system_setting_categories.hierarchy'))
+                Section::make(__('system_setting_categories.hierarchy'))
                     ->schema([
                         Select::make('parent_id')
                             ->label(__('system_setting_categories.parent'))
@@ -137,9 +138,9 @@ final class SystemSettingCategoryResource extends Resource
                             ->preload()
                             ->helperText(__('system_setting_categories.parent_help')),
                     ]),
-                SchemaSection::make(__('system_setting_categories.configuration'))
+                Section::make(__('system_setting_categories.configuration'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('sort_order')
                                     ->label(__('system_setting_categories.sort_order'))
@@ -236,8 +237,8 @@ final class SystemSettingCategoryResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingCategory $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->name = $record->name.' (Copy)';
-                        $newRecord->slug = $record->slug.'-copy';
+                        $newRecord->name = $record->name . ' (Copy)';
+                        $newRecord->slug = $record->slug . '-copy';
                         $newRecord->save();
 
                         Notification::make()
@@ -332,10 +333,10 @@ final class SystemSettingCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettingCategories::route('/'),
+            'index'  => Pages\ListSystemSettingCategories::route('/'),
             'create' => Pages\CreateSystemSettingCategory::route('/create'),
-            'view' => Pages\ViewSystemSettingCategory::route('/{record}'),
-            'edit' => Pages\EditSystemSettingCategory::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingCategory::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingCategory::route('/{record}/edit'),
         ];
     }
 }
