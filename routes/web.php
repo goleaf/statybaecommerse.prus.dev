@@ -927,10 +927,16 @@ Route::middleware('auth')->group(function (): void {
 // Notification routes
 Route::middleware('auth')->group(function (): void {
     Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/{id}/unread', [App\Http\Controllers\NotificationController::class, 'markAsUnread'])->name('notifications.unread');
+    Route::post('/notifications/{notification}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])
+        ->name('notifications.read')
+        ->missing(static fn () => response()->json(['error' => 'Notification not found'], 404));
+    Route::post('/notifications/{notification}/unread', [App\Http\Controllers\NotificationController::class, 'markAsUnread'])
+        ->name('notifications.unread')
+        ->missing(static fn () => response()->json(['error' => 'Notification not found'], 404));
     Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-    Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'delete'])->name('notifications.delete');
+    Route::delete('/notifications/{notification}', [App\Http\Controllers\NotificationController::class, 'delete'])
+        ->name('notifications.delete')
+        ->missing(static fn () => response()->json(['error' => 'Notification not found'], 404));
     Route::delete('/notifications', [App\Http\Controllers\NotificationController::class, 'clearAll'])->name('notifications.clear-all');
     Route::get('/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('/notifications/recent', [App\Http\Controllers\NotificationController::class, 'getRecent'])->name('notifications.recent');
@@ -1096,10 +1102,16 @@ Route::middleware('auth')->group(function (): void {
 // Notification routes
 Route::middleware('auth')->group(function (): void {
     Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/{id}/unread', [App\Http\Controllers\NotificationController::class, 'markAsUnread'])->name('notifications.unread');
+    Route::post('/notifications/{notification}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])
+        ->name('notifications.read')
+        ->missing(static fn () => response()->json(['error' => 'Notification not found'], 404));
+    Route::post('/notifications/{notification}/unread', [App\Http\Controllers\NotificationController::class, 'markAsUnread'])
+        ->name('notifications.unread')
+        ->missing(static fn () => response()->json(['error' => 'Notification not found'], 404));
     Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-    Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'delete'])->name('notifications.delete');
+    Route::delete('/notifications/{notification}', [App\Http\Controllers\NotificationController::class, 'delete'])
+        ->name('notifications.delete')
+        ->missing(static fn () => response()->json(['error' => 'Notification not found'], 404));
     Route::delete('/notifications', [App\Http\Controllers\NotificationController::class, 'clearAll'])->name('notifications.clear-all');
     Route::get('/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('/notifications/recent', [App\Http\Controllers\NotificationController::class, 'getRecent'])->name('notifications.recent');

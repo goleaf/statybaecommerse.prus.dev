@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
@@ -26,12 +27,14 @@ final class NotificationController extends Controller
     /**
      * Handle markAsRead functionality with proper error handling.
      */
-    public function markAsRead(string $id): JsonResponse
+    public function markAsRead(DatabaseNotification $notification): JsonResponse
     {
-        $notification = DatabaseNotification::find($id);
-        if (! $notification || $notification->notifiable_id !== Auth::id()) {
-            return response()->json(['error' => 'Notification not found'], 404);
+        $guardResponse = $this->ensureNotificationBelongsToUser($notification);
+
+        if ($guardResponse instanceof JsonResponse) {
+            return $guardResponse;
         }
+
         $notification->markAsRead();
 
         return response()->json(['success' => true, 'message' => __('Notification marked as read')]);
@@ -40,12 +43,14 @@ final class NotificationController extends Controller
     /**
      * Handle markAsUnread functionality with proper error handling.
      */
-    public function markAsUnread(string $id): JsonResponse
+    public function markAsUnread(DatabaseNotification $notification): JsonResponse
     {
-        $notification = DatabaseNotification::find($id);
-        if (! $notification || $notification->notifiable_id !== Auth::id()) {
-            return response()->json(['error' => 'Notification not found'], 404);
+        $guardResponse = $this->ensureNotificationBelongsToUser($notification);
+
+        if ($guardResponse instanceof JsonResponse) {
+            return $guardResponse;
         }
+
         $notification->markAsUnread();
 
         return response()->json(['success' => true, 'message' => __('Notification marked as unread')]);
@@ -64,12 +69,14 @@ final class NotificationController extends Controller
     /**
      * Handle delete functionality with proper error handling.
      */
-    public function delete(string $id): JsonResponse
+    public function delete(DatabaseNotification $notification): JsonResponse
     {
-        $notification = DatabaseNotification::find($id);
-        if (! $notification || $notification->notifiable_id !== Auth::id()) {
-            return response()->json(['error' => 'Notification not found'], 404);
+        $guardResponse = $this->ensureNotificationBelongsToUser($notification);
+
+        if ($guardResponse instanceof JsonResponse) {
+            return $guardResponse;
         }
+
         $notification->delete();
 
         return response()->json(['success' => true, 'message' => __('Notification deleted')]);
@@ -105,5 +112,29 @@ final class NotificationController extends Controller
         });
 
         return response()->json(['notifications' => $notifications]);
+    }
+
+    private function ensureNotificationBelongsToUser(DatabaseNotification $notification): ?JsonResponse
+    {
+        $user = Auth::user();
+
+        if (! $user instanceof AuthenticatableContract) {
+            return $this->notificationNotFoundResponse();
+        }
+
+        if ((string) $notification->notifiable_id !== (string) $user->getAuthIdentifier()) {
+            return $this->notificationNotFoundResponse();
+        }
+
+        if ($notification->notifiable_type !== $user::class) {
+            return $this->notificationNotFoundResponse();
+        }
+
+        return null;
+    }
+
+    private function notificationNotFoundResponse(): JsonResponse
+    {
+        return response()->json(['error' => 'Notification not found'], 404);
     }
 }
