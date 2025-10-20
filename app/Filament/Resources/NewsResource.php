@@ -83,6 +83,8 @@ class NewsResource extends Resource
                         ->disabled(),
                     Forms\Components\Toggle::make('is_featured')
                         ->label(__('news.fields.is_featured')),
+                    Forms\Components\Toggle::make('is_breaking')
+                        ->label(__('news.fields.is_breaking')),
                     Forms\Components\Placeholder::make('moderation_state')
                         ->label(__('news.fields.moderation_state'))
                         ->content(fn (?News $record): string => $record?->moderation_state?->label() ?? ModerationState::Draft->label()),
@@ -182,6 +184,9 @@ class NewsResource extends Resource
                 Tables\Columns\IconColumn::make('is_featured')
                     ->label(__('news.fields.is_featured'))
                     ->boolean(),
+                Tables\Columns\IconColumn::make('is_breaking')
+                    ->label(__('news.fields.is_breaking'))
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('view_count')
                     ->label(__('news.fields.view_count'))
                     ->numeric()
@@ -207,6 +212,8 @@ class NewsResource extends Resource
                     ->label(__('news.fields.is_visible')),
                 Tables\Filters\TernaryFilter::make('is_featured')
                     ->label(__('news.fields.is_featured')),
+                Tables\Filters\TernaryFilter::make('is_breaking')
+                    ->label(__('news.fields.is_breaking')),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
                         Forms\Components\DatePicker::make('published_from')
@@ -408,6 +415,9 @@ class NewsResource extends Resource
                             ->boolean(),
                         Infolists\Components\IconEntry::make('is_featured')
                             ->label(__('news.fields.is_featured'))
+                            ->boolean(),
+                        Infolists\Components\IconEntry::make('is_breaking')
+                            ->label(__('news.fields.is_breaking'))
                             ->boolean(),
                         Infolists\Components\TextEntry::make('view_count')
                             ->label(__('news.fields.view_count'))
