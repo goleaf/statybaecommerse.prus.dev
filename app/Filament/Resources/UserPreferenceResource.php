@@ -72,14 +72,14 @@ final class UserPreferenceResource extends Resource
                 Select::make('preference_type')
                     ->label(__('admin.user_preferences.preference_type'))
                     ->options([
-                        'category' => 'Category',
-                        'brand' => 'Brand',
+                        'category'    => 'Category',
+                        'brand'       => 'Brand',
                         'price_range' => 'Price Range',
-                        'color' => 'Color',
-                        'size' => 'Size',
-                        'material' => 'Material',
-                        'style' => 'Style',
-                        'feature' => 'Feature',
+                        'color'       => 'Color',
+                        'size'        => 'Size',
+                        'material'    => 'Material',
+                        'style'       => 'Style',
+                        'feature'     => 'Feature',
                     ])
                     ->required(),
                 TextInput::make('preference_key')
@@ -114,14 +114,14 @@ final class UserPreferenceResource extends Resource
                 BadgeColumn::make('preference_type')
                     ->label(__('admin.user_preferences.preference_type'))
                     ->colors([
-                        'primary' => 'category',
-                        'success' => 'brand',
-                        'warning' => 'price_range',
-                        'info' => 'color',
+                        'primary'   => 'category',
+                        'success'   => 'brand',
+                        'warning'   => 'price_range',
+                        'info'      => 'color',
                         'secondary' => 'size',
-                        'danger' => 'material',
-                        'gray' => 'style',
-                        'pink' => 'feature',
+                        'danger'    => 'material',
+                        'gray'      => 'style',
+                        'pink'      => 'feature',
                     ])
                     ->formatStateUsing(fn (string $state): string => ucfirst(str_replace('_', ' ', $state)))
                     ->sortable(),
@@ -151,14 +151,14 @@ final class UserPreferenceResource extends Resource
                 SelectFilter::make('preference_type')
                     ->label(__('admin.user_preferences.preference_type'))
                     ->options([
-                        'category' => 'Category',
-                        'brand' => 'Brand',
+                        'category'    => 'Category',
+                        'brand'       => 'Brand',
                         'price_range' => 'Price Range',
-                        'color' => 'Color',
-                        'size' => 'Size',
-                        'material' => 'Material',
-                        'style' => 'Style',
-                        'feature' => 'Feature',
+                        'color'       => 'Color',
+                        'size'        => 'Size',
+                        'material'    => 'Material',
+                        'style'       => 'Style',
+                        'feature'     => 'Feature',
                     ]),
                 Filter::make('score_range')
                     ->form([
@@ -224,10 +224,10 @@ final class UserPreferenceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserPreferences::route('/'),
+            'index'  => Pages\ListUserPreferences::route('/'),
             'create' => Pages\CreateUserPreference::route('/create'),
-            'view' => Pages\ViewUserPreference::route('/{record}'),
-            'edit' => Pages\EditUserPreference::route('/{record}/edit'),
+            'view'   => Pages\ViewUserPreference::route('/{record}'),
+            'edit'   => Pages\EditUserPreference::route('/{record}/edit'),
         ];
     }
 
