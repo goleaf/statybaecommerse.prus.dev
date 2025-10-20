@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -141,12 +142,9 @@ final class CartController extends Controller
     private function summarize(Collection $items): array
     {
         $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
-        return [
-            'item_count' => (int) $items->sum('quantity'),
-            'subtotal' => $subtotal,
-            'formatted_subtotal' => app_money_format($subtotal),
-        ];
+        return ['item_count' => (int) $items->sum('quantity')] + $breakdown->toSummary();
     }
 
     private function ensureOwnership(Request $request, CartItem $cartItem): CartItem

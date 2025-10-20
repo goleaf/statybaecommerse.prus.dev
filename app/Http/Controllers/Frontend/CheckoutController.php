@@ -9,6 +9,7 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\Cart\CartLifecycleService;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -42,17 +43,18 @@ final class CheckoutController extends Controller
 
         $order = DB::transaction(function () use ($items, $request, $validated) {
             $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+            $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
             $order = Order::query()->create([
                 'number' => Str::upper(Str::random(10)),
                 'user_id' => $request->user()?->id,
                 'status' => 'processing',
-                'subtotal' => $subtotal,
-                'tax_amount' => 0,
-                'shipping_amount' => 0,
-                'discount_amount' => 0,
-                'total' => $subtotal,
-                'currency' => current_currency(),
+                'subtotal' => $breakdown->subtotal,
+                'tax_amount' => $breakdown->tax,
+                'shipping_amount' => $breakdown->shipping,
+                'discount_amount' => $breakdown->discount,
+                'total' => $breakdown->total,
+                'currency' => $breakdown->currency,
                 'billing_address' => [],
                 'shipping_address' => [],
                 'payment_status' => 'paid',
@@ -121,11 +123,8 @@ final class CheckoutController extends Controller
     private function summarize(Collection $items): array
     {
         $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
-        return [
-            'item_count' => (int) $items->sum('quantity'),
-            'subtotal' => $subtotal,
-            'formatted_subtotal' => app_money_format($subtotal),
-        ];
+        return ['item_count' => (int) $items->sum('quantity')] + $breakdown->toSummary();
     }
 }
