@@ -393,8 +393,10 @@ final class ProductVariantResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('primary_image')
+                ImageColumn::make('primaryImage.thumbnail_url')
                     ->label(__('product_variants.fields.image'))
+                    ->getStateUsing(fn (ProductVariant $record): ?string => $record->primaryImage?->thumbnail_url)
+                    ->defaultImageUrl(product_placeholder_url('thumb'))
                     ->circular()
                     ->size(50),
                 TextColumn::make('product.name')
