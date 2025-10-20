@@ -13,8 +13,10 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Exists;
 
 final class ProfileController extends Controller
 {
@@ -42,7 +44,7 @@ final class ProfileController extends Controller
         return view('profile.edit', [
             'user' => $user,
             'customer' => $this->resolveCustomerForUser($user),
-            'countries' => Country::query()->orderBy('name')->get(['id', 'name', 'cca2']),
+            'countries' => $this->resolveCountries(),
         ]);
     }
 
@@ -59,8 +61,8 @@ final class ProfileController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string', 'max:500'],
             'postal_code' => ['nullable', 'string', 'max:20'],
-            'country_id' => ['nullable', 'integer', 'exists:countries,id'],
-            'city_id' => ['nullable', 'integer', 'exists:cities,id'],
+            'country_id' => $this->countryRule(),
+            'city_id' => $this->cityRule(),
         ]);
 
         $user->forceFill([
@@ -93,7 +95,7 @@ final class ProfileController extends Controller
             'user' => $user,
             'addresses' => $addresses,
             'addressTypes' => AddressType::options(),
-            'countries' => Country::query()->orderBy('name')->get(['id', 'name', 'cca2']),
+            'countries' => $this->resolveCountries(),
         ]);
     }
 
@@ -162,8 +164,8 @@ final class ProfileController extends Controller
             'state' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['required', 'string', 'max:20'],
             'country_code' => ['required', 'string', 'size:2'],
-            'country_id' => ['nullable', 'integer', 'exists:countries,id'],
-            'city_id' => ['nullable', 'integer', 'exists:cities,id'],
+            'country_id' => $this->countryRule(),
+            'city_id' => $this->cityRule(),
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -249,5 +251,42 @@ final class ProfileController extends Controller
         }
 
         $customer->save();
+    }
+
+    /**
+     * @return array<int, string|Exists>
+     */
+    private function countryRule(): array
+    {
+        $rules = ['nullable', 'integer'];
+
+        if (Schema::hasTable('countries')) {
+            $rules[] = Rule::exists('countries', 'id');
+        }
+
+        return $rules;
+    }
+
+    /**
+     * @return array<int, string|Exists>
+     */
+    private function cityRule(): array
+    {
+        $rules = ['nullable', 'integer'];
+
+        if (Schema::hasTable('cities')) {
+            $rules[] = Rule::exists('cities', 'id');
+        }
+
+        return $rules;
+    }
+
+    private function resolveCountries(): Collection
+    {
+        if (! Schema::hasTable('countries')) {
+            return collect();
+        }
+
+        return Country::query()->orderBy('name')->get(['id', 'name', 'cca2']);
     }
 }
