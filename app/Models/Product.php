@@ -13,6 +13,7 @@ use App\Traits\HasTranslations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -560,7 +561,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestApprovedReview(): HasOne
     {
-        return $this->reviews()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->reviews()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('is_approved', true);
         });
     }
@@ -693,7 +694,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestPriceChange(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('field_name', 'price');
         });
     }
@@ -703,7 +704,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestStockUpdate(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('field_name', 'stock_quantity');
         });
     }
@@ -713,7 +714,7 @@ final class Product extends Model implements HasMedia
      */
     public function currentPrice(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max', 'id' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max', 'id' => 'max'], function ($query): void {
             $query->where('field_name', 'price')->where('created_at', '<=', now());
         });
     }
@@ -871,7 +872,7 @@ final class Product extends Model implements HasMedia
      */
     public function scopeByCategory($query, int $categoryId)
     {
-        return $query->whereHas('categories', function ($q) use ($categoryId) {
+        return $query->whereHas('categories', function ($q) use ($categoryId): void {
             $q->where('category_id', $categoryId);
         });
     }
@@ -883,7 +884,7 @@ final class Product extends Model implements HasMedia
      */
     public function scopeByCollection($query, int $collectionId)
     {
-        return $query->whereHas('collections', function ($q) use ($collectionId) {
+        return $query->whereHas('collections', function ($q) use ($collectionId): void {
             $q->where('collection_id', $collectionId);
         });
     }
@@ -1057,9 +1058,9 @@ final class Product extends Model implements HasMedia
      */
     public function getMainImageAttribute(): ?string
     {
-        $img = $this->images()->orderBy('sort_order')->first();
+        $image = $this->resolvePrimaryImageModel();
 
-        return $img ? $this->resolvePublicUrl($img->path) : null;
+        return $image ? $this->resolvePublicUrl($image->path) : null;
     }
 
     /**
@@ -1067,9 +1068,9 @@ final class Product extends Model implements HasMedia
      */
     public function getThumbnailAttribute(): ?string
     {
-        $img = $this->images()->orderBy('sort_order')->first();
+        $image = $this->resolvePrimaryImageModel();
 
-        return $img ? $this->resolvePublicUrl($img->path) : null;
+        return $image ? $this->resolvePublicUrl($image->path) : null;
     }
 
     /**
@@ -1077,9 +1078,34 @@ final class Product extends Model implements HasMedia
      */
     public function getImageUrl(?string $size = null): ?string
     {
-        $img = $this->images()->orderBy('sort_order')->first();
+        $image = $this->resolvePrimaryImageModel();
 
-        return $img ? $this->resolvePublicUrl($img->path) : null;
+        return $image ? $this->resolvePublicUrl($image->path) : null;
+    }
+
+    private function resolvePrimaryImageModel(): ?ProductImage
+    {
+        if ($this->relationLoaded('primaryImage')) {
+            $image = $this->getRelation('primaryImage');
+
+            return $image instanceof ProductImage ? $image : null;
+        }
+
+        if ($this->relationLoaded('images')) {
+            $images = $this->getRelation('images');
+
+            if ($images instanceof EloquentCollection) {
+                $image = $images->first();
+
+                return $image instanceof ProductImage ? $image : null;
+            }
+
+            return null;
+        }
+
+        $image = $this->primaryImage()->first();
+
+        return $image instanceof ProductImage ? $image : null;
     }
 
     /**
@@ -1126,8 +1152,9 @@ final class Product extends Model implements HasMedia
             return ['src' => null, 'srcset' => '', 'sizes' => '', 'alt' => $this->name];
         }
         $srcset = [$images['xs'] ?? null ? $images['xs'].' 150w' : null, $images['sm'] ?? null ? $images['sm'].' 300w' : null, $images['md'] ?? null ? $images['md'].' 500w' : null, $images['lg'] ?? null ? $images['lg'].' 800w' : null, $images['xl'] ?? null ? $images['xl'].' 1200w' : null];
+        $sizeKey = $defaultSize ?? 'md';
 
-        return ['src' => $images[$defaultSize] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];
+        return ['src' => $images[$sizeKey] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];
     }
 
     /**
@@ -1234,7 +1261,7 @@ final class Product extends Model implements HasMedia
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -1310,7 +1337,7 @@ final class Product extends Model implements HasMedia
         $query = Product::published()->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations']);
         // First try to get products from same categories
         if (! empty($categoryIds)) {
-            $query->whereHas('categories', function ($q) use ($categoryIds) {
+            $query->whereHas('categories', function ($q) use ($categoryIds): void {
                 $q->whereIn('category_id', $categoryIds);
             });
         }
@@ -1347,7 +1374,7 @@ final class Product extends Model implements HasMedia
             return collect();
         }
 
-        return Product::published()->whereHas('categories', function ($query) use ($categoryIds) {
+        return Product::published()->whereHas('categories', function ($query) use ($categoryIds): void {
             $query->whereIn('category_id', $categoryIds);
         })->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
@@ -1380,7 +1407,7 @@ final class Product extends Model implements HasMedia
         $minPrice = $currentPrice * (1 - $priceRange);
         $maxPrice = $currentPrice * (1 + $priceRange);
 
-        return Product::published()->where('id', '!=', $this->id)->where(function ($query) use ($minPrice, $maxPrice) {
+        return Product::published()->where('id', '!=', $this->id)->where(function ($query) use ($minPrice, $maxPrice): void {
             $query->whereBetween('price', [$minPrice, $maxPrice])->orWhereBetween('sale_price', [$minPrice, $maxPrice]);
         })->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
