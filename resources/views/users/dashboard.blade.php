@@ -105,7 +105,7 @@ title(__('users.dashboard'));
                 </div>
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
-                        <a href="{{ route('users.wishlist') }}" class="font-medium text-red-600 hover:text-red-500">{{ __('users.view_wishlist') }}</a>
+                        <a href="{{ route('frontend.wishlist.index') }}" class="font-medium text-red-600 hover:text-red-500">{{ __('users.view_wishlist') }}</a>
                     </div>
                 </div>
             </div>
@@ -216,7 +216,7 @@ title(__('users.dashboard'));
                                 {{ __('users.manage_addresses') }}
                             </a>
                             
-                            <a href="{{ route('users.wishlist') }}" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <a href="{{ route('frontend.wishlist.index') }}" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                 </svg>
