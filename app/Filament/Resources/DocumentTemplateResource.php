@@ -8,11 +8,7 @@ use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -27,6 +23,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -34,7 +35,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 /**
  * DocumentTemplateResource
@@ -43,15 +43,15 @@ use UnitEnum;
  */
 final class DocumentTemplateResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+
+    public static function getNavigationGroup(): ?string
     {
         return 'Documents';
     }
 
     protected static ?string $model = DocumentTemplate::class;
 
-    // /** @var UnitEnum|string|null */
-    // /** @var UnitEnum|string|null */
     protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -61,7 +61,7 @@ final class DocumentTemplateResource extends Resource
      */
     public static function getNavigationLabel(): string
     {
-        return __('document_templates.title');
+        return __('admin/document_templates.title');
     }
 
     /**
@@ -69,7 +69,7 @@ final class DocumentTemplateResource extends Resource
      */
     public static function getPluralModelLabel(): string
     {
-        return __('document_templates.plural');
+        return __('admin/document_templates.plural');
     }
 
     /**
@@ -77,7 +77,7 @@ final class DocumentTemplateResource extends Resource
      */
     public static function getModelLabel(): string
     {
-        return __('document_templates.single');
+        return __('admin/document_templates.single');
     }
 
     /**
@@ -88,67 +88,67 @@ final class DocumentTemplateResource extends Resource
         return $form->schema([
             Tabs::make('document_template_form')
                 ->tabs([
-                    Tab::make(__('document_templates.form.tabs.basic_information'))
+                    Tab::make(__('admin/document_templates.form.tabs.basic_information'))
                         ->schema([
-                            Section::make(__('document_templates.form.sections.basic_information'))
+                            Section::make(__('admin/document_templates.form.sections.basic_information'))
                                 ->schema([
                                     Grid::make(2)
                                         ->schema([
                                             TextInput::make('name')
-                                                ->label(__('document_templates.form.fields.name'))
+                                                ->label(__('admin/document_templates.form.fields.name'))
                                                 ->required()
                                                 ->maxLength(255),
                                             TextInput::make('slug')
-                                                ->label(__('document_templates.form.fields.slug'))
+                                                ->label(__('admin/document_templates.form.fields.slug'))
                                                 ->maxLength(255)
                                                 ->unique(ignoreRecord: true),
                                         ]),
                                     Textarea::make('description')
-                                        ->label(__('document_templates.form.fields.description'))
+                                        ->label(__('admin/document_templates.form.fields.description'))
                                         ->rows(3)
                                         ->maxLength(500)
                                         ->columnSpanFull(),
                                     Grid::make(2)
                                         ->schema([
                                             Select::make('type')
-                                                ->label(__('document_templates.form.fields.type'))
+                                                ->label(__('admin/document_templates.form.fields.type'))
                                                 ->options(DocumentTemplateType::options())
                                                 ->required()
                                                 ->searchable(),
                                             Select::make('category')
-                                                ->label(__('document_templates.form.fields.category'))
+                                                ->label(__('admin/document_templates.form.fields.category'))
                                                 ->options(DocumentTemplateCategory::options())
                                                 ->required()
                                                 ->searchable(),
                                         ]),
                                     Toggle::make('is_active')
-                                        ->label(__('document_templates.form.fields.is_active'))
+                                        ->label(__('admin/document_templates.form.fields.is_active'))
                                         ->default(true),
                                 ]),
                         ]),
-                    Tab::make(__('document_templates.form.tabs.content'))
+                    Tab::make(__('admin/document_templates.form.tabs.content'))
                         ->schema([
-                            Section::make(__('document_templates.form.sections.content'))
+                            Section::make(__('admin/document_templates.form.sections.content'))
                                 ->schema([
                                     RichEditor::make('content')
-                                        ->label(__('document_templates.form.fields.content'))
+                                        ->label(__('admin/document_templates.form.fields.content'))
                                         ->required()
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(__('document_templates.form.tabs.variables'))
+                    Tab::make(__('admin/document_templates.form.tabs.variables'))
                         ->schema([
-                            Section::make(__('document_templates.form.sections.variables'))
+                            Section::make(__('admin/document_templates.form.sections.variables'))
                                 ->schema([
                                     Repeater::make('variables')
-                                        ->label(__('document_templates.form.fields.variables'))
+                                        ->label(__('admin/document_templates.form.fields.variables'))
                                         ->schema([
                                             TextInput::make('name')
-                                                ->label(__('document_templates.form.fields.variable_name'))
+                                                ->label(__('admin/document_templates.form.fields.variable_name'))
                                                 ->required()
                                                 ->maxLength(255),
                                             TextInput::make('description')
-                                                ->label(__('document_templates.form.fields.variable_description'))
+                                                ->label(__('admin/document_templates.form.fields.variable_description'))
                                                 ->required()
                                                 ->maxLength(255),
                                         ])
@@ -160,26 +160,26 @@ final class DocumentTemplateResource extends Resource
                                         }),
                                 ]),
                         ]),
-                    Tab::make(__('document_templates.form.tabs.settings'))
+                    Tab::make(__('admin/document_templates.form.tabs.settings'))
                         ->schema([
-                            Section::make(__('document_templates.form.sections.settings'))
+                            Section::make(__('admin/document_templates.form.sections.settings'))
                                 ->schema([
                                     KeyValue::make('settings')
-                                        ->label(__('document_templates.form.fields.settings'))
-                                        ->keyLabel(__('document_templates.form.fields.setting_key'))
-                                        ->valueLabel(__('document_templates.form.fields.setting_value'))
+                                        ->label(__('admin/document_templates.form.fields.settings'))
+                                        ->keyLabel(__('admin/document_templates.form.fields.setting_key'))
+                                        ->valueLabel(__('admin/document_templates.form.fields.setting_value'))
                                         ->addButtonLabel(__('filament-forms::components.key_value.buttons.add'))
                                         ->default([])
                                         ->reorderable()
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(__('document_templates.form.tabs.preview'))
+                    Tab::make(__('admin/document_templates.form.tabs.preview'))
                         ->schema([
-                            Section::make(__('document_templates.form.sections.preview'))
+                            Section::make(__('admin/document_templates.form.sections.preview'))
                                 ->schema([
                                     Placeholder::make('template_preview')
-                                        ->label(__('document_templates.form.fields.template_preview'))
+                                        ->label(__('admin/document_templates.form.fields.template_preview'))
                                         ->content(fn (callable $get): HtmlString => self::renderPreview($get))
                                         ->columnSpanFull()
                                         ->extraAttributes(['class' => 'prose max-w-none dark:prose-invert space-y-4']),
@@ -198,46 +198,46 @@ final class DocumentTemplateResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('document_templates.name'))
+                    ->label(__('admin/document_templates.form.fields.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
-                    ->label(__('document_templates.slug'))
+                    ->label(__('admin/document_templates.form.fields.slug'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('type')
-                    ->label(__('document_templates.type'))
+                    ->label(__('admin/document_templates.form.fields.type'))
                     ->badge()
                     ->color(fn (string $state): string => DocumentTemplateType::tryFrom($state)?->color() ?? 'gray')
                     ->formatStateUsing(fn (string $state): string => DocumentTemplateType::tryFrom($state)?->label() ?? $state),
                 TextColumn::make('category')
-                    ->label(__('document_templates.category'))
+                    ->label(__('admin/document_templates.form.fields.category'))
                     ->badge()
                     ->color(fn (string $state): string => DocumentTemplateCategory::tryFrom($state)?->color() ?? 'gray')
                     ->formatStateUsing(fn (string $state): string => DocumentTemplateCategory::tryFrom($state)?->label() ?? $state),
                 IconColumn::make('is_active')
-                    ->label(__('document_templates.is_active'))
+                    ->label(__('admin/document_templates.form.fields.is_active'))
                     ->boolean(),
                 TextColumn::make('created_at')
-                    ->label(__('document_templates.created_at'))
+                    ->label(__('admin/document_templates.form.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label(__('document_templates.updated_at'))
+                    ->label(__('admin/document_templates.form.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label(__('document_templates.type'))
+                    ->label(__('admin/document_templates.filters.type'))
                     ->options(DocumentTemplateType::options()),
                 SelectFilter::make('category')
-                    ->label(__('document_templates.category'))
+                    ->label(__('admin/document_templates.filters.category'))
                     ->options(DocumentTemplateCategory::options()),
                 TernaryFilter::make('is_active')
-                    ->label(__('document_templates.is_active')),
+                    ->label(__('admin/document_templates.filters.is_active')),
             ])
             ->actions([
                 ViewAction::make(),
@@ -338,8 +338,8 @@ final class DocumentTemplateResource extends Resource
 
         if ($variables === []) {
             $variables = [
-                'title'       => __('document_templates.form.fields.variable_name'),
-                'description' => __('document_templates.form.fields.variable_description'),
+                'title'       => __('admin/document_templates.form.fields.variable_name'),
+                'description' => __('admin/document_templates.form.fields.variable_description'),
             ];
         }
 

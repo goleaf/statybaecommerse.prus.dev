@@ -16,7 +16,7 @@ enum DocumentTemplateCategory: string
 
     public function label(): string
     {
-        return __('document_templates.categories.' . $this->value);
+        return __('admin/document_templates.categories.' . $this->value);
     }
 
     public function color(): string
