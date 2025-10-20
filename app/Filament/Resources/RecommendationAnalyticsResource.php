@@ -90,9 +90,9 @@ final class RecommendationAnalyticsResource extends Resource
                                     ->searchable(),
                                 Select::make('product_id')
                                     ->label(__('admin.recommendation_analytics.product'))
-                                    ->options(Product::pluck('name', 'id'))
-                                    ->required()
-                                    ->searchable(),
+                                    ->options(fn (): array => Product::withoutGlobalScopes()->pluck('name', 'id')->all())
+                                    ->searchable()
+                                    ->nullable(),
                                 Select::make('action')
                                     ->label(__('admin.recommendation_analytics.action'))
                                     ->options([
@@ -203,7 +203,7 @@ final class RecommendationAnalyticsResource extends Resource
                     ->searchable(),
                 SelectFilter::make('product_id')
                     ->label(__('admin.recommendation_analytics.product'))
-                    ->options(Product::pluck('name', 'id'))
+                    ->options(fn (): array => Product::withoutGlobalScopes()->pluck('name', 'id')->all())
                     ->searchable(),
                 SelectFilter::make('action')
                     ->label(__('admin.recommendation_analytics.action'))
