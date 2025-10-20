@@ -56,7 +56,7 @@ composer run dev
 
 ## Data and integration dependencies
 - **Caching & queues**: Redis (or Predis) backing Horizon for real-time metrics and queue execution.
-- **Search**: Laravel Scout ready for Algolia/Meilisearch; disable or swap drivers via `.env`.
+- **Search**: Toggle between database and Laravel Scout engines with `SEARCH_DRIVER`; keep `SCOUT_ENABLED=false` locally for SQL fallback, or enable Scout for Algolia/Meilisearch and rebuild indexes via `php artisan search:index`.
 - **Media**: `spatie/laravel-medialibrary` manages product imagery, generated conversions, and downloads.
 - **PDF & exports**: `barryvdh/laravel-dompdf` and `pxlrbt/filament-excel` power report exports from the admin panel.
 
@@ -83,6 +83,7 @@ composer run dev
 - SQLite is enabled by default for fast onboarding—switch `DB_CONNECTION` in `.env` if you need MySQL/PostgreSQL.
 - Storage symlink (`public/storage`) is created by `make setup`; re-run `php artisan storage:link` if you remove it.
 - Horizon, Scout, and media-processing queues expect Redis; fall back to the sync driver for local smoke testing by setting `QUEUE_CONNECTION=sync`.
+- Rebuild search indexes for Scout with `php artisan search:index --fresh` or schedule zero-downtime refreshes through `php artisan search:index:rebuild`.
 - Frontend assets rely on modern Node (20+) with native ESM; ensure `npm install` runs before invoking Vite or Playwright scripts.
 
 ## Further reading

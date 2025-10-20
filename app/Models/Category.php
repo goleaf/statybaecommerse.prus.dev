@@ -9,6 +9,7 @@ use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -29,6 +31,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property mixed $casts
  * @property mixed $appends
  * @property string $translationModel
+ * @property int $id
+ * @property string $name
+ * @property string|null $slug
+ * @property string|null $description
+ * @property bool $is_visible
+ * @property-read int|null $products_count
+ * @property-read int|null $children_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $children
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Category newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Category newQuery()
@@ -39,7 +49,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
 final class Category extends Model implements HasMedia
 {
-    use HasFactory, HasTranslations, InteractsWithMedia, SoftDeletes;
+    use HasFactory;
+    use HasTranslations;
+    use InteractsWithMedia;
+    use Searchable;
+    use SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'seo_title', 'seo_description', 'show_in_menu', 'product_limit'];
 
@@ -53,6 +67,57 @@ final class Category extends Model implements HasMedia
     protected $appends = ['full_name', 'breadcrumb', 'canonical_url', 'meta_tags', 'total_revenue', 'average_product_price', 'is_root', 'is_leaf', 'depth', 'level', 'ancestors_count', 'descendants_count', 'full_path'];
 
     protected string $translationModel = \App\Models\Translations\CategoryTranslation::class;
+
+    public function shouldBeSearchable(): bool
+    {
+        if (config('search.driver') !== 'scout' || ! config('search.scout.enabled')) {
+            return false;
+        }
+
+        if (! $this->is_visible || empty($this->slug)) {
+            return false;
+        }
+
+        return $this->searchableProductsExist();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        $this->loadCount([
+            'products as products_count' => static fn (Builder $query): Builder => $query
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now()),
+        ]);
+        $this->loadCount('children');
+
+        $locale = app()->getLocale();
+
+        return [
+            'id' => $this->getKey(),
+            'type' => 'category',
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'translated_name' => $this->trans('name', $locale),
+            'translated_description' => $this->trans('description', $locale),
+            'products_count' => (int) ($this->products_count ?? 0),
+            'children_count' => (int) ($this->children_count ?? 0),
+            'is_visible' => (bool) $this->is_visible,
+        ];
+    }
+
+    private function searchableProductsExist(): bool
+    {
+        return $this->products()
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->exists();
+    }
 
     /**
      * Handle parent functionality with proper error handling.
@@ -359,7 +424,7 @@ final class Category extends Model implements HasMedia
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -764,10 +829,10 @@ final class Category extends Model implements HasMedia
      */
     public function scopeDeep($query, int $minDepth = 2)
     {
-        return $query->whereHas('parent', function ($q) use ($minDepth) {
-            $q->whereHas('parent', function ($q2) use ($minDepth) {
+        return $query->whereHas('parent', function ($q) use ($minDepth): void {
+            $q->whereHas('parent', function ($q2) use ($minDepth): void {
                 if ($minDepth > 2) {
-                    $q2->whereHas('parent', function ($q3) {
+                    $q2->whereHas('parent', function ($q3): void {
                         $q3->whereNotNull('parent_id');
                     });
                 } else {
