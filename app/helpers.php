@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Support\Security\CspNonce;
+
+if (! function_exists('csp_nonce')) {
+    function csp_nonce(): string
+    {
+        return app(CspNonce::class)->value();
+    }
+}
+
 if (! function_exists('app_setting')) {
     /**
      * Get or set a setting value.

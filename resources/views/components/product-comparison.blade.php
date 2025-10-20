@@ -335,7 +335,7 @@ $comparisonAttributes = [
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     function productComparison() {
         return {
             removeProduct(productId) {

@@ -92,7 +92,7 @@
     @livewireScripts
 
     <!-- Notification Handler -->
-    <script>
+    <script nonce="{{ csp_nonce() }}">
         document.addEventListener('livewire:init', () => {
             Livewire.on('notify', (event) => {
                 const notification = event[0] || event;
