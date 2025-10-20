@@ -6,8 +6,8 @@ namespace App\Filament\Resources\AddressResource\Pages;
 
 use App\Filament\Resources\AddressResource;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListAddresses extends ListRecords
@@ -24,7 +24,7 @@ final class ListAddresses extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('translations.all_addresses')),
+            'all'      => Tab::make(__('translations.all_addresses')),
             'shipping' => Tab::make(__('translations.shipping_addresses'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', \App\Enums\AddressType::SHIPPING))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', \App\Enums\AddressType::SHIPPING)->count()),
