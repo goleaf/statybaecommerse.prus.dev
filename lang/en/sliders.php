@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'title' => 'Sliders',
+    'navigation_label' => 'Sliders',
     'plural' => 'Sliders',
     'single' => 'Slider',
 
