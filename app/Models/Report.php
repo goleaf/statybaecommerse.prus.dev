@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Translatable\HasTranslations;
 
 /**
  * Report
@@ -30,11 +31,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
  */
 final class Report extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'type', 'category', 'date_range', 'start_date', 'end_date', 'filters', 'description', 'content', 'is_active', 'is_public', 'is_scheduled', 'schedule_frequency', 'last_generated_at', 'generated_by', 'view_count', 'download_count', 'settings', 'metadata'];
 
     protected $casts = ['filters' => 'array', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_scheduled' => 'boolean', 'start_date' => 'date', 'end_date' => 'date', 'last_generated_at' => 'datetime', 'view_count' => 'integer', 'download_count' => 'integer', 'settings' => 'array', 'metadata' => 'array'];
+
+    protected array $translatable = ['name', 'description', 'content'];
 
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
@@ -71,7 +74,7 @@ final class Report extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType($query, string $type)
     {
@@ -81,7 +84,7 @@ final class Report extends Model
     /**
      * Handle scopeByCategory functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCategory($query, string $category)
     {
@@ -91,7 +94,7 @@ final class Report extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -101,7 +104,7 @@ final class Report extends Model
     /**
      * Handle scopePublic functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePublic($query)
     {
@@ -111,7 +114,7 @@ final class Report extends Model
     /**
      * Handle scopeScheduled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeScheduled($query)
     {
@@ -121,9 +124,9 @@ final class Report extends Model
     /**
      * Handle scopeInDateRange functionality with proper error handling.
      *
-     * @param  mixed  $query
-     * @param  mixed  $startDate
-     * @param  mixed  $endDate
+     * @param mixed $query
+     * @param mixed $startDate
+     * @param mixed $endDate
      */
     public function scopeInDateRange($query, $startDate, $endDate)
     {
@@ -133,7 +136,7 @@ final class Report extends Model
     /**
      * Handle scopePopular functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePopular($query)
     {
@@ -143,7 +146,7 @@ final class Report extends Model
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query)
     {
