@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\FeatureFlags\Schemas;
 
+use App\Models\FeatureFlag;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -48,8 +50,14 @@ class FeatureFlagForm
                 TextInput::make('approval_status'),
                 Textarea::make('approval_notes')
                     ->columnSpanFull(),
-                TextInput::make('created_by'),
-                TextInput::make('updated_by'),
+                Placeholder::make('creator_name')
+                    ->label(__('system.created_by'))
+                    ->content(fn (?FeatureFlag $record): string => $record?->creator?->name ?? '—')
+                    ->visible(fn (?FeatureFlag $record): bool => $record !== null),
+                Placeholder::make('updater_name')
+                    ->label(__('system.updated_by'))
+                    ->content(fn (?FeatureFlag $record): string => $record?->updater?->name ?? '—')
+                    ->visible(fn (?FeatureFlag $record): bool => $record !== null),
                 DateTimePicker::make('last_activated'),
                 DateTimePicker::make('last_deactivated'),
             ]);
