@@ -98,8 +98,8 @@ Route::middleware(['web'])->group(function () {
 
     // Collections
     Route::prefix('collections')->name('frontend.collections.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\CollectionController::class, 'index'])->name('index');
-        Route::get('/{collection}', [App\Http\Controllers\Frontend\CollectionController::class, 'show'])->name('show');
+        Route::get('/', [App\Http\Controllers\CollectionController::class, 'index'])->name('index');
+        Route::get('/{collection}', [App\Http\Controllers\CollectionController::class, 'show'])->name('show');
     });
 
     // News & Content
