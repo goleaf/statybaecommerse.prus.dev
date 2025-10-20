@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
+use App\Support\Html\HtmlSanitizer;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -53,6 +54,13 @@ final class EditProduct extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        /** @var HtmlSanitizer $sanitizer */
+        $sanitizer = app(HtmlSanitizer::class);
+
+        if (array_key_exists('description', $data)) {
+            $data['description'] = $sanitizer->sanitize($data['description']);
+        }
+
         // Update slug if name changed
         if (isset($data['name']) && $data['name'] !== $this->record->name) {
             $data['slug'] = Str::slug($data['name']);

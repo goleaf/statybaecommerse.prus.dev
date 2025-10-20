@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Filament\Components\LiveNotificationFeed;
 use App\Services\DocumentService;
+use App\Support\Html\HtmlSanitizer;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
@@ -29,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->singleton(HtmlSanitizer::class);
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \App\Console\Commands\ImportProducts::class,
