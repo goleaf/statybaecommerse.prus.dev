@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
@@ -85,7 +86,8 @@ final class DocumentService
         // Generate filename
         $filename = 'documents/'.$document->id.'_'.now()->format('Y-m-d_H-i-s').'.pdf';
         // Save to storage
-        Storage::disk('public')->put($filename, $pdf->output());
+        $disk = SecureStorage::disk();
+        Storage::disk($disk)->put($filename, $pdf->output());
         // Update document record
         $document->update(['format' => 'pdf', 'file_path' => $filename, 'status' => 'published']);
         // Send notification with PDF attachment
@@ -93,7 +95,7 @@ final class DocumentService
             Auth::user()->notify(new DocumentGenerated($document, true));
         }
 
-        return Storage::disk('public')->url($filename);
+        return SecureStorage::temporarySignedUrl($filename, now()->addMinutes((int) config('media-security.url_lifetime', 30)), true);
     }
 
     /**

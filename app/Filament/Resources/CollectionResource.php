@@ -103,7 +103,7 @@ final class CollectionResource extends Resource
                             '4:3',
                         ])
                         ->directory('collections/images')
-                        ->visibility('public'),
+                        ->visibility('private'),
                     FileUpload::make('banner')
                         ->label(__('collections.banner'))
                         ->image()
@@ -112,7 +112,7 @@ final class CollectionResource extends Resource
                             '21:9',
                         ])
                         ->directory('collections/banners')
-                        ->visibility('public'),
+                        ->visibility('private'),
                 ]),
             Section::make(__('collections.products'))
                 ->schema([

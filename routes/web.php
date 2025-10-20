@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\SecureMediaDownloadController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
@@ -12,6 +13,11 @@ require __DIR__.'/frontend.php';
 
 // Include admin routes
 require __DIR__.'/admin.php';
+
+Route::middleware(['web', 'signed'])
+    ->get('/secure-media/{encodedPath}', SecureMediaDownloadController::class)
+    ->where('encodedPath', '.*')
+    ->name('media.secure-download');
 
 Route::middleware(['web'])->group(function () {
     Route::get('/docs/api', ApiDocsController::class)->name('docs.api');

@@ -69,7 +69,7 @@
             <h3 class="text-lg font-semibold mb-4">{{ __('admin.import_export.recent_operations') }}</h3>
             <div class="space-y-3">
                 @php
-                    $recentFiles = \Storage::disk('public')->files('exports');
+                    $recentFiles = \Storage::disk(\App\Support\Storage\SecureStorage::disk())->files('exports');
                     $recentFiles = array_slice(array_reverse($recentFiles), 0, 5);
                 @endphp
                 
@@ -80,13 +80,13 @@
                             <div>
                                 <div class="font-medium">{{ basename($file) }}</div>
                                 <div class="text-sm text-gray-500">
-                                    {{ __('admin.import_export.file_size') }}: {{ \Storage::disk('public')->size($file) }} bytes
+                                    {{ __('admin.import_export.file_size') }}: {{ \Storage::disk(\App\Support\Storage\SecureStorage::disk())->size($file) }} bytes
                                 </div>
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <a 
-                                href="{{ asset('storage/' . $file) }}" 
+                              <a
+                                  href="{{ \App\Support\Storage\SecureStorage::temporarySignedUrl($file, now()->addMinutes(config('media-security.url_lifetime', 30)), true) }}"
                                 target="_blank"
                                 class="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-700"
                             >
