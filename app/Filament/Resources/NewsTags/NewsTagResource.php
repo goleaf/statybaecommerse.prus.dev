@@ -7,6 +7,7 @@ namespace App\Filament\Resources\NewsTags;
 use App\Filament\Resources\NewsTags\Pages\CreateNewsTag;
 use App\Filament\Resources\NewsTags\Pages\EditNewsTag;
 use App\Filament\Resources\NewsTags\Pages\ListNewsTags;
+use App\Filament\Resources\NewsTags\Pages\ViewNewsTag;
 use App\Filament\Resources\NewsTags\Schemas\NewsTagForm;
 use App\Filament\Resources\NewsTags\Tables\NewsTagsTable;
 use App\Models\NewsTag;
@@ -44,6 +45,7 @@ class NewsTagResource extends Resource
         return [
             'index' => ListNewsTags::route('/'),
             'create' => CreateNewsTag::route('/create'),
+            'view' => ViewNewsTag::route('/{record}'),
             'edit' => EditNewsTag::route('/{record}/edit'),
         ];
     }
