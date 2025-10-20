@@ -87,7 +87,7 @@ final class NormalSettingTranslationSeeder extends Seeder
             }
 
             // Merge with new translations
-            $allTranslations = array_merge_recursive($existing, $localeTranslations);
+            $allTranslations = array_replace_recursive($existing, $localeTranslations);
 
             // Create directory if it doesn't exist
             $dir = dirname($filePath);
