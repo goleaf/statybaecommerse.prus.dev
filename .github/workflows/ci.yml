@@ -19,7 +19,7 @@ jobs:
         with:
           php-version: '8.3'
           extensions: mbstring, intl, pdo_sqlite
-          coverage: none
+          coverage: xdebug
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
@@ -29,8 +29,33 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
-      - name: Run unit tests
-        run: php artisan test --testsuite=Unit
+      - name: Prepare directories
+        run: |
+          mkdir -p build
+          mkdir -p storage/app/coverage
+
+      - name: Run test suite
+        run: composer test:ci
+
+      - name: Publish unit test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/junit.xml
+
+      - name: Upload junit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phpunit-junit
+          path: build/junit.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phpunit-coverage
+          path: build/coverage.xml
 
   php-compat:
     name: PHP Compatibility
