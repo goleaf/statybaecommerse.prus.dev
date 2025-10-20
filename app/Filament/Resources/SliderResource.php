@@ -39,7 +39,7 @@ final class SliderResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
 
@@ -199,10 +199,10 @@ final class SliderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSliders::route('/'),
+            'index'  => Pages\ListSliders::route('/'),
             'create' => Pages\CreateSlider::route('/create'),
-            'view' => Pages\ViewSlider::route('/{record}'),
-            'edit' => Pages\EditSlider::route('/{record}/edit'),
+            'view'   => Pages\ViewSlider::route('/{record}'),
+            'edit'   => Pages\EditSlider::route('/{record}/edit'),
         ];
     }
 }
