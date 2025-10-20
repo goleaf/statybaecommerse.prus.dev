@@ -8,6 +8,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductHistory;
 use App\Traits\HandlesContentNegotiation;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -27,35 +31,50 @@ final class ProductHistoryController extends Controller
      */
     public function index(Request $request, Product $product): JsonResponse|View|Response
     {
-        $query = $product->histories()->with(['user:id,name,email'])->latest();
-        // Apply filters
-        if ($request->has('action')) {
-            $query->byAction($request->get('action'));
-        }
-        if ($request->has('field_name')) {
-            $query->byField($request->get('field_name'));
-        }
-        if ($request->has('user_id')) {
-            $query->byUser($request->get('user_id'));
-        }
-        if ($request->has('date_from')) {
-            $query->where('created_at', '>=', $request->get('date_from'));
-        }
-        if ($request->has('date_to')) {
-            $query->where('created_at', '<=', $request->get('date_to'));
-        }
-        if ($request->has('search')) {
-            $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('description', 'like', "%{$search}%")->orWhere('action', 'like', "%{$search}%")->orWhere('field_name', 'like', "%{$search}%");
-            });
-        }
-        // Pagination
-        $perPage = min($request->get('per_page', 15), 100);
-        $histories = $query->paginate($perPage);
-        $data = ['histories' => $histories->items(), 'pagination' => ['current_page' => $histories->currentPage(), 'last_page' => $histories->lastPage(), 'per_page' => $histories->perPage(), 'total' => $histories->total(), 'from' => $histories->firstItem(), 'to' => $histories->lastItem()], 'product' => ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku]];
+        $definition = $this->productHistoryListDefinition();
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        return $this->handleContentNegotiation($request, $data);
+        $query = $product->histories()->with(['user:id,name,email']);
+
+        $paginator = $listQuery->apply($query, $definition);
+
+        $response = ListResponse::fromPaginator(
+            $paginator,
+            $listQuery,
+            static fn (ProductHistory $history): array => [
+                'id' => $history->id,
+                'product_id' => $history->product_id,
+                'action' => $history->action,
+                'field_name' => $history->field_name,
+                'description' => $history->description,
+                'old_value' => $history->old_value,
+                'new_value' => $history->new_value,
+                'created_at' => $history->created_at,
+                'user' => $history->user ? ['id' => $history->user->id, 'name' => $history->user->name, 'email' => $history->user->email] : null,
+            ],
+        );
+
+        $productContext = ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku];
+
+        if ($request->accepts(['application/json', 'text/json'])) {
+            return response()->json([
+                'success' => true,
+                'data' => $response['data'],
+                'meta' => $response['meta'],
+                'links' => $response['links'],
+                'product' => $productContext,
+            ]);
+        }
+
+        return $this->handleContentNegotiation(
+            $request,
+            [
+                'histories' => $response['data'],
+                'meta' => $response['meta'],
+                'links' => $response['links'],
+                'product' => $productContext,
+            ],
+        );
     }
 
     /**
@@ -129,5 +148,37 @@ final class ProductHistoryController extends Controller
         $history->load(['user:id,name,email']);
 
         return response()->json(['data' => $history, 'message' => 'History entry created successfully'], 201);
+}
+
+    private function productHistoryListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(15)
+            ->maxPerPage(100)
+            ->defaultSort('created_at', 'desc')
+            ->allowedSorts([
+                'created_at' => ['column' => 'created_at'],
+                'action' => ['column' => ['action', 'id']],
+                'field_name' => ['column' => ['field_name', 'id']],
+                'user' => ['column' => 'user_id'],
+            ])
+            ->filters([
+                'action' => ['type' => 'string', 'nullable' => true, 'scope' => 'byAction'],
+                'field_name' => ['type' => 'string', 'nullable' => true, 'scope' => 'byField'],
+                'user_id' => ['type' => 'int', 'nullable' => true, 'scope' => 'byUser'],
+                'date_from' => ['type' => 'date', 'column' => 'created_at', 'operator' => '>='],
+                'date_to' => ['type' => 'date', 'column' => 'created_at', 'operator' => '<='],
+                'search' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, string $search): void {
+                        $builder->where(static function (Builder $query) use ($search): void {
+                            $query->where('description', 'like', '%'.$search.'%')
+                                ->orWhere('action', 'like', '%'.$search.'%')
+                                ->orWhere('field_name', 'like', '%'.$search.'%');
+                        });
+                    },
+                ],
+            ]);
     }
 }

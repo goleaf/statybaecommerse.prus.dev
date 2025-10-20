@@ -13,6 +13,10 @@ use App\Http\Requests\Api\NotificationStatsRequest;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,14 +37,33 @@ final class NotificationController extends Controller
      */
     public function index(NotificationIndexRequest $request): JsonResponse
     {
-        $user = Auth::user();
-        $validated = $request->validated();
-        $perPage = (int) ($validated['per_page'] ?? 25);
-        $type = $validated['type'] ?? null;
-        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
-        $notifications = $this->notificationService->getUserNotifications($user, $perPage, $type, $read);
+        $definition = $this->notificationListDefinition();
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
+        $user = Auth::user();
+        $notifications = $this->notificationService->getUserNotifications($user, $listQuery, $definition);
+
+        $response = ListResponse::fromPaginator(
+            $notifications,
+            $listQuery,
+            static fn (Notification $notification): array => [
+                'id' => $notification->id,
+                'type' => $notification->type,
+                'data' => $notification->data,
+                'read_at' => $notification->read_at,
+                'created_at' => $notification->created_at,
+                'updated_at' => $notification->updated_at,
+                'is_read' => $notification->is_read,
+                'is_urgent' => $notification->is_urgent,
+            ],
+        );
+
+        return response()->json([
+            'success' => true,
+            'data' => $response['data'],
+            'meta' => $response['meta'],
+            'links' => $response['links'],
+        ]);
     }
 
     /**
@@ -149,5 +172,35 @@ final class NotificationController extends Controller
         $notifications = $this->notificationService->searchNotifications($query, $user, $type, $read, $perPage);
 
         return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
+}
+
+    private function notificationListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(25)
+            ->maxPerPage(100)
+            ->defaultSort('created_at', 'desc')
+            ->allowedSorts([
+                'created_at' => ['column' => 'created_at'],
+                'read_at' => ['column' => 'read_at'],
+                'type' => ['column' => 'type'],
+            ])
+            ->filters([
+                'type' => ['type' => 'string', 'nullable' => true, 'scope' => 'byType'],
+                'read' => [
+                    'type' => 'bool',
+                    'nullable' => true,
+                    'callback' => static function (Builder $query, bool $read): void {
+                        $read ? $query->read() : $query->unread();
+                    },
+                ],
+                'urgent' => [
+                    'type' => 'bool',
+                    'nullable' => true,
+                    'callback' => static function (Builder $query, bool $urgent): void {
+                        $urgent ? $query->urgent() : $query->normal();
+                    },
+                ],
+            ]);
     }
 }

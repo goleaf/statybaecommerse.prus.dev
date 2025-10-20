@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Support\ListQuery\ListQuery;
+use App\Support\ListQuery\ListQueryDefinition;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -65,14 +67,12 @@ final class NotificationService
 
     /**
      * Handle getUserNotifications functionality with proper error handling.
-     *
-     * @return Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getUserNotifications(User $user, int $perPage = 25, ?string $type = null, ?bool $read = null): LengthAwarePaginator
+    public function getUserNotifications(User $user, ListQuery $listQuery, ListQueryDefinition $definition): LengthAwarePaginator
     {
-        $query = $this->applyFilters(Notification::forUser($user->id), $type, $read);
+        $query = Notification::forUser($user->id);
 
-        return $query->latest()->paginate($perPage);
+        return $listQuery->apply($query, $definition);
     }
 
     /**
