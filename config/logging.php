@@ -14,11 +14,17 @@ $configuredStackChannels = array_filter(array_map(
     explode(',', (string) env('LOG_STACK', 'daily'))
 ));
 
-if ($sentryAvailable) {
-    $configuredStackChannels[] = 'sentry';
-}
+$stackChannels = $configuredStackChannels === []
+    ? ['daily']
+    : array_values(array_unique($configuredStackChannels));
 
-$stackChannels = $configuredStackChannels === [] ? ['daily'] : array_values(array_unique($configuredStackChannels));
+$productionStackChannels = array_values(array_unique(array_merge(['daily'], $stackChannels)));
+
+if ($sentryAvailable) {
+    $stackChannels = array_values(array_unique(array_merge($stackChannels, ['sentry'])));
+    $productionStackChannels = array_values(array_unique(array_merge($productionStackChannels, ['sentry'])));
+}
+$isProductionEnvironment = env('APP_ENV', 'production') === 'production';
 
 return [
 
@@ -33,7 +39,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LOG_CHANNEL', $isProductionEnvironment ? 'production' : 'stack'),
 
     /*
     |--------------------------------------------------------------------------
@@ -70,6 +76,12 @@ return [
         'stack' => [
             'driver' => 'stack',
             'channels' => $stackChannels,
+            'ignore_exceptions' => false,
+        ],
+
+        'production' => [
+            'driver' => 'stack',
+            'channels' => $productionStackChannels,
             'ignore_exceptions' => false,
         ],
 
