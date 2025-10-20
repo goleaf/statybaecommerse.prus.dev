@@ -9,7 +9,6 @@ use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
-use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -29,7 +28,8 @@ final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-clock';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
@@ -189,6 +189,7 @@ final class ProductHistoryResource extends Resource
         return [
             'index' => Pages\ListProductHistories::route('/'),
             'create' => Pages\CreateProductHistory::route('/create'),
+            'view' => Pages\ViewProductHistory::route('/{record}'),
             'edit' => Pages\EditProductHistory::route('/{record}/edit'),
         ];
     }
