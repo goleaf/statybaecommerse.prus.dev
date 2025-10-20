@@ -121,7 +121,6 @@ class CreateOrder
             }
             // Clear cart
             CartFacade::session($sessionId)->clear();
-            // @phpstan-ignore-line
             // Queue order confirmation email with user's preferred locale
             try {
                 $mailable = new OrderPlaced($order);
