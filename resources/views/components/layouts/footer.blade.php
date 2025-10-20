@@ -252,6 +252,19 @@
                             {{ __('legal_shipping') }}
                         </x-link>
                     @endif
+                @else
+                    <x-link href="{{ route('frontend.legal.privacy') }}"
+                            class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
+                        {{ __('legal_privacy') }}
+                    </x-link>
+                    <x-link href="{{ route('frontend.legal.cookies') }}"
+                            class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
+                        {{ __('frontend/legal.cookie_policy') }}
+                    </x-link>
+                    <x-link href="{{ route('frontend.legal.terms') }}"
+                            class="inline-flex px-3 text-sm leading-5 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
+                        {{ __('legal_terms') }}
+                    </x-link>
                 @endif
             </div>
         </div>
