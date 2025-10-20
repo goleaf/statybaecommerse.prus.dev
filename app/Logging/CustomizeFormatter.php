@@ -6,6 +6,7 @@ namespace App\Logging;
 
 use App\Logging\Processors\KibanaContextProcessor;
 use App\Logging\Processors\TraceContextProcessor;
+use Illuminate\Log\Logger as IlluminateLogger;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Logger;
 
@@ -13,12 +14,18 @@ final class CustomizeFormatter
 {
     private const DATE_FORMAT = 'Y-m-d\TH:i:s.vP';
 
-    public function __invoke(Logger $logger): void
+    public function __invoke(IlluminateLogger $logger): void
     {
-        $logger->pushProcessor(new TraceContextProcessor());
-        $logger->pushProcessor(new KibanaContextProcessor());
+        $monolog = $logger->getLogger();
 
-        foreach ($logger->getHandlers() as $handler) {
+        if (! $monolog instanceof Logger) {
+            return;
+        }
+
+        $monolog->pushProcessor(new TraceContextProcessor);
+        $monolog->pushProcessor(new KibanaContextProcessor);
+
+        foreach ($monolog->getHandlers() as $handler) {
             if (method_exists($handler, 'setFormatter')) {
                 $handler->setFormatter($this->createFormatter());
             }
