@@ -8,6 +8,7 @@ use App\Data\ExportRequestData;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use App\Support\Authorization\AuthorizationMatrix;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\OrderExport;
@@ -67,6 +68,11 @@ final class OrderResource extends Resource
     protected static ?string $modelLabel = 'orders.models.order';
 
     protected static ?string $pluralModelLabel = 'orders.models.orders';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'viewAny');
+    }
 
     public static function getNavigationIcon(): string|\BackedEnum|null
     {
@@ -440,10 +446,13 @@ final class OrderResource extends Resource
             ])
             ->actions([
                 ViewAction::make()
-                    ->color('info'),
+                    ->color('info')
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'view')),
                 EditAction::make()
-                    ->color('warning'),
-                \Filament\Tables\Actions\DeleteAction::make(),
+                    ->color('warning')
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                \Filament\Tables\Actions\DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
                 Action::make('mark_processing')
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')
@@ -456,7 +465,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                 Action::make('mark_shipped')
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
@@ -472,7 +482,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                 Action::make('mark_delivered')
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
@@ -488,7 +499,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                 Action::make('cancel_order')
                     ->label(__('orders.cancel_order'))
                     ->icon('heroicon-o-x-circle')
@@ -501,7 +513,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                 Action::make('refund_order')
                     ->label(__('orders.refund_order'))
                     ->icon('heroicon-o-arrow-uturn-left')
@@ -514,7 +527,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -560,8 +574,10 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->deselectRecordsAfterCompletion(),
-                    DeleteBulkAction::make(),
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
                     BulkAction::make('mark_processing')
                         ->label(__('orders.bulk_mark_processing'))
                         ->icon('heroicon-o-cog')
@@ -573,7 +589,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('mark_shipped')
                         ->label(__('orders.bulk_mark_shipped'))
                         ->icon('heroicon-o-truck')
@@ -588,7 +605,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('mark_delivered')
                         ->label(__('orders.bulk_mark_delivered'))
                         ->icon('heroicon-o-check-circle')
@@ -603,7 +621,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('cancel_orders')
                         ->label(__('orders.bulk_cancel'))
                         ->icon('heroicon-o-x-circle')
@@ -615,7 +634,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('export_orders')
                         ->label(__('orders.export'))
                         ->icon('heroicon-o-arrow-down-tray')
@@ -626,7 +646,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

@@ -14,6 +14,7 @@ use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManage
 use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Models\Product;
+use App\Support\Authorization\AuthorizationMatrix;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\ProductExport;
@@ -64,6 +65,11 @@ use Filament\Forms\Form;
 final class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('products', 'viewAny');
+    }
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -476,9 +482,12 @@ final class ProductResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
+                    ViewAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'view')),
+                    EditAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
+                    DeleteAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'delete')),
                 ]),
             ])
             ->bulkActions([
@@ -525,7 +534,8 @@ final class ProductResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->deselectRecordsAfterCompletion(),
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'viewAny')),
                     BulkAction::make('publish')
                         ->label(__('products.actions.publish'))
                         ->icon('heroicon-o-eye')
@@ -535,7 +545,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.published'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('unpublish')
                         ->label(__('products.actions.unpublish'))
                         ->icon('heroicon-o-eye-slash')
@@ -545,7 +556,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.unpublished'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('feature')
                         ->label(__('products.actions.feature'))
                         ->icon('heroicon-o-star')
@@ -555,7 +567,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.featured'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('unfeature')
                         ->label(__('products.actions.unfeature'))
                         ->icon('heroicon-o-star')
@@ -565,7 +578,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.unfeatured'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('update_stock')
                         ->label(__('products.actions.update_stock'))
                         ->icon('heroicon-o-cube')
@@ -588,7 +602,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.stock_updated'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('update_prices')
                         ->label(__('products.actions.update_prices'))
                         ->icon('heroicon-o-currency-euro')
@@ -615,8 +630,10 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.prices_updated'))
                                 ->success()
                                 ->send();
-                        }),
-                    DeleteBulkAction::make(),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'delete')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
