@@ -20,11 +20,14 @@ return new class extends Migration
 
         Schema::table('feature_flags', function (Blueprint $table): void {
             if (! Schema::hasColumn('feature_flags', 'created_by')) {
-                $table->foreignId('created_by')
+                $createdByColumn = $table->foreignId('created_by')
                     ->nullable()
-                    ->after('created_by_name')
                     ->constrained('users')
                     ->nullOnDelete();
+
+                if ($afterColumn = $this->getCreatedByPositionColumn()) {
+                    $createdByColumn->after($afterColumn);
+                }
             }
 
             if (! Schema::hasColumn('feature_flags', 'updated_by')) {
@@ -74,5 +77,18 @@ return new class extends Migration
                 $table->renameColumn('created_by_name', 'created_by');
             }
         });
+    }
+
+    private function getCreatedByPositionColumn(): ?string
+    {
+        if (Schema::hasColumn('feature_flags', 'created_by_name')) {
+            return 'created_by_name';
+        }
+
+        if (Schema::hasColumn('feature_flags', 'approval_notes')) {
+            return 'approval_notes';
+        }
+
+        return null;
     }
 };
