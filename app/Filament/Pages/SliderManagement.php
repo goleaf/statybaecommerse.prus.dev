@@ -30,15 +30,16 @@ use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    public static function getNavigationIcon(): BackedEnum|string|null
+    {
+        return 'heroicon-o-rectangle-stack';
+    }
 
     protected static ?string $navigationLabel = 'Slider Management';
 
@@ -48,7 +49,10 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationGroup = 'Content';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Content';
+    }
 
     public Collection $sliders;
 

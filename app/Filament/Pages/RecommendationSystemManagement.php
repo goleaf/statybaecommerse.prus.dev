@@ -18,6 +18,7 @@ use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use UnitEnum;
 
 final class RecommendationSystemManagement extends Page
 {
@@ -27,14 +28,17 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?string $slug = 'recommendation-system-management';
 
-    protected static ?string $navigationGroup = 'Analytics';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Analytics';
+    }
 
     protected static ?int $navigationSort = 40;
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-sparkles';
+    public static function getNavigationIcon(): BackedEnum|string|null
+    {
+        return 'heroicon-o-sparkles';
+    }
 
     protected string $view = 'filament.pages.recommendation-system-management';
 
