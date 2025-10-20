@@ -24,6 +24,9 @@ use Spatie\Translatable\HasTranslations;
  *
  * @property mixed $fillable
  * @property array $translatable
+ * @property \App\Models\Referral|null $referral
+ * @property \App\Models\User|null $user
+ * @property \App\Models\Order|null $order
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ReferralReward newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ReferralReward newQuery()
