@@ -57,11 +57,13 @@ final class ReferralCodeResource extends Resource
                         TextInput::make('title')
                             ->label(__('referral.form.title'))
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->translatable(),
                         Textarea::make('description')
                             ->label(__('referral.form.description'))
                             ->maxLength(65535)
-                            ->nullable(),
+                            ->nullable()
+                            ->translatable(),
                         Toggle::make('is_active')
                             ->label(__('referral.form.is_active'))
                             ->inline(false)
