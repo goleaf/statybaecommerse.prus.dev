@@ -109,6 +109,9 @@ return [
         'set_sale_period' => 'Set Sale Period',
         'rating' => 'Rating',
         'available' => 'Available',
+        'variant_metadata' => 'Metadata',
+        'variant_metadata_key' => 'Key',
+        'variant_metadata_value' => 'Value',
         'badges' => 'Badges',
     ],
 
