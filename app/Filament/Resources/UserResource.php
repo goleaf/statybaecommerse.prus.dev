@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use App\Filament\Resources\UserResource\Pages;
 use BackedEnum;
 use App\Models\User;
@@ -206,6 +208,7 @@ final class UserResource extends Resource
                                 ->success()
                                 ->send();
                         }),
+                    RequestExportBulkAction::make(ExportType::USERS),
                     DeleteBulkAction::make(),
                 ]),
             ])

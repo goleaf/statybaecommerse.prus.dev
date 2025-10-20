@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -568,6 +570,7 @@ final class ProductResource extends Resource
                                 ->success()
                                 ->send();
                         }),
+                    RequestExportBulkAction::make(ExportType::PRODUCTS),
                     DeleteBulkAction::make(),
                 ]),
             ])
