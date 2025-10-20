@@ -13,7 +13,5 @@ it('has consolidated admin navigation labels configured', function (): void {
     expect(__('admin.navigation.analytics'))->not()->toBe('admin.navigation.analytics');
     expect(__('admin.navigation.system'))->not()->toBe('admin.navigation.system');
 
-    // TODO: Fix commerce translation issue - it's returning the key instead of the translation
-    // This appears to be a test environment issue with JSON translation files
-    // expect(__('admin.navigation.commerce'))->toBe('Prekyba');
-})->skip('Commerce translation not working in test environment');
+    expect(__('admin.navigation.commerce'))->toBe('Prekyba');
+});
