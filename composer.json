@@ -94,10 +94,21 @@
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
         ],
+        "ci": [
+            "@analyze",
+            "@test:ci"
+        ],
         "app:install": [
             "@php artisan migrate --force",
             "@php artisan storage:link"
         ],
+        "analyse": "@analyze",
+        "seed:fresh": "@php artisan migrate:fresh --seed --ansi",
+        "build": [
+            "@php artisan optimize --ansi",
+            "npm run build"
+        ],
+        "serve": "@php artisan serve --ansi",
         "lint:php": "vendor/bin/pint --test",
         "fix:php": "vendor/bin/pint -v",
         "analyze": "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G",
