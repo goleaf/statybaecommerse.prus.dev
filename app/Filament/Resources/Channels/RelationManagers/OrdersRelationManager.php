@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Channels\RelationManagers;
 
 use Filament\Actions\AssociateAction;
@@ -23,7 +25,7 @@ class OrdersRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 TextInput::make('number')
                     ->required()
                     ->maxLength(255),
