@@ -44,11 +44,13 @@ final class AutocompleteSelect extends Select
         return parent::make($name);
     }
 
-    public function searchable(bool|Closure $condition = true): static
+    public function searchable(Closure|array|bool $condition = true): static
     {
         parent::searchable($condition);
 
-        $this->searchable = (bool) $this->evaluate($condition);
+        $evaluated = $this->evaluate($condition);
+
+        $this->searchable = is_array($evaluated) ? true : (bool) $evaluated;
 
         return $this;
     }
@@ -103,8 +105,8 @@ final class AutocompleteSelect extends Select
 
         $modelClass = match (true) {
             $evaluatedModel instanceof Model => $evaluatedModel::class,
-            is_string($evaluatedModel) => $evaluatedModel,
-            default => null,
+            is_string($evaluatedModel)       => $evaluatedModel,
+            default                          => null,
         };
 
         if ($modelClass !== null) {
@@ -200,14 +202,14 @@ final class AutocompleteSelect extends Select
 
         $query = $model
             ->query()
-            ->where($searchField, 'like', '%'.$this->searchQuery.'%')
+            ->where($searchField, 'like', '%' . $this->searchQuery . '%')
             ->limit($this->maxSearchResults);
 
         $this->searchResults = $query->get()->map(function (Model $item) use ($valueField, $labelField) {
             return [
                 'value' => $item->{$valueField},
                 'label' => $item->{$labelField},
-                'data' => $item->toArray(),
+                'data'  => $item->toArray(),
             ];
         });
     }
@@ -215,16 +217,16 @@ final class AutocompleteSelect extends Select
     public function getViewData(): array
     {
         return [
-            'searchable' => $this->getSearchable(),
-            'multiple' => $this->getMultiple(),
-            'minSearchLength' => $this->getMinSearchLength(),
+            'searchable'       => $this->getSearchable(),
+            'multiple'         => $this->getMultiple(),
+            'minSearchLength'  => $this->getMinSearchLength(),
             'maxSearchResults' => $this->getMaxSearchResults(),
-            'searchField' => $this->getSearchField(),
-            'valueField' => $this->getValueField(),
-            'labelField' => $this->getLabelField(),
-            'modelClass' => $this->getModelClass(),
-            'searchResults' => $this->searchResults ?? collect(),
-            'searchQuery' => $this->getSearchQuery(),
+            'searchField'      => $this->getSearchField(),
+            'valueField'       => $this->getValueField(),
+            'labelField'       => $this->getLabelField(),
+            'modelClass'       => $this->getModelClass(),
+            'searchResults'    => $this->searchResults ?? collect(),
+            'searchQuery'      => $this->getSearchQuery(),
         ];
     }
 }
