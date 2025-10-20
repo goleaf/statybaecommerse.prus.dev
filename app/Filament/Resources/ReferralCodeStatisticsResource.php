@@ -12,12 +12,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
@@ -58,9 +58,9 @@ final class ReferralCodeStatisticsResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.referral_code_statistics.basic_information'))
+                Section::make(__('admin.referral_code_statistics.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Select::make('referral_code_id')
                                     ->label(__('admin.referral_code_statistics.referral_code'))
@@ -73,9 +73,9 @@ final class ReferralCodeStatisticsResource extends Resource
                                     ->default(now()),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.referral_code_statistics.metrics'))
+                Section::make(__('admin.referral_code_statistics.metrics'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('total_views')
                                     ->label(__('admin.referral_code_statistics.total_views'))
@@ -178,10 +178,10 @@ final class ReferralCodeStatisticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralCodeStatistics::route('/'),
+            'index'  => Pages\ListReferralCodeStatistics::route('/'),
             'create' => Pages\CreateReferralCodeStatistics::route('/create'),
-            'view' => Pages\ViewReferralCodeStatistics::route('/{record}'),
-            'edit' => Pages\EditReferralCodeStatistics::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralCodeStatistics::route('/{record}'),
+            'edit'   => Pages\EditReferralCodeStatistics::route('/{record}/edit'),
         ];
     }
 }
