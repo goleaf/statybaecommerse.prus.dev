@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\LocaleController;
 use App\Models\Discount;
@@ -365,7 +366,8 @@ use Illuminate\Http\Request;
  * |--------------------------------------------------------------------------
  */
 
-Route::get('/health', fn () => response()->json(['ok' => true]))->name('health');
+Route::get('/health', [HealthController::class, 'health'])->name('health');
+Route::get('/ready', [HealthController::class, 'ready'])->name('ready');
 
 // Language switching
 Route::post('/locale', LocaleController::class)->name('locale.switch');
