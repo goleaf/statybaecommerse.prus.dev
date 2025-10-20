@@ -5,11 +5,11 @@ declare(strict_types=1);
 return [
     'headers' => [
         'enabled' => (bool) env('SECURITY_HEADERS_ENABLED', true),
-        'values' => [
-            'X-Frame-Options' => 'DENY',
+        'values'  => [
+            'X-Frame-Options'        => 'DENY',
             'X-Content-Type-Options' => 'nosniff',
-            'Referrer-Policy' => 'strict-origin-when-cross-origin',
-            'Permissions-Policy' => implode(', ', [
+            'Referrer-Policy'        => 'strict-origin-when-cross-origin',
+            'Permissions-Policy'     => implode(', ', [
                 'accelerometer=()',
                 'camera=()',
                 'geolocation=()',
@@ -21,12 +21,12 @@ return [
             ]),
         ],
         'content_security_policy' => [
-            'default-src' => ["'self'"],
-            'base-uri' => ["'self'"],
-            'form-action' => ["'self'"],
+            'default-src'     => ["'self'"],
+            'base-uri'        => ["'self'"],
+            'form-action'     => ["'self'"],
             'frame-ancestors' => ["'none'"],
-            'object-src' => ["'none'"],
-            'script-src' => [
+            'object-src'      => ["'none'"],
+            'script-src'      => [
                 "'self'",
                 '@nonce',
                 'https://unpkg.com',
@@ -60,19 +60,40 @@ return [
     ],
     'rate_limiting' => [
         'api' => [
-            'default' => (int) env('API_RATE_LIMIT_DEFAULT', 60),
+            'default'       => (int) env('API_RATE_LIMIT_DEFAULT', 60),
             'notifications' => (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60),
-            'autocomplete' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30),
+            'autocomplete'  => (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30),
         ],
         'auth' => [
             'login' => [
-                'max_attempts' => (int) env('AUTH_RATE_LIMIT_LOGIN_ATTEMPTS', 5),
+                'max_attempts'  => (int) env('AUTH_RATE_LIMIT_LOGIN_ATTEMPTS', 5),
                 'decay_seconds' => (int) env('AUTH_RATE_LIMIT_LOGIN_DECAY', 60),
             ],
             'password_reset' => [
-                'max_attempts' => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_ATTEMPTS', 5),
+                'max_attempts'  => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_ATTEMPTS', 5),
                 'decay_seconds' => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_DECAY', 300),
             ],
+        ],
+    ],
+    'captcha' => [
+        'auth' => [
+            'login' => [
+                'enabled'     => (bool) env('AUTH_CAPTCHA_LOGIN_ENABLED', true),
+                'threshold'   => (int) env('AUTH_CAPTCHA_LOGIN_THRESHOLD', 3),
+                'ttl_seconds' => (int) env('AUTH_CAPTCHA_LOGIN_TTL', 600),
+            ],
+            'password_reset' => [
+                'enabled'     => (bool) env('AUTH_CAPTCHA_PASSWORD_RESET_ENABLED', true),
+                'threshold'   => (int) env('AUTH_CAPTCHA_PASSWORD_RESET_THRESHOLD', 3),
+                'ttl_seconds' => (int) env('AUTH_CAPTCHA_PASSWORD_RESET_TTL', 600),
+            ],
+        ],
+    ],
+    'monitoring' => [
+        'suspicious_ip' => [
+            'enabled'       => (bool) env('SECURITY_MONITORING_SUSPICIOUS_IP_ENABLED', true),
+            'threshold'     => (int) env('SECURITY_MONITORING_SUSPICIOUS_IP_THRESHOLD', 10),
+            'decay_seconds' => (int) env('SECURITY_MONITORING_SUSPICIOUS_IP_DECAY', 900),
         ],
     ],
 ];
