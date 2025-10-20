@@ -8,7 +8,6 @@ use App\Filament\Resources\UserResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Facades\Hash;
 
 class EditUser extends EditRecord
 {
@@ -24,9 +23,7 @@ class EditUser extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if (isset($data['password']) && ! empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        } else {
+        if (! array_key_exists('password', $data) || blank($data['password'])) {
             unset($data['password']);
         }
 
