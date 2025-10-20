@@ -6,19 +6,20 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CountryResource\Pages;
 use App\Models\Country;
+use Exception;
 use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TableEditAction;
@@ -274,7 +275,7 @@ final class CountryResource extends Resource
                     ->getStateUsing(fn ($record) => $record->is_active ? __('countries.statuses.active') : __('countries.statuses.inactive'))
                     ->colors([
                         'success' => fn ($state) => $state === __('countries.statuses.active'),
-                        'danger' => fn ($state) => $state === __('countries.statuses.inactive'),
+                        'danger'  => fn ($state) => $state === __('countries.statuses.inactive'),
                     ])
                     ->toggleable(),
                 TextColumn::make('cities_count')
@@ -342,7 +343,7 @@ final class CountryResource extends Resource
                         ->label(__('countries.actions.activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function (Country $record) {
+                        ->action(function (Country $record): void {
                             $record->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('countries.notifications.activated'))
@@ -354,7 +355,7 @@ final class CountryResource extends Resource
                         ->label(__('countries.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function (Country $record) {
+                        ->action(function (Country $record): void {
                             $record->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('countries.notifications.deactivated'))
@@ -371,7 +372,7 @@ final class CountryResource extends Resource
                         ->label(__('countries.actions.activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function ($records) {
+                        ->action(function ($records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('countries.notifications.bulk_activated'))
@@ -382,7 +383,7 @@ final class CountryResource extends Resource
                         ->label(__('countries.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function ($records) {
+                        ->action(function ($records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('countries.notifications.bulk_deactivated'))
@@ -412,24 +413,24 @@ final class CountryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCountries::route('/'),
+            'index'  => Pages\ListCountries::route('/'),
             'create' => Pages\CreateCountry::route('/create'),
-            'view' => Pages\ViewCountry::route('/{record}'),
-            'edit' => Pages\EditCountry::route('/{record}/edit'),
+            'view'   => Pages\ViewCountry::route('/{record}'),
+            'edit'   => Pages\EditCountry::route('/{record}/edit'),
         ];
     }
 
     /**
      * Handle getGlobalSearchResultDetails functionality with proper error handling.
      *
-     * @param  mixed  $record
+     * @param mixed $record
      */
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
-            'Code' => $record->cca2,
-            'Region' => $record->region,
-            'Currency' => $record->currency_code,
+            'Code'      => $record->cca2,
+            'Region'    => $record->region,
+            'Currency'  => $record->currency_code,
             'EU Member' => $record->is_eu_member ? 'Yes' : 'No',
         ];
     }
@@ -446,7 +447,7 @@ final class CountryResource extends Resource
                 ->label(__('countries.actions.view'))
                 ->icon('heroicon-o-eye')
                 ->url(self::getUrl('view', ['record' => $record]));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 
@@ -455,7 +456,7 @@ final class CountryResource extends Resource
                 ->label(__('countries.actions.edit'))
                 ->icon('heroicon-o-pencil')
                 ->url(self::getUrl('edit', ['record' => $record]));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 
