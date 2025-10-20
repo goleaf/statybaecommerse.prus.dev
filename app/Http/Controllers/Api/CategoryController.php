@@ -7,6 +7,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Traits\HandlesContentNegotiation;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -41,17 +45,49 @@ final class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse|View|Response
     {
-        $perPage = min((int) $request->get('per_page', 20), 100);
-        $search = $request->get('search');
-        $query = Category::query()->where('is_visible', true)->withCount('products');
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-        $categories = $query->orderBy('sort_order')->orderBy('name')->paginate($perPage);
+        $definition = $this->categoryListDefinition();
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        return $this->handleCategoryContentNegotiation($request, $categories);
+        $query = Category::query()
+            ->where('is_visible', true)
+            ->withCount('products');
+
+        $paginator = $listQuery->apply($query, $definition);
+
+        $response = ListResponse::fromPaginator(
+            $paginator,
+            $listQuery,
+            static fn (Category $category): array => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'description' => $category->description,
+                'sort_order' => $category->sort_order,
+                'is_visible' => (bool) $category->is_visible,
+                'product_count' => $category->products_count ?? 0,
+            ],
+        );
+
+        if ($request->accepts(['application/json', 'text/json'])) {
+            return response()->json([
+                'success' => true,
+                'data' => $response['data'],
+                'meta' => $response['meta'],
+                'links' => $response['links'],
+            ]);
+        }
+
+        return $this->handleCategoryContentNegotiation(
+            $request,
+            $paginator->getCollection(),
+            null,
+            [
+                'pagination' => $response['meta']['pagination'],
+                'sorting' => $response['meta']['sort'],
+                'filters' => $response['meta']['filters'],
+                'links' => $response['links'],
+            ],
+        );
     }
 
     /**
@@ -65,5 +101,30 @@ final class CategoryController extends Controller
         })->toArray(), 'url' => route('category.show', $category->slug), 'product_count' => $category->products_count ?? 0]];
 
         return $this->handleContentNegotiation($request, $data);
+}
+
+    private function categoryListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(20)
+            ->maxPerPage(100)
+            ->defaultSort('sort_order', 'asc')
+            ->allowedSorts([
+                'name' => ['column' => ['name', 'id']],
+                'sort_order' => ['column' => ['sort_order', 'name']],
+                'product_count' => ['column' => 'products_count'],
+            ])
+            ->filters([
+                'search' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, string $search): void {
+                        $builder->where(static function (Builder $query) use ($search): void {
+                            $query->where('name', 'like', '%'.$search.'%')
+                                ->orWhere('description', 'like', '%'.$search.'%');
+                        });
+                    },
+                ],
+            ]);
     }
 }

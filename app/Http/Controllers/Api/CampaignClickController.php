@@ -7,9 +7,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCampaignClickRequest;
 use App\Http\Requests\UpdateCampaignClickRequest;
-use App\Http\Resources\CampaignClickCollection;
 use App\Http\Resources\CampaignClickResource;
 use App\Models\CampaignClick;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,39 +30,29 @@ final class CampaignClickController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = CampaignClick::with(['campaign', 'customer']);
-        // Apply filters
-        if ($request->has('campaign_id')) {
-            $query->where('campaign_id', $request->campaign_id);
-        }
-        if ($request->has('click_type')) {
-            $query->where('click_type', $request->click_type);
-        }
-        if ($request->has('device_type')) {
-            $query->where('device_type', $request->device_type);
-        }
-        if ($request->has('is_converted')) {
-            $query->where('is_converted', $request->boolean('is_converted'));
-        }
-        if ($request->has('country')) {
-            $query->where('country', $request->country);
-        }
-        if ($request->has('utm_source')) {
-            $query->where('utm_source', $request->utm_source);
-        }
-        if ($request->has('date_from')) {
-            $query->where('clicked_at', '>=', $request->date_from);
-        }
-        if ($request->has('date_to')) {
-            $query->where('clicked_at', '<=', $request->date_to);
-        }
-        // For authenticated users, show only their clicks
+        $definition = $this->campaignClickListDefinition();
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
+        $query = CampaignClick::query()->with(['campaign', 'customer']);
+
         if (Auth::check()) {
             $query->where('customer_id', Auth::id());
         }
-        $clicks = $query->orderBy('clicked_at', 'desc')->paginate($request->get('per_page', 15));
 
-        return response()->json(new CampaignClickCollection($clicks));
+        $paginator = $listQuery->apply($query, $definition);
+
+        $response = ListResponse::fromPaginator(
+            $paginator,
+            $listQuery,
+            static fn (CampaignClick $click) => (new CampaignClickResource($click))->toArray($request),
+        );
+
+        return response()->json([
+            'success' => true,
+            'data' => $response['data'],
+            'meta' => $response['meta'],
+            'links' => $response['links'],
+        ]);
     }
 
     /**
@@ -219,5 +211,28 @@ final class CampaignClickController extends Controller
             });
             fclose($handle);
         }, 200, $headers);
+}
+
+    private function campaignClickListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(15)
+            ->maxPerPage(100)
+            ->defaultSort('clicked_at', 'desc')
+            ->allowedSorts([
+                'clicked_at' => ['column' => 'clicked_at'],
+                'created_at' => ['column' => 'created_at'],
+                'conversion_value' => ['column' => 'conversion_value'],
+            ])
+            ->filters([
+                'campaign_id' => ['type' => 'int', 'column' => 'campaign_id'],
+                'click_type' => ['type' => 'string', 'column' => 'click_type'],
+                'device_type' => ['type' => 'string', 'column' => 'device_type'],
+                'is_converted' => ['type' => 'bool', 'column' => 'is_converted'],
+                'country' => ['type' => 'string', 'column' => 'country'],
+                'utm_source' => ['type' => 'string', 'column' => 'utm_source'],
+                'date_from' => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '>='],
+                'date_to' => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '<='],
+            ]);
     }
 }
