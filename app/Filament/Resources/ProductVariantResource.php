@@ -8,6 +8,7 @@ use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\ProductVariant;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -39,6 +40,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
@@ -70,7 +72,7 @@ final class ProductVariantResource extends Resource
         return __('product_variants.single');
     }
 
-    public static function getNavigationIcon(): string|\BackedEnum|Htmlable|null
+    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return 'heroicon-o-squares-2x2';
     }
@@ -260,7 +262,7 @@ final class ProductVariantResource extends Resource
                                                     ->withPivot('attribute_id')
                                                     ->get()
                                                     ->map(fn (AttributeValue $value): array => [
-                                                        'attribute_id' => $value->pivot->attribute_id,
+                                                        'attribute_id'       => $value->pivot->attribute_id,
                                                         'attribute_value_id' => $value->getKey(),
                                                     ])
                                                     ->values()
@@ -322,7 +324,7 @@ final class ProductVariantResource extends Resource
     {
         $processedSelections = collect($selections)
             ->map(fn ($selection): array => [
-                'attribute_id' => data_get($selection, 'attribute_id'),
+                'attribute_id'       => data_get($selection, 'attribute_id'),
                 'attribute_value_id' => data_get($selection, 'attribute_value_id'),
             ])
             ->filter(fn (array $selection): bool => filled($selection['attribute_id']) && filled($selection['attribute_value_id']))
@@ -359,17 +361,17 @@ final class ProductVariantResource extends Resource
             ];
 
             $variantAttributeValues[] = [
-                'variant_id' => $variant->getKey(),
-                'attribute_id' => $attributeId,
-                'attribute_name' => $attribute?->name,
-                'attribute_value' => $attributeValue->value,
+                'variant_id'              => $variant->getKey(),
+                'attribute_id'            => $attributeId,
+                'attribute_name'          => $attribute?->name,
+                'attribute_value'         => $attributeValue->value,
                 'attribute_value_display' => $attributeValue->display_value ?? $attributeValue->value,
-                'attribute_value_lt' => $attributeValue->getTranslation('value', 'lt', false) ?? $attributeValue->value,
-                'attribute_value_en' => $attributeValue->getTranslation('value', 'en', false) ?? $attributeValue->value,
-                'attribute_value_slug' => $attributeValue->slug,
-                'sort_order' => $index,
-                'is_filterable' => (bool) ($attribute?->is_filterable ?? true),
-                'is_searchable' => (bool) ($attribute?->is_searchable ?? true),
+                'attribute_value_lt'      => $attributeValue->getTranslation('value', 'lt', false) ?? $attributeValue->value,
+                'attribute_value_en'      => $attributeValue->getTranslation('value', 'en', false) ?? $attributeValue->value,
+                'attribute_value_slug'    => $attributeValue->slug,
+                'sort_order'              => $index,
+                'is_filterable'           => (bool) ($attribute?->is_filterable ?? true),
+                'is_searchable'           => (bool) ($attribute?->is_searchable ?? true),
             ];
         }
 
@@ -421,18 +423,18 @@ final class ProductVariantResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
-                        $state <= 0 => 'danger',
+                        $state <= 0  => 'danger',
                         $state <= 10 => 'warning',
-                        default => 'success',
+                        default      => 'success',
                     }),
                 BadgeColumn::make('stock_status')
                     ->label(__('product_variants.fields.stock_status'))
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'in_stock' => __('product_variants.stock_status.in_stock'),
-                        'low_stock' => __('product_variants.stock_status.low_stock'),
+                        'in_stock'     => __('product_variants.stock_status.in_stock'),
+                        'low_stock'    => __('product_variants.stock_status.low_stock'),
                         'out_of_stock' => __('product_variants.stock_status.out_of_stock'),
-                        'not_tracked' => __('product_variants.stock_status.not_tracked'),
-                        default => $state,
+                        'not_tracked'  => __('product_variants.stock_status.not_tracked'),
+                        default        => $state,
                     }),
                 IconColumn::make('is_enabled')
                     ->label(__('product_variants.fields.is_enabled'))
@@ -460,20 +462,45 @@ final class ProductVariantResource extends Resource
                 SelectFilter::make('variant_type')
                     ->label(__('product_variants.fields.variant_type'))
                     ->options([
-                        'size' => __('product_variants.variant_types.size'),
-                        'color' => __('product_variants.variant_types.color'),
+                        'size'     => __('product_variants.variant_types.size'),
+                        'color'    => __('product_variants.variant_types.color'),
                         'material' => __('product_variants.variant_types.material'),
-                        'style' => __('product_variants.variant_types.style'),
-                        'custom' => __('product_variants.variant_types.custom'),
+                        'style'    => __('product_variants.variant_types.style'),
+                        'custom'   => __('product_variants.variant_types.custom'),
                     ]),
                 SelectFilter::make('stock_status')
                     ->label(__('product_variants.filters.stock_status'))
                     ->options([
-                        'in_stock' => __('product_variants.stock_status.in_stock'),
-                        'low_stock' => __('product_variants.stock_status.low_stock'),
+                        'in_stock'     => __('product_variants.stock_status.in_stock'),
+                        'low_stock'    => __('product_variants.stock_status.low_stock'),
                         'out_of_stock' => __('product_variants.stock_status.out_of_stock'),
-                        'not_tracked' => __('product_variants.stock_status.not_tracked'),
-                    ]),
+                        'not_tracked'  => __('product_variants.stock_status.not_tracked'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+                        $availableExpression = 'COALESCE(stock_quantity, 0) - COALESCE(reserved_quantity, 0)';
+
+                        return match ($value) {
+                            'in_stock' => $query
+                                ->where('track_inventory', true)
+                                ->whereRaw("{$availableExpression} > 0")
+                                ->where(function (Builder $query) use ($availableExpression): void {
+                                    $query
+                                        ->whereNull('low_stock_threshold')
+                                        ->orWhereRaw("{$availableExpression} > low_stock_threshold");
+                                }),
+                            'low_stock' => $query
+                                ->where('track_inventory', true)
+                                ->whereRaw("{$availableExpression} > 0")
+                                ->whereNotNull('low_stock_threshold')
+                                ->whereRaw("{$availableExpression} <= low_stock_threshold"),
+                            'out_of_stock' => $query
+                                ->where('track_inventory', true)
+                                ->whereRaw("{$availableExpression} <= 0"),
+                            'not_tracked' => $query->where('track_inventory', false),
+                            default       => $query,
+                        };
+                    }),
                 TernaryFilter::make('is_enabled')
                     ->label(__('product_variants.fields.is_enabled')),
                 TernaryFilter::make('is_default_variant')
@@ -491,7 +518,7 @@ final class ProductVariantResource extends Resource
                 Action::make('set_default')
                     ->label(__('product_variants.actions.set_default'))
                     ->icon('heroicon-o-star')
-                    ->action(function (ProductVariant $record) {
+                    ->action(function (ProductVariant $record): void {
                         $record->setAsDefault();
                         Notification::make()
                             ->title(__('product_variants.messages.set_as_default_success'))
@@ -508,7 +535,7 @@ final class ProductVariantResource extends Resource
                     BulkAction::make('enable')
                         ->label(__('product_variants.actions.enable'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_enabled' => true]);
                             Notification::make()
                                 ->title(__('product_variants.messages.bulk_enable_success'))
@@ -518,7 +545,7 @@ final class ProductVariantResource extends Resource
                     BulkAction::make('disable')
                         ->label(__('product_variants.actions.disable'))
                         ->icon('heroicon-o-x-circle')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_enabled' => false]);
                             Notification::make()
                                 ->title(__('product_variants.messages.bulk_disable_success'))
@@ -541,10 +568,10 @@ final class ProductVariantResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductVariants::route('/'),
+            'index'  => Pages\ListProductVariants::route('/'),
             'create' => Pages\CreateProductVariant::route('/create'),
-            'view' => Pages\ViewProductVariant::route('/{record}'),
-            'edit' => Pages\EditProductVariant::route('/{record}/edit'),
+            'view'   => Pages\ViewProductVariant::route('/{record}'),
+            'edit'   => Pages\EditProductVariant::route('/{record}/edit'),
         ];
     }
 }
