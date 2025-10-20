@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use App\Support\Authorization\AuthorizationMatrix;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\UserExport;
@@ -49,6 +50,11 @@ final class UserResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('users', 'viewAny');
+    }
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
@@ -186,8 +192,10 @@ final class UserResource extends Resource
                     ->label(__('users.fields.email_verified')),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
+                DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('users', 'delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -233,7 +241,8 @@ final class UserResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->deselectRecordsAfterCompletion(),
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'viewAny')),
                     BulkAction::make('activate')
                         ->label(__('users.actions.activate'))
                         ->icon('heroicon-o-check-circle')
@@ -243,7 +252,8 @@ final class UserResource extends Resource
                                 ->title(__('users.messages.bulk_activate_success'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
                     BulkAction::make('deactivate')
                         ->label(__('users.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
@@ -253,8 +263,10 @@ final class UserResource extends Resource
                                 ->title(__('users.messages.bulk_deactivate_success'))
                                 ->success()
                                 ->send();
-                        }),
-                    DeleteBulkAction::make(),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'delete')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

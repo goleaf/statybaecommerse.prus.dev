@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
+use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -17,7 +18,8 @@ final class EditProduct extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->visible(fn () => AuthorizationMatrix::check('products', 'delete')),
             Actions\Action::make('duplicate')
                 ->label(__('products.actions.duplicate'))
                 ->icon('heroicon-o-document-duplicate')
@@ -34,7 +36,8 @@ final class EditProduct extends EditRecord
                         ->title(__('products.messages.duplicated_success'))
                         ->success()
                         ->send();
-                }),
+                })
+                ->visible(fn () => AuthorizationMatrix::check('products', 'create')),
         ];
     }
 
