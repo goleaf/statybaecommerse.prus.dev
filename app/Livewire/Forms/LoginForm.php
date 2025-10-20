@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Forms;
 
+use App\Support\Security\Captcha\CaptchaManager;
+use App\Support\Security\SuspiciousIpMonitor;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -23,16 +25,56 @@ final class LoginForm extends Form
     #[Validate('boolean')]
     public bool $remember = false;
 
+    #[Validate('nullable|string')]
+    public ?string $captchaToken = null;
+
+    #[Validate('nullable|string')]
+    public ?string $captchaResponse = null;
+
+    public ?string $captchaQuestion = null;
+
     public function authenticate(): void
     {
         $this->validate();
 
-        $this->ensureIsNotRateLimited();
+        $captchaManager = app(CaptchaManager::class);
+        $monitor = app(SuspiciousIpMonitor::class);
+
+        $this->ensureIsNotRateLimited($captchaManager, $monitor);
+
+        if ($captchaManager->shouldChallenge($this->throttleKey(), 'auth.login')) {
+            $this->syncCaptchaState($captchaManager);
+
+            $this->validate([
+                'captchaToken'    => ['required', 'string'],
+                'captchaResponse' => ['required', 'string'],
+            ]);
+
+            if (! $captchaManager->verify($this->throttleKey(), 'auth.login', (string) $this->captchaToken, (string) $this->captchaResponse)) {
+                $this->syncCaptchaState($captchaManager, true);
+                $this->captchaResponse = '';
+
+                throw ValidationException::withMessages([
+                    'loginForm.captchaResponse' => __('The security check response did not match. Please try again.'),
+                ]);
+            }
+        } else {
+            $this->syncCaptchaState($captchaManager);
+        }
 
         $decaySeconds = $this->decaySeconds();
 
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
             RateLimiter::hit($this->throttleKey(), $decaySeconds);
+
+            $captchaManager->markRequired($this->throttleKey(), 'auth.login');
+            $monitor->record($this->ipAddress(), 'auth-login', [
+                'email'        => $this->email,
+                'attempts'     => RateLimiter::attempts($this->throttleKey()),
+                'max_attempts' => $this->maxAttempts(),
+            ]);
+
+            $this->syncCaptchaState($captchaManager, true);
 
             throw ValidationException::withMessages([
                 'loginForm.email' => trans('auth.failed'),
@@ -40,13 +82,52 @@ final class LoginForm extends Form
         }
 
         RateLimiter::clear($this->throttleKey());
+        $captchaManager->clear($this->throttleKey(), 'auth.login');
+        $monitor->reset($this->ipAddress(), 'auth-login');
+        $this->resetCaptcha();
     }
 
-    protected function ensureIsNotRateLimited(): void
+    public function syncCaptchaState(?CaptchaManager $captchaManager = null, bool $forceRefresh = false): void
+    {
+        $captchaManager ??= app(CaptchaManager::class);
+
+        if (! $captchaManager->shouldChallenge($this->throttleKey(), 'auth.login')) {
+            $this->resetCaptcha();
+
+            return;
+        }
+
+        $challenge = $captchaManager->challenge($this->throttleKey(), 'auth.login', $forceRefresh);
+
+        if ($challenge === null) {
+            $this->resetCaptcha();
+
+            return;
+        }
+
+        $questionChanged = $this->captchaQuestion !== $challenge->question();
+
+        $this->captchaQuestion = $challenge->question();
+        $this->captchaToken = $challenge->token();
+
+        if ($forceRefresh || $questionChanged) {
+            $this->captchaResponse = '';
+        }
+    }
+
+    protected function ensureIsNotRateLimited(CaptchaManager $captchaManager, SuspiciousIpMonitor $monitor): void
     {
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
             return;
         }
+
+        $captchaManager->markRequired($this->throttleKey(), 'auth.login');
+        $monitor->record($this->ipAddress(), 'auth-login-rate-limit', [
+            'email'        => $this->email,
+            'attempts'     => RateLimiter::attempts($this->throttleKey()),
+            'max_attempts' => $this->maxAttempts(),
+        ]);
+        $this->syncCaptchaState($captchaManager, true);
 
         event(new Lockout(request()));
 
@@ -60,12 +141,26 @@ final class LoginForm extends Form
         ]);
     }
 
-    protected function throttleKey(): string
+    public function throttleKey(): string
     {
         $ip = request()->ip();
         $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
 
-        return Str::transliterate(Str::lower($this->email).'|'.$ipAddress);
+        return Str::transliterate(Str::lower($this->email) . '|' . $ipAddress);
+    }
+
+    private function resetCaptcha(): void
+    {
+        $this->captchaQuestion = null;
+        $this->captchaToken = null;
+        $this->captchaResponse = null;
+    }
+
+    private function ipAddress(): string
+    {
+        $ip = request()->ip();
+
+        return is_string($ip) && $ip !== '' ? $ip : 'unknown';
     }
 
     private function maxAttempts(): int
