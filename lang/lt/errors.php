@@ -19,4 +19,10 @@ return [
 
     // @translators: Rodoma, kai vartotojas prisijungęs, bet neturi reikiamų teisių veiksmui.
     ErrorCodes::FORBIDDEN => 'Prieiga uždrausta',
+
+    // @translators: Rodoma, kai sistema neranda užsakymo pagal pateiktą numerį.
+    ErrorCodes::ORDER_NOT_FOUND => 'Užsakymas :order nerastas.',
+
+    // @translators: Rodoma, kai pasirinktos prekės SKU atsargų neužtenka užsakymui įvykdyti.
+    ErrorCodes::INVENTORY_INSUFFICIENT => 'SKU :sku atsargų nepakanka.',
 ];
