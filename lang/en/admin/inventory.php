@@ -48,6 +48,7 @@ return [
         'out_of_stock' => 'Out of Stock',
     ],
     'actions' => [
+        'create' => 'Create Inventory',
         'adjust_stock' => 'Adjust Stock',
         'add_stock' => 'Add Stock',
         'remove_stock' => 'Remove Stock',
