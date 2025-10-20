@@ -52,10 +52,10 @@ Route::middleware(['web'])->group(function () {
     // Cart
     Route::prefix('cart')->name('frontend.cart.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\CartController::class, 'index'])->name('index');
-        Route::post('/add', [App\Http\Controllers\Frontend\CartController::class, 'add'])->name('add');
-        Route::post('/update', [App\Http\Controllers\Frontend\CartController::class, 'update'])->name('update');
-        Route::post('/remove', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('remove');
-        Route::post('/clear', [App\Http\Controllers\Frontend\CartController::class, 'clear'])->name('clear');
+        Route::post('/items', [App\Http\Controllers\Frontend\CartController::class, 'add'])->name('add');
+        Route::patch('/items/{cartItem}', [App\Http\Controllers\Frontend\CartController::class, 'update'])->name('update');
+        Route::delete('/items/{cartItem}', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('remove');
+        Route::delete('/', [App\Http\Controllers\Frontend\CartController::class, 'clear'])->name('clear');
     });
 
     // Checkout

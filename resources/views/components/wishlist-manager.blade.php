@@ -239,16 +239,16 @@
                 }
             },
 
-            addAllToCart() {
+            async addAllToCart() {
                 // Add all wishlist items to cart
                 const productIds = {{ $wishlistItems->pluck('id')->toJson() }};
 
-                productIds.forEach(productId => {
-                    // Add to cart logic
-                    fetch('/cart/add', {
+                await Promise.all(productIds.map(productId => {
+                    return fetch('/cart/items', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
                                 .getAttribute('content')
                         },
@@ -257,7 +257,7 @@
                             quantity: 1
                         })
                     });
-                });
+                }));
 
                 this.showNotification('{{ __('All items added to cart!') }}', 'success');
             },
