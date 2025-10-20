@@ -28,6 +28,8 @@ return [
         'verified' => 'Verified',
         'unverified' => 'Unverified',
         'created_at' => 'Created At',
+        'created_from' => 'Created From',
+        'created_until' => 'Created Until',
         'recent' => 'Recent (30 days)',
     ],
     'actions' => [
