@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCodes;
+use App\Support\ErrorCode;
 
 return [
-    // @translators: Сообщение при отсутствии страницы или записи (HTTP 404).
-    ErrorCodes::NOT_FOUND => 'Страница не найдена',
+    // @translators: Displayed when a requested page or record is missing (HTTP 404).
+    ErrorCode::NotFound->value => 'Страница не найдена',
 
-    // @translators: Показывается при непредвиденной ошибке сервера (HTTP 500).
-    ErrorCodes::SERVER_ERROR => 'Ошибка сервера',
+    // @translators: Shown when the system encounters an unexpected failure (HTTP 500).
+    ErrorCode::ServerError->value => 'Ошибка сервера',
 
-    // @translators: Используется, когда введённые данные не проходят проверку.
-    ErrorCodes::VALIDATION_FAILED => 'Проверьте введённые данные',
+    // @translators: Used when form submission fails validation and users must review inputs.
+    ErrorCode::ValidationFailed->value => 'Проверьте введённые данные',
 
-    // @translators: Указывает, что пользователь должен войти в систему.
-    ErrorCodes::UNAUTHORIZED => 'Нет доступа',
+    // @translators: Indicates the user needs to log in before accessing the requested content.
+    ErrorCode::Unauthorized->value => 'Нет доступа',
 
-    // @translators: Указывает, что у вошедшего пользователя нет прав для действия.
-    ErrorCodes::FORBIDDEN => 'Доступ запрещён',
+    // @translators: Indicates the user is logged in but does not have permission for the action.
+    ErrorCode::Forbidden->value => 'Доступ запрещён',
 
-    // @translators: Показывается, когда заказ с указанным номером не найден.
-    ErrorCodes::ORDER_NOT_FOUND => 'Заказ :order не найден.',
+    // @translators: Displayed when an order number could not be located in the system.
+    ErrorCode::OrderNotFound->value => 'Заказ :order не найден.',
 
-    // @translators: Сообщает о недостаточном количестве товара для указанного SKU.
-    ErrorCodes::INVENTORY_INSUFFICIENT => 'Недостаточно запасов для артикула :sku.',
+    // @translators: Shown when there is not enough stock to fulfill a request for a SKU.
+    ErrorCode::InventoryInsufficient->value => 'Недостаточно запасов для артикула :sku.',
 ];
