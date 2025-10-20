@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Throwable;
+use Illuminate\Validation\ValidationException;
 
 final class AutocompleteSearchController extends Controller
 {
@@ -21,11 +21,9 @@ final class AutocompleteSearchController extends Controller
         $modelClass = $validated['model_class'];
 
         if (! class_exists($modelClass) || ! is_subclass_of($modelClass, Model::class)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'The selected model_class is invalid.',
-                'errors' => ['model_class' => ['The selected model_class must be an Eloquent model.']],
-            ], 422);
+            throw ValidationException::withMessages([
+                'model_class' => ['The selected model_class must be an Eloquent model.'],
+            ]);
         }
 
         $searchField = Arr::get($validated, 'search_field', Arr::get($validated, 'label_field', 'name'));
@@ -34,31 +32,22 @@ final class AutocompleteSearchController extends Controller
         $labelField = Arr::get($validated, 'label_field', 'name');
         $limit = Arr::get($validated, 'limit', 10);
 
-        try {
-            /** @var Model $model */
-            $model = new $modelClass();
+        /** @var Model $model */
+        $model = new $modelClass();
 
-            $query = $model->newQuery()
-                ->where($searchField, 'like', '%'.Str::of($searchQuery)->trim().'%')
-                ->limit($limit);
+        $query = $model->newQuery()
+            ->where($searchField, 'like', '%'.Str::of($searchQuery)->trim().'%')
+            ->limit($limit);
 
-            $results = $query->get()->map(static fn (Model $item): array => [
-                'value' => $item->getAttribute($valueField),
-                'label' => $item->getAttribute($labelField),
-                'data' => $item->toArray(),
-            ]);
+        $results = $query->get()->map(static fn (Model $item): array => [
+            'value' => $item->getAttribute($valueField),
+            'label' => $item->getAttribute($labelField),
+            'data' => $item->toArray(),
+        ]);
 
-            return response()->json([
-                'success' => true,
-                'results' => $results,
-            ]);
-        } catch (Throwable $exception) {
-            report($exception);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Unable to complete the autocomplete search.',
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'results' => $results,
+        ]);
     }
 }
