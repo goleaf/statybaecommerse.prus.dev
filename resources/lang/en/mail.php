@@ -19,4 +19,5 @@ return [
     'verify_email_intro' => 'Please click the button below to verify your email address.',
     'verify_email_button' => 'Verify Email Address',
     'verify_email_no_action' => 'If you did not create an account, no further action is required.',
+    'contact_message_subject' => 'New contact message: :subject',
 ];
