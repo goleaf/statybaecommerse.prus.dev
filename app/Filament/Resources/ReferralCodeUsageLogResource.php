@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
-use App\Models\ReferralCode;
 use App\Models\ReferralCodeUsageLog;
-use App\Models\User;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -58,23 +56,26 @@ final class ReferralCodeUsageLogResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.referral_code_usage_logs.basic_information'))
+                Section::make(__('admin.referral_code_usage_logs.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Select::make('referral_code_id')
                                     ->label(__('admin.referral_code_usage_logs.referral_code'))
-                                    ->options(ReferralCode::pluck('code', 'id'))
+                                    ->relationship('referralCode', 'code')
                                     ->required()
-                                    ->searchable(),
+                                    ->searchable()
+                                    ->preload(),
                                 Select::make('user_id')
                                     ->label(__('admin.referral_code_usage_logs.user'))
-                                    ->options(User::pluck('name', 'id'))
-                                    ->required()
-                                    ->searchable(),
+                                    ->relationship('user', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable(),
                                 TextInput::make('ip_address')
                                     ->label(__('admin.referral_code_usage_logs.ip_address'))
                                     ->ip()
+                                    ->required()
                                     ->maxLength(45),
                                 TextInput::make('referrer')
                                     ->label(__('admin.referral_code_usage_logs.referrer'))
@@ -84,10 +85,13 @@ final class ReferralCodeUsageLogResource extends Resource
                                     ->label(__('admin.referral_code_usage_logs.user_agent'))
                                     ->maxLength(500),
                             ]),
-                        Textarea::make('metadata')
+                        KeyValue::make('metadata')
                             ->label(__('admin.referral_code_usage_logs.metadata'))
-                            ->rows(5)
-                            ->helperText(__('admin.referral_code_usage_logs.metadata_help')),
+                            ->keyLabel(__('referral.form.metadata_key'))
+                            ->valueLabel(__('referral.form.metadata_value'))
+                            ->helperText(__('admin.referral_code_usage_logs.metadata_help'))
+                            ->nullable()
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
@@ -95,6 +99,12 @@ final class ReferralCodeUsageLogResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(
+                ReferralCodeUsageLog::query()->with([
+                    'referralCode:id,code',
+                    'user:id,name',
+                ]),
+            )
             ->columns([
                 TextColumn::make('referralCode.code')
                     ->label(__('admin.referral_code_usage_logs.referral_code'))
@@ -142,18 +152,18 @@ final class ReferralCodeUsageLogResource extends Resource
             ->filters([
                 SelectFilter::make('referral_code_id')
                     ->label(__('admin.referral_code_usage_logs.referral_code'))
-                    ->options(ReferralCode::pluck('code', 'id'))
+                    ->relationship('referralCode', 'code')
                     ->searchable(),
                 SelectFilter::make('user_id')
                     ->label(__('admin.referral_code_usage_logs.user'))
-                    ->options(User::pluck('name', 'id'))
+                    ->relationship('user', 'name')
                     ->searchable(),
             ])
-            ->recordActions([
+            ->actions([
                 ViewAction::make(),
                 EditAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
@@ -171,10 +181,10 @@ final class ReferralCodeUsageLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralCodeUsageLogs::route('/'),
+            'index'  => Pages\ListReferralCodeUsageLogs::route('/'),
             'create' => Pages\CreateReferralCodeUsageLog::route('/create'),
-            'view' => Pages\ViewReferralCodeUsageLog::route('/{record}'),
-            'edit' => Pages\EditReferralCodeUsageLog::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralCodeUsageLog::route('/{record}'),
+            'edit'   => Pages\EditReferralCodeUsageLog::route('/{record}/edit'),
         ];
     }
 }
