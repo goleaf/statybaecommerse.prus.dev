@@ -7,6 +7,7 @@ namespace App\Filament\Resources\SystemSettingHistories;
 use App\Filament\Resources\SystemSettingHistories\Pages\CreateSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\Pages\EditSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\Pages\ListSystemSettingHistories;
+use App\Filament\Resources\SystemSettingHistories\Pages\ViewSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\Schemas\SystemSettingHistoryForm;
 use App\Filament\Resources\SystemSettingHistories\Tables\SystemSettingHistoriesTable;
 use App\Models\SystemSettingHistory;
@@ -42,9 +43,10 @@ class SystemSettingHistoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSystemSettingHistories::route('/'),
+            'index'  => ListSystemSettingHistories::route('/'),
             'create' => CreateSystemSettingHistory::route('/create'),
-            'edit' => EditSystemSettingHistory::route('/{record}/edit'),
+            'view'   => ViewSystemSettingHistory::route('/{record}'),
+            'edit'   => EditSystemSettingHistory::route('/{record}/edit'),
         ];
     }
 }

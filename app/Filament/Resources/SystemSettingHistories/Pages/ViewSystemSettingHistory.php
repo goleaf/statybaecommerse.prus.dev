@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SystemSettingHistories\Pages;
 
 use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\EditAction;
+use Filament\Resources\Pages\ViewRecord;
 
-class EditSystemSettingHistory extends EditRecord
+class ViewSystemSettingHistory extends ViewRecord
 {
     protected static string $resource = SystemSettingHistoryResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            EditAction::make(),
         ];
     }
 }
