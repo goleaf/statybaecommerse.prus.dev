@@ -4,10 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
-use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -23,88 +32,132 @@ final class RedemptionsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\TextInput::make('order_id')
-                    ->label('Order ID')
-                    ->numeric()
-                    ->helperText('Associated order ID'),
-                Forms\Components\TextInput::make('discount_amount')
-                    ->label('Discount Amount')
-                    ->numeric()
-                    ->step(0.01)
-                    ->required(),
-                Forms\Components\TextInput::make('original_amount')
-                    ->label('Original Amount')
-                    ->numeric()
-                    ->step(0.01)
-                    ->required(),
-                Forms\Components\TextInput::make('final_amount')
-                    ->label('Final Amount')
-                    ->numeric()
-                    ->step(0.01)
-                    ->required(),
-                Forms\Components\TextInput::make('discount_code_id')
-                    ->label('Discount Code ID')
-                    ->numeric()
-                    ->helperText('Specific code used (if any)'),
-                Forms\Components\DateTimePicker::make('redeemed_at')
-                    ->label('Redeemed At')
-                    ->default(now())
-                    ->required(),
-            ]);
+        return $form->schema([
+            Section::make('Redemption Details')
+                ->schema([
+                    Select::make('code_id')
+                        ->relationship('code', 'code')
+                        ->label('Discount Code')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    Select::make('user_id')
+                        ->relationship('user', 'name')
+                        ->label('Customer')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    Select::make('order_id')
+                        ->relationship('order', 'number')
+                        ->label('Order')
+                        ->searchable()
+                        ->preload(),
+                    TextInput::make('amount_saved')
+                        ->label('Amount Saved')
+                        ->numeric()
+                        ->minValue(0)
+                        ->prefix('€')
+                        ->required(),
+                    TextInput::make('currency_code')
+                        ->label('Currency')
+                        ->length(3)
+                        ->default('EUR')
+                        ->required(),
+                    Select::make('status')
+                        ->label('Status')
+                        ->options([
+                            'pending'   => 'Pending',
+                            'redeemed'  => 'Redeemed',
+                            'expired'   => 'Expired',
+                            'cancelled' => 'Cancelled',
+                        ])
+                        ->default('pending')
+                        ->required(),
+                    DateTimePicker::make('redeemed_at')
+                        ->label('Redeemed At')
+                        ->seconds(false)
+                        ->required(),
+                    Textarea::make('notes')
+                        ->label('Notes')
+                        ->rows(3),
+                    KeyValue::make('metadata')
+                        ->label('Metadata')
+                        ->keyLabel('Key')
+                        ->valueLabel('Value')
+                        ->columnSpanFull(),
+                ])
+                ->columns(2),
+        ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('user.name')
+            ->recordTitleAttribute('code.code')
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
+                TextColumn::make('code.code')
+                    ->label('Code')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('user.name')
                     ->label('Customer')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('order_id')
-                    ->label('Order ID')
+                TextColumn::make('order.number')
+                    ->label('Order')
+                    ->formatStateUsing(fn (?string $state) => $state ? "#{$state}" : '-')
+                    ->sortable(),
+                TextColumn::make('amount_saved')
+                    ->label('Amount Saved')
+                    ->money(fn ($record) => $record->currency_code ?? 'EUR')
+                    ->sortable(),
+                TextColumn::make('currency_code')
+                    ->label('Currency')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('original_amount')
-                    ->label('Original Amount')
-                    ->money('EUR')
+                BadgeColumn::make('status')
+                    ->label('Status')
+                    ->colors([
+                        'success' => 'redeemed',
+                        'warning' => 'pending',
+                        'danger'  => 'expired',
+                        'gray'    => 'cancelled',
+                    ])
+                    ->icons([
+                        'heroicon-m-check-circle'         => 'redeemed',
+                        'heroicon-m-clock'                => 'pending',
+                        'heroicon-m-x-mark'               => 'cancelled',
+                        'heroicon-m-exclamation-triangle' => 'expired',
+                    ])
                     ->sortable(),
-                Tables\Columns\TextColumn::make('discount_amount')
-                    ->label('Discount Amount')
-                    ->money('EUR')
-                    ->sortable()
-                    ->color('success'),
-                Tables\Columns\TextColumn::make('final_amount')
-                    ->label('Final Amount')
-                    ->money('EUR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('discount_code.code')
-                    ->label('Code Used')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('redeemed_at')
+                TextColumn::make('redeemed_at')
                     ->label('Redeemed At')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\Filter::make('recent')
-                    ->query(fn (Builder $query): Builder => $query->where('redeemed_at', '>=', now()->subDays(7)))
-                    ->label('Last 7 Days'),
-                Tables\Filters\Filter::make('this_month')
-                    ->query(fn (Builder $query): Builder => $query->whereMonth('redeemed_at', now()->month))
-                    ->label('This Month'),
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'pending'   => 'Pending',
+                        'redeemed'  => 'Redeemed',
+                        'expired'   => 'Expired',
+                        'cancelled' => 'Cancelled',
+                    ]),
+                SelectFilter::make('currency_code')
+                    ->label('Currency')
+                    ->options([
+                        'EUR' => 'EUR',
+                        'USD' => 'USD',
+                        'GBP' => 'GBP',
+                    ]),
+                Filter::make('has_order')
+                    ->label('Has Order')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('order_id')),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
