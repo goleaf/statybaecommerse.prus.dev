@@ -89,32 +89,32 @@ final class AttributeResource extends Resource
                     Select::make('type')
                         ->label(__('attributes.type'))
                         ->options([
-                            'text' => __('attributes.types.text'),
-                            'textarea' => __('attributes.types.textarea'),
-                            'number' => __('attributes.types.number'),
-                            'select' => __('attributes.types.select'),
+                            'text'        => __('attributes.types.text'),
+                            'textarea'    => __('attributes.types.textarea'),
+                            'number'      => __('attributes.types.number'),
+                            'select'      => __('attributes.types.select'),
                             'multiselect' => __('attributes.types.multiselect'),
-                            'boolean' => __('attributes.types.boolean'),
-                            'date' => __('attributes.types.date'),
-                            'datetime' => __('attributes.types.datetime'),
-                            'color' => __('attributes.types.color'),
-                            'file' => __('attributes.types.file'),
-                            'image' => __('attributes.types.image'),
-                            'url' => __('attributes.types.url'),
+                            'boolean'     => __('attributes.types.boolean'),
+                            'date'        => __('attributes.types.date'),
+                            'datetime'    => __('attributes.types.datetime'),
+                            'color'       => __('attributes.types.color'),
+                            'file'        => __('attributes.types.file'),
+                            'image'       => __('attributes.types.image'),
+                            'url'         => __('attributes.types.url'),
                         ])
                         ->default('text')
                         ->live(),
                     Select::make('input_type')
                         ->label(__('attributes.input_type'))
                         ->options([
-                            'text' => __('attributes.input_types.text'),
+                            'text'     => __('attributes.input_types.text'),
                             'textarea' => __('attributes.input_types.textarea'),
-                            'number' => __('attributes.input_types.number'),
-                            'email' => __('attributes.input_types.email'),
-                            'url' => __('attributes.input_types.url'),
-                            'tel' => __('attributes.input_types.tel'),
+                            'number'   => __('attributes.input_types.number'),
+                            'email'    => __('attributes.input_types.email'),
+                            'url'      => __('attributes.input_types.url'),
+                            'tel'      => __('attributes.input_types.tel'),
                             'password' => __('attributes.input_types.password'),
-                            'search' => __('attributes.input_types.search'),
+                            'search'   => __('attributes.input_types.search'),
                         ])
                         ->default('text'),
                     Toggle::make('is_required')
@@ -188,20 +188,20 @@ final class AttributeResource extends Resource
                                 ->label(__('attributes.group'))
                                 ->options([
                                     // Legacy / factory-generated group names
-                                    'basic_info' => 'basic_info',
+                                    'basic_info'      => 'basic_info',
                                     'technical_specs' => 'technical_specs',
-                                    'materials' => 'materials',
-                                    'features' => 'features',
-                                    'compatibility' => 'compatibility',
-                                    'warranty' => 'warranty',
+                                    'materials'       => 'materials',
+                                    'features'        => 'features',
+                                    'compatibility'   => 'compatibility',
+                                    'warranty'        => 'warranty',
                                     // Current UI groups
-                                    'general' => __('attributes.groups.general'),
-                                    'technical' => __('attributes.groups.technical'),
+                                    'general'    => __('attributes.groups.general'),
+                                    'technical'  => __('attributes.groups.technical'),
                                     'appearance' => __('attributes.groups.appearance'),
                                     'dimensions' => __('attributes.groups.dimensions'),
-                                    'shipping' => __('attributes.groups.shipping'),
-                                    'seo' => __('attributes.groups.seo'),
-                                    'other' => __('attributes.groups.other'),
+                                    'shipping'   => __('attributes.groups.shipping'),
+                                    'seo'        => __('attributes.groups.seo'),
+                                    'other'      => __('attributes.groups.other'),
                                 ])
                                 ->default('general'),
                         ]),
@@ -232,21 +232,21 @@ final class AttributeResource extends Resource
                     ->label(__('attributes.type'))
                     ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
                     ->color(fn (string $state): string => match ($state) {
-                        'text' => 'blue',
-                        'number' => 'green',
-                        'select' => 'purple',
+                        'text'        => 'blue',
+                        'number'      => 'green',
+                        'select'      => 'purple',
                         'multiselect' => 'orange',
-                        'boolean' => 'yellow',
-                        'date' => 'pink',
-                        'datetime' => 'indigo',
-                        'color' => 'red',
-                        'file' => 'gray',
-                        'url' => 'teal',
-                        default => 'gray',
+                        'boolean'     => 'yellow',
+                        'date'        => 'pink',
+                        'datetime'    => 'indigo',
+                        'color'       => 'red',
+                        'file'        => 'gray',
+                        'url'         => 'teal',
+                        default       => 'gray',
                     }),
                 TextColumn::make('group_name')
                     ->label(__('attributes.group'))
-                    ->formatStateUsing(fn (string $state): string => __("attributes.groups.{$state}"))
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("attributes.groups.{$state}") : __('attributes.none'))
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('options_count')
@@ -286,28 +286,28 @@ final class AttributeResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'text' => __('attributes.types.text'),
-                        'textarea' => __('attributes.types.textarea'),
-                        'number' => __('attributes.types.number'),
-                        'select' => __('attributes.types.select'),
+                        'text'        => __('attributes.types.text'),
+                        'textarea'    => __('attributes.types.textarea'),
+                        'number'      => __('attributes.types.number'),
+                        'select'      => __('attributes.types.select'),
                         'multiselect' => __('attributes.types.multiselect'),
-                        'boolean' => __('attributes.types.boolean'),
-                        'date' => __('attributes.types.date'),
-                        'datetime' => __('attributes.types.datetime'),
-                        'color' => __('attributes.types.color'),
-                        'file' => __('attributes.types.file'),
-                        'image' => __('attributes.types.image'),
-                        'url' => __('attributes.types.url'),
+                        'boolean'     => __('attributes.types.boolean'),
+                        'date'        => __('attributes.types.date'),
+                        'datetime'    => __('attributes.types.datetime'),
+                        'color'       => __('attributes.types.color'),
+                        'file'        => __('attributes.types.file'),
+                        'image'       => __('attributes.types.image'),
+                        'url'         => __('attributes.types.url'),
                     ]),
                 SelectFilter::make('group_name')
                     ->options([
-                        'general' => __('attributes.groups.general'),
-                        'technical' => __('attributes.groups.technical'),
+                        'general'    => __('attributes.groups.general'),
+                        'technical'  => __('attributes.groups.technical'),
                         'appearance' => __('attributes.groups.appearance'),
                         'dimensions' => __('attributes.groups.dimensions'),
-                        'shipping' => __('attributes.groups.shipping'),
-                        'seo' => __('attributes.groups.seo'),
-                        'other' => __('attributes.groups.other'),
+                        'shipping'   => __('attributes.groups.shipping'),
+                        'seo'        => __('attributes.groups.seo'),
+                        'other'      => __('attributes.groups.other'),
                     ]),
                 TernaryFilter::make('is_required')
                     ->trueLabel(__('attributes.required_only'))
@@ -407,10 +407,10 @@ final class AttributeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAttributes::route('/'),
+            'index'  => Pages\ListAttributes::route('/'),
             'create' => Pages\CreateAttribute::route('/create'),
-            'view' => Pages\ViewAttribute::route('/{record}'),
-            'edit' => Pages\EditAttribute::route('/{record}/edit'),
+            'view'   => Pages\ViewAttribute::route('/{record}'),
+            'edit'   => Pages\EditAttribute::route('/{record}/edit'),
         ];
     }
 
