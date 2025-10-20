@@ -52,6 +52,7 @@ return [
     ],
     'categories' => [
         'business' => 'Business',
+        'sales' => 'Sales',
         'legal' => 'Legal',
         'financial' => 'Financial',
         'marketing' => 'Marketing',
