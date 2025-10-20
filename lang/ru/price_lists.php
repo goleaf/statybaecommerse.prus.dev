@@ -1,0 +1,75 @@
+<?php
+
+return [
+    'title' => 'Прайс-листы',
+    'plural' => 'Прайс-листы',
+    'single' => 'Прайс-лист',
+
+    'basic_information' => 'Основная информация',
+    'settings' => 'Настройки',
+
+    'name' => 'Название',
+    'description' => 'Описание',
+    'pricing_type' => 'Тип ценообразования',
+    'fixed' => 'Фиксированная цена',
+    'tiered' => 'Ступенчатая цена',
+    'volume' => 'Объемная цена',
+    'tiered_pricing' => 'Ступенчатое ценообразование',
+    'tiers' => 'Ценовые ступени',
+    'min_quantity' => 'Минимальное количество',
+    'max_quantity' => 'Максимальное количество',
+    'price' => 'Цена за единицу',
+    'add_tier' => 'Добавить ступень',
+    'volume_pricing' => 'Ценообразование по объему',
+    'volume_tiers' => 'Объемные ступени',
+    'is_active' => 'Активен',
+    'is_enabled' => 'Включен',
+    'valid_from' => 'Действует с',
+    'valid_until' => 'Действует до',
+    'valid_from_from' => 'Дата начала (с)',
+    'valid_from_until' => 'Дата начала (по)',
+    'notes' => 'Внутренние заметки',
+    'currency' => 'Валюта',
+    'is_default' => 'По умолчанию',
+    'customer_group' => 'Группа клиентов',
+    'discount_percentage' => 'Скидка (%)',
+    'priority' => 'Приоритет',
+    'partner' => 'Партнер',
+    'commission_percentage' => 'Комиссия (%)',
+    'email' => 'Email',
+    'phone' => 'Телефон',
+
+    'created_at' => 'Создано',
+    'updated_at' => 'Обновлено',
+
+    'all_records' => 'Все записи',
+    'active_only' => 'Только активные',
+    'inactive_only' => 'Только неактивные',
+    'valid_now' => 'Действует сейчас',
+    'expired' => 'Просрочено',
+
+    'tabs' => [
+        'all' => 'Все прайс-листы',
+        'active' => 'Активные',
+        'public' => 'Публичные',
+        'default' => 'По умолчанию',
+        'wholesale' => 'Оптовые',
+        'retail' => 'Розничные',
+        'promotional' => 'Промоакции',
+    ],
+
+    'stats' => [
+        'total_price_lists' => 'Всего прайс-листов',
+        'total_price_lists_description' => 'Количество всех прайс-листов в системе',
+        'active_price_lists' => 'Активные прайс-листы',
+        'active_price_lists_description' => 'Сейчас включенные и используемые',
+        'public_price_lists' => 'Публичные прайс-листы',
+        'public_price_lists_description' => 'Доступные всем клиентам',
+        'default_price_lists' => 'Прайс-листы по умолчанию',
+        'default_price_lists_description' => 'Применяются автоматически, если не выбран другой',
+    ],
+
+    'charts' => [
+        'price_lists_created' => 'Созданные прайс-листы',
+    ],
+];

@@ -1,0 +1,75 @@
+<?php
+
+return [
+    'title' => 'Kainoraščiai',
+    'plural' => 'Kainoraščiai',
+    'single' => 'Kainoraštis',
+
+    'basic_information' => 'Pagrindinė informacija',
+    'settings' => 'Nustatymai',
+
+    'name' => 'Pavadinimas',
+    'description' => 'Aprašymas',
+    'pricing_type' => 'Kainodaros tipas',
+    'fixed' => 'Fiksuota kaina',
+    'tiered' => 'Pakopinė kainodara',
+    'volume' => 'Kainodara pagal kiekį',
+    'tiered_pricing' => 'Pakopinė kainodara',
+    'tiers' => 'Kainų pakopos',
+    'min_quantity' => 'Minimalus kiekis',
+    'max_quantity' => 'Maksimalus kiekis',
+    'price' => 'Vieneto kaina',
+    'add_tier' => 'Pridėti pakopą',
+    'volume_pricing' => 'Kainodara pagal kiekį',
+    'volume_tiers' => 'Kiekio pakopos',
+    'is_active' => 'Aktyvus',
+    'is_enabled' => 'Įjungtas',
+    'valid_from' => 'Galioja nuo',
+    'valid_until' => 'Galioja iki',
+    'valid_from_from' => 'Galiojimo pradžia (nuo)',
+    'valid_from_until' => 'Galiojimo pradžia (iki)',
+    'notes' => 'Vidinės pastabos',
+    'currency' => 'Valiuta',
+    'is_default' => 'Numatytasis sąrašas',
+    'customer_group' => 'Klientų grupė',
+    'discount_percentage' => 'Nuolaida (%)',
+    'priority' => 'Prioritetas',
+    'partner' => 'Partneris',
+    'commission_percentage' => 'Komisiniai (%)',
+    'email' => 'El. paštas',
+    'phone' => 'Telefonas',
+
+    'created_at' => 'Sukurta',
+    'updated_at' => 'Atnaujinta',
+
+    'all_records' => 'Visi įrašai',
+    'active_only' => 'Tik aktyvūs',
+    'inactive_only' => 'Tik neaktyvūs',
+    'valid_now' => 'Galioja dabar',
+    'expired' => 'Nebegalioja',
+
+    'tabs' => [
+        'all' => 'Visi kainoraščiai',
+        'active' => 'Aktyvūs',
+        'public' => 'Vieši',
+        'default' => 'Numatytieji',
+        'wholesale' => 'Didmeniniams',
+        'retail' => 'Mažmeniniams',
+        'promotional' => 'Akcijiniai',
+    ],
+
+    'stats' => [
+        'total_price_lists' => 'Viso kainoraščių',
+        'total_price_lists_description' => 'Visi sistemoje esantys kainoraščiai',
+        'active_price_lists' => 'Aktyvūs kainoraščiai',
+        'active_price_lists_description' => 'Šiuo metu naudojami kainoraščiai',
+        'public_price_lists' => 'Vieši kainoraščiai',
+        'public_price_lists_description' => 'Matomi visiems klientams',
+        'default_price_lists' => 'Numatytieji kainoraščiai',
+        'default_price_lists_description' => 'Taikomi automatiškai, kai neparinktas kitas',
+    ],
+
+    'charts' => [
+        'price_lists_created' => 'Sukurti kainoraščiai',
+    ],
+];
