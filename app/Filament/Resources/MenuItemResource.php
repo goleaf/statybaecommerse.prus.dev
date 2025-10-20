@@ -18,12 +18,14 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -73,7 +75,24 @@ final class MenuItemResource extends Resource
                                     ->searchable(),
                                 Select::make('parent_id')
                                     ->label(__('admin.menu_items.parent'))
-                                    ->options(MenuItem::whereNull('parent_id')->pluck('label', 'id'))
+                                    ->options(function (Get $get, ?MenuItem $record): array {
+                                        $menuId = $get('menu_id') ?? $record?->menu_id;
+
+                                        if (! $menuId) {
+                                            return [];
+                                        }
+
+                                        return MenuItem::query()
+                                            ->withoutGlobalScopes()
+                                            ->where('menu_id', $menuId)
+                                            ->whereNull('parent_id')
+                                            ->when(
+                                                $record,
+                                                fn (Builder $query): Builder => $query->whereKeyNot($record->getKey()),
+                                            )
+                                            ->pluck('label', 'id')
+                                            ->all();
+                                    })
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -161,7 +180,19 @@ final class MenuItemResource extends Resource
                     ->searchable(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.menu_items.parent'))
-                    ->options(MenuItem::whereNull('parent_id')->pluck('label', 'id'))
+                    ->options(function (SelectFilter $filter): array {
+                        $menuId = data_get($filter->getLivewire()->tableFilters ?? [], 'menu_id.value');
+
+                        $query = MenuItem::query()
+                            ->withoutGlobalScopes()
+                            ->whereNull('parent_id');
+
+                        if ($menuId) {
+                            $query->where('menu_id', $menuId);
+                        }
+
+                        return $query->pluck('label', 'id')->all();
+                    })
                     ->searchable(),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.menu_items.is_visible')),
@@ -188,10 +219,10 @@ final class MenuItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMenuItems::route('/'),
+            'index'  => Pages\ListMenuItems::route('/'),
             'create' => Pages\CreateMenuItem::route('/create'),
-            'view' => Pages\ViewMenuItem::route('/{record}'),
-            'edit' => Pages\EditMenuItem::route('/{record}/edit'),
+            'view'   => Pages\ViewMenuItem::route('/{record}'),
+            'edit'   => Pages\EditMenuItem::route('/{record}/edit'),
         ];
     }
 }
