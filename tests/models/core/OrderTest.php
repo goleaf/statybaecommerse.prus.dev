@@ -209,6 +209,17 @@ class OrderTest extends TestCase
         $this->assertFalse($shippedOrder->canBeCancelled());
     }
 
+    public function test_order_can_request_return(): void
+    {
+        $deliveredOrder = Order::factory()->create(['status' => 'delivered']);
+        $completedOrder = Order::factory()->create(['status' => 'completed']);
+        $pendingOrder = Order::factory()->create(['status' => 'pending']);
+
+        $this->assertTrue($deliveredOrder->canRequestReturn());
+        $this->assertTrue($completedOrder->canRequestReturn());
+        $this->assertFalse($pendingOrder->canRequestReturn());
+    }
+
     public function test_order_total_items_count_attribute(): void
     {
         $order = Order::factory()->create();
