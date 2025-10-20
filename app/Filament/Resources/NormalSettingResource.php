@@ -108,9 +108,32 @@ final class NormalSettingResource extends Resource
                     ->copyable(),
                 TextColumn::make('value')
                     ->label(__('normal_settings.value'))
+                    ->formatStateUsing(static function ($state): string {
+                        if (is_array($state) || is_object($state)) {
+                            $encoded = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+                            if ($encoded !== false) {
+                                return $encoded;
+                            }
+
+                            return (string) $state;
+                        }
+
+                        if (is_bool($state)) {
+                            return $state ? 'true' : 'false';
+                        }
+
+                        return (string) $state;
+                    })
                     ->limit(50)
+                    ->copyable()
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
                         if (strlen($state) <= 50) {
                             return null;
                         }
