@@ -7,12 +7,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CityResource\Pages;
 use App\Models\City;
 use App\Models\Country;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,15 +16,20 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 final class CityResource extends Resource
 {
@@ -77,7 +78,7 @@ final class CityResource extends Resource
                                 ->live(onBlur: true)
                                 ->afterStateUpdated(function ($state, Forms\Set $set, $operation) {
                                     if ($operation === 'create' && $state) {
-                                        $set('slug', \Str::slug($state));
+                                        $set('slug', Str::slug($state));
                                     }
                                 }),
                             TextInput::make('slug')
@@ -268,7 +269,7 @@ final class CityResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn (City $record): string => $record->description ? \Str::limit($record->description, 50) : ''),
+                    ->description(fn (City $record): string => $record->description ? Str::limit($record->description, 50) : ''),
                 TextColumn::make('code')
                     ->label(__('cities.code'))
                     ->copyable()
