@@ -50,6 +50,13 @@ return [
     'required_only' => 'Tik privalomi',
     'optional_only' => 'Tik neprivalomi',
     // Actions
+    'actions' => [
+        'create' => 'Sukurti teisinį dokumentą',
+        'preview' => 'Peržiūrėti',
+        'publish' => 'Paskelbti',
+        'unpublish' => 'Nepaskelbti',
+        'duplicate' => 'Kopijuoti',
+    ],
     'enable' => 'Įjungti',
     'disable' => 'Išjungti',
     'publish' => 'Paskelbti',
@@ -59,7 +66,20 @@ return [
     'disable_selected' => 'Išjungti pasirinktus',
     'publish_selected' => 'Paskelbti pasirinktus',
     'unpublish_selected' => 'Nepaskelbti pasirinktus',
+    'tabs' => [
+        'all' => 'Visi dokumentai',
+        'enabled' => 'Įjungti',
+        'disabled' => 'Išjungti',
+        'required' => 'Privalomi',
+        'published' => 'Paskelbti',
+        'draft' => 'Juodraščiai',
+    ],
     // Notifications
+    'notifications' => [
+        'published' => 'Dokumentas sėkmingai paskelbtas',
+        'unpublished' => 'Dokumentas sėkmingai nepaskelbtas',
+        'duplicated' => 'Dokumentas sėkmingai nukopijuotas',
+    ],
     'enabled_successfully' => 'Dokumentas sėkmingai įjungtas',
     'disabled_successfully' => 'Dokumentas sėkmingai išjungtas',
     'published_successfully' => 'Dokumentas sėkmingai paskelbtas',

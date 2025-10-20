@@ -48,6 +48,7 @@ return [
         'out_of_stock' => 'Nėra atsargų',
     ],
     'actions' => [
+        'create' => 'Sukurti inventorių',
         'adjust_stock' => 'Koreguoti atsargas',
         'add_stock' => 'Pridėti atsargas',
         'remove_stock' => 'Pašalinti atsargas',
