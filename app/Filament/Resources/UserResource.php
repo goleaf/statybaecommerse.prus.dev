@@ -153,7 +153,7 @@ final class UserResource extends Resource
                                     ? Hash::make($state)
                                     : null,
                             ),
-                        Select::make('locale')
+                        Select::make('preferred_locale')
                             ->label(__('users.fields.locale'))
                             ->options([
                                 'lt' => 'Lietuvių',
@@ -168,7 +168,7 @@ final class UserResource extends Resource
                     ->columns(1),
                 Section::make(__('users.sections.profile'))
                     ->schema([
-                        FileUpload::make('avatar')
+                        FileUpload::make('avatar_url')
                             ->label(__('users.fields.avatar'))
                             ->image()
                             ->directory('users/avatars')
@@ -189,7 +189,7 @@ final class UserResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('avatar')
+                ImageColumn::make('avatar_url')
                     ->label(__('users.fields.avatar'))
                     ->circular()
                     ->defaultImageUrl(url('/images/logo.svg')),
@@ -202,12 +202,12 @@ final class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-                TextColumn::make('locale')
+                TextColumn::make('preferred_locale')
                     ->label(__('users.fields.locale'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'success',
-                        'en' => 'info',
+                    ->color(fn (?string $state): string => match ($state) {
+                        'lt'    => 'success',
+                        'en'    => 'info',
                         default => 'gray',
                     }),
                 IconColumn::make('is_active')
@@ -223,7 +223,7 @@ final class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('locale')
+                SelectFilter::make('preferred_locale')
                     ->options([
                         'lt' => 'Lietuvių',
                         'en' => 'English',
@@ -250,9 +250,9 @@ final class UserResource extends Resource
                             Select::make('format')
                                 ->label(__('Format'))
                                 ->options([
-                                    'csv' => 'CSV',
+                                    'csv'  => 'CSV',
                                     'xlsx' => 'XLSX',
-                                    'pdf' => 'PDF',
+                                    'pdf'  => 'PDF',
                                 ])
                                 ->default('csv')
                                 ->required(),
@@ -289,7 +289,7 @@ final class UserResource extends Resource
                     BulkAction::make('activate')
                         ->label(__('users.actions.activate'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('users.messages.bulk_activate_success'))
@@ -300,7 +300,7 @@ final class UserResource extends Resource
                     BulkAction::make('deactivate')
                         ->label(__('users.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('users.messages.bulk_deactivate_success'))
@@ -321,10 +321,10 @@ final class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
+            'index'  => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'view' => Pages\ViewUser::route('/{record}'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view'   => Pages\ViewUser::route('/{record}'),
+            'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 }
