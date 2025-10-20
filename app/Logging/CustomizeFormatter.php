@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Logging;
 
+use App\Logging\Processors\KibanaContextProcessor;
+use App\Logging\Processors\TraceContextProcessor;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Logger;
 
@@ -13,6 +15,9 @@ final class CustomizeFormatter
 
     public function __invoke(Logger $logger): void
     {
+        $logger->pushProcessor(new TraceContextProcessor());
+        $logger->pushProcessor(new KibanaContextProcessor());
+
         foreach ($logger->getHandlers() as $handler) {
             if (method_exists($handler, 'setFormatter')) {
                 $handler->setFormatter($this->createFormatter());
