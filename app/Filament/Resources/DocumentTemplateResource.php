@@ -6,11 +6,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
-use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
-use Filament\Actions\EditAction as TableEditAction;
-use Filament\Actions\ViewAction as TableViewAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -206,13 +206,13 @@ final class DocumentTemplateResource extends Resource
                     ->label(__('document_templates.is_active')),
             ])
             ->actions([
-                TableViewAction::make(),
-                TableEditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
                 DeleteAction::make(),
             ])
             ->bulkActions([
-                TableBulkActionGroup::make([
-                    TableDeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
