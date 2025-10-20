@@ -13,26 +13,29 @@ final class SetLocale
 {
     public function handle(Request $request, Closure $next): mixed
     {
-        // Prefer locale from route parameter if present (e.g., /{locale}/...)
-        $routeLocale = $request->route('locale');
-        // Allow explicit override via query (?locale=xx)
-        $queryLocale = $request->query('locale');
-
-        // Get locale from query, session (both keys), cookie, or user preference
-        $locale = $routeLocale
-            ?? $queryLocale
-            ?? Session::get('locale')
-            ?? Session::get('app.locale')
-            ?? $request->cookie('app_locale')
-            ?? (auth()->check() ? auth()->user()->preferred_locale ?? null : null)
-            ?? config('app.locale', 'lt');
-
         // Validate locale against configured supported locales
         $supported = config('app.supported_locales', ['lt', 'en']);
         $supportedLocales = is_array($supported)
             ? $supported
             : array_filter(array_map('trim', explode(',', (string) $supported)));
         $supportedLocales = array_map('trim', $supportedLocales);
+
+        // Prefer locale from route parameter if present (e.g., /{locale}/...)
+        $routeLocale = $request->route('locale');
+        // Allow explicit override via query (?locale=xx)
+        $queryLocale = $request->query('locale');
+        // Try to honor Accept-Language header when it matches a supported locale
+        $headerLocale = $request->getPreferredLanguage($supportedLocales);
+
+        // Get locale from query, session (both keys), cookie, user preference, or Accept-Language
+        $locale = $routeLocale
+            ?? $queryLocale
+            ?? Session::get('locale')
+            ?? Session::get('app.locale')
+            ?? $request->cookie('app_locale')
+            ?? (auth()->check() ? auth()->user()->preferred_locale ?? null : null)
+            ?? $headerLocale
+            ?? config('app.locale', 'lt');
 
         if (! in_array($locale, $supportedLocales, true)) {
             $locale = (string) (config('app.locale', 'lt'));
