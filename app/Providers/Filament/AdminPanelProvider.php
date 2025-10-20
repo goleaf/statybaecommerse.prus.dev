@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -25,6 +26,19 @@ final class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $resourceClasses = array_values(array_filter(
+            (array) config('filament.navigation.resources', []),
+            static fn (mixed $resource): bool => is_string($resource),
+        ));
+
+        /** @var array<class-string> $resourceClasses */
+        $pageClasses = array_values(array_filter(
+            (array) config('filament.navigation.pages', []),
+            static fn (mixed $page): bool => is_string($page),
+        ));
+
+        /** @var array<class-string> $pageClasses */
+
         return $panel
             ->default()
             ->id('admin')
@@ -48,8 +62,8 @@ final class AdminPanelProvider extends PanelProvider
                 'info' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->resources(config('filament.navigation.resources', []))
-            ->pages(config('filament.navigation.pages', []))
+            ->resources($resourceClasses)
+            ->pages($pageClasses)
             ->widgets([
                 AccountWidget::class,
             ])
@@ -71,7 +85,6 @@ final class AdminPanelProvider extends PanelProvider
             // Disable database notifications polling to prevent auto-refresh on the main page
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarCollapsibleOnDesktop()
-            ->topNavigation()
             ->maxContentWidth('full')
             ->font('Inter')
             ->darkMode()
@@ -82,6 +95,7 @@ final class AdminPanelProvider extends PanelProvider
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
             ->navigationGroups($this->configuredNavigationGroups())
+            ->userMenu(position: UserMenuPosition::Sidebar)
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
@@ -109,8 +123,15 @@ final class AdminPanelProvider extends PanelProvider
      */
     private function configuredNavigationGroups(): array
     {
-        return collect(config('filament.navigation.groups', []))
-            ->map(static function (array $group): NavigationGroup {
+        $groupConfigurations = array_values(array_filter(
+            (array) config('filament.navigation.groups', []),
+            static fn (mixed $group): bool => is_array($group),
+        ));
+
+        /** @var array<int, array{label?: string, icon?: string|null, collapsed?: bool|null}> $groupConfigurations */
+
+        return collect($groupConfigurations)
+            ->map(static function (array $group, int|string $unused): NavigationGroup {
                 $navigationGroup = NavigationGroup::make()
                     ->label(__($group['label'] ?? ''));
 
