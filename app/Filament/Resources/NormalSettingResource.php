@@ -49,7 +49,7 @@ final class NormalSettingResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Tabs::make(__('normal_settings.tabs'))
+            Tabs::make(__('normal_settings.tabs.label'))
                 ->tabs([
                     Tab::make(__('normal_settings.basic_information'))
                         ->icon('heroicon-o-information-circle')
@@ -70,11 +70,11 @@ final class NormalSettingResource extends Resource
                             Select::make('type')
                                 ->label(__('normal_settings.type'))
                                 ->options([
-                                    'string' => __('normal_settings.types.string'),
+                                    'string'  => __('normal_settings.types.string'),
                                     'integer' => __('normal_settings.types.integer'),
                                     'boolean' => __('normal_settings.types.boolean'),
-                                    'array' => __('normal_settings.types.array'),
-                                    'json' => __('normal_settings.types.json'),
+                                    'array'   => __('normal_settings.types.array'),
+                                    'json'    => __('normal_settings.types.json'),
                                 ])
                                 ->required()
                                 ->native(false),
@@ -134,11 +134,11 @@ final class NormalSettingResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('normal_settings.type'))
                     ->options([
-                        'string' => __('normal_settings.types.string'),
+                        'string'  => __('normal_settings.types.string'),
                         'integer' => __('normal_settings.types.integer'),
                         'boolean' => __('normal_settings.types.boolean'),
-                        'array' => __('normal_settings.types.array'),
-                        'json' => __('normal_settings.types.json'),
+                        'array'   => __('normal_settings.types.array'),
+                        'json'    => __('normal_settings.types.json'),
                     ]),
                 TernaryFilter::make('is_public')
                     ->label(__('normal_settings.is_public'))
@@ -155,9 +155,9 @@ final class NormalSettingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNormalSettings::route('/'),
+            'index'  => Pages\ListNormalSettings::route('/'),
             'create' => Pages\CreateNormalSetting::route('/create'),
-            'edit' => Pages\EditNormalSetting::route('/{record}/edit'),
+            'edit'   => Pages\EditNormalSetting::route('/{record}/edit'),
         ];
     }
 }
