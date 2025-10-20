@@ -15,7 +15,8 @@
         "test": "php artisan test",
         "e2e:smoke": "node scripts/e2e-smoke.mjs",
         "e2e:routes": "node scripts/check-routes.mjs",
-        "e2e:console": "node scripts/check-console.mjs"
+        "e2e:console": "node scripts/check-console.mjs",
+        "prepare": "husky"
     },
     "devDependencies": {
         "@modelcontextprotocol/sdk": "1.0.0",
@@ -28,6 +29,7 @@
         "axios": "1.11.0",
         "cheerio": "1.0.0",
         "concurrently": "9.0.1",
+        "husky": "^9.1.7",
         "laravel-vite-plugin": "2.0.0",
         "node-fetch": "3.3.2",
         "playwright": "1.47.2",
