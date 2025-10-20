@@ -109,8 +109,8 @@ Route::middleware(['web'])->group(function () {
     });
 
     Route::prefix('posts')->name('frontend.posts.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\PostController::class, 'index'])->name('index');
-        Route::get('/{post}', [App\Http\Controllers\Frontend\PostController::class, 'show'])->name('show');
+        Route::get('/', [App\Http\Controllers\PostController::class, 'index'])->name('index');
+        Route::get('/{post}', [App\Http\Controllers\PostController::class, 'show'])->name('show');
     });
 
     // Legal Pages
