@@ -29,6 +29,15 @@ final class UserProductInteractionSeeder extends Seeder
                     ->count(fake()->numberBetween(2, 6))
                     ->for($user)
                     ->for($product)
+                    ->state(function () {
+                        $isAnonymous = fake()->boolean(20);
+
+                        return [
+                            'notes' => fake()->optional()->realText(160),
+                            'is_anonymous' => $isAnonymous,
+                            'ip_address' => $isAnonymous ? null : fake()->ipv4(),
+                        ];
+                    })
                     ->create();
             });
         });

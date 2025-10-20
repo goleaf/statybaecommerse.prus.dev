@@ -28,13 +28,15 @@ final class UserProductInteractionFactory extends Factory
 
         $firstInteraction = fake()->dateTimeBetween('-6 months', '-1 month');
         $lastInteraction = fake()->dateTimeBetween($firstInteraction, 'now');
-
         return [
             'user_id' => User::factory(),
             'product_id' => Product::factory(),
             'interaction_type' => $interactionType,
             'rating' => $interactionType === 'review' ? fake()->randomFloat(1, 1, 5) : null,
             'count' => fake()->numberBetween(1, 20),
+            'notes' => fake()->optional(0.4)->realText(120),
+            'is_anonymous' => false,
+            'ip_address' => fake()->ipv4(),
             'first_interaction' => $firstInteraction,
             'last_interaction' => $lastInteraction,
         ];
