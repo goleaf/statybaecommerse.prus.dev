@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderTranslationResource\Pages;
-use App\Models\Slider;
 use App\Models\SliderTranslation;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -59,14 +59,15 @@ final class SliderTranslationResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            SchemaSection::make(__('admin.slider_translations.basic_information'))
+            Section::make(__('admin.slider_translations.basic_information'))
                 ->components([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->components([
                             Select::make('slider_id')
                                 ->label(__('admin.slider_translations.slider'))
-                                ->options(Slider::pluck('name', 'id'))
+                                ->relationship('slider', 'name')
                                 ->required()
+                                ->preload()
                                 ->searchable(),
                             Select::make('locale')
                                 ->label(__('admin.slider_translations.locale'))
@@ -107,12 +108,12 @@ final class SliderTranslationResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('admin.slider_translations.locale'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'en' => 'success',
-                        'lt' => 'info',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
+                    ->color(fn (?string $state): string => match ($state) {
+                        'en'    => 'success',
+                        'lt'    => 'info',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
                         default => 'gray',
                     }),
                 TextColumn::make('title')
@@ -123,7 +124,11 @@ final class SliderTranslationResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('description')
                     ->label(__('admin.slider_translations.description'))
@@ -131,7 +136,11 @@ final class SliderTranslationResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('button_text')
                     ->label(__('admin.slider_translations.button_text'))
@@ -139,7 +148,11 @@ final class SliderTranslationResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 30 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
@@ -148,9 +161,10 @@ final class SliderTranslationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('slider_id')
+                SelectFilter::make('slider')
                     ->label(__('admin.slider_translations.slider'))
-                    ->options(Slider::pluck('name', 'id'))
+                    ->relationship('slider', 'name')
+                    ->preload()
                     ->searchable(),
                 SelectFilter::make('locale')
                     ->label(__('admin.slider_translations.locale'))
@@ -184,10 +198,10 @@ final class SliderTranslationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSliderTranslations::route('/'),
+            'index'  => Pages\ListSliderTranslations::route('/'),
             'create' => Pages\CreateSliderTranslation::route('/create'),
-            'view' => Pages\ViewSliderTranslation::route('/{record}'),
-            'edit' => Pages\EditSliderTranslation::route('/{record}/edit'),
+            'view'   => Pages\ViewSliderTranslation::route('/{record}'),
+            'edit'   => Pages\EditSliderTranslation::route('/{record}/edit'),
         ];
     }
 }
