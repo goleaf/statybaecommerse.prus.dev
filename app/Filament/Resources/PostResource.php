@@ -203,7 +203,36 @@ final class PostResource extends Resource
                             ->content(fn (?Post $record): string => $record?->approvedBy?->name ?? '—'),
                         TagsInput::make('tags')
                             ->label(__('posts.tags'))
-                            ->placeholder(__('posts.add_tag')),
+                            ->placeholder(__('posts.add_tag'))
+                            ->formatStateUsing(static function ($state): array {
+                                if (blank($state)) {
+                                    return [];
+                                }
+
+                                if (is_array($state)) {
+                                    return array_values(array_filter(array_map(
+                                        static fn ($tag): string => trim((string) $tag),
+                                        $state,
+                                    )));
+                                }
+
+                                return collect(explode(',', (string) $state))
+                                    ->map(static fn ($tag): string => trim($tag))
+                                    ->filter()
+                                    ->values()
+                                    ->all();
+                            })
+                            ->dehydrateStateUsing(static function ($state): ?string {
+                                if (blank($state)) {
+                                    return null;
+                                }
+
+                                $tags = collect(is_array($state) ? $state : explode(',', (string) $state))
+                                    ->map(static fn ($tag): string => trim((string) $tag))
+                                    ->filter();
+
+                                return $tags->isEmpty() ? null : $tags->implode(', ');
+                            }),
                     ]),
             ]);
     }
