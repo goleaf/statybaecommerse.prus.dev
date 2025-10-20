@@ -6,8 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\CouponUsage;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;

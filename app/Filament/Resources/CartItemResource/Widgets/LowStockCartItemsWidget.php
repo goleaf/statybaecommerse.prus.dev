@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CartItemResource\Widgets;
 
 use App\Models\CartItem;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables;
 use Filament\Tables\Table;
