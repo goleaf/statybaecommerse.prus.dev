@@ -403,7 +403,7 @@ final class VariantInventoryResource extends Resource
 
                         $record->save();
                         Notification::make()
-                            ->title('Stock adjusted successfully')
+                            ->title(__('admin.variant_inventory.stock_adjusted_successfully'))
                             ->success()
                             ->send();
                     }),
@@ -427,9 +427,9 @@ final class VariantInventoryResource extends Resource
                         $quantity = (int) ($data['quantity'] ?? 0);
 
                         if ($record->reserveStock($quantity)) {
-                            Notification::make()->title('Stock reserved successfully')->success()->send();
+                            Notification::make()->title(__('admin.variant_inventory.stock_reserved_successfully'))->success()->send();
                         } else {
-                            Notification::make()->title('Insufficient stock')->danger()->send();
+                            Notification::make()->title(__('admin.variant_inventory.insufficient_stock'))->danger()->send();
                         }
                     }),
             ])
@@ -479,7 +479,7 @@ final class VariantInventoryResource extends Resource
                                 $count++;
                             }
                             Notification::make()
-                                ->title("Successfully adjusted stock for {$count} records")
+                                ->title(__('admin.variant_inventory.bulk_stock_adjusted_successfully', ['count' => $count]))
                                 ->success()
                                 ->send();
                         }),

@@ -19,31 +19,31 @@ class EditLegal extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
             Actions\Action::make('publish')
-                ->label('Publish')
+                ->label(__('legal.publish'))
                 ->icon('heroicon-o-eye')
                 ->color('success')
                 ->visible(fn () => ! $this->record->published_at)
                 ->action(function () {
                     $this->record->publish();
                     Notification::make()
-                        ->title('Document published successfully')
+                        ->title(__('legal.published_successfully'))
                         ->success()
                         ->send();
                 }),
             Actions\Action::make('unpublish')
-                ->label('Unpublish')
+                ->label(__('legal.unpublish'))
                 ->icon('heroicon-o-eye-slash')
                 ->color('warning')
                 ->visible(fn () => $this->record->published_at)
                 ->action(function () {
                     $this->record->unpublish();
                     Notification::make()
-                        ->title('Document unpublished successfully')
+                        ->title(__('legal.unpublished_successfully'))
                         ->warning()
                         ->send();
                 }),
             Actions\Action::make('duplicate')
-                ->label('Duplicate')
+                ->label(__('legal.duplicate'))
                 ->icon('heroicon-o-document-duplicate')
                 ->color('gray')
                 ->action(function () {
@@ -60,7 +60,7 @@ class EditLegal extends EditRecord
                     }
 
                     Notification::make()
-                        ->title('Document duplicated successfully')
+                        ->title(__('legal.duplicated_successfully'))
                         ->success()
                         ->send();
 
