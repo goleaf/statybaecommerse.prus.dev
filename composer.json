@@ -23,6 +23,9 @@
         "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",
         "livewire/volt": "^1.0",
+        "open-telemetry/exporter-otlp": "^1.0",
+        "open-telemetry/opentelemetry": "^1.0",
+        "php-http/httplug": "^2.4",
         "predis/predis": "^3.2",
         "pxlrbt/filament-excel": "^3.1",
         "solution-forest/tab-layout-plugin": "^3.2",
@@ -232,7 +235,8 @@
         },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "tbachert/spi": true
         }
     },
     "minimum-stability": "stable",

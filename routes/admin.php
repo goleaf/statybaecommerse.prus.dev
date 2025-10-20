@@ -46,15 +46,15 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/admin/seo-analytics', $placeholder('SEO Analytics'));  // Filament registers s-e-o-analytics; avoid name conflict
     Route::get('/admin/security-audit', $placeholder('Security Audit'))->name('filament.admin.pages.security-audit');
     // User impersonation route is handled by Filament automatically
-    Route::get('/admin/system-monitoring', function () use ($placeholder) {
+    Route::get('/admin/observability', function () use ($placeholder) {
         $user = auth()->user();
         $isAdmin = ($user?->is_admin ?? false) || ($user?->hasAnyRole(['admin', 'Admin']) ?? false);
         if (! $isAdmin) {
             abort(403);
         }
 
-        return $placeholder('System Monitoring')();
-    })->name('filament.admin.pages.system-monitoring');
+        return $placeholder('Observability')();
+    })->name('filament.admin.pages.observability');
 
     // Discount Presets placeholder routes (auth required)
     Route::get('/admin/discounts/presets', $placeholder('Discount Presets'))
