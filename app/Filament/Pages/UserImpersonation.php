@@ -6,7 +6,6 @@ namespace App\Filament\Pages;
 
 use App\Models\User;
 use BackedEnum;
-use UnitEnum;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -20,6 +19,11 @@ final class UserImpersonation extends Page implements HasTable
 {
     use InteractsWithTable;
 
+    /**
+     * Navigation icon that Filament displays for this page.
+     *
+     * @var string|BackedEnum|null Filament navigation icon identifier.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
