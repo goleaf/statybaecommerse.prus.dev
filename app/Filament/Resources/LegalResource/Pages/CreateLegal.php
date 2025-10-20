@@ -16,7 +16,7 @@ class CreateLegal extends CreateRecord
     {
         return [
             Actions\Action::make('preview')
-                ->label('Preview')
+                ->label(__('legal.actions.preview'))
                 ->icon('heroicon-o-eye')
                 ->color('gray')
                 ->action(function () {

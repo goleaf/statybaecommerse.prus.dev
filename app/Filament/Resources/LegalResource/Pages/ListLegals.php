@@ -18,7 +18,7 @@ class ListLegals extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Create Legal Document')
+                ->label(__('legal.actions.create'))
                 ->icon('heroicon-o-plus'),
         ];
     }
@@ -26,26 +26,26 @@ class ListLegals extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make('All Documents')
+            'all' => Tab::make(__('legal.tabs.all'))
                 ->icon('heroicon-o-document-text'),
 
-            'enabled' => Tab::make('Enabled')
+            'enabled' => Tab::make(__('legal.tabs.enabled'))
                 ->icon('heroicon-o-check-circle')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_enabled', true)),
 
-            'disabled' => Tab::make('Disabled')
+            'disabled' => Tab::make(__('legal.tabs.disabled'))
                 ->icon('heroicon-o-x-circle')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_enabled', false)),
 
-            'required' => Tab::make('Required')
+            'required' => Tab::make(__('legal.tabs.required'))
                 ->icon('heroicon-o-exclamation-triangle')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_required', true)),
 
-            'published' => Tab::make('Published')
+            'published' => Tab::make(__('legal.tabs.published'))
                 ->icon('heroicon-o-eye')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('published_at')),
 
-            'draft' => Tab::make('Draft')
+            'draft' => Tab::make(__('legal.tabs.draft'))
                 ->icon('heroicon-o-pencil')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('published_at')),
         ];
