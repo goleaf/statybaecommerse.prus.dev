@@ -22,6 +22,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -272,6 +273,7 @@ final class VariantPricingRuleResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (VariantPricingRule $record): string => $record->is_active ? __('variant_pricing_rules.deactivate') : __('variant_pricing_rules.activate'))
                     ->icon(fn (VariantPricingRule $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
