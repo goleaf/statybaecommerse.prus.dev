@@ -21,6 +21,7 @@ return [
             'next_run_at' => 'Kitas paleidimas',
             'last_run_at' => 'Paskutinis paleidimas',
             'is_active' => 'Aktyvus',
+            'status' => 'Būsena',
             'schedule_config' => 'Grafiko konfigūracija',
             'config_key' => 'Konfigūracijos raktas',
             'config_value' => 'Konfigūracijos reikšmė',
