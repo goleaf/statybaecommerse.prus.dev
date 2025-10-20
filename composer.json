@@ -16,9 +16,9 @@
         "dutchcodingcompany/filament-socialite": "*",
         "filament/filament": "^4.1",
         "filament/forms": "^4.1",
-        "filament/tables": "^4.1",
         "filament/infolists": "^4.1",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
+        "filament/tables": "^4.1",
         "kenepa/resource-lock": "^4.0",
         "lara-zeus/bolt": "*",
         "laravel/framework": "^12.0",
@@ -34,7 +34,8 @@
         "spatie/laravel-medialibrary": "^11",
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-sluggable": "^3.7",
-        "spatie/laravel-translatable": "^6.11"
+        "spatie/laravel-translatable": "^6.11",
+        "zircote/swagger-php": "^4.9"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
@@ -88,6 +89,7 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
+        "api:spec": "@php artisan api:spec",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
