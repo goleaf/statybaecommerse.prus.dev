@@ -142,6 +142,7 @@ return [
         'author_email' => 'Author Email',
         'is_visible' => 'Visible',
         'is_featured' => 'Featured',
+        'is_breaking' => 'Breaking News',
         'meta_title' => 'Meta Title',
         'meta_description' => 'Meta Description',
         'meta_keywords' => 'Meta Keywords',

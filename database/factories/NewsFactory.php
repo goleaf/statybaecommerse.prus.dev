@@ -19,6 +19,8 @@ final class NewsFactory extends Factory
     {
         return [
             'is_visible' => true,
+            'is_featured' => fake()->boolean(20),
+            'is_breaking' => fake()->boolean(10),
             'moderation_state' => ModerationState::Published->value,
             'submitted_for_review_at' => now()->subDays(fake()->numberBetween(2, 5)),
             'approved_at' => now()->subDay(),
