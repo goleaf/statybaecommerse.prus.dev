@@ -221,7 +221,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
 let currentConditionId = null;
 
 function testCondition(conditionId) {

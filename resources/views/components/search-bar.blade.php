@@ -101,7 +101,7 @@
     @endif
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     function searchBar() {
         return {
             query: '',

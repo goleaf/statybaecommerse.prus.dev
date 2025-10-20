@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Document' }}</title>
-    <style>
+    <style nonce="{{ csp_nonce() }}">
         @page { margin: 20mm; }
     </style>
 </head>

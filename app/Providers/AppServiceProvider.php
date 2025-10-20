@@ -29,6 +29,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
@@ -51,6 +52,14 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (class_exists(\Illuminate\Foundation\Vite::class) && method_exists(\Illuminate\Foundation\Vite::class, 'useCspNonce')) {
+            Vite::useCspNonce(fn (): string => csp_nonce());
+        }
+
+        if (method_exists(Livewire::class, 'setScriptNonce')) {
+            Livewire::setScriptNonce(fn (): string => csp_nonce());
+        }
+
         $this->registerModelObservers();
 
         // Register Livewire components
