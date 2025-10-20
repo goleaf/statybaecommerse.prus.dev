@@ -14,13 +14,13 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -103,10 +103,12 @@ final class CartItemResource extends Resource
                         }),
                     TextInput::make('product_name')
                         ->label(__('cart_items.product_name'))
-                        ->maxLength(255),
+                        ->disabled()
+                        ->dehydrated(false),
                     TextInput::make('product_sku')
                         ->label(__('cart_items.product_sku'))
-                        ->maxLength(255),
+                        ->disabled()
+                        ->dehydrated(false),
                     Grid::make(2)
                         ->components([
                             TextInput::make('quantity')
@@ -168,7 +170,8 @@ final class CartItemResource extends Resource
                             TextInput::make('total_price')
                                 ->label(__('cart_items.total'))
                                 ->prefix('€')
-                                ->disabled(),
+                                ->disabled()
+                                ->dehydrated(true),
                         ]),
                 ]),
             Section::make(__('cart_items.additional_info'))

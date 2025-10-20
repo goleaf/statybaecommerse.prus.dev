@@ -31,9 +31,9 @@ final class CartItem extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['session_id', 'user_id', 'product_id', 'variant_id', 'product_variant_id', 'quantity', 'minimum_quantity', 'unit_price', 'total_price', 'price', 'product_snapshot', 'notes', 'attributes'];
+    protected $fillable = ['session_id', 'user_id', 'product_id', 'variant_id', 'product_variant_id', 'quantity', 'minimum_quantity', 'unit_price', 'discount_amount', 'total_price', 'price', 'product_snapshot', 'notes', 'attributes'];
 
-    protected $casts = ['quantity' => 'integer', 'minimum_quantity' => 'integer', 'unit_price' => 'decimal:2', 'total_price' => 'decimal:2', 'price' => 'decimal:2', 'product_snapshot' => 'array', 'attributes' => 'array'];
+    protected $casts = ['quantity' => 'integer', 'minimum_quantity' => 'integer', 'unit_price' => 'decimal:2', 'discount_amount' => 'decimal:2', 'total_price' => 'decimal:2', 'price' => 'decimal:2', 'product_snapshot' => 'array', 'attributes' => 'array'];
 
     /**
      * The accessors to append to the model's array form.
@@ -41,6 +41,16 @@ final class CartItem extends Model
      * @var array<int, string>
      */
     protected $appends = ['formatted_total_price', 'formatted_unit_price', 'subtotal'];
+
+    public function getProductNameAttribute(): ?string
+    {
+        return $this->product?->name;
+    }
+
+    public function getProductSkuAttribute(): ?string
+    {
+        return $this->product?->sku;
+    }
 
     /**
      * Handle user functionality with proper error handling.
