@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\EmailCampaigns\Pages;
 
 use App\Filament\Resources\EmailCampaigns\EmailCampaignResource;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditEmailCampaign extends EditRecord
@@ -13,6 +16,7 @@ class EditEmailCampaign extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            ViewAction::make(),
             DeleteAction::make(),
         ];
     }
