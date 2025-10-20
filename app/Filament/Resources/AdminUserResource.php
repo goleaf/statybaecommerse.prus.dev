@@ -153,7 +153,7 @@ final class AdminUserResource extends Resource
                 SelectFilter::make('email_verified')
                     ->label(__('admin.admin_users.filters.email_verified'))
                     ->options([
-                        'verified' => __('admin.admin_users.filters.verified'),
+                        'verified'   => __('admin.admin_users.filters.verified'),
                         'unverified' => __('admin.admin_users.filters.unverified'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -161,9 +161,9 @@ final class AdminUserResource extends Resource
                             $data['value'] ?? null,
                             function (Builder $query, $value): Builder {
                                 return match ($value) {
-                                    'verified' => $query->whereNotNull('email_verified_at'),
+                                    'verified'   => $query->whereNotNull('email_verified_at'),
                                     'unverified' => $query->whereNull('email_verified_at'),
-                                    default => $query,
+                                    default      => $query,
                                 };
                             }
                         );
@@ -202,7 +202,7 @@ final class AdminUserResource extends Resource
                     ->action(function (AdminUser $record): void {
                         $record->update(['email_verified_at' => now()]);
                         FilamentNotification::make()
-                            ->title(__('admin.admin_users.email_verified_successfully'))
+                            ->title(__('admin.admin_users.notifications.email_verified_successfully'))
                             ->success()
                             ->send();
                     }),
@@ -213,7 +213,7 @@ final class AdminUserResource extends Resource
                     ->action(function (AdminUser $record): void {
                         // Send verification email logic here
                         FilamentNotification::make()
-                            ->title(__('admin.admin_users.verification_sent_successfully'))
+                            ->title(__('admin.admin_users.notifications.verification_sent_successfully'))
                             ->success()
                             ->send();
                     }),
@@ -230,7 +230,7 @@ final class AdminUserResource extends Resource
                                 $record->update(['email_verified_at' => now()]);
                             });
                             FilamentNotification::make()
-                                ->title(__('admin.admin_users.emails_verified_successfully'))
+                                ->title(__('admin.admin_users.notifications.emails_verified_successfully'))
                                 ->success()
                                 ->send();
                         }),
@@ -241,7 +241,7 @@ final class AdminUserResource extends Resource
                         ->action(function (Collection $records): void {
                             // Send verification emails logic here
                             FilamentNotification::make()
-                                ->title(__('admin.admin_users.verifications_sent_successfully'))
+                                ->title(__('admin.admin_users.notifications.verifications_sent_successfully'))
                                 ->success()
                                 ->send();
                         }),
@@ -260,10 +260,10 @@ final class AdminUserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAdminUsers::route('/'),
+            'index'  => Pages\ListAdminUsers::route('/'),
             'create' => Pages\CreateAdminUser::route('/create'),
-            'view' => Pages\ViewAdminUser::route('/{record}'),
-            'edit' => Pages\EditAdminUser::route('/{record}/edit'),
+            'view'   => Pages\ViewAdminUser::route('/{record}'),
+            'edit'   => Pages\EditAdminUser::route('/{record}/edit'),
         ];
     }
 }
