@@ -1,15 +1,20 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use App\Http\Controllers\ApiDocsController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
 // Include frontend routes
-require __DIR__ . '/frontend.php';
+require __DIR__.'/frontend.php';
 
 // Include admin routes
-require __DIR__ . '/admin.php';
+require __DIR__.'/admin.php';
 
 Route::middleware(['web'])->group(function () {
+    Route::get('/docs/api', ApiDocsController::class)->name('docs.api');
+
     // Live Demo Route
     Route::get('/live-demo', App\Livewire\Pages\LiveDemo::class)->name('live-demo');
 
@@ -286,7 +291,7 @@ Route::middleware(['web'])->group(function () {
             'is_enabled' => (bool) ($data['is_active'] ?? $record->is_enabled),
         ]);
 
-        return redirect('/admin/discounts/' . $record->getKey() . '/edit');
+        return redirect('/admin/discounts/'.$record->getKey().'/edit');
     })->name('filament.admin.resources.discounts.update');
 
     Route::put('/admin/discounts/{record}/edit', function (\Illuminate\Http\Request $request, Discount $record) {
@@ -312,7 +317,7 @@ Route::middleware(['web'])->group(function () {
             'is_enabled' => (bool) ($data['is_active'] ?? $record->is_enabled),
         ]);
 
-        return redirect('/admin/discounts/' . $record->getKey() . '/edit');
+        return redirect('/admin/discounts/'.$record->getKey().'/edit');
     });
 
     Route::delete('/admin/discounts/{record}', function (Discount $record) {
@@ -331,15 +336,15 @@ Route::middleware(['web'])->group(function () {
 // --- Test-only route stubs to satisfy Filament navigation links ---
 if (app()->environment('testing')) {
     Route::middleware('web')->group(function () {
-        Route::get('/admin/system-settings', fn() => response('OK'))
+        Route::get('/admin/system-settings', fn () => response('OK'))
             ->name('filament.admin.resources.system-settings.index');
-        Route::post('/admin/system-settings', fn() => response('OK'))
+        Route::post('/admin/system-settings', fn () => response('OK'))
             ->name('filament.admin.resources.system-settings.store');
-        Route::put('/admin/system-settings/{record}', fn($record) => response('OK'))
+        Route::put('/admin/system-settings/{record}', fn ($record) => response('OK'))
             ->name('filament.admin.resources.system-settings.update');
-        Route::delete('/admin/system-settings/{record}', fn($record) => response('OK'))
+        Route::delete('/admin/system-settings/{record}', fn ($record) => response('OK'))
             ->name('filament.admin.resources.system-settings.destroy');
-        Route::get('/admin/system-settings/{record}', fn($record) => response('OK'))
+        Route::get('/admin/system-settings/{record}', fn ($record) => response('OK'))
             ->name('filament.admin.resources.system-settings.view');
         Route::post('/admin/collections/{collection}/toggle-visibility', function ($collection) {
             $model = \App\Models\Collection::query()->findOrFail($collection);
@@ -359,7 +364,7 @@ use Illuminate\Http\Request;
  * |--------------------------------------------------------------------------
  */
 
-Route::get('/health', fn() => response()->json(['ok' => true]))->name('health');
+Route::get('/health', fn () => response()->json(['ok' => true]))->name('health');
 
 // Language switching
 Route::get('/lang/{locale}', function (string $locale) {
@@ -398,10 +403,10 @@ Route::get('/', function () {
         : array_filter(array_map('trim', explode(',', (string) $supported)));
     $locale = $locales[0] ?? config('app.locale', 'en');
 
-    return redirect('/' . $locale);
+    return redirect('/'.$locale);
 })->name('home');
 // Backward-compatible redirect
-Route::get('/home', fn() => redirect()->route('home'));
+Route::get('/home', fn () => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
 Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
 Route::get('/products/{product}/history', Pages\ProductHistoryPage::class)->name('products.history');
@@ -416,7 +421,7 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
 Route::get('/products/{product}/gallery', function ($product) {
-    return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
+    return redirect('/'.app()->getLocale().'/products/'.$product.'/gallery');
 })->name('products.gallery');
 // Alias for legacy route names - handled by route model binding
 Route::get('/product/{product}', function ($product) {
@@ -427,17 +432,17 @@ Route::get('/product/{product}', function ($product) {
 })->name('product.show');
 
 Route::get('/categories', function () {
-    return redirect('/' . app()->getLocale() . '/categories');
+    return redirect('/'.app()->getLocale().'/categories');
 })->name('categories.index');
 Route::get('/categories/{category}', function ($category) {
-    return redirect('/' . app()->getLocale() . '/categories/' . $category);
+    return redirect('/'.app()->getLocale().'/categories/'.$category);
 })->name('categories.show');
 // Brands
 Route::get('/brands', function () {
-    return redirect('/' . app()->getLocale() . '/brands');
+    return redirect('/'.app()->getLocale().'/brands');
 })->name('brands.index');
 Route::get('/brands/{brand}', function ($brand) {
-    return redirect('/' . app()->getLocale() . '/brands/' . $brand);
+    return redirect('/'.app()->getLocale().'/brands/'.$brand);
 })->name('brands.show');
 // Collection routes
 Route::prefix('collections')->name('collections.')->group(function () {
@@ -453,7 +458,7 @@ Route::prefix('collections')->name('collections.')->group(function () {
 });
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
 Route::get('/search', function () {
-    return redirect('/' . app()->getLocale() . '/search');
+    return redirect('/'.app()->getLocale().'/search');
 })->name('search');
 // Legal pages
 Route::prefix('legal')->name('legal.')->group(function () {
@@ -469,7 +474,7 @@ Route::prefix('legal')->name('legal.')->group(function () {
 
 // Legacy legal route
 Route::get('/legal/{slug}', function ($slug) {
-    return redirect('/' . app()->getLocale() . '/legal/' . $slug);
+    return redirect('/'.app()->getLocale().'/legal/'.$slug);
 })->name('legal.show.legacy');
 
 // Cpanel routes
@@ -477,11 +482,11 @@ Route::get('/cpanel/login', function () {
     return response('Cpanel Login Page', 200);
 })->name('cpanel.login');
 Route::get('/cpanel/{path?}', function ($path = null) {
-    return response('Cpanel Page: ' . ($path ?? 'index'), 200);
+    return response('Cpanel Page: '.($path ?? 'index'), 200);
 })->where('path', '.*')->name('cpanel.any');
 
 // Auth routes
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 // Authenticated routes
 Route::middleware('auth')->group(function (): void {
@@ -514,7 +519,7 @@ Route::get('/{locale}/sitemap.xml', [App\Http\Controllers\SitemapController::cla
 // Catalog XML (products / categories) — on-the-fly via service with file fallback
 Route::get('/catalog.xml', function (\Illuminate\Http\Request $request) {
     $only = (string) $request->query('only', 'products');
-    if (!in_array($only, ['all', 'products', 'categories'], true)) {
+    if (! in_array($only, ['all', 'products', 'categories'], true)) {
         $only = 'products';
     }
 
@@ -540,7 +545,7 @@ Route::get('/catalog.xml', function (\Illuminate\Http\Request $request) {
 Route::get('/{locale}/catalog.xml', function (string $locale, \Illuminate\Http\Request $request) {
     app()->setLocale($locale);
     $only = (string) $request->query('only', 'products');
-    if (!in_array($only, ['all', 'products', 'categories'], true)) {
+    if (! in_array($only, ['all', 'products', 'categories'], true)) {
         $only = 'products';
     }
 
@@ -605,10 +610,10 @@ Route::get('/products.xml', function () {
             foreach ($chunk as $product) {
                 $pEl = $doc->createElement('product');
                 $pEl->appendChild($doc->createElement('id', (string) $product->id));
-                if (!empty($product->sku)) {
+                if (! empty($product->sku)) {
                     $pEl->appendChild($doc->createElement('sku', (string) $product->sku));
                 }
-                if (!empty($product->slug)) {
+                if (! empty($product->slug)) {
                     $pEl->appendChild($doc->createElement('slug', (string) $product->slug));
                 }
 
@@ -632,7 +637,7 @@ Route::get('/products.xml', function () {
                         $attrEl->appendChild($nameEl);
                     }
 
-                    if (!empty($pv->attribute_value_id)) {
+                    if (! empty($pv->attribute_value_id)) {
                         $valueText = (string) ($valTexts[$pv->attribute_value_id]->value ?? '');
                         $valEl = $doc->createElement('value', $valueText);
                         $valEl->setAttribute('id', (string) $pv->attribute_value_id);
@@ -675,10 +680,10 @@ Route::get('/categories.xml', function () {
             foreach ($chunk as $cat) {
                 $cEl = $doc->createElement('category');
                 $cEl->appendChild($doc->createElement('id', (string) $cat->id));
-                if (!is_null($cat->parent_id)) {
+                if (! is_null($cat->parent_id)) {
                     $cEl->appendChild($doc->createElement('parent_id', (string) $cat->parent_id));
                 }
-                if (!empty($cat->slug)) {
+                if (! empty($cat->slug)) {
                     $cEl->appendChild($doc->createElement('slug', (string) $cat->slug));
                 }
                 $name = (string) ($names[$cat->id]->name ?? '');
@@ -710,7 +715,7 @@ Route::middleware('auth')->group(function (): void {
 
 // Locations pages
 Route::get('/locations', function () {
-    return redirect('/' . app()->getLocale() . '/locations');
+    return redirect('/'.app()->getLocale().'/locations');
 })->name('locations.index');
 // Primary Livewire route uses {slug}
 Route::get('/locations/{slug}', App\Livewire\Pages\Location\Show::class)->name('locations.view');
@@ -785,7 +790,7 @@ Route::prefix('{locale}')
             return redirect('/cpanel/login');
         })->name('localized.cpanel');
         Route::get('/cpanel/{path?}', function ($locale, $path = null) {
-            return redirect('/cpanel/' . ($path ?? ''));
+            return redirect('/cpanel/'.($path ?? ''));
         })->where('path', '.*')->name('localized.cpanel.any');
 
         // Order confirmation by number (must be authed in tests)
@@ -825,11 +830,11 @@ Route::middleware('auth')->group(function (): void {
         ]);
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
-            if (!is_array($t)) {
+            if (! is_array($t)) {
                 continue;
             }
             $locale = $t['locale'] ?? null;
-            if (!is_string($locale) || $locale === '') {
+            if (! is_string($locale) || $locale === '') {
                 continue;
             }
             \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
@@ -864,14 +869,14 @@ Route::middleware('auth')->group(function (): void {
             'is_visible' => $data['is_visible'] ?? $record->is_visible,
             'published_at' => $data['published_at'] ?? $record->published_at,
             'author_name' => $data['author_name'] ?? $record->author_name,
-        ], fn($v) => !is_null($v)));
+        ], fn ($v) => ! is_null($v)));
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
-            if (!is_array($t)) {
+            if (! is_array($t)) {
                 continue;
             }
             $locale = $t['locale'] ?? null;
-            if (!is_string($locale) || $locale === '') {
+            if (! is_string($locale) || $locale === '') {
                 continue;
             }
             \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
@@ -896,19 +901,19 @@ Route::middleware('auth')->group(function (): void {
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
-    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn () => back())
         ->name('admin.legal.translations.save');
-    Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn () => back())
         ->name('admin.brands.translations.save');
-    Route::put('/admin/{locale}/categories/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/categories/{id}/translations/{lang}', fn () => back())
         ->name('admin.categories.translations.save');
-    Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn () => back())
         ->name('admin.collections.translations.save');
-    Route::put('/admin/{locale}/products/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/products/{id}/translations/{lang}', fn () => back())
         ->name('admin.products.translations.save');
-    Route::put('/admin/{locale}/attributes/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/attributes/{id}/translations/{lang}', fn () => back())
         ->name('admin.attributes.translations.save');
-    Route::put('/admin/{locale}/attribute-values/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/attribute-values/{id}/translations/{lang}', fn () => back())
         ->name('admin.attribute-values.translations.save');
 });
 
@@ -994,11 +999,11 @@ Route::middleware('auth')->group(function (): void {
         ]);
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
-            if (!is_array($t)) {
+            if (! is_array($t)) {
                 continue;
             }
             $locale = $t['locale'] ?? null;
-            if (!is_string($locale) || $locale === '') {
+            if (! is_string($locale) || $locale === '') {
                 continue;
             }
             \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
@@ -1033,14 +1038,14 @@ Route::middleware('auth')->group(function (): void {
             'is_visible' => $data['is_visible'] ?? $record->is_visible,
             'published_at' => $data['published_at'] ?? $record->published_at,
             'author_name' => $data['author_name'] ?? $record->author_name,
-        ], fn($v) => !is_null($v)));
+        ], fn ($v) => ! is_null($v)));
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
-            if (!is_array($t)) {
+            if (! is_array($t)) {
                 continue;
             }
             $locale = $t['locale'] ?? null;
-            if (!is_string($locale) || $locale === '') {
+            if (! is_string($locale) || $locale === '') {
                 continue;
             }
             \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
@@ -1065,19 +1070,19 @@ Route::middleware('auth')->group(function (): void {
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
-    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn () => back())
         ->name('admin.legal.translations.save');
-    Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn () => back())
         ->name('admin.brands.translations.save');
-    Route::put('/admin/{locale}/categories/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/categories/{id}/translations/{lang}', fn () => back())
         ->name('admin.categories.translations.save');
-    Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn () => back())
         ->name('admin.collections.translations.save');
-    Route::put('/admin/{locale}/products/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/products/{id}/translations/{lang}', fn () => back())
         ->name('admin.products.translations.save');
-    Route::put('/admin/{locale}/attributes/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/attributes/{id}/translations/{lang}', fn () => back())
         ->name('admin.attributes.translations.save');
-    Route::put('/admin/{locale}/attribute-values/{id}/translations/{lang}', fn() => back())
+    Route::put('/admin/{locale}/attribute-values/{id}/translations/{lang}', fn () => back())
         ->name('admin.attribute-values.translations.save');
 });
 
