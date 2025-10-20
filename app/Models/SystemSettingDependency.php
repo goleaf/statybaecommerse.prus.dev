@@ -26,9 +26,13 @@ final class SystemSettingDependency extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['setting_id', 'depends_on_setting_id', 'condition', 'is_active'];
+    protected $fillable = ['setting_id', 'depends_on_setting_id', 'condition', 'condition_value', 'is_active'];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = [
+        'condition' => 'string',
+        'condition_value' => 'string',
+        'is_active' => 'boolean',
+    ];
 
     /**
      * Handle setting functionality with proper error handling.
@@ -203,19 +207,206 @@ final class SystemSettingDependency extends Model
         if (! $this->dependsOn) {
             return false;
         }
-        $dependencyValue = $this->dependsOn->value;
-        $condition = $this->condition;
 
-        return match ($condition['operator'] ?? 'equals') {
-            'equals' => $dependencyValue == $condition['value'],
-            'not_equals' => $dependencyValue != $condition['value'],
-            'greater_than' => $dependencyValue > $condition['value'],
-            'less_than' => $dependencyValue < $condition['value'],
-            'contains' => str_contains($dependencyValue, $condition['value']),
-            'not_contains' => ! str_contains($dependencyValue, $condition['value']),
-            'in' => in_array($dependencyValue, $condition['value'] ?? []),
-            'not_in' => ! in_array($dependencyValue, $condition['value'] ?? []),
+        $operator = $this->condition;
+
+        if (! is_string($operator) || $operator === '') {
+            return false;
+        }
+
+        $dependencyValue = $this->dependsOn->value;
+        $conditionValue = $this->condition_value;
+
+        return match ($operator) {
+            'equals' => $this->compareEquality($dependencyValue, $conditionValue),
+            'not_equals' => ! $this->compareEquality($dependencyValue, $conditionValue),
+            'greater_than' => $this->compareNumeric($dependencyValue, $conditionValue, fn ($a, $b) => $a > $b),
+            'greater_than_or_equals' => $this->compareNumeric($dependencyValue, $conditionValue, fn ($a, $b) => $a >= $b),
+            'less_than' => $this->compareNumeric($dependencyValue, $conditionValue, fn ($a, $b) => $a < $b),
+            'less_than_or_equals' => $this->compareNumeric($dependencyValue, $conditionValue, fn ($a, $b) => $a <= $b),
+            'contains' => $this->containsValue($dependencyValue, $conditionValue),
+            'not_contains' => ! $this->containsValue($dependencyValue, $conditionValue),
+            'in' => $this->inCollection($dependencyValue, $conditionValue),
+            'not_in' => ! $this->inCollection($dependencyValue, $conditionValue),
+            'starts_with' => $this->stringComparison($dependencyValue, $conditionValue, fn ($haystack, $needle) => str_starts_with($haystack, $needle)),
+            'ends_with' => $this->stringComparison($dependencyValue, $conditionValue, fn ($haystack, $needle) => str_ends_with($haystack, $needle)),
+            'is_empty' => $this->isEmptyValue($dependencyValue),
+            'is_not_empty' => ! $this->isEmptyValue($dependencyValue),
+            'is_true' => $this->toBool($dependencyValue) === true,
+            'is_false' => $this->toBool($dependencyValue) === false,
             default => false,
         };
+    }
+
+    private function compareEquality(mixed $actual, mixed $expected): bool
+    {
+        if ($expected === null) {
+            return $actual === null || $this->isEmptyValue($actual);
+        }
+
+        if (is_bool($actual) || is_bool($expected)) {
+            $actualBool = $this->toBool($actual);
+            $expectedBool = $this->toBool($expected);
+
+            return $actualBool !== null && $expectedBool !== null && $actualBool === $expectedBool;
+        }
+
+        return $this->normalizeString($actual) === $this->normalizeString($expected);
+    }
+
+    private function compareNumeric(mixed $actual, mixed $expected, callable $comparator): bool
+    {
+        $actualNumber = $this->toNumber($actual);
+        $expectedNumber = $this->toNumber($expected);
+
+        if ($actualNumber === null || $expectedNumber === null) {
+            return false;
+        }
+
+        return (bool) $comparator($actualNumber, $expectedNumber);
+    }
+
+    private function containsValue(mixed $actual, mixed $expected): bool
+    {
+        if ($expected === null) {
+            return false;
+        }
+
+        if (is_array($actual)) {
+            return in_array($expected, $actual, true);
+        }
+
+        $actualString = $this->normalizeString($actual);
+        $expectedString = $this->normalizeString($expected);
+
+        return $actualString !== '' && $expectedString !== '' && str_contains($actualString, $expectedString);
+    }
+
+    private function inCollection(mixed $actual, mixed $expected): bool
+    {
+        if ($expected === null) {
+            return false;
+        }
+
+        $collection = $this->toArray($expected);
+
+        if ($collection === []) {
+            return false;
+        }
+
+        if (is_array($actual)) {
+            return (bool) array_intersect($actual, $collection);
+        }
+
+        return in_array($this->normalizeString($actual), array_map([$this, 'normalizeString'], $collection), true);
+    }
+
+    private function stringComparison(mixed $actual, mixed $expected, callable $callback): bool
+    {
+        if ($expected === null) {
+            return false;
+        }
+
+        $actualString = $this->normalizeString($actual);
+        $expectedString = $this->normalizeString($expected);
+
+        return $actualString !== '' && $expectedString !== '' && $callback($actualString, $expectedString);
+    }
+
+    private function isEmptyValue(mixed $value): bool
+    {
+        if ($value === null) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_array($value)) {
+            return count($value) === 0;
+        }
+
+        return false;
+    }
+
+    private function normalizeString(mixed $value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_array($value) || is_object($value)) {
+            return json_encode($value, JSON_THROW_ON_ERROR);
+        }
+
+        return (string) $value;
+    }
+
+    private function toNumber(mixed $value): ?float
+    {
+        if (is_int($value) || is_float($value)) {
+            return (float) $value;
+        }
+
+        if (is_string($value) && is_numeric($value)) {
+            return (float) $value;
+        }
+
+        return null;
+    }
+
+    private function toBool(mixed $value): ?bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value)) {
+            return $value !== 0;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower(trim($value));
+
+            return match ($normalized) {
+                '1', 'true', 'yes', 'on' => true,
+                '0', 'false', 'no', 'off', '' => false,
+                default => null,
+            };
+        }
+
+        return null;
+    }
+
+    private function toArray(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return [];
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            return array_filter(array_map('trim', explode(',', $value)), fn ($item) => $item !== '');
+        }
+
+        return [$value];
     }
 }

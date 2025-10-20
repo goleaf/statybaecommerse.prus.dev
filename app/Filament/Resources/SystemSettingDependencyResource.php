@@ -17,7 +17,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -88,12 +88,35 @@ final class SystemSettingDependencyResource extends Resource
                                 ->preload()
                                 ->helperText(__('admin.system_setting_dependencies.depends_on_setting_help')),
                         ]),
-                    Textarea::make('condition')
+                    Select::make('condition')
                         ->label(__('admin.system_setting_dependencies.condition'))
-                        ->rows(5)
-                        ->helperText(__('admin.system_setting_dependencies.condition_help'))
-                        ->columnSpanFull()
-                        ->required(),
+                        ->options([
+                            'equals' => __('admin.system_setting_dependencies.conditions.equals'),
+                            'not_equals' => __('admin.system_setting_dependencies.conditions.not_equals'),
+                            'greater_than' => __('admin.system_setting_dependencies.conditions.greater_than'),
+                            'greater_than_or_equals' => __('admin.system_setting_dependencies.conditions.greater_than_or_equals'),
+                            'less_than' => __('admin.system_setting_dependencies.conditions.less_than'),
+                            'less_than_or_equals' => __('admin.system_setting_dependencies.conditions.less_than_or_equals'),
+                            'contains' => __('admin.system_setting_dependencies.conditions.contains'),
+                            'not_contains' => __('admin.system_setting_dependencies.conditions.not_contains'),
+                            'in' => __('admin.system_setting_dependencies.conditions.in'),
+                            'not_in' => __('admin.system_setting_dependencies.conditions.not_in'),
+                            'starts_with' => __('admin.system_setting_dependencies.conditions.starts_with'),
+                            'ends_with' => __('admin.system_setting_dependencies.conditions.ends_with'),
+                            'is_empty' => __('admin.system_setting_dependencies.conditions.is_empty'),
+                            'is_not_empty' => __('admin.system_setting_dependencies.conditions.is_not_empty'),
+                            'is_true' => __('admin.system_setting_dependencies.conditions.is_true'),
+                            'is_false' => __('admin.system_setting_dependencies.conditions.is_false'),
+                        ])
+                        ->searchable()
+                        ->required()
+                        ->helperText(__('admin.system_setting_dependencies.condition_help')),
+                    TextInput::make('condition_value')
+                        ->label(__('admin.system_setting_dependencies.condition_value'))
+                        ->helperText(__('admin.system_setting_dependencies.condition_value_help'))
+                        ->visible(fn (callable $get): bool => ! in_array($get('condition'), ['is_empty', 'is_not_empty', 'is_true', 'is_false'], true))
+                        ->required(fn (callable $get): bool => ! in_array($get('condition'), ['is_empty', 'is_not_empty', 'is_true', 'is_false'], true))
+                        ->columnSpanFull(),
                     Grid::make(2)
                         ->schema([
                             Toggle::make('is_active')
@@ -153,11 +176,15 @@ final class SystemSettingDependencyResource extends Resource
                     ->limit(30),
                 TextColumn::make('condition')
                     ->label(__('admin.system_setting_dependencies.condition'))
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('condition_value')
+                    ->label(__('admin.system_setting_dependencies.condition_value'))
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && strlen($state) > 50 ? $state : null;
                     })
                     ->searchable()
                     ->sortable(),
@@ -237,7 +264,7 @@ final class SystemSettingDependencyResource extends Resource
                             );
                     }),
             ])
-            ->searchable(['condition', 'setting.key', 'dependsOnSetting.key'])
+            ->searchable(['condition', 'condition_value', 'setting.key', 'dependsOnSetting.key'])
             ->actions([
                 ViewAction::make()
                     ->label(__('admin.common.view'))
@@ -265,7 +292,9 @@ final class SystemSettingDependencyResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingDependency $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->condition = $record->condition.' (Copy)';
+                        if ($newRecord->condition_value) {
+                            $newRecord->condition_value .= ' (Copy)';
+                        }
                         $newRecord->is_active = false;
                         $newRecord->save();
 
@@ -320,9 +349,11 @@ final class SystemSettingDependencyResource extends Resource
                         ->icon('heroicon-o-document-duplicate')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            $records->each(function (SystemSettingDependency $record) {
+                            $records->each(function (SystemSettingDependency $record): void {
                                 $newRecord = $record->replicate();
-                                $newRecord->condition = $record->condition.' (Copy)';
+                                if ($newRecord->condition_value) {
+                                    $newRecord->condition_value .= ' (Copy)';
+                                }
                                 $newRecord->is_active = false;
                                 $newRecord->save();
                             });
