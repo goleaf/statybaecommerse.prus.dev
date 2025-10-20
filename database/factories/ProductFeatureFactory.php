@@ -28,6 +28,7 @@ final class ProductFeatureFactory extends Factory
             'feature_key' => $this->faker->word(),
             'feature_value' => $this->faker->sentence(),
             'weight' => $this->faker->randomFloat(4, 0, 1),
+            'is_active' => true,
         ];
     }
 

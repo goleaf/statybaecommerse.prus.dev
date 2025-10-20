@@ -33,24 +33,37 @@ final class ProductFeatureResource extends Resource
     {
         return $form->schema([
             Forms\Components\Select::make('product_id')
+                ->label('Product')
                 ->relationship('product', 'name')
                 ->required()
                 ->searchable()
                 ->preload(),
             Forms\Components\Select::make('feature_type')
+                ->label('Feature Type')
                 ->options(self::getFeatureTypeOptions())
+                ->required()
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
                 ->label('Feature Key')
+                ->required()
                 ->maxLength(255),
             Forms\Components\Textarea::make('feature_value')
                 ->label('Feature Value')
+                ->required()
+                ->rows(3)
                 ->columnSpanFull(),
             Forms\Components\TextInput::make('weight')
+                ->label('Weight')
                 ->numeric()
                 ->step(0.0001)
                 ->default(0)
                 ->minValue(0),
+            Forms\Components\Toggle::make('is_active')
+                ->label('Active')
+                ->default(true)
+                ->inline(false)
+                ->helperText('Inactive features will be hidden from customer-facing experiences.')
+                ->columnSpanFull(),
         ]);
     }
 
@@ -60,8 +73,11 @@ final class ProductFeatureResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
                     ->label('Product')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\BadgeColumn::make('feature_type')
+                    ->label('Feature Type')
+                    ->enum(self::getFeatureTypeOptions())
                     ->colors([
                         'primary' => 'specification',
                         'success' => 'benefit',
@@ -69,21 +85,40 @@ final class ProductFeatureResource extends Resource
                         'info' => 'technical',
                         'danger' => 'performance',
                     ]),
-                Tables\Columns\TextColumn::make('feature_key'),
+                Tables\Columns\TextColumn::make('feature_key')
+                    ->label('Feature Key')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('feature_value')
-                    ->limit(50),
+                    ->label('Feature Value')
+                    ->limit(50)
+                    ->wrap()
+                    ->searchable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('weight')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at'),
+                    ->label('Created')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Updated')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('feature_type')
                     ->options(self::getFeatureTypeOptions()),
                 Tables\Filters\SelectFilter::make('product_id')
                     ->relationship('product', 'name'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active')
+                    ->trueLabel('Active')
+                    ->falseLabel('Inactive'),
             ])
             ->actions([
                 TablesEditAction::make(),
