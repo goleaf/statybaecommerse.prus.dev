@@ -11,15 +11,18 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -169,12 +172,12 @@ final class StockMovementResource extends Resource
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
                     ->preload(),
-                \Filament\Tables\Filters\Filter::make('moved_at')
+                Filter::make('moved_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('moved_from')
+                        DatePicker::make('moved_from')
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.from')),
-                        \Filament\Forms\Components\DatePicker::make('moved_to')
+                        DatePicker::make('moved_to')
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.to')),
                     ])
@@ -185,6 +188,7 @@ final class StockMovementResource extends Resource
                     }),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -201,6 +205,7 @@ final class StockMovementResource extends Resource
         return [
             'index' => Pages\ListStockMovements::route('/'),
             'create' => Pages\CreateStockMovement::route('/create'),
+            'view' => Pages\ViewStockMovement::route('/{record}'),
             'edit' => Pages\EditStockMovement::route('/{record}/edit'),
         ];
     }
