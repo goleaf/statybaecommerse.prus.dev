@@ -17,8 +17,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     /**
      * @var string|null
      */
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     /**
      * @var string|null

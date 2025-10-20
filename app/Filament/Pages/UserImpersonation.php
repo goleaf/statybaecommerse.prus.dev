@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\User;
-use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -19,8 +18,7 @@ final class UserImpersonation extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    /** @var string|\BackedEnum|null */
-    public static $navigationIcon = 'heroicon-o-user';
+    public static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user';
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
 

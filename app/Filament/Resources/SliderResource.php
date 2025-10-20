@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderResource\Pages;
-use BackedEnum;
 use App\Models\Slider;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\ColorPicker;
@@ -15,6 +14,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
@@ -27,8 +27,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 /**
  * SliderResource
  *
@@ -38,12 +36,8 @@ final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /**
-     * @var UnitEnum|string|null
-     */
     protected static UnitEnum|string|null $navigationGroup = 'Content Management';
 
     protected static ?int $navigationSort = 4;
