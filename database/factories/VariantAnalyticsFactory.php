@@ -7,6 +7,7 @@ namespace Database\Factories;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\VariantAnalytics>
@@ -24,7 +25,7 @@ final class VariantAnalyticsFactory extends Factory
 
         return [
             'variant_id' => ProductVariant::factory(),
-            'date' => fake()->dateTimeBetween('-30 days', 'now'),
+            'date' => fake()->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
             'views' => $views,
             'clicks' => $clicks,
             'add_to_cart' => $addToCart,
@@ -61,14 +62,14 @@ final class VariantAnalyticsFactory extends Factory
     public function recent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => fake()->dateTimeBetween('-7 days', 'now'),
+            'date' => fake()->dateTimeBetween('-7 days', 'now')->format('Y-m-d'),
         ]);
     }
 
     public function historical(): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => fake()->dateTimeBetween('-1 year', '-30 days'),
+            'date' => fake()->dateTimeBetween('-1 year', '-30 days')->format('Y-m-d'),
         ]);
     }
 
@@ -82,7 +83,7 @@ final class VariantAnalyticsFactory extends Factory
     public function forDate(string $date): static
     {
         return $this->state(fn (array $attributes) => [
-            'date' => $date,
+            'date' => Carbon::parse($date)->toDateString(),
         ]);
     }
 }
