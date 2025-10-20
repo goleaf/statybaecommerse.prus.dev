@@ -302,6 +302,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $providers = [
             App\Providers\AuthServiceProvider::class,
             App\Providers\ApiServiceProvider::class,
+            App\Providers\ModelScopeServiceProvider::class,
         ];
 
         $appEnvironment = (string) env('APP_ENV', 'production');
