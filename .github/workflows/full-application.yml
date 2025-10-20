@@ -26,16 +26,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'yarn'
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Install Node dependencies
-        run: |
-          corepack enable
-          yarn install --immutable
+        run: npm ci
 
       - name: Prepare application environment
         run: |
@@ -95,7 +94,7 @@ jobs:
           php artisan view:cache
 
       - name: Build frontend assets
-        run: yarn build
+        run: npm run build
 
       - name: Run unit tests
         id: full-unit-tests
