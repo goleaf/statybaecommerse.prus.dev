@@ -102,10 +102,10 @@ return [
      * | ],
      * |
      */
-    'locale_mapping' => array_filter([
+    'locale_mapping' => [
         'lt' => ['currency' => 'EUR', 'zone' => 'eu'],
         // Add more mappings as needed
-    ]),
+    ],
 
     /*
      * |--------------------------------------------------------------------------
