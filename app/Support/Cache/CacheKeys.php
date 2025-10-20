@@ -20,6 +20,11 @@ final class CacheKeys
 
     public const TTL_ONE_DAY = 86400;
 
+    public static function productVisibleCount(): string
+    {
+        return 'product:visible:count';
+    }
+
     public static function productTotalCount(): string
     {
         return 'product:aggregate:count';
@@ -100,6 +105,11 @@ final class CacheKeys
         return sprintf('product:featured:list:%d', $limit);
     }
 
+    public static function productLatestList(int $limit): string
+    {
+        return sprintf('product:latest:list:%d', $limit);
+    }
+
     public static function categoryPopularList(int $limit): string
     {
         return sprintf('category:popular:list:%d', $limit);
@@ -113,6 +123,26 @@ final class CacheKeys
     public static function categoryNavigationTree(): string
     {
         return 'category:navigation:tree';
+    }
+
+    public static function navigationCategories(int $limit, string $locale): string
+    {
+        return sprintf('navigation:categories:%d:%s', $limit, $locale);
+    }
+
+    public static function menuCollectionKey(?string $location, string $locale): string
+    {
+        return sprintf('menu:collection:%s:%s', $location ?? 'all', $locale);
+    }
+
+    public static function menuByKey(string $key, string $locale): string
+    {
+        return sprintf('menu:key:%s:%s', $key, $locale);
+    }
+
+    public static function menuByLocation(string $location, string $locale): string
+    {
+        return sprintf('menu:location:%s:%s', $location, $locale);
     }
 
     public static function dashboardStats(string $range): string
@@ -155,6 +185,11 @@ final class CacheKeys
         return sprintf('category:%d', $categoryId);
     }
 
+    public static function menuTag(int $menuId): string
+    {
+        return sprintf('menu:%d', $menuId);
+    }
+
     public static function brandTag(int $brandId): string
     {
         return sprintf('brand:%d', $brandId);
@@ -163,6 +198,11 @@ final class CacheKeys
     public static function homeTag(): string
     {
         return 'home';
+    }
+
+    public static function navigationTag(): string
+    {
+        return 'navigation';
     }
 
     public static function dashboardTag(): string
