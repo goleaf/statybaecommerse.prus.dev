@@ -1,0 +1,25 @@
+site_name: Statyba E-commerce Knowledge Base
+site_description: Internal documentation for the Statyba e-commerce platform.
+docs_dir: docs
+theme:
+  name: readthedocs
+nav:
+  - Overview:
+      - Home: INDEX.md
+      - Architecture Overview: ARCHITECTURE_OVERVIEW.md
+      - Change Log: CHANGELOG.md
+  - Analysis & Summaries:
+      - Directory: analysis/INDEX.md
+      - Filament v4 Implementation: analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md
+      - News Resource Implementation: analysis/NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md
+      - Company Resource Analysis: analysis/COMPANY_RESOURCE_ANALYSIS.md
+      - Product Variants Summary: PRODUCT_VARIANTS_SUMMARY.md
+  - Operations & Runbooks:
+      - Deployment Guide: DEPLOYMENT_GUIDE.md
+      - Deployment Readiness Checklist: DEPLOYMENT_READINESS_CHECKLIST.md
+      - Production Deployment Checklist: PRODUCTION_DEPLOYMENT_CHECKLIST.md
+      - Current System Status: CURRENT_SYSTEM_STATUS.md
+  - Testing & Quality:
+      - Test Organisation Summary: TEST_ORGANIZATION_SUMMARY.md
+      - Widget Testing Summary: WIDGET_TESTING_SUMMARY.md
+      - Implementation Status: IMPLEMENTATION_STATUS.md
