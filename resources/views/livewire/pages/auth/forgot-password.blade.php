@@ -1,5 +1,8 @@
 <?php
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -15,6 +18,13 @@ new #[Layout('components.layouts.base')] class extends Component {
             'email' => ['required', 'string', 'email'],
         ]);
 
+        $this->ensureIsNotRateLimited();
+
+        $limiterKey = $this->rateLimiterKey();
+        $decaySeconds = (int) config('security.rate_limiting.password_reset.decay_seconds', 600);
+
+        RateLimiter::hit($limiterKey, $decaySeconds);
+
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
@@ -29,6 +39,34 @@ new #[Layout('components.layouts.base')] class extends Component {
         $this->reset('email');
 
         session()->flash('status', __($status));
+    }
+
+    private function ensureIsNotRateLimited(): void
+    {
+        $key = $this->rateLimiterKey();
+        $maxAttempts = (int) config('security.rate_limiting.password_reset.max_attempts', 3);
+
+        if (! RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            return;
+        }
+
+        $seconds = RateLimiter::availableIn($key);
+
+        $exception = ValidationException::withMessages([
+            'email' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => (int) ceil($seconds / 60),
+            ]),
+        ]);
+
+        $exception->status = 429;
+
+        throw $exception;
+    }
+
+    private function rateLimiterKey(): string
+    {
+        return 'password-reset:'.Str::transliterate(Str::lower($this->email).'|'.request()->ip());
     }
 }; ?>
 

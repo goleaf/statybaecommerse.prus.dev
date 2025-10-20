@@ -29,8 +29,10 @@ final class LoginForm extends Form
 
         $this->ensureIsNotRateLimited();
 
+        $decaySeconds = (int) config('security.rate_limiting.login.decay_seconds', 60);
+
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
-            RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->throttleKey(), $decaySeconds);
 
             throw ValidationException::withMessages([
                 'loginForm.email' => trans('auth.failed'),
@@ -42,7 +44,9 @@ final class LoginForm extends Form
 
     protected function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        $maxAttempts = (int) config('security.rate_limiting.login.max_attempts', 5);
+
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $maxAttempts)) {
             return;
         }
 
@@ -50,12 +54,16 @@ final class LoginForm extends Form
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
-        throw ValidationException::withMessages([
+        $exception = ValidationException::withMessages([
             'loginForm.email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => (int) ceil($seconds / 60),
             ]),
         ]);
+
+        $exception->status = 429;
+
+        throw $exception;
     }
 
     protected function throttleKey(): string

@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(App\Http\Middleware\AddSecurityHeaders::class);
         $middleware->append(App\Http\Middleware\SetLocale::class);
         $middleware->append(App\Http\Middleware\SetFilamentLocale::class);
         // Handle user impersonation for admin support
@@ -45,6 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\AuthServiceProvider::class,
         App\Providers\HorizonServiceProvider::class,
         App\Providers\LocaleServiceProvider::class,
+        App\Providers\SecurityServiceProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
     ])
     ->create();
