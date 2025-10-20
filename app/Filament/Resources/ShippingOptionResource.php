@@ -24,6 +24,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -77,7 +78,7 @@ final class ShippingOptionResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.shipping_options.slug'))
                                     ->required()
@@ -87,13 +88,18 @@ final class ShippingOptionResource extends Resource
                                 TextInput::make('carrier_name')
                                     ->label(__('admin.shipping_options.carrier_name'))
                                     ->maxLength(255),
+                                Select::make('zone_id')
+                                    ->label(__('admin.shipping_options.zone'))
+                                    ->relationship('zone', 'name')
+                                    ->preload()
+                                    ->searchable(),
                                 Select::make('service_type')
                                     ->label(__('admin.shipping_options.service_type'))
                                     ->options([
-                                        'standard' => __('admin.shipping_options.service_types.standard'),
-                                        'express' => __('admin.shipping_options.service_types.express'),
+                                        'standard'  => __('admin.shipping_options.service_types.standard'),
+                                        'express'   => __('admin.shipping_options.service_types.express'),
                                         'overnight' => __('admin.shipping_options.service_types.overnight'),
-                                        'economy' => __('admin.shipping_options.service_types.economy'),
+                                        'economy'   => __('admin.shipping_options.service_types.economy'),
                                     ])
                                     ->required()
                                     ->default('standard'),
@@ -201,20 +207,24 @@ final class ShippingOptionResource extends Resource
                     ->label(__('admin.shipping_options.service_type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'standard' => 'success',
-                        'express' => 'warning',
+                        'standard'  => 'success',
+                        'express'   => 'warning',
                         'overnight' => 'danger',
-                        'economy' => 'info',
-                        default => 'gray',
+                        'economy'   => 'info',
+                        default     => 'gray',
                     }),
                 TextColumn::make('price')
                     ->label(__('admin.shipping_options.price'))
                     ->money('EUR')
                     ->sortable(),
+                TextColumn::make('zone.name')
+                    ->label(__('admin.shipping_options.zone'))
+                    ->badge()
+                    ->sortable(),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
                     ->formatStateUsing(fn ($record) => $record->estimated_days_min && $record->estimated_days_max
-                        ? "{$record->estimated_days_min}-{$record->estimated_days_max} ".__('admin.shipping_options.days')
+                        ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
                         : '-'),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled'))
@@ -232,11 +242,14 @@ final class ShippingOptionResource extends Resource
                 SelectFilter::make('service_type')
                     ->label(__('admin.shipping_options.service_type'))
                     ->options([
-                        'standard' => __('admin.shipping_options.service_types.standard'),
-                        'express' => __('admin.shipping_options.service_types.express'),
+                        'standard'  => __('admin.shipping_options.service_types.standard'),
+                        'express'   => __('admin.shipping_options.service_types.express'),
                         'overnight' => __('admin.shipping_options.service_types.overnight'),
-                        'economy' => __('admin.shipping_options.service_types.economy'),
+                        'economy'   => __('admin.shipping_options.service_types.economy'),
                     ]),
+                SelectFilter::make('zone_id')
+                    ->label(__('admin.shipping_options.zone'))
+                    ->relationship('zone', 'name'),
                 TernaryFilter::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled')),
                 TernaryFilter::make('is_default')
@@ -264,10 +277,10 @@ final class ShippingOptionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListShippingOptions::route('/'),
+            'index'  => Pages\ListShippingOptions::route('/'),
             'create' => Pages\CreateShippingOption::route('/create'),
-            'view' => Pages\ViewShippingOption::route('/{record}'),
-            'edit' => Pages\EditShippingOption::route('/{record}/edit'),
+            'view'   => Pages\ViewShippingOption::route('/{record}'),
+            'edit'   => Pages\EditShippingOption::route('/{record}/edit'),
         ];
     }
 }
