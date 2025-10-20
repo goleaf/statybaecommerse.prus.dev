@@ -7,10 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -22,7 +18,13 @@ use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -191,7 +193,8 @@ final class NotificationResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('mark_as_read')
+                DeleteAction::make(),
+                Action::make('mark_as_read')
                     ->label(__('admin.notifications.actions.mark_as_read'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -202,7 +205,7 @@ final class NotificationResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableBulkAction::make('mark_as_unread')
+                Action::make('mark_as_unread')
                     ->label(__('admin.notifications.actions.mark_as_unread'))
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
@@ -217,7 +220,7 @@ final class NotificationResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    TableBulkAction::make('bulk_mark_as_read')
+                    BulkAction::make('bulk_mark_as_read')
                         ->label(__('admin.notifications.actions.bulk_mark_as_read'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -230,7 +233,7 @@ final class NotificationResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    TableBulkAction::make('bulk_mark_as_unread')
+                    BulkAction::make('bulk_mark_as_unread')
                         ->label(__('admin.notifications.actions.bulk_mark_as_unread'))
                         ->icon('heroicon-o-x-circle')
                         ->color('gray')
