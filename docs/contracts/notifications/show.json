@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NotificationsShowResponse",
+  "type": "object",
+  "required": ["success", "data"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "const": true
+    },
+    "data": {
+      "$ref": "index.json#/definitions/notification"
+    }
+  },
+  "examples": [
+    {
+      "success": true,
+      "data": {
+        "id": "9f6b2c46-4450-4c41-90d0-6eb5d263f852",
+        "type": "App\\\\Notifications\\\\ProductNotification",
+        "notifiable_type": "App\\\\Models\\\\User",
+        "notifiable_id": "1",
+        "data": {
+          "type": "product",
+          "title": "Produktas atnaujintas",
+          "message": "Produktas 'Marškinėliai' buvo atnaujintas.",
+          "product_id": 21,
+          "product_name": "Marškinėliai",
+          "urgent": false,
+          "color": null,
+          "tags": []
+        },
+        "read_at": "2024-06-02T08:00:00+00:00",
+        "created_at": "2024-06-01T10:15:00+00:00",
+        "updated_at": "2024-06-02T08:00:00+00:00",
+        "is_read": true,
+        "is_urgent": false,
+        "notification_type": "product",
+        "formatted_created_at": "01/06/2024 13:15",
+        "formatted_read_at": "02/06/2024 11:00",
+        "title": "Produktas atnaujintas",
+        "message": "Produktas 'Marškinėliai' buvo atnaujintas.",
+        "color": null,
+        "tags": [],
+        "attachment": null
+      }
+    }
+  ]
+}

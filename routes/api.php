@@ -51,3 +51,5 @@ Route::post('/autocomplete-search', function (Request $request) {
         return response()->json(['results' => []], 500);
     }
 })->name('api.autocomplete.search');
+
+require __DIR__.'/api/notifications.php';
