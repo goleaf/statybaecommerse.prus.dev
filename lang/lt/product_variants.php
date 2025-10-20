@@ -109,6 +109,9 @@ return [
         'set_sale_period' => 'Nustatyti Akcijos Laikotarpį',
         'rating' => 'Įvertinimas',
         'available' => 'Prieinama',
+        'variant_metadata' => 'Papildomi duomenys',
+        'variant_metadata_key' => 'Raktas',
+        'variant_metadata_value' => 'Reikšmė',
         'badges' => 'Žymės',
     ],
 
