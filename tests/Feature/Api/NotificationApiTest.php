@@ -8,6 +8,7 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -40,6 +41,35 @@ final class NotificationApiTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function test_notifications_index_requires_read_ability(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user, ['notifications.manage']);
+
+        $response = $this->getJson(route('api.v1.notifications.index'));
+
+        $response->assertForbidden();
+    }
+
+    public function test_notifications_index_rejects_invalid_query_parameters(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user, ['notifications.read']);
+
+        $response = $this->getJson(route('api.v1.notifications.index', [
+            'per_page' => 0,
+        ]));
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => 'The given data was invalid.',
+            ])
+            ->assertJsonValidationErrors(['per_page']);
+    }
+
     public function test_mark_as_read_requires_manage_ability(): void
     {
         $user = User::factory()->create();
@@ -63,6 +93,46 @@ final class NotificationApiTest extends TestCase
         $response = $this->postJson(route('api.v1.notifications.mark-as-read', $notification));
 
         $response->assertNotFound();
+    }
+
+    public function test_notification_show_returns_not_found_for_missing_resource(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user, ['notifications.read']);
+
+        $response = $this->getJson(route('api.v1.notifications.show', [
+            'notification' => Str::uuid()->toString(),
+        ]));
+
+        $response->assertNotFound();
+    }
+
+    public function test_notification_search_requires_query_parameter(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user, ['notifications.read']);
+
+        $response = $this->getJson(route('api.v1.notifications.search'));
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => 'The given data was invalid.',
+            ])
+            ->assertJsonValidationErrors(['q']);
+    }
+
+    public function test_notification_stats_requires_read_ability(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user, ['notifications.manage']);
+
+        $response = $this->getJson(route('api.v1.notifications.stats'));
+
+        $response->assertForbidden();
     }
 
     public function test_notification_requests_are_rate_limited(): void
