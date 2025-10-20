@@ -70,6 +70,17 @@ return [
         'description' => 'Description',
         'button_text' => 'Button Text',
     ],
+    'prices' => [
+        'navigation_label' => 'Prices',
+        'plural_model_label' => 'Prices',
+        'model_label' => 'Price',
+        'basic_information' => 'Basic Information',
+        'product' => 'Product',
+        'amount' => 'Amount',
+        'audit_section' => 'Change justification',
+        'audit_reason' => 'Reason for change',
+        'audit_reason_help' => 'Explain why this price needs to be updated.',
+    ],
     'variant_combinations' => [
         'navigation_label' => 'Variant Combinations',
         'plural_model_label' => 'Variant Combinations',
@@ -317,6 +328,40 @@ return [
         // Timestamps
         'created_at' => 'Created At',
         'updated_at' => 'Updated At',
+        'audit_section' => 'Change justification',
+        'audit_reason' => 'Reason for change',
+        'audit_reason_help' => 'Explain why this inventory change is necessary.',
+    ],
+    'audit_trails' => [
+        'navigation_label' => 'Audit Trails',
+        'plural_model_label' => 'Audit Trails',
+        'model_label' => 'Audit Trail',
+        'fields' => [
+            'created_at' => 'Timestamp',
+            'event' => 'Event',
+            'auditable' => 'Target',
+            'actor' => 'Actor',
+            'changed_fields' => 'Changed Fields',
+            'reason' => 'Reason',
+            'request_id' => 'Request ID',
+            'diff' => 'Diff',
+        ],
+        'filters' => [
+            'event' => 'Event',
+        ],
+        'events' => [
+            'price_updated' => 'Price updated',
+            'inventory_updated' => 'Inventory updated',
+            'roles_updated' => 'Roles updated',
+        ],
+        'details' => 'Audit details',
+        'diff_section' => 'Change details',
+        'none' => 'Not provided',
+        'system_actor' => 'System',
+        'back_to_list' => 'Back to audits',
+        'validation' => [
+            'reason_required' => 'Please provide a reason for this change.',
+        ],
     ],
     'user_product_interactions' => [
         'navigation_label' => 'User Product Interactions',

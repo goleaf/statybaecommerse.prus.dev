@@ -29,8 +29,7 @@ final class SearchService
         private readonly BrandSearchRepository $brandRepository,
         private readonly SearchRankingService $rankingService,
         private readonly SearchCacheService $cacheService
-    ) {
-    }
+    ) {}
 
     /**
      * Handle search functionality with proper error handling.

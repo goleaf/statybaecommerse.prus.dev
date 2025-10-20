@@ -12,6 +12,7 @@ return [
         'sections' => [
             'basic_information' => 'Pagrindinė informacija',
             'account_details' => 'Paskyros detalės',
+            'roles_permissions' => 'Vaidmenys ir leidimai',
         ],
         'fields' => [
             'name' => 'Vardas',
@@ -21,6 +22,12 @@ return [
             'email_verified_at' => 'El. paštas patvirtintas',
             'created_at' => 'Sukurta',
             'updated_at' => 'Atnaujinta',
+            'roles' => 'Vaidmenys',
+            'audit_reason' => 'Pakeitimo priežastis',
+        ],
+        'helpers' => [
+            'roles' => 'Pasirinkite administratoriaus vaidmenis šiam naudotojui.',
+            'audit_reason' => 'Paaiškinkite, kodėl keičiami vaidmenys.',
         ],
     ],
     'filters' => [
