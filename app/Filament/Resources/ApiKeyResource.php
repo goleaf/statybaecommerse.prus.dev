@@ -40,8 +40,7 @@ final class ApiKeyResource extends Resource
 
     protected static ?string $navigationLabel = 'api_keys.navigation.label';
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-key';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-key';
 
     protected static UnitEnum|string|null $navigationGroup = null;
 
@@ -110,7 +109,7 @@ final class ApiKeyResource extends Resource
                                 return;
                             }
 
-                            $plainText = session()->get(static::getCredentialSessionKey($record));
+                            $plainText = session()->get(self::getCredentialSessionKey($record));
 
                             if (filled($plainText)) {
                                 $component->state($plainText);
@@ -199,13 +198,13 @@ final class ApiKeyResource extends Resource
                 TableAction::make('reveal')
                     ->label(__('api_keys.actions.reveal'))
                     ->icon('heroicon-o-eye')
-                    ->visible(fn (ApiKey $record): bool => session()->has(static::getCredentialSessionKey($record)))
+                    ->visible(fn (ApiKey $record): bool => session()->has(self::getCredentialSessionKey($record)))
                     ->modalHeading(fn (ApiKey $record): string => __('api_keys.modals.reveal_title', ['name' => $record->name]))
                     ->modalSubmitAction(false)
                     ->modalIcon('heroicon-o-eye')
                     ->modalCancelActionLabel(__('api_keys.actions.close'))
                     ->modalContent(fn (ApiKey $record) => view('filament.resources.api-key.actions.reveal', [
-                        'plainTextKey' => session()->get(static::getCredentialSessionKey($record)),
+                        'plainTextKey' => session()->get(self::getCredentialSessionKey($record)),
                     ])),
                 TableAction::make('regenerate')
                     ->label(__('api_keys.actions.regenerate'))
@@ -224,7 +223,7 @@ final class ApiKeyResource extends Resource
                             'last_used_at' => null,
                         ])->save();
 
-                        session()->flash(static::getCredentialSessionKey($record), $credentials['plain_text']);
+                        session()->flash(self::getCredentialSessionKey($record), $credentials['plain_text']);
                     })
                     ->successRedirectUrl(fn (ApiKey $record): string => Pages\EditApiKey::getUrl(['record' => $record]))
                     ->successNotificationTitle(__('api_keys.notifications.regenerated')),
