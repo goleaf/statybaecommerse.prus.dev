@@ -8,6 +8,7 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -28,7 +29,19 @@ final class NotificationApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['success' => true])
             ->assertJsonStructure([
-                'data',
+                'data' => [[
+                    'id',
+                    'notification_type',
+                    'category',
+                    'title',
+                    'message',
+                    'urgent',
+                    'color',
+                    'tags',
+                    'read_at',
+                    'created_at',
+                    'meta',
+                ]],
                 'meta' => ['query', 'pagination'],
                 'links' => ['first', 'last', 'prev', 'next'],
             ]);
@@ -70,6 +83,28 @@ final class NotificationApiTest extends TestCase
             ->assertJsonValidationErrors(['per_page']);
     }
 
+    public function test_notifications_index_rejects_invalid_sort_direction(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user, ['notifications.read']);
+
+        $response = $this->getJson(route('api.v1.notifications.index', [
+            'sort' => 'invalid',
+        ]));
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['sort']);
+
+        $response = $this->getJson(route('api.v1.notifications.index', [
+            'sort' => 'created_at',
+            'direction' => 'sideways',
+        ]));
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['direction']);
+    }
+
     public function test_mark_as_read_requires_manage_ability(): void
     {
         $user = User::factory()->create();
@@ -93,6 +128,31 @@ final class NotificationApiTest extends TestCase
         $response = $this->postJson(route('api.v1.notifications.mark-as-read', $notification));
 
         $response->assertNotFound();
+    }
+
+    public function test_mark_as_read_returns_payload_for_owned_notification(): void
+    {
+        $user = User::factory()->create();
+        $notification = Notification::factory()->forUser($user)->unread()->create([
+            'data' => [
+                'title' => 'Order created',
+                'message' => 'Order #123 created',
+                'type' => 'order',
+            ],
+        ]);
+
+        Sanctum::actingAs($user, ['notifications.manage']);
+
+        $response = $this->postJson(route('api.v1.notifications.mark-as-read', $notification));
+
+        $response->assertOk()
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('success', true)
+                ->where('data.id', $notification->id)
+                ->where('data.title', 'Order created')
+                ->where('data.category', 'order')
+                ->whereType('data.read_at', 'string')
+            );
     }
 
     public function test_notification_show_returns_not_found_for_missing_resource(): void
