@@ -7,6 +7,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * VariantAnalytics
@@ -16,6 +19,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class VariantAnalytics extends Model
 {
     use HasFactory;
+
+    /**
+     * Metrics that can be recorded for analytics entries.
+     *
+     * @var array<int, string>
+     */
+    private const METRIC_FIELDS = [
+        'views',
+        'clicks',
+        'add_to_cart',
+        'purchases',
+        'revenue',
+        'conversion_rate',
+    ];
 
     protected $fillable = [
         'variant_id',
@@ -136,23 +153,38 @@ final class VariantAnalytics extends Model
      */
     public static function recordAnalytics(
         int $variantId,
-        string|\DateTime $date,
+        string|\DateTimeInterface $date,
         array $data = []
     ): self {
-        $defaultData = [
-            'variant_id' => $variantId,
-            'date' => $date,
-            'views' => $data['views'] ?? 0,
-            'clicks' => $data['clicks'] ?? 0,
-            'add_to_cart' => $data['add_to_cart'] ?? 0,
-            'purchases' => $data['purchases'] ?? 0,
-            'revenue' => $data['revenue'] ?? 0,
-            'conversion_rate' => $data['conversion_rate'] ?? 0,
-        ];
+        $dateKey = Carbon::parse($date)->toDateString();
 
-        return self::updateOrCreate(
-            ['variant_id' => $variantId, 'date' => $date],
-            $defaultData
+        return DB::transaction(
+            static function () use ($variantId, $dateKey, $data): self {
+                $metrics = Arr::only($data, self::METRIC_FIELDS);
+
+                $analytics = self::query()
+                    ->lockForUpdate()
+                    ->firstOrNew([
+                        'variant_id' => $variantId,
+                        'date' => $dateKey,
+                    ]);
+
+                if (! $analytics->exists) {
+                    foreach (self::METRIC_FIELDS as $field) {
+                        $analytics->{$field} = $analytics->{$field} ?? 0;
+                    }
+                }
+
+                foreach ($metrics as $field => $value) {
+                    $analytics->{$field} = $value;
+                }
+
+                $analytics->variant_id = $variantId;
+                $analytics->date = $dateKey;
+                $analytics->save();
+
+                return $analytics;
+            }
         );
     }
 
