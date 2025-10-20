@@ -14,6 +14,10 @@ class ListUsers extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! UserResource::canCreate()) {
+            return [];
+        }
+
         return [
             CreateAction::make(),
         ];

@@ -434,9 +434,12 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // Allow all authenticated users to access Filament during tests and development.
-        // Production policies should be enforced via resource policies/permissions.
-        return true;
+        $allowedRoles = collect(array_keys(config('permissions.roles', [])))
+            ->merge(array_keys(config('permissions.aliases', [])))
+            ->unique()
+            ->all();
+
+        return $this->hasAnyRole($allowedRoles);
     }
 
     // Referral relationships

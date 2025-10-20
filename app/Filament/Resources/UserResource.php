@@ -5,11 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use BackedEnum;
 use App\Models\User;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -181,8 +181,10 @@ final class UserResource extends Resource
                     ->label(__('users.fields.email_verified')),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->visible(fn (User $record): bool => static::authorizeUser($record, 'update')),
+                DeleteAction::make()
+                    ->visible(fn (User $record): bool => static::authorizeUser($record, 'delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -195,7 +197,8 @@ final class UserResource extends Resource
                                 ->title(__('users.messages.bulk_activate_success'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (): bool => static::authorizeUser(null, 'update')),
                     BulkAction::make('deactivate')
                         ->label(__('users.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
@@ -205,11 +208,48 @@ final class UserResource extends Resource
                                 ->title(__('users.messages.bulk_deactivate_success'))
                                 ->success()
                                 ->send();
-                        }),
-                    DeleteBulkAction::make(),
-                ]),
+                        })
+                        ->visible(fn (): bool => static::authorizeUser(null, 'update')),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => static::authorizeUser(null, 'delete')),
+                ])->visible(fn (): bool => static::authorizeUser(null, 'update') || static::authorizeUser(null, 'delete')),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::authorizeUser(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeUser(null, 'create');
+    }
+
+    public static function canView(User $record): bool
+    {
+        return static::authorizeUser($record, 'view');
+    }
+
+    public static function canEdit(User $record): bool
+    {
+        return static::authorizeUser($record, 'update');
+    }
+
+    public static function canDelete(User $record): bool
+    {
+        return static::authorizeUser($record, 'delete');
+    }
+
+    public static function canRestore(User $record): bool
+    {
+        return static::authorizeUser($record, 'restore');
     }
 
     /**
@@ -222,5 +262,18 @@ final class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    private static function authorizeUser(?User $user, string $ability): bool
+    {
+        $current = auth()->user();
+
+        if (! $current) {
+            return false;
+        }
+
+        return $user instanceof User
+            ? $current->can($ability, $user)
+            : $current->can($ability, User::class);
     }
 }

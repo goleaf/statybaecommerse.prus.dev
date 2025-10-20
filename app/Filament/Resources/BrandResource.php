@@ -9,14 +9,15 @@ use App\Models\Brand;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Filament\Actions;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -46,9 +47,7 @@ final class BrandResource extends Resource
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
-
-        return $user?->can('browse_brands') ?? false;
+        return static::canViewAny();
     }
 
     public static function getEloquentQuery(): Builder
@@ -231,9 +230,12 @@ final class BrandResource extends Resource
                     ->query(fn (Builder $query) => $query->where('created_at', '>=', now()->subDays(30))),
             ])
             ->actions([
-                Actions\ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                ViewAction::make()
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'view')),
+                EditAction::make()
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'update')),
+                DeleteAction::make()
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'delete')),
                 Action::make('toggle_active')
                     ->label(fn (Brand $record): string => $record->is_active ? __('brands.deactivate') : __('brands.activate'))
                     ->icon(fn (Brand $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -246,7 +248,8 @@ final class BrandResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'update')),
                 Action::make('toggle_featured')
                     ->label(fn (Brand $record): string => $record->is_featured ? __('brands.unfeature') : __('brands.feature'))
                     ->icon(fn (Brand $record): string => $record->is_featured ? 'heroicon-o-star' : 'heroicon-o-star')
@@ -259,13 +262,17 @@ final class BrandResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'delete')),
+                    RestoreBulkAction::make()
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'restore')),
+                    ForceDeleteBulkAction::make()
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'delete')),
                     BulkAction::make('enable')
                         ->label(__('brands.enable_selected'))
                         ->icon('heroicon-o-check')
@@ -279,7 +286,8 @@ final class BrandResource extends Resource
                                 ->title(__('brands.bulk_enabled_success'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'update')),
                     BulkAction::make('disable')
                         ->label(__('brands.disable_selected'))
                         ->icon('heroicon-o-x-mark')
@@ -293,7 +301,8 @@ final class BrandResource extends Resource
                                 ->title(__('brands.bulk_disabled_success'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'update')),
                     BulkAction::make('feature')
                         ->label(__('brands.feature_selected'))
                         ->icon('heroicon-o-star')
@@ -305,7 +314,8 @@ final class BrandResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'update')),
                     BulkAction::make('unfeature')
                         ->label(__('brands.unfeature_selected'))
                         ->icon('heroicon-o-star')
@@ -317,10 +327,46 @@ final class BrandResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
-                ]),
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'update')),
+                ])->visible(fn (): bool => static::authorizeBrand(null, 'update') || static::authorizeBrand(null, 'delete') || static::authorizeBrand(null, 'restore')),
             ])
             ->defaultSort('name');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::authorizeBrand(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeBrand(null, 'create');
+    }
+
+    public static function canView(Brand $record): bool
+    {
+        return static::authorizeBrand($record, 'view');
+    }
+
+    public static function canEdit(Brand $record): bool
+    {
+        return static::authorizeBrand($record, 'update');
+    }
+
+    public static function canDelete(Brand $record): bool
+    {
+        return static::authorizeBrand($record, 'delete');
+    }
+
+    public static function canRestore(Brand $record): bool
+    {
+        return static::authorizeBrand($record, 'restore');
     }
 
     /**
@@ -344,5 +390,18 @@ final class BrandResource extends Resource
             'view' => Pages\ViewBrand::route('/{record}'),
             'edit' => Pages\EditBrand::route('/{record}/edit'),
         ];
+    }
+
+    private static function authorizeBrand(?Brand $brand, string $ability): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $brand instanceof Brand
+            ? $user->can($ability, $brand)
+            : $user->can($ability, Brand::class);
     }
 }

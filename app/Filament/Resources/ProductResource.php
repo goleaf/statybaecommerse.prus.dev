@@ -14,13 +14,13 @@ use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManag
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Models\Product;
 use BackedEnum;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
@@ -471,10 +471,13 @@ final class ProductResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
+                    ViewAction::make()
+                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'view')),
+                    EditAction::make()
+                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'update')),
+                    DeleteAction::make()
+                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'delete')),
+                ])->visible(fn (Product $record): bool => static::authorizeProduct($record, 'view') || static::authorizeProduct($record, 'update') || static::authorizeProduct($record, 'delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -487,7 +490,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.published'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('unpublish')
                         ->label(__('products.actions.unpublish'))
                         ->icon('heroicon-o-eye-slash')
@@ -497,7 +501,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.unpublished'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('feature')
                         ->label(__('products.actions.feature'))
                         ->icon('heroicon-o-star')
@@ -507,7 +512,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.featured'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('unfeature')
                         ->label(__('products.actions.unfeature'))
                         ->icon('heroicon-o-star')
@@ -517,7 +523,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.unfeatured'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('update_stock')
                         ->label(__('products.actions.update_stock'))
                         ->icon('heroicon-o-cube')
@@ -540,7 +547,8 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.stock_updated'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('update_prices')
                         ->label(__('products.actions.update_prices'))
                         ->icon('heroicon-o-currency-euro')
@@ -567,11 +575,48 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.prices_updated'))
                                 ->success()
                                 ->send();
-                        }),
-                    DeleteBulkAction::make(),
-                ]),
+                        })
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'delete')),
+                ])->visible(fn (): bool => static::authorizeProduct(null, 'update') || static::authorizeProduct(null, 'delete')),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::authorizeProduct(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeProduct(null, 'create');
+    }
+
+    public static function canView(Product $record): bool
+    {
+        return static::authorizeProduct($record, 'view');
+    }
+
+    public static function canEdit(Product $record): bool
+    {
+        return static::authorizeProduct($record, 'update');
+    }
+
+    public static function canDelete(Product $record): bool
+    {
+        return static::authorizeProduct($record, 'delete');
+    }
+
+    public static function canRestore(Product $record): bool
+    {
+        return static::authorizeProduct($record, 'restore');
     }
 
     public static function getRelations(): array
@@ -603,5 +648,18 @@ final class ProductResource extends Resource
             'view' => Pages\ViewProduct::route('/{record}'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    private static function authorizeProduct(?Product $product, string $ability): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $product instanceof Product
+            ? $user->can($ability, $product)
+            : $user->can($ability, Product::class);
     }
 }
