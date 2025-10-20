@@ -5,7 +5,14 @@ return [
     'plural' => 'Discount Conditions',
     'single' => 'Discount Condition',
 
-    'tabs' => 'Tabs',
+    'tabs' => [
+        'all' => 'All',
+        'active' => 'Active',
+        'inactive' => 'Inactive',
+        'high_priority' => 'High Priority',
+        'low_priority' => 'Low Priority',
+    ],
+
     'basic_information' => 'Basic Information',
     'condition_settings' => 'Condition Settings',
     'targeting' => 'Targeting',
@@ -18,11 +25,18 @@ return [
     'operator' => 'Operator',
     'value' => 'Value',
     'priority' => 'Priority',
+    'position' => 'Position',
     'products' => 'Products',
     'categories' => 'Categories',
     'is_active' => 'Active',
     'is_required' => 'Required',
     'metadata' => 'Metadata',
+    'translations' => 'Translations',
+    'locale' => 'Locale',
+    'metadata_key' => 'Key',
+    'metadata_value' => 'Value',
+    'add_metadata_item' => 'Add metadata item',
+    'status_filter' => 'Status',
 
     'value_help' => 'Condition value depending on type',
     'priority_help' => 'Condition execution priority (0 = highest)',
@@ -82,4 +96,29 @@ return [
     'deactivate_selected' => 'Deactivate Selected',
     'bulk_activated_success' => 'Selected records activated successfully',
     'bulk_deactivated_success' => 'Selected records deactivated successfully',
+    'set_priority' => 'Set Priority',
+
+    'boolean_yes' => 'Yes',
+    'boolean_no' => 'No',
+
+    'charts' => [
+        'conditions_by_type' => 'Conditions by type',
+    ],
+
+    'stats' => [
+        'total_conditions' => 'Total conditions',
+        'total_conditions_description' => 'Overall number of configured conditions.',
+        'active_conditions' => 'Active conditions',
+        'active_conditions_description' => 'Currently enabled conditions.',
+        'inactive_conditions' => 'Inactive conditions',
+        'inactive_conditions_description' => 'Conditions disabled for now.',
+        'top_condition_type' => 'Most common type',
+        'top_condition_type_description' => 'Most frequently used condition type.',
+        'type_usage' => '{1} :count condition|[2,*] :count conditions',
+        'no_data' => 'No data yet',
+    ],
+
+    'widgets' => [
+        'recent_conditions' => 'Recent discount conditions',
+    ],
 ];
