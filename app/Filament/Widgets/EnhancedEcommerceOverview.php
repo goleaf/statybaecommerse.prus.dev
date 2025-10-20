@@ -28,8 +28,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     /**
      * @var string|null
      */
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Dashboard';
+    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
 
