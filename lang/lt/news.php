@@ -142,6 +142,7 @@ return [
         'author_email' => 'Autoriaus el. paštas',
         'is_visible' => 'Matoma',
         'is_featured' => 'Išskirtinė',
+        'is_breaking' => 'Skubios naujienos',
         'meta_title' => 'Meta pavadinimas',
         'meta_description' => 'Meta aprašymas',
         'meta_keywords' => 'Meta raktažodžiai',

@@ -412,6 +412,17 @@ it('can scope featured news', function () {
     expect($featuredResults->first()->id)->toBe($featuredNews->id);
 });
 
+it('can filter breaking news tab without database errors', function () {
+    $breakingNews = News::factory()->create(['is_breaking' => true]);
+    $regularNews = News::factory()->create(['is_breaking' => false]);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(NewsResource\Pages\ListNews::class)
+        ->set('activeTab', 'breaking')
+        ->assertCanSeeTableRecords([$breakingNews])
+        ->assertCanNotSeeTableRecords([$regularNews]);
+});
+
 it('can search news by content', function () {
     $news1 = News::factory()->create();
     $news1->translations()->create([
