@@ -9,18 +9,21 @@ use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Fieldset;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Storage;
 
 final class DataImportExport extends Page
 {
     protected string $view = 'filament.pages.data-import-export';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
+    /**
+     * @var string|BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 
@@ -30,7 +33,7 @@ final class DataImportExport extends Page
 
     public ?string $exportPath = 'catalog-export.xml';
 
-    public $file;
+    public array|string|null $file = null;
 
     public function form(Form $form): Form
     {
