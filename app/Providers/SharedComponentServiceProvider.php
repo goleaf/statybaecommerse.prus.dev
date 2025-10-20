@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Services\Cart\CartService;
 use App\Services\Shared\CacheService;
 use App\Services\Shared\ProductService;
 use App\Services\Shared\TranslationService;
@@ -102,9 +103,7 @@ final class SharedComponentServiceProvider extends ServiceProvider
 
     private function getCartCount(): int
     {
-        $cart = session('cart', []);
-
-        return array_sum(array_column($cart, 'quantity'));
+        return app(CartService::class)->getCount(auth()->id(), session()->getId());
     }
 
     private function getTopCategories()
