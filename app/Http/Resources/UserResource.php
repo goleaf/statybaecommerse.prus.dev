@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Support\Contracts\Entities\UserContract;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,11 +17,10 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // Use the except() method to exclude sensitive fields
-        $safeAttributes = $this->resource->toApiSafeArray();
+        $contract = UserContract::fromModel($this->resource);
+        $meta = $contract['meta'];
 
-        return array_merge($safeAttributes, [
-            // Add computed fields that are safe for API
+        $meta = array_merge($meta, [
             'full_name' => $this->resource->full_name,
             'initials' => $this->resource->initials,
             'avatar_url' => $this->resource->avatar_url,
@@ -36,26 +36,29 @@ class UserResource extends JsonResource
             'gender_text' => $this->resource->gender_text,
             'locale_text' => $this->resource->locale_text,
             'roles_label' => $this->resource->roles_label,
-
-            // Add relationships if loaded
-            'addresses' => $this->whenLoaded('addresses', function () {
-                return $this->resource->addresses->map(function ($address) {
-                    return $address->except(['user_id', 'created_at', 'updated_at'])->toArray();
-                });
-            }),
-
-            'orders' => $this->whenLoaded('orders', function () {
-                return $this->resource->orders->map(function ($order) {
-                    return $order->except(['user_id', 'created_at', 'updated_at'])->toArray();
-                });
-            }),
-
-            'wishlist' => $this->whenLoaded('wishlist', function () {
-                return $this->resource->wishlist->map(function ($product) {
-                    return $product->except(['created_at', 'updated_at'])->toArray();
-                });
-            }),
         ]);
+
+        if ($this->resource->relationLoaded('addresses')) {
+            $meta['addresses'] = $this->resource->addresses->map(function ($address) {
+                return $address->except(['user_id', 'created_at', 'updated_at'])->toArray();
+            })->toArray();
+        }
+
+        if ($this->resource->relationLoaded('orders')) {
+            $meta['orders'] = $this->resource->orders->map(function ($order) {
+                return $order->except(['user_id', 'created_at', 'updated_at'])->toArray();
+            })->toArray();
+        }
+
+        if ($this->resource->relationLoaded('wishlist')) {
+            $meta['wishlist'] = $this->resource->wishlist->map(function ($product) {
+                return $product->except(['created_at', 'updated_at'])->toArray();
+            })->toArray();
+        }
+
+        $contract['meta'] = $meta;
+
+        return $contract;
     }
 
     /**

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Support\Contracts\Entities\ProductContract;
 use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,14 +34,17 @@ final class ProductController extends Controller
         // 10 second timeout for product search
         $products = Product::query()->where('is_visible', true)->where(function ($q) use ($query) {
             $q->where('name', 'like', "%{$query}%")->orWhere('description', 'like', "%{$query}%")->orWhere('sku', 'like', "%{$query}%");
-        })->with(['brand', 'media', 'category'])->cursor()->takeUntilTimeout($timeout)->take($limit)->collect();
+        })->with(['brand', 'media', 'categories'])->cursor()->takeUntilTimeout($timeout)->take($limit)->collect();
         // Apply skipWhile to filter out products that are not properly configured
         $filteredProducts = $products->skipWhile(function (Product $product) {
             return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
         });
-        $data = ['products' => $filteredProducts->map(function (Product $product) {
-            return ['id' => $product->id, 'name' => $product->name, 'slug' => $product->slug, 'sku' => $product->sku, 'price' => $product->price, 'sale_price' => $product->sale_price, 'brand' => $product->brand?->name, 'category' => $product->category?->name, 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => route('product.show', $product->slug), 'stock_quantity' => $product->stock_quantity ?? 0];
-        })->toArray(), 'query' => $query, 'total' => $filteredProducts->count(), 'limit' => $limit];
+        $data = [
+            'products' => $filteredProducts->map(static fn (Product $product): array => ProductContract::fromModel($product))->toArray(),
+            'query' => $query,
+            'total' => $filteredProducts->count(),
+            'limit' => $limit,
+        ];
 
         return $this->handleContentNegotiation($request, $data);
     }
@@ -55,7 +59,7 @@ final class ProductController extends Controller
         $brand = $request->get('brand');
         $sortBy = $request->get('sort_by', 'name');
         $sortOrder = $request->get('sort_order', 'asc');
-        $query = Product::query()->where('is_visible', true)->with(['brand', 'media', 'category']);
+        $query = Product::query()->where('is_visible', true)->with(['brand', 'media', 'categories']);
         if ($category) {
             $query->whereHas('category', function ($q) use ($category) {
                 $q->where('slug', $category);
@@ -77,6 +81,8 @@ final class ProductController extends Controller
         $paginatedProducts = $products->slice($offset, $perPage);
         $paginatedData = new \Illuminate\Pagination\LengthAwarePaginator($paginatedProducts, $total, $perPage, $currentPage, ['path' => $request->url(), 'pageName' => 'page']);
 
+        $paginatedData->setCollection($paginatedData->getCollection()->map(static fn (Product $product): array => ProductContract::fromModel($product)));
+
         return $this->handleProductContentNegotiation($request, $paginatedData);
     }
 
@@ -85,12 +91,8 @@ final class ProductController extends Controller
      */
     public function show(Request $request, Product $product): JsonResponse|View|Response
     {
-        $product->load(['brand', 'media', 'category', 'variants']);
-        $data = ['product' => ['id' => $product->id, 'name' => $product->name, 'slug' => $product->slug, 'sku' => $product->sku, 'description' => $product->description, 'price' => $product->price, 'sale_price' => $product->sale_price, 'brand' => $product->brand?->name, 'category' => $product->category?->name, 'images' => $product->getMedia('images')->map(function ($media) {
-            return ['url' => $media->getUrl(), 'thumb' => $media->getUrl('thumb'), 'alt' => $media->getCustomProperty('alt', '')];
-        })->toArray(), 'variants' => $product->variants->map(function ($variant) {
-            return ['id' => $variant->id, 'name' => $variant->name, 'sku' => $variant->sku, 'price' => $variant->price, 'stock_quantity' => $variant->stock_quantity];
-        })->toArray(), 'stock_quantity' => $product->stock_quantity ?? 0, 'is_visible' => $product->is_visible, 'url' => route('product.show', $product->slug)]];
+        $product->load(['brand', 'media', 'categories']);
+        $data = ['product' => ProductContract::fromModel($product)];
 
         return $this->handleContentNegotiation($request, $data);
     }
