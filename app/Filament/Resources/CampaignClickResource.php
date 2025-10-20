@@ -17,7 +17,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -96,7 +95,8 @@ final class CampaignClickResource extends Resource
                             TextInput::make('campaign_name')
                                 ->label(__('campaign_clicks.campaign_name'))
                                 ->maxLength(255)
-                                ->disabled(),
+                                ->disabled()
+                                ->dehydrated(false),
                         ]),
                     Select::make('customer_id')
                         ->label(__('campaign_clicks.customer'))
@@ -116,7 +116,8 @@ final class CampaignClickResource extends Resource
                     TextInput::make('customer_name')
                         ->label(__('campaign_clicks.customer_name'))
                         ->maxLength(255)
-                        ->disabled(),
+                        ->disabled()
+                        ->dehydrated(false),
                 ]),
             Section::make(__('campaign_clicks.click_information'))
                 ->schema([
@@ -184,16 +185,6 @@ final class CampaignClickResource extends Resource
                         ->step(0.01)
                         ->minValue(0)
                         ->helperText(__('campaign_clicks.conversion_value_help')),
-                    TextInput::make('conversion_currency')
-                        ->label(__('campaign_clicks.conversion_currency'))
-                        ->maxLength(3)
-                        ->default('EUR')
-                        ->rules(['alpha']),
-                    Textarea::make('notes')
-                        ->label(__('campaign_clicks.notes'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
                 ]),
         ]);
     }
@@ -254,8 +245,6 @@ final class CampaignClickResource extends Resource
                     ->label(__('campaign_clicks.conversion_value'))
                     ->money('EUR')
                     ->alignCenter(),
-                TextColumn::make('conversion_currency')
-                    ->label(__('campaign_clicks.conversion_currency')),
                 TextColumn::make('session_id')
                     ->label(__('campaign_clicks.session_id'))
                     ->toggleable(isToggledHiddenByDefault: true),
