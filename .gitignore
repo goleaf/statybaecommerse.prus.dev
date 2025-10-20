@@ -26,3 +26,7 @@ Thumbs.db
 # PHPDoc generated files
 /docs/html/
 /docs/cache/
+
+# Data transfer artifacts
+/storage/app/exports/
+/storage/app/imports/
