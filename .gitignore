@@ -28,6 +28,11 @@ Thumbs.db
 *.sql.gz
 *.tar
 
+# Prevent accidental commits of session and network capture artifacts
+*cookies*.txt
+*.session
+*.har
+
 # PHPDoc generated files
 /docs/html/
 /docs/cache/
