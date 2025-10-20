@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Minimal, usable foundation
             CurrencySeeder::class,
+            AdminAuthorizationSeeder::class,
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
             SystemUserSeeder::class,
