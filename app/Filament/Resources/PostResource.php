@@ -42,6 +42,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
+use Maatwebsite\Excel\Excel;
+use pxlrbt\FilamentExcel\Actions\ExportBulkAction as ExcelExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 /**
  * PostResource
@@ -439,6 +443,20 @@ final class PostResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    ExcelExportBulkAction::make()
+                        ->exports([
+                            ExcelExport::make('posts_export')
+                                ->fromTable()
+                                ->withFilename(fn (): string => sprintf('posts-%s', now()->format('Y-m-d-His')))
+                                ->withWriterType(Excel::CSV)
+                                ->withColumns([
+                                    ExcelColumn::make('title')->heading(__('posts.fields.title')),
+                                    ExcelColumn::make('slug')->heading(__('posts.fields.slug')),
+                                    ExcelColumn::make('status')->heading(__('posts.fields.status')),
+                                    ExcelColumn::make('published_at')->heading(__('posts.fields.published_at')),
+                                    ExcelColumn::make('user.name')->heading(__('posts.fields.user_id')),
+                                ]),
+                        ]),
                     DeleteBulkAction::make(),
                 ]),
             ])
