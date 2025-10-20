@@ -25,6 +25,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\BackupVerifyCommand::class,
         \App\Console\Commands\I18nAuditCommand::class,
         \App\Console\Commands\ValidateContractCommand::class,
+        \App\Console\Commands\PruneAuditLogsCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -92,6 +93,13 @@ final class Kernel extends ConsoleKernel
                     \Log::error('Scheduled backup:verify command failed');
                 });
         }
+
+        $schedule
+            ->command('privacy:prune-audit-logs')
+            ->daily()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->onOneServer();
     }
 
     protected function commands(): void
