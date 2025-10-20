@@ -38,6 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
 use UnitEnum;
 
 final class NewsImageResource extends Resource
@@ -113,19 +114,48 @@ final class NewsImageResource extends Resource
                                                 '1:1',
                                             ])
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                                if ($state) {
-                                                    $file = storage_path('app/public/'.$state);
-                                                    if (file_exists($file)) {
-                                                        $set('file_size', filesize($file));
-                                                        $set('mime_type', mime_content_type($file));
-                                                        $imageInfo = getimagesize($file);
-                                                        if ($imageInfo) {
-                                                            $set('dimensions', [
-                                                                'width' => $imageInfo[0],
-                                                                'height' => $imageInfo[1],
-                                                            ]);
-                                                        }
+                                            ->afterStateUpdated(function ($state, callable $set) {
+                                                if (! $state) {
+                                                    return;
+                                                }
+
+                                                $disk = Storage::disk(SecureStorage::disk());
+
+                                                if (! $disk->exists($state)) {
+                                                    return;
+                                                }
+
+                                                $set('file_size', $disk->size($state));
+                                                $set('mime_type', $disk->mimeType($state));
+
+                                                $path = null;
+
+                                                try {
+                                                    $path = $disk->path($state);
+                                                } catch (\Throwable $exception) {
+                                                    $path = null;
+                                                }
+
+                                                if ($path && ! file_exists($path)) {
+                                                    $path = null;
+                                                }
+
+                                                if (! $path && method_exists($disk, 'temporaryUrl')) {
+                                                    try {
+                                                        $path = $disk->temporaryUrl($state, now()->addMinutes(5));
+                                                    } catch (\Throwable $exception) {
+                                                        $path = null;
+                                                    }
+                                                }
+
+                                                if ($path) {
+                                                    $imageInfo = @getimagesize($path);
+
+                                                    if ($imageInfo) {
+                                                        $set('dimensions', [
+                                                            'width' => $imageInfo[0],
+                                                            'height' => $imageInfo[1],
+                                                        ]);
                                                     }
                                                 }
                                             }),
