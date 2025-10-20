@@ -9,10 +9,10 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class SimplifiedStatsWidget extends BaseWidget
 {
@@ -133,7 +133,7 @@ class SimplifiedStatsWidget extends BaseWidget
             }
 
             $orderStats = Order::query()
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->createdBetween($startDate, $endDate)
                 ->selectRaw('DATE(created_at) as date, SUM(CASE WHEN status != ? THEN total ELSE 0 END) as revenue, COUNT(*) as total_orders', ['cancelled'])
                 ->groupBy('date')
                 ->get()
@@ -171,23 +171,15 @@ class SimplifiedStatsWidget extends BaseWidget
         $lastMonth = $now->copy()->subMonth();
 
         return Cache::remember('dashboard.simplified-stats.summary', 60, function () use ($lastMonth) {
-            $orderStats = Order::query()
-                ->selectRaw('
-                    SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
-                    SUM(CASE WHEN status != ? AND created_at >= ? THEN total ELSE 0 END) as last_month_revenue,
-                    COUNT(*) as total_orders,
-                    SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as last_month_orders
-                ', ['cancelled', 'cancelled', $lastMonth, $lastMonth])
-                ->toBase()
-                ->first();
+            $nonCancelledOrders = static fn () => Order::query()->where('status', '!=', 'cancelled');
 
-            $userStats = User::query()
-                ->selectRaw('
-                    COUNT(*) as total_users,
-                    SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as new_users_this_month
-                ', [$lastMonth])
-                ->toBase()
-                ->first();
+            $totalRevenue = (float) ($nonCancelledOrders()->sum('total') ?? 0.0);
+            $lastMonthRevenue = (float) ($nonCancelledOrders()->createdSince($lastMonth)->sum('total') ?? 0.0);
+            $totalOrders = (int) Order::count();
+            $lastMonthOrders = (int) Order::query()->createdSince($lastMonth)->count();
+
+            $totalUsers = (int) User::query()->count();
+            $newUsersThisMonth = (int) User::query()->where('created_at', '>=', $lastMonth)->count();
 
             $productStats = Product::query()
                 ->selectRaw('
@@ -208,14 +200,14 @@ class SimplifiedStatsWidget extends BaseWidget
 
             return [
                 'orders' => [
-                    'total_revenue' => (float) ($orderStats->total_revenue ?? 0),
-                    'last_month_revenue' => (float) ($orderStats->last_month_revenue ?? 0),
-                    'total_orders' => (int) ($orderStats->total_orders ?? 0),
-                    'last_month_orders' => (int) ($orderStats->last_month_orders ?? 0),
+                    'total_revenue' => $totalRevenue,
+                    'last_month_revenue' => $lastMonthRevenue,
+                    'total_orders' => $totalOrders,
+                    'last_month_orders' => $lastMonthOrders,
                 ],
                 'users' => [
-                    'total_users' => (int) ($userStats->total_users ?? 0),
-                    'new_users_this_month' => (int) ($userStats->new_users_this_month ?? 0),
+                    'total_users' => $totalUsers,
+                    'new_users_this_month' => $newUsersThisMonth,
                 ],
                 'products' => [
                     'total_products' => (int) ($productStats->total_products ?? 0),

@@ -32,12 +32,12 @@ final class EcommerceOverview extends BaseWidget
         $revenueThisMonth = (float) ($this
             ->orders()
             ->where('status', '!=', 'cancelled')
-            ->whereBetween('created_at', [$thisMonthStart, $now])
+            ->createdBetween($thisMonthStart, $now)
             ->sum('total') ?? 0);
         $revenueLastMonth = (float) ($this
             ->orders()
             ->where('status', '!=', 'cancelled')
-            ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
+            ->createdBetween($lastMonthStart, $lastMonthEnd)
             ->sum('total') ?? 0);
         $revenueChange = $revenueLastMonth > 0
             ? (($revenueThisMonth - $revenueLastMonth) / $revenueLastMonth) * 100
@@ -45,11 +45,11 @@ final class EcommerceOverview extends BaseWidget
 
         $ordersThisMonth = (int) $this
             ->orders()
-            ->whereBetween('created_at', [$thisMonthStart, $now])
+            ->createdBetween($thisMonthStart, $now)
             ->count();
         $ordersLastMonth = (int) $this
             ->orders()
-            ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
+            ->createdBetween($lastMonthStart, $lastMonthEnd)
             ->count();
         $ordersChange = $ordersLastMonth > 0
             ? (($ordersThisMonth - $ordersLastMonth) / $ordersLastMonth) * 100

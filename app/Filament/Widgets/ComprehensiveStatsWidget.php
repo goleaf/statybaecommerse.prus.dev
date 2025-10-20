@@ -17,15 +17,23 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
     public function getStats(): array
     {
-        $totalRevenue = (float) (Order::where('status', 'completed')
+        $now = now();
+        $thisMonthStart = $now->copy()->startOfMonth();
+        $lastMonthStart = $now->copy()->subMonth()->startOfMonth();
+        $lastMonthEnd = $now->copy()->subMonth()->endOfMonth();
+
+        $totalRevenue = (float) (Order::query()
+            ->byStatus('completed')
             ->sum('total') ?? 0);
 
-        $monthlyRevenue = (float) (Order::where('status', 'completed')
-            ->whereMonth('created_at', now()->month)
+        $monthlyRevenue = (float) (Order::query()
+            ->byStatus('completed')
+            ->createdBetween($thisMonthStart, $now)
             ->sum('total') ?? 0);
 
-        $lastMonthRevenue = (float) (Order::where('status', 'completed')
-            ->whereMonth('created_at', now()->subMonth()->month)
+        $lastMonthRevenue = (float) (Order::query()
+            ->byStatus('completed')
+            ->createdBetween($lastMonthStart, $lastMonthEnd)
             ->sum('total') ?? 0);
 
         $revenueChange = $lastMonthRevenue > 0
@@ -33,8 +41,8 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
             : 0;
 
         $totalOrders = (int) Order::count();
-        $monthlyOrders = (int) Order::whereMonth('created_at', now()->month)->count();
-        $lastMonthOrders = (int) Order::whereMonth('created_at', now()->subMonth()->month)->count();
+        $monthlyOrders = (int) Order::query()->createdBetween($thisMonthStart, $now)->count();
+        $lastMonthOrders = (int) Order::query()->createdBetween($lastMonthStart, $lastMonthEnd)->count();
 
         $ordersChange = $lastMonthOrders > 0
             ? (($monthlyOrders - $lastMonthOrders) / $lastMonthOrders) * 100
@@ -45,7 +53,7 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
         $totalCustomers = (int) User::whereHas('orders')->count();
         $newCustomers = (int) User::whereHas('orders')
-            ->whereMonth('created_at', now()->month)
+            ->whereBetween('created_at', [$thisMonthStart, $now])
             ->count();
 
         $averageOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
@@ -93,8 +101,9 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
     private function getRevenueChart(): array
     {
-        return Order::where('status', 'completed')
-            ->whereDate('created_at', '>=', now()->subDays(30))
+        return Order::query()
+            ->byStatus('completed')
+            ->createdSince(now()->subDays(30))
             ->selectRaw('DATE(created_at) as date, SUM(total) as revenue')
             ->groupBy('date')
             ->orderBy('date')
@@ -104,7 +113,8 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
     private function getOrdersChart(): array
     {
-        return Order::whereDate('created_at', '>=', now()->subDays(30))
+        return Order::query()
+            ->createdSince(now()->subDays(30))
             ->selectRaw('DATE(created_at) as date, COUNT(*) as orders')
             ->groupBy('date')
             ->orderBy('date')
