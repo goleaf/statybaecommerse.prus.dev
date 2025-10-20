@@ -43,7 +43,7 @@ final class ReferralCampaign extends Model
      */
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'start_date' => 'datetime', 'end_date' => 'datetime', 'reward_amount' => 'decimal:2', 'max_referrals_per_user' => 'integer', 'max_total_referrals' => 'integer', 'conditions' => 'array', 'metadata' => 'array'];
+        return ['is_active' => 'boolean', 'start_date' => 'datetime', 'end_date' => 'datetime', 'reward_amount' => 'float', 'max_referrals_per_user' => 'integer', 'max_total_referrals' => 'integer', 'conditions' => 'array', 'metadata' => 'array'];
     }
 
     /**
@@ -97,7 +97,22 @@ final class ReferralCampaign extends Model
      */
     public function getLocalizedNameAttribute(): string
     {
-        return $this->getTranslation('name', app()->getLocale()) ?: $this->name;
+        $locale = app()->getLocale();
+        $fallbackLocale = config('app.fallback_locale', 'en');
+        $translated = $this->getTranslation('name', $locale);
+
+        if ($translated !== null && $translated !== '') {
+            return $translated;
+        }
+
+        $fallback = $this->getTranslation('name', $fallbackLocale);
+        if ($fallback !== null && $fallback !== '') {
+            return $fallback;
+        }
+
+        $raw = $this->getAttribute('name');
+
+        return is_array($raw) ? (string) reset($raw) : (string) $raw;
     }
 
     /**
@@ -105,6 +120,21 @@ final class ReferralCampaign extends Model
      */
     public function getLocalizedDescriptionAttribute(): string
     {
-        return $this->getTranslation('description', app()->getLocale()) ?: $this->description;
+        $locale = app()->getLocale();
+        $fallbackLocale = config('app.fallback_locale', 'en');
+        $translated = $this->getTranslation('description', $locale);
+
+        if ($translated !== null && $translated !== '') {
+            return $translated;
+        }
+
+        $fallback = $this->getTranslation('description', $fallbackLocale);
+        if ($fallback !== null && $fallback !== '') {
+            return $fallback;
+        }
+
+        $raw = $this->getAttribute('description');
+
+        return is_array($raw) ? (string) reset($raw) : (string) $raw;
     }
 }
