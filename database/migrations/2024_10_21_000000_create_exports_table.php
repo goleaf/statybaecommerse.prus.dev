@@ -28,7 +28,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('failed_at')->nullable();
             $table->text('failure_reason')->nullable();
-            $table->foreignId('requested_by')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->foreignId('requested_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
