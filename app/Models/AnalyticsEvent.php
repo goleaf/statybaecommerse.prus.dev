@@ -82,13 +82,13 @@ final class AnalyticsEvent extends Model
     ];
 
     protected $casts = [
-        'properties' => 'array',
-        'event_data' => 'array',
-        'is_important' => 'boolean',
-        'is_conversion' => 'boolean',
+        'properties'       => 'array',
+        'event_data'       => 'array',
+        'is_important'     => 'boolean',
+        'is_conversion'    => 'boolean',
         'conversion_value' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'created_at'       => 'datetime',
+        'updated_at'       => 'datetime',
     ];
 
     protected $dates = ['created_at', 'updated_at'];
@@ -242,12 +242,37 @@ final class AnalyticsEvent extends Model
 
     // Accessors & Mutators
 
+    public const EVENT_TYPES = [
+        'page_view',
+        'click',
+        'form_submit',
+        'purchase',
+        'signup',
+        'login',
+        'logout',
+        'search',
+        'download',
+        'custom',
+        'product_view',
+        'add_to_cart',
+        'remove_from_cart',
+        'user_register',
+        'user_login',
+        'user_logout',
+        'newsletter_signup',
+        'contact_form',
+        'video_play',
+        'social_share',
+        'scroll',
+    ];
+
     /**
      * Handle getEventTypeLabelAttribute functionality with proper error handling.
      */
     public function getEventTypeLabelAttribute(): string
     {
-        return __('admin.analytics.event_types.'.$this->event_type, $this->event_type);
+        return self::eventTypeOptions()[$this->event_type]
+            ?? __('analytics_events.types.' . $this->event_type, ['type' => $this->event_type]);
     }
 
     /**
@@ -257,9 +282,9 @@ final class AnalyticsEvent extends Model
     {
         return match ($this->device_type) {
             'desktop' => 'heroicon-o-computer-desktop',
-            'mobile' => 'heroicon-o-device-phone-mobile',
-            'tablet' => 'heroicon-o-device-tablet',
-            default => 'heroicon-o-question-mark-circle',
+            'mobile'  => 'heroicon-o-device-phone-mobile',
+            'tablet'  => 'heroicon-o-device-tablet',
+            default   => 'heroicon-o-question-mark-circle',
         };
     }
 
@@ -273,7 +298,7 @@ final class AnalyticsEvent extends Model
         }
         $currency = $this->currency ?? 'EUR';
 
-        return number_format($this->value, 2).' '.$currency;
+        return number_format($this->value, 2) . ' ' . $currency;
     }
 
     /**
@@ -297,9 +322,18 @@ final class AnalyticsEvent extends Model
     /**
      * Handle getEventTypes functionality with proper error handling.
      */
+    public static function eventTypeOptions(): array
+    {
+        return collect(self::EVENT_TYPES)
+            ->mapWithKeys(fn (string $type): array => [
+                $type => __('analytics_events.types.' . $type),
+            ])
+            ->all();
+    }
+
     public static function getEventTypes(): array
     {
-        return ['page_view' => __('admin.analytics.event_types.page_view'), 'product_view' => __('admin.analytics.event_types.product_view'), 'add_to_cart' => __('admin.analytics.event_types.add_to_cart'), 'remove_from_cart' => __('admin.analytics.event_types.remove_from_cart'), 'purchase' => __('admin.analytics.event_types.purchase'), 'search' => __('admin.analytics.event_types.search'), 'user_register' => __('admin.analytics.event_types.user_register'), 'user_login' => __('admin.analytics.event_types.user_login'), 'user_logout' => __('admin.analytics.event_types.user_logout'), 'newsletter_signup' => __('admin.analytics.event_types.newsletter_signup'), 'contact_form' => __('admin.analytics.event_types.contact_form'), 'download' => __('admin.analytics.event_types.download'), 'video_play' => __('admin.analytics.event_types.video_play'), 'social_share' => __('admin.analytics.event_types.social_share')];
+        return self::eventTypeOptions();
     }
 
     /**
@@ -353,16 +387,16 @@ final class AnalyticsEvent extends Model
     /**
      * Handle track functionality with proper error handling.
      *
-     * @param  mixed  $trackable
+     * @param mixed $trackable
      */
     public static function track(string $eventType, array $data = [], $trackable = null): self
     {
         $eventData = [
             'event_type' => $eventType,
             'session_id' => session()->getId(),
-            'user_id' => auth()->id(),
-            'url' => request()->url(),
-            'referrer' => request()->header('referer'),
+            'user_id'    => auth()->id(),
+            'url'        => request()->url(),
+            'referrer'   => request()->header('referer'),
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
             'created_at' => now(),
