@@ -1,7 +1,7 @@
 @props(['items' => []])
 
 @php
-    $breadcrumbs = collect([['label' => __('Home'), 'url' => url('/' . app()->getLocale())]])
+    $breadcrumbs = collect([['label' => __('frontend.navigation.home'), 'url' => url('/' . app()->getLocale())]])
         ->merge(collect($items))
         ->mapWithKeys(function ($item) {
             return [$item['url'] ?? '' => $item['label']];
@@ -18,7 +18,7 @@
     @php
         $ldItems = [];
         $pos = 1;
-        $trail = array_merge([["label" => __('Home'), "url" => url('/' . app()->getLocale())]], $items ?? []);
+        $trail = array_merge([["label" => __('frontend.navigation.home'), "url" => url('/' . app()->getLocale())]], $items ?? []);
         foreach ($trail as $it) {
             if (!empty($it['label'])) {
                 $ldItems[] = [
