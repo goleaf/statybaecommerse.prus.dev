@@ -15,32 +15,29 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use UnitEnum;
 
 final class CampaignClickResource extends Resource
 {
-    protected static ?string $model = CampaignClick::class;
+    /** @phpstan-var string|\BackedEnum|null */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-chart-bar';
-    }
+    protected static ?string $model = CampaignClick::class;
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -65,9 +62,6 @@ final class CampaignClickResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
-     *
-     * @param  Forms\Form  $schema
-     * @return Forms\Form
      */
     public static function form(Form $form): Form
     {
@@ -83,14 +77,19 @@ final class CampaignClickResource extends Resource
                                 ->preload()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                    if ($state) {
-                                        $campaign = Campaign::find($state);
-                                        if ($campaign) {
-                                            $set('campaign_name', $campaign->name);
-                                            $set('campaign_code', $campaign->code);
-                                        }
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if (! $state) {
+                                        return;
                                     }
+
+                                    $campaign = Campaign::find($state);
+
+                                    if ($campaign === null) {
+                                        return;
+                                    }
+
+                                    $set('campaign_name', $campaign->name);
+                                    $set('campaign_code', $campaign->code);
                                 }),
                             TextInput::make('campaign_name')
                                 ->label(__('campaign_clicks.campaign_name'))
@@ -104,14 +103,19 @@ final class CampaignClickResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
-                            if ($state) {
-                                $user = User::find($state);
-                                if ($user) {
-                                    $set('customer_name', $user->name);
-                                    $set('customer_email', $user->email);
-                                }
+                        ->afterStateUpdated(function (?int $state, Set $set): void {
+                            if (! $state) {
+                                return;
                             }
+
+                            $user = User::find($state);
+
+                            if ($user === null) {
+                                return;
+                            }
+
+                            $set('customer_name', $user->name);
+                            $set('customer_email', $user->email);
                         }),
                     TextInput::make('customer_name')
                         ->label(__('campaign_clicks.customer_name'))
@@ -346,10 +350,10 @@ final class CampaignClickResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaignClicks::route('/'),
+            'index'  => Pages\ListCampaignClicks::route('/'),
             'create' => Pages\CreateCampaignClick::route('/create'),
-            'view' => Pages\ViewCampaignClick::route('/{record}'),
-            'edit' => Pages\EditCampaignClick::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaignClick::route('/{record}'),
+            'edit'   => Pages\EditCampaignClick::route('/{record}/edit'),
         ];
     }
 }
