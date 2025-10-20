@@ -22,7 +22,7 @@ final class ReferralRewardLogTest extends TestCase
         $log = ReferralRewardLog::factory()->create([
             'referral_reward_id' => $referralReward->id,
             'user_id' => $user->id,
-            'action' => 'claimed',
+            'action' => ReferralRewardLog::ACTION_EARNED,
             'data' => ['amount' => 10.00, 'currency' => 'EUR'],
             'ip_address' => '192.168.1.1',
             'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -31,7 +31,7 @@ final class ReferralRewardLogTest extends TestCase
         $this->assertInstanceOf(ReferralRewardLog::class, $log);
         $this->assertEquals($referralReward->id, $log->referral_reward_id);
         $this->assertEquals($user->id, $log->user_id);
-        $this->assertEquals('claimed', $log->action);
+        $this->assertEquals(ReferralRewardLog::ACTION_EARNED, $log->action);
         $this->assertIsArray($log->data);
         $this->assertEquals(10.00, $log->data['amount']);
         $this->assertEquals('EUR', $log->data['currency']);
@@ -94,7 +94,7 @@ final class ReferralRewardLogTest extends TestCase
         $log = ReferralRewardLog::factory()->create([
             'referral_reward_id' => $referralReward->id,
             'user_id' => $user->id,
-            'action' => 'claimed',
+            'action' => ReferralRewardLog::ACTION_EARNED,
             'data' => ['amount' => 10.00, 'currency' => 'EUR'],
             'ip_address' => '192.168.1.1',
             'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -104,7 +104,7 @@ final class ReferralRewardLogTest extends TestCase
         $this->assertInstanceOf(ReferralRewardLog::class, $log);
         $this->assertEquals($referralReward->id, $log->referral_reward_id);
         $this->assertEquals($user->id, $log->user_id);
-        $this->assertEquals('claimed', $log->action);
+        $this->assertEquals(ReferralRewardLog::ACTION_EARNED, $log->action);
         $this->assertEquals('192.168.1.1', $log->ip_address);
         $this->assertNotEmpty($log->user_agent);
     }

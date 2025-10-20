@@ -138,7 +138,7 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
         $referralRewards = ReferralReward::all();
 
         foreach ($referralRewards as $referralReward) {
-            $actions = ['earned', 'redeemed', 'expired', 'cancelled'];
+            $actions = ReferralRewardLog::ACTIONS;
 
             // Create logs for each reward
             for ($i = 0; $i < rand(1, 5); $i++) {
