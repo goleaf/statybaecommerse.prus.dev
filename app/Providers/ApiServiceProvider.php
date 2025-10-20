@@ -14,17 +14,17 @@ final class ApiServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api.default', function (Request $request): Limit {
-            return Limit::perMinute((int) config('api.rate_limits.default', 60))
+            return Limit::perMinute((int) config('security.rate_limiting.api.default', 60))
                 ->by($this->rateLimitKey($request));
         });
 
         RateLimiter::for('api.notifications', function (Request $request): Limit {
-            return Limit::perMinute((int) config('api.rate_limits.notifications', 60))
+            return Limit::perMinute((int) config('security.rate_limiting.api.notifications', 60))
                 ->by($this->rateLimitKey($request, 'notifications'));
         });
 
         RateLimiter::for('api.autocomplete', function (Request $request): Limit {
-            return Limit::perMinute((int) config('api.rate_limits.autocomplete', 30))
+            return Limit::perMinute((int) config('security.rate_limiting.api.autocomplete', 30))
                 ->by($this->rateLimitKey($request, 'autocomplete'));
         });
     }
