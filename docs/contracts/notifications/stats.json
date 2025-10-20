@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NotificationsStatsResponse",
+  "type": "object",
+  "required": ["success", "data"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "const": true
+    },
+    "data": {
+      "type": "object",
+      "required": ["total", "read", "unread", "urgent", "today", "this_week", "this_month"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "read": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unread": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "urgent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "today": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "this_week": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "this_month": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "success": true,
+      "data": {
+        "total": 12,
+        "read": 5,
+        "unread": 7,
+        "urgent": 2,
+        "today": 3,
+        "this_week": 9,
+        "this_month": 12
+      }
+    }
+  ]
+}
