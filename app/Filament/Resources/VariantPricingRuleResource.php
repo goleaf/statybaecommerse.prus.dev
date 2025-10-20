@@ -28,6 +28,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Number;
 use UnitEnum;
 
 /**
@@ -211,7 +212,7 @@ final class VariantPricingRuleResource extends Resource
                             return $state.'%';
                         }
 
-                        return '€'.number_format($state, 2);
+                        return Number::currency((float) $state, 'EUR');
                     }),
                 TextColumn::make('min_quantity')
                     ->label(__('variant_pricing_rules.min_quantity'))
