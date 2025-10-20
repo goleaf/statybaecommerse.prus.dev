@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
+use App\Support\Cache\CacheKeys;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
@@ -23,7 +24,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:stats:{$locale}", 60, function (): array {
+        return Cache::remember(CacheKeys::homeStats($locale), CacheKeys::TTL_MINUTE, function (): array {
             return [
                 'products_count' => Product::where('is_visible', true)->count(),
                 'categories_count' => Category::where('is_visible', true)->count(),
@@ -39,7 +40,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:featured:{$locale}", 60, static function (): Collection {
+        return Cache::remember(CacheKeys::homeFeaturedProducts($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
             return Product::query()
                 ->withoutGlobalScopes()
                 ->where('is_visible', true)
@@ -57,7 +58,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:latest-products:{$locale}", 60, static function (): Collection {
+        return Cache::remember(CacheKeys::homeLatestProducts($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
             return Product::query()
                 ->withoutGlobalScopes()
                 ->where('is_visible', true)
@@ -74,7 +75,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:latest-reviews:{$locale}", 60, static function (): Collection {
+        return Cache::remember(CacheKeys::homeLatestReviews($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
             return Review::query()
                 ->where('is_approved', true)
                 ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
