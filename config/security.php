@@ -28,15 +28,20 @@ return [
             'object-src' => ["'none'"],
             'script-src' => [
                 "'self'",
-                "'unsafe-inline'",
-                "'unsafe-eval'",
+                '@nonce',
                 'https://unpkg.com',
+            ],
+            'script-src-attr' => [
+                "'unsafe-inline'",
             ],
             'style-src' => [
                 "'self'",
-                "'unsafe-inline'",
+                '@nonce',
                 'https://fonts.bunny.net',
                 'https://unpkg.com',
+            ],
+            'style-src-attr' => [
+                "'unsafe-inline'",
             ],
             'font-src' => [
                 "'self'",
