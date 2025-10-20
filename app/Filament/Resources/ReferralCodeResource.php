@@ -86,7 +86,7 @@ final class ReferralCodeResource extends Resource
                         Select::make('reward_type')
                             ->label(__('referral.form.reward_type'))
                             ->options([
-                                'fixed' => 'fixed',
+                                'fixed'      => 'fixed',
                                 'percentage' => 'percentage',
                             ])
                             ->required(),
@@ -181,9 +181,18 @@ final class ReferralCodeResource extends Resource
                 SelectFilter::make('by_reward_type')
                     ->label(__('referral.filters.reward_type'))
                     ->options([
-                        'fixed' => 'fixed',
+                        'fixed'      => 'fixed',
                         'percentage' => 'percentage',
-                    ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['reward_type'] ?? $data['value'] ?? null;
+
+                        if ($value === null) {
+                            return $query;
+                        }
+
+                        return $query->where('reward_type', $value);
+                    }),
                 SelectFilter::make('user_id')
                     ->label(__('referral.filters.user'))
                     ->relationship('user', 'name'),
@@ -203,10 +212,10 @@ final class ReferralCodeResource extends Resource
                             return $query;
                         }
 
-                        return $query->where(function (Builder $q) {
+                        return $query->where(function (Builder $q): void {
                             $q
                                 ->where('is_active', false)
-                                ->orWhere(function (Builder $q2) {
+                                ->orWhere(function (Builder $q2): void {
                                     $q2->whereNotNull('expires_at')->where('expires_at', '<=', now());
                                 });
                         });
@@ -215,7 +224,7 @@ final class ReferralCodeResource extends Resource
                     ->label('source')
                     ->options([
                         'admin' => 'admin',
-                        'user' => 'user',
+                        'user'  => 'user',
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['value'] ?? null;
@@ -263,10 +272,10 @@ final class ReferralCodeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralCodes::route('/'),
+            'index'  => Pages\ListReferralCodes::route('/'),
             'create' => Pages\CreateReferralCode::route('/create'),
-            'view' => Pages\ViewReferralCode::route('/{record}'),
-            'edit' => Pages\EditReferralCode::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralCode::route('/{record}'),
+            'edit'   => Pages\EditReferralCode::route('/{record}/edit'),
         ];
     }
 
