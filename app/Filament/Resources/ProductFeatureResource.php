@@ -21,6 +21,17 @@ use UnitEnum;
 
 final class ProductFeatureResource extends Resource
 {
+    /**
+     * @var array<string, string>
+     */
+    private const FEATURE_TYPE_OPTIONS = [
+        'specification' => 'Specification',
+        'benefit' => 'Benefit',
+        'feature' => 'Feature',
+        'technical' => 'Technical',
+        'performance' => 'Performance',
+    ];
+
     protected static ?string $model = ProductFeature::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
@@ -38,13 +49,7 @@ final class ProductFeatureResource extends Resource
                 ->searchable()
                 ->preload(),
             Forms\Components\Select::make('feature_type')
-                ->options([
-                    'specification' => 'Specification',
-                    'benefit' => 'Benefit',
-                    'feature' => 'Feature',
-                    'technical' => 'Technical',
-                    'performance' => 'Performance',
-                ])
+                ->options(self::FEATURE_TYPE_OPTIONS)
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
                 ->label('Feature Key')
@@ -86,8 +91,10 @@ final class ProductFeatureResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('feature_type'),
-                Tables\Filters\SelectFilter::make('product_id'),
+                Tables\Filters\SelectFilter::make('feature_type')
+                    ->options(self::FEATURE_TYPE_OPTIONS),
+                Tables\Filters\SelectFilter::make('product_id')
+                    ->relationship('product', 'name'),
             ])
             ->actions([
                 EditAction::make(),
