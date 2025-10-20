@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
+use App\Models\City;
 use App\Models\Customer;
+use App\Models\Scopes\ActiveScope;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -22,7 +24,8 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Tables;
+use Filament\Schemas\Components\Utilities\Get as SchemaGet;
+use Filament\Schemas\Components\Utilities\Set as SchemaSet;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -120,23 +123,35 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set|SchemaSet $set): void {
                                     if ($state) {
                                         $set('city_id', null);
                                     }
                                 }),
                             Select::make('city_id')
                                 ->label(__('customers.city'))
-                                ->relationship('city', 'name')
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->modifyOptionsQueryUsing(function (Builder $query, Forms\Get $get) {
-                                    $countryId = $get('country_id');
-                                    if ($countryId) {
+                                ->options(function (Forms\Get|SchemaGet $get): array {
+                                    $query = City::query()->orderBy('name');
+
+                                    if ($countryId = $get('country_id')) {
                                         $query->where('country_id', $countryId);
                                     }
-                                }),
+
+                                    return $query->pluck('name', 'id')->all();
+                                })
+                                ->getSearchResultsUsing(function (Forms\Get|SchemaGet $get, string $search): array {
+                                    return City::query()
+                                        ->where('name', 'like', "%{$search}%")
+                                        ->when($get('country_id'), fn (Builder $query, $countryId): Builder => $query->where('country_id', $countryId))
+                                        ->orderBy('name')
+                                        ->limit(50)
+                                        ->pluck('name', 'id')
+                                        ->all();
+                                })
+                                ->getOptionLabelUsing(fn ($value): ?string => City::query()->find($value)?->name),
                             TextInput::make('postal_code')
                                 ->label(__('customers.postal_code'))
                                 ->maxLength(20),
@@ -239,7 +254,6 @@ final class CustomerResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (Customer $record): string => $record->is_active ? __('customers.deactivate') : __('customers.activate'))
@@ -302,10 +316,17 @@ final class CustomerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomers::route('/'),
+            'index'  => Pages\ListCustomers::route('/'),
             'create' => Pages\CreateCustomer::route('/create'),
-            'view' => Pages\ViewCustomer::route('/{record}'),
-            'edit' => Pages\EditCustomer::route('/{record}/edit'),
+            'view'   => Pages\ViewCustomer::route('/{record}'),
+            'edit'   => Pages\EditCustomer::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+        ]);
     }
 }
