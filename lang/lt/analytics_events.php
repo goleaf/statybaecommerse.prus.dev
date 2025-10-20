@@ -23,6 +23,17 @@ return [
         'download' => 'Atsisiuntimas',
         'custom' => 'Pritaikytas',
     ],
+    // Tabs
+    'tabs' => [
+        'all' => 'Visi įvykiai',
+        'page_views' => 'Puslapių peržiūros',
+        'clicks' => 'Paspaudimai',
+        'purchases' => 'Pirkimai',
+        'signups' => 'Registracijos',
+        'today' => 'Šiandienos įvykiai',
+        'this_week' => 'Šios savaitės įvykiai',
+        'this_month' => 'Šio mėnesio įvykiai',
+    ],
     // User Information
     'user_information' => 'Vartotojo Informacija',
     'user' => 'Vartotojas',
