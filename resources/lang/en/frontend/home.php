@@ -76,6 +76,23 @@ return [
         'highlights' => [
             'title' => 'Stay inspired',
             'subtitle' => 'Keep up with trending, new-in, and best-value picks curated daily.',
+            'blocks' => [
+                'latest' => [
+                    'title' => 'Latest arrivals',
+                    'subtitle' => 'Fresh stock from the warehouse updated every morning.',
+                    'link' => 'View new products',
+                ],
+                'trending' => [
+                    'title' => 'Trending now',
+                    'subtitle' => 'Popular best-sellers customers are watching right now.',
+                    'link' => 'Explore trending items',
+                ],
+                'sale' => [
+                    'title' => 'Limited-time offers',
+                    'subtitle' => 'Deals and bundle-ready savings available today.',
+                    'link' => 'Shop all promotions',
+                ],
+            ],
         ],
         'discovery' => [
             'title' => 'Why shop with us?',
@@ -165,5 +182,11 @@ return [
         'badge' => 'Collection',
         'open' => 'Open collection',
         'products_count' => '{0}No products|{1}1 product|[2,*]:count products',
+    ],
+    'messages' => [
+        'no_featured_products' => 'Featured products are coming soon.',
+        'no_latest_products' => 'New arrivals will appear here once published.',
+        'no_trending_products' => 'Trending picks update soon – check back shortly.',
+        'no_sale_products' => 'Sale items will populate as promotions go live.',
     ],
 ];
