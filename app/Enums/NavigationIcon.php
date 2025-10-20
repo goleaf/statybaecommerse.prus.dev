@@ -11,50 +11,92 @@ namespace App\Enums;
  */
 enum NavigationIcon: string
 {
-    case Document = 'heroicon-o-document-text';
-    case RectangleStack = 'heroicon-o-rectangle-stack';
-    case Tag = 'heroicon-o-tag';
-    case Map = 'heroicon-o-map';
-    case Cube = 'heroicon-o-cube';
-    case ShoppingBag = 'heroicon-o-shopping-bag';
-    case Users = 'heroicon-o-users';
-    case Cog = 'heroicon-o-cog-6-tooth';
-    case ChartBar = 'heroicon-o-chart-bar';
-    case ComputerDesktop = 'heroicon-o-computer-desktop';
-    case Megaphone = 'heroicon-o-megaphone';
-    case ArchiveBox = 'heroicon-o-archive-box';
-    case DocumentChartBar = 'heroicon-o-document-chart-bar';
-    case Gift = 'heroicon-o-gift';
-    case Globe = 'heroicon-o-globe-alt';
-    case Building = 'heroicon-o-building-office';
-    case Currency = 'heroicon-o-currency-dollar';
-    case Location = 'heroicon-o-map-pin';
-    case Collection = 'heroicon-o-folder';
-    case Attribute = 'heroicon-o-tag';
-    case Media = 'heroicon-o-photo';
-    case News = 'heroicon-o-newspaper';
-    case Menu = 'heroicon-o-bars-3';
-    case City = 'heroicon-o-building-office-2';
-    case Country = 'heroicon-o-flag';
-    case Address = 'heroicon-o-home';
-    case Customer = 'heroicon-o-user-group';
-    case Cart = 'heroicon-o-shopping-cart';
-    case Order = 'heroicon-o-clipboard-document-list';
-    case Coupon = 'heroicon-o-ticket';
-    case Campaign = 'heroicon-o-megaphone';
-    case Analytics = 'heroicon-o-chart-pie';
-    case Report = 'heroicon-o-document-chart-bar';
-    case Activity = 'heroicon-o-clock';
-    case Stock = 'heroicon-o-archive-box';
-    case Price = 'heroicon-o-currency-dollar';
-    case PriceList = 'heroicon-o-list-bullet';
-    case Discount = 'heroicon-o-percent';
-    case Referral = 'heroicon-o-gift';
-    case Partner = 'heroicon-o-handshake';
-    case PartnerTier = 'heroicon-o-star';
-    case Seo = 'heroicon-o-magnifying-glass';
-    case SystemSetting = 'heroicon-o-cog-6-tooth';
-    case SystemSettings = 'heroicon-o-cog-6-tooth';
+    case Document = 'document';
+    case RectangleStack = 'rectangle-stack';
+    case Tag = 'tag';
+    case Map = 'map';
+    case Cube = 'cube';
+    case ShoppingBag = 'shopping-bag';
+    case Users = 'users';
+    case Cog = 'cog';
+    case ChartBar = 'chart-bar';
+    case ComputerDesktop = 'computer-desktop';
+    case Megaphone = 'megaphone';
+    case ArchiveBox = 'archive-box';
+    case DocumentChartBar = 'document-chart-bar';
+    case Gift = 'gift';
+    case Globe = 'globe';
+    case Building = 'building';
+    case Currency = 'currency';
+    case Location = 'location';
+    case Collection = 'collection';
+    case Attribute = 'attribute';
+    case Media = 'media';
+    case News = 'news';
+    case Menu = 'menu';
+    case City = 'city';
+    case Country = 'country';
+    case Address = 'address';
+    case Customer = 'customer';
+    case Cart = 'cart';
+    case Order = 'order';
+    case Coupon = 'coupon';
+    case Campaign = 'campaign';
+    case Analytics = 'analytics';
+    case Report = 'report';
+    case Activity = 'activity';
+    case Stock = 'stock';
+    case Price = 'price';
+    case PriceList = 'price-list';
+    case Discount = 'discount';
+    case Referral = 'referral';
+    case Partner = 'partner';
+    case PartnerTier = 'partner-tier';
+    case Seo = 'seo';
+    case SystemSetting = 'system-setting';
+    case SystemSettings = 'system-settings';
+
+    public function icon(): string
+    {
+        return match ($this) {
+            self::Document => 'heroicon-o-document-text',
+            self::RectangleStack => 'heroicon-o-rectangle-stack',
+            self::Tag, self::Attribute => 'heroicon-o-tag',
+            self::Map => 'heroicon-o-map',
+            self::Cube => 'heroicon-o-cube',
+            self::ShoppingBag => 'heroicon-o-shopping-bag',
+            self::Users => 'heroicon-o-users',
+            self::Cog, self::SystemSetting, self::SystemSettings => 'heroicon-o-cog-6-tooth',
+            self::ChartBar => 'heroicon-o-chart-bar',
+            self::ComputerDesktop => 'heroicon-o-computer-desktop',
+            self::Megaphone, self::Campaign => 'heroicon-o-megaphone',
+            self::ArchiveBox, self::Stock => 'heroicon-o-archive-box',
+            self::DocumentChartBar, self::Report => 'heroicon-o-document-chart-bar',
+            self::Gift, self::Referral => 'heroicon-o-gift',
+            self::Globe => 'heroicon-o-globe-alt',
+            self::Building => 'heroicon-o-building-office',
+            self::Currency, self::Price => 'heroicon-o-currency-dollar',
+            self::Location => 'heroicon-o-map-pin',
+            self::Collection => 'heroicon-o-folder',
+            self::Media => 'heroicon-o-photo',
+            self::News => 'heroicon-o-newspaper',
+            self::Menu => 'heroicon-o-bars-3',
+            self::City => 'heroicon-o-building-office-2',
+            self::Country => 'heroicon-o-flag',
+            self::Address => 'heroicon-o-home',
+            self::Customer => 'heroicon-o-user-group',
+            self::Cart => 'heroicon-o-shopping-cart',
+            self::Order => 'heroicon-o-clipboard-document-list',
+            self::Coupon => 'heroicon-o-ticket',
+            self::Analytics => 'heroicon-o-chart-pie',
+            self::Activity => 'heroicon-o-clock',
+            self::PriceList => 'heroicon-o-list-bullet',
+            self::Discount => 'heroicon-o-percent',
+            self::Partner => 'heroicon-o-handshake',
+            self::PartnerTier => 'heroicon-o-star',
+            self::Seo => 'heroicon-o-magnifying-glass',
+        };
+    }
 
     public function label(): string
     {

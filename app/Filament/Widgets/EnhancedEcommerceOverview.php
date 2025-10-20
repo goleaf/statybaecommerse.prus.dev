@@ -33,7 +33,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
 
     protected string $maxHeight = '32rem';
 
-    protected string $pollingInterval = '15s';
+    protected ?string $pollingInterval = '15s';
 
     protected function getStats(): array
     {

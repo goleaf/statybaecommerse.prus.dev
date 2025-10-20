@@ -24,12 +24,12 @@ final class DashboardTimeSeriesWidget extends ChartWidget
         return Gate::allows(config('dashboard.permissions.view_charts'));
     }
 
-    protected function getHeading(): string
+    public function getHeading(): string
     {
         return trans('admin/dashboard.charts.heading');
     }
 
-    protected function getDescription(): ?string
+    public function getDescription(): ?string
     {
         return trans('admin/dashboard.charts.description');
     }
