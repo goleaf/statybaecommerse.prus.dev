@@ -27,6 +27,8 @@
         'label' => __('Contact Support'),
         'url' => $contactUrl,
     ],
+    'supportTitle' => __('Need immediate assistance?'),
+    'supportDescription' => __('Share the reference ID below with our engineers so we can restore your experience as quickly as possible.'),
     'links' => [
         [
             'label' => __('Check System Status'),
