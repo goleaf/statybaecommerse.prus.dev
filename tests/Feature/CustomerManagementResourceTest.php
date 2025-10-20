@@ -26,7 +26,7 @@ final class CustomerManagementResourceTest extends TestCase
         parent::setUp();
 
         $adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -46,42 +46,51 @@ final class CustomerManagementResourceTest extends TestCase
     {
         $customerGroup = CustomerGroup::factory()->create();
         $newCustomerData = User::factory()->make([
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'phone' => '+37060000000',
-            'is_active' => true,
+            'name'        => 'John Doe',
+            'email'       => 'john@example.com',
+            'phone'       => '+37060000000',
+            'is_active'   => true,
             'is_verified' => false,
         ]);
 
         Livewire::test(CreateCustomer::class)
             ->fillForm([
-                'name' => $newCustomerData->name,
-                'email' => $newCustomerData->email,
-                'phone' => $newCustomerData->phone,
-                'is_active' => true,
-                'is_verified' => false,
-                'customer_group_id' => $customerGroup->id,
-                'preferred_language' => 'lt',
-                'preferred_currency' => 'EUR',
-                'newsletter_subscription' => false,
-                'sms_notifications' => false,
+                'name'                                              => $newCustomerData->name,
+                'email'                                             => $newCustomerData->email,
+                'phone'                                             => $newCustomerData->phone,
+                'is_active'                                         => true,
+                'is_verified'                                       => false,
+                'customer_group_id'                                 => $customerGroup->id,
+                'preferred_locale'                                  => 'lt',
+                'preferences->preferred_currency'                   => 'EUR',
+                'notification_preferences->newsletter_subscription' => false,
+                'notification_preferences->sms_notifications'       => false,
             ])
             ->call('create')
             ->assertNotified();
 
         $this->assertDatabaseHas('users', [
-            'name' => $newCustomerData->name,
-            'email' => $newCustomerData->email,
-            'phone' => $newCustomerData->phone,
-            'is_active' => true,
+            'name'        => $newCustomerData->name,
+            'email'       => $newCustomerData->email,
+            'phone'       => $newCustomerData->phone,
+            'is_active'   => true,
             'is_verified' => false,
         ]);
+
+        $createdCustomer = User::whereEmail($newCustomerData->email)->firstOrFail();
+        $this->assertSame('lt', $createdCustomer->preferred_locale);
+        $this->assertSame('EUR', $createdCustomer->preferred_currency);
+        $this->assertFalse($createdCustomer->newsletter_subscription);
+        $this->assertFalse($createdCustomer->sms_notifications);
+        $this->assertSame('EUR', data_get($createdCustomer->preferences, 'preferred_currency'));
+        $this->assertFalse((bool) data_get($createdCustomer->notification_preferences, 'newsletter_subscription'));
+        $this->assertFalse((bool) data_get($createdCustomer->notification_preferences, 'sms_notifications'));
     }
 
     public function test_can_edit_customer(): void
     {
         $customer = User::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'is_verified' => false,
         ]);
 
@@ -89,19 +98,27 @@ final class CustomerManagementResourceTest extends TestCase
             'record' => $customer->id,
         ])
             ->fillForm([
-                'is_active' => false,
-                'is_verified' => true,
-                'preferred_language' => 'en',
-                'newsletter_subscription' => true,
+                'is_active'                                         => false,
+                'is_verified'                                       => true,
+                'preferred_locale'                                  => 'en',
+                'preferences->preferred_currency'                   => 'USD',
+                'notification_preferences->newsletter_subscription' => true,
             ])
             ->call('save')
             ->assertNotified();
 
         $this->assertDatabaseHas('users', [
-            'id' => $customer->id,
-            'is_active' => false,
+            'id'          => $customer->id,
+            'is_active'   => false,
             'is_verified' => true,
         ]);
+
+        $customer->refresh();
+        $this->assertSame('en', $customer->preferred_locale);
+        $this->assertSame('USD', $customer->preferred_currency);
+        $this->assertTrue($customer->newsletter_subscription);
+        $this->assertSame('USD', data_get($customer->preferences, 'preferred_currency'));
+        $this->assertTrue((bool) data_get($customer->notification_preferences, 'newsletter_subscription'));
     }
 
     public function test_can_view_customer(): void
@@ -173,7 +190,7 @@ final class CustomerManagementResourceTest extends TestCase
             ->callTableAction('toggle_active', $customer);
 
         $this->assertDatabaseHas('users', [
-            'id' => $customer->id,
+            'id'        => $customer->id,
             'is_active' => false,
         ]);
     }
@@ -200,7 +217,7 @@ final class CustomerManagementResourceTest extends TestCase
 
         foreach ($customers as $customer) {
             $this->assertDatabaseHas('users', [
-                'id' => $customer->id,
+                'id'        => $customer->id,
                 'is_active' => true,
             ]);
         }
@@ -215,7 +232,7 @@ final class CustomerManagementResourceTest extends TestCase
 
         foreach ($customers as $customer) {
             $this->assertDatabaseHas('users', [
-                'id' => $customer->id,
+                'id'        => $customer->id,
                 'is_active' => false,
             ]);
         }
@@ -225,7 +242,7 @@ final class CustomerManagementResourceTest extends TestCase
     {
         Livewire::test(CreateCustomer::class)
             ->fillForm([
-                'name' => '',
+                'name'  => '',
                 'email' => 'invalid-email',
             ])
             ->call('create')
