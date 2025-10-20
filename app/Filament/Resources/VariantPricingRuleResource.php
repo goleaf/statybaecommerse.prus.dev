@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use BackedEnum;
 use App\Models\VariantPricingRule;
@@ -37,6 +39,8 @@ use UnitEnum;
  */
 final class VariantPricingRuleResource extends Resource
 {
+    use HasNav;
+
     protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 10;
@@ -54,10 +58,7 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Products';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

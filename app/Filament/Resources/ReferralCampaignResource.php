@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralCampaignResource\Pages;
 use BackedEnum;
 use App\Models\ReferralCampaign;
@@ -29,6 +31,8 @@ use Filament\Forms\Form;
 
 final class ReferralCampaignResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralCampaign::class;
 
     /** @var string|\BackedEnum|null */
@@ -38,10 +42,7 @@ final class ReferralCampaignResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
-    {
-        return 'System';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

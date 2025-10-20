@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsComments;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsComments\Pages\CreateNewsComment;
 use UnitEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 class NewsCommentResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsComment::class;
 
     /** @var string|\BackedEnum|null */

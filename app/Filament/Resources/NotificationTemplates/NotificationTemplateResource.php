@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NotificationTemplates;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NotificationTemplates\Pages\CreateNotificationTemplate;
 use App\Filament\Resources\NotificationTemplates\Pages\EditNotificationTemplate;
@@ -20,12 +21,11 @@ use Filament\Forms\Form;
 
 class NotificationTemplateResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NotificationTemplate::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return Heroicon::OutlinedRectangleStack;
-    }
+    
 
     public static function form(Form $form): Form
     {

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\RecommendationCacheResource\Pages;
 use App\Models\Product;
 use App\Models\RecommendationBlock;
@@ -32,10 +34,9 @@ use Filament\Forms\Form;
  */
 final class RecommendationCacheResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Analytics';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = RecommendationCache::class;
 

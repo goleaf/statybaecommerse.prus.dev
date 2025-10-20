@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralResource\Pages;
 use BackedEnum;
 use App\Models\Referral;
@@ -27,6 +29,8 @@ use Filament\Forms\Form;
 
 final class ReferralResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Referral::class;
 
     /** @var string|\BackedEnum|null */

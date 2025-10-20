@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Filament\Resources\ReferralStatistics;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralStatistics\Pages\CreateReferralStatistics;
 use UnitEnum;
@@ -18,6 +19,8 @@ use Filament\Forms\Form;
 
 class ReferralStatisticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralStatistics::class;
 
     /** @var string|\BackedEnum|null */

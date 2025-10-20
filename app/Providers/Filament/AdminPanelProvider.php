@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Support\Nav;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -47,10 +48,7 @@ final class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'info' => Color::Sky,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->resources([
-                \App\Filament\Resources\SystemSettingResource::class,
-            ])
+            ->resources(Nav::orderedResources())
             ->pages([
                 \App\Filament\Pages\Dashboard::class,
                 \App\Filament\Pages\SliderAnalytics::class,
@@ -90,16 +88,18 @@ final class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts()
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
-            ->navigationGroups([
-                NavigationGroup::make()->label(__('admin.navigation.dashboard'))->icon('heroicon-o-home'),
-                NavigationGroup::make()->label(__('admin.navigation.commerce'))->icon('heroicon-o-shopping-bag'),
-                NavigationGroup::make()->label(__('admin.navigation.products'))->icon('heroicon-o-cube'),
-                NavigationGroup::make()->label(__('admin.navigation.marketing'))->icon('heroicon-o-megaphone'),
-                NavigationGroup::make()->label(__('admin.navigation.content'))->icon('heroicon-o-document-text'),
-                NavigationGroup::make()->label(__('admin.navigation.analytics'))->icon('heroicon-o-chart-bar'),
-                NavigationGroup::make()->label(__('admin.navigation.system'))->icon('heroicon-o-cog-6-tooth'),
-                NavigationGroup::make()->label('Recommendation System')->icon('heroicon-o-sparkles'),
-            ])
+            ->navigationGroups(array_map(
+                static function (array $group): NavigationGroup {
+                    $navigationGroup = NavigationGroup::make()->label($group['label']);
+
+                    if ($group['icon']) {
+                        $navigationGroup->icon($group['icon']);
+                    }
+
+                    return $navigationGroup;
+                },
+                Nav::navigationGroups()
+            ))
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))

@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategories;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use BackedEnum;
@@ -17,15 +18,14 @@ use Filament\Forms\Form;
 
 final class NewsCategoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsCategory::class;
 
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'News';
-    }
+    
 
     public static function form(Form $form): Form
     {

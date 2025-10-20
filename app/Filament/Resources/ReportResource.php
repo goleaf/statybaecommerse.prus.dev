@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
@@ -44,23 +46,19 @@ use Filament\Forms\Form;
 
 final class ReportResource extends Resource
 {
+    use HasNav;
+
     /**
      * @var UnitEnum|string|null
      */
-    public static function getNavigationGroup(): \UnitEnum|string|null
-    {
-        return NavigationGroup::Reports;
-    }
+    
 
     protected static ?string $model = Report::class;
 
     /**
      * @var string|\BackedEnum|null
      */
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-document-chart-bar';
-    }
+    
 
     protected static ?int $navigationSort = 17;
 

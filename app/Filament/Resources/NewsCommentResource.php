@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NewsCommentResource\Pages;
 use App\Models\News;
 use App\Models\NewsComment;
@@ -31,12 +33,11 @@ use Filament\Forms\Form;
 
 final class NewsCommentResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsComment::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
+    
 
     protected static ?int $navigationSort = 3;
 

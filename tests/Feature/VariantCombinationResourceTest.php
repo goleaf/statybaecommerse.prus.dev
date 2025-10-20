@@ -10,6 +10,7 @@ use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombinati
 use App\Models\Product;
 use App\Models\User;
 use App\Models\VariantCombination;
+use App\Support\Nav;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -289,9 +290,15 @@ describe('VariantCombinationResource', function () {
     });
 
     it('has correct navigation configuration', function () {
-        expect(VariantCombinationResource::getNavigationIcon())->toBe('heroicon-o-squares-2x2');
-        expect(VariantCombinationResource::getNavigationGroup())->toBe('Inventory');
-        expect(VariantCombinationResource::getNavigationSort())->toBe(19);
+        expect(VariantCombinationResource::getNavigationIcon())->toBe(
+            Nav::iconForResource(VariantCombinationResource::class)
+        );
+        expect(VariantCombinationResource::getNavigationGroup())->toBe(
+            Nav::groupForResource(VariantCombinationResource::class)
+        );
+        expect(VariantCombinationResource::getNavigationSort())->toBe(
+            Nav::sortForResource(VariantCombinationResource::class)
+        );
     });
 
     it('has correct model configuration', function () {

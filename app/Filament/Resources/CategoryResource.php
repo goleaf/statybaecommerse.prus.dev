@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use BackedEnum;
@@ -38,17 +40,13 @@ use Filament\Forms\Form;
 
 final class CategoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Category::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
+    
 
     public static function getPluralModelLabel(): string
     {

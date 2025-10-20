@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SubscriberResource\Pages;
 use BackedEnum;
 use App\Models\Subscriber;
@@ -43,6 +45,8 @@ use Filament\Forms\Form;
  */
 final class SubscriberResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Subscriber::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';

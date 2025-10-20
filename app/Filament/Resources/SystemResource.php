@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SystemResource\Pages;
 use BackedEnum;
 use App\Models\SystemSetting;
@@ -62,6 +64,8 @@ use Filament\Forms\Form;
  */
 final class SystemResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSetting::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
@@ -90,10 +94,7 @@ final class SystemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

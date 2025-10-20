@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
 use Filament\Actions\Action;
@@ -31,6 +33,8 @@ use Filament\Forms\Form;
 
 final class CustomerGroupResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CustomerGroup::class;
 
     /**

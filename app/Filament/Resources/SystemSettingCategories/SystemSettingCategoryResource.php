@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategories;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SystemSettingCategories\Pages\CreateSystemSettingCategory;
 use UnitEnum;
@@ -22,6 +23,8 @@ use Filament\Forms\Form;
 
 class SystemSettingCategoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSettingCategory::class;
 
     /** @var string|\BackedEnum|null */

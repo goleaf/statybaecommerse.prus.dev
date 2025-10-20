@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
 use BackedEnum;
@@ -31,17 +33,13 @@ use UnitEnum;
 
 final class AttributeResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Attribute::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

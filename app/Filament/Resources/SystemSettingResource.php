@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
 use BackedEnum;
@@ -39,6 +41,8 @@ use Filament\Forms\Form;
  */
 final class SystemSettingResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSetting::class;
 
     protected static ?int $navigationSort = 18;

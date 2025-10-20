@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignSchedule;
@@ -38,6 +40,8 @@ use Filament\Forms\Form;
 
 final class CampaignScheduleResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CampaignSchedule::class;
 
     /**

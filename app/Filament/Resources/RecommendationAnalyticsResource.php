@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages;
 use App\Models\Product;
 use App\Models\RecommendationAnalytics;
@@ -33,21 +35,17 @@ use Filament\Forms\Form;
  */
 final class RecommendationAnalyticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = RecommendationAnalytics::class;
 
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-chart-bar';
-    }
+    
 
     protected static ?int $navigationSort = 8;
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
-    {
-        return 'Analytics';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

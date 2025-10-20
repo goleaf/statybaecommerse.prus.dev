@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingDependencies;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SystemSettingDependencies\Pages\CreateSystemSettingDependency;
 use UnitEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 class SystemSettingDependencyResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSettingDependency::class;
 
     /** @var string|\BackedEnum|null */

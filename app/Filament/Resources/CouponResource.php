@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
 use Filament\Actions\Action;
@@ -33,6 +35,8 @@ use Filament\Forms\Form;
 
 final class CouponResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Coupon::class;
 
     /**

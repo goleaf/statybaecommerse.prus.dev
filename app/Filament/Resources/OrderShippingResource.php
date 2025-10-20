@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
@@ -34,17 +36,13 @@ use Filament\Forms\Form;
 
 final class OrderShippingResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = OrderShipping::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return Heroicon::OutlinedRectangleStack;
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Orders';
-    }
+    
 
     protected static ?int $navigationSort = 3;
 

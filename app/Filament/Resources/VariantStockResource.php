@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
@@ -34,6 +36,8 @@ use Filament\Forms\Form;
 
 final class VariantStockResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = VariantInventory::class;
 
     /** @var string|\BackedEnum|null */

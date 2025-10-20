@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\WishlistItemResource\Pages;
 use App\Models\Brand;
 use App\Models\CartItem;
@@ -49,17 +51,13 @@ use Filament\Forms\Form;
  */
 final class WishlistItemResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Customers';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = WishlistItem::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-heart';
-    }
+    
 
     /**
      * @var UnitEnum|string|null
@@ -79,10 +77,7 @@ final class WishlistItemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroupLabel(): string
-    {
-        return 'Customers';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

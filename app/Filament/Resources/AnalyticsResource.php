@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
@@ -17,6 +19,8 @@ use Filament\Forms\Form;
 
 final class AnalyticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Order::class;
 
     /** @var string|\BackedEnum|null */

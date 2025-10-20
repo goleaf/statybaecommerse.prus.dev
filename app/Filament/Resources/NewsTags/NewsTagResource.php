@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsTags;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsTags\Pages\CreateNewsTag;
 use UnitEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 class NewsTagResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsTag::class;
 
     /** @var string|\BackedEnum|null */

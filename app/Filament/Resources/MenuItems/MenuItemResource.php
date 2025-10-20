@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\MenuItems;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\MenuItems\Pages\CreateMenuItem;
 use UnitEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 class MenuItemResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = MenuItem::class;
 
     /** @var string|\BackedEnum|null */

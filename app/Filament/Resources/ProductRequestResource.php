@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\ProductRequest;
 use BackedEnum;
@@ -22,12 +24,11 @@ use Filament\Forms\Form;
 
 final class ProductRequestResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductRequest::class;
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-clipboard-document-list';
-    }
+    
 
     protected static UnitEnum|string|null $navigationGroup = 'Products';
 

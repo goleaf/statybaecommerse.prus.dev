@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Countries;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\Countries\Pages\CreateCountry;
 use App\Filament\Resources\Countries\Pages\EditCountry;
@@ -25,17 +26,13 @@ use Filament\Forms\Form;
  */
 final class CountryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Country::class;
 
-    public static function getNavigationIcon(): \BackedEnum|string|null
-    {
-        return 'heroicon-o-globe-alt';
-    }
+    
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
-    {
-        return 'Locations';
-    }
+    
 
     protected static ?int $navigationSort = 1;
 

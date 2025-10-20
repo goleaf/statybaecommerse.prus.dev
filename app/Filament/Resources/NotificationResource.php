@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use BackedEnum;
@@ -37,19 +39,15 @@ use Filament\Forms\Form;
 
 final class NotificationResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Notification::class;
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-bell';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    
 
     protected static ?int $navigationSort = 3;
 

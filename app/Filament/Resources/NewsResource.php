@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
@@ -20,12 +22,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class NewsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = News::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-newspaper';
-    }
+    
 
     protected static ?int $navigationSort = 1;
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
 use BackedEnum;
@@ -28,14 +30,13 @@ use Filament\Forms\Form;
 
 final class EmailCampaignResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = EmailCampaign::class;
 
     protected static ?int $navigationSort = 4;
 
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-envelope';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

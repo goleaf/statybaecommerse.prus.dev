@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeStatistics;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralCodeStatistics\Pages\CreateReferralCodeStatistics;
 use UnitEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 class ReferralCodeStatisticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralCodeStatistics::class;
 
     /** @var string|\BackedEnum|null */

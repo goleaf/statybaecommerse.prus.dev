@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\EnumValueResource\Pages;
 use App\Models\EnumValue;
 use Filament\Actions\Action;
@@ -33,12 +35,11 @@ use Filament\Forms\Form;
 
 final class EnumValueResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = EnumValue::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    
 
     protected static ?int $navigationSort = 1;
 

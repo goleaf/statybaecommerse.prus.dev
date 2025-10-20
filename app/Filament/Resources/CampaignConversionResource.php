@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
@@ -34,6 +36,8 @@ use Filament\Forms\Form;
  */
 final class CampaignConversionResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CampaignConversion::class;
 
     /** @var string|\BackedEnum|null */
@@ -46,10 +50,7 @@ final class CampaignConversionResource extends Resource
         return __('campaign_conversions.title');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Marketing';
-    }
+    
 
     public static function getPluralModelLabel(): string
     {

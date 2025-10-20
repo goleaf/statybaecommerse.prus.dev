@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CountryResource\Pages;
 use App\Models\Country;
 use Filament\Actions\Action;
@@ -33,6 +35,8 @@ use Filament\Forms\Form;
 
 final class CountryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Country::class;
 
     protected static ?int $navigationSort = 1;

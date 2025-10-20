@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeUsageLogs;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralCodeUsageLogs\Pages\CreateReferralCodeUsageLog;
 use App\Filament\Resources\ReferralCodeUsageLogs\Pages\EditReferralCodeUsageLog;
@@ -20,12 +21,11 @@ use Filament\Forms\Form;
 
 class ReferralCodeUsageLogResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralCodeUsageLog::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return Heroicon::OutlinedRectangleStack;
-    }
+    
 
     public static function form(Form $form): Form
     {
