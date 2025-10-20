@@ -23,7 +23,6 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -58,11 +57,11 @@ final class CustomerManagementResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Section::make(__('customers.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('name')
                                 ->label(__('customers.name'))
                                 ->required()
@@ -73,7 +72,7 @@ final class CustomerManagementResource extends Resource
                                 ->unique(ignoreRecord: true),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('phone')
                                 ->label(__('customers.phone'))
                                 ->tel()
@@ -84,9 +83,9 @@ final class CustomerManagementResource extends Resource
                         ]),
                 ]),
             Section::make(__('customers.account_settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('is_active')
                                 ->label(__('customers.is_active'))
                                 ->default(true),
@@ -100,21 +99,26 @@ final class CustomerManagementResource extends Resource
                         ->searchable()
                         ->preload()
                         ->createOptionForm([
+                            TextInput::make('name')
+                                ->label(__('customer_groups.name'))
+                                ->required()
+                                ->maxLength(255),
                             Textarea::make('description')
+                                ->label(__('customer_groups.description'))
                                 ->maxLength(500),
                         ]),
                 ]),
             Section::make(__('customers.personal_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('first_name')
                                 ->label(__('customers.first_name')),
                             TextInput::make('last_name')
                                 ->label(__('customers.last_name')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             DateTimePicker::make('date_of_birth')
                                 ->label(__('customers.date_of_birth'))
                                 ->displayFormat('Y-m-d'),
@@ -128,9 +132,9 @@ final class CustomerManagementResource extends Resource
                         ]),
                 ]),
             Section::make(__('customers.preferences'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('preferred_locale')
                                 ->label(__('customers.preferred_language'))
                                 ->options([
@@ -147,7 +151,7 @@ final class CustomerManagementResource extends Resource
                                 ->default('EUR'),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('notification_preferences->newsletter_subscription')
                                 ->label(__('customers.newsletter_subscription'))
                                 ->default(false),
@@ -181,12 +185,13 @@ final class CustomerManagementResource extends Resource
                 TextColumn::make('customerGroup.name')
                     ->label(__('customers.customer_group'))
                     ->sortable(),
-                BadgeColumn::make('email_verified_at')
+                TextColumn::make('email_verified_at')
                     ->label(__('customers.email_status'))
-                    ->formatStateUsing(fn ($state): string => $state ? __('customers.verified') : __('customers.unverified'))
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => filled($state) ? __('customers.verified') : __('customers.unverified'))
                     ->colors([
-                        'success' => fn ($state): bool => (bool) $state,
-                        'warning' => fn ($state): bool => ! $state,
+                        'success' => fn (?string $state): bool => filled($state),
+                        'warning' => fn (?string $state): bool => blank($state),
                     ]),
                 IconColumn::make('is_active')
                     ->label(__('customers.is_active'))
@@ -230,14 +235,17 @@ final class CustomerManagementResource extends Resource
                             ->label(__('customers.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
+                        $createdFrom = $data['created_from'] ?? null;
+                        $createdUntil = $data['created_until'] ?? null;
+
                         return $query
                             ->when(
-                                $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                $createdFrom,
+                                fn (Builder $query, string $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
-                                $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                $createdUntil,
+                                fn (Builder $query, string $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -248,7 +256,7 @@ final class CustomerManagementResource extends Resource
                     ->label(__('customers.verify_email'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (User $record): bool => ! $record->email_verified_at)
+                    ->visible(fn (User $record): bool => $record->email_verified_at === null)
                     ->action(function (User $record): void {
                         $record->update(['email_verified_at' => now()]);
                         Notification::make()
