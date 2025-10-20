@@ -7,24 +7,24 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\AddressType;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
+use App\Models\City;
 use App\Models\Customer;
 use App\Models\Country;
 use App\Models\User;
+use App\Support\Database\TableAvailability;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Exists;
 
 final class ProfileController extends Controller
 {
-    private ?bool $countriesTableExists = null;
-
-    private ?bool $citiesTableExists = null;
-
-    private ?bool $customersTableExists = null;
+    public function __construct(
+        private readonly TableAvailability $tableAvailability,
+    ) {
+    }
 
     public function index(Request $request): View
     {
@@ -298,28 +298,22 @@ final class ProfileController extends Controller
 
     private function countriesTableExists(): bool
     {
-        if ($this->countriesTableExists === null) {
-            $this->countriesTableExists = Schema::hasTable('countries');
-        }
+        $model = new Country();
 
-        return $this->countriesTableExists;
+        return $this->tableAvailability->has('countries', $model->getConnectionName());
     }
 
     private function citiesTableExists(): bool
     {
-        if ($this->citiesTableExists === null) {
-            $this->citiesTableExists = Schema::hasTable('cities');
-        }
+        $model = new City();
 
-        return $this->citiesTableExists;
+        return $this->tableAvailability->has('cities', $model->getConnectionName());
     }
 
     private function customersTableExists(): bool
     {
-        if ($this->customersTableExists === null) {
-            $this->customersTableExists = Schema::hasTable('customers');
-        }
+        $model = new Customer();
 
-        return $this->customersTableExists;
+        return $this->tableAvailability->has('customers', $model->getConnectionName());
     }
 }
