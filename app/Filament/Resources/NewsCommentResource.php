@@ -116,6 +116,10 @@ final class NewsCommentResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('author_name')
@@ -132,6 +136,10 @@ final class NewsCommentResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
 
                         return strlen($state) > 50 ? $state : null;
                     }),
