@@ -44,11 +44,13 @@ final class AutocompleteSelect extends Select
         return parent::make($name);
     }
 
-    public function searchable(bool|Closure $condition = true): static
+    public function searchable(Closure|array|bool $condition = true): static
     {
         parent::searchable($condition);
 
-        $this->searchable = (bool) $this->evaluate($condition);
+        $this->searchable = is_array($condition)
+            ? $condition !== []
+            : (bool) $this->evaluate($condition);
 
         return $this;
     }
@@ -156,13 +158,19 @@ final class AutocompleteSelect extends Select
         return $this->modelClass;
     }
 
-    public function getSearchResults(string $search): array
+    public function getSearchResults(string $search = ''): array
     {
-        $this->setSearchQuery($search);
+        if ($search !== '') {
+            $this->setSearchQuery($search);
+        } elseif ($this->searchQuery === null || $this->searchQuery === '') {
+            $this->searchResults = collect();
 
-        $results = $this->searchResults ?? collect();
+            return [];
+        } else {
+            $this->performSearch();
+        }
 
-        return $results
+        return ($this->searchResults ?? collect())
             ->mapWithKeys(function (array $item): array {
                 $value = $item['value'] ?? null;
                 $label = $item['label'] ?? (is_array($item['data'] ?? null) ? ($item['data']['name'] ?? (string) $value) : (string) $value);
@@ -199,7 +207,7 @@ final class AutocompleteSelect extends Select
         $labelField = $this->getLabelField();
 
         $query = $model
-            ->query()
+            ->newQueryWithoutScopes()
             ->where($searchField, 'like', '%'.$this->searchQuery.'%')
             ->limit($this->maxSearchResults);
 
