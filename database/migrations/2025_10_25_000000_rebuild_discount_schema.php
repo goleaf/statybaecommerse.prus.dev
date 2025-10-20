@@ -46,10 +46,12 @@ return new class extends Migration
             Schema::dropIfExists($legacyTable);
             Schema::rename('discount_codes', $legacyTable);
 
+            $this->dropIndexIfExists('discount_codes_code_unique', $legacyTable);
+
             Schema::create('discount_codes', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('discount_id')->nullable()->constrained('discounts')->nullOnDelete();
-                $table->string('code')->unique();
+                $table->string('code');
                 $table->string('name')->nullable();
                 $table->text('description')->nullable();
                 $table->text('description_lt')->nullable();
@@ -78,6 +80,7 @@ return new class extends Migration
                 $table->timestamps();
                 $table->softDeletes();
 
+                $table->unique('code', 'discount_codes_code_unique_new');
                 $table->index(['is_active', 'status', 'starts_at', 'expires_at'], 'discount_codes_active_window_idx');
                 $table->index(['discount_id', 'code'], 'discount_codes_discount_code_idx');
                 $table->index(['customer_group_id', 'status'], 'discount_codes_customer_status_idx');
@@ -356,6 +359,23 @@ return new class extends Migration
                 DB::table($to)->insert($batch);
             }
         });
+    }
+
+    private function dropIndexIfExists(string $indexName, string $table): void
+    {
+        $connection = Schema::getConnection()->getDriverName();
+
+        try {
+            if ($connection === 'mysql') {
+                DB::statement(sprintf('DROP INDEX %s ON %s', $indexName, $table));
+
+                return;
+            }
+
+            DB::statement(sprintf('DROP INDEX IF EXISTS %s', $indexName));
+        } catch (\Throwable) {
+            // Index was already removed or the driver does not support conditional drops.
+        }
     }
 
     /**
