@@ -70,6 +70,7 @@ return [
         'description' => 'Description',
         'button_text' => 'Button Text',
     ],
+    'email_campaigns' => require __DIR__.'/admin/email_campaigns.php',
     'variant_combinations' => [
         'navigation_label' => 'Variant Combinations',
         'plural_model_label' => 'Variant Combinations',

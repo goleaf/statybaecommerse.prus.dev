@@ -115,4 +115,5 @@ return [
         'warning' => 'Предупреждение',
         'danger' => 'Опасность',
     ],
+    'email_campaigns' => require __DIR__.'/admin/email_campaigns.php',
 ];
