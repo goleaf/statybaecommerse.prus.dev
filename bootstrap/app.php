@@ -1,8 +1,8 @@
 <?php
 
 use App\Exceptions\Domain\DomainException;
-use App\Http\Middleware\AttachCorrelationId;
 use App\Http\Middleware\AddSecurityHeaders;
+use App\Http\Middleware\AttachCorrelationId;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
 use Illuminate\Foundation\Application;

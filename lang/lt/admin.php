@@ -70,6 +70,17 @@ return [
         'description' => 'Aprašymas',
         'button_text' => 'Mygtuko tekstas',
     ],
+    'prices' => [
+        'navigation_label' => 'Kainos',
+        'plural_model_label' => 'Kainos',
+        'model_label' => 'Kaina',
+        'basic_information' => 'Pagrindinė informacija',
+        'product' => 'Produktas',
+        'amount' => 'Suma',
+        'audit_section' => 'Pakeitimo pagrindimas',
+        'audit_reason' => 'Pakeitimo priežastis',
+        'audit_reason_help' => 'Paaiškinkite, kodėl ši kaina turi būti atnaujinta.',
+    ],
     'variant_combinations' => [
         'navigation_label' => 'Variantų kombinacijos',
         'plural_model_label' => 'Variantų kombinacijos',
@@ -233,6 +244,40 @@ return [
         // Timestamps
         'created_at' => 'Sukurta',
         'updated_at' => 'Atnaujinta',
+        'audit_section' => 'Pakeitimo pagrindimas',
+        'audit_reason' => 'Pakeitimo priežastis',
+        'audit_reason_help' => 'Paaiškinkite, kodėl reikia keisti atsargas.',
+    ],
+    'audit_trails' => [
+        'navigation_label' => 'Auditai',
+        'plural_model_label' => 'Auditai',
+        'model_label' => 'Auditas',
+        'fields' => [
+            'created_at' => 'Laiko žyma',
+            'event' => 'Įvykis',
+            'auditable' => 'Objektas',
+            'actor' => 'Iniciatorius',
+            'changed_fields' => 'Keisti laukai',
+            'reason' => 'Priežastis',
+            'request_id' => 'Užklausos ID',
+            'diff' => 'Skirtumai',
+        ],
+        'filters' => [
+            'event' => 'Įvykis',
+        ],
+        'events' => [
+            'price_updated' => 'Kaina atnaujinta',
+            'inventory_updated' => 'Atsargos atnaujintos',
+            'roles_updated' => 'Vaidmenys atnaujinti',
+        ],
+        'details' => 'Audito detalės',
+        'diff_section' => 'Pakeitimų detalės',
+        'none' => 'Nepateikta',
+        'system_actor' => 'Sistema',
+        'back_to_list' => 'Atgal į auditus',
+        'validation' => [
+            'reason_required' => 'Pateikite priežastį šiam pakeitimui.',
+        ],
     ],
     'user_behaviors' => [
         'navigation_label' => 'Vartotojų Elgsena',

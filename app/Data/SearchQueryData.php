@@ -30,8 +30,8 @@ final class SearchQueryData
     private readonly array $context;
 
     /**
-     * @param array<int, string> $types
-     * @param array<string, mixed> $context
+     * @param  array<int, string>  $types
+     * @param  array<string, mixed>  $context
      */
     private function __construct(string $query, int $page, int $perPage, array $types, array $context)
     {
@@ -43,8 +43,8 @@ final class SearchQueryData
     }
 
     /**
-     * @param array<string, mixed> $input
-     * @param array<string, mixed> $context
+     * @param  array<string, mixed>  $input
+     * @param  array<string, mixed>  $context
      */
     public static function fromArray(array $input, array $context = []): self
     {

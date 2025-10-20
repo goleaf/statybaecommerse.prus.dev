@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -46,6 +47,15 @@ final class PriceResource extends Resource
                                     ->required(),
                             ]),
                     ]),
+                SchemaSection::make(__('admin.prices.audit_section'))
+                    ->schema([
+                        Textarea::make('audit_reason')
+                            ->label(__('admin.prices.audit_reason'))
+                            ->helperText(__('admin.prices.audit_reason_help'))
+                            ->visible(fn (?Price $record): bool => (bool) ($record?->exists))
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1),
             ]);
     }
 
