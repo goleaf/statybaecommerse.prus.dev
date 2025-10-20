@@ -158,10 +158,11 @@
                     @foreach($results as $result)
                         <div class="result-item bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
                             <!-- Result Image -->
-                            @if(!empty($result['image']))
+                            @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                            @if(!empty($image))
                                 <div class="aspect-w-16 aspect-h-9">
-                                    <img 
-                                        src="{{ $result['image'] }}" 
+                                    <img
+                                        src="{{ $image }}"
                                         alt="{{ $result['title'] }}"
                                         class="w-full h-48 object-cover rounded-t-lg"
                                     >

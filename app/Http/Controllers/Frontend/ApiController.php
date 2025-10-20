@@ -18,10 +18,32 @@ final class ApiController extends Controller
     {
         $query = $request->get('q', '');
 
-        $products = Product::where('name', 'like', "%{$query}%")
-            ->orWhere('description', 'like', "%{$query}%")
-            ->limit(10)
-            ->get(['id', 'name', 'price', 'image']);
+        $limit = (int) $request->integer('limit', 10);
+        $limit = max(1, min($limit, 25));
+
+        $products = Product::query()
+            ->when($query !== '', function ($productQuery) use ($query) {
+                $productQuery->where(function ($nestedQuery) use ($query) {
+                    $likeQuery = "%{$query}%";
+
+                    $nestedQuery
+                        ->where('name', 'like', $likeQuery)
+                        ->orWhere('description', 'like', $likeQuery);
+                });
+            })
+            ->limit($limit)
+            ->get(['id', 'name', 'slug', 'price'])
+            ->map(static function (Product $product): array {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'price' => $product->price,
+                    'main_image' => $product->main_image,
+                    'thumbnail' => $product->thumbnail,
+                ];
+            })
+            ->values();
 
         return response()->json($products);
     }
@@ -90,9 +112,31 @@ final class ApiController extends Controller
     {
         $recentlyViewed = session('recently_viewed', []);
 
-        $products = Product::whereIn('id', $recentlyViewed)
-            ->limit(10)
-            ->get(['id', 'name', 'price', 'image']);
+        if ($recentlyViewed === []) {
+            return response()->json([]);
+        }
+
+        $orderedIds = array_values(array_unique(array_slice($recentlyViewed, 0, 10)));
+
+        $products = Product::query()
+            ->whereIn('id', $orderedIds)
+            ->get(['id', 'name', 'slug', 'price'])
+            ->sortBy(static function (Product $product) use ($orderedIds): int {
+                $position = array_search($product->id, $orderedIds, true);
+
+                return $position === false ? PHP_INT_MAX : $position;
+            })
+            ->values()
+            ->map(static function (Product $product): array {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'price' => $product->price,
+                    'main_image' => $product->main_image,
+                    'thumbnail' => $product->thumbnail,
+                ];
+            });
 
         return response()->json($products);
     }

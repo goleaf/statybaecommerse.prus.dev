@@ -143,9 +143,10 @@
                         <div class="flex items-center space-x-3">
                             {{-- Category Image --}}
                             <div class="flex-shrink-0">
-                                @if($result['image'])
-                                    <img 
-                                        src="{{ $result['image'] }}" 
+                                @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                                @if($image)
+                                    <img
+                                        src="{{ $image }}"
                                         alt="{{ $result['title'] }}"
                                         class="w-8 h-8 object-cover rounded"
                                     />
