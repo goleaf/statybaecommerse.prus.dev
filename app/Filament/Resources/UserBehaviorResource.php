@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserBehaviorResource\Pages;
-use App\Models\User;
 use App\Models\UserBehavior;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -14,6 +13,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -43,6 +43,9 @@ final class UserBehaviorResource extends Resource
 {
     protected static ?string $model = UserBehavior::class;
 
+    /**
+     * Filament navigation icon identifier.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
@@ -52,16 +55,16 @@ final class UserBehaviorResource extends Resource
     private static function behaviorTypeOptions(): array
     {
         return [
-            'view' => __('admin.user_behaviors.behavior_types.view'),
-            'click' => __('admin.user_behaviors.behavior_types.click'),
-            'add_to_cart' => __('admin.user_behaviors.behavior_types.add_to_cart'),
+            'view'             => __('admin.user_behaviors.behavior_types.view'),
+            'click'            => __('admin.user_behaviors.behavior_types.click'),
+            'add_to_cart'      => __('admin.user_behaviors.behavior_types.add_to_cart'),
             'remove_from_cart' => __('admin.user_behaviors.behavior_types.remove_from_cart'),
-            'purchase' => __('admin.user_behaviors.behavior_types.purchase'),
-            'search' => __('admin.user_behaviors.behavior_types.search'),
-            'filter' => __('admin.user_behaviors.behavior_types.filter'),
-            'sort' => __('admin.user_behaviors.behavior_types.sort'),
-            'wishlist' => __('admin.user_behaviors.behavior_types.wishlist'),
-            'share' => __('admin.user_behaviors.behavior_types.share'),
+            'purchase'         => __('admin.user_behaviors.behavior_types.purchase'),
+            'search'           => __('admin.user_behaviors.behavior_types.search'),
+            'filter'           => __('admin.user_behaviors.behavior_types.filter'),
+            'sort'             => __('admin.user_behaviors.behavior_types.sort'),
+            'wishlist'         => __('admin.user_behaviors.behavior_types.wishlist'),
+            'share'            => __('admin.user_behaviors.behavior_types.share'),
         ];
     }
 
@@ -174,17 +177,17 @@ final class UserBehaviorResource extends Resource
                     ->label(__('admin.user_behaviors.behavior_type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'view' => 'info',
-                        'click' => 'success',
-                        'add_to_cart' => 'warning',
+                        'view'             => 'info',
+                        'click'            => 'success',
+                        'add_to_cart'      => 'warning',
                         'remove_from_cart' => 'danger',
-                        'purchase' => 'primary',
-                        'search' => 'secondary',
-                        'filter' => 'gray',
-                        'sort' => 'gray',
-                        'wishlist' => 'pink',
-                        'share' => 'blue',
-                        default => 'gray',
+                        'purchase'         => 'primary',
+                        'search'           => 'secondary',
+                        'filter'           => 'gray',
+                        'sort'             => 'gray',
+                        'wishlist'         => 'pink',
+                        'share'            => 'blue',
+                        default            => 'gray',
                     })
                     ->searchable(),
                 TextColumn::make('product.name')
@@ -256,23 +259,23 @@ final class UserBehaviorResource extends Resource
                     ->preload(),
                 TernaryFilter::make('has_product')
                     ->label(__('admin.user_behaviors.has_product'))
-                    ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('product_id'),
-                        false: fn (Builder $query) => $query->whereNull('product_id'),
-                        blank: fn (Builder $query) => $query,
-                    ),
+                    ->queries([
+                        true  => fn (Builder $query): Builder => $query->whereNotNull('product_id'),
+                        false => fn (Builder $query): Builder => $query->whereNull('product_id'),
+                        null  => fn (Builder $query): Builder => $query,
+                    ]),
                 TernaryFilter::make('has_category')
                     ->label(__('admin.user_behaviors.has_category'))
-                    ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('category_id'),
-                        false: fn (Builder $query) => $query->whereNull('category_id'),
-                        blank: fn (Builder $query) => $query,
-                    ),
+                    ->queries([
+                        true  => fn (Builder $query): Builder => $query->whereNotNull('category_id'),
+                        false => fn (Builder $query): Builder => $query->whereNull('category_id'),
+                        null  => fn (Builder $query): Builder => $query,
+                    ]),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')
+                        DatePicker::make('created_from')
                             ->label(__('admin.user_behaviors.created_from')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')
+                        DatePicker::make('created_until')
                             ->label(__('admin.user_behaviors.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -405,10 +408,10 @@ final class UserBehaviorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserBehaviors::route('/'),
-            'create' => Pages\CreateUserBehavior::route('/create'),
-            'view' => Pages\ViewUserBehavior::route('/{record}'),
-            'edit' => Pages\EditUserBehavior::route('/{record}/edit'),
+            'index'     => Pages\ListUserBehaviors::route('/'),
+            'create'    => Pages\CreateUserBehavior::route('/create'),
+            'view'      => Pages\ViewUserBehavior::route('/{record}'),
+            'edit'      => Pages\EditUserBehavior::route('/{record}/edit'),
             'analytics' => Pages\Analytics::route('/analytics'),
         ];
     }
