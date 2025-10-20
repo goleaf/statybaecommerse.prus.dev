@@ -7,7 +7,7 @@ namespace App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tab;
+use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListCountries extends ListRecords
