@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Wishlist;
+use App\Models\UserWishlist;
+use App\Models\WishlistItem;
+use App\Services\Cart\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 final class ApiController extends Controller
 {
+    public function __construct(private readonly CartService $cartService)
+    {
+    }
+
     public function searchProducts(Request $request): JsonResponse
     {
         $query = $request->get('q', '');
@@ -37,83 +43,122 @@ final class ApiController extends Controller
 
     public function getCartCount(Request $request): JsonResponse
     {
-        $count = 0;
+        $userId = $request->user()?->getAuthIdentifier();
+        $sessionId = $request->session()->getId();
 
-        if (auth()->check()) {
-            $count = Cart::where('user_id', auth()->id())->sum('quantity');
-        } else {
-            $count = session('cart', []);
-            $count = is_array($count) ? count($count) : 0;
-        }
+        $count = $this->cartService->getCount(
+            $userId !== null ? (int) $userId : null,
+            $sessionId
+        );
 
         return response()->json(['count' => $count]);
     }
 
     public function getWishlistCount(Request $request): JsonResponse
     {
-        $count = 0;
+        $userId = $request->user()?->getAuthIdentifier();
 
-        if (auth()->check()) {
-            $count = Wishlist::where('user_id', auth()->id())->count();
+        if ($userId === null) {
+            return response()->json(['count' => 0]);
         }
+
+        $count = WishlistItem::query()
+            ->forUser((int) $userId)
+            ->count();
 
         return response()->json(['count' => $count]);
     }
 
     public function toggleWishlist(Request $request): JsonResponse
     {
-        if (! auth()->check()) {
+        $user = $request->user();
+
+        if ($user === null) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $productId = $request->get('product_id');
+        $productId = (int) $request->integer('product_id');
 
-        $wishlist = Wishlist::where('user_id', auth()->id())
+        if ($productId <= 0 || ! Product::query()->whereKey($productId)->exists()) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        $variantId = $request->has('variant_id') ? (int) $request->integer('variant_id') : null;
+
+        $wishlist = $this->resolveDefaultWishlist((int) $user->getAuthIdentifier());
+
+        $wishlistItemQuery = $wishlist->items()
             ->where('product_id', $productId)
-            ->first();
+            ->when($variantId, static fn ($query) => $query->where('variant_id', $variantId));
 
-        if ($wishlist) {
-            $wishlist->delete();
+        $wishlistItem = $wishlistItemQuery->first();
+
+        if ($wishlistItem !== null) {
+            $wishlistItem->delete();
             $added = false;
         } else {
-            Wishlist::create([
-                'user_id' => auth()->id(),
+            $wishlist->items()->create([
                 'product_id' => $productId,
+                'variant_id' => $variantId,
+                'quantity' => 1,
             ]);
             $added = true;
         }
 
-        return response()->json(['added' => $added]);
+        $count = $wishlist->items()->count();
+
+        return response()->json([
+            'added' => $added,
+            'count' => $count,
+        ]);
     }
 
     public function getRecentlyViewed(Request $request): JsonResponse
     {
-        $recentlyViewed = session('recently_viewed', []);
+        $recentlyViewed = array_values(array_unique(array_map('intval', (array) $request->session()->get('recently_viewed', []))));
 
-        $products = Product::whereIn('id', $recentlyViewed)
-            ->limit(10)
-            ->get(['id', 'name', 'price', 'image']);
+        if ($recentlyViewed === []) {
+            return response()->json([]);
+        }
+
+        $recentlyViewed = array_slice($recentlyViewed, 0, 10);
+
+        $products = Product::query()
+            ->whereIn('id', $recentlyViewed)
+            ->get(['id', 'name', 'price', 'image'])
+            ->sortBy(fn (Product $product) => array_search($product->getKey(), $recentlyViewed, true))
+            ->values();
 
         return response()->json($products);
     }
 
     public function addRecentlyViewed(Request $request): JsonResponse
     {
-        $productId = $request->get('product_id');
+        $productId = (int) $request->integer('product_id');
 
-        $recentlyViewed = session('recently_viewed', []);
+        if ($productId <= 0 || ! Product::query()->whereKey($productId)->exists()) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
 
-        // Remove if already exists
-        $recentlyViewed = array_filter($recentlyViewed, fn ($id) => $id != $productId);
+        $recentlyViewed = array_values(array_filter(
+            array_map('intval', (array) $request->session()->get('recently_viewed', [])),
+            static fn (int $id) => $id !== $productId
+        ));
 
-        // Add to beginning
         array_unshift($recentlyViewed, $productId);
 
-        // Keep only last 20
         $recentlyViewed = array_slice($recentlyViewed, 0, 20);
 
-        session(['recently_viewed' => $recentlyViewed]);
+        $request->session()->put('recently_viewed', $recentlyViewed);
 
         return response()->json(['success' => true]);
+    }
+
+    private function resolveDefaultWishlist(int $userId): UserWishlist
+    {
+        return UserWishlist::query()->firstOrCreate(
+            ['user_id' => $userId, 'is_default' => true],
+            ['name' => __('My Wishlist')]
+        );
     }
 }
