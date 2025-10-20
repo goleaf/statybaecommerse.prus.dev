@@ -36,3 +36,7 @@ Thumbs.db
 *.sql.gz
 *.tar
 !/storage/app/backups/.gitignore
+
+# Local PHP runtime overrides
+php.ini
+.php-unlimited.ini
