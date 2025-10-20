@@ -1,5 +1,32 @@
 @extends('components.layouts.base')
 
+@php
+    $correlationId = null;
+
+    if (app()->bound('request_correlation_id')) {
+        $resolvedCorrelation = app('request_correlation_id');
+        if (is_string($resolvedCorrelation) && $resolvedCorrelation !== '') {
+            $correlationId = $resolvedCorrelation;
+        }
+    }
+
+    if ($correlationId === null) {
+        $attributeCorrelation = request()->attributes->get('correlation_id');
+        if (is_string($attributeCorrelation) && $attributeCorrelation !== '') {
+            $correlationId = $attributeCorrelation;
+        }
+    }
+
+    $supportEmail = config('mail.from.address');
+
+    if (! is_string($supportEmail) || $supportEmail === '') {
+        $host = parse_url(config('app.url'), PHP_URL_HOST);
+        $supportEmail = is_string($host) && $host !== ''
+            ? 'support@' . $host
+            : 'support@example.com';
+    }
+@endphp
+
 @section('title', __('Page Not Found') . ' - ' . config('app.name'))
 
 @section('meta')
@@ -108,6 +135,29 @@
                         </a>
                     </div>
                 </div>
+            </div>
+
+            <div class="mt-12 bg-white rounded-2xl border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">{{ __('Need more help?') }}</h3>
+                <p class="text-gray-600 mb-3">
+                    {{ __('Contact our support team and include the reference below so we can assist you quickly.') }}
+                </p>
+
+                @if ($correlationId)
+                    <div class="bg-gray-50 border border-dashed border-gray-200 rounded-xl px-4 py-3 mb-4">
+                        <p class="text-sm font-medium text-gray-700 mb-1">{{ __('Reference code') }}</p>
+                        <code class="text-sm text-gray-500 break-all">{{ $correlationId }}</code>
+                    </div>
+                @endif
+
+                <a href="mailto:{{ $supportEmail }}"
+                   class="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.068 1.916l-7.5 4.687a2.25 2.25 0 01-2.364 0l-7.5-4.687a2.25 2.25 0 01-1.068-1.916V6.75" />
+                    </svg>
+                    {{ __('Email support') }}
+                </a>
             </div>
         </div>
     </div>
