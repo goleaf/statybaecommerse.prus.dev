@@ -25,8 +25,26 @@ final class NotificationApiTest extends TestCase
         $response = $this->getJson(route('api.v1.notifications.index'));
 
         $response->assertOk()
-            ->assertJsonFragment(['success' => true])
-            ->assertJsonStructure(['data', 'pagination']);
+            ->assertJsonStructure([
+                'success',
+                'data' => [
+                    '*' => [
+                        'id',
+                        'notification_class',
+                        'type',
+                        'title',
+                        'message',
+                        'urgent',
+                        'color',
+                        'tags',
+                        'is_read',
+                        'read_at',
+                        'created_at',
+                        'context',
+                    ],
+                ],
+                'pagination' => ['current_page', 'last_page', 'per_page', 'total', 'from', 'to'],
+            ]);
     }
 
     public function test_notifications_index_requires_authentication(): void
@@ -34,6 +52,17 @@ final class NotificationApiTest extends TestCase
         $response = $this->getJson(route('api.v1.notifications.index'));
 
         $response->assertUnauthorized();
+    }
+
+    public function test_notifications_index_rejects_out_of_range_per_page_values(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user, ['notifications.read']);
+
+        $response = $this->getJson(route('api.v1.notifications.index', ['per_page' => 0]));
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['per_page']);
     }
 
     public function test_mark_as_read_requires_manage_ability(): void
@@ -48,6 +77,20 @@ final class NotificationApiTest extends TestCase
         $response->assertForbidden();
     }
 
+    public function test_mark_as_read_returns_payload_for_owner(): void
+    {
+        $user = User::factory()->create();
+        $notification = Notification::factory()->forUser($user)->unread()->create();
+
+        Sanctum::actingAs($user, ['notifications.manage']);
+
+        $response = $this->postJson(route('api.v1.notifications.mark-as-read', $notification));
+
+        $response->assertOk()
+            ->assertJsonPath('data.is_read', true)
+            ->assertJsonPath('data.id', $notification->id);
+    }
+
     public function test_mark_as_read_returns_not_found_for_foreign_notification(): void
     {
         $user = User::factory()->create();
@@ -58,7 +101,8 @@ final class NotificationApiTest extends TestCase
 
         $response = $this->postJson(route('api.v1.notifications.mark-as-read', $notification));
 
-        $response->assertNotFound();
+        $response->assertNotFound()
+            ->assertJsonPath('success', false);
     }
 
     public function test_notification_requests_are_rate_limited(): void
@@ -80,5 +124,16 @@ final class NotificationApiTest extends TestCase
 
         config(['api.rate_limits.notifications' => $originalLimit]);
         RateLimiter::clear('user:'.$user->id.'|notifications');
+    }
+
+    public function test_notification_search_requires_query_parameter(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user, ['notifications.read']);
+
+        $response = $this->getJson(route('api.v1.notifications.search'));
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['q']);
     }
 }
