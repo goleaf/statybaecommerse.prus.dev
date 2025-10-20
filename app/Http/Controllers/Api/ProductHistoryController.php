@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductHistory;
 use App\Traits\HandlesContentNegotiation;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -27,33 +30,99 @@ final class ProductHistoryController extends Controller
      */
     public function index(Request $request, Product $product): JsonResponse|View|Response
     {
-        $query = $product->histories()->with(['user:id,name,email'])->latest();
-        // Apply filters
-        if ($request->has('action')) {
-            $query->byAction($request->get('action'));
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'created_at' => 'created_at',
+                'action' => 'action',
+                'field_name' => 'field_name',
+            ],
+            defaultSort: 'created_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 15,
+            maxPerPage: 100,
+        );
+
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
+        $query = $product->histories()->with(['user:id,name,email']);
+
+        $filters = $listQuery->filters;
+
+        if (array_key_exists('action', $filters)) {
+            $query->byAction($filters['action']);
         }
-        if ($request->has('field_name')) {
-            $query->byField($request->get('field_name'));
+
+        if (array_key_exists('field_name', $filters)) {
+            $query->byField($filters['field_name']);
         }
-        if ($request->has('user_id')) {
-            $query->byUser($request->get('user_id'));
+
+        if (array_key_exists('user_id', $filters)) {
+            $query->byUser($filters['user_id']);
         }
-        if ($request->has('date_from')) {
-            $query->where('created_at', '>=', $request->get('date_from'));
+
+        if (array_key_exists('date_from', $filters)) {
+            $query->where('created_at', '>=', $filters['date_from']);
         }
-        if ($request->has('date_to')) {
-            $query->where('created_at', '<=', $request->get('date_to'));
+
+        if (array_key_exists('date_to', $filters)) {
+            $query->where('created_at', '<=', $filters['date_to']);
         }
-        if ($request->has('search')) {
-            $search = $request->get('search');
+
+        if (array_key_exists('search', $filters)) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('description', 'like', "%{$search}%")->orWhere('action', 'like', "%{$search}%")->orWhere('field_name', 'like', "%{$search}%");
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhere('field_name', 'like', "%{$search}%");
             });
         }
-        // Pagination
-        $perPage = min($request->get('per_page', 15), 100);
-        $histories = $query->paginate($perPage);
-        $data = ['histories' => $histories->items(), 'pagination' => ['current_page' => $histories->currentPage(), 'last_page' => $histories->lastPage(), 'per_page' => $histories->perPage(), 'total' => $histories->total(), 'from' => $histories->firstItem(), 'to' => $histories->lastItem()], 'product' => ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku]];
+
+        $query = $listQuery->apply($query, $definition);
+
+        $paginator = $query->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
+            ->appends($request->query());
+
+        if ($request->expectsJson()) {
+            $response = ListResponse::fromPaginator(
+                $paginator->through(static fn (ProductHistory $history) => [
+                    'id' => $history->id,
+                    'action' => $history->action,
+                    'field_name' => $history->field_name,
+                    'description' => $history->description,
+                    'old_value' => $history->old_value,
+                    'new_value' => $history->new_value,
+                    'created_at' => $history->created_at,
+                    'user' => $history->user,
+                ]),
+            );
+
+            $response['context'] = [
+                'product' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'sku' => $product->sku,
+                ],
+            ];
+
+            return response()->json($response);
+        }
+
+        $data = [
+            'histories' => $paginator->items(),
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+            ],
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku,
+            ],
+        ];
 
         return $this->handleContentNegotiation($request, $data);
     }

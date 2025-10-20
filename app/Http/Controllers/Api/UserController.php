@@ -8,9 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminUserResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
  * UserController
@@ -22,24 +24,58 @@ class UserController extends Controller
     /**
      * Display a listing of the resource with pagination and filtering.
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', User::class);
-        $users = User::with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals'])->when($request->has('search'), function ($query) use ($request) {
-            $search = $request->get('search');
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'created_at' => 'created_at',
+                'name' => 'name',
+                'email' => 'email',
+                'last_login_at' => 'last_login_at',
+            ],
+            defaultSort: 'created_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 15,
+            maxPerPage: 100,
+        );
 
-            return $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")->orWhere('first_name', 'like', "%{$search}%")->orWhere('last_name', 'like', "%{$search}%");
-            });
-        })->when($request->has('status'), function ($query) use ($request) {
-            return $query->where('is_active', $request->boolean('status'));
-        })->when($request->has('role'), function ($query) use ($request) {
-            return $query->whereHas('roles', function ($q) use ($request) {
-                $q->where('name', $request->get('role'));
-            });
-        })->paginate($request->get('per_page', 15));
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+        $filters = $listQuery->filters;
 
-        return AdminUserResource::collection($users);
+        $users = User::with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals']);
+
+        if ($search = $filters['search'] ?? null) {
+            $users->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%");
+            });
+        }
+
+        if (array_key_exists('status', $filters)) {
+            $isActive = filter_var($filters['status'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($isActive !== null) {
+                $users->where('is_active', $isActive);
+            }
+        }
+
+        if ($role = $filters['role'] ?? null) {
+            $users->whereHas('roles', function ($q) use ($role) {
+                $q->where('name', $role);
+            });
+        }
+
+        $users = $listQuery->apply($users, $definition)
+            ->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
+            ->appends($request->query());
+
+        $response = ListResponse::fromPaginator(
+            $users->through(fn (User $user) => (new AdminUserResource($user))->toArray($request)),
+        );
+
+        return response()->json($response);
     }
 
     /**

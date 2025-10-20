@@ -66,7 +66,15 @@ final class NotificationService
      *
      * @return Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getUserNotifications(User $user, int $perPage = 25, ?string $type = null, ?bool $read = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getUserNotifications(
+        User $user,
+        int $perPage = 25,
+        ?string $type = null,
+        ?bool $read = null,
+        string $sortColumn = 'created_at',
+        string $sortDirection = 'desc',
+        int $page = 1,
+    ): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = Notification::forUser($user->id);
         if ($type) {
@@ -76,7 +84,9 @@ final class NotificationService
             $query = $read ? $query->read() : $query->unread();
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query
+            ->orderBy($sortColumn, $sortDirection)
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
