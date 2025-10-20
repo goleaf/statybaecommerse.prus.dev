@@ -15,7 +15,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -30,7 +30,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -135,17 +135,16 @@ final class PostResource extends Resource
                     ]),
                 Section::make(__('posts.sections.media'))
                     ->schema([
-                        FileUpload::make('featured_image')
+                        SpatieMediaLibraryFileUpload::make('images')
                             ->label(__('posts.fields.images'))
+                            ->collection('images')
                             ->image()
-                            ->directory('posts')
-                            ->visibility('private'),
-                        FileUpload::make('gallery')
+                            ->singleFile(),
+                        SpatieMediaLibraryFileUpload::make('gallery')
                             ->label(__('posts.fields.gallery'))
+                            ->collection('gallery')
                             ->image()
-                            ->multiple()
-                            ->directory('posts/gallery')
-                            ->visibility('private'),
+                            ->multiple(),
                     ]),
                 Section::make(__('posts.sections.seo'))
                     ->schema([
@@ -248,8 +247,10 @@ final class PostResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('featured_image')
+                SpatieMediaLibraryImageColumn::make('images')
                     ->label(__('posts.fields.images'))
+                    ->collection('images')
+                    ->conversion('thumb')
                     ->circular()
                     ->size(50),
                 TextColumn::make('title')

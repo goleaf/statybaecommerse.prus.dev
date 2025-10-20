@@ -151,6 +151,8 @@ final class EditPost extends EditRecord
             $data['status'] = $data['status'] ?? 'draft';
         }
 
+        unset($data['images'], $data['gallery']);
+
         return $data;
     }
 }
