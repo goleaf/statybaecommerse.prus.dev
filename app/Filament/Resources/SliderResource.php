@@ -6,8 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
-use BackedEnum;
-use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -18,6 +16,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TableEditAction;
 use Filament\Tables\Actions\ViewAction as TableViewAction;
@@ -37,7 +36,10 @@ final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';
 
@@ -174,7 +176,7 @@ final class SliderResource extends Resource
             ->actions([
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make(),
+                TableDeleteAction::make(),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
