@@ -44,8 +44,7 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 

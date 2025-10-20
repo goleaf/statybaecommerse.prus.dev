@@ -13,15 +13,16 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -55,7 +56,7 @@ final class CouponResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Section::make(__('coupons.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -84,8 +85,8 @@ final class CouponResource extends Resource
                             Select::make('type')
                                 ->label(__('coupons.type'))
                                 ->options([
-                                    'percentage' => __('coupons.types.percentage'),
-                                    'fixed' => __('coupons.types.fixed'),
+                                    'percentage'    => __('coupons.types.percentage'),
+                                    'fixed'         => __('coupons.types.fixed'),
                                     'free_shipping' => __('coupons.types.free_shipping'),
                                 ])
                                 ->default('percentage')
@@ -95,15 +96,20 @@ final class CouponResource extends Resource
                                 ->numeric()
                                 ->step(0.01)
                                 ->minValue(0)
+                                ->required(fn (Get $get): bool => $get('type') !== 'free_shipping')
                                 ->helperText(__('coupons.value_help')),
                             TextInput::make('minimum_amount')
                                 ->label(__('coupons.minimum_amount'))
                                 ->prefix('€')
-                                ->minValue(0),
+                                ->numeric()
+                                ->minValue(0)
+                                ->nullable(),
                             TextInput::make('maximum_discount')
                                 ->label(__('coupons.maximum_discount'))
                                 ->prefix('€')
-                                ->minValue(0),
+                                ->numeric()
+                                ->minValue(0)
+                                ->nullable(),
                         ]),
                 ]),
             Section::make(__('coupons.usage_limits'))
@@ -112,17 +118,19 @@ final class CouponResource extends Resource
                         ->schema([
                             TextInput::make('usage_limit')
                                 ->label(__('coupons.usage_limit'))
+                                ->numeric()
                                 ->minValue(1)
+                                ->nullable()
                                 ->helperText(__('coupons.usage_limit_help')),
                             TextInput::make('usage_limit_per_user')
                                 ->label(__('coupons.usage_limit_per_user'))
+                                ->numeric()
+                                ->minValue(1)
+                                ->nullable()
                                 ->helperText(__('coupons.usage_limit_per_user_help')),
                             TextInput::make('used_count')
                                 ->label(__('coupons.used_count'))
-                                ->default(0)
-                                ->disabled(),
-                            TextInput::make('remaining_uses')
-                                ->label(__('coupons.remaining_uses'))
+                                ->numeric()
                                 ->default(0)
                                 ->disabled(),
                         ]),
@@ -131,34 +139,13 @@ final class CouponResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('valid_from')
-                                ->label(__('coupons.valid_from'))
+                            DateTimePicker::make('starts_at')
+                                ->label(__('coupons.starts_at'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            DateTimePicker::make('valid_until')
-                                ->label(__('coupons.valid_until'))
+                            DateTimePicker::make('expires_at')
+                                ->label(__('coupons.expires_at'))
                                 ->displayFormat('d/m/Y H:i'),
-                        ]),
-                ]),
-            Section::make(__('coupons.targeting'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            Select::make('customer_group_id')
-                                ->label(__('coupons.customer_group'))
-                                ->relationship('customerGroup', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    Textarea::make('description')
-                                        ->maxLength(500),
-                                ]),
-                            Toggle::make('is_first_time_only')
-                                ->label(__('coupons.is_first_time_only'))
-                                ->default(false),
                         ]),
                 ]),
             Section::make(__('coupons.settings'))
@@ -204,21 +191,21 @@ final class CouponResource extends Resource
                     ->label(__('coupons.type'))
                     ->formatStateUsing(fn (string $state): string => __("coupons.types.{$state}"))
                     ->color(fn (string $state): string => match ($state) {
-                        'percentage' => 'green',
-                        'fixed' => 'blue',
+                        'percentage'    => 'green',
+                        'fixed'         => 'blue',
                         'free_shipping' => 'purple',
-                        default => 'gray',
+                        default         => 'gray',
                     }),
                 TextColumn::make('value')
                     ->label(__('coupons.value'))
                     ->formatStateUsing(function ($state, $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
+                            return $state . '%';
                         } elseif ($record->type === 'free_shipping') {
                             return __('coupons.free_shipping');
                         }
 
-                        return '€'.number_format((float) $state, 2);
+                        return '€' . number_format((float) $state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -231,16 +218,14 @@ final class CouponResource extends Resource
                     ->color(fn ($state, $record): string => $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
                 TextColumn::make('remaining_uses')
                     ->label(__('coupons.remaining_uses'))
-                    ->color(fn ($state): string => $state <= 0 ? 'danger' : 'success'),
-                TextColumn::make('customerGroup.name')
-                    ->label(__('coupons.customer_group'))
-                    ->color('gray'),
+                    ->getStateUsing(fn (Coupon $record): ?int => $record->usage_limit ? max($record->usage_limit - $record->used_count, 0) : null)
+                    ->color(fn (?int $state): ?string => $state === null ? null : ($state <= 0 ? 'danger' : 'success')),
                 BadgeColumn::make('is_active')
                     ->label(__('coupons.status'))
                     ->formatStateUsing(fn (bool $state): string => $state ? __('coupons.active') : __('coupons.inactive'))
                     ->colors([
                         'success' => true,
-                        'danger' => false,
+                        'danger'  => false,
                     ]),
                 IconColumn::make('is_public')
                     ->label(__('coupons.is_public'))
@@ -251,12 +236,12 @@ final class CouponResource extends Resource
                 IconColumn::make('is_stackable')
                     ->label(__('coupons.is_stackable'))
                     ->boolean(),
-                TextColumn::make('valid_from')
-                    ->label(__('coupons.valid_from'))
+                TextColumn::make('starts_at')
+                    ->label(__('coupons.starts_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('valid_until')
-                    ->label(__('coupons.valid_until'))
+                TextColumn::make('expires_at')
+                    ->label(__('coupons.expires_at'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('created_at')
@@ -273,13 +258,10 @@ final class CouponResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'percentage' => __('coupons.types.percentage'),
-                        'fixed' => __('coupons.types.fixed'),
+                        'percentage'    => __('coupons.types.percentage'),
+                        'fixed'         => __('coupons.types.fixed'),
                         'free_shipping' => __('coupons.types.free_shipping'),
                     ]),
-                SelectFilter::make('customer_group_id')
-                    ->relationship('customerGroup', 'name')
-                    ->preload(),
                 TernaryFilter::make('is_active')
                     ->label(__('coupons.is_active'))
                     ->trueLabel(__('coupons.active_only'))
@@ -323,8 +305,8 @@ final class CouponResource extends Resource
                     ->color('info')
                     ->action(function (Coupon $record): void {
                         $newCoupon = $record->replicate();
-                        $newCoupon->code = $record->code.'_copy_'.time();
-                        $newCoupon->name = $record->name.' (Copy)';
+                        $newCoupon->code = $record->code . '_copy_' . time();
+                        $newCoupon->name = $record->name . ' (Copy)';
                         $newCoupon->used_count = 0;
                         $newCoupon->save();
 
@@ -384,10 +366,10 @@ final class CouponResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCoupons::route('/'),
+            'index'  => Pages\ListCoupons::route('/'),
             'create' => Pages\CreateCoupon::route('/create'),
-            'view' => Pages\ViewCoupon::route('/{record}'),
-            'edit' => Pages\EditCoupon::route('/{record}/edit'),
+            'view'   => Pages\ViewCoupon::route('/{record}'),
+            'edit'   => Pages\EditCoupon::route('/{record}/edit'),
         ];
     }
 }
