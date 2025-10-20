@@ -7,13 +7,13 @@ namespace App\Filament\Pages\Auth;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 
 class EditProfile extends BaseEditProfile
 {
@@ -47,9 +47,9 @@ class EditProfile extends BaseEditProfile
                         Select::make('gender')
                             ->label(__('admin.profile.gender'))
                             ->options([
-                                'male' => __('admin.gender.male'),
+                                'male'   => __('admin.gender.male'),
                                 'female' => __('admin.gender.female'),
-                                'other' => __('admin.gender.other'),
+                                'other'  => __('admin.gender.other'),
                             ])
                             ->native(false),
                         DatePicker::make('birth_date')
@@ -100,10 +100,10 @@ class EditProfile extends BaseEditProfile
                         Select::make('timezone')
                             ->label(__('admin.profile.timezone'))
                             ->options([
-                                'Europe/Vilnius' => 'Europe/Vilnius (GMT+2)',
-                                'Europe/London' => 'Europe/London (GMT+0)',
+                                'Europe/Vilnius'   => 'Europe/Vilnius (GMT+2)',
+                                'Europe/London'    => 'Europe/London (GMT+0)',
                                 'America/New_York' => 'America/New_York (GMT-5)',
-                                'UTC' => 'UTC (GMT+0)',
+                                'UTC'              => 'UTC (GMT+0)',
                             ])
                             ->native(false)
                             ->default('Europe/Vilnius'),
