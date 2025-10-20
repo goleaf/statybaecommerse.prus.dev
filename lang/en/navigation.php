@@ -16,6 +16,7 @@ return [
         'system' => 'System',
         'reports' => 'Reports',
     ],
+    'api_keys' => 'API Keys',
     'user_impersonation' => 'User Impersonation',
     'user_management' => 'User Management',
 ];
