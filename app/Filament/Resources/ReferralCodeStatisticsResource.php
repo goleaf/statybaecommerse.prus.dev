@@ -12,6 +12,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -19,9 +20,10 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -64,9 +66,10 @@ final class ReferralCodeStatisticsResource extends Resource
                             ->schema([
                                 Select::make('referral_code_id')
                                     ->label(__('admin.referral_code_statistics.referral_code'))
-                                    ->options(ReferralCode::pluck('code', 'id'))
+                                    ->relationship('referralCode', 'code')
                                     ->required()
-                                    ->searchable(),
+                                    ->searchable()
+                                    ->preload(),
                                 DatePicker::make('date')
                                     ->label(__('admin.referral_code_statistics.date'))
                                     ->required()
@@ -105,6 +108,15 @@ final class ReferralCodeStatisticsResource extends Resource
                                     ->prefix('€')
                                     ->default(0),
                             ]),
+                    ]),
+                SchemaSection::make(__('admin.referral_code_statistics.additional_information'))
+                    ->collapsible()
+                    ->schema([
+                        KeyValue::make('metadata')
+                            ->label(__('admin.referral_code_statistics.metadata'))
+                            ->keyLabel(__('admin.referral_code_statistics.metadata_key'))
+                            ->valueLabel(__('admin.referral_code_statistics.metadata_value'))
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
@@ -149,12 +161,34 @@ final class ReferralCodeStatisticsResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('referral_code_id')
+                SelectFilter::make('referralCode')
                     ->label(__('admin.referral_code_statistics.referral_code'))
-                    ->options(ReferralCode::pluck('code', 'id'))
+                    ->relationship('referralCode', 'code')
                     ->searchable(),
-                DateFilter::make('date')
-                    ->label(__('admin.referral_code_statistics.date')),
+                Filter::make('date')
+                    ->label(__('admin.referral_code_statistics.date'))
+                    ->form([
+                        DatePicker::make('from'),
+                        DatePicker::make('until'),
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['from'] ?? null) {
+                            $indicators[] = __('admin.referral_code_statistics.date').' ≥ '.($data['from']);
+                        }
+
+                        if ($data['until'] ?? null) {
+                            $indicators[] = __('admin.referral_code_statistics.date').' ≤ '.($data['until']);
+                        }
+
+                        return $indicators;
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['from'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date))
+                            ->when($data['until'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date));
+                    }),
             ])
             ->recordActions([
                 ViewAction::make(),
