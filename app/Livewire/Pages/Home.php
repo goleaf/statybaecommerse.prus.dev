@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
@@ -8,22 +10,41 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
+/**
+ * @property-read array<string, int|float> $stats
+ * @property-read Collection<int, Product> $featuredProducts
+ * @property-read Collection<int, Product> $latestProducts
+ * @property-read Collection<int, Review> $latestReviews
+ */
 final class Home extends Component
 {
     use WithCart;
     use WithNotifications;
 
+    /**
+     * @return array<string, int|float>
+     */
     #[Computed]
     public function stats(): array
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:stats:{$locale}", 60, function (): array {
+        return Cache::tags([
+            CacheTags::home(),
+            CacheTags::locale($locale),
+            CacheTags::products(),
+            CacheTags::categories(),
+            CacheTags::brands(),
+            CacheTags::reviews(),
+        ])->remember(CacheKeys::homeStats($locale), now()->addSeconds(60), function (): array {
             return [
                 'products_count' => Product::where('is_visible', true)->count(),
                 'categories_count' => Category::where('is_visible', true)->count(),
@@ -34,12 +55,21 @@ final class Home extends Component
         });
     }
 
+    /**
+     * @return Collection<int, Product>
+     */
     #[Computed]
     public function featuredProducts(): Collection
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:featured:{$locale}", 60, static function (): Collection {
+        return Cache::tags([
+            CacheTags::home(),
+            CacheTags::locale($locale),
+            CacheTags::products(),
+            CacheTags::brands(),
+            CacheTags::categories(),
+        ])->remember(CacheKeys::homeFeaturedProducts($locale), now()->addSeconds(60), static function (): Collection {
             return Product::query()
                 ->withoutGlobalScopes()
                 ->where('is_visible', true)
@@ -52,12 +82,21 @@ final class Home extends Component
         });
     }
 
+    /**
+     * @return Collection<int, Product>
+     */
     #[Computed]
     public function latestProducts(): Collection
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:latest-products:{$locale}", 60, static function (): Collection {
+        return Cache::tags([
+            CacheTags::home(),
+            CacheTags::locale($locale),
+            CacheTags::products(),
+            CacheTags::brands(),
+            CacheTags::categories(),
+        ])->remember(CacheKeys::homeLatestProducts($locale), now()->addSeconds(60), static function (): Collection {
             return Product::query()
                 ->withoutGlobalScopes()
                 ->where('is_visible', true)
@@ -69,12 +108,20 @@ final class Home extends Component
         });
     }
 
+    /**
+     * @return Collection<int, Review>
+     */
     #[Computed]
     public function latestReviews(): Collection
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:latest-reviews:{$locale}", 60, static function (): Collection {
+        return Cache::tags([
+            CacheTags::home(),
+            CacheTags::locale($locale),
+            CacheTags::reviews(),
+            CacheTags::products(),
+        ])->remember(CacheKeys::homeLatestReviews($locale), now()->addSeconds(60), static function (): Collection {
             return Review::query()
                 ->where('is_approved', true)
                 ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
@@ -103,15 +150,17 @@ final class Home extends Component
         $this->persistCartItem($product);
     }
 
-    public function render()
+    public function render(): View
     {
+        $appName = config('app.name');
+
         return view('livewire.pages.home', [
             'stats' => $this->stats,
             'featuredProducts' => $this->featuredProducts,
             'latestProducts' => $this->latestProducts,
             'latestReviews' => $this->latestReviews,
         ])->layout('components.layouts.base', [
-            'title' => __('Home') . ' - ' . config('app.name'),
+            'title' => __('Home').' - '.(is_string($appName) ? $appName : ''),
         ]);
     }
 }

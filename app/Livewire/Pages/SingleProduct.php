@@ -7,9 +7,11 @@ namespace App\Livewire\Pages;
 use App\Livewire\Concerns\WithCart;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Review;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -65,45 +67,75 @@ final class SingleProduct extends Component
     {
         abort_if(! $product->is_visible, 404);
 
-        $product = Product::query()
-            ->whereKey($product)
-            ->with([
-                'brand.translations',
-                'categories.translations',
-                'translations',
-                'media',
-                'documents',
-                'attributes' => fn ($query) => $query->with([
-                    'translations',
-                    'values' => fn ($valueQuery) => $valueQuery->with('translations'),
-                ]),
-                'variants' => fn ($variantQuery) => $variantQuery->with([
-                    'media',
-                    'prices.currency',
-                    'variantAttributeValues.attribute.translations',
-                ]),
-            ])
-            ->withCount([
-                'reviews as approved_reviews_count' => fn ($query) => $query->approved(),
-            ])
-            ->withAvg([
-                'reviews as approved_reviews_avg_rating' => fn ($query) => $query->approved(),
-            ], 'rating')
-            ->firstOrFail();
+        $locale = app()->getLocale();
+        $productId = $product->getKey();
 
-        $this->product = $product;
+        $productTags = array_merge(
+            [CacheTags::locale($locale), CacheTags::products()],
+            CacheTags::productIds([$productId]),
+            [CacheTags::categories(), CacheTags::brands()]
+        );
 
-        $this->recentHistoriesCollection = $this->product
-            ->recentHistories()
-            ->orderByDesc('created_at')
-            ->limit(4)
-            ->get(['id', 'product_id', 'action', 'field_name', 'old_value', 'new_value', 'description', 'created_at']);
+        $this->product = Cache::tags($productTags)->remember(
+            CacheKeys::productDetail($productId, $locale),
+            now()->addSeconds(180),
+            static function () use ($product) {
+                return Product::query()
+                    ->whereKey($product)
+                    ->with([
+                        'brand.translations',
+                        'categories.translations',
+                        'translations',
+                        'media',
+                        'documents',
+                        'attributes' => fn ($query) => $query->with([
+                            'translations',
+                            'values' => fn ($valueQuery) => $valueQuery->with('translations'),
+                        ]),
+                        'variants' => fn ($variantQuery) => $variantQuery->with([
+                            'media',
+                            'prices.currency',
+                            'variantAttributeValues.attribute.translations',
+                        ]),
+                    ])
+                    ->withCount([
+                        'reviews as approved_reviews_count' => fn ($query) => $query->approved(),
+                    ])
+                    ->withAvg([
+                        'reviews as approved_reviews_avg_rating' => fn ($query) => $query->approved(),
+                    ], 'rating')
+                    ->firstOrFail();
+            }
+        );
 
-        $this->recentApprovedReviewsCollection = $this->product
-            ->reviews()
-            ->latest('id')
-            ->limit(5)
-            ->get(['id', 'product_id', 'title', 'content', 'rating', 'created_at']);
+        $this->recentHistoriesCollection = Cache::tags($productTags)->remember(
+            CacheKeys::productRecentHistories($productId),
+            now()->addSeconds(120),
+            function () {
+                return $this->product
+                    ->recentHistories()
+                    ->orderByDesc('created_at')
+                    ->limit(4)
+                    ->get(['id', 'product_id', 'action', 'field_name', 'old_value', 'new_value', 'description', 'created_at']);
+            }
+        );
+
+        $this->recentApprovedReviewsCollection = Cache::tags([
+            CacheTags::locale($locale),
+            CacheTags::reviews(),
+            CacheTags::products(),
+            ...CacheTags::productIds([$productId]),
+        ])->remember(
+            CacheKeys::productRecentReviews($productId),
+            now()->addSeconds(120),
+            function () {
+                return $this->product
+                    ->reviews()
+                    ->latest('id')
+                    ->limit(5)
+                    ->get(['id', 'product_id', 'title', 'content', 'rating', 'created_at']);
+            }
+        );
 
         $this->trackProductView();
         $this->trackProductViewHistory();
