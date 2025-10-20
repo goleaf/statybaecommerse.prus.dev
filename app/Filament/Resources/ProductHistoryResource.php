@@ -12,11 +12,11 @@ use App\Models\ProductHistory;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -77,12 +77,16 @@ final class ProductHistoryResource extends Resource
             Section::make(__('product_history.details'))
                 ->columns(2)
                 ->schema([
-                    TextInput::make('old_value')
+                    Textarea::make('old_value')
                         ->label(__('product_history.old_value'))
-                        ->maxLength(255),
-                    TextInput::make('new_value')
+                        ->rows(3)
+                        ->formatStateUsing(fn (mixed $state): ?string => self::encodeJsonForTextarea($state))
+                        ->dehydrateStateUsing(fn (?string $state): mixed => self::decodeJsonFromTextarea($state)),
+                    Textarea::make('new_value')
                         ->label(__('product_history.new_value'))
-                        ->maxLength(255),
+                        ->rows(3)
+                        ->formatStateUsing(fn (mixed $state): ?string => self::encodeJsonForTextarea($state))
+                        ->dehydrateStateUsing(fn (?string $state): mixed => self::decodeJsonFromTextarea($state)),
                     KeyValue::make('meta')
                         ->label(__('product_history.meta'))
                         ->keyLabel(__('product_history.meta_key'))
@@ -107,22 +111,30 @@ final class ProductHistoryResource extends Resource
                 TextColumn::make('action')
                     ->label(__('product_history.action'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'created' => 'success',
-                        'updated' => 'warning',
-                        'deleted' => 'danger',
-                        default => 'gray',
-                    })
+                    ->color(fn (string $state): string => self::actionColor($state))
                     ->sortable(),
                 TextColumn::make('field_name')
                     ->label(__('product_history.field_name'))
                     ->toggleable(),
+                TextColumn::make('old_value')
+                    ->label(__('product_history.old_value'))
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->formatStateUsing(fn (mixed $state): string => self::formatValueForTable($state))
+                    ->wrap(),
+                TextColumn::make('new_value')
+                    ->label(__('product_history.new_value'))
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->formatStateUsing(fn (mixed $state): string => self::formatValueForTable($state))
+                    ->wrap(),
                 TextColumn::make('created_at')
                     ->label(__('product_history.created_at'))
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
+                SelectFilter::make('action')
+                    ->label(__('product_history.action'))
+                    ->options(self::actionOptions()),
                 SelectFilter::make('product_id')
                     ->label(__('product_history.product'))
                     ->relationship('product', 'name')
@@ -208,7 +220,7 @@ final class ProductHistoryResource extends Resource
             'deleted' => 'danger',
             'restored' => 'gray',
             'price_changed' => 'warning',
-            'stock_updated' => 'info',
+            'stock_updated', 'stock_changed' => 'info',
             'status_changed' => 'purple',
             default => 'secondary',
         };
@@ -253,6 +265,9 @@ final class ProductHistoryResource extends Resource
         }
         if (is_bool($value)) {
             return $value ? __('admin.common.yes') : __('admin.common.no');
+        }
+        if (is_scalar($value)) {
+            return (string) $value;
         }
         if (is_array($value)) {
             $flattened = Arr::flatten($value);
