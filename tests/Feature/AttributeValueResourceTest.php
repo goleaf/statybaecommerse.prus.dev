@@ -40,10 +40,14 @@ class AttributeValueResourceTest extends TestCase
     public function test_can_create_attribute_value(): void
     {
         $attribute = Attribute::factory()->create();
+        $product = Product::factory()->create();
 
         Livewire::test(\App\Filament\Resources\AttributeValueResource\Pages\CreateAttributeValue::class)
             ->fillForm([
                 'attribute_id' => $attribute->id,
+                'attribute_value_type' => 'text',
+                'valueable_type' => Product::class,
+                'valueable_id' => $product->id,
                 'value' => 'Test Value',
                 'display_value' => 'Test Display Value',
                 'description' => 'Test Description',
@@ -58,6 +62,9 @@ class AttributeValueResourceTest extends TestCase
 
         $this->assertDatabaseHas('attribute_values', [
             'attribute_id' => $attribute->id,
+            'attribute_value_type' => 'text',
+            'valueable_type' => Product::class,
+            'valueable_id' => $product->id,
             'value' => 'Test Value',
             'display_value' => 'Test Display Value',
             'description' => 'Test Description',
@@ -219,14 +226,49 @@ class AttributeValueResourceTest extends TestCase
     public function test_can_set_default_attribute_value(): void
     {
         $attribute = Attribute::factory()->create();
+        $product = Product::factory()->create();
 
         $attributeValue1 = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
             'is_default' => true,
+            'valueable_type' => Product::class,
+            'valueable_id' => $product->id,
         ]);
         $attributeValue2 = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
             'is_default' => false,
+            'valueable_type' => Product::class,
+            'valueable_id' => $product->id,
+        ]);
+
+        Livewire::test(\App\Filament\Resources\AttributeValueResource\Pages\ListAttributeValues::class)
+            ->callTableAction('set_default', $attributeValue2);
+
+        $this->assertDatabaseHas('attribute_values', [
+            'id' => $attributeValue1->id,
+            'is_default' => false,
+        ]);
+        $this->assertDatabaseHas('attribute_values', [
+            'id' => $attributeValue2->id,
+            'is_default' => true,
+        ]);
+    }
+
+    public function test_set_default_handles_missing_valueable_relationship(): void
+    {
+        $attribute = Attribute::factory()->create();
+
+        $attributeValue1 = AttributeValue::factory()->create([
+            'attribute_id' => $attribute->id,
+            'is_default' => true,
+            'valueable_type' => null,
+            'valueable_id' => null,
+        ]);
+        $attributeValue2 = AttributeValue::factory()->create([
+            'attribute_id' => $attribute->id,
+            'is_default' => false,
+            'valueable_type' => null,
+            'valueable_id' => null,
         ]);
 
         Livewire::test(\App\Filament\Resources\AttributeValueResource\Pages\ListAttributeValues::class)
