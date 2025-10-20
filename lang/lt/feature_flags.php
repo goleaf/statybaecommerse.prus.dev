@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => 'Funkcijų vėliavos',
+    'plural' => 'Funkcijų vėliavos',
+    'single' => 'Funkcijų vėliava',
+    'basic_information' => 'Pagrindinė informacija',
+    'name' => 'Pavadinimas',
+    'key' => 'Raktas',
+    'description' => 'Aprašymas',
+    'status' => 'Būsena',
+    'is_active' => 'Aktyvi',
+    'is_enabled' => 'Įjungta',
+    'is_global' => 'Globali',
+    'scheduling' => 'Planavimas',
+    'starts_at' => 'Prasideda',
+    'ends_at' => 'Baigiasi',
+    'configuration' => 'Konfigūracija',
+    'environment' => 'Aplinka',
+    'category' => 'Kategorija',
+    'priority' => 'Prioritetas',
+    'conditions' => 'Sąlygos',
+    'condition_key' => 'Sąlygos raktas',
+    'condition_value' => 'Sąlygos reikšmė',
+    'created_at' => 'Sukurta',
+];
