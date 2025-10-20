@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserProductInteractionResource\Pages;
+use App\Models\Product;
+use App\Models\User;
 use App\Models\UserProductInteraction;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
@@ -32,6 +34,9 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use UnitEnum;
 
 final class UserProductInteractionResource extends Resource
@@ -76,8 +81,25 @@ final class UserProductInteractionResource extends Resource
                                             ->label(__('admin.users.email'))
                                             ->email()
                                             ->required()
-                                            ->maxLength(255),
-                                    ]),
+                                            ->maxLength(255)
+                                            ->unique(User::class, 'email', ignoreRecord: true),
+                                        TextInput::make('password')
+                                            ->label(__('filament-panels::password_reset.reset.form.password.label'))
+                                            ->password()
+                                            ->required()
+                                            ->minLength(8)
+                                            ->rule(Password::defaults())
+                                            ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
+                                        TextInput::make('password_confirmation')
+                                            ->label(__('filament-panels::password_reset.reset.form.password_confirmation.label'))
+                                            ->password()
+                                            ->required()
+                                            ->same('password')
+                                            ->dehydrated(false),
+                                    ])
+                                    ->createOptionUsing(function (array $data): int {
+                                        return User::create($data)->getKey();
+                                    }),
                                 Select::make('product_id')
                                     ->label(__('admin.user_product_interactions.product'))
                                     ->relationship('product', 'name')
@@ -89,10 +111,20 @@ final class UserProductInteractionResource extends Resource
                                             ->label(__('admin.products.name'))
                                             ->required()
                                             ->maxLength(255),
+                                        TextInput::make('slug')
+                                            ->label(__('products.fields.slug'))
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->unique(Product::class, 'slug', ignoreRecord: true),
                                         TextInput::make('sku')
                                             ->label(__('admin.products.sku'))
                                             ->maxLength(100),
-                                    ]),
+                                    ])
+                                    ->createOptionUsing(function (array $data): int {
+                                        $data['slug'] = Str::slug($data['slug'] ?? $data['name'] ?? '');
+
+                                        return Product::create($data)->getKey();
+                                    }),
                                 Select::make('interaction_type')
                                     ->label(__('admin.user_product_interactions.interaction_type'))
                                     ->options([
