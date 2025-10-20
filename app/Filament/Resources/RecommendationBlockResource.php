@@ -10,13 +10,13 @@ use App\Models\Scopes\ActiveScope;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -92,23 +92,12 @@ final class RecommendationBlockResource extends Resource
                         ->rows(3),
                     Select::make('type')
                         ->label(__('recommendation_blocks.type'))
-                        ->options([
-                            'featured' => __('recommendation_blocks.featured'),
-                            'related' => __('recommendation_blocks.related'),
-                            'similar' => __('recommendation_blocks.similar'),
-                            'trending' => __('recommendation_blocks.trending'),
-                            'recent' => __('recommendation_blocks.recent'),
-                        ])
+                        ->options(self::getTypeOptions())
                         ->required()
                         ->native(false),
                     Select::make('position')
                         ->label(__('recommendation_blocks.position'))
-                        ->options([
-                            'top' => __('recommendation_blocks.top'),
-                            'bottom' => __('recommendation_blocks.bottom'),
-                            'sidebar' => __('recommendation_blocks.sidebar'),
-                            'inline' => __('recommendation_blocks.inline'),
-                        ])
+                        ->options(self::getPositionOptions())
                         ->required()
                         ->native(false),
                 ]),
@@ -170,6 +159,7 @@ final class RecommendationBlockResource extends Resource
                     ->copyable(),
                 TextColumn::make('type')
                     ->label(__('recommendation_blocks.type'))
+                    ->formatStateUsing(fn (string $state): string => __('recommendation_blocks.types.' . $state))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'featured' => 'success',
@@ -181,6 +171,7 @@ final class RecommendationBlockResource extends Resource
                     }),
                 TextColumn::make('position')
                     ->label(__('recommendation_blocks.position'))
+                    ->formatStateUsing(fn (string $state): string => __('recommendation_blocks.positions.' . $state))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'top' => 'success',
@@ -222,26 +213,15 @@ final class RecommendationBlockResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('recommendation_blocks.type'))
-                    ->options([
-                        'featured' => __('recommendation_blocks.featured'),
-                        'related' => __('recommendation_blocks.related'),
-                        'similar' => __('recommendation_blocks.similar'),
-                        'trending' => __('recommendation_blocks.trending'),
-                        'recent' => __('recommendation_blocks.recent'),
-                    ]),
+                    ->options(self::getTypeOptions()),
                 SelectFilter::make('position')
                     ->label(__('recommendation_blocks.position'))
-                    ->options([
-                        'top' => __('recommendation_blocks.top'),
-                        'bottom' => __('recommendation_blocks.bottom'),
-                        'sidebar' => __('recommendation_blocks.sidebar'),
-                        'inline' => __('recommendation_blocks.inline'),
-                    ]),
+                    ->options(self::getPositionOptions()),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_blocks.is_active'))
-                    ->placeholder(__('recommendation_blocks.all_records'))
-                    ->trueLabel(__('recommendation_blocks.active_only'))
-                    ->falseLabel(__('recommendation_blocks.inactive_only')),
+                    ->placeholder(__('recommendation_blocks.filters.all_records'))
+                    ->trueLabel(__('recommendation_blocks.filters.active_only'))
+                    ->falseLabel(__('recommendation_blocks.filters.inactive_only')),
             ])
             ->actions([
                 EditAction::make(),
@@ -251,6 +231,37 @@ final class RecommendationBlockResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Get available recommendation block types mapped to their translations.
+     *
+     * @return array<string, string>
+     */
+    protected static function getTypeOptions(): array
+    {
+        return [
+            'featured' => __('recommendation_blocks.types.featured'),
+            'related' => __('recommendation_blocks.types.related'),
+            'similar' => __('recommendation_blocks.types.similar'),
+            'trending' => __('recommendation_blocks.types.trending'),
+            'recent' => __('recommendation_blocks.types.recent'),
+        ];
+    }
+
+    /**
+     * Get available recommendation block positions mapped to their translations.
+     *
+     * @return array<string, string>
+     */
+    protected static function getPositionOptions(): array
+    {
+        return [
+            'top' => __('recommendation_blocks.positions.top'),
+            'bottom' => __('recommendation_blocks.positions.bottom'),
+            'sidebar' => __('recommendation_blocks.positions.sidebar'),
+            'inline' => __('recommendation_blocks.positions.inline'),
+        ];
     }
 
     public static function getRelations(): array
