@@ -5,19 +5,35 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Brand;
+use App\Models\Product;
+use Illuminate\View\View;
 
 final class BrandController extends Controller
 {
-    public function index(Request $request)
+    public function index(): View
     {
-        // TODO: Implement brand listing
-        return response()->json(['message' => 'Brand listing not implemented yet']);
+        $brands = Brand::query()
+            ->withCount('products')
+            ->orderBy('name')
+            ->get();
+
+        return view('frontend.brands.index', compact('brands'));
     }
 
-    public function show(string $id)
+    public function show(Brand $brand): View
     {
-        // TODO: Implement brand details
-        return response()->json(['message' => 'Brand details not implemented yet', 'id' => $id]);
+        $brand->load('products');
+
+        $products = Product::query()
+            ->where('brand_id', $brand->getKey())
+            ->with(['brand', 'categories'])
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('frontend.brands.show', [
+            'brand' => $brand,
+            'products' => $products,
+        ]);
     }
 }
