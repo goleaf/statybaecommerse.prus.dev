@@ -20,7 +20,10 @@ final class InventoryManagement extends Page implements HasTable
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
+    }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
     {
