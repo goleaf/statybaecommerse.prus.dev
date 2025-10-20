@@ -25,6 +25,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -70,7 +71,11 @@ final class NotificationTemplateResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                    ->afterStateUpdated(
+                                        fn (string $context, $state, callable $set) => $context === 'create'
+                                            ? $set('slug', Str::slug((string) $state))
+                                            : null,
+                                    ),
                                 TextInput::make('slug')
                                     ->label(__('admin.notification_templates.slug'))
                                     ->required()
@@ -156,6 +161,10 @@ final class NotificationTemplateResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 50 ? $state : null;
                     }),
