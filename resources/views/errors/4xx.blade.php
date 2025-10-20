@@ -69,6 +69,12 @@
     'supportDescription' => $supportDescription,
     'supportPageUrl' => $supportUrl,
     'statusPageUrl' => $statusUrl,
+    'showSearch' => $showSearch ?? false,
+    'searchTitle' => $searchTitle ?? __('Search for what you need'),
+    'searchPlaceholder' => $searchPlaceholder ?? __('Search products...'),
+    'topCategories' => $topCategories ?? [],
+    'topCategoriesTitle' => $topCategoriesTitle ?? __('Top Categories'),
+    'contactCta' => $contactCta ?? null,
     'links' => $links ?? [
         [
             'label' => __('Visit Support Center'),
