@@ -48,6 +48,17 @@ return [
         'enhanced_settings' => 'Расширенные настройки',
         'system_settings' => 'Системные настройки',
     ],
+    'inventory' => [
+        'actions' => [
+            'create' => 'Создать запись инвентаря',
+        ],
+        'tabs' => [
+            'all' => 'Все записи',
+            'in_stock' => 'В наличии',
+            'low_stock' => 'Мало на складе',
+            'out_of_stock' => 'Нет в наличии',
+        ],
+    ],
     // Table
     'table' => [
         'name' => 'Имя',
