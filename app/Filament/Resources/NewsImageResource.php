@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NewsImageResource\Pages;
+use App\Filament\Resources\NewsResource;
 use App\Models\News;
 use App\Models\NewsImage;
 use BackedEnum;
@@ -284,7 +285,7 @@ final class NewsImageResource extends Resource
                     })
                     ->url(
                         fn (NewsImage $record): ?string => $record->news_id
-                            ? route('filament.admin.resources.news.edit', ['record' => $record->news_id])
+                            ? NewsResource::getUrl('edit', ['record' => $record->news])
                             : null
                     )
                     ->color('primary'),
