@@ -5,8 +5,11 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
+use App\Observers\CategoryObserver;
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -34,6 +37,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([CategoryObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
 final class Category extends Model implements HasMedia
 {
@@ -202,6 +206,20 @@ final class Category extends Model implements HasMedia
     public function scopeWithAllRelations($query)
     {
         return $query->with(['parent', 'children', 'products', 'translations']);
+    }
+
+    public function scopeWithLocale(Builder $query, ?string $locale = null): Builder
+    {
+        $resolvedLocale = $locale ?? app()->getLocale();
+
+        return $query->with([
+            'translations' => static fn ($translationQuery) => $translationQuery->where('locale', $resolvedLocale),
+        ]);
+    }
+
+    public function scopeTopLevelVisible(Builder $query): Builder
+    {
+        return $query->visible()->roots()->ordered();
     }
 
     /**
