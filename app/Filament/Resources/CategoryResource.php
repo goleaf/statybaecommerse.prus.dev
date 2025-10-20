@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -39,6 +40,11 @@ use Filament\Forms\Form;
 final class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('categories', 'viewAny');
+    }
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -224,8 +230,10 @@ final class CategoryResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
+                EditAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
                 Action::make('toggle_active')
                     ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
                     ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -237,11 +245,13 @@ final class CategoryResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'delete')),
                     BulkAction::make('activate')
                         ->label(__('categories.activate_selected'))
                         ->icon('heroicon-o-eye')
@@ -253,7 +263,8 @@ final class CategoryResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
                     BulkAction::make('deactivate')
                         ->label(__('categories.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
@@ -265,7 +276,8 @@ final class CategoryResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
                 ]),
             ])
             ->defaultSort('sort_order');

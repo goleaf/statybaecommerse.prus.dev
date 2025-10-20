@@ -8,6 +8,7 @@ use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -46,9 +47,12 @@ final class BrandResource extends Resource
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
+        return AuthorizationMatrix::check('brands', 'viewAny');
+    }
 
-        return $user?->can('browse_brands') ?? false;
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('brands', 'viewAny');
     }
 
     public static function getEloquentQuery(): Builder
@@ -231,9 +235,12 @@ final class BrandResource extends Resource
                     ->query(fn (Builder $query) => $query->where('created_at', '>=', now()->subDays(30))),
             ])
             ->actions([
-                Actions\ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Actions\ViewAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('brands', 'view')),
+                EditAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
                 Action::make('toggle_active')
                     ->label(fn (Brand $record): string => $record->is_active ? __('brands.deactivate') : __('brands.activate'))
                     ->icon(fn (Brand $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -246,7 +253,8 @@ final class BrandResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
                 Action::make('toggle_featured')
                     ->label(fn (Brand $record): string => $record->is_featured ? __('brands.unfeature') : __('brands.feature'))
                     ->icon(fn (Brand $record): string => $record->is_featured ? 'heroicon-o-star' : 'heroicon-o-star')
@@ -259,13 +267,17 @@ final class BrandResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
+                    RestoreBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                    ForceDeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
                     BulkAction::make('enable')
                         ->label(__('brands.enable_selected'))
                         ->icon('heroicon-o-check')
@@ -279,7 +291,8 @@ final class BrandResource extends Resource
                                 ->title(__('brands.bulk_enabled_success'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
                     BulkAction::make('disable')
                         ->label(__('brands.disable_selected'))
                         ->icon('heroicon-o-x-mark')
@@ -293,7 +306,8 @@ final class BrandResource extends Resource
                                 ->title(__('brands.bulk_disabled_success'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
                     BulkAction::make('feature')
                         ->label(__('brands.feature_selected'))
                         ->icon('heroicon-o-star')
@@ -305,7 +319,8 @@ final class BrandResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
                     BulkAction::make('unfeature')
                         ->label(__('brands.unfeature_selected'))
                         ->icon('heroicon-o-star')
@@ -317,7 +332,8 @@ final class BrandResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
                 ]),
             ])
             ->defaultSort('name');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\BrandResource\Pages;
 
 use App\Filament\Resources\BrandResource;
+use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -15,7 +16,8 @@ final class ListBrands extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->visible(fn () => AuthorizationMatrix::check('brands', 'create')),
         ];
     }
 }
