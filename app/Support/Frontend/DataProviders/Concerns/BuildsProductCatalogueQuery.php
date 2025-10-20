@@ -16,6 +16,10 @@ trait BuildsProductCatalogueQuery
     private function baseProductQuery(): Builder
     {
         return Product::query()
+            ->where('is_visible', true)
+            ->where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
             ->with([
                 'brand:id,name,slug',
                 'media',
