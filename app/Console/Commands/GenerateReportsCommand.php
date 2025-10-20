@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\ReportGenerationService;
+use App\Support\Logging\StructuredLogger;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
 final class GenerateReportsCommand extends Command
 {
-    protected $signature = 'reports:generate 
+    protected $signature = 'reports:generate
                             {--type=all : Report type (all, sales, products, users, system)}
                             {--output=storage/reports : Output directory}
                             {--format=json : Output format (json, csv)}
@@ -19,6 +20,11 @@ final class GenerateReportsCommand extends Command
 
     protected $description = 'Generate various reports with timeout protection using LazyCollections takeUntilTimeout';
 
+    public function __construct(private readonly StructuredLogger $logger)
+    {
+        parent::__construct();
+    }
+
     public function handle(ReportGenerationService $reportService): int
     {
         $type = $this->option('type');
@@ -26,6 +32,12 @@ final class GenerateReportsCommand extends Command
         $format = $this->option('format');
         $dateFrom = $this->option('date-from');
         $dateTo = $this->option('date-to');
+
+        $operation = $this->logger->operation('reports_generate_command', [
+            'type' => $type,
+            'format' => $format,
+            'output_directory' => $outputDir,
+        ]);
 
         $this->info('🚀 Starting report generation with timeout protection...');
 
@@ -42,6 +54,15 @@ final class GenerateReportsCommand extends Command
             $filters['date_to'] = $dateTo;
         }
 
+        if (! in_array($type, ['sales', 'products', 'users', 'system', 'all'], true)) {
+            $this->error("Unknown report type: {$type}");
+            $operation->fail(new \InvalidArgumentException("Unknown report type: {$type}"), [
+                'requested_type' => $type,
+            ]);
+
+            return self::FAILURE;
+        }
+
         $startTime = microtime(true);
         $generatedReports = [];
 
@@ -52,7 +73,6 @@ final class GenerateReportsCommand extends Command
                 'users' => $this->generateUserReport($reportService, $filters, $outputDir, $format, $generatedReports),
                 'system' => $this->generateSystemReport($reportService, $outputDir, $format, $generatedReports),
                 'all' => $this->generateAllReports($reportService, $filters, $outputDir, $format, $generatedReports),
-                default => $this->error("Unknown report type: {$type}")
             };
 
             $duration = microtime(true) - $startTime;
@@ -65,10 +85,18 @@ final class GenerateReportsCommand extends Command
                 $this->line("  📄 {$report['name']} - {$report['size']} bytes");
             }
 
+            $operation->finish([
+                'duration_seconds' => round($duration, 2),
+                'reports_generated' => count($generatedReports),
+                'report_names' => array_column($generatedReports, 'name'),
+            ]);
+
             return self::SUCCESS;
 
         } catch (\Exception $e) {
             $this->error('❌ Report generation failed: '.$e->getMessage());
+
+            $operation->fail($e);
 
             return self::FAILURE;
         }

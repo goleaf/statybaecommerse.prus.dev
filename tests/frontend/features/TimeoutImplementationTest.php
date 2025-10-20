@@ -166,7 +166,7 @@ final class TimeoutImplementationTest extends TestCase
 
     public function test_report_generation_service_sales_report(): void
     {
-        $reportService = new ReportGenerationService;
+        $reportService = app(ReportGenerationService::class);
         $report = $reportService->generateSalesReport();
 
         $this->assertIsArray($report);
@@ -176,7 +176,7 @@ final class TimeoutImplementationTest extends TestCase
 
     public function test_report_generation_service_product_analytics(): void
     {
-        $reportService = new ReportGenerationService;
+        $reportService = app(ReportGenerationService::class);
         $report = $reportService->generateProductAnalyticsReport();
 
         $this->assertIsArray($report);
@@ -186,7 +186,7 @@ final class TimeoutImplementationTest extends TestCase
 
     public function test_report_generation_service_user_activity(): void
     {
-        $reportService = new ReportGenerationService;
+        $reportService = app(ReportGenerationService::class);
         $report = $reportService->generateUserActivityReport();
 
         $this->assertIsArray($report);
@@ -196,7 +196,7 @@ final class TimeoutImplementationTest extends TestCase
 
     public function test_report_generation_service_system_report(): void
     {
-        $reportService = new ReportGenerationService;
+        $reportService = app(ReportGenerationService::class);
         $report = $reportService->generateSystemReport();
 
         $this->assertIsArray($report);

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Support\Logging\StructuredLogger;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use function collect;
 
 /**
  * Optimize SQLite Database Command
@@ -27,6 +28,11 @@ final class OptimizeSqliteCommand extends Command
      * The console command description.
      */
     protected $description = 'Apply SQLite optimizations for production use or check current settings';
+
+    public function __construct(private readonly StructuredLogger $logger)
+    {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -55,6 +61,11 @@ final class OptimizeSqliteCommand extends Command
      */
     private function checkCurrentSettings(): int
     {
+        $operation = $this->logger->operation('sqlite_check_settings', [
+            'command' => 'sqlite:optimize',
+            'mode' => 'check',
+        ]);
+
         $this->info('Checking current SQLite settings...');
         $this->newLine();
 
@@ -89,9 +100,32 @@ final class OptimizeSqliteCommand extends Command
             $this->newLine();
             $this->info('Legend: ✅ = Optimized, ❌ = Needs optimization');
 
+            $optimized = collect($settings)
+                ->map(static fn ($value, $key) => match ($key) {
+                    'journal_mode' => $value === 'wal',
+                    'busy_timeout' => $value == 10000,
+                    'cache_size' => $value == -64000,
+                    'temp_store' => $value == 2,
+                    'mmap_size' => $value == 268435456,
+                    'page_size' => $value == 4096,
+                    'auto_vacuum' => $value == 2,
+                    'synchronous' => $value == 1,
+                    'foreign_keys' => $value == 1,
+                    default => false,
+                })
+                ->filter()
+                ->count();
+
+            $operation->finish([
+                'settings_checked' => count($settings),
+                'settings_optimized' => $optimized,
+            ]);
+
             return 0;
         } catch (\Exception $e) {
             $this->error('Failed to check SQLite settings: '.$e->getMessage());
+
+            $operation->fail($e);
 
             return 1;
         }
@@ -102,6 +136,11 @@ final class OptimizeSqliteCommand extends Command
      */
     private function applyOptimizations(): int
     {
+        $operation = $this->logger->operation('sqlite_apply_optimizations', [
+            'command' => 'sqlite:optimize',
+            'mode' => 'apply',
+        ]);
+
         $this->info('Applying SQLite optimizations...');
         $this->newLine();
 
@@ -142,12 +181,16 @@ final class OptimizeSqliteCommand extends Command
             $this->info('SQLite optimizations applied successfully!');
             $this->info('These optimizations will improve performance for production use.');
 
-            Log::info('SQLite optimizations applied via artisan command');
+            $operation->finish([
+                'settings_applied' => count($optimizations),
+                'auto_vacuum_status' => $autoVacuumResult,
+            ]);
 
             return 0;
         } catch (\Exception $e) {
             $this->error('Failed to apply SQLite optimizations: '.$e->getMessage());
-            Log::error('Failed to apply SQLite optimizations: '.$e->getMessage());
+
+            $operation->fail($e);
 
             return 1;
         }
@@ -158,6 +201,11 @@ final class OptimizeSqliteCommand extends Command
      */
     private function runVacuum(): int
     {
+        $operation = $this->logger->operation('sqlite_incremental_vacuum', [
+            'command' => 'sqlite:optimize',
+            'mode' => 'vacuum',
+        ]);
+
         $this->info('Running incremental vacuum...');
         $this->newLine();
 
@@ -186,12 +234,17 @@ final class OptimizeSqliteCommand extends Command
             $this->newLine();
             $this->info('Incremental vacuum completed successfully!');
 
-            Log::info('SQLite incremental vacuum completed via artisan command');
+            $operation->finish([
+                'space_reclaimed_bytes' => $spaceReclaimed,
+                'size_before_bytes' => $sizeBefore,
+                'size_after_bytes' => $sizeAfter,
+            ]);
 
             return 0;
         } catch (\Exception $e) {
             $this->error('Failed to run incremental vacuum: '.$e->getMessage());
-            Log::error('Failed to run incremental vacuum: '.$e->getMessage());
+
+            $operation->fail($e);
 
             return 1;
         }
