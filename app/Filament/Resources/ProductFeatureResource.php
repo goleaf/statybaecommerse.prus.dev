@@ -8,14 +8,14 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
+use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -40,10 +40,10 @@ final class ProductFeatureResource extends Resource
             Forms\Components\Select::make('feature_type')
                 ->options([
                     'specification' => 'Specification',
-                    'benefit' => 'Benefit',
-                    'feature' => 'Feature',
-                    'technical' => 'Technical',
-                    'performance' => 'Performance',
+                    'benefit'       => 'Benefit',
+                    'feature'       => 'Feature',
+                    'technical'     => 'Technical',
+                    'performance'   => 'Performance',
                 ])
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
@@ -72,8 +72,8 @@ final class ProductFeatureResource extends Resource
                         'primary' => 'specification',
                         'success' => 'benefit',
                         'warning' => 'feature',
-                        'info' => 'technical',
-                        'danger' => 'performance',
+                        'info'    => 'technical',
+                        'danger'  => 'performance',
                     ]),
                 Tables\Columns\TextColumn::make('feature_key'),
                 Tables\Columns\TextColumn::make('feature_value')
@@ -90,12 +90,12 @@ final class ProductFeatureResource extends Resource
                 Tables\Filters\SelectFilter::make('product_id'),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                TablesEditAction::make(),
+                TablesDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                TablesBulkActionGroup::make([
+                    TablesDeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('weight', 'desc');
@@ -111,9 +111,9 @@ final class ProductFeatureResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductFeatures::route('/'),
+            'index'  => Pages\ListProductFeatures::route('/'),
             'create' => Pages\CreateProductFeature::route('/create'),
-            'edit' => Pages\EditProductFeature::route('/{record}/edit'),
+            'edit'   => Pages\EditProductFeature::route('/{record}/edit'),
         ];
     }
 }
