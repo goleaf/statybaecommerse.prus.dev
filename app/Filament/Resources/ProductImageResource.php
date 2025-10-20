@@ -46,8 +46,11 @@ final class ProductImageResource extends Resource
                 Forms\Components\FileUpload::make('path')
                     ->label('Image')
                     ->image()
+                    ->disk('public')
                     ->directory('product-images')
-                    ->visibility('private'),
+                    ->visibility('public')
+                    ->dehydrateStateUsing(static fn (?string $state): ?string => $state ? 'storage/' . ltrim($state, '/') : null)
+                    ->formatStateUsing(static fn (?string $state): ?string => $state && str_starts_with($state, 'storage/') ? substr($state, strlen('storage/')) : $state),
                 Forms\Components\TextInput::make('alt_text')
                     ->label('Alt Text')
                     ->maxLength(255),
@@ -63,6 +66,7 @@ final class ProductImageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('path')
+                    ->getStateUsing(static fn (ProductImage $record): ?string => $record->path ? asset(trim($record->path, '/')) : null)
                     ->size(60),
                 Tables\Columns\TextColumn::make('product.name')
                     ->label('Product')
