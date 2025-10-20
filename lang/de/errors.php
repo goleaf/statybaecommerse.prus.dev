@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCodes;
+use App\Support\ErrorCode;
 
 return [
-    // @translators: Wird angezeigt, wenn die angeforderte Seite oder Ressource fehlt (HTTP 404).
-    ErrorCodes::NOT_FOUND => 'Seite nicht gefunden',
+    // @translators: Displayed when a requested page or record is missing (HTTP 404).
+    ErrorCode::NotFound->value => 'Seite nicht gefunden',
 
-    // @translators: Hinweis auf einen unerwarteten Serverfehler (HTTP 500).
-    ErrorCodes::SERVER_ERROR => 'Serverfehler',
+    // @translators: Shown when the system encounters an unexpected failure (HTTP 500).
+    ErrorCode::ServerError->value => 'Serverfehler',
 
-    // @translators: Verwenden, wenn Benutzereingaben die Validierung nicht bestehen.
-    ErrorCodes::VALIDATION_FAILED => 'Bitte überprüfen Sie Ihre Eingaben',
+    // @translators: Used when form submission fails validation and users must review inputs.
+    ErrorCode::ValidationFailed->value => 'Bitte überprüfen Sie Ihre Eingaben',
 
-    // @translators: Bedeutet, dass der Benutzer sich anmelden muss, um fortzufahren.
-    ErrorCodes::UNAUTHORIZED => 'Nicht autorisiert',
+    // @translators: Indicates the user needs to log in before accessing the requested content.
+    ErrorCode::Unauthorized->value => 'Nicht autorisiert',
 
-    // @translators: Bedeutet, dass dem angemeldeten Benutzer die Berechtigung fehlt.
-    ErrorCodes::FORBIDDEN => 'Zugriff verweigert',
+    // @translators: Indicates the user is logged in but does not have permission for the action.
+    ErrorCode::Forbidden->value => 'Zugriff verweigert',
 
-    // @translators: Wird angezeigt, wenn eine Bestellung mit der angegebenen Nummer nicht gefunden wurde.
-    ErrorCodes::ORDER_NOT_FOUND => 'Bestellung :order wurde nicht gefunden.',
+    // @translators: Displayed when an order number could not be located in the system.
+    ErrorCode::OrderNotFound->value => 'Bestellung :order wurde nicht gefunden.',
 
-    // @translators: Hinweis darauf, dass nicht genügend Bestand für die angeforderte SKU vorhanden ist.
-    ErrorCodes::INVENTORY_INSUFFICIENT => 'Für SKU :sku ist nicht genügend Bestand verfügbar.',
+    // @translators: Shown when there is not enough stock to fulfill a request for a SKU.
+    ErrorCode::InventoryInsufficient->value => 'Für SKU :sku ist nicht genügend Bestand verfügbar.',
 ];
