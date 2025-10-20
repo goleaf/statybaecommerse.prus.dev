@@ -36,12 +36,8 @@ return new class extends Migration
             if (! Schema::hasColumn('feature_flags', 'updated_by')) {
                 $updatedByColumn = $table->foreignId('updated_by')->nullable();
 
-                if ($shouldAddCreatedBy || Schema::hasColumn('feature_flags', 'created_by')) {
-                    $updatedByColumn->after('created_by');
-                } elseif (Schema::hasColumn('feature_flags', 'created_by_name')) {
-                    $updatedByColumn->after('created_by_name');
-                } elseif (Schema::hasColumn('feature_flags', 'approval_notes')) {
-                    $updatedByColumn->after('approval_notes');
+                if ($afterColumn = $this->getUpdatedByPositionColumn($shouldAddCreatedBy)) {
+                    $updatedByColumn->after($afterColumn);
                 }
 
                 $updatedByColumn
@@ -92,12 +88,62 @@ return new class extends Migration
 
     private function getCreatedByPositionColumn(): ?string
     {
-        if (Schema::hasColumn('feature_flags', 'created_by_name')) {
-            return 'created_by_name';
+        return $this->getFirstExistingColumn([
+            'created_by_name',
+            'approval_notes',
+            'approval_status',
+            'success_metrics',
+            'rollback_plan',
+            'rollout_strategy',
+            'impact_level',
+            'category',
+            'priority',
+            'metadata',
+            'end_date',
+            'start_date',
+            'ends_at',
+            'starts_at',
+            'environment',
+            'rollout_percentage',
+            'conditions',
+            'description',
+        ]);
+    }
+
+    private function getUpdatedByPositionColumn(bool $shouldAddCreatedBy): ?string
+    {
+        if ($shouldAddCreatedBy || Schema::hasColumn('feature_flags', 'created_by')) {
+            return 'created_by';
         }
 
-        if (Schema::hasColumn('feature_flags', 'approval_notes')) {
-            return 'approval_notes';
+        return $this->getFirstExistingColumn([
+            'created_by_name',
+            'approval_notes',
+            'approval_status',
+            'success_metrics',
+            'rollback_plan',
+            'rollout_strategy',
+            'impact_level',
+            'category',
+            'priority',
+            'metadata',
+            'end_date',
+            'start_date',
+            'ends_at',
+            'starts_at',
+            'environment',
+            'rollout_percentage',
+            'conditions',
+            'description',
+        ]);
+    }
+
+    private function getFirstExistingColumn(array $columns): ?string
+    {
+        foreach ($columns as $column) {
+            if (Schema::hasColumn('feature_flags', $column)) {
+                return $column;
+            }
         }
 
         return null;
