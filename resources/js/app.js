@@ -2,8 +2,12 @@ import './bootstrap';
 import './shared/utilities.js';
 import './frontend.js';
 import './modern-interactions.js';
+import '@fontsource/inter/latin.css';
+import '@fontsource/space-grotesk/latin.css';
+import '@fontsource/figtree/latin.css';
+import '@fontsource/instrument-sans/latin.css';
 // import '../../vendor/shopper/framework/resources/js/index.js'; // Temporarily disabled
-// Local fonts are now loaded via CSS @font-face declarations
+// Fonts are provided by @fontsource packages and bundled by Vite
 
 // Modern frontend enhancements
 document.addEventListener('DOMContentLoaded', function () {
