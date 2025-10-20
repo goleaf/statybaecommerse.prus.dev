@@ -9,9 +9,7 @@ use App\Models\PriceList;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -72,81 +70,50 @@ final class PriceListResource extends Resource
                         ->label(__('price_lists.name'))
                         ->required()
                         ->maxLength(255),
+                    TextInput::make('code')
+                        ->label(__('price_lists.code'))
+                        ->required()
+                        ->maxLength(64)
+                        ->unique(ignoreRecord: true),
+                    Select::make('currency_id')
+                        ->label(__('price_lists.currency'))
+                        ->relationship('currency', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
                     Textarea::make('description')
                         ->label(__('price_lists.description'))
                         ->maxLength(1000)
                         ->rows(3),
-                    Select::make('pricing_type')
-                        ->label(__('price_lists.pricing_type'))
-                        ->options([
-                            'fixed' => __('price_lists.fixed'),
-                            'tiered' => __('price_lists.tiered'),
-                            'volume' => __('price_lists.volume'),
-                        ])
-                        ->required()
-                        ->native(false)
-                        ->live(),
-                ]),
-            Section::make(__('price_lists.tiered_pricing'))
-                ->schema([
-                    Repeater::make('tiers')
-                        ->label(__('price_lists.tiers'))
-                        ->schema([
-                            TextInput::make('min_quantity')
-                                ->label(__('price_lists.min_quantity'))
-                                ->numeric()
-                                ->required(),
-                            TextInput::make('max_quantity')
-                                ->label(__('price_lists.max_quantity'))
-                                ->numeric(),
-                            TextInput::make('price')
-                                ->label(__('price_lists.price'))
-                                ->numeric()
-                                ->required()
-                                ->prefix('€'),
-                        ])
-                        ->defaultItems(1)
-                        ->addActionLabel(__('price_lists.add_tier'))
-                        ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'tiered'),
+                    TextInput::make('priority')
+                        ->label(__('price_lists.priority'))
+                        ->numeric()
+                        ->default(0),
                 ])
-                ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'tiered'),
-            Section::make(__('price_lists.volume_pricing'))
-                ->schema([
-                    Repeater::make('volume_tiers')
-                        ->label(__('price_lists.volume_tiers'))
-                        ->schema([
-                            TextInput::make('min_quantity')
-                                ->label(__('price_lists.min_quantity'))
-                                ->numeric()
-                                ->required(),
-                            TextInput::make('max_quantity')
-                                ->label(__('price_lists.max_quantity'))
-                                ->numeric(),
-                            TextInput::make('price')
-                                ->label(__('price_lists.price'))
-                                ->numeric()
-                                ->required()
-                                ->prefix('€'),
-                        ])
-                        ->defaultItems(1)
-                        ->addActionLabel(__('price_lists.add_tier'))
-                        ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'volume'),
-                ])
-                ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'volume'),
+                ->columns(2),
             Section::make(__('price_lists.settings'))
                 ->schema([
-                    Toggle::make('is_active')
+                    Toggle::make('is_enabled')
                         ->label(__('price_lists.is_active'))
                         ->default(true),
-                    DateTimePicker::make('valid_from')
+                    Toggle::make('is_default')
+                        ->label(__('price_lists.is_default')),
+                    Toggle::make('auto_apply')
+                        ->label(__('price_lists.auto_apply')),
+                    DateTimePicker::make('starts_at')
                         ->label(__('price_lists.valid_from')),
-                    DateTimePicker::make('valid_until')
+                    DateTimePicker::make('ends_at')
                         ->label(__('price_lists.valid_until')),
-                    Textarea::make('notes')
-                        ->label(__('price_lists.notes'))
-                        ->maxLength(500)
-                        ->rows(3),
-                ]),
+                    TextInput::make('min_order_amount')
+                        ->label(__('price_lists.min_order_amount'))
+                        ->numeric()
+                        ->prefix('€'),
+                    TextInput::make('max_order_amount')
+                        ->label(__('price_lists.max_order_amount'))
+                        ->numeric()
+                        ->prefix('€'),
+                ])
+                ->columns(2),
         ]);
     }
 
@@ -159,15 +126,14 @@ final class PriceListResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-                TextColumn::make('pricing_type')
-                    ->label(__('price_lists.pricing_type'))
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'fixed' => 'success',
-                        'tiered' => 'info',
-                        'volume' => 'warning',
-                        default => 'gray',
-                    }),
+                TextColumn::make('code')
+                    ->label(__('price_lists.code'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('currency.code')
+                    ->label(__('price_lists.currency'))
+                    ->sortable()
+                    ->badge(),
                 TextColumn::make('description')
                     ->label(__('price_lists.description'))
                     ->limit(50)
@@ -180,19 +146,36 @@ final class PriceListResource extends Resource
                         return $state;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('is_active')
+                IconColumn::make('is_enabled')
                     ->label(__('price_lists.is_active'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
-                TextColumn::make('valid_from')
+                IconColumn::make('is_default')
+                    ->label(__('price_lists.is_default'))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+                IconColumn::make('auto_apply')
+                    ->label(__('price_lists.auto_apply'))
+                    ->boolean()
+                    ->trueColor('primary')
+                    ->falseColor('gray'),
+                TextColumn::make('priority')
+                    ->label(__('price_lists.priority'))
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('starts_at')
                     ->label(__('price_lists.valid_from'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('valid_until')
+                TextColumn::make('ends_at')
                     ->label(__('price_lists.valid_until'))
                     ->dateTime()
                     ->sortable()
@@ -209,35 +192,36 @@ final class PriceListResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('pricing_type')
-                    ->label(__('price_lists.pricing_type'))
-                    ->options([
-                        'fixed' => __('price_lists.fixed'),
-                        'tiered' => __('price_lists.tiered'),
-                        'volume' => __('price_lists.volume'),
-                    ]),
-                TernaryFilter::make('is_active')
+                SelectFilter::make('currency_id')
+                    ->label(__('price_lists.currency'))
+                    ->relationship('currency', 'name'),
+                TernaryFilter::make('is_enabled')
                     ->label(__('price_lists.is_active'))
                     ->placeholder(__('price_lists.all_records'))
                     ->trueLabel(__('price_lists.active_only'))
                     ->falseLabel(__('price_lists.inactive_only')),
-                Filter::make('valid_from')
+                TernaryFilter::make('is_default')
+                    ->label(__('price_lists.is_default'))
+                    ->placeholder(__('price_lists.all_records'))
+                    ->trueLabel(__('price_lists.default_only'))
+                    ->falseLabel(__('price_lists.non_default_only')),
+                Filter::make('starts_at')
                     ->label(__('price_lists.valid_from'))
                     ->form([
-                        DateTimePicker::make('valid_from_from')
+                        DateTimePicker::make('starts_from')
                             ->label(__('price_lists.valid_from_from')),
-                        DateTimePicker::make('valid_from_until')
+                        DateTimePicker::make('starts_until')
                             ->label(__('price_lists.valid_from_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['valid_from_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('valid_from', '>=', $date),
+                                $data['starts_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '>=', $date),
                             )
                             ->when(
-                                $data['valid_from_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('valid_from', '<=', $date),
+                                $data['starts_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '<=', $date),
                             );
                     }),
             ])
