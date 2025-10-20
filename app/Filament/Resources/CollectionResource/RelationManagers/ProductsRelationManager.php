@@ -54,7 +54,7 @@ final class ProductsRelationManager extends RelationManager
                 Tables\Columns\ImageColumn::make('image')
                     ->label(__('admin.products.fields.image'))
                     ->getStateUsing(fn (Product $record) => $record->getFirstMediaUrl('images', 'thumb'))
-                    ->defaultImageUrl(asset('images/placeholder-product.png'))
+                    ->defaultImageUrl(product_placeholder_url('thumb'))
                     ->circular()
                     ->size(40),
                 Tables\Columns\TextColumn::make('name')
@@ -170,8 +170,8 @@ final class ProductsRelationManager extends RelationManager
                         ->label(__('admin.collections.actions.toggle_featured'))
                         ->icon('heroicon-o-star')
                         ->color('warning')
-                        ->action(function ($records) {
-                            $records->each(function ($record) {
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
                                 $record->pivot->update(['is_featured' => ! $record->pivot->is_featured]);
                             });
                         })

@@ -277,10 +277,39 @@ if (! function_exists('debug_order')) {
     }
 }
 
+if (! function_exists('media_placeholder_url')) {
+    function media_placeholder_url(string $key, ?string $variant = null, ?string $default = null): string
+    {
+        $resolver = app(App\Support\Media\PlaceholderResolver::class);
+
+        return $resolver->resolve($key, $variant, $default) ?? ($default ?? '');
+    }
+}
+
 if (! function_exists('app_placeholder_url')) {
     function app_placeholder_url(): string
     {
-        return asset('images/placeholder.jpg');
+        return media_placeholder_url('app', null, asset('images/placeholder.jpg'));
+    }
+}
+
+if (! function_exists('product_placeholder_url')) {
+    function product_placeholder_url(?string $variant = null): string
+    {
+        $fallback = $variant === 'thumb'
+            ? asset('images/placeholder-product.png')
+            : asset('images/placeholder-product.jpg');
+
+        $key = $variant === 'thumb' ? 'product_png' : 'product';
+
+        return media_placeholder_url($key, $variant, $fallback);
+    }
+}
+
+if (! function_exists('og_placeholder_url')) {
+    function og_placeholder_url(): string
+    {
+        return media_placeholder_url('og', null, asset('images/og-default.jpg'));
     }
 }
 

@@ -234,7 +234,7 @@
                                     {{-- Product Image --}}
                                     <div class="md:w-48 flex-shrink-0">
                                         <div class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden">
-                                            <img src="{{ $product->getFirstMediaUrl('images') ?? asset('images/placeholder-product.jpg') }}"
+                                            <img src="{{ $product->getFirstMediaUrl('images') ?? product_placeholder_url('large') }}"
                                                  alt="{{ $product->name }}"
                                                  class="w-full h-48 object-cover">
                                         </div>
