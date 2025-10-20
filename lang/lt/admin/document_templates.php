@@ -52,6 +52,7 @@ return [
     ],
     'categories' => [
         'business' => 'Verslas',
+        'sales' => 'Pardavimai',
         'legal' => 'Teisinė',
         'financial' => 'Finansinė',
         'marketing' => 'Rinkodara',
