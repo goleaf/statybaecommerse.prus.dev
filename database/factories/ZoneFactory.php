@@ -22,5 +22,14 @@ final class ZoneFactory extends Factory
             'is_enabled' => true,
         ];
     }
+
+    public function lithuania(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Lietuva',
+            'code' => 'LT',
+            'is_enabled' => true,
+        ]);
+    }
 }
 

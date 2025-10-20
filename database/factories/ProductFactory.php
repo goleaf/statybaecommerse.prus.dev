@@ -16,6 +16,39 @@ class ProductFactory extends Factory
 {
     protected $model = Product::class;
 
+    private const PRESET_PRODUCTS = [
+        'hammer-drill' => [
+            'type' => 'simple',
+            'name' => 'Makita HR2475 smūginis perforatorius',
+            'slug' => 'makita-hr2475-smuginis-perforatorius',
+            'sku' => 'MK-HR2475',
+            'price' => 329.00,
+            'short_description' => 'Profesionalus perforatorius betonui ir mūrijimui.',
+            'seo_title' => 'Makita HR2475 smūginis perforatorius',
+            'seo_description' => 'Galingas Makita perforatorius profesionaliems statybos darbams.',
+        ],
+        'circular-saw' => [
+            'type' => 'simple',
+            'name' => 'DeWalt DWE576K diskinis pjūklas',
+            'slug' => 'dewalt-dwe576k-diskinis-pjuklas',
+            'sku' => 'DW-DWE576K',
+            'price' => 289.00,
+            'short_description' => 'Tikslaus pjovimo diskinis pjūklas su kreipiančiaja liniuotė.',
+            'seo_title' => 'DeWalt DWE576K diskinis pjūklas',
+            'seo_description' => 'Patikimas DeWalt diskinis pjūklas tiksliems pjūviams.',
+        ],
+        'safety-glasses' => [
+            'type' => 'simple',
+            'name' => 'Bosch apsauginiai akiniai UltraClear',
+            'slug' => 'bosch-apsauginiai-akiniai-ultraclear',
+            'sku' => 'BS-GLASS01',
+            'price' => 29.00,
+            'short_description' => 'Apsauginiai akiniai su antifog danga ir UV apsauga.',
+            'seo_title' => 'Bosch apsauginiai akiniai UltraClear',
+            'seo_description' => 'Patogūs Bosch apsauginiai akiniai saugiam darbui.',
+        ],
+    ];
+
     public function definition(): array
     {
         $lithuanianProducts = [
@@ -126,5 +159,52 @@ class ProductFactory extends Factory
         return $this->afterCreating(function (Product $product): void {
             // Skip media for now - will be added manually or via admin
         });
+    }
+
+    public function published(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'published',
+            'is_visible' => true,
+            'published_at' => now()->subDays(3),
+        ]);
+    }
+
+    public function featured(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_featured' => true,
+        ]);
+    }
+
+    public function hammerDrill(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('hammer-drill'));
+    }
+
+    public function circularSaw(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('circular-saw'));
+    }
+
+    public function safetyGlasses(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('safety-glasses'));
+    }
+
+    private function preset(string $key): array
+    {
+        $preset = self::PRESET_PRODUCTS[$key] ?? [];
+
+        return array_merge([
+            'description' => $this->generateLithuanianDescription($preset['name'] ?? 'Produktas'),
+            'weight' => 1.0,
+            'length' => 10.0,
+            'width' => 10.0,
+            'height' => 10.0,
+            'manage_stock' => true,
+            'stock_quantity' => 25,
+            'low_stock_threshold' => 5,
+        ], $preset);
     }
 }
