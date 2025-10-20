@@ -5,7 +5,14 @@ return [
     'plural' => 'Nuolaidos sąlygos',
     'single' => 'Nuolaidos sąlyga',
 
-    'tabs' => 'Skirtukai',
+    'tabs' => [
+        'all' => 'Visos',
+        'active' => 'Aktyvios',
+        'inactive' => 'Neaktyvios',
+        'high_priority' => 'Aukšto prioriteto',
+        'low_priority' => 'Žemo prioriteto',
+    ],
+
     'basic_information' => 'Pagrindinė informacija',
     'condition_settings' => 'Sąlygų nustatymai',
     'targeting' => 'Taikymas',
@@ -18,11 +25,18 @@ return [
     'operator' => 'Operatorius',
     'value' => 'Reikšmė',
     'priority' => 'Prioritetas',
+    'position' => 'Pozicija',
     'products' => 'Produktai',
     'categories' => 'Kategorijos',
     'is_active' => 'Aktyvus',
     'is_required' => 'Privalomas',
     'metadata' => 'Metaduomenys',
+    'translations' => 'Vertimai',
+    'locale' => 'Kalba',
+    'metadata_key' => 'Raktas',
+    'metadata_value' => 'Reikšmė',
+    'add_metadata_item' => 'Pridėti metaduomenų įrašą',
+    'status_filter' => 'Būsena',
 
     'value_help' => 'Sąlygos reikšmė, priklausomai nuo tipo',
     'priority_help' => 'Sąlygų vykdymo prioritetas (0 = aukščiausias)',
@@ -82,4 +96,29 @@ return [
     'deactivate_selected' => 'Deaktyvuoti pasirinktus',
     'bulk_activated_success' => 'Sėkmingai aktyvuoti pasirinkti įrašai',
     'bulk_deactivated_success' => 'Sėkmingai deaktyvuoti pasirinkti įrašai',
+    'set_priority' => 'Nustatyti prioritetą',
+
+    'boolean_yes' => 'Taip',
+    'boolean_no' => 'Ne',
+
+    'charts' => [
+        'conditions_by_type' => 'Sąlygos pagal tipą',
+    ],
+
+    'stats' => [
+        'total_conditions' => 'Iš viso sąlygų',
+        'total_conditions_description' => 'Bendras sukonfigūruotų sąlygų skaičius.',
+        'active_conditions' => 'Aktyvios sąlygos',
+        'active_conditions_description' => 'Šiuo metu įjungtos sąlygos.',
+        'inactive_conditions' => 'Neaktyvios sąlygos',
+        'inactive_conditions_description' => 'Šiuo metu išjungtos sąlygos.',
+        'top_condition_type' => 'Dažniausias tipas',
+        'top_condition_type_description' => 'Dažniausiai naudojamas sąlygos tipas.',
+        'type_usage' => '{1} :count sąlyga|{2} :count sąlygos|[3,*] :count sąlygų',
+        'no_data' => 'Nėra duomenų',
+    ],
+
+    'widgets' => [
+        'recent_conditions' => 'Naujausios nuolaidų sąlygos',
+    ],
 ];
