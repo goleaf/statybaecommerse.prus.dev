@@ -9,12 +9,14 @@ use App\Models\Campaign;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use OpenApi\Attributes as OA;
 
 /**
  * CampaignController
  *
  * HTTP controller handling CampaignController related web requests, responses, and business logic with proper validation and error handling.
  */
+#[OA\Tag(name: 'Campaigns', description: 'Campaign discovery and analytics endpoints')]
 final class CampaignController extends Controller
 {
     /**
@@ -54,6 +56,38 @@ final class CampaignController extends Controller
     /**
      * Handle click functionality with proper error handling.
      */
+    #[OA\Post(
+        path: '/campaigns/{campaign}/click',
+        operationId: 'recordCampaignClick',
+        summary: 'Record a campaign click event.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'campaign',
+                description: 'Campaign identifier.',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: false,
+            description: 'Optional click context metadata.',
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'type', type: 'string', example: 'cta'),
+                    new OA\Property(property: 'url', type: 'string', format: 'uri', nullable: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Click recorded successfully.',
+                content: new OA\JsonContent(ref: '#/components/schemas/GenericSuccessMessage')
+            ),
+        ]
+    )]
     public function click(Request $request, Campaign $campaign): JsonResponse
     {
         $clickType = $request->get('type', 'cta');
@@ -66,6 +100,40 @@ final class CampaignController extends Controller
     /**
      * Handle conversion functionality with proper error handling.
      */
+    #[OA\Post(
+        path: '/campaigns/{campaign}/conversion',
+        operationId: 'recordCampaignConversion',
+        summary: 'Record a campaign conversion event.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'campaign',
+                description: 'Campaign identifier.',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: false,
+            description: 'Conversion payload.',
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'type', type: 'string', example: 'purchase'),
+                    new OA\Property(property: 'value', type: 'number', format: 'float', example: 199.99),
+                    new OA\Property(property: 'order_id', type: 'string', nullable: true),
+                    new OA\Property(property: 'data', type: 'object', nullable: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Conversion recorded successfully.',
+                content: new OA\JsonContent(ref: '#/components/schemas/GenericSuccessMessage')
+            ),
+        ]
+    )]
     public function conversion(Request $request, Campaign $campaign): JsonResponse
     {
         $conversionType = $request->get('type', 'purchase');
@@ -113,6 +181,19 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignStatistics functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/statistics',
+        operationId: 'getCampaignStatistics',
+        summary: 'Retrieve aggregated campaign statistics.',
+        tags: ['Campaigns'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Statistics successfully retrieved.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignStatisticsResponse')
+            ),
+        ]
+    )]
     public function getCampaignStatistics(): JsonResponse
     {
         $statistics = ['total_campaigns' => Campaign::count(), 'active_campaigns' => Campaign::active()->count(), 'scheduled_campaigns' => Campaign::scheduled()->count(), 'completed_campaigns' => Campaign::where('status', 'completed')->count(), 'total_views' => Campaign::sum('total_views'), 'total_clicks' => Campaign::sum('total_clicks'), 'total_conversions' => Campaign::sum('total_conversions'), 'total_revenue' => Campaign::sum('total_revenue'), 'average_conversion_rate' => Campaign::where('total_views', '>', 0)->avg('conversion_rate') ?? 0, 'average_click_through_rate' => Campaign::where('total_views', '>', 0)->avg(\DB::raw('(total_clicks / total_views) * 100')) ?? 0, 'average_roi' => Campaign::where('budget', '>', 0)->avg(\DB::raw('((total_revenue - budget) / budget) * 100')) ?? 0];
@@ -123,6 +204,19 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignTypes functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/types',
+        operationId: 'getCampaignTypes',
+        summary: 'List available campaign types with counts.',
+        tags: ['Campaigns'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Campaign types returned.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignTypesResponse')
+            ),
+        ]
+    )]
     public function getCampaignTypes(): JsonResponse
     {
         $campaigns = Campaign::all();
@@ -158,6 +252,19 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignPerformance functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/performance',
+        operationId: 'getCampaignPerformance',
+        summary: 'Summarize campaign performance tiers.',
+        tags: ['Campaigns'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Performance buckets returned.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignPerformanceResponse')
+            ),
+        ]
+    )]
     public function getCampaignPerformance(): JsonResponse
     {
         $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => Campaign::where(function ($query) {
@@ -170,6 +277,27 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignAnalytics functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/analytics',
+        operationId: 'getCampaignAnalytics',
+        summary: 'Retrieve campaign analytics over a period.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\QueryParameter(
+                name: 'period',
+                description: 'Number of days to include in analytics window.',
+                required: false,
+                schema: new OA\Schema(type: 'integer', default: 30, minimum: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Analytics payload returned.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignAnalyticsResponse')
+            ),
+        ]
+    )]
     public function getCampaignAnalytics(Request $request): JsonResponse
     {
         $period = $request->input('period', '30');
@@ -183,6 +311,34 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignComparison functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/compare',
+        operationId: 'getCampaignComparison',
+        summary: 'Compare metrics across selected campaigns.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\QueryParameter(
+                name: 'campaign_ids[]',
+                description: 'Campaign identifiers to include.',
+                required: false,
+                schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'integer')),
+                style: 'form',
+                explode: true
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Comparison returned successfully.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignComparisonResponse')
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'No campaign identifiers provided.',
+                content: new OA\JsonContent(ref: '#/components/schemas/GenericErrorMessage')
+            ),
+        ]
+    )]
     public function getCampaignComparison(Request $request): JsonResponse
     {
         $campaignIds = $request->input('campaign_ids', []);
@@ -200,6 +356,27 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignRecommendations functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/{campaign}/recommendations',
+        operationId: 'getCampaignRecommendations',
+        summary: 'Retrieve recommendations for a campaign.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'campaign',
+                description: 'Campaign identifier.',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Recommendations generated.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignRecommendationsResponse')
+            ),
+        ]
+    )]
     public function getCampaignRecommendations(Campaign $campaign): JsonResponse
     {
         $recommendations = [];

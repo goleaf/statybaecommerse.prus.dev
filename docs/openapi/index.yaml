@@ -1,0 +1,485 @@
+openapi: 3.1.0
+info:
+  title: Statyba E-commerce API
+  version: 1.0.0
+  description: |
+    OpenAPI specification describing the JSON endpoints exposed by the Statyba e-commerce
+    platform. The document merges PHP attribute annotations with these shared component
+    definitions.
+servers:
+  - url: https://prus.dev
+    description: Production server
+  - url: http://localhost
+    description: Local development server
+security:
+  - sessionAuth: []
+tags:
+  - name: Campaigns
+    description: Campaign discovery, analytics, and optimisation endpoints.
+  - name: System Settings
+    description: Public configuration queries for storefront integrations.
+  - name: Discount Conditions
+    description: Utilities for inspecting discount condition configuration.
+  - name: Autocomplete
+    description: Shared autocomplete helpers for administrative tooling.
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: XSRF-TOKEN
+  schemas:
+    GenericSuccessMessage:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Operation completed successfully.
+    GenericErrorMessage:
+      type: object
+      properties:
+        success:
+          type: boolean
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+      description: Flexible error envelope used by legacy endpoints.
+    CampaignStatisticsResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - total_campaigns
+            - active_campaigns
+            - scheduled_campaigns
+            - completed_campaigns
+            - total_views
+            - total_clicks
+            - total_conversions
+            - total_revenue
+            - average_conversion_rate
+            - average_click_through_rate
+            - average_roi
+          properties:
+            total_campaigns:
+              type: integer
+            active_campaigns:
+              type: integer
+            scheduled_campaigns:
+              type: integer
+            completed_campaigns:
+              type: integer
+            total_views:
+              type: integer
+            total_clicks:
+              type: integer
+            total_conversions:
+              type: integer
+            total_revenue:
+              type: number
+              format: float
+            average_conversion_rate:
+              type: number
+              format: float
+            average_click_through_rate:
+              type: number
+              format: float
+            average_roi:
+              type: number
+              format: float
+    CampaignTypesResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            required:
+              - type
+              - label
+              - count
+              - icon
+              - color
+            properties:
+              type:
+                type: string
+              label:
+                type: string
+              count:
+                type: integer
+              icon:
+                type: string
+              color:
+                type: string
+    CampaignPerformanceResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          required:
+            - high_performing
+            - medium_performing
+            - low_performing
+            - needs_attention
+          properties:
+            high_performing:
+              type: integer
+            medium_performing:
+              type: integer
+            low_performing:
+              type: integer
+            needs_attention:
+              type: integer
+    CampaignAnalyticsResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          required:
+            - period
+            - start_date
+            - end_date
+            - campaigns_created
+            - campaigns_started
+            - campaigns_completed
+            - total_views
+            - total_clicks
+            - total_conversions
+            - total_revenue
+            - top_performing_campaigns
+            - campaign_types_breakdown
+          properties:
+            period:
+              type: integer
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+            campaigns_created:
+              type: integer
+            campaigns_started:
+              type: integer
+            campaigns_completed:
+              type: integer
+            total_views:
+              type: integer
+            total_clicks:
+              type: integer
+            total_conversions:
+              type: integer
+            total_revenue:
+              type: number
+              format: float
+            top_performing_campaigns:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  conversion_rate:
+                    type: number
+                    format: float
+                  total_revenue:
+                    type: number
+                    format: float
+            campaign_types_breakdown:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  count:
+                    type: integer
+                  avg_conversion_rate:
+                    type: number
+                    format: float
+    CampaignComparisonResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              type:
+                type: string
+              type_label:
+                type: string
+              status:
+                type: string
+              status_label:
+                type: string
+              views:
+                type: integer
+              clicks:
+                type: integer
+              conversions:
+                type: integer
+              revenue:
+                type: number
+                format: float
+              conversion_rate:
+                type: number
+                format: float
+              click_through_rate:
+                type: number
+                format: float
+              roi:
+                type: number
+                format: float
+              performance_score:
+                type: number
+                format: float
+              performance_grade:
+                type: string
+              budget:
+                type: number
+                format: float
+              budget_utilization:
+                type: number
+                format: float
+    CampaignRecommendationsResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              priority:
+                type: string
+              title:
+                type: string
+              description:
+                type: string
+              action:
+                type: string
+    SystemSettingResource:
+      type: object
+      required:
+        - key
+        - name
+        - value
+        - type
+        - group
+        - description
+        - help_text
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        value:
+          nullable: true
+        type:
+          type: string
+        group:
+          type: string
+        description:
+          type: string
+        help_text:
+          type: string
+    SystemSettingCategoryCollection:
+      type: array
+      items:
+        type: object
+        required:
+          - id
+          - name
+          - slug
+          - description
+          - icon
+          - color
+          - settings_count
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          slug:
+            type: string
+          description:
+            type: string
+          icon:
+            type: string
+          color:
+            type: string
+          settings_count:
+            type: integer
+    SystemSettingGroupCollection:
+      type: array
+      items:
+        type: object
+        required:
+          - name
+          - label
+          - settings_count
+        properties:
+          name:
+            type: string
+          label:
+            type: string
+          settings_count:
+            type: integer
+    DiscountConditionTestResponse:
+      type: object
+      required:
+        - matches
+        - is_valid
+        - condition_description
+        - message
+      properties:
+        matches:
+          type: boolean
+        is_valid:
+          type: boolean
+        condition_description:
+          type: string
+        message:
+          type: string
+    DiscountConditionCollection:
+      type: object
+      required:
+        - conditions
+      properties:
+        conditions:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - type
+              - type_label
+              - operator
+              - operator_label
+              - value
+              - priority
+              - position
+              - description
+              - name
+            properties:
+              id:
+                type: integer
+              type:
+                type: string
+              type_label:
+                type: string
+              operator:
+                type: string
+              operator_label:
+                type: string
+              value:
+                nullable: true
+              priority:
+                type: integer
+              position:
+                type: integer
+              description:
+                type: string
+              name:
+                type: string
+    DiscountConditionOperatorResponse:
+      type: object
+      required:
+        - operators
+      properties:
+        operators:
+          type: array
+          items:
+            type: string
+    DiscountConditionStatisticsResponse:
+      type: object
+      required:
+        - total
+        - active
+        - inactive
+        - by_type
+        - by_operator
+      properties:
+        total:
+          type: integer
+        active:
+          type: integer
+        inactive:
+          type: integer
+        by_type:
+          type: object
+          additionalProperties:
+            type: integer
+        by_operator:
+          type: object
+          additionalProperties:
+            type: integer
+    AutocompleteResponse:
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                nullable: true
+              label:
+                nullable: true
+              data:
+                type: object
+                additionalProperties: {}
