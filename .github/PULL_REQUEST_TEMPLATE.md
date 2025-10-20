@@ -1,6 +1,7 @@
 ## Summary
-- [ ] Linked issue or context is documented
-- [ ] Tests or QA notes are included when behaviour changes
+- [ ] Linked issue or context is documented (include doc links where helpful)
+- [ ] Behavioural changes have accompanying tests or QA notes
+- [ ] Relevant knowledge base pages updated (e.g., `docs/INDEX.md`, `docs/CHANGELOG.md`, or feature-specific summaries)
 
 ## Dependency Review
 - [ ] composer.json constraints updated when dependencies change
