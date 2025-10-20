@@ -120,6 +120,10 @@ final class RecommendationCacheResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('block.name')
@@ -137,6 +141,10 @@ final class RecommendationCacheResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 30 ? $state : null;
                     }),
@@ -175,9 +183,9 @@ final class RecommendationCacheResource extends Resource
                     ->label(__('admin.recommendation_caches.context_type'))
                     ->options([
                         'homepage' => 'Homepage',
-                        'product' => 'Product',
+                        'product'  => 'Product',
                         'category' => 'Category',
-                        'cart' => 'Cart',
+                        'cart'     => 'Cart',
                         'checkout' => 'Checkout',
                     ]),
             ])
@@ -203,10 +211,10 @@ final class RecommendationCacheResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationCaches::route('/'),
+            'index'  => Pages\ListRecommendationCaches::route('/'),
             'create' => Pages\CreateRecommendationCache::route('/create'),
-            'view' => Pages\ViewRecommendationCache::route('/{record}'),
-            'edit' => Pages\EditRecommendationCache::route('/{record}/edit'),
+            'view'   => Pages\ViewRecommendationCache::route('/{record}'),
+            'edit'   => Pages\EditRecommendationCache::route('/{record}/edit'),
         ];
     }
 }
