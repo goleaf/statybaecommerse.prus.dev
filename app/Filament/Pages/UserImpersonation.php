@@ -13,15 +13,17 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class UserImpersonation extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
+    /**
+     * @var string|BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-user';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'System';
 
     protected static ?string $title = 'User Impersonation';
 
@@ -49,17 +51,17 @@ final class UserImpersonation extends Page implements HasTable
                         Tables\Components\TextInput::make('title')->required(),
                         Tables\Components\Textarea::make('message')->required(),
                         Tables\Components\Select::make('type')->options([
-                            'info' => 'Info',
+                            'info'    => 'Info',
                             'success' => 'Success',
                             'warning' => 'Warning',
-                            'danger' => 'Danger',
+                            'danger'  => 'Danger',
                         ])->required(),
                     ])
                     ->action(function (User $record, array $data): void {
                         $record->notify(new \Illuminate\Notifications\Messages\BroadcastMessage([
-                            'title' => $data['title'],
+                            'title'   => $data['title'],
                             'message' => $data['message'],
-                            'type' => $data['type'],
+                            'type'    => $data['type'],
                         ]));
                     }),
             ]);

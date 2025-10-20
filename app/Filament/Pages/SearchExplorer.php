@@ -8,13 +8,15 @@ use App\Data\SearchQueryData;
 use App\Services\SearchService;
 use BackedEnum;
 use Filament\Pages\Page;
-use UnitEnum;
 
 final class SearchExplorer extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    /**
+     * @var string|BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Search';
+    protected static ?string $navigationGroup = 'Search';
 
     protected static ?string $title = 'Search Explorer';
 
@@ -40,21 +42,21 @@ final class SearchExplorer extends Page
      * @var array<string, int>
      */
     public array $buckets = [
-        'product' => 0,
+        'product'  => 0,
         'category' => 0,
-        'brand' => 0,
+        'brand'    => 0,
     ];
 
     public function mount(): void
     {
         $this->meta = [
-            'query' => '',
-            'page' => 1,
-            'per_page' => $this->perPage,
+            'query'         => '',
+            'page'          => 1,
+            'per_page'      => $this->perPage,
             'total_results' => 0,
-            'returned' => 0,
-            'cached' => false,
-            'types' => ['product', 'category', 'brand'],
+            'returned'      => 0,
+            'cached'        => false,
+            'types'         => ['product', 'category', 'brand'],
         ];
     }
 
@@ -83,31 +85,31 @@ final class SearchExplorer extends Page
         if ($query === '') {
             $this->results = [];
             $this->meta = [
-                'query' => '',
-                'page' => 1,
-                'per_page' => $perPage,
+                'query'         => '',
+                'page'          => 1,
+                'per_page'      => $perPage,
                 'total_results' => 0,
-                'returned' => 0,
-                'cached' => false,
-                'types' => ['product', 'category', 'brand'],
+                'returned'      => 0,
+                'cached'        => false,
+                'types'         => ['product', 'category', 'brand'],
             ];
             $this->buckets = [
-                'product' => 0,
+                'product'  => 0,
                 'category' => 0,
-                'brand' => 0,
+                'brand'    => 0,
             ];
 
             return;
         }
 
         $queryData = SearchQueryData::fromArray([
-            'query' => $query,
-            'page' => 1,
+            'query'    => $query,
+            'page'     => 1,
             'per_page' => $perPage,
         ], [
-            'source' => 'filament.search-explorer',
+            'source'  => 'filament.search-explorer',
             'user_id' => auth()->id(),
-            'locale' => app()->getLocale(),
+            'locale'  => app()->getLocale(),
         ]);
 
         /** @var SearchService $service */

@@ -37,7 +37,10 @@ final class SliderAnalytics extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Slider Analytics';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    /**
+     * @var string|BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 
@@ -71,8 +74,8 @@ final class SliderAnalytics extends BaseDashboard
                     Select::make('status')
                         ->label('Status Filter')
                         ->options([
-                            'all' => 'All Sliders',
-                            'active' => 'Active Only',
+                            'all'      => 'All Sliders',
+                            'active'   => 'Active Only',
                             'inactive' => 'Inactive Only',
                         ])
                         ->default('all')
@@ -82,14 +85,14 @@ final class SliderAnalytics extends BaseDashboard
                 ->label('Export Analytics')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->action(function () {
+                ->action(function (): void {
                     $this->exportAnalytics();
                 }),
             Action::make('refresh')
                 ->label('Refresh Data')
                 ->icon('heroicon-o-arrow-path')
                 ->color('info')
-                ->action(function () {
+                ->action(function (): void {
                     $this->refreshData();
                 }),
         ];
@@ -140,22 +143,22 @@ final class SliderAnalytics extends BaseDashboard
 
         $analyticsData = $sliders->map(function (Slider $slider) {
             return [
-                'ID' => $slider->id,
-                'Title' => $slider->title,
-                'Status' => $slider->is_active ? 'Active' : 'Inactive',
-                'Created At' => $slider->created_at->format('Y-m-d H:i:s'),
-                'Updated At' => $slider->updated_at->format('Y-m-d H:i:s'),
-                'Sort Order' => $slider->sort_order,
-                'Has Image' => $slider->hasMedia('slider_images') ? 'Yes' : 'No',
-                'Has Background' => $slider->hasMedia('slider_backgrounds') ? 'Yes' : 'No',
-                'Button Text' => $slider->button_text,
-                'Button URL' => $slider->button_url,
+                'ID'               => $slider->id,
+                'Title'            => $slider->title,
+                'Status'           => $slider->is_active ? 'Active' : 'Inactive',
+                'Created At'       => $slider->created_at->format('Y-m-d H:i:s'),
+                'Updated At'       => $slider->updated_at->format('Y-m-d H:i:s'),
+                'Sort Order'       => $slider->sort_order,
+                'Has Image'        => $slider->hasMedia('slider_images') ? 'Yes' : 'No',
+                'Has Background'   => $slider->hasMedia('slider_backgrounds') ? 'Yes' : 'No',
+                'Button Text'      => $slider->button_text,
+                'Button URL'       => $slider->button_url,
                 'Background Color' => $slider->background_color,
-                'Text Color' => $slider->text_color,
+                'Text Color'       => $slider->text_color,
             ];
         });
 
-        $filename = 'slider_analytics_'.now()->format('Y-m-d_H-i-s').'.csv';
+        $filename = 'slider_analytics_' . now()->format('Y-m-d_H-i-s') . '.csv';
 
         $this->notify('success', "Analytics exported successfully as {$filename}");
     }
