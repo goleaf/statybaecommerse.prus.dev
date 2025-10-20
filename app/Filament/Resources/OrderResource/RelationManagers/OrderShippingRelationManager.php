@@ -10,6 +10,8 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -17,8 +19,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -62,7 +62,7 @@ final class OrderShippingRelationManager extends RelationManager
                         Grid::make(2)
                             ->schema([
                                 Select::make('shipping_method')
-                                    ->label(__('orders.shipping_method'))
+                                    ->label(__('orders.fields.shipping_method'))
                                     ->options([
                                         'standard' => __('orders.shipping_methods.standard'),
                                         'express' => __('orders.shipping_methods.express'),
@@ -72,16 +72,16 @@ final class OrderShippingRelationManager extends RelationManager
                                     ])
                                     ->required(),
                                 TextInput::make('tracking_number')
-                                    ->label(__('orders.tracking_number'))
+                                    ->label(__('orders.fields.tracking_number'))
                                     ->maxLength(255),
                             ]),
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('carrier')
-                                    ->label(__('orders.carrier'))
+                                    ->label(__('orders.fields.carrier'))
                                     ->maxLength(255),
                                 TextInput::make('service_type')
-                                    ->label(__('orders.service_type'))
+                                    ->label(__('orders.fields.service_type'))
                                     ->maxLength(255),
                             ]),
                     ])
@@ -93,18 +93,18 @@ final class OrderShippingRelationManager extends RelationManager
                         Grid::make(3)
                             ->schema([
                                 TextInput::make('base_cost')
-                                    ->label(__('orders.base_cost'))
+                                    ->label(__('orders.fields.base_cost'))
                                     ->numeric()
                                     ->prefix('€')
                                     ->step(0.01),
                                 TextInput::make('insurance_cost')
-                                    ->label(__('orders.insurance_cost'))
+                                    ->label(__('orders.fields.insurance_cost'))
                                     ->numeric()
                                     ->prefix('€')
                                     ->step(0.01)
                                     ->default(0),
                                 TextInput::make('total_cost')
-                                    ->label(__('orders.total_cost'))
+                                    ->label(__('orders.fields.total_cost'))
                                     ->numeric()
                                     ->prefix('€')
                                     ->step(0.01),
@@ -118,20 +118,20 @@ final class OrderShippingRelationManager extends RelationManager
                         Grid::make(2)
                             ->schema([
                                 DateTimePicker::make('shipped_at')
-                                    ->label(__('orders.shipped_at')),
+                                    ->label(__('orders.fields.shipped_at')),
                                 DateTimePicker::make('estimated_delivery')
-                                    ->label(__('orders.estimated_delivery')),
+                                    ->label(__('orders.fields.estimated_delivery')),
                             ]),
                         Grid::make(2)
                             ->schema([
                                 DateTimePicker::make('delivered_at')
-                                    ->label(__('orders.delivered_at')),
+                                    ->label(__('orders.fields.delivered_at')),
                                 TextInput::make('delivery_notes')
-                                    ->label(__('orders.delivery_notes'))
+                                    ->label(__('orders.fields.delivery_notes'))
                                     ->maxLength(500),
                             ]),
                         Toggle::make('is_delivered')
-                            ->label(__('orders.is_delivered'))
+                            ->label(__('orders.fields.is_delivered'))
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set) {
                                 if ($state) {
@@ -162,21 +162,21 @@ final class OrderShippingRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('shipping_method')
-                    ->label(__('orders.shipping_method'))
+                    ->label(__('orders.fields.shipping_method'))
                     ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_methods.{$state}") : '-')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('tracking_number')
-                    ->label(__('orders.tracking_number'))
+                    ->label(__('orders.fields.tracking_number'))
                     ->searchable()
                     ->sortable()
                     ->copyable(),
                 TextColumn::make('carrier')
-                    ->label(__('orders.carrier'))
+                    ->label(__('orders.fields.carrier'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('total_cost')
-                    ->label(__('orders.total_cost'))
+                    ->label(__('orders.fields.total_cost'))
                     ->money('EUR')
                     ->sortable(),
                 BadgeColumn::make('status')
@@ -191,31 +191,31 @@ final class OrderShippingRelationManager extends RelationManager
                     ])
                     ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_statuses.{$state}") : '-'),
                 IconColumn::make('is_delivered')
-                    ->label(__('orders.is_delivered'))
+                    ->label(__('orders.fields.is_delivered'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
                 TextColumn::make('shipped_at')
-                    ->label(__('orders.shipped_at'))
+                    ->label(__('orders.fields.shipped_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estimated_delivery')
-                    ->label(__('orders.estimated_delivery'))
+                    ->label(__('orders.fields.estimated_delivery'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('delivered_at')
-                    ->label(__('orders.delivered_at'))
+                    ->label(__('orders.fields.delivered_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('shipping_method')
-                    ->label(__('orders.shipping_method'))
+                    ->label(__('orders.fields.shipping_method'))
                     ->options([
                         'standard' => __('orders.shipping_methods.standard'),
                         'express' => __('orders.shipping_methods.express'),
@@ -236,7 +236,7 @@ final class OrderShippingRelationManager extends RelationManager
                     ])
                     ->multiple(),
                 TernaryFilter::make('is_delivered')
-                    ->label(__('orders.is_delivered'))
+                    ->label(__('orders.fields.is_delivered'))
                     ->queries(
                         true: fn (Builder $query) => $query->where('is_delivered', true),
                         false: fn (Builder $query) => $query->where('is_delivered', false),
@@ -249,7 +249,7 @@ final class OrderShippingRelationManager extends RelationManager
                     ->color('primary')
                     ->form([
                         Select::make('shipping_method')
-                            ->label(__('orders.shipping_method'))
+                            ->label(__('orders.fields.shipping_method'))
                             ->options([
                                 'standard' => __('orders.shipping_methods.standard'),
                                 'express' => __('orders.shipping_methods.express'),
@@ -259,27 +259,27 @@ final class OrderShippingRelationManager extends RelationManager
                             ])
                             ->required(),
                         TextInput::make('tracking_number')
-                            ->label(__('orders.tracking_number'))
+                            ->label(__('orders.fields.tracking_number'))
                             ->maxLength(255),
                         TextInput::make('carrier')
-                            ->label(__('orders.carrier'))
+                            ->label(__('orders.fields.carrier'))
                             ->maxLength(255),
                         TextInput::make('service_type')
-                            ->label(__('orders.service_type'))
+                            ->label(__('orders.fields.service_type'))
                             ->maxLength(255),
                         TextInput::make('base_cost')
-                            ->label(__('orders.base_cost'))
+                            ->label(__('orders.fields.base_cost'))
                             ->numeric()
                             ->prefix('€')
                             ->step(0.01),
                         TextInput::make('insurance_cost')
-                            ->label(__('orders.insurance_cost'))
+                            ->label(__('orders.fields.insurance_cost'))
                             ->numeric()
                             ->prefix('€')
                             ->step(0.01)
                             ->default(0),
                         TextInput::make('total_cost')
-                            ->label(__('orders.total_cost'))
+                            ->label(__('orders.fields.total_cost'))
                             ->numeric()
                             ->prefix('€')
                             ->step(0.01),
