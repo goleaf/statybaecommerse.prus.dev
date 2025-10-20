@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Menu;
+use App\Repositories\MenuRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,28 +16,24 @@ use Illuminate\Http\Request;
  */
 final class MenuController extends Controller
 {
+    public function __construct(
+        private readonly MenuRepository $menuRepository,
+    ) {}
+
     /**
      * Display a listing of the resource with pagination and filtering.
      */
     public function index(Request $request): JsonResponse
     {
         $location = $request->get('location');
-        $query = Menu::with(['allItems' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order');
-        }]);
-        if ($location) {
-            $query->where('location', $location);
-        }
-        $timeout = now()->addSeconds(5);
-        // 5 second timeout for menu loading
-        $menus = $query->where('is_active', true)->cursor()->takeUntilTimeout($timeout)->collect()->skipWhile(function ($menu) {
-            // Skip menus that are not properly configured for display
-            return empty($menu->name) || empty($menu->key) || ! $menu->is_active || empty($menu->allItems);
-        });
+        $menus = $this->menuRepository->all($location, app()->getLocale())
+            ->filter(static fn (array $menu): bool => ! empty($menu['items']))
+            ->values();
 
-        return response()->json(['success' => true, 'data' => $menus->map(function ($menu) {
-            return ['id' => $menu->id, 'key' => $menu->key, 'name' => $menu->name, 'location' => $menu->location, 'items' => $this->formatMenuItems($menu->allItems)];
-        })]);
+        return response()->json([
+            'success' => true,
+            'data' => $menus->map(fn (array $menu): array => $this->transformMenu($menu))->all(),
+        ]);
     }
 
     /**
@@ -45,14 +41,13 @@ final class MenuController extends Controller
      */
     public function show(string $key): JsonResponse
     {
-        $menu = Menu::with(['allItems' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order');
-        }])->where('key', $key)->where('is_active', true)->first();
-        if (! $menu) {
+        $menu = $this->menuRepository->byKey($key, app()->getLocale());
+
+        if ($menu === null || empty($menu['items'])) {
             return response()->json(['success' => false, 'message' => __('api.menu_not_found')], 404);
         }
 
-        return response()->json(['success' => true, 'data' => ['id' => $menu->id, 'key' => $menu->key, 'name' => $menu->name, 'location' => $menu->location, 'items' => $this->formatMenuItems($menu->allItems)]]);
+        return response()->json(['success' => true, 'data' => $this->transformMenu($menu)]);
     }
 
     /**
@@ -60,46 +55,26 @@ final class MenuController extends Controller
      */
     public function byLocation(string $location): JsonResponse
     {
-        $menu = Menu::with(['allItems' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order');
-        }])->where('location', $location)->where('is_active', true)->first();
-        if (! $menu) {
+        $menu = $this->menuRepository->byLocation($location, app()->getLocale());
+
+        if ($menu === null || empty($menu['items'])) {
             return response()->json(['success' => false, 'message' => __('api.menu_not_found_for_location')], 404);
         }
 
-        return response()->json(['success' => true, 'data' => ['id' => $menu->id, 'key' => $menu->key, 'name' => $menu->name, 'location' => $menu->location, 'items' => $this->formatMenuItems($menu->allItems)]]);
+        return response()->json(['success' => true, 'data' => $this->transformMenu($menu)]);
     }
 
     /**
-     * Handle formatMenuItems functionality with proper error handling.
-     *
-     * @param  mixed  $items
+     * Normalize menu payload for API responses.
      */
-    private function formatMenuItems($items): array
+    private function transformMenu(array $menu): array
     {
-        $formatted = [];
-        $itemsByParent = $items->groupBy('parent_id');
-        // Get root items (no parent)
-        $rootItems = $itemsByParent->get(null, collect());
-        foreach ($rootItems as $item) {
-            $formatted[] = $this->formatMenuItem($item, $itemsByParent);
-        }
-
-        return $formatted;
-    }
-
-    /**
-     * Handle formatMenuItem functionality with proper error handling.
-     *
-     * @param  mixed  $item
-     * @param  mixed  $itemsByParent
-     */
-    private function formatMenuItem($item, $itemsByParent): array
-    {
-        $children = $itemsByParent->get($item->id, collect())->map(function ($child) use ($itemsByParent) {
-            return $this->formatMenuItem($child, $itemsByParent);
-        })->toArray();
-
-        return ['id' => $item->id, 'label' => $item->label, 'url' => $item->url, 'route_name' => $item->route_name, 'route_params' => $item->route_params, 'icon' => $item->icon, 'sort_order' => $item->sort_order, 'children' => $children];
+        return [
+            'id' => $menu['id'],
+            'key' => $menu['key'],
+            'name' => $menu['name'],
+            'location' => $menu['location'],
+            'items' => $menu['items'],
+        ];
     }
 }

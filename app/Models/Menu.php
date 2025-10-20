@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
+use App\Observers\MenuObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,7 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Menu query()
  *
  * @mixin \Eloquent
- */
+*/
+#[ObservedBy([MenuObserver::class])]
 #[ScopedBy([ActiveScope::class])]
 final class Menu extends Model
 {
@@ -52,5 +56,27 @@ final class Menu extends Model
     public function allItems(): HasMany
     {
         return $this->hasMany(MenuItem::class)->orderBy('sort_order');
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeForKey(Builder $query, string $key): Builder
+    {
+        return $query->where('key', $key);
+    }
+
+    public function scopeForLocation(Builder $query, string $location): Builder
+    {
+        return $query->where('location', $location);
+    }
+
+    public function scopeWithVisibleItems(Builder $query): Builder
+    {
+        return $query->with([
+            'allItems' => static fn ($itemQuery) => $itemQuery->visible()->ordered(),
+        ]);
     }
 }

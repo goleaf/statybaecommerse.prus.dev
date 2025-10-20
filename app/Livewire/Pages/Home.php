@@ -8,8 +8,8 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Product;
 use App\Models\Review;
+use App\Repositories\ProductRepository;
 use App\Support\Cache\CacheKeys;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -27,8 +27,10 @@ final class Home extends Component
         $locale = app()->getLocale();
 
         return Cache::remember(CacheKeys::homeStats($locale), CacheKeys::TTL_MINUTE, function (): array {
+            $productRepository = app(ProductRepository::class);
+
             return [
-                'products_count' => Product::where('is_visible', true)->count(),
+                'products_count' => $productRepository->visibleCount(),
                 'categories_count' => Category::where('is_visible', true)->count(),
                 'brands_count' => Brand::where('is_enabled', true)->count(),
                 'reviews_count' => Review::where('is_approved', true)->count(),
@@ -42,17 +44,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeFeaturedProducts($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
-            return Product::query()
-                ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->where('is_featured', true)
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
-                ->latest('published_at')
-                ->limit(8)
-                ->get();
-        });
+        return app(ProductRepository::class)->featured();
     }
 
     #[Computed]
@@ -60,16 +52,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeLatestProducts($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
-            return Product::query()
-                ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
-                ->latest('created_at')
-                ->limit(8)
-                ->get();
-        });
+        return app(ProductRepository::class)->latest();
     }
 
     #[Computed]
@@ -89,13 +72,7 @@ final class Home extends Component
 
     public function addToCart(int $productId): void
     {
-        $product = Product::query()
-            ->withoutGlobalScopes()
-            ->whereKey($productId)
-            ->where('is_visible', true)
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now())
-            ->first();
+        $product = app(ProductRepository::class)->findPublishedById($productId);
 
         if (! $product || ($product->stock_quantity ?? 0) < 1) {
             $this->notifyWarning(__('This product is currently unavailable.'));
