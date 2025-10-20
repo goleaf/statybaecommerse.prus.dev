@@ -11,7 +11,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use BackedEnum;
 use UnitEnum;
 
 use Filament\Forms\Form;
