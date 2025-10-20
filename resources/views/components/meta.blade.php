@@ -26,7 +26,7 @@
     $openGraphDescription = $ogDescription ?? $metaDescription;
     $twTitle = $twitterTitle ?? $openGraphTitle;
     $twDescription = $twitterDescription ?? $openGraphDescription;
-    $defaultImage = asset('og-image.jpg');
+    $defaultImage = og_placeholder_url();
     $effectiveOgImage = $ogImage ?: $defaultImage;
 @endphp
 
