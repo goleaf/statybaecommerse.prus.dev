@@ -20,7 +20,23 @@ class AuthServiceProvider extends ServiceProvider
                 return true;
             }
 
+            if (property_exists($user, 'is_admin') && (bool) $user->is_admin) {
+                return true;
+            }
+
             return null;
         });
+
+        $permissions = (array) config('dashboard.permissions');
+
+        foreach ($permissions as $permission) {
+            Gate::define($permission, static function ($user) use ($permission): bool {
+                if (method_exists($user, 'getAllPermissions') && $user->getAllPermissions()->contains('name', $permission)) {
+                    return true;
+                }
+
+                return property_exists($user, 'is_admin') && (bool) $user->is_admin;
+            });
+        }
     }
 }
