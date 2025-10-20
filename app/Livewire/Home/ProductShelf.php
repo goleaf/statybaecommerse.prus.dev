@@ -7,6 +7,7 @@ namespace App\Livewire\Home;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
+use App\Support\Cache\CacheKeys;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -50,11 +51,9 @@ final class ProductShelf extends Component implements HasSchemas
     #[Computed]
     public function products(): EloquentCollection
     {
-        $cacheKey = sprintf('home:shelf:%s:%d:%s', $this->preset, $this->limit, app()->getLocale());
+        $locale = app()->getLocale();
 
-        return Cache::remember($cacheKey, 60, function (): EloquentCollection {
-            $locale = app()->getLocale();
-
+        return Cache::remember(CacheKeys::homeShelf($this->preset, $this->limit, $locale), CacheKeys::TTL_MINUTE, function () use ($locale): EloquentCollection {
             $query = Product::query()
                 ->with(['brand', 'media', 'categories'])
                 ->with(['translations' => function ($q) use ($locale) {
