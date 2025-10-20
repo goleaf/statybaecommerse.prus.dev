@@ -376,7 +376,7 @@ class AttributeValueResourceTest extends TestCase
         $response = $this->post('/admin/attribute-values', [
             'attribute_id' => $attribute->id,
             'value' => 'Test Value',
-            'meta_data' => [
+            'metadata' => [
                 'created_by' => 'admin',
                 'version' => '1.0',
                 'tags' => ['red', 'color'],
@@ -391,6 +391,6 @@ class AttributeValueResourceTest extends TestCase
             'created_by' => 'admin',
             'version' => '1.0',
             'tags' => ['red', 'color'],
-        ], $attributeValue->meta_data);
+        ], $attributeValue->metadata);
     }
 }
