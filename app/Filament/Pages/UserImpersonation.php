@@ -13,17 +13,21 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use UnitEnum;
 
 final class UserImpersonation extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-user';
+    public static function getNavigationIcon(): BackedEnum|string|null
+    {
+        return 'heroicon-o-user';
+    }
 
-    protected static ?string $navigationGroup = 'System';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'System';
+    }
 
     protected static ?string $title = 'User Impersonation';
 
