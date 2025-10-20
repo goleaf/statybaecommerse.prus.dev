@@ -7,9 +7,11 @@ namespace App\Http\Controllers;
 use App\Data\ReviewData;
 use App\Models\Product;
 use App\Models\Review;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
@@ -110,6 +112,92 @@ final class ReviewController extends Controller
         $review->delete();
 
         return redirect()->route('reviews.index')->with('success', __('reviews.review_deleted_successfully'));
+    }
+
+    /**
+     * Register a "helpful" interaction for the specified review.
+     */
+    public function like(Request $request, Review $review): JsonResponse
+    {
+        if (! Auth::check()) {
+            return response()->json(['message' => __('auth.unauthenticated')], 401);
+        }
+
+        $userId = (int) Auth::id();
+        $metadata = $review->metadata ?? [];
+        $likedBy = collect($metadata['liked_by'] ?? []);
+
+        if ($likedBy->contains($userId)) {
+            return response()->json([
+                'message' => __('You have already marked this review as helpful.'),
+                'helpful_count' => (int) ($review->helpful_count ?? $likedBy->count()),
+                'reported_count' => (int) ($review->reported_count ?? 0),
+            ]);
+        }
+
+        $likedBy = $likedBy->push($userId)->unique()->values();
+        $metadata['liked_by'] = $likedBy->all();
+
+        DB::transaction(function () use ($review, $metadata, $likedBy): void {
+            $review->metadata = $metadata;
+            $review->helpful_count = $likedBy->count();
+            $review->save();
+        });
+
+        $review->refresh();
+
+        return response()->json([
+            'message' => __('Thanks for your feedback!'),
+            'helpful_count' => (int) ($review->helpful_count ?? $likedBy->count()),
+            'reported_count' => (int) ($review->reported_count ?? 0),
+        ]);
+    }
+
+    /**
+     * Register a report for the specified review.
+     */
+    public function report(Request $request, Review $review): JsonResponse
+    {
+        if (! Auth::check()) {
+            return response()->json(['message' => __('auth.unauthenticated')], 401);
+        }
+
+        $validated = $request->validate(['reason' => ['nullable', 'string', 'max:500']]);
+
+        $userId = (int) Auth::id();
+        $metadata = $review->metadata ?? [];
+        $reportedBy = collect($metadata['reported_by'] ?? []);
+
+        if ($reportedBy->contains($userId)) {
+            return response()->json([
+                'message' => __('You have already reported this review.'),
+                'helpful_count' => (int) ($review->helpful_count ?? 0),
+                'reported_count' => (int) ($review->reported_count ?? $reportedBy->count()),
+            ]);
+        }
+
+        $reportedBy = $reportedBy->push($userId)->unique()->values();
+        $metadata['reported_by'] = $reportedBy->all();
+
+        if (($validated['reason'] ?? null) !== null && $validated['reason'] !== '') {
+            $reasons = $metadata['reported_reasons'] ?? [];
+            $reasons[(string) $userId] = $validated['reason'];
+            $metadata['reported_reasons'] = $reasons;
+        }
+
+        DB::transaction(function () use ($review, $metadata, $reportedBy): void {
+            $review->metadata = $metadata;
+            $review->reported_count = $reportedBy->count();
+            $review->save();
+        });
+
+        $review->refresh();
+
+        return response()->json([
+            'message' => __('Thanks for letting us know.'),
+            'helpful_count' => (int) ($review->helpful_count ?? 0),
+            'reported_count' => (int) ($review->reported_count ?? $reportedBy->count()),
+        ]);
     }
 
     /**
