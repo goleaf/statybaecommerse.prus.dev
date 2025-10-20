@@ -8,22 +8,47 @@
     <meta name="color-scheme" content="light">
 
     @php
+        $seoData = $seo ?? [];
         $sectionTitle = trim($__env->yieldContent('title'));
-        $resolvedTitle = $title ?? ($sectionTitle !== '' ? $sectionTitle : config('app.name', 'E-Commerce'));
+        $resolvedTitle = $seoData['title']
+            ?? $title
+            ?? ($sectionTitle !== '' ? $sectionTitle : config('app.name', 'E-Commerce'));
         $sectionDescription = trim($__env->yieldContent('description'));
-        $resolvedDescription = $description ?? ($sectionDescription !== '' ? $sectionDescription : null);
+        $resolvedDescription = $seoData['description']
+            ?? $description
+            ?? ($sectionDescription !== '' ? $sectionDescription : null);
+        $canonicalLink = $seoData['canonical_url'] ?? ($canonicalUrl ?? null);
+        $alternateLinks = $seoData['alternate_locales'] ?? ($alternateLocales ?? null);
+        $metaKeywords = $seoData['keywords'] ?? ($metaKeywords ?? null);
+        $resolvedOgTitle = $seoData['og_title'] ?? ($ogTitle ?? $resolvedTitle);
+        $resolvedOgDescription = $seoData['og_description'] ?? ($ogDescription ?? $resolvedDescription);
+        $resolvedOgImage = $seoData['og_image'] ?? ($ogImage ?? null);
+        $resolvedOgType = $seoData['og_type'] ?? ($ogType ?? 'website');
+        $resolvedTwitterCard = $seoData['twitter_card'] ?? ($twitterCard ?? 'summary_large_image');
+        $structuredPayload = $seoData['structured_data'] ?? ($structuredData ?? []);
     @endphp
 
     <title>{{ $resolvedTitle }}</title>
 
-    @if($resolvedDescription)
-        <meta name="description" content="{{ $resolvedDescription }}">
-    @endif
+    <x-meta
+        :title="$resolvedTitle"
+        :description="$resolvedDescription"
+        :og-title="$resolvedOgTitle"
+        :og-description="$resolvedOgDescription"
+        :og-image="$resolvedOgImage"
+        :og-type="$resolvedOgType"
+        :og-url="$canonicalLink"
+        :twitter-card="$resolvedTwitterCard"
+        :twitter-title="$resolvedOgTitle"
+        :twitter-description="$resolvedOgDescription"
+        :twitter-url="$canonicalLink"
+        :canonical="$canonicalLink"
+        :keywords="$metaKeywords"
+        :alternate-locales="is_array($alternateLinks) ? $alternateLinks : null"
+        :jsonld="$structuredPayload"
+    />
 
     @yield('meta')
-
-    @includeWhen(view()->exists('components.hreflang'), 'components.hreflang')
-    @includeWhen(view()->exists('components.canonical'), 'components.canonical')
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
