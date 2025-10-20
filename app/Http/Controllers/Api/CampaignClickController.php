@@ -7,9 +7,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCampaignClickRequest;
 use App\Http\Requests\UpdateCampaignClickRequest;
-use App\Http\Resources\CampaignClickCollection;
 use App\Http\Resources\CampaignClickResource;
 use App\Models\CampaignClick;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,39 +30,76 @@ final class CampaignClickController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'clicked_at' => 'clicked_at',
+                'created_at' => 'created_at',
+                'conversion_value' => 'conversion_value',
+            ],
+            defaultSort: 'clicked_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 15,
+            maxPerPage: 100,
+        );
+
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
         $query = CampaignClick::with(['campaign', 'customer']);
-        // Apply filters
-        if ($request->has('campaign_id')) {
-            $query->where('campaign_id', $request->campaign_id);
+
+        // Route bound campaign (campaign/{campaign}/clicks) should be respected
+        if ($request->route('campaign')) {
+            $query->where('campaign_id', (int) $request->route('campaign'));
         }
-        if ($request->has('click_type')) {
-            $query->where('click_type', $request->click_type);
+
+        $filters = $listQuery->filters;
+
+        if (array_key_exists('campaign_id', $filters)) {
+            $query->where('campaign_id', $filters['campaign_id']);
         }
-        if ($request->has('device_type')) {
-            $query->where('device_type', $request->device_type);
+
+        if (array_key_exists('click_type', $filters)) {
+            $query->where('click_type', $filters['click_type']);
         }
-        if ($request->has('is_converted')) {
-            $query->where('is_converted', $request->boolean('is_converted'));
+
+        if (array_key_exists('device_type', $filters)) {
+            $query->where('device_type', $filters['device_type']);
         }
-        if ($request->has('country')) {
-            $query->where('country', $request->country);
+
+        if (array_key_exists('is_converted', $filters)) {
+            $query->where('is_converted', filter_var($filters['is_converted'], FILTER_VALIDATE_BOOLEAN));
         }
-        if ($request->has('utm_source')) {
-            $query->where('utm_source', $request->utm_source);
+
+        if (array_key_exists('country', $filters)) {
+            $query->where('country', $filters['country']);
         }
-        if ($request->has('date_from')) {
-            $query->where('clicked_at', '>=', $request->date_from);
+
+        if (array_key_exists('utm_source', $filters)) {
+            $query->where('utm_source', $filters['utm_source']);
         }
-        if ($request->has('date_to')) {
-            $query->where('clicked_at', '<=', $request->date_to);
+
+        if (array_key_exists('date_from', $filters)) {
+            $query->where('clicked_at', '>=', $filters['date_from']);
         }
+
+        if (array_key_exists('date_to', $filters)) {
+            $query->where('clicked_at', '<=', $filters['date_to']);
+        }
+
         // For authenticated users, show only their clicks
         if (Auth::check()) {
             $query->where('customer_id', Auth::id());
         }
-        $clicks = $query->orderBy('clicked_at', 'desc')->paginate($request->get('per_page', 15));
 
-        return response()->json(new CampaignClickCollection($clicks));
+        $query = $listQuery->apply($query, $definition);
+
+        $paginator = $query->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
+            ->appends($request->query());
+
+        $response = ListResponse::fromPaginator(
+            $paginator->through(fn (CampaignClick $click) => (new CampaignClickResource($click))->resolve()),
+        );
+
+        return response()->json($response);
     }
 
     /**

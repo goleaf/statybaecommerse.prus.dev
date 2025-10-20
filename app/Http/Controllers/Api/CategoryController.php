@@ -7,6 +7,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Traits\HandlesContentNegotiation;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -41,17 +44,58 @@ final class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse|View|Response
     {
-        $perPage = min((int) $request->get('per_page', 20), 100);
-        $search = $request->get('search');
-        $query = Category::query()->where('is_visible', true)->withCount('products');
-        if ($search) {
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'sort_order' => 'sort_order',
+                'name' => 'name',
+                'created_at' => 'created_at',
+            ],
+            defaultSort: 'sort_order',
+            defaultDirection: 'asc',
+            defaultPerPage: 20,
+            maxPerPage: 100,
+        );
+
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
+        $query = Category::query()
+            ->where('is_visible', true)
+            ->withCount('products');
+
+        if ($search = $listQuery->filter('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
-        $categories = $query->orderBy('sort_order')->orderBy('name')->paginate($perPage);
 
-        return $this->handleCategoryContentNegotiation($request, $categories);
+        $query = $listQuery->apply($query, $definition);
+
+        if ($listQuery->sortField === 'sort_order') {
+            $query->orderBy('name');
+        }
+
+        $paginator = $query->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
+            ->appends($request->query());
+
+        if ($request->expectsJson()) {
+            $response = ListResponse::fromPaginator(
+                $paginator->through(static function (Category $category) {
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'slug' => $category->slug,
+                        'description' => $category->description,
+                        'product_count' => $category->products_count,
+                        'url' => route('category.show', $category->slug),
+                    ];
+                }),
+            );
+
+            return response()->json($response);
+        }
+
+        return $this->handleCategoryContentNegotiation($request, $paginator);
     }
 
     /**

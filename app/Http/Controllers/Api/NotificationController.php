@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,12 +33,50 @@ final class NotificationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
-        $perPage = (int) $request->get('per_page', 25);
-        $type = $request->get('type');
-        $read = $request->get('read') !== null ? (bool) $request->get('read') : null;
-        $notifications = $this->notificationService->getUserNotifications($user, $perPage, $type, $read);
 
-        return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'created_at' => 'created_at',
+                'read_at' => 'read_at',
+                'type' => 'type',
+            ],
+            defaultSort: 'created_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 25,
+            maxPerPage: 100,
+        );
+
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+        $filters = $listQuery->filters;
+
+        $type = $filters['type'] ?? null;
+        $read = array_key_exists('read', $filters)
+            ? filter_var($filters['read'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+            : null;
+
+        $notifications = $this->notificationService->getUserNotifications(
+            $user,
+            $listQuery->perPage,
+            $type,
+            $read,
+            $definition->resolveSortColumn($listQuery->sortField),
+            $listQuery->sortDirection,
+            $listQuery->page,
+        )->appends($request->query());
+
+        $response = ListResponse::fromPaginator(
+            $notifications->through(static function (Notification $notification) {
+                return [
+                    'id' => $notification->id,
+                    'type' => $notification->type,
+                    'data' => $notification->data,
+                    'read_at' => $notification->read_at,
+                    'created_at' => $notification->created_at,
+                ];
+            }),
+        );
+
+        return response()->json($response);
     }
 
     /**
@@ -136,15 +177,66 @@ final class NotificationController extends Controller
     public function search(Request $request): JsonResponse
     {
         $user = Auth::user();
-        $query = $request->get('q');
-        $type = $request->get('type');
-        $read = $request->get('read') !== null ? (bool) $request->get('read') : null;
-        $perPage = (int) $request->get('per_page', 25);
-        if (empty($query)) {
+        $searchQuery = $request->get('q');
+
+        if (empty($searchQuery)) {
             return response()->json(['success' => false, 'message' => 'Search query is required'], 400);
         }
-        $notifications = $this->notificationService->searchNotifications($query, $user, $type, $read, $perPage);
 
-        return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'created_at' => 'created_at',
+                'read_at' => 'read_at',
+            ],
+            defaultSort: 'created_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 25,
+            maxPerPage: 100,
+        );
+
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+        $filters = $listQuery->filters;
+
+        $builder = Notification::forUser($user->id);
+
+        if ($type = $filters['type'] ?? null) {
+            $builder->byType($type);
+        }
+
+        if (array_key_exists('read', $filters)) {
+            $isRead = filter_var($filters['read'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($isRead === true) {
+                $builder->read();
+            } elseif ($isRead === false) {
+                $builder->unread();
+            }
+        }
+
+        $builder->where(function ($q) use ($searchQuery) {
+            $q->where('data->title', 'like', "%{$searchQuery}%")
+                ->orWhere('data->message', 'like', "%{$searchQuery}%")
+                ->orWhere('type', 'like', "%{$searchQuery}%");
+        });
+
+        $builder = $listQuery->apply($builder, $definition);
+
+        $notifications = $builder->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
+            ->appends($request->query());
+
+        $response = ListResponse::fromPaginator(
+            $notifications->through(static function (Notification $notification) {
+                return [
+                    'id' => $notification->id,
+                    'type' => $notification->type,
+                    'data' => $notification->data,
+                    'read_at' => $notification->read_at,
+                    'created_at' => $notification->created_at,
+                ];
+            }),
+        );
+
+        $response['context'] = ['query' => $searchQuery];
+
+        return response()->json($response);
     }
 }
