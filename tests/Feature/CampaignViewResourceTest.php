@@ -41,7 +41,7 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'user_id' => $user->id,
             'ip_address' => '192.168.1.1',
             'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'referrer' => 'https://google.com',
+            'referer' => 'https://google.com',
             'session_id' => 'session_123',
         ]);
 
@@ -63,7 +63,7 @@ final class CampaignViewResourceTest extends \Tests\TestCase
                 'user.name',
                 'ip_address',
                 'user_agent',
-                'referrer',
+                'referer',
                 'created_at',
             ]);
     }
@@ -78,7 +78,7 @@ final class CampaignViewResourceTest extends \Tests\TestCase
             'user_id' => $user->id,
             'ip_address' => '192.168.1.100',
             'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'referrer' => 'https://facebook.com',
+            'referer' => 'https://facebook.com',
             'session_id' => 'session_456',
         ]);
 
@@ -212,7 +212,7 @@ final class CampaignViewResourceTest extends \Tests\TestCase
 
         $view = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
-            'referrer' => $longReferrer,
+            'referer' => $longReferrer,
             'ip_address' => '192.168.1.1',
         ]);
 
@@ -308,12 +308,12 @@ final class CampaignViewResourceTest extends \Tests\TestCase
 
         $view = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
-            'referrer' => 'https://google.com/search?q=test',
+            'referer' => 'https://google.com/search?q=test',
             'ip_address' => '192.168.1.1',
         ]);
 
         $this->assertDatabaseHas('campaign_views', [
-            'referrer' => 'https://google.com/search?q=test',
+            'referer' => 'https://google.com/search?q=test',
         ]);
     }
 
