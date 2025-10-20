@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 #[ObservedBy([AttributionObserver::class])]
 final class Document extends Model
 {
+    /** @use HasFactory<\Database\Factories\DocumentFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -78,49 +79,53 @@ final class Document extends Model
     /**
      * Handle template functionality with proper error handling.
      *
-     * @return BelongsTo<DocumentTemplate, static>
-     *
-     * @phpstan-return BelongsTo<DocumentTemplate, Document>
+     * @return BelongsTo<DocumentTemplate, Document>
      */
     public function template(): BelongsTo
     {
-        return $this->belongsTo(DocumentTemplate::class, 'document_template_id');
+        /** @var BelongsTo<DocumentTemplate, Document> $relation */
+        $relation = $this->belongsTo(DocumentTemplate::class, 'document_template_id');
+
+        return $relation;
     }
 
     /**
      * Handle documentable functionality with proper error handling.
      *
-     * @return MorphTo<Model, static>
-     *
-     * @phpstan-return MorphTo<Model, Document>
+     * @return MorphTo<Model, Document>
      */
     public function documentable(): MorphTo
     {
-        return $this->morphTo();
+        /** @var MorphTo<Model, Document> $relation */
+        $relation = $this->morphTo();
+
+        return $relation;
     }
 
     /**
      * Handle creator functionality with proper error handling.
      *
-     * @return BelongsTo<User, static>
-     *
-     * @phpstan-return BelongsTo<User, Document>
+     * @return BelongsTo<User, Document>
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        /** @var BelongsTo<User, Document> $relation */
+        $relation = $this->belongsTo(User::class, 'created_by');
+
+        return $relation;
     }
 
     /**
      * Handle updater functionality with proper error handling.
      *
-     * @return BelongsTo<User, static>
-     *
-     * @phpstan-return BelongsTo<User, Document>
+     * @return BelongsTo<User, Document>
      */
     public function updater(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'updated_by');
+        /** @var BelongsTo<User, Document> $relation */
+        $relation = $this->belongsTo(User::class, 'updated_by');
+
+        return $relation;
     }
 
     /**
