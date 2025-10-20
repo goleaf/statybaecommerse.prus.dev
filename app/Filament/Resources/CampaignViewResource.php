@@ -127,15 +127,10 @@ final class CampaignViewResource extends Resource
                         return $state;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                TextColumn::make('viewed_at')
                     ->label(__('campaign_views.viewed_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('updated_at')
-                    ->label(__('campaign_views.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('campaign_id')
@@ -176,7 +171,7 @@ final class CampaignViewResource extends Resource
     {
         return [
             'index' => Pages\ListCampaignViews::route('/'),
-            'view' => Pages\ViewCampaignView::route('/{record}'),
+            'view'  => Pages\ViewCampaignView::route('/{record}'),
         ];
     }
 }
