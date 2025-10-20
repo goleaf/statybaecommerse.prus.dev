@@ -126,6 +126,27 @@ final class NotificationControllerTest extends TestCase
             ]);
     }
 
+    public function test_mark_notification_as_unread_unauthorized(): void
+    {
+        $otherUser = User::factory()->create();
+
+        $notification = DatabaseNotification::create([
+            'id' => 'test-notification-unauthorized-unread',
+            'type' => TestNotification::class,
+            'notifiable_type' => User::class,
+            'notifiable_id' => $otherUser->id,
+            'data' => ['title' => 'Test', 'message' => 'Test message'],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->postJson("/notifications/{$notification->id}/unread");
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'error' => 'Notification not found',
+            ]);
+    }
+
     public function test_mark_all_notifications_as_read(): void
     {
         // Create multiple unread notifications
@@ -187,6 +208,17 @@ final class NotificationControllerTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->deleteJson('/notifications/non-existent-id');
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'error' => 'Notification not found',
+            ]);
+    }
+
+    public function test_delete_notification_not_found_via_standard_request(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->delete('/notifications/non-existent-id');
 
         $response->assertStatus(404)
             ->assertJson([
@@ -385,5 +417,15 @@ final class NotificationControllerTest extends TestCase
 
         $this->getJson('/notifications/recent')
             ->assertStatus(401);
+    }
+
+    public function test_mark_notification_as_read_missing_returns_json_payload(): void
+    {
+        $this->actingAs($this->user)
+            ->post('/notifications/non-existent-id/read')
+            ->assertStatus(404)
+            ->assertJson([
+                'error' => 'Notification not found',
+            ]);
     }
 }
