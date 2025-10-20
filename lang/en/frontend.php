@@ -213,7 +213,9 @@ return [
         ],
         'status' => [
             'completed' => 'Completed',
+            'redeemed' => 'Redeemed',
             'pending' => 'Pending',
+            'expired' => 'Expired',
             'cancelled' => 'Cancelled',
             'refunded' => 'Refunded',
         ],

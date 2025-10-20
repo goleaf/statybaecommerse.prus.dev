@@ -263,7 +263,9 @@ return [
         ],
         'status' => [
             'completed' => 'Užbaigta',
+            'redeemed' => 'Panaudota',
             'pending' => 'Laukiant',
+            'expired' => 'Nebegalioja',
             'cancelled' => 'Atšaukta',
             'refunded' => 'Grąžinta',
         ],

@@ -38,7 +38,8 @@ final class DiscountRedemptionResourceTest extends TestCase
         $discountCode = DiscountCode::factory()->create(['discount_id' => $discount->id]);
         $user = User::factory()->create();
         $discountRedemptions = DiscountRedemption::factory()->count(5)->create([
-            'discount_code_id' => $discountCode->id,
+            'discount_id' => $discount->id,
+            'code_id' => $discountCode->id,
             'user_id' => $user->id,
         ]);
 
@@ -55,29 +56,32 @@ final class DiscountRedemptionResourceTest extends TestCase
         $order = Order::factory()->create(['user_id' => $user->id]);
 
         $newRedemptionData = DiscountRedemption::factory()->make([
-            'discount_code_id' => $discountCode->id,
+            'discount_id' => $discount->id,
+            'code_id' => $discountCode->id,
             'user_id' => $user->id,
             'order_id' => $order->id,
-            'discount_amount' => 15.50,
+            'amount_saved' => 15.50,
             'redeemed_at' => now(),
         ]);
 
         Livewire::test(CreateDiscountRedemption::class)
             ->fillForm([
-                'discount_code_id' => $newRedemptionData->discount_code_id,
+                'discount_id' => $newRedemptionData->discount_id,
+                'code_id' => $newRedemptionData->code_id,
                 'user_id' => $newRedemptionData->user_id,
                 'order_id' => $newRedemptionData->order_id,
-                'discount_amount' => $newRedemptionData->discount_amount,
+                'amount_saved' => $newRedemptionData->amount_saved,
                 'redeemed_at' => $newRedemptionData->redeemed_at,
             ])
             ->call('create')
             ->assertNotified();
 
         $this->assertDatabaseHas('discount_redemptions', [
-            'discount_code_id' => $newRedemptionData->discount_code_id,
+            'discount_id' => $newRedemptionData->discount_id,
+            'code_id' => $newRedemptionData->code_id,
             'user_id' => $newRedemptionData->user_id,
             'order_id' => $newRedemptionData->order_id,
-            'discount_amount' => $newRedemptionData->discount_amount,
+            'amount_saved' => $newRedemptionData->amount_saved,
         ]);
     }
 
@@ -87,23 +91,24 @@ final class DiscountRedemptionResourceTest extends TestCase
         $discountCode = DiscountCode::factory()->create(['discount_id' => $discount->id]);
         $user = User::factory()->create();
         $redemption = DiscountRedemption::factory()->create([
-            'discount_code_id' => $discountCode->id,
+            'discount_id' => $discount->id,
+            'code_id' => $discountCode->id,
             'user_id' => $user->id,
-            'discount_amount' => 10.00,
+            'amount_saved' => 10.00,
         ]);
 
         Livewire::test(EditDiscountRedemption::class, [
             'record' => $redemption->id,
         ])
             ->fillForm([
-                'discount_amount' => 20.00,
+                'amount_saved' => 20.00,
             ])
             ->call('save')
             ->assertNotified();
 
         $this->assertDatabaseHas('discount_redemptions', [
             'id' => $redemption->id,
-            'discount_amount' => 20.00,
+            'amount_saved' => 20.00,
         ]);
     }
 
@@ -131,12 +136,13 @@ final class DiscountRedemptionResourceTest extends TestCase
         $order = Order::factory()->create(['user_id' => $user->id]);
 
         $redemption = DiscountRedemption::factory()->create([
-            'discount_code_id' => $discountCode->id,
+            'discount_id' => $discount->id,
+            'code_id' => $discountCode->id,
             'user_id' => $user->id,
             'order_id' => $order->id,
         ]);
 
-        $this->assertEquals($discountCode->id, $redemption->discountCode->id);
+        $this->assertEquals($discountCode->id, $redemption->code->id);
         $this->assertEquals($user->id, $redemption->user->id);
         $this->assertEquals($order->id, $redemption->order->id);
     }
