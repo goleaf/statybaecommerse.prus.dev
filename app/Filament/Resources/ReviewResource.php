@@ -35,7 +35,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 final class ReviewResource extends Resource
@@ -190,7 +189,7 @@ final class ReviewResource extends Resource
                     ->colors([
                         'approved' => 'success',
                         'rejected' => 'danger',
-                        'pending' => 'warning',
+                        'pending'  => 'warning',
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reviews.status.{$state}")),
                 IconColumn::make('is_approved')
@@ -324,7 +323,12 @@ final class ReviewResource extends Resource
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each->approve();
+                            foreach ($records as $record) {
+                                if ($record instanceof Review) {
+                                    $record->approve();
+                                }
+                            }
+
                             Notification::make()
                                 ->title(__('reviews.notifications.bulk_approved_successfully'))
                                 ->success()
@@ -336,7 +340,12 @@ final class ReviewResource extends Resource
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(function (Collection $records): void {
-                            $records->each->reject();
+                            foreach ($records as $record) {
+                                if ($record instanceof Review) {
+                                    $record->reject();
+                                }
+                            }
+
                             Notification::make()
                                 ->title(__('reviews.notifications.bulk_rejected_successfully'))
                                 ->warning()
@@ -348,7 +357,12 @@ final class ReviewResource extends Resource
                         ->icon('heroicon-o-star')
                         ->color('warning')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_featured' => true]);
+                            foreach ($records as $record) {
+                                if ($record instanceof Review) {
+                                    $record->update(['is_featured' => true]);
+                                }
+                            }
+
                             Notification::make()
                                 ->title(__('reviews.notifications.bulk_featured_successfully'))
                                 ->success()
@@ -360,7 +374,12 @@ final class ReviewResource extends Resource
                         ->icon('heroicon-o-star')
                         ->color('gray')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_featured' => false]);
+                            foreach ($records as $record) {
+                                if ($record instanceof Review) {
+                                    $record->update(['is_featured' => false]);
+                                }
+                            }
+
                             Notification::make()
                                 ->title(__('reviews.notifications.bulk_unfeatured_successfully'))
                                 ->info()
@@ -420,8 +439,8 @@ final class ReviewResource extends Resource
                             ->color(fn (string $state): string => match ($state) {
                                 'approved' => 'success',
                                 'rejected' => 'danger',
-                                'pending' => 'warning',
-                                default => 'gray',
+                                'pending'  => 'warning',
+                                default    => 'gray',
                             })
                             ->formatStateUsing(fn (string $state): string => __("reviews.status.{$state}")),
                         IconEntry::make('is_approved')
@@ -443,10 +462,18 @@ final class ReviewResource extends Resource
                             ->label(__('reviews.fields.metadata'))
                             ->formatStateUsing(function ($state): string {
                                 if (is_array($state)) {
-                                    return json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                                    $encoded = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+                                    return $encoded !== false ? $encoded : '';
                                 }
 
-                                return (string) $state;
+                                if (is_scalar($state) || $state === null) {
+                                    return (string) $state;
+                                }
+
+                                $encoded = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+                                return $encoded !== false ? $encoded : '';
                             })
                             ->placeholder(__('reviews.placeholders.no_metadata')),
                     ]),
@@ -471,21 +498,21 @@ final class ReviewResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<Review>
+     */
     public static function getEloquentQuery(): Builder
     {
-        /** @var class-string<Model> $model */
-        $model = self::getModel();
-
-        return $model::withoutGlobalScopes();
+        return Review::withoutGlobalScopes();
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReviews::route('/'),
+            'index'  => Pages\ListReviews::route('/'),
             'create' => Pages\CreateReview::route('/create'),
-            'view' => Pages\ViewReview::route('/{record}'),
-            'edit' => Pages\EditReview::route('/{record}/edit'),
+            'view'   => Pages\ViewReview::route('/{record}'),
+            'edit'   => Pages\EditReview::route('/{record}/edit'),
         ];
     }
 
@@ -496,7 +523,7 @@ final class ReviewResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = (int) self::$model::count();
+        $count = (int) Review::count();
 
         return $count > 0 ? (string) $count : null;
     }
