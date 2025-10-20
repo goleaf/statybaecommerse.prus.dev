@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Services\Discounts\CouponApplicationService;
+use App\Services\Discounts\DiscountContextBuilder;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -54,30 +55,25 @@ class CouponForm extends Component
     public function apply(): void
     {
         $this->validate();
-        if ($this->code) {
-            $raw = strtoupper(trim($this->code));
-            $row = DB::table('sh_discount_codes')->select('id', 'discount_id', 'expires_at', 'max_uses', 'usage_count')->whereRaw('UPPER(code) = ?', [$raw])->first();
-            if ($row) {
-                $now = now();
-                $valid = true;
-                if ($row->expires_at && $now->greaterThan($row->expires_at)) {
-                    $valid = false;
-                }
-                if ($row->max_uses !== null && $row->usage_count >= $row->max_uses) {
-                    $valid = false;
-                }
-                if ($valid) {
-                    session()->put('checkout.coupon', ['code' => $raw]);
-                } else {
-                    session()->forget('checkout.coupon');
-                    $this->addError('code', __('This code is expired or fully used.'));
-                }
-            } else {
-                session()->forget('checkout.coupon');
-                $this->addError('code', __('This code is invalid.'));
-            }
+        if (! $this->code) {
+            $this->addError('code', __('Please provide a coupon code.'));
+
+            return;
         }
-        $this->dispatch('coupon-updated');
+
+        $service = app(CouponApplicationService::class);
+        $context = app(DiscountContextBuilder::class)->fromSession(auth()->user(), $this->code);
+        $result = $service->apply($this->code, $context);
+
+        if (! $result['success']) {
+            $this->addError('code', $result['message']);
+            $this->dispatch('coupon-updated', applied: false);
+
+            return;
+        }
+
+        $this->code = $result['coupon']['code'];
+        $this->dispatch('coupon-updated', applied: true, coupon: $result['coupon']);
     }
 
     /**
@@ -85,9 +81,11 @@ class CouponForm extends Component
      */
     public function remove(): void
     {
-        session()->forget('checkout.coupon');
+        $service = app(CouponApplicationService::class);
+        $context = app(DiscountContextBuilder::class)->fromSession(auth()->user());
+        $service->remove($context);
         $this->reset('code');
-        $this->dispatch('coupon-updated');
+        $this->dispatch('coupon-updated', applied: false);
     }
 
     /**
