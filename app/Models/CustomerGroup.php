@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -30,7 +31,9 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class CustomerGroup extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory;
+    use HasTranslations;
+    use SoftDeletes;
 
     protected $table = 'customer_groups';
 
@@ -57,6 +60,7 @@ final class CustomerGroup extends Model
             'is_enabled' => 'boolean',
             'metadata' => 'array',
             'conditions' => 'array',
+            'deleted_at' => 'datetime',
         ];
     }
 
