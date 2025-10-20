@@ -1,0 +1,75 @@
+<?php
+
+return [
+    'title' => 'Price Lists',
+    'plural' => 'Price Lists',
+    'single' => 'Price List',
+
+    'basic_information' => 'Basic information',
+    'settings' => 'Settings',
+
+    'name' => 'Name',
+    'description' => 'Description',
+    'pricing_type' => 'Pricing model',
+    'fixed' => 'Fixed price',
+    'tiered' => 'Tiered pricing',
+    'volume' => 'Volume pricing',
+    'tiered_pricing' => 'Tiered pricing',
+    'tiers' => 'Pricing tiers',
+    'min_quantity' => 'Minimum quantity',
+    'max_quantity' => 'Maximum quantity',
+    'price' => 'Unit price',
+    'add_tier' => 'Add tier',
+    'volume_pricing' => 'Volume pricing',
+    'volume_tiers' => 'Volume tiers',
+    'is_active' => 'Active',
+    'is_enabled' => 'Enabled',
+    'valid_from' => 'Valid from',
+    'valid_until' => 'Valid until',
+    'valid_from_from' => 'Valid from (start)',
+    'valid_from_until' => 'Valid from (end)',
+    'notes' => 'Internal notes',
+    'currency' => 'Currency',
+    'is_default' => 'Default list',
+    'customer_group' => 'Customer group',
+    'discount_percentage' => 'Discount (%)',
+    'priority' => 'Priority',
+    'partner' => 'Partner',
+    'commission_percentage' => 'Commission (%)',
+    'email' => 'Email',
+    'phone' => 'Phone',
+
+    'created_at' => 'Created at',
+    'updated_at' => 'Updated at',
+
+    'all_records' => 'All records',
+    'active_only' => 'Active only',
+    'inactive_only' => 'Inactive only',
+    'valid_now' => 'Valid now',
+    'expired' => 'Expired',
+
+    'tabs' => [
+        'all' => 'All price lists',
+        'active' => 'Active',
+        'public' => 'Public',
+        'default' => 'Default',
+        'wholesale' => 'Wholesale',
+        'retail' => 'Retail',
+        'promotional' => 'Promotional',
+    ],
+
+    'stats' => [
+        'total_price_lists' => 'Total price lists',
+        'total_price_lists_description' => 'All price lists across the catalogue',
+        'active_price_lists' => 'Active price lists',
+        'active_price_lists_description' => 'Currently enabled and in use',
+        'public_price_lists' => 'Public price lists',
+        'public_price_lists_description' => 'Visible to all customers',
+        'default_price_lists' => 'Default price lists',
+        'default_price_lists_description' => 'Applied automatically when no specific list is chosen',
+    ],
+
+    'charts' => [
+        'price_lists_created' => 'Price lists created',
+    ],
+];

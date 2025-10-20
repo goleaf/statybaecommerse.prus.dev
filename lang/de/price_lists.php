@@ -1,0 +1,75 @@
+<?php
+
+return [
+    'title' => 'Preislisten',
+    'plural' => 'Preislisten',
+    'single' => 'Preisliste',
+
+    'basic_information' => 'Allgemeine Informationen',
+    'settings' => 'Einstellungen',
+
+    'name' => 'Name',
+    'description' => 'Beschreibung',
+    'pricing_type' => 'Preisstrategie',
+    'fixed' => 'Festpreis',
+    'tiered' => 'Staffelpreise',
+    'volume' => 'Mengenpreise',
+    'tiered_pricing' => 'Staffelpreise',
+    'tiers' => 'Preisstaffeln',
+    'min_quantity' => 'Mindestmenge',
+    'max_quantity' => 'Höchstmenge',
+    'price' => 'Einzelpreis',
+    'add_tier' => 'Staffel hinzufügen',
+    'volume_pricing' => 'Mengenbasierte Preise',
+    'volume_tiers' => 'Mengengrenzen',
+    'is_active' => 'Aktiv',
+    'is_enabled' => 'Aktiviert',
+    'valid_from' => 'Gültig ab',
+    'valid_until' => 'Gültig bis',
+    'valid_from_from' => 'Startdatum (ab)',
+    'valid_from_until' => 'Startdatum (bis)',
+    'notes' => 'Interne Notizen',
+    'currency' => 'Währung',
+    'is_default' => 'Standardliste',
+    'customer_group' => 'Kundengruppe',
+    'discount_percentage' => 'Rabatt (%)',
+    'priority' => 'Priorität',
+    'partner' => 'Partner',
+    'commission_percentage' => 'Provision (%)',
+    'email' => 'E-Mail',
+    'phone' => 'Telefon',
+
+    'created_at' => 'Erstellt am',
+    'updated_at' => 'Aktualisiert am',
+
+    'all_records' => 'Alle Einträge',
+    'active_only' => 'Nur aktive',
+    'inactive_only' => 'Nur inaktive',
+    'valid_now' => 'Jetzt gültig',
+    'expired' => 'Abgelaufen',
+
+    'tabs' => [
+        'all' => 'Alle Preislisten',
+        'active' => 'Aktiv',
+        'public' => 'Öffentlich',
+        'default' => 'Standard',
+        'wholesale' => 'Großhandel',
+        'retail' => 'Einzelhandel',
+        'promotional' => 'Aktionen',
+    ],
+
+    'stats' => [
+        'total_price_lists' => 'Preislisten gesamt',
+        'total_price_lists_description' => 'Alle Preislisten im System',
+        'active_price_lists' => 'Aktive Preislisten',
+        'active_price_lists_description' => 'Derzeit freigeschaltete Preislisten',
+        'public_price_lists' => 'Öffentliche Preislisten',
+        'public_price_lists_description' => 'Für alle Kund:innen sichtbar',
+        'default_price_lists' => 'Standard-Preislisten',
+        'default_price_lists_description' => 'Werden automatisch angewendet, wenn nichts anderes gewählt ist',
+    ],
+
+    'charts' => [
+        'price_lists_created' => 'Erstellte Preislisten',
+    ],
+];
