@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ProductSimilarities;
 
 use App\Filament\Resources\ProductSimilarities\Pages\CreateProductSimilarity;
@@ -40,9 +42,9 @@ class ProductSimilarityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListProductSimilarities::route('/'),
+            'index'  => ListProductSimilarities::route('/'),
             'create' => CreateProductSimilarity::route('/create'),
-            'edit' => EditProductSimilarity::route('/{record}/edit'),
+            'edit'   => EditProductSimilarity::route('/{record}/edit'),
         ];
     }
 }
