@@ -8,10 +8,10 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
+use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -90,12 +90,12 @@ final class ProductFeatureResource extends Resource
                 Tables\Filters\SelectFilter::make('product_id'),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                TablesEditAction::make(),
+                TablesDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                TablesBulkActionGroup::make([
+                    TablesDeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('weight', 'desc');
