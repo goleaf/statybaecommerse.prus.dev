@@ -7,11 +7,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
@@ -225,11 +226,6 @@ final class ReferralCodeResource extends Resource
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
-                // Alias for legacy Tables DeleteAction class reference in tests
-                Action::make(\Filament\Tables\Actions\DeleteAction::class)
-                    ->requiresConfirmation()
-                    ->color('danger')
-                    ->action(fn (ReferralCode $record) => $record->delete()),
                 Action::make('deactivate')
                     ->label('deactivate')
                     ->action(fn (ReferralCode $record) => $record->update(['is_active' => false])),
@@ -241,10 +237,10 @@ final class ReferralCodeResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Action::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('deactivate')
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => false])),
-                    Action::make('activate')
+                    BulkAction::make('activate')
                         ->label('activate')
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => true])),
                     DeleteBulkAction::make(),
