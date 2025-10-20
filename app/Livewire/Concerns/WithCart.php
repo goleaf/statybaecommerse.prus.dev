@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Concerns;
 
 use App\Models\Product;
+use App\Services\Cart\CartService;
 
 /**
  * WithCart
@@ -82,9 +83,7 @@ trait WithCart
 
     public function getCartCount(): int
     {
-        $cartItems = session()->get('cart', []);
-
-        return array_sum(array_column($cartItems, 'quantity'));
+        return app(CartService::class)->getSessionCount();
     }
 
     public function getCartTotal(): float
