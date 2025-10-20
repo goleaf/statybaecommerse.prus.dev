@@ -8,6 +8,7 @@ use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Http\Requests\StoreReferralRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -89,21 +90,21 @@ final class ReferralController extends Controller
     /**
      * Store a newly created resource in storage with validation.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreReferralRequest $request): RedirectResponse
     {
         $user = Auth::user();
         if (! Referral::canUserRefer($user->id)) {
             return redirect()->route('referrals.index')->with('error', __('referrals.referral_limit_reached'));
         }
-        $request->validate(['referred_email' => 'required|email|exists:users,email', 'message' => 'nullable|string|max:500']);
-        $referredUser = User::where('email', $request->referred_email)->first();
+        $validated = $request->validated();
+        $referredUser = User::where('email', $validated['referred_email'])->first();
         if ($referredUser->id === $user->id) {
             return redirect()->back()->with('error', __('referrals.cannot_refer_yourself'));
         }
         if (Referral::userAlreadyReferred($referredUser->id)) {
             return redirect()->back()->with('error', __('referrals.user_already_referred'));
         }
-        $referral = Referral::createWithCode(['referrer_id' => $user->id, 'referred_id' => $referredUser->id, 'source' => $request->get('source', 'manual'), 'campaign' => $request->get('campaign'), 'utm_source' => $request->get('utm_source'), 'utm_medium' => $request->get('utm_medium'), 'utm_campaign' => $request->get('utm_campaign'), 'ip_address' => $request->ip(), 'user_agent' => $request->userAgent(), 'metadata' => ['message' => $request->message, 'created_via' => 'manual']]);
+        $referral = Referral::createWithCode(['referrer_id' => $user->id, 'referred_id' => $referredUser->id, 'source' => $request->get('source', 'manual'), 'campaign' => $request->get('campaign'), 'utm_source' => $request->get('utm_source'), 'utm_medium' => $request->get('utm_medium'), 'utm_campaign' => $request->get('utm_campaign'), 'ip_address' => $request->ip(), 'user_agent' => $request->userAgent(), 'metadata' => ['message' => $validated['message'] ?? null, 'created_via' => 'manual']]);
         // Update statistics
         $this->updateReferralStatistics($user->id, $referral->created_at->toDateString());
 

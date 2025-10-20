@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Data\ReviewData;
+use App\Http\Requests\ReportReviewRequest;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Http\JsonResponse;
@@ -156,13 +157,13 @@ final class ReviewController extends Controller
     /**
      * Register a report for the specified review.
      */
-    public function report(Request $request, Review $review): JsonResponse
+    public function report(ReportReviewRequest $request, Review $review): JsonResponse
     {
         if (! Auth::check()) {
             return response()->json(['message' => __('auth.unauthenticated')], 401);
         }
 
-        $validated = $request->validate(['reason' => ['nullable', 'string', 'max:500']]);
+        $validated = $request->validated();
 
         $userId = (int) Auth::id();
         $metadata = $review->metadata ?? [];
