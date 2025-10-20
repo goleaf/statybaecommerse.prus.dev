@@ -49,7 +49,7 @@ final class TopPerformingSliders extends BaseWidget
 
                         return $media ? $media->getUrl() : null;
                     })
-                    ->defaultImageUrl('/images/placeholder-slider.png')
+                    ->defaultImageUrl('/images/placeholder-slider.svg')
                     ->size(60)
                     ->circular(),
                 TextColumn::make('title')
