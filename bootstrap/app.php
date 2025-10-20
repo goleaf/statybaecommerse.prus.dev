@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        then: function () {
+        then: function (): void {
             Route::middleware('web')
                 ->group(base_path('routes/system-settings.php'));
             // Load admin routes
@@ -43,6 +43,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'permissions' => Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'localize' => App\Http\Middleware\SetLocale::class,
+            'abilities' => Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'ability' => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -127,5 +129,6 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\HorizonServiceProvider::class,
         App\Providers\LocaleServiceProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
+        Laravel\Sanctum\SanctumServiceProvider::class,
     ])
     ->create();

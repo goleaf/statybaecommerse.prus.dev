@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
@@ -47,7 +48,7 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class])]
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
-    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, HasRoles, HasSafeSerialization, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
 
     /**
      * Handle booted functionality with proper error handling.
@@ -176,7 +177,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function latestCompletedOrder(): HasOne
     {
-        return $this->orders()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->orders()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->whereIn('status', ['delivered', 'completed']);
         });
     }
@@ -714,7 +715,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function scopeByRole($query, string $role)
     {
-        return $query->whereHas('roles', function ($q) use ($role) {
+        return $query->whereHas('roles', function ($q) use ($role): void {
             $q->where('name', $role);
         });
     }
