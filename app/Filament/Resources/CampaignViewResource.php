@@ -73,7 +73,7 @@ final class CampaignViewResource extends Resource
                                 TextInput::make('user_agent')
                                     ->label(__('campaign_views.user_agent'))
                                     ->maxLength(500),
-                                TextInput::make('referrer')
+                                TextInput::make('referer')
                                     ->label(__('campaign_views.referrer'))
                                     ->url()
                                     ->maxLength(255),
@@ -115,7 +115,7 @@ final class CampaignViewResource extends Resource
                         return $state;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('referrer')
+                TextColumn::make('referer')
                     ->label(__('campaign_views.referrer'))
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
