@@ -149,7 +149,7 @@ Route::middleware(['web'])->group(function () {
     Route::prefix('stock')->name('stock.')->group(function () {
         Route::get('/', [App\Http\Controllers\StockController::class, 'index'])->name('index');
         Route::get('/report', [App\Http\Controllers\StockController::class, 'getStockReport'])->name('report');
-        Route::get('/export', [App\Http\Controllers\StockController::class, 'exportStock'])->name('export');
+        Route::post('/export', [App\Http\Controllers\StockController::class, 'exportStock'])->name('export');
         Route::get('/{stock}', [App\Http\Controllers\StockController::class, 'show'])->name('show');
         Route::post('/{stock}/adjust', [App\Http\Controllers\StockController::class, 'adjustStock'])->name('adjust');
         Route::post('/{stock}/reserve', [App\Http\Controllers\StockController::class, 'reserveStock'])->name('reserve');
