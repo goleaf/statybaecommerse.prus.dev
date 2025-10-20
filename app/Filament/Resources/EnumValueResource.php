@@ -229,7 +229,7 @@ final class EnumValueResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('is_default', true)),
                 Filter::make('high_usage')
                     ->label(__('admin.enum_values.filters.high_usage'))
-                    ->query(fn (Builder $query): Builder => $query->where('usage_count', '>', 50)),
+                    ->query(fn (Builder $query): Builder => $query->where('metadata->usage_count', '>', 50)),
             ])
             ->actions([
                 Action::make('activate')

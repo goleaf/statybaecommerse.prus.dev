@@ -100,9 +100,13 @@ final class EnumValue extends Model
     // Methods
     public function getUsageCount(): int
     {
-        // This would be implemented based on actual usage tracking
-        // For now, return a random number for demonstration
-        return rand(0, 100);
+        $metadata = $this->metadata;
+
+        if (! is_array($metadata)) {
+            return 0;
+        }
+
+        return (int) ($metadata['usage_count'] ?? 0);
     }
 
     public function activate(): bool
@@ -129,6 +133,15 @@ final class EnumValue extends Model
         $newEnumValue = $this->replicate();
         $newEnumValue->key = $this->key.'_copy';
         $newEnumValue->is_default = false;
+
+        $metadata = $newEnumValue->metadata;
+        if (! is_array($metadata)) {
+            $metadata = [];
+        }
+
+        $metadata['usage_count'] = 0;
+        $newEnumValue->metadata = $metadata;
+
         $newEnumValue->save();
 
         return $newEnumValue;
@@ -174,8 +187,24 @@ final class EnumValue extends Model
 
     public static function cleanupUnused(): int
     {
-        return self::where('usage_count', 0)
-            ->where('created_at', '<', now()->subMonths(6))
-            ->delete();
+        $threshold = now()->subMonths(6);
+
+        $candidates = self::query()
+            ->where('created_at', '<', $threshold)
+            ->get();
+
+        $deleted = 0;
+
+        foreach ($candidates as $enumValue) {
+            if ($enumValue->getUsageCount() > 0) {
+                continue;
+            }
+
+            if ($enumValue->delete()) {
+                $deleted++;
+            }
+        }
+
+        return $deleted;
     }
 }
