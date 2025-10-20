@@ -1,0 +1,50 @@
+{
+    "labels": [
+        "Jan 6",
+        "Jan 7",
+        "Jan 8",
+        "Jan 9",
+        "Jan 10"
+    ],
+    "datasets": [
+        {
+            "label": "Revenue (€)",
+            "data": [
+                0,
+                80,
+                0,
+                200,
+                200
+            ],
+            "borderColor": "#10B981",
+            "backgroundColor": "rgba(16, 185, 129, 0.15)",
+            "yAxisID": "y1"
+        },
+        {
+            "label": "Orders",
+            "data": [
+                0,
+                1,
+                0,
+                1,
+                2
+            ],
+            "borderColor": "#3B82F6",
+            "backgroundColor": "rgba(59, 130, 246, 0.15)",
+            "yAxisID": "y"
+        },
+        {
+            "label": "New users",
+            "data": [
+                0,
+                2,
+                1,
+                1,
+                1
+            ],
+            "borderColor": "#F97316",
+            "backgroundColor": "rgba(249, 115, 22, 0.15)",
+            "yAxisID": "y"
+        }
+    ]
+}
