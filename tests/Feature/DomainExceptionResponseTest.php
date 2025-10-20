@@ -33,18 +33,27 @@ final class DomainExceptionResponseTest extends TestCase
         $response
             ->assertStatus(404)
             ->assertJsonStructure([
-                'error' => ['code', 'message', 'locale', 'context'],
-                'meta' => ['correlation_id', 'timestamp'],
+                'type',
+                'title',
+                'status',
+                'detail',
+                'instance',
+                'correlation_id',
+                'error' => ['code', 'locale', 'context'],
+                'meta' => ['timestamp'],
             ])
+            ->assertJsonPath('type', 'tag:statybaecommerse.prus.dev,2024:error:orders.not_found')
+            ->assertJsonPath('title', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], $defaultLocale))
+            ->assertJsonPath('detail', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], $defaultLocale))
             ->assertJsonPath('error.code', 'orders.not_found')
-            ->assertJsonPath('error.message', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], $defaultLocale))
             ->assertJsonPath('error.locale', $defaultLocale)
             ->assertJsonPath('error.context.order', 'ORD-123');
 
-        $correlationId = $response->json('meta.correlation_id');
+        $correlationId = $response->json('correlation_id');
         $this->assertIsString($correlationId);
         $this->assertNotEmpty($correlationId);
         $this->assertSame($correlationId, $response->headers->get('X-Correlation-ID'));
+        $this->assertSame($defaultLocale, $response->headers->get('Content-Language'));
 
         $timestamp = $response->json('meta.timestamp');
         $this->assertIsString($timestamp);
@@ -60,7 +69,8 @@ final class DomainExceptionResponseTest extends TestCase
         $response
             ->assertStatus(409)
             ->assertJsonPath('error.code', 'inventory.insufficient')
-            ->assertJsonPath('error.message', TranslationService::get('exceptions.inventory.insufficient', ['sku' => 'SKU-42'], $defaultLocale))
+            ->assertJsonPath('title', TranslationService::get('exceptions.inventory.insufficient', ['sku' => 'SKU-42'], $defaultLocale))
+            ->assertJsonPath('detail', TranslationService::get('exceptions.inventory.insufficient', ['sku' => 'SKU-42'], $defaultLocale))
             ->assertJsonPath('error.context.sku', 'SKU-42');
     }
 
@@ -69,13 +79,13 @@ final class DomainExceptionResponseTest extends TestCase
         $responseEn = $this->withHeader('Accept-Language', 'en')->getJson('/testing/domain-exception');
         $responseEn
             ->assertStatus(404)
-            ->assertJsonPath('error.message', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], 'en'))
+            ->assertJsonPath('title', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], 'en'))
             ->assertJsonPath('error.locale', 'en');
 
         $responseDe = $this->withHeader('Accept-Language', 'de')->getJson('/testing/domain-exception');
         $responseDe
             ->assertStatus(404)
-            ->assertJsonPath('error.message', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], 'de'))
+            ->assertJsonPath('title', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], 'de'))
             ->assertJsonPath('error.locale', 'de');
     }
 
@@ -87,7 +97,7 @@ final class DomainExceptionResponseTest extends TestCase
 
         $response
             ->assertStatus(404)
-            ->assertJsonPath('error.message', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], $defaultLocale))
+            ->assertJsonPath('title', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], $defaultLocale))
             ->assertJsonPath('error.locale', $defaultLocale);
     }
 }
