@@ -59,7 +59,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     protected static function booted(): void
     {
         self::saving(function (self $user): void {
-            $computedName = trim((string) ($user->first_name ?? '').' '.(string) ($user->last_name ?? ''));
+            $computedName = trim((string) ($user->first_name ?? '') . ' ' . (string) ($user->last_name ?? ''));
             if (empty($user->name) && $computedName !== '') {
                 $user->name = $computedName;
             }
@@ -71,7 +71,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
 
     public array $translatable = ['name', 'first_name', 'last_name', 'bio', 'company', 'position', 'website'];
 
-    protected $fillable = ['name', 'email', 'password', 'preferred_locale', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'two_factor_enabled', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings'];
+    protected $fillable = ['name', 'email', 'password', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'two_factor_enabled', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings'];
 
     protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes', 'verification_token', 'password_reset_token', 'api_token'];
 
@@ -90,6 +90,60 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         return ['email_verified_at' => 'datetime', 'phone_verified_at' => 'datetime', 'two_factor_confirmed_at' => 'datetime', 'password' => 'hashed', 'is_active' => 'boolean', 'is_verified' => 'boolean', 'accepts_marketing' => 'boolean', 'two_factor_enabled' => 'boolean', 'is_admin' => 'boolean', 'last_login_at' => 'datetime', 'last_activity_at' => 'datetime', 'preferences' => 'array', 'social_links' => 'array', 'notification_preferences' => 'array', 'privacy_settings' => 'array', 'marketing_preferences' => 'array', 'two_factor_recovery_codes' => 'array', 'subscription_ends_at' => 'datetime', 'trial_ends_at' => 'datetime', 'password_reset_expires_at' => 'datetime', 'birth_date' => 'date', 'date_of_birth' => 'date'];
     }
 
+    protected function preferredCurrency(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => data_get($this->preferences, 'preferred_currency'),
+            set: function (?string $value): array {
+                $preferences = $this->preferences ?? [];
+
+                if ($value === null || $value === '') {
+                    Arr::forget($preferences, 'preferred_currency');
+                } else {
+                    Arr::set($preferences, 'preferred_currency', $value);
+                }
+
+                return ['preferences' => $preferences];
+            }
+        );
+    }
+
+    protected function newsletterSubscription(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (bool) data_get($this->notification_preferences, 'newsletter_subscription', false),
+            set: function (?bool $value): array {
+                $preferences = $this->notification_preferences ?? [];
+
+                if ($value === null) {
+                    Arr::forget($preferences, 'newsletter_subscription');
+                } else {
+                    Arr::set($preferences, 'newsletter_subscription', (bool) $value);
+                }
+
+                return ['notification_preferences' => $preferences];
+            }
+        );
+    }
+
+    protected function smsNotifications(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (bool) data_get($this->notification_preferences, 'sms_notifications', false),
+            set: function (?bool $value): array {
+                $preferences = $this->notification_preferences ?? [];
+
+                if ($value === null) {
+                    Arr::forget($preferences, 'sms_notifications');
+                } else {
+                    Arr::set($preferences, 'sms_notifications', (bool) $value);
+                }
+
+                return ['notification_preferences' => $preferences];
+            }
+        );
+    }
+
     /**
      * Handle preferredLocale functionality with proper error handling.
      */
@@ -103,7 +157,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle sendPasswordResetNotification functionality with proper error handling.
      *
-     * @param  mixed  $token
+     * @param mixed $token
      */
     public function sendPasswordResetNotification($token): void
     {
@@ -180,7 +234,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function latestCompletedOrder(): HasOne
     {
-        return $this->orders()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->orders()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->whereIn('status', ['delivered', 'completed']);
         });
     }
@@ -368,7 +422,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeWithPreferredLocale functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithPreferredLocale($query, string $locale)
     {
@@ -654,7 +708,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -664,7 +718,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeInactive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInactive($query)
     {
@@ -674,7 +728,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeAdmins functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeAdmins($query)
     {
@@ -684,7 +738,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeWithOrders functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithOrders($query)
     {
@@ -694,7 +748,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeWithoutOrders functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithoutOrders($query)
     {
@@ -704,7 +758,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeRecentlyActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecentlyActive($query, int $days = 30)
     {
@@ -714,11 +768,11 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeByRole functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByRole($query, string $role)
     {
-        return $query->whereHas('roles', function ($q) use ($role) {
+        return $query->whereHas('roles', function ($q) use ($role): void {
             $q->where('name', $role);
         });
     }
@@ -726,7 +780,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeByGender functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByGender($query, string $gender)
     {
@@ -736,7 +790,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeByLocale functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByLocale($query, string $locale)
     {
@@ -746,7 +800,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeSubscribed functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeSubscribed($query)
     {
@@ -756,7 +810,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     /**
      * Handle scopeOnTrial functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOnTrial($query)
     {
@@ -770,7 +824,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function getFullNameAttribute(): string
     {
-        return trim($this->first_name.' '.$this->last_name) ?: $this->name;
+        return trim($this->first_name . ' ' . $this->last_name) ?: $this->name;
     }
 
     /**
@@ -887,7 +941,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getSubscriptionStatusColorAttribute(): string
     {
         return match ($this->subscription_status) {
-            'active' => 'success',
+            'active'   => 'success',
             'trialing' => 'info',
             'past_due' => 'warning',
             'cancelled', 'expired' => 'danger',
@@ -944,10 +998,10 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getGenderTextAttribute(): ?string
     {
         return match ($this->gender) {
-            'male' => __('admin.gender.male'),
+            'male'   => __('admin.gender.male'),
             'female' => __('admin.gender.female'),
-            'other' => __('admin.gender.other'),
-            default => null,
+            'other'  => __('admin.gender.other'),
+            default  => null,
         };
     }
 
@@ -957,8 +1011,8 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getLocaleTextAttribute(): string
     {
         return match ($this->preferred_locale) {
-            'en' => __('admin.locales.english'),
-            'lt' => __('admin.locales.lithuanian'),
+            'en'    => __('admin.locales.english'),
+            'lt'    => __('admin.locales.lithuanian'),
             default => $this->preferred_locale,
         };
     }
