@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralStatistics;
 
 use App\Filament\Resources\ReferralStatistics\Pages\CreateReferralStatistics;
@@ -40,9 +42,9 @@ class ReferralStatisticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralStatistics::route('/'),
+            'index'  => ListReferralStatistics::route('/'),
             'create' => CreateReferralStatistics::route('/create'),
-            'edit' => EditReferralStatistics::route('/{record}/edit'),
+            'edit'   => EditReferralStatistics::route('/{record}/edit'),
         ];
     }
 }
