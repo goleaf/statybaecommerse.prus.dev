@@ -6,12 +6,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -29,9 +29,9 @@ final class PriceResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.prices.basic_information'))
+                Section::make(__('admin.prices.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Select::make('product_id')
                                     ->label(__('admin.prices.product'))
@@ -75,9 +75,9 @@ final class PriceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPrices::route('/'),
+            'index'  => Pages\ListPrices::route('/'),
             'create' => Pages\CreatePrice::route('/create'),
-            'edit' => Pages\EditPrice::route('/{record}/edit'),
+            'edit'   => Pages\EditPrice::route('/{record}/edit'),
         ];
     }
 }
