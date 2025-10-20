@@ -36,6 +36,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
+        "brianium/paratest": "^7.8",
         "fakerphp/faker": "^1.24",
         "filament/upgrade": "^4.0",
         "larastan/larastan": "^3.6",
@@ -208,15 +209,9 @@
         "filament:fix-simple": [
             "@php artisan filament:fix-simple-issues"
         ],
-        "app:test-analytics": [
-            "@php artisan app:test-analytics-simple"
-        ],
-        "app:test-brand": [
-            "@php artisan app:test-brand-resource"
-        ],
-        "app:test-seeders": [
-            "@php artisan app:test-seeders"
-        ]
+        "app:test-analytics": "phpunit --configuration phpunit.xml --filter AnalyticsEventSmokeTest",
+        "app:test-brand": "phpunit --configuration phpunit.xml --filter BrandResourceMetadataTest",
+        "app:test-seeders": "phpunit --configuration phpunit.xml --filter DiagnosticSeedersTest"
     },
     "extra": {
         "laravel": {
