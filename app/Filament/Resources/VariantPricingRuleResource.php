@@ -6,11 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -21,8 +16,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -58,7 +58,7 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string
     {
         return 'Products';
     }
@@ -98,9 +98,9 @@ final class VariantPricingRuleResource extends Resource
                                     ->label(__('variant_pricing_rules.type'))
                                     ->options([
                                         'percentage' => __('variant_pricing_rules.types.percentage'),
-                                        'fixed' => __('variant_pricing_rules.types.fixed'),
-                                        'tier' => __('variant_pricing_rules.types.tier'),
-                                        'bulk' => __('variant_pricing_rules.types.bulk'),
+                                        'fixed'      => __('variant_pricing_rules.types.fixed'),
+                                        'tier'       => __('variant_pricing_rules.types.tier'),
+                                        'bulk'       => __('variant_pricing_rules.types.bulk'),
                                     ])
                                     ->required()
                                     ->reactive(),
@@ -195,10 +195,10 @@ final class VariantPricingRuleResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'percentage' => 'blue',
-                        'fixed' => 'green',
-                        'tier' => 'purple',
-                        'bulk' => 'orange',
-                        default => 'gray',
+                        'fixed'      => 'green',
+                        'tier'       => 'purple',
+                        'bulk'       => 'orange',
+                        default      => 'gray',
                     }),
                 TextColumn::make('productVariant.name')
                     ->label(__('variant_pricing_rules.product_variant'))
@@ -210,12 +210,12 @@ final class VariantPricingRuleResource extends Resource
                 TextColumn::make('value')
                     ->label(__('variant_pricing_rules.value'))
                     ->numeric()
-                    ->formatStateUsing(function ($state, $record): string {
+                    ->formatStateUsing(function (string $state, VariantPricingRule $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
+                            return $state . '%';
                         }
 
-                        return Number::currency((float) $state, 'EUR');
+                        return (string) Number::currency((float) $state, 'EUR');
                     }),
                 TextColumn::make('min_quantity')
                     ->label(__('variant_pricing_rules.min_quantity'))
@@ -254,9 +254,9 @@ final class VariantPricingRuleResource extends Resource
                 SelectFilter::make('type')
                     ->options([
                         'percentage' => __('variant_pricing_rules.types.percentage'),
-                        'fixed' => __('variant_pricing_rules.types.fixed'),
-                        'tier' => __('variant_pricing_rules.types.tier'),
-                        'bulk' => __('variant_pricing_rules.types.bulk'),
+                        'fixed'      => __('variant_pricing_rules.types.fixed'),
+                        'tier'       => __('variant_pricing_rules.types.tier'),
+                        'bulk'       => __('variant_pricing_rules.types.bulk'),
                     ]),
                 SelectFilter::make('product_variant_id')
                     ->relationship('productVariant', 'name')
@@ -274,7 +274,7 @@ final class VariantPricingRuleResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('toggle_active')
@@ -338,10 +338,10 @@ final class VariantPricingRuleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantPricingRules::route('/'),
+            'index'  => Pages\ListVariantPricingRules::route('/'),
             'create' => Pages\CreateVariantPricingRule::route('/create'),
-            'view' => Pages\ViewVariantPricingRule::route('/{record}'),
-            'edit' => Pages\EditVariantPricingRule::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantPricingRule::route('/{record}'),
+            'edit'   => Pages\EditVariantPricingRule::route('/{record}/edit'),
         ];
     }
 }
