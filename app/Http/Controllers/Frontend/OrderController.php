@@ -240,4 +240,21 @@ final class OrderController extends Controller
 
         return redirect()->route('frontend.orders.show', $order)->with('success', __('orders.messages.cancelled_successfully'));
     }
+
+    /**
+     * Handle return request functionality with proper error handling.
+     */
+    public function requestReturn(Order $order): RedirectResponse
+    {
+        $user = Auth::user();
+        if (! $user || $order->user_id !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+        if (! $order->canRequestReturn()) {
+            abort(403, __('orders.messages.cannot_request_return'));
+        }
+        $order->update(['status' => 'returned']);
+
+        return redirect()->route('frontend.orders.show', $order)->with('success', __('orders.messages.return_requested_successfully'));
+    }
 }
