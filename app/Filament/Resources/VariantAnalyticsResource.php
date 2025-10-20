@@ -389,13 +389,16 @@ final class VariantAnalyticsResource extends Resource
                             ->label(__('admin.variant_analytics.date_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
+                        $dateFrom = $data['date_from'] ?? null;
+                        $dateUntil = $data['date_until'] ?? null;
+
                         return $query
                             ->when(
-                                $data['date_from'],
+                                $dateFrom,
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
                             )
                             ->when(
-                                $data['date_until'],
+                                $dateUntil,
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     }),
@@ -411,13 +414,16 @@ final class VariantAnalyticsResource extends Resource
                             ->step(0.01),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
+                        $revenueFrom = $data['revenue_from'] ?? null;
+                        $revenueTo = $data['revenue_to'] ?? null;
+
                         return $query
                             ->when(
-                                $data['revenue_from'],
+                                $revenueFrom,
                                 fn (Builder $query, $amount): Builder => $query->where('revenue', '>=', $amount),
                             )
                             ->when(
-                                $data['revenue_to'],
+                                $revenueTo,
                                 fn (Builder $query, $amount): Builder => $query->where('revenue', '<=', $amount),
                             );
                     }),
@@ -435,13 +441,16 @@ final class VariantAnalyticsResource extends Resource
                             ->suffix('%'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
+                        $conversionRateFrom = $data['conversion_rate_from'] ?? null;
+                        $conversionRateTo = $data['conversion_rate_to'] ?? null;
+
                         return $query
                             ->when(
-                                $data['conversion_rate_from'],
+                                $conversionRateFrom,
                                 fn (Builder $query, $rate): Builder => $query->where('conversion_rate', '>=', $rate),
                             )
                             ->when(
-                                $data['conversion_rate_to'],
+                                $conversionRateTo,
                                 fn (Builder $query, $rate): Builder => $query->where('conversion_rate', '<=', $rate),
                             );
                     }),
