@@ -323,7 +323,7 @@ final class CityResource extends Resource
                 TextColumn::make('type')
                     ->label(__('cities.type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'metropolitan' => 'purple',
                         'urban' => 'blue',
                         'rural' => 'green',
@@ -332,19 +332,19 @@ final class CityResource extends Resource
                         'tourist' => 'pink',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => __("cities.types.{$state}"))
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("cities.types.{$state}") : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('level')
                     ->label(__('cities.level'))
                     ->badge()
-                    ->color(fn (int $state): string => match ($state) {
+                    ->color(fn (?int $state): string => match ($state) {
                         0 => 'blue',
                         1 => 'green',
                         2 => 'yellow',
                         3 => 'orange',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (int $state): string => __("cities.levels.{$state}"))
+                    ->formatStateUsing(fn (?int $state): string => $state !== null ? __("cities.levels.{$state}") : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('timezone')
                     ->label(__('cities.timezone'))
