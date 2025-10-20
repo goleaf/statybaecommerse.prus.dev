@@ -15,13 +15,14 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 test('it queues and processes exports', function (): void {
-    config()->set('filesystems.default', 'public');
     Storage::fake('public');
     Notification::fake();
     Bus::fake();
 
     $user = User::factory()->create();
     $orders = Order::factory()->count(3)->create();
+    /** @var array<int, int> $orderIds */
+    $orderIds = $orders->pluck('id')->map(static fn ($id): int => (int) $id)->all();
 
     $service = app(ExportService::class);
     $request = new ExportRequestData(
@@ -29,36 +30,37 @@ test('it queues and processes exports', function (): void {
         exportable: OrderExport::class,
         format: 'csv',
         columns: ['number', 'status'],
-        recordIds: $orders->pluck('id')->all(),
-        userId: $user->getKey(),
+        recordIds: $orderIds,
+        userId: (int) $user->getKey(),
     );
 
     $export = $service->queue($request);
 
-    Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
+    Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === (int) $export->getKey());
 
-    (new ProcessExportJob($export->getKey()))->handle($service);
+    (new ProcessExportJob((int) $export->getKey()))->handle($service);
 
     $export->refresh();
 
     expect($export->status)->toBe(ExportStatus::Completed)
         ->and($export->total_rows)->toBe(3)
-        ->and(Storage::disk('public')->exists($export->artifact_path))->toBeTrue();
+        ->and(Storage::disk('public')->exists((string) $export->artifact_path))->toBeTrue();
 
-    Notification::assertSentTo($user, ExportReadyNotification::class, function (ExportReadyNotification $notification) use ($export): bool {
+    Notification::assertSentTo($user, ExportReadyNotification::class, function (ExportReadyNotification $notification) use ($export, $user): bool {
         $data = $notification->toArray($user);
 
-        return $data['export_id'] === $export->getKey();
+        return $data['export_id'] === (int) $export->getKey();
     });
 });
 
 test('it returns signed download responses', function (): void {
-    config()->set('filesystems.default', 'public');
     Storage::fake('public');
     Notification::fake();
 
     $user = User::factory()->create();
     $orders = Order::factory()->count(2)->create();
+    /** @var array<int, int> $orderIds */
+    $orderIds = $orders->pluck('id')->map(static fn ($id): int => (int) $id)->all();
 
     $service = app(ExportService::class);
     $request = new ExportRequestData(
@@ -66,17 +68,17 @@ test('it returns signed download responses', function (): void {
         exportable: OrderExport::class,
         format: 'csv',
         columns: ['number', 'status'],
-        recordIds: $orders->pluck('id')->all(),
-        userId: $user->getKey(),
+        recordIds: $orderIds,
+        userId: (int) $user->getKey(),
     );
 
     $export = $service->queue($request);
-    (new ProcessExportJob($export->getKey()))->handle($service);
+    (new ProcessExportJob((int) $export->getKey()))->handle($service);
     $export->refresh();
 
     $url = $service->downloadUrl($export, 5);
 
-    $response = $this->get($url);
+    $response = get($url);
 
     $response->assertOk();
     $response->assertHeader('content-disposition');

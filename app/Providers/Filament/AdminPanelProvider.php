@@ -15,29 +15,48 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Collection;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Throwable;
 
 final class AdminPanelProvider extends PanelProvider
 {
+    /** @var array<string, mixed>|null */
+    private static ?array $filamentConfigCache = null;
+
+    public function __construct(?Application $app = null)
+    {
+        if ($app instanceof Application) {
+            parent::__construct($app);
+
+            return;
+        }
+
+        $container = Container::getInstance();
+
+        if ($container instanceof Application) {
+            parent::__construct($container);
+
+            return;
+        }
+
+        $this->app = null;
+    }
+
     public function panel(Panel $panel): Panel
     {
-        $resourceClasses = array_values(array_filter(
-            (array) config('filament.navigation.resources', []),
-            static fn (mixed $resource): bool => is_string($resource),
-        ));
-
-        /** @var array<class-string> $resourceClasses */
-        $pageClasses = array_values(array_filter(
-            (array) config('filament.navigation.pages', []),
-            static fn (mixed $page): bool => is_string($page),
-        ));
-
-        /** @var array<class-string> $pageClasses */
+        $resourceClasses = $this->stringClassList('filament.navigation.resources');
+        $pageClasses = $this->stringClassList('filament.navigation.pages');
+        $isTesting = $this->isTestingEnvironment();
 
         return $panel
             ->default()
@@ -45,14 +64,15 @@ final class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile()
-            ->when(app()->environment('testing'),
+            ->topbar(false)
+            ->when($isTesting,
                 fn (Panel $p) => $p->authGuard('web'),
                 fn (Panel $p) => $p->authGuard('admin'))
             ->authPasswordBroker('admin_users')
-            ->brandName(__('admin.brand_name'))
-            ->brandLogo(asset('images/logo-admin.svg'))
+            ->brandName($this->translate('admin.brand_name'))
+            ->brandLogo($this->assetUrl('images/logo-admin.svg'))
             ->brandLogoHeight('2rem')
-            ->favicon(asset('favicon.ico'))
+            ->favicon($this->assetUrl('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
                 'gray' => Color::Slate,
@@ -61,7 +81,7 @@ final class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'info' => Color::Sky,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->discoverResources(in: $this->appPath('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources($resourceClasses)
             ->pages($pageClasses)
             ->widgets([
@@ -98,15 +118,17 @@ final class AdminPanelProvider extends PanelProvider
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
-                    ->label(__('admin.navigation.profile'))
+                    ->label($this->translate('admin.navigation.profile'))
                     ->url(fn (): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
                     ->icon('heroicon-o-user-circle'),
                 'language' => \Filament\Navigation\MenuItem::make()
-                    ->label(__('admin.navigation.language'))
-                    ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
+                    ->label($this->translate('admin.navigation.language'))
+                    ->url(fn (): string => $this->routeUrl('language.switch', [
+                        'locale' => $this->currentLocale() === 'lt' ? 'en' : 'lt',
+                    ]))
                     ->icon('heroicon-o-language'),
             ])
-            ->when(app()->environment('testing'),
+            ->when($isTesting,
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
@@ -124,16 +146,16 @@ final class AdminPanelProvider extends PanelProvider
     private function configuredNavigationGroups(): array
     {
         $groupConfigurations = array_values(array_filter(
-            (array) config('filament.navigation.groups', []),
+            (array) $this->configValue('filament.navigation.groups', []),
             static fn (mixed $group): bool => is_array($group),
         ));
 
         /** @var array<int, array{label?: string, icon?: string|null, collapsed?: bool|null}> $groupConfigurations */
 
-        return collect($groupConfigurations)
-            ->map(static function (array $group, int|string $unused): NavigationGroup {
+        return Collection::make($groupConfigurations)
+            ->map(function (array $group): NavigationGroup {
                 $navigationGroup = NavigationGroup::make()
-                    ->label(__($group['label'] ?? ''));
+                    ->label($this->translate($group['label'] ?? ''));
 
                 if (! empty($group['icon'])) {
                     $navigationGroup->icon($group['icon']);
@@ -146,5 +168,224 @@ final class AdminPanelProvider extends PanelProvider
                 return $navigationGroup;
             })
             ->all();
+    }
+
+    /**
+     * Normalise configured class lists into unique string arrays.
+     *
+     * @return array<int, class-string>
+     */
+    private function stringClassList(string $key): array
+    {
+        $items = $this->configValue($key, []);
+
+        if (! is_array($items)) {
+            return [];
+        }
+
+        $filtered = array_filter($items, static fn ($item): bool => is_string($item) && $item !== '' && class_exists($item));
+
+        /** @var array<int, class-string> $normalized */
+        $normalized = array_values(array_unique($filtered));
+
+        return $normalized;
+    }
+
+    private function isTestingEnvironment(): bool
+    {
+        $application = $this->application();
+
+        if (! $application) {
+            return false;
+        }
+
+        try {
+            return $application->environment('testing');
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function assetUrl(string $path): string
+    {
+        if (function_exists('asset')) {
+            try {
+                return asset($path);
+            } catch (Throwable) {
+                // ignore and fall back
+            }
+        }
+
+        return '/'.ltrim($path, '/');
+    }
+
+    private function appPath(string $path): string
+    {
+        if (function_exists('app_path')) {
+            try {
+                return app_path($path);
+            } catch (Throwable) {
+                // ignore and fall back
+            }
+        }
+
+        return rtrim(dirname(__DIR__, 2).'/'.$path, '/');
+    }
+
+    /**
+     * @param  array<string, mixed>  $parameters
+     */
+    private function routeUrl(string $name, array $parameters = [], string $default = '#'): string
+    {
+        if (function_exists('route')) {
+            try {
+                return route($name, $parameters);
+            } catch (Throwable) {
+                return $default;
+            }
+        }
+
+        return $default;
+    }
+
+    private function currentLocale(): string
+    {
+        $application = $this->application();
+
+        if ($application) {
+            try {
+                return (string) $application->getLocale();
+            } catch (Throwable) {
+                // ignore and fall back
+            }
+        }
+
+        $translator = $this->translator();
+
+        if ($translator) {
+            try {
+                return (string) $translator->getLocale();
+            } catch (Throwable) {
+                // ignore and fall back
+            }
+        }
+
+        return 'en';
+    }
+
+    private function translate(?string $key, string $default = ''): string
+    {
+        if ($key === null || $key === '') {
+            return $default;
+        }
+
+        $translator = $this->translator();
+
+        if (! $translator) {
+            return $key;
+        }
+
+        try {
+            $translated = $translator->get($key);
+
+            return is_string($translated) ? $translated : $key;
+        } catch (Throwable) {
+            return $key;
+        }
+    }
+
+    private function configValue(string $key, mixed $default = null): mixed
+    {
+        $repository = $this->configRepository();
+
+        if ($repository) {
+            return $repository->get($key, $default);
+        }
+
+        if (! str_starts_with($key, 'filament.')) {
+            return $default;
+        }
+
+        $relativeKey = substr($key, strlen('filament.'));
+        $config = $this->filamentConfig();
+
+        foreach (explode('.', $relativeKey) as $segment) {
+            if (! is_array($config) || ! array_key_exists($segment, $config)) {
+                return $default;
+            }
+
+            $config = $config[$segment];
+        }
+
+        return $config;
+    }
+
+    private function configRepository(): ?ConfigRepository
+    {
+        $application = $this->application();
+
+        if (! $application || ! $application->bound('config')) {
+            return null;
+        }
+
+        try {
+            $repository = $application->make('config');
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! $repository instanceof ConfigRepository) {
+            return null;
+        }
+
+        return $repository;
+    }
+
+    private function filamentConfig(): array
+    {
+        if (self::$filamentConfigCache !== null) {
+            return self::$filamentConfigCache;
+        }
+
+        $path = dirname(__DIR__, 3).'/config/filament.php';
+
+        if (is_file($path)) {
+            $config = require $path;
+
+            if (is_array($config)) {
+                /** @var array<string, mixed> $config */
+                return self::$filamentConfigCache = $config;
+            }
+        }
+
+        return self::$filamentConfigCache = [];
+    }
+
+    private function application(): ?Application
+    {
+        $container = Container::getInstance();
+
+        return $container instanceof Application ? $container : null;
+    }
+
+    private function translator(): ?Translator
+    {
+        $application = $this->application();
+
+        if (! $application || ! $application->bound('translator')) {
+            return null;
+        }
+
+        try {
+            $translator = $application->make('translator');
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! $translator instanceof Translator) {
+            return null;
+        }
+
+        return $translator;
     }
 }
