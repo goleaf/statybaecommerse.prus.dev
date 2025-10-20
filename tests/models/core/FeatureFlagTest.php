@@ -267,22 +267,69 @@ class FeatureFlagTest extends TestCase
         $this->assertEquals('Approved by product team after testing', $featureFlag->approval_notes);
     }
 
-    public function test_feature_flag_can_have_created_by(): void
+    public function test_feature_flag_tracks_creator_via_observer(): void
     {
-        $featureFlag = FeatureFlag::factory()->create([
-            'created_by' => 'admin',
+        $creator = User::factory()->create([
+            'name' => 'Creator User',
         ]);
 
-        $this->assertEquals('admin', $featureFlag->created_by);
+        $this->actingAs($creator);
+
+        $featureFlag = FeatureFlag::factory()->create();
+
+        $featureFlag->refresh();
+
+        $this->assertSame($creator->id, $featureFlag->created_by);
+        $this->assertSame($creator->name, $featureFlag->created_by_name);
+        $this->assertSame($creator->name, $featureFlag->created_by_display);
+        $this->assertSame($creator->id, $featureFlag->updated_by);
+        $this->assertSame($creator->name, $featureFlag->updated_by_name);
     }
 
-    public function test_feature_flag_can_have_updated_by(): void
+    public function test_feature_flag_tracks_updater_via_observer(): void
     {
-        $featureFlag = FeatureFlag::factory()->create([
-            'updated_by' => 'developer',
+        $creator = User::factory()->create([
+            'name' => 'Original Creator',
         ]);
 
-        $this->assertEquals('developer', $featureFlag->updated_by);
+        $this->actingAs($creator);
+
+        $featureFlag = FeatureFlag::factory()->create();
+
+        $updater = User::factory()->create([
+            'name' => 'Updating User',
+        ]);
+
+        $this->actingAs($updater);
+
+        $featureFlag->update(['name' => 'Updated Flag']);
+
+        $featureFlag->refresh();
+
+        $this->assertSame($creator->id, $featureFlag->created_by);
+        $this->assertSame($creator->name, $featureFlag->created_by_name);
+        $this->assertSame($updater->id, $featureFlag->updated_by);
+        $this->assertSame($updater->name, $featureFlag->updated_by_name);
+        $this->assertSame($updater->name, $featureFlag->updated_by_display);
+    }
+
+    public function test_feature_flag_preserves_legacy_attribution_names(): void
+    {
+        $featureFlag = FeatureFlag::factory()->create([
+            'created_by' => null,
+            'created_by_name' => 'legacy_admin',
+            'updated_by' => null,
+            'updated_by_name' => 'legacy_editor',
+        ]);
+
+        $featureFlag->refresh();
+
+        $this->assertNull($featureFlag->created_by);
+        $this->assertNull($featureFlag->updated_by);
+        $this->assertSame('legacy_admin', $featureFlag->created_by_name);
+        $this->assertSame('legacy_editor', $featureFlag->updated_by_name);
+        $this->assertSame('legacy_admin', $featureFlag->created_by_display);
+        $this->assertSame('legacy_editor', $featureFlag->updated_by_display);
     }
 
     public function test_feature_flag_can_have_last_activated(): void

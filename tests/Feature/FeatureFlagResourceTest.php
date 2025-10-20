@@ -14,13 +14,18 @@ final class FeatureFlagResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    private User $adminUser;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->actingAs(User::factory()->create([
+        $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
-        ]));
+            'name' => 'Admin Example',
+        ]);
+
+        $this->actingAs($this->adminUser);
     }
 
     public function test_can_list_feature_flags(): void
@@ -30,7 +35,8 @@ final class FeatureFlagResourceTest extends TestCase
         $this
             ->get('/admin/feature-flags')
             ->assertOk()
-            ->assertSee('Feature Flags');
+            ->assertSee('Feature Flags')
+            ->assertSee($this->adminUser->name);
     }
 
     public function test_can_create_feature_flag(): void
@@ -55,6 +61,10 @@ final class FeatureFlagResourceTest extends TestCase
         $this->assertDatabaseHas('feature_flags', [
             'name' => 'New Feature',
             'key' => 'new_feature',
+            'created_by' => $this->adminUser->id,
+            'created_by_name' => $this->adminUser->name,
+            'updated_by' => $this->adminUser->id,
+            'updated_by_name' => $this->adminUser->name,
         ]);
     }
 
