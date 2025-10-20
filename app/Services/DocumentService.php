@@ -30,7 +30,7 @@ final class DocumentService
         // Sanitize variables
         $variables = $this->sanitizeVariables($variables);
         $processedContent = $this->processTemplate($template->content, $variables);
-        $document = Document::create(['document_template_id' => $template->id, 'title' => $title ?? $template->name.' - '.$relatedModel->id, 'content' => $processedContent, 'variables' => $variables, 'status' => 'draft', 'format' => 'html', 'documentable_type' => get_class($relatedModel), 'documentable_id' => $relatedModel->id, 'created_by' => Auth::id(), 'generated_at' => now()]);
+        $document = Document::create(['document_template_id' => $template->id, 'title' => $title ?? $template->name.' - '.$relatedModel->id, 'content' => $processedContent, 'variables' => $variables, 'status' => 'draft', 'format' => 'html', 'documentable_type' => get_class($relatedModel), 'documentable_id' => $relatedModel->id, 'created_by' => Auth::id(), 'updated_by' => Auth::id(), 'generated_at' => now()]);
         // Send notification if requested
         if ($sendNotification && Auth::user()) {
             Auth::user()->notify(new DocumentGenerated($document, false));
@@ -167,7 +167,7 @@ final class DocumentService
      */
     public function generateDocumentAsync(DocumentTemplate $template, Model $relatedModel, array $variables = [], ?string $title = null): void
     {
-        dispatch(function () use ($template, $relatedModel, $variables, $title) {
+        dispatch(function () use ($template, $relatedModel, $variables, $title): void {
             $this->generateDocument($template, $relatedModel, $variables, $title, true);
         });
     }
