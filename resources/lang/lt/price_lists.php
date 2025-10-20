@@ -30,6 +30,14 @@ return [
     'valid_until' => 'Galioja iki',
     'notes' => 'Pastabos',
 
+    'customer_group' => 'Klientų grupė',
+    'code' => 'Kodas',
+    'discount_percentage' => 'Nuolaidos procentas',
+    'partner' => 'Partneris',
+    'email' => 'El. paštas',
+    'phone' => 'Telefonas',
+    'commission_rate' => 'Komisinis procentas',
+
     // Status labels
     'all_records' => 'Visi įrašai',
     'active_only' => 'Tik aktyvūs',
