@@ -5,23 +5,26 @@ declare(strict_types=1);
 namespace App\Logging\Processors;
 
 use App\Support\Tracing\Trace;
+use Monolog\LogRecord;
 
 final class TraceContextProcessor
 {
-    public function __invoke(array $record): array
+    public function __invoke(LogRecord $record): LogRecord
     {
         $context = Trace::current();
 
-        $record['extra']['trace_id'] = $context->traceId();
-        $record['extra']['span_id'] = $context->spanId();
+        $extra = $record->extra;
+
+        $extra['trace_id'] = $context->traceId();
+        $extra['span_id'] = $context->spanId();
 
         if ($context->parentSpanId() !== null) {
-            $record['extra']['parent_span_id'] = $context->parentSpanId();
+            $extra['parent_span_id'] = $context->parentSpanId();
         }
 
-        $record['extra']['correlation_id'] = $context->correlationId();
-        $record['extra']['traceparent'] = $context->toTraceParent();
-        $record['extra']['trace'] = [
+        $extra['correlation_id'] = $context->correlationId();
+        $extra['traceparent'] = $context->toTraceParent();
+        $extra['trace'] = [
             'id' => $context->traceId(),
             'span' => [
                 'id' => $context->spanId(),
@@ -30,15 +33,15 @@ final class TraceContextProcessor
         ];
 
         if ($context->parentSpanId() !== null) {
-            $record['extra']['trace']['parent'] = [
+            $extra['trace']['parent'] = [
                 'id' => $context->parentSpanId(),
             ];
         }
 
-        $record['extra']['correlation'] = [
+        $extra['correlation'] = [
             'id' => $context->correlationId(),
         ];
 
-        return $record;
+        return $record->with(extra: $extra);
     }
 }

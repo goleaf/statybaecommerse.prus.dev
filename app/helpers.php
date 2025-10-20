@@ -280,9 +280,13 @@ if (! function_exists('debug_order')) {
 if (! function_exists('media_placeholder_url')) {
     function media_placeholder_url(string $key, ?string $variant = null, ?string $default = null): string
     {
-        $resolver = app(App\Support\Media\PlaceholderResolver::class);
+        try {
+            $resolver = app(App\Support\Media\PlaceholderResolver::class);
 
-        return $resolver->resolve($key, $variant, $default) ?? ($default ?? '');
+            return $resolver->resolve($key, $variant, $default) ?? ($default ?? '');
+        } catch (\Throwable $exception) {
+            return $default ?? '';
+        }
     }
 }
 
