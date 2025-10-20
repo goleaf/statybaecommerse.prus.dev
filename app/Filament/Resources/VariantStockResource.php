@@ -9,7 +9,7 @@ use App\Models\Location;
 use App\Models\VariantInventory;
 use BackedEnum;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;

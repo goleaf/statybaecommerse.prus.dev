@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
