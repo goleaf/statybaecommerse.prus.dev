@@ -20,11 +20,25 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Throwable;
-
 require_once __DIR__.'/../app/Support/filament_compat.php';
 
-return Application::configure(basePath: dirname(__DIR__))
+$providers = [
+    App\Providers\AuthServiceProvider::class,
+    App\Providers\ApiServiceProvider::class,
+];
+
+$appEnvironment = (string) env('APP_ENV', 'production');
+$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
+
+if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
+    $providers[] = App\Providers\HorizonServiceProvider::class;
+}
+
+$providers[] = App\Providers\LocaleServiceProvider::class;
+$providers[] = App\Providers\Filament\AdminPanelProvider::class;
+$providers[] = SecurityServiceProvider::class;
+
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -297,23 +311,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->header('Content-Language', $locale);
         });
     })
-    ->withProviders(function (): array {
-        $providers = [
-            App\Providers\AuthServiceProvider::class,
-            App\Providers\ApiServiceProvider::class,
-        ];
-
-        $appEnvironment = (string) env('APP_ENV', 'production');
-        $queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
-
-        if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-            $providers[] = App\Providers\HorizonServiceProvider::class;
-        }
-
-        $providers[] = App\Providers\LocaleServiceProvider::class;
-        $providers[] = App\Providers\Filament\AdminPanelProvider::class;
-        $providers[] = SecurityServiceProvider::class;
-
-        return $providers;
-    })
+    ->withProviders($providers)
     ->create();
+
+if (! $app->bound('request')) {
+    $app->instance('request', Request::createFromGlobals());
+}
+
+return $app;

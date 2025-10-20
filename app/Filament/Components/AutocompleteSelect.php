@@ -44,7 +44,7 @@ final class AutocompleteSelect extends Select
         return parent::make($name);
     }
 
-    public function searchable(bool|Closure $condition = true): static
+    public function searchable(Closure|array|bool $condition = true): static
     {
         parent::searchable($condition);
 
@@ -156,9 +156,13 @@ final class AutocompleteSelect extends Select
         return $this->modelClass;
     }
 
-    public function getSearchResults(string $search): array
+    public function getSearchResults(?string $search = null): array
     {
-        $this->setSearchQuery($search);
+        if ($search !== null) {
+            $this->setSearchQuery($search);
+        } elseif ($this->searchResults === null) {
+            $this->performSearch();
+        }
 
         $results = $this->searchResults ?? collect();
 
