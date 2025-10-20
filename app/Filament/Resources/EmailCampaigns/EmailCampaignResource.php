@@ -7,6 +7,7 @@ namespace App\Filament\Resources\EmailCampaigns;
 use App\Filament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Pages\ListEmailCampaigns;
+use App\Filament\Resources\EmailCampaigns\Pages\ViewEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Schemas\EmailCampaignForm;
 use App\Filament\Resources\EmailCampaigns\Tables\EmailCampaignsTable;
 use App\Models\EmailCampaign;
@@ -42,9 +43,10 @@ class EmailCampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListEmailCampaigns::route('/'),
+            'index'  => ListEmailCampaigns::route('/'),
             'create' => CreateEmailCampaign::route('/create'),
-            'edit' => EditEmailCampaign::route('/{record}/edit'),
+            'view'   => ViewEmailCampaign::route('/{record}'),
+            'edit'   => EditEmailCampaign::route('/{record}/edit'),
         ];
     }
 }
