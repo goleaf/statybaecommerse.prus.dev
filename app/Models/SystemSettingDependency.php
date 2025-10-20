@@ -126,6 +126,16 @@ final class SystemSettingDependency extends Model
     }
 
     /**
+     * Scope the query to dependencies matching the given condition operator.
+     */
+    public function scopeByCondition(Builder $query, string $operator): Builder
+    {
+        $normalizedOperator = strtolower($operator);
+
+        return $query->whereRaw('LOWER(condition) = ?', [$normalizedOperator]);
+    }
+
+    /**
      * Handle scopeCreatedBetween functionality with proper error handling.
      *
      * @param mixed $query
