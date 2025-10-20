@@ -41,6 +41,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use RuntimeException;
 use UnitEnum;
 
 /**
@@ -501,13 +502,7 @@ final class WishlistItemResource extends Resource
                         ->color('success')
                         ->action(function (WishlistItem $record): void {
                             try {
-                                // Create cart item logic here
-                                CartItem::create([
-                                    'user_id' => $record->wishlist->user_id,
-                                    'product_id' => $record->product_id,
-                                    'variant_id' => $record->variant_id,
-                                    'quantity' => $record->quantity,
-                                ]);
+                                CartItem::create(self::buildCartItemPayload($record));
 
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.moved_to_cart_successfully'))
@@ -546,12 +541,7 @@ final class WishlistItemResource extends Resource
                             try {
                                 $moved = 0;
                                 foreach ($records as $record) {
-                                    CartItem::create([
-                                        'user_id' => $record->wishlist->user_id,
-                                        'product_id' => $record->product_id,
-                                        'variant_id' => $record->variant_id,
-                                        'quantity' => $record->quantity,
-                                    ]);
+                                    CartItem::create(self::buildCartItemPayload($record));
                                     $moved++;
                                 }
 
@@ -598,6 +588,72 @@ final class WishlistItemResource extends Resource
     {
         return [
             //
+        ];
+    }
+
+    /**
+     * Build the payload for creating a cart item from a wishlist record.
+     */
+    private static function buildCartItemPayload(WishlistItem $record): array
+    {
+        $record->loadMissing([
+            'wishlist',
+            'product',
+            'variant.attributes.attribute',
+        ]);
+
+        $product = $record->product;
+
+        if ($product === null) {
+            throw new RuntimeException('Wishlist item is missing an associated product.');
+        }
+
+        $variant = $record->variant;
+        $quantity = max(1, (int) $record->quantity);
+        $unitPrice = (float) ($variant?->price ?? $product->sale_price ?? $product->price ?? 0.0);
+        $totalPrice = round($unitPrice * $quantity, 2);
+
+        $variantAttributes = [];
+
+        if ($variant !== null) {
+            $attributeValues = $variant->attributes()->with('attribute')->get();
+
+            if ($attributeValues->isNotEmpty()) {
+                $variantAttributes = $attributeValues
+                    ->mapWithKeys(fn ($value): array => [
+                        $value->attribute->name => $value->value,
+                    ])
+                    ->toArray();
+            }
+        }
+
+        $snapshotName = $variant?->name ?? $product->name;
+
+        if (! empty($variantAttributes)) {
+            $snapshotName .= ' ('.collect($variantAttributes)
+                ->map(fn ($value, $key) => sprintf('%s: %s', $key, $value))
+                ->implode(', ').')';
+        }
+
+        $productSnapshot = array_filter([
+            'name' => $snapshotName,
+            'sku' => $variant?->sku ?? $product->sku,
+            'price' => $unitPrice,
+            'variant_id' => $variant?->getKey(),
+            'variant_attributes' => ! empty($variantAttributes) ? $variantAttributes : null,
+        ], static fn ($value) => $value !== null);
+
+        return [
+            'user_id' => $record->wishlist->user_id,
+            'product_id' => $product->getKey(),
+            'variant_id' => $variant?->getKey(),
+            'product_variant_id' => $variant?->getKey(),
+            'quantity' => $quantity,
+            'minimum_quantity' => $product->getMinimumQuantity(),
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
+            'price' => $unitPrice,
+            'product_snapshot' => $productSnapshot,
         ];
     }
 
