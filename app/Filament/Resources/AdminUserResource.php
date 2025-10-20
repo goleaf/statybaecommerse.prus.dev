@@ -202,7 +202,7 @@ final class AdminUserResource extends Resource
                     ->action(function (AdminUser $record): void {
                         $record->update(['email_verified_at' => now()]);
                         FilamentNotification::make()
-                            ->title(__('admin.admin_users.email_verified_successfully'))
+                            ->title(__('admin.admin_users.notifications.email_verified_successfully'))
                             ->success()
                             ->send();
                     }),
@@ -213,7 +213,7 @@ final class AdminUserResource extends Resource
                     ->action(function (AdminUser $record): void {
                         // Send verification email logic here
                         FilamentNotification::make()
-                            ->title(__('admin.admin_users.verification_sent_successfully'))
+                            ->title(__('admin.admin_users.notifications.verification_sent_successfully'))
                             ->success()
                             ->send();
                     }),
@@ -230,7 +230,7 @@ final class AdminUserResource extends Resource
                                 $record->update(['email_verified_at' => now()]);
                             });
                             FilamentNotification::make()
-                                ->title(__('admin.admin_users.emails_verified_successfully'))
+                                ->title(__('admin.admin_users.notifications.emails_verified_successfully'))
                                 ->success()
                                 ->send();
                         }),
@@ -241,7 +241,7 @@ final class AdminUserResource extends Resource
                         ->action(function (Collection $records): void {
                             // Send verification emails logic here
                             FilamentNotification::make()
-                                ->title(__('admin.admin_users.verifications_sent_successfully'))
+                                ->title(__('admin.admin_users.notifications.verifications_sent_successfully'))
                                 ->success()
                                 ->send();
                         }),
