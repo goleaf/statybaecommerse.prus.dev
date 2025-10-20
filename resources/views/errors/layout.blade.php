@@ -16,38 +16,47 @@
         ? $correlationHeaderConfig
         : 'X-Correlation-ID';
 
+    $traceId = $traceId ?? null;
     $correlationId = $correlationId ?? null;
 
-    if (! is_string($correlationId) || $correlationId === '') {
-        if (app()->bound('request_correlation_id')) {
-            $resolvedCorrelation = app()->make('request_correlation_id');
-            $correlationId = is_string($resolvedCorrelation) && $resolvedCorrelation !== ''
-                ? $resolvedCorrelation
-                : $correlationId;
+    if (! is_string($traceId) || $traceId === '') {
+        if (is_string($correlationId) && $correlationId !== '') {
+            $traceId = $correlationId;
         }
     }
 
-    if ((! is_string($correlationId) || $correlationId === '') && function_exists('request')) {
+    if (! is_string($traceId) || $traceId === '') {
+        if (app()->bound('request_correlation_id')) {
+            $resolvedCorrelation = app()->make('request_correlation_id');
+            if (is_string($resolvedCorrelation) && $resolvedCorrelation !== '') {
+                $traceId = $resolvedCorrelation;
+            }
+        }
+    }
+
+    if ((! is_string($traceId) || $traceId === '') && function_exists('request')) {
         $request = request();
 
         if ($request !== null) {
             $attributeCorrelation = $request->attributes->get('correlation_id');
             if (is_string($attributeCorrelation) && $attributeCorrelation !== '') {
-                $correlationId = $attributeCorrelation;
+                $traceId = $attributeCorrelation;
             }
 
-            if (! is_string($correlationId) || $correlationId === '') {
+            if (! is_string($traceId) || $traceId === '') {
                 $headerCorrelation = (string) $request->headers->get($correlationHeader, '');
                 if ($headerCorrelation !== '') {
-                    $correlationId = $headerCorrelation;
+                    $traceId = $headerCorrelation;
                 }
             }
         }
     }
 
-    if (! is_string($correlationId) || $correlationId === '') {
-        $correlationId = null;
+    if (! is_string($traceId) || $traceId === '') {
+        $traceId = null;
     }
+
+    $correlationId = $traceId;
 
     $localizedSupportEmail = __('company_email');
     $fallbackSupportEmail = config('mail.from.address', 'support@example.com');
@@ -57,7 +66,7 @@
 
     $supportEmail = $supportEmail ?? $resolvedSupportEmail;
     $supportTitle = $supportTitle ?? __('Need more help?');
-    $supportDescription = $supportDescription ?? __('If the problem continues, contact our support team and share the reference ID below so we can assist you quickly.');
+    $supportDescription = $supportDescription ?? __('If the problem continues, contact our support team and share the trace ID below so we can assist you quickly.');
     $statusPageUrl = $statusPageUrl ?? (\Illuminate\Support\Facades\Route::has('status.page')
         ? route('status.page', ['locale' => $locale])
         : url('/status'));
@@ -177,11 +186,11 @@
                     <h2 class="text-lg font-semibold text-gray-800 text-center mb-3">{{ $supportTitle }}</h2>
                     <p class="text-sm text-gray-500 max-w-xl mx-auto text-center">{{ $supportDescription }}</p>
 
-                    @if($correlationId !== null)
+                    @if($traceId !== null)
                         <div class="mt-6 flex items-center justify-center">
                             <div class="inline-flex flex-col sm:flex-row sm:items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-5 py-3">
-                                <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Reference ID') }}</span>
-                                <span class="font-mono text-sm text-gray-800">{{ $correlationId }}</span>
+                                <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Trace ID') }}</span>
+                                <span class="font-mono text-sm text-gray-800">{{ $traceId }}</span>
                             </div>
                         </div>
                     @endif
@@ -205,7 +214,7 @@
                         </a>
                     </div>
 
-                    <p class="mt-6 text-xs text-gray-400 text-center">{{ __('Share the reference ID with our support team so we can find your request faster.') }}</p>
+                    <p class="mt-6 text-xs text-gray-400 text-center">{{ __('Share the trace ID with our support team so we can find your request faster.') }}</p>
                 </div>
             </div>
         </div>

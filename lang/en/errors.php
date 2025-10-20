@@ -25,4 +25,22 @@ return [
 
     // @translators: Shown when there is not enough stock to fulfill a request for a SKU.
     ErrorCodes::INVENTORY_INSUFFICIENT => 'Inventory for SKU :sku is unavailable.',
+
+    'messages' => [
+        // @translators: Generic API-friendly message for unexpected server failures.
+        'server_error' => 'Something went wrong. Please try again later.',
+    ],
+
+    'pages' => [
+        'unexpected' => [
+            // @translators: Title shown on the global error page when an unexpected failure occurs.
+            'title' => 'We ran into a problem',
+            // @translators: Description shown on the global error page when an unexpected failure occurs.
+            'description' => 'Our team has been notified and is already looking into the issue. If it keeps happening, share the trace ID with support.',
+            // @translators: Label for the primary action button on the unexpected error page.
+            'primary' => 'Return Home',
+            // @translators: Label for the secondary action button on the unexpected error page.
+            'secondary' => 'Contact Support',
+        ],
+    ],
 ];
