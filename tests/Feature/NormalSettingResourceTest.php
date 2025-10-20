@@ -43,6 +43,36 @@ final class NormalSettingResourceTest extends TestCase
         $response->assertSee('Normal Settings');
     }
 
+    public function test_index_handles_non_string_values_without_type_errors(): void
+    {
+        NormalSetting::factory()->create([
+            'key' => 'boolean_setting',
+            'value' => true,
+            'type' => 'boolean',
+        ]);
+
+        NormalSetting::factory()->create([
+            'key' => 'array_setting',
+            'value' => ['foo' => 'bar'],
+            'type' => 'array',
+        ]);
+
+        NormalSetting::factory()->create([
+            'key' => 'json_setting',
+            'value' => ['baz' => ['qux']],
+            'type' => 'json',
+        ]);
+
+        $this->actingAs($this->admin);
+
+        $response = $this->get('/admin/normal-settings');
+
+        $response->assertStatus(200);
+        $response->assertSee('boolean_setting');
+        $response->assertSee('array_setting');
+        $response->assertSee('json_setting');
+    }
+
     public function test_can_create_normal_setting(): void
     {
         $this->actingAs($this->admin);
