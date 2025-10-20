@@ -7,6 +7,7 @@ namespace App\Services\Shared;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\Cache\CacheTagHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -26,6 +27,9 @@ final class ProductService
     /**
      * Handle getFeaturedProducts functionality with proper error handling.
      */
+    /**
+     * @return Collection<int, Product>
+     */
     public function getFeaturedProducts(int $limit = 8): Collection
     {
         $locale = app()->getLocale();
@@ -33,11 +37,14 @@ final class ProductService
 
         return $this->cacheService->rememberDefault("featured_products.{$locale}.{$currency}", function () use ($limit) {
             return Product::query()->with($this->getProductRelations())->where('is_visible', true)->where('is_featured', true)->whereNotNull('published_at')->latest('published_at')->limit($limit)->get();
-        });
+        }, null, CacheTagHelper::products());
     }
 
     /**
      * Handle getNewArrivals functionality with proper error handling.
+     */
+    /**
+     * @return Collection<int, Product>
      */
     public function getNewArrivals(int $limit = 12, int $days = 30): Collection
     {
@@ -46,11 +53,15 @@ final class ProductService
 
         return $this->cacheService->rememberShort("new_arrivals.{$locale}.{$currency}", function () use ($limit, $days) {
             return Product::query()->with($this->getProductRelations())->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '>=', now()->subDays($days))->latest('published_at')->limit($limit)->get();
-        });
+        }, null, CacheTagHelper::products());
     }
 
     /**
      * Handle searchProducts functionality with proper error handling.
+     */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Product>
      */
     public function searchProducts(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
@@ -63,6 +74,10 @@ final class ProductService
 
     /**
      * Handle getProductsByCategory functionality with proper error handling.
+     */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Product>
      */
     public function getProductsByCategory(int $categoryId, array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
@@ -78,6 +93,10 @@ final class ProductService
     /**
      * Handle getProductsByBrand functionality with proper error handling.
      */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Product>
+     */
     public function getProductsByBrand(int $brandId, array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
         $query = Product::query()->with($this->getProductRelations())->where('brand_id', $brandId)->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
@@ -89,6 +108,10 @@ final class ProductService
 
     /**
      * Handle getProductsByCollection functionality with proper error handling.
+     */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Product>
      */
     public function getProductsByCollection(int $collectionId, array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
@@ -104,6 +127,9 @@ final class ProductService
     /**
      * Handle getRelatedProducts functionality with proper error handling.
      */
+    /**
+     * @return Collection<int, Product>
+     */
     public function getRelatedProducts(Product $product, int $limit = 4): Collection
     {
         $locale = app()->getLocale();
@@ -116,11 +142,14 @@ final class ProductService
                     $q->whereIn('categories.id', $product->categories->pluck('id'));
                 })->orWhere('brand_id', $product->brand_id);
             })->inRandomOrder()->limit($limit)->get();
-        });
+        }, null, CacheTagHelper::products());
     }
 
     /**
      * Handle getProductRelations functionality with proper error handling.
+     */
+    /**
+     * @return array<int, mixed>
      */
     private function getProductRelations(): array
     {
@@ -140,6 +169,11 @@ final class ProductService
 
     /**
      * Handle applyFilters functionality with proper error handling.
+     */
+    /**
+     * @param  Builder<Product>  $query
+     * @param  array<string, mixed>  $filters
+     * @return Builder<Product>
      */
     private function applyFilters(Builder $query, array $filters): Builder
     {
@@ -180,6 +214,10 @@ final class ProductService
 
     /**
      * Handle applySorting functionality with proper error handling.
+     */
+    /**
+     * @param  Builder<Product>  $query
+     * @return Builder<Product>
      */
     private function applySorting(Builder $query, string $sortBy, string $direction = 'desc'): Builder
     {

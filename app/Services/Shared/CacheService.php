@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
+use App\Services\CacheInvalidationService;
+use App\Support\Cache\CacheTagHelper;
+use Closure;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -22,39 +26,70 @@ final class CacheService
     private const LONG_TTL = 86400;
 
     // 24 hours
+
+    private readonly bool $supportsTags;
+
+    public function __construct()
+    {
+        $this->supportsTags = Cache::getStore() instanceof TaggableStore;
+    }
+
     /**
      * Handle rememberShort functionality with proper error handling.
+     *
+     * @template TCacheValue
+     *
+     * @param  Closure(): TCacheValue  $callback
+     * @param  array<int, string>  $tags
+     * @return TCacheValue
      */
-    public function rememberShort(string $key, callable $callback, ?int $ttl = null): mixed
+    public function rememberShort(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
     {
-        return Cache::remember($key, $ttl ?? self::SHORT_TTL, $callback);
+        return $this->rememberWithTags($tags, $key, $ttl ?? self::SHORT_TTL, $callback);
     }
 
     /**
      * Handle rememberDefault functionality with proper error handling.
+     *
+     * @template TCacheValue
+     *
+     * @param  Closure(): TCacheValue  $callback
+     * @param  array<int, string>  $tags
+     * @return TCacheValue
      */
-    public function rememberDefault(string $key, callable $callback, ?int $ttl = null): mixed
+    public function rememberDefault(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
     {
-        return Cache::remember($key, $ttl ?? self::DEFAULT_TTL, $callback);
+        return $this->rememberWithTags($tags, $key, $ttl ?? self::DEFAULT_TTL, $callback);
     }
 
     /**
      * Handle rememberLong functionality with proper error handling.
+     *
+     * @template TCacheValue
+     *
+     * @param  Closure(): TCacheValue  $callback
+     * @param  array<int, string>  $tags
+     * @return TCacheValue
      */
-    public function rememberLong(string $key, callable $callback, ?int $ttl = null): mixed
+    public function rememberLong(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
     {
-        return Cache::remember($key, $ttl ?? self::LONG_TTL, $callback);
+        return $this->rememberWithTags($tags, $key, $ttl ?? self::LONG_TTL, $callback);
     }
 
     /**
-     * Handle forgetPattern functionality with proper error handling.
+     * @template TCacheValue
+     *
+     * @param  array<int, string>  $tags
+     * @param  Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
-    public function forgetPattern(string $pattern): void
+    private function rememberWithTags(array $tags, string $key, int|\DateInterval $ttl, Closure $callback): mixed
     {
-        $keys = Cache::getRedis()->keys($pattern);
-        if (! empty($keys)) {
-            Cache::deleteMultiple($keys);
+        if ($tags !== [] && $this->supportsTags) {
+            return Cache::tags($tags)->remember($key, $ttl, $callback);
         }
+
+        return Cache::remember($key, $ttl, $callback);
     }
 
     /**
@@ -107,13 +142,7 @@ final class CacheService
      */
     public function invalidateProductCache(int $productId): void
     {
-        $this->forgetPattern("product.{$productId}.*");
-        $this->forgetPattern('home.*');
-        // Home page caches products
-        $this->forgetPattern('category.*');
-        // Categories cache product counts
-        $this->forgetPattern('brand.*');
-        // Brands cache product counts
+        app(CacheInvalidationService::class)->flushProducts();
     }
 
     /**
@@ -121,8 +150,7 @@ final class CacheService
      */
     public function invalidateCategoryCache(int $categoryId): void
     {
-        $this->forgetPattern("category.{$categoryId}.*");
-        $this->forgetPattern('home.top_categories.*');
+        app(CacheInvalidationService::class)->flushCategories();
     }
 
     /**
@@ -130,8 +158,7 @@ final class CacheService
      */
     public function invalidateBrandCache(int $brandId): void
     {
-        $this->forgetPattern("brand.{$brandId}.*");
-        $this->forgetPattern('home.top_brands.*');
+        app(CacheInvalidationService::class)->flushBrands();
     }
 
     /**
@@ -139,8 +166,7 @@ final class CacheService
      */
     public function invalidateCollectionCache(int $collectionId): void
     {
-        $this->forgetPattern("collection.{$collectionId}.*");
-        $this->forgetPattern('home.featured_collections.*');
+        app(CacheInvalidationService::class)->flushCollections();
     }
 
     /**
@@ -154,9 +180,19 @@ final class CacheService
             foreach ($currencies as $currency) {
                 app()->setLocale($locale);
                 // Warm up featured products
-                $this->rememberDefault($this->generateHomeKey('featured_products', $locale, $currency), fn () => \App\Models\Product::query()->with(['translations', 'brand', 'media', 'prices'])->where('is_visible', true)->where('is_featured', true)->limit(8)->get());
+                $this->rememberDefault(
+                    $this->generateHomeKey('featured_products', $locale, $currency),
+                    fn () => \App\Models\Product::query()->with(['translations', 'brand', 'media', 'prices'])->where('is_visible', true)->where('is_featured', true)->limit(8)->get(),
+                    null,
+                    CacheTagHelper::products(),
+                );
                 // Warm up top categories
-                $this->rememberLong($this->generateHomeKey('top_categories', $locale), fn () => \App\Models\Category::query()->with(['translations', 'media'])->where('is_visible', true)->whereNull('parent_id')->withCount('products')->orderBy('products_count', 'desc')->limit(8)->get());
+                $this->rememberLong(
+                    $this->generateHomeKey('top_categories', $locale),
+                    fn () => \App\Models\Category::query()->with(['translations', 'media'])->where('is_visible', true)->whereNull('parent_id')->withCount('products')->orderBy('products_count', 'desc')->limit(8)->get(),
+                    null,
+                    CacheTagHelper::categories(),
+                );
             }
         }
     }
