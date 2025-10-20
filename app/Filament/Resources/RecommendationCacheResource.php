@@ -19,8 +19,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -63,9 +63,9 @@ final class RecommendationCacheResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.recommendation_caches.basic_information'))
+                Section::make(__('admin.recommendation_caches.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('cache_key')
                                     ->label(__('admin.recommendation_caches.cache_key'))
