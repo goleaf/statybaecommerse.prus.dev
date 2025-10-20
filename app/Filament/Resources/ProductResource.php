@@ -13,6 +13,10 @@ use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManage
 use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Models\Product;
+use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\ExportFormat;
+use App\Services\Export\ExportService;
 use BackedEnum;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -21,6 +25,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
@@ -30,6 +35,7 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -49,14 +55,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 /**
  * ProductResource
  *
  * Filament v4 resource for Product management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
-final class ProductResource extends Resource
+final class ProductResource extends Resource implements DefinesExportColumns
 {
     protected static ?string $model = Product::class;
 
@@ -568,10 +572,68 @@ final class ProductResource extends Resource
                                 ->success()
                                 ->send();
                         }),
+                    BulkAction::make('export_products')
+                        ->label(__('exports.actions.export_products'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('gray')
+                        ->form([
+                            Select::make('format')
+                                ->label(__('exports.form.format'))
+                                ->options(collect(ExportFormat::cases())->mapWithKeys(fn (ExportFormat $format) => [$format->value => $format->label()])->all())
+                                ->default(ExportFormat::Csv->value)
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('exports.form.columns'))
+                                ->options(self::exportColumnOptions())
+                                ->default(array_keys(self::exportColumnOptions()))
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $exportService */
+                            $exportService = app(ExportService::class);
+
+                            $exportService->queueResourceExport(
+                                resourceClass: self::class,
+                                records: $records,
+                                columnKeys: $data['columns'],
+                                format: ExportFormat::from($data['format']),
+                                requestedBy: auth()->user(),
+                            );
+
+                            Notification::make()
+                                ->title(__('exports.notifications.queued'))
+                                ->body(__('exports.notifications.queued_body'))
+                                ->success()
+                                ->send();
+                        }),
                     DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * @return array<string, ExportColumn>
+     */
+    public static function availableExportColumns(): array
+    {
+        return [
+            'name' => new ExportColumn('name', __('products.fields.name'), fn (Product $product): string => (string) $product->name),
+            'sku' => new ExportColumn('sku', __('products.fields.sku'), fn (Product $product): string => (string) $product->sku),
+            'price' => new ExportColumn('price', __('products.fields.price'), fn (Product $product): string => (string) $product->price),
+            'status' => new ExportColumn('status', __('products.fields.status'), fn (Product $product): string => (string) $product->status),
+            'is_visible' => new ExportColumn('is_visible', __('products.fields.is_visible'), fn (Product $product): string => $product->is_visible ? __('exports.boolean.yes') : __('exports.boolean.no')),
+            'created_at' => new ExportColumn('created_at', __('products.fields.created_at'), fn (Product $product): string => optional($product->created_at)->toDateTimeString() ?? ''),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function exportColumnOptions(): array
+    {
+        return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
     }
 
     public static function getRelations(): array

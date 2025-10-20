@@ -19,8 +19,10 @@ class FeatureFlagResource extends Resource
 {
     protected static ?string $model = FeatureFlag::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationIcon(): string|\BackedEnum|null
+    {
+        return Heroicon::OutlinedRectangleStack;
+    }
 
     public static function form(Form $form): Form
     {

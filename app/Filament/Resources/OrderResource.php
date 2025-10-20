@@ -7,6 +7,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\ExportFormat;
+use App\Services\Export\ExportService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -14,6 +18,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
@@ -21,6 +26,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -35,8 +41,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 /**
  * OrderResource
  *
@@ -49,7 +53,7 @@ use Filament\Forms\Form;
  * - Export capabilities
  * - Audit trail integration
  */
-final class OrderResource extends Resource
+final class OrderResource extends Resource implements DefinesExportColumns
 {
     protected static ?string $model = Order::class;
 
@@ -569,22 +573,69 @@ final class OrderResource extends Resource
                         })
                         ->requiresConfirmation(),
                     BulkAction::make('export_orders')
-                        ->label(__('orders.export'))
+                        ->label(__('exports.actions.export_orders'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('gray')
-                        ->action(function (Collection $records): void {
+                        ->form([
+                            Select::make('format')
+                                ->label(__('exports.form.format'))
+                                ->options(collect(ExportFormat::cases())->mapWithKeys(fn (ExportFormat $format) => [$format->value => $format->label()])->all())
+                                ->default(ExportFormat::Csv->value)
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('exports.form.columns'))
+                                ->options(self::exportColumnOptions())
+                                ->default(array_keys(self::exportColumnOptions()))
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $exportService */
+                            $exportService = app(ExportService::class);
+
+                            $exportService->queueResourceExport(
+                                resourceClass: self::class,
+                                records: $records,
+                                columnKeys: $data['columns'],
+                                format: ExportFormat::from($data['format']),
+                                requestedBy: auth()->user(),
+                            );
+
                             Notification::make()
-                                ->title(__('orders.export_success'))
+                                ->title(__('exports.notifications.queued'))
+                                ->body(__('exports.notifications.queued_body'))
                                 ->success()
                                 ->send();
-                        })
-                        ->requiresConfirmation(),
+                        }),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
             ->poll('30s')
             ->striped()
             ->paginated([10, 25, 50, 100]);
+    }
+
+    /**
+     * @return array<string, ExportColumn>
+     */
+    public static function availableExportColumns(): array
+    {
+        return [
+            'number' => new ExportColumn('number', __('orders.number'), fn (Order $order): string => (string) $order->number),
+            'status' => new ExportColumn('status', __('orders.status'), fn (Order $order): string => (string) $order->status),
+            'payment_status' => new ExportColumn('payment_status', __('orders.payment_status'), fn (Order $order): string => (string) $order->payment_status),
+            'total' => new ExportColumn('total', __('orders.total'), fn (Order $order): string => (string) $order->total),
+            'customer' => new ExportColumn('customer', __('orders.customer'), fn (Order $order): string => (string) ($order->user?->name ?? '')),
+            'created_at' => new ExportColumn('created_at', __('orders.created_at'), fn (Order $order): string => optional($order->created_at)->toDateTimeString() ?? ''),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function exportColumnOptions(): array
+    {
+        return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
     }
 
     /**

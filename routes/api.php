@@ -18,3 +18,7 @@ Route::prefix('api/v1')
 
         require __DIR__.'/api/notifications.php';
     });
+
+Route::get('api/v1/exports/{export}/download', \App\Http\Controllers\Api\ExportDownloadController::class)
+    ->middleware('signed')
+    ->name('api.exports.download');

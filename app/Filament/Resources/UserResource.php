@@ -1,15 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use BackedEnum;
 use App\Models\User;
+use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\ExportFormat;
+use App\Services\Export\ExportService;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -17,7 +23,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -35,7 +40,7 @@ use UnitEnum;
  *
  * Filament v4 resource for User management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
-final class UserResource extends Resource
+final class UserResource extends Resource implements DefinesExportColumns
 {
     protected static ?string $model = User::class;
 
@@ -96,10 +101,10 @@ final class UserResource extends Resource
                         TextInput::make('password')
                             ->label(__('users.fields.password'))
                             ->password()
-                            ->required(fn(string $context): bool => $context === 'create')
+                            ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8)
-                            ->dehydrated(fn($state) => filled($state))
-                            ->dehydrateStateUsing(fn($state) => bcrypt($state)),
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
                         Select::make('locale')
                             ->label(__('users.fields.locale'))
                             ->options([
@@ -152,7 +157,7 @@ final class UserResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('users.fields.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'lt' => 'success',
                         'en' => 'info',
                         default => 'gray',
@@ -206,10 +211,68 @@ final class UserResource extends Resource
                                 ->success()
                                 ->send();
                         }),
+                    BulkAction::make('export_users')
+                        ->label(__('exports.actions.export_users'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('gray')
+                        ->form([
+                            Select::make('format')
+                                ->label(__('exports.form.format'))
+                                ->options(collect(ExportFormat::cases())->mapWithKeys(fn (ExportFormat $format) => [$format->value => $format->label()])->all())
+                                ->default(ExportFormat::Csv->value)
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('exports.form.columns'))
+                                ->options(self::exportColumnOptions())
+                                ->default(array_keys(self::exportColumnOptions()))
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $exportService */
+                            $exportService = app(ExportService::class);
+
+                            $exportService->queueResourceExport(
+                                resourceClass: self::class,
+                                records: $records,
+                                columnKeys: $data['columns'],
+                                format: ExportFormat::from($data['format']),
+                                requestedBy: auth()->user(),
+                            );
+
+                            Notification::make()
+                                ->title(__('exports.notifications.queued'))
+                                ->body(__('exports.notifications.queued_body'))
+                                ->success()
+                                ->send();
+                        }),
                     DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * @return array<string, ExportColumn>
+     */
+    public static function availableExportColumns(): array
+    {
+        return [
+            'name' => new ExportColumn('name', __('users.fields.name'), fn (User $user): string => (string) $user->name),
+            'email' => new ExportColumn('email', __('users.fields.email'), fn (User $user): string => (string) $user->email),
+            'is_active' => new ExportColumn('is_active', __('users.fields.is_active'), fn (User $user): string => $user->is_active ? __('exports.boolean.yes') : __('exports.boolean.no')),
+            'is_verified' => new ExportColumn('is_verified', __('users.fields.is_verified'), fn (User $user): string => $user->is_verified ? __('exports.boolean.yes') : __('exports.boolean.no')),
+            'roles' => new ExportColumn('roles', __('users.fields.roles'), fn (User $user): string => (string) $user->roles_label),
+            'created_at' => new ExportColumn('created_at', __('users.fields.created_at'), fn (User $user): string => optional($user->created_at)->toDateTimeString() ?? ''),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function exportColumnOptions(): array
+    {
+        return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
     }
 
     /**
