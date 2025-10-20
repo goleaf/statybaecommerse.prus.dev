@@ -76,6 +76,23 @@ return [
         'highlights' => [
             'title' => 'Kasdieninis įkvėpimas',
             'subtitle' => 'Sekite tendencijas, naujienas ir geriausius pasiūlymus, atnaujinamus kiekvieną dieną.',
+            'blocks' => [
+                'latest' => [
+                    'title' => 'Naujausios prekės',
+                    'subtitle' => 'Šviežiai į sandėlį atvykusios prekės, atnaujinamos kasdien.',
+                    'link' => 'Peržiūrėti naujienas',
+                ],
+                'trending' => [
+                    'title' => 'Populiaru dabar',
+                    'subtitle' => 'Geriausiai perkami ir dažniausiai peržiūrimi pasiūlymai.',
+                    'link' => 'Atrasti populiariausius',
+                ],
+                'sale' => [
+                    'title' => 'Laikinos akcijos',
+                    'subtitle' => 'Šiandien galiojančios nuolaidos ir rinkinių pasiūlymai.',
+                    'link' => 'Peržiūrėti akcijas',
+                ],
+            ],
         ],
         'discovery' => [
             'title' => 'Kodėl verta rinktis mus?',
@@ -165,5 +182,11 @@ return [
         'badge' => 'Kolekcija',
         'open' => 'Atidaryti kolekciją',
         'products_count' => '{0}Nėra prekių|{1}1 prekė|[2,*]:count prekės',
+    ],
+    'messages' => [
+        'no_featured_products' => 'Išskirtiniai produktai greitai bus papildyti.',
+        'no_latest_products' => 'Naujausios prekės pasirodys vos tik bus paskelbtos.',
+        'no_trending_products' => 'Populiariausi pasiūlymai netrukus bus atnaujinti.',
+        'no_sale_products' => 'Akcijos bus rodomos, kai tik jos prasidės.',
     ],
 ];
