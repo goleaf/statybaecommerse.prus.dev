@@ -20,35 +20,27 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - SQLite (default local database) or MySQL/PostgreSQL if you prefer
 - Make (optional but recommended for the helper targets below)
 
-## Quick start (Make helpers + dev stack)
-1. **Clone & bootstrap**
+## Quick start (3 commands)
+1. **Bootstrap dependencies and environment**
    ```bash
-   git clone <repo-url>
-   cd statybaecommerse.prus.dev
    make setup
    ```
-   This installs PHP and Node dependencies, prepares a fresh `.env`, provisions a SQLite database, and links storage symlinks.
-2. **Run migrations**
+   Installs Composer and npm dependencies, copies `.env`, prepares the SQLite database, and links storage.
+2. **Reset the database and seed demo data**
    ```bash
-   make migrate
+   composer seed:fresh
    ```
-3. **Seed minimal data (creates admin user and system settings)**
+   Runs `php artisan migrate:fresh --seed` so you get the admin user (`admin@statybaecommerse.prus.dev` / `admin123`) and sample content in one shot.
+3. **Serve the application**
    ```bash
-   make seed
+   composer serve
    ```
-   Admin credentials: `admin@statybaecommerse.prus.dev` / `admin123`.
-4. **Start the app**
-   - Lightweight PHP server:
-     ```bash
-     make serve
-     ```
-   - Full experience (PHP server, queue listener, pail, Vite) via the existing Composer script:
-     ```bash
-     make dev
-     ```
-5. **Visit the site**
-   - Storefront: http://127.0.0.1:8000/
-   - Admin panel: http://127.0.0.1:8000/admin (log in with the seeded admin user)
+   Visit the storefront at http://127.0.0.1:8000/ or the admin panel at http://127.0.0.1:8000/admin.
+
+Need background workers, logs, and Vite in one go? Use the existing dev loop:
+```bash
+composer run dev
+```
 
 ## Architecture cheatsheet
 
@@ -76,6 +68,15 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 | PHP formatting | `make format` |
 | Build production assets | `make build` |
 | Generate coverage locally | `php artisan test --coverage` |
+
+## Composer script quick reference
+| Script | What it does |
+| --- | --- |
+| `composer ci` | Runs PHPStan (`phpstan analyse`) then executes the CI-friendly PHPUnit suite (`phpunit --log-junit ...`). |
+| `composer analyse` | Alias of `composer analyze` for PHPStan static analysis. |
+| `composer seed:fresh` | Proxies `php artisan migrate:fresh --seed --ansi` to rebuild the database with demo data. |
+| `composer build` | Calls `php artisan optimize --ansi` before `npm run build` to prep caches and assets. |
+| `composer serve` | Uses `php artisan serve --ansi` for a local HTTP server. |
 
 ## Configuration notes
 - Environment defaults live in `.env.example`; copy it to `.env` to tweak database/queue/mail settings.
