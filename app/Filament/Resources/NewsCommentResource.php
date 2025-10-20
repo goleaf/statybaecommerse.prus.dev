@@ -64,13 +64,13 @@ final class NewsCommentResource extends Resource
                         ->schema([
                             Select::make('news_id')
                                 ->label(__('admin.news_comments.news'))
-                                ->options(News::pluck('title', 'id'))
+                                ->options(fn () => News::query()->pluck('title', 'id')->toArray())
                                 ->required()
                                 ->searchable()
                                 ->preload(),
                             Select::make('parent_id')
                                 ->label(__('admin.news_comments.parent_comment'))
-                                ->options(NewsComment::pluck('author_name', 'id'))
+                                ->options(fn () => NewsComment::query()->pluck('author_name', 'id')->toArray())
                                 ->searchable()
                                 ->preload(),
                         ]),
@@ -157,7 +157,7 @@ final class NewsCommentResource extends Resource
             ->filters([
                 SelectFilter::make('news_id')
                     ->label(__('admin.news_comments.news'))
-                    ->options(News::pluck('title', 'id'))
+                    ->options(fn () => News::query()->pluck('title', 'id')->toArray())
                     ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_approved')
@@ -168,7 +168,7 @@ final class NewsCommentResource extends Resource
                     ->boolean(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.news_comments.parent_comment'))
-                    ->options(NewsComment::pluck('author_name', 'id'))
+                    ->options(fn () => NewsComment::query()->pluck('author_name', 'id')->toArray())
                     ->searchable()
                     ->preload(),
             ])
