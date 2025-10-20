@@ -6,12 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserWishlistResource\Pages;
 use App\Models\UserWishlist;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -19,6 +14,12 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -36,7 +37,7 @@ final class UserWishlistResource extends Resource
 {
     protected static ?string $model = UserWishlist::class;
 
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-heart';
     }
@@ -105,7 +106,11 @@ final class UserWishlistResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return mb_strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(),
                 IconColumn::make('is_public')
@@ -197,10 +202,10 @@ final class UserWishlistResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserWishlists::route('/'),
+            'index'  => Pages\ListUserWishlists::route('/'),
             'create' => Pages\CreateUserWishlist::route('/create'),
-            'view' => Pages\ViewUserWishlist::route('/{record}'),
-            'edit' => Pages\EditUserWishlist::route('/{record}/edit'),
+            'view'   => Pages\ViewUserWishlist::route('/{record}'),
+            'edit'   => Pages\EditUserWishlist::route('/{record}/edit'),
         ];
     }
 }
