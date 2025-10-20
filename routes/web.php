@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\ApiDocsController;
+use App\Http\Controllers\LocaleController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
@@ -367,33 +368,10 @@ use Illuminate\Http\Request;
 Route::get('/health', fn () => response()->json(['ok' => true]))->name('health');
 
 // Language switching
-Route::get('/lang/{locale}', function (string $locale) {
-    $supported = config('app.supported_locales', 'en');
-    $supportedLocales = is_array($supported) ? $supported : explode(',', $supported);
-    $supportedLocales = array_map('trim', $supportedLocales);
-
-    if (in_array($locale, $supportedLocales)) {
-        // Set runtime and persist
-        app()->setLocale($locale);
-        session(['locale' => $locale, 'app.locale' => $locale]);
-
-        // Set cookie for persistence
-        cookie()->queue(cookie('app_locale', $locale, 60 * 24 * 30));
-
-        // Update user preference if authenticated
-        if (auth()->check()) {
-            auth()->user()->update(['preferred_locale' => $locale]);
-        }
-
-        // Optional currency mapping
-        $mapping = (array) config('app.locale_mapping', []);
-        if (isset($mapping[$locale]['currency']) && is_string($mapping[$locale]['currency'])) {
-            session(['forced_currency' => $mapping[$locale]['currency']]);
-        }
-    }
-
-    return redirect()->back();
-})->name('language.switch');
+Route::post('/locale', LocaleController::class)->name('locale.switch');
+Route::get('/lang/{locale}', LocaleController::class)
+    ->where(['locale' => '[A-Za-z\-_]+'])
+    ->name('language.switch');
 
 // Root -> redirect to first supported locale home
 Route::get('/', function () {
