@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Number;
+use Throwable;
 
 /**
  * CreateOrder
@@ -33,27 +34,27 @@ class CreateOrder
         return DB::transaction(function () use ($checkout, $sessionId, $customer) {
             /** @var OrderAddress $shippingAddress */
             $shippingAddress = OrderAddress::query()->create([
-                'customer_id' => data_get($checkout, 'shipping_address.user_id'),
-                'last_name' => data_get($checkout, 'shipping_address.last_name'),
-                'first_name' => data_get($checkout, 'shipping_address.first_name'),
-                'street_address' => data_get($checkout, 'shipping_address.street_address'),
+                'customer_id'         => data_get($checkout, 'shipping_address.user_id'),
+                'last_name'           => data_get($checkout, 'shipping_address.last_name'),
+                'first_name'          => data_get($checkout, 'shipping_address.first_name'),
+                'street_address'      => data_get($checkout, 'shipping_address.street_address'),
                 'street_address_plus' => data_get($checkout, 'shipping_address.street_address_plus'),
-                'city' => data_get($checkout, 'shipping_address.city'),
-                'postal_code' => data_get($checkout, 'shipping_address.postal_code'),
-                'phone' => data_get($checkout, 'shipping_address.phone_number'),
+                'city'                => data_get($checkout, 'shipping_address.city'),
+                'postal_code'         => data_get($checkout, 'shipping_address.postal_code'),
+                'phone'               => data_get($checkout, 'shipping_address.phone_number'),
                 // @phpstan-ignore-next-line
                 'country_name' => Country::query()->find(data_get($checkout, 'shipping_address.country_id'))->name,
             ]);
             /** @var OrderAddress $billingAddress */
             $billingAddress = ! data_get($checkout, 'same_as_shipping') ? OrderAddress::query()->create([
-                'customer_id' => data_get($checkout, 'billing_address.user_id'),
-                'last_name' => data_get($checkout, 'billing_address.last_name'),
-                'first_name' => data_get($checkout, 'billing_address.first_name'),
-                'street_address' => data_get($checkout, 'billing_address.street_address'),
+                'customer_id'         => data_get($checkout, 'billing_address.user_id'),
+                'last_name'           => data_get($checkout, 'billing_address.last_name'),
+                'first_name'          => data_get($checkout, 'billing_address.first_name'),
+                'street_address'      => data_get($checkout, 'billing_address.street_address'),
                 'street_address_plus' => data_get($checkout, 'billing_address.street_address_plus'),
-                'city' => data_get($checkout, 'billing_address.city'),
-                'postal_code' => data_get($checkout, 'billing_address.postal_code'),
-                'phone' => data_get($checkout, 'billing_address.phone_number'),
+                'city'                => data_get($checkout, 'billing_address.city'),
+                'postal_code'         => data_get($checkout, 'billing_address.postal_code'),
+                'phone'               => data_get($checkout, 'billing_address.phone_number'),
                 // @phpstan-ignore-next-line
                 'country_name' => Country::query()->find(data_get($checkout, 'billing_address.country_id'))->name,
             ]) : $shippingAddress;
@@ -82,7 +83,6 @@ class CreateOrder
             /** @var Order $order */
             $order = Order::query()->create(['number' => generate_number(), 'customer_id' => $customer->id, 'currency_code' => current_currency(), 'shipping_address_id' => $shippingAddress->id, 'billing_address_id' => $billingAddress->id, 'shipping_option_id' => data_get($checkout, 'shipping_option')[0]['id'], 'payment_method_id' => data_get($checkout, 'payment')[0]['id'], 'payment_method' => (string) data_get($checkout, 'payment')[0]['name'], 'subtotal_amount' => round($subtotal, 2), 'discount_total_amount' => round($discountTotal, 2), 'tax_total_amount' => round($taxTotal, 2), 'shipping_total_amount' => round($shippingTotal, 2), 'grand_total_amount' => $grandTotal]);
             // Items
-            // @phpstan-ignore-next-line
             foreach (CartFacade::session($sessionId)->getContent() as $item) {
                 OrderItem::query()->create(['order_id' => $order->id, 'quantity' => $item->quantity, 'unit_price_amount' => $item->price, 'name' => $item->name, 'sku' => $item->associatedModel->sku, 'product_id' => $item->associatedModel->id, 'product_type' => $item->associatedModel->getMorphClass()]);
             }
@@ -117,7 +117,7 @@ class CreateOrder
                 $existing[] = (array) ($payment['transaction'] ?? []);
                 $order->transactions = $existing;
                 $order->save();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // ignore payment errors in stub
             }
             // Clear cart
@@ -133,7 +133,7 @@ class CreateOrder
                     $mailable->locale($customer->preferred_locale);
                 }
                 Mail::to($customer->email)->queue($mailable);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // swallow mail errors to not block checkout
             }
 
