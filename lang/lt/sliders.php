@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'title' => 'Skaidrių valdymas',
+    'navigation_label' => 'Skaidrių valdymas',
     'plural' => 'Skaidrės',
     'single' => 'Skaidrė',
 
