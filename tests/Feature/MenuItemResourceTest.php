@@ -42,6 +42,23 @@ class MenuItemResourceTest extends TestCase
             ->assertSee('/');
     }
 
+    public function test_index_page_loads_when_menu_item_has_null_url(): void
+    {
+        $menu = Menu::factory()->create(['name' => 'Secondary Menu']);
+
+        MenuItem::factory()->create([
+            'menu_id' => $menu->id,
+            'label' => 'Contact',
+            'url' => null,
+        ]);
+
+        $this
+            ->get('/admin/menu-items')
+            ->assertOk()
+            ->assertSee('Secondary Menu')
+            ->assertSee('Contact');
+    }
+
     public function test_can_create_menu_item(): void
     {
         $menu = Menu::factory()->create();
