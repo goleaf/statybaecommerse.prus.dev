@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -49,28 +50,28 @@ class LithuanianBuilderShopSeeder extends Seeder
 
     private function createRolesAndPermissions(): void
     {
-        // Create permissions
-        $permissions = [
-            'view_admin_panel',
-            'manage_products',
-            'manage_categories',
-            'manage_brands',
-            'manage_orders',
-            'manage_users',
-            'view_reports',
-        ];
+        $roleNames = ['admin', 'manager'];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        foreach ($roleNames as $roleName) {
+            $permissions = AuthorizationMatrix::permissionsForRole($roleName);
+
+            foreach ($permissions as $permission) {
+                Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+            }
+
+            $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
+            $role->syncPermissions($permissions);
         }
 
-        // Create roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $managerRole = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'web']);
+        $additionalPermissions = ['view_reports'];
 
-        // Assign permissions to roles
-        $adminRole->syncPermissions($permissions);
-        $managerRole->syncPermissions(['view_admin_panel', 'manage_products', 'manage_categories', 'manage_orders', 'view_reports']);
+        foreach ($additionalPermissions as $permission) {
+            $permissionModel = Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+
+            foreach ($roleNames as $roleName) {
+                Role::findByName($roleName, 'web')->givePermissionTo($permissionModel);
+            }
+        }
     }
 
     private function createAdminUsers(): void

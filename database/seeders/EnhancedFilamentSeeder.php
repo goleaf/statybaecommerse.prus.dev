@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
+use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -27,10 +28,20 @@ final class EnhancedFilamentSeeder extends Seeder
 
     private function createAdminUser(): void
     {
-        $adminRole = Role::query()->firstOrCreate(['name' => 'admin']);
+        $adminRole = Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
 
-        $permissions = [
-            'view_admin_panel',
+        $permissions = AuthorizationMatrix::permissionsForRole('admin');
+
+        collect($permissions)->each(
+            fn (string $permission) => Permission::query()->firstOrCreate([
+                'name' => $permission,
+                'guard_name' => 'web',
+            ])
+        );
+
+        $adminRole->syncPermissions($permissions);
+
+        $additionalPermissions = [
             'manage_products',
             'manage_orders',
             'manage_users',
@@ -38,9 +49,14 @@ final class EnhancedFilamentSeeder extends Seeder
             'view_analytics',
         ];
 
-        collect($permissions)->each(fn (string $permission) => Permission::query()->firstOrCreate(['name' => $permission]));
+        collect($additionalPermissions)->each(function (string $permission) use ($adminRole): void {
+            $permissionModel = Permission::query()->firstOrCreate([
+                'name' => $permission,
+                'guard_name' => 'web',
+            ]);
 
-        $adminRole->syncPermissions($permissions);
+            $adminRole->givePermissionTo($permissionModel);
+        });
 
         $admin = User::query()->firstOrCreate(
             ['email' => 'admin@statybaecommerse.prus.dev'],

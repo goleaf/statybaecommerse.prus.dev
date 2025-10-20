@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\DocumentService;
 use App\Services\MultiLanguageTabService;
+use Database\Seeders\AdminAuthorizationSeeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -18,15 +19,19 @@ it('complete system integration test', function () {
     $admin = User::factory()->create([
         'name' => 'System Admin',
         'email' => 'admin@system.test',
+        'is_admin' => true,
     ]);
 
-    $permissions = ['view_admin_panel', 'view_any_product', 'create_product', 'view_any_document_template'];
-    foreach ($permissions as $permission) {
+    $this->seed(AdminAuthorizationSeeder::class);
+
+    $extraPermissions = ['view_any_document_template'];
+
+    foreach ($extraPermissions as $permission) {
         Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
     }
 
-    $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-    $adminRole->syncPermissions($permissions);
+    $adminRole = Role::findByName('admin', 'web');
+    $adminRole->givePermissionTo($extraPermissions);
     $admin->assignRole($adminRole);
 
     // Test brand creation

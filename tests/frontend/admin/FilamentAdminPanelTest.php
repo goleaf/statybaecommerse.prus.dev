@@ -3,24 +3,25 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Database\Seeders\AdminAuthorizationSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    $this->seed(AdminAuthorizationSeeder::class);
+});
 
 it('can access admin panel with authenticated user', function () {
     $admin = User::factory()->create([
         'name' => 'Test Admin',
         'email' => 'test@admin.com',
+        'is_admin' => true,
     ]);
 
-    // Create admin role if it doesn't exist
-    $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+    $adminRole = Role::findByName('administrator', 'web');
 
-    // Create necessary permissions
-    $permissions = ['view_admin_panel', 'view_any_product', 'view_any_user', 'view_any_order'];
-    foreach ($permissions as $permission) {
-        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-    }
-
-    $adminRole->syncPermissions($permissions);
     $admin->assignRole($adminRole);
 
     $response = $this->actingAs($admin)->get('/admin');
@@ -39,9 +40,10 @@ it('can access product resource', function () {
     $admin = User::factory()->create([
         'name' => 'Test Admin',
         'email' => 'test@admin.com',
+        'is_admin' => true,
     ]);
 
-    $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+    $adminRole = Role::findByName('admin', 'web');
     $admin->assignRole($adminRole);
 
     $response = $this->actingAs($admin)->get('/admin/products');
@@ -53,9 +55,10 @@ it('can access dashboard', function () {
     $admin = User::factory()->create([
         'name' => 'Test Admin',
         'email' => 'test@admin.com',
+        'is_admin' => true,
     ]);
 
-    $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+    $adminRole = Role::findByName('administrator', 'web');
     $admin->assignRole($adminRole);
 
     $response = $this->actingAs($admin)->get('/admin');
