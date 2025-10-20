@@ -8,21 +8,18 @@ use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 final class ActivityLogResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
-
     protected static ?string $model = ActivityLog::class;
 
     protected static ?int $navigationSort = 9;
@@ -35,6 +32,11 @@ final class ActivityLogResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'description';
 
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return __('navigation.groups.system');
+    }
+
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-document-text';
@@ -42,17 +44,22 @@ final class ActivityLogResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Veiklos žurnalai');
+        return __('activity_logs.plural');
     }
 
     public static function getModelLabel(): string
     {
-        return __('admin.activity_logs.title');
+        return __('activity_logs.single');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('admin.activity_logs.title');
+        return __('activity_logs.plural');
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([]);
     }
 
     public static function table(Table $table): Table
@@ -125,6 +132,30 @@ final class ActivityLogResource extends Resource
                     ->modalSubmitActionLabel(__('Close')),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getRecordTitle(?Model $record): string
+    {
+        if ($record instanceof ActivityLog) {
+            $title = (string) ($record->description ?? '');
+
+            if ($title !== '') {
+                return $title;
+            }
+
+            $key = $record->getKey();
+
+            if ($key !== null) {
+                return __('activity_logs.single').' #'.$key;
+            }
+        }
+
+        return __('activity_logs.single');
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
     }
 
     public static function getPages(): array

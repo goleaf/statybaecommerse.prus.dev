@@ -9,12 +9,31 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\StatsOverviewWidget;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use InvalidArgumentException;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function __construct(?ApplicationContract $app = null)
+    {
+        if (! $app instanceof ApplicationContract) {
+            $resolved = function_exists('app') ? app() : null;
+
+            if ($resolved instanceof ApplicationContract) {
+                $app = $resolved;
+            }
+        }
+
+        if (! $app instanceof ApplicationContract) {
+            throw new InvalidArgumentException('A Laravel application instance is required to construct the admin panel provider.');
+        }
+
+        parent::__construct($app);
+    }
+
     public function panel(Panel $panel): Panel
     {
-        if (app()->environment('testing')) {
+        if ($this->isTestingEnvironment()) {
             return $panel
                 ->default()
                 ->id('admin')
@@ -84,5 +103,24 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 \Illuminate\Auth\Middleware\Authenticate::class,
             ]);
+    }
+
+    private function isTestingEnvironment(): bool
+    {
+        if (! function_exists('app')) {
+            return false;
+        }
+
+        $application = app();
+
+        if (! $application instanceof ApplicationContract) {
+            return false;
+        }
+
+        if (! method_exists($application, 'environment')) {
+            return false;
+        }
+
+        return $application->environment('testing');
     }
 }
