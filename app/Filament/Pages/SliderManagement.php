@@ -6,7 +6,6 @@ namespace App\Filament\Pages;
 
 use App\Models\Slider;
 use BackedEnum;
-use UnitEnum;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -31,7 +30,6 @@ use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class SliderManagement extends Page implements HasActions, HasForms
 {
@@ -47,7 +45,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     public Collection $sliders;
 

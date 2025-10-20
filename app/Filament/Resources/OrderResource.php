@@ -22,17 +22,18 @@ use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -207,11 +208,11 @@ final class OrderResource extends Resource
                                     'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
                                     'paypal' => __('orders.payment_methods.paypal'),
                                     'stripe' => __('orders.payment_methods.stripe'),
-                                    'apple_pay' => __('orders.payment_methods.credit_card'),
-                                    'google_pay' => __('orders.payment_methods.credit_card'),
+                                    'apple_pay' => __('orders.payment_methods.apple_pay'),
+                                    'google_pay' => __('orders.payment_methods.google_pay'),
                                 ]),
                             TextInput::make('payment_reference')
-                                ->label(__('orders.fields.tracking_number')),
+                                ->label(__('orders.fields.payment_reference')),
                         ]),
                 ])
                 ->collapsible(),
@@ -245,7 +246,7 @@ final class OrderResource extends Resource
                         ]),
                     Placeholder::make('total')
                         ->label(__('orders.fields.total'))
-                        ->content(function (\Filament\Schemas\Components\Utilities\Get $get): string {
+                        ->content(function (Get $get): string {
                             $subtotal = (float) $get('subtotal') ?? 0;
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
@@ -257,7 +258,7 @@ final class OrderResource extends Resource
                             return $breakdown->toSummary()['formatted_total'];
                         }),
                     Hidden::make('total')
-                        ->default(function (\Filament\Schemas\Components\Utilities\Get $get): float {
+                        ->default(function (Get $get): float {
                             $subtotal = (float) $get('subtotal') ?? 0;
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
@@ -319,12 +320,12 @@ final class OrderResource extends Resource
                     Grid::make(3)
                         ->schema([
                             Select::make('channel_id')
-                                ->label(__('orders.fields.customer'))
+                                ->label(__('orders.fields.channel'))
                                 ->relationship('channel', 'name')
                                 ->searchable()
                                 ->preload(),
                             Select::make('partner_id')
-                                ->label(__('orders.fields.customer'))
+                                ->label(__('orders.fields.partner'))
                                 ->relationship('partner', 'name')
                                 ->searchable()
                                 ->preload(),
@@ -393,7 +394,7 @@ final class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 TextColumn::make('channel.name')
-                    ->label(__('orders.fields.customer'))
+                    ->label(__('orders.fields.channel'))
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 TextColumn::make('created_at')
