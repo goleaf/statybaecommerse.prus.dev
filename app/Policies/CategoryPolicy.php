@@ -13,16 +13,20 @@ final class CategoryPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        return $user instanceof AdminUser
-            ? AuthorizationMatrix::check('categories', 'viewAny', $user)
-            : (bool) ($user->is_admin ?? false);
+        if (! $user instanceof AdminUser) {
+            return false;
+        }
+
+        return AuthorizationMatrix::check('categories', 'viewAny', $user);
     }
 
     public function view(AdminUser|User $user, Category $category): bool
     {
-        return $user instanceof AdminUser
-            ? AuthorizationMatrix::check('categories', 'view', $user)
-            : (bool) ($user->is_admin ?? false);
+        if (! $user instanceof AdminUser) {
+            return false;
+        }
+
+        return AuthorizationMatrix::check('categories', 'view', $user);
     }
 
     public function create(AdminUser $user): bool

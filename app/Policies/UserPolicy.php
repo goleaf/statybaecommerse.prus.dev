@@ -12,9 +12,11 @@ final class UserPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        return $user instanceof AdminUser
-            ? AuthorizationMatrix::check('users', 'viewAny', $user)
-            : (bool) ($user->is_admin ?? false);
+        if (! $user instanceof AdminUser) {
+            return false;
+        }
+
+        return AuthorizationMatrix::check('users', 'viewAny', $user);
     }
 
     public function view(AdminUser|User $user, User $model): bool
@@ -23,7 +25,7 @@ final class UserPolicy
             return AuthorizationMatrix::check('users', 'view', $user);
         }
 
-        if ($user->is_admin ?? false) {
+        if (AuthorizationMatrix::check('users', 'view', $user)) {
             return true;
         }
 
@@ -41,7 +43,7 @@ final class UserPolicy
             return AuthorizationMatrix::check('users', 'update', $user);
         }
 
-        if ($user->is_admin ?? false) {
+        if (AuthorizationMatrix::check('users', 'update', $user)) {
             return true;
         }
 
