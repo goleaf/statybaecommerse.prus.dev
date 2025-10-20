@@ -22,17 +22,18 @@ use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -207,11 +208,11 @@ final class OrderResource extends Resource
                                     'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
                                     'paypal' => __('orders.payment_methods.paypal'),
                                     'stripe' => __('orders.payment_methods.stripe'),
-                                    'apple_pay' => __('orders.payment_methods.credit_card'),
-                                    'google_pay' => __('orders.payment_methods.credit_card'),
+                                    'apple_pay' => __('orders.payment_methods.apple_pay'),
+                                    'google_pay' => __('orders.payment_methods.google_pay'),
                                 ]),
                             TextInput::make('payment_reference')
-                                ->label(__('orders.fields.tracking_number')),
+                                ->label(__('orders.fields.payment_reference')),
                         ]),
                 ])
                 ->collapsible(),
@@ -245,7 +246,7 @@ final class OrderResource extends Resource
                         ]),
                     Placeholder::make('total')
                         ->label(__('orders.fields.total'))
-                        ->content(function (\Filament\Schemas\Components\Utilities\Get $get): string {
+                        ->content(function (Get $get): string {
                             $subtotal = (float) $get('subtotal') ?? 0;
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
@@ -257,7 +258,7 @@ final class OrderResource extends Resource
                             return $breakdown->toSummary()['formatted_total'];
                         }),
                     Hidden::make('total')
-                        ->default(function (\Filament\Schemas\Components\Utilities\Get $get): float {
+                        ->default(function (Get $get): float {
                             $subtotal = (float) $get('subtotal') ?? 0;
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
@@ -500,7 +501,7 @@ final class OrderResource extends Resource
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')
                     ->color('primary')
-                    ->visible(fn (Order $record): bool => $record->status === 'pending')
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'pending')
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'processing']);
                         Notification::make()
@@ -508,13 +509,12 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
                 Action::make('mark_shipped')
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn (Order $record): bool => $record->status === 'processing')
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'processing')
                     ->action(function (Order $record): void {
                         $record->update([
                             'status' => 'shipped',
@@ -525,13 +525,12 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
                 Action::make('mark_delivered')
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Order $record): bool => $record->status === 'shipped')
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'shipped')
                     ->action(function (Order $record): void {
                         $record->update([
                             'status' => 'delivered',
@@ -542,13 +541,12 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
                 Action::make('cancel_order')
                     ->label(__('orders.cancel_order'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Order $record): bool => in_array($record->status, ['pending', 'processing']))
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && in_array($record->status, ['pending', 'processing']))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'cancelled']);
                         Notification::make()
@@ -556,13 +554,12 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
                 Action::make('refund_order')
                     ->label(__('orders.refund_order'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('secondary')
-                    ->visible(fn (Order $record): bool => in_array($record->status, ['delivered', 'completed']))
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && in_array($record->status, ['delivered', 'completed']))
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'refunded']);
                         Notification::make()
@@ -570,8 +567,7 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
