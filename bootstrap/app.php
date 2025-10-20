@@ -30,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             // Load reports routes
             Route::middleware('web')
                 ->group(base_path('routes/reports.php'));
+            Route::middleware('api')
+                ->group(base_path('routes/monitoring.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -130,6 +132,7 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\HorizonServiceProvider::class,
         App\Providers\LocaleServiceProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
+        App\Providers\MonitoringServiceProvider::class,
         SecurityServiceProvider::class,
     ])
     ->create();

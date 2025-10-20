@@ -6,7 +6,9 @@ namespace App\Services\Recommendations;
 
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Telemetry\TelemetryManager;
 use Illuminate\Database\Eloquent\Collection;
+use OpenTelemetry\API\Trace\SpanInterface;
 
 /**
  * PopularityRecommendation
@@ -36,17 +38,31 @@ final class PopularityRecommendation extends BaseRecommendation
      */
     public function getRecommendations(?User $user = null, ?Product $product = null, array $context = []): Collection
     {
-        $startTime = microtime(true);
-        $cacheKey = $this->generateCacheKey('popularity', $user, $product, $context);
-        $cached = $this->getCachedResult($cacheKey);
-        if ($cached) {
-            return $cached;
-        }
-        $recommendations = $this->calculatePopularityRecommendations($user, $product);
-        $this->logPerformance('popularity', microtime(true) - $startTime, $recommendations->count());
-        $this->trackRecommendation('popularity', $user, $product, $recommendations->toArray());
+        /** @var TelemetryManager $telemetry */
+        $telemetry = app(TelemetryManager::class);
 
-        return $this->cacheResult($cacheKey, $recommendations, $this->config['cache_ttl'] ?? 1800);
+        return $telemetry->inSpan('recommendations.popularity.generate', function (?SpanInterface $span) use ($user, $product, $context): Collection {
+            $startTime = microtime(true);
+            $cacheKey = $this->generateCacheKey('popularity', $user, $product, $context);
+            $cached = $this->getCachedResult($cacheKey);
+            if ($cached) {
+                $span?->setAttribute('recommendations.cache_hit', true);
+
+                return $cached;
+            }
+
+            $recommendations = $this->calculatePopularityRecommendations($user, $product);
+            $duration = microtime(true) - $startTime;
+            $span?->setAttribute('recommendations.count', $recommendations->count());
+            $span?->setAttribute('recommendations.duration', $duration);
+
+            $this->logPerformance('popularity', $duration, $recommendations->count());
+            $this->trackRecommendation('popularity', $user, $product, $recommendations->toArray());
+
+            return $this->cacheResult($cacheKey, $recommendations, $this->config['cache_ttl'] ?? 1800);
+        }, [
+            'recommendations.strategy' => 'popularity',
+        ]);
     }
 
     /**
