@@ -6,8 +6,10 @@ namespace App\Filament\Components;
 
 use Closure;
 use Filament\Forms\Components\Select;
+use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\Renderless;
 
 /**
  * AutocompleteSelect Component
@@ -44,7 +46,7 @@ final class AutocompleteSelect extends Select
         return parent::make($name);
     }
 
-    public function searchable(bool|Closure $condition = true): static
+    public function searchable(Closure|array|bool $condition = true): static
     {
         parent::searchable($condition);
 
@@ -156,20 +158,57 @@ final class AutocompleteSelect extends Select
         return $this->modelClass;
     }
 
-    public function getSearchResults(string $search): array
+    /**
+     * @return array<string, string>
+     */
+    public function getSearchResults(string $search = ''): array
     {
-        $this->setSearchQuery($search);
+        $results = func_num_args() === 0
+            ? $this->resolveSearchResults()
+            : $this->resolveSearchResults($search);
 
-        $results = $this->searchResults ?? collect();
+        return $this->mapSearchResultsForOptions($results);
+    }
 
+    public function getSearchResultsCollection(?string $search = null): Collection
+    {
+        return $this->resolveSearchResults($search);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function mapSearchResultsForOptions(Collection $results): array
+    {
         return $results
             ->mapWithKeys(function (array $item): array {
                 $value = $item['value'] ?? null;
-                $label = $item['label'] ?? (is_array($item['data'] ?? null) ? ($item['data']['name'] ?? (string) $value) : (string) $value);
+                $label = $item['label']
+                    ?? (is_array($item['data'] ?? null)
+                        ? ($item['data'][$this->getLabelField() ?? 'name'] ?? (string) $value)
+                        : (string) $value);
 
                 return $value !== null ? [$value => $label] : [];
             })
             ->all();
+    }
+
+    protected function resolveSearchResults(?string $search = null): Collection
+    {
+        if ($search !== null) {
+            $this->setSearchQuery($search);
+        } elseif ($this->searchResults === null) {
+            $this->performSearch();
+        }
+
+        return $this->searchResults ?? collect();
+    }
+
+    #[ExposedLivewireMethod]
+    #[Renderless]
+    public function getSearchResultsForJs(string $search): array
+    {
+        return $this->transformOptionsForJs($this->getSearchResults($search));
     }
 
     public function setSearchQuery(?string $query): static
