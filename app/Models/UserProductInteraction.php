@@ -29,9 +29,26 @@ final class UserProductInteraction extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'product_id', 'interaction_type', 'rating', 'count', 'first_interaction', 'last_interaction'];
+    protected $fillable = [
+        'user_id',
+        'product_id',
+        'interaction_type',
+        'rating',
+        'count',
+        'notes',
+        'is_anonymous',
+        'ip_address',
+        'first_interaction',
+        'last_interaction',
+    ];
 
-    protected $casts = ['rating' => 'decimal:2', 'count' => 'integer', 'first_interaction' => 'datetime', 'last_interaction' => 'datetime'];
+    protected $casts = [
+        'rating' => 'decimal:2',
+        'count' => 'integer',
+        'is_anonymous' => 'boolean',
+        'first_interaction' => 'datetime',
+        'last_interaction' => 'datetime',
+    ];
 
     /**
      * Handle user functionality with proper error handling.
