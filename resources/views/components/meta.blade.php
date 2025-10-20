@@ -88,5 +88,5 @@
 @endif
 
 @if (!empty($jsonld))
-    <script type="application/ld+json">{!! $jsonld !!}</script>
+    <script nonce="{{ csp_nonce() }}" type="application/ld+json">{!! $jsonld !!}</script>
 @endif

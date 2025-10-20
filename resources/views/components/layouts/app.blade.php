@@ -88,6 +88,6 @@
     @stack('scripts')
 
     {{-- Alpine.js --}}
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script nonce="{{ csp_nonce() }}" defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>

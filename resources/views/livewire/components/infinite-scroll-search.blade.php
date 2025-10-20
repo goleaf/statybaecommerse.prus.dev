@@ -274,7 +274,7 @@
     @endif
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
 function infiniteScrollSearch() {
     return {
         init() {

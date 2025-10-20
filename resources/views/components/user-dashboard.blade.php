@@ -363,7 +363,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     function userDashboard() {
         return {
             // Dashboard functionality can be added here
