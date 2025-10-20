@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Filament\Components\LiveNotificationFeed;
+use App\Mail\Auth\PasswordResetMail;
+use App\Mail\Auth\VerifyEmailMail;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\Document;
@@ -24,10 +26,11 @@ use App\View\Creators\UserDataCreator;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response as HttpResponse;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Number;
@@ -127,27 +130,37 @@ class AppServiceProvider extends ServiceProvider
 
         // Use localized Markdown templates for auth notifications
         ResetPassword::toMailUsing(function ($notifiable, string $url) {
-            $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
             $minutes = (int) config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
 
-            return (new MailMessage)
-                ->locale($locale)
-                ->subject(__('mail.reset_password_subject', [], $locale))
-                ->markdown('emails.auth.password-reset', [
-                    'url' => $url,
-                    'minutes' => $minutes,
-                ]);
+            if (! $notifiable instanceof CanResetPasswordContract) {
+                return new PasswordResetMail($url, $minutes, app()->getLocale());
+            }
+
+            $locale = $this->resolveNotifiableLocale($notifiable);
+            $mail = new PasswordResetMail($url, $minutes, $locale);
+
+            $email = $notifiable->getEmailForPasswordReset();
+            if ($email !== '') {
+                $mail->to($email);
+            }
+
+            return $mail;
         });
 
         VerifyEmail::toMailUsing(function ($notifiable, string $url) {
-            $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
+            if (! $notifiable instanceof MustVerifyEmailContract) {
+                return new VerifyEmailMail($url, app()->getLocale());
+            }
 
-            return (new MailMessage)
-                ->locale($locale)
-                ->subject(__('mail.verify_email_subject', [], $locale))
-                ->markdown('emails.auth.verify', [
-                    'url' => $url,
-                ]);
+            $locale = $this->resolveNotifiableLocale($notifiable);
+            $mail = new VerifyEmailMail($url, $locale);
+
+            $email = $notifiable->getEmailForVerification();
+            if ($email !== '') {
+                $mail->to($email);
+            }
+
+            return $mail;
         });
 
         // Configure document service global variables for e-commerce (skip during console commands)
@@ -183,6 +196,18 @@ class AppServiceProvider extends ServiceProvider
                 // ignore macro registration failures
             }
         }
+    }
+
+    private function resolveNotifiableLocale(object $notifiable): string
+    {
+        if (method_exists($notifiable, 'preferredLocale')) {
+            $preferred = $notifiable->preferredLocale();
+            if (is_string($preferred) && $preferred !== '') {
+                return $preferred;
+            }
+        }
+
+        return app()->getLocale();
     }
 
     private function registerModelObservers(): void

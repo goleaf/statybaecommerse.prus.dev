@@ -14,6 +14,7 @@ use App\Policies\CategoryPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\UserPolicy;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -48,6 +49,18 @@ class AuthServiceProvider extends ServiceProvider
             }
 
             return null;
+        });
+
+        Gate::define('viewMailPreviews', static function (?Authenticatable $user = null): bool {
+            if (app()->environment(['local', 'development', 'testing'])) {
+                return true;
+            }
+
+            if ($user === null) {
+                return false;
+            }
+
+            return isset($user->is_admin) ? (bool) $user->is_admin : false;
         });
 
         $permissions = (array) config('dashboard.permissions');
