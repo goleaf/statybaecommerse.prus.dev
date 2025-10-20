@@ -67,11 +67,21 @@
                                     </div>
                                     <div class="flex justify-between">
                                         <span>{{ __('Estimated tax') }}</span>
-                                        <span class="font-semibold text-gray-900 dark:text-white">{{ app_money_format(0) }}</span>
+                                        <span class="font-semibold text-gray-900 dark:text-white">{{ $summary['formatted_tax_amount'] }}</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span>{{ __('Shipping') }}</span>
-                                        <span class="font-semibold text-gray-900 dark:text-white">{{ __('Calculated at delivery') }}</span>
+                                        <span class="font-semibold text-gray-900 dark:text-white">{{ $summary['formatted_shipping_amount'] }}</span>
+                                    </div>
+                                    @if(($summary['discount_amount'] ?? 0) > 0)
+                                        <div class="flex justify-between text-green-600 dark:text-green-400">
+                                            <span>{{ __('Discount') }}</span>
+                                            <span class="font-semibold">-{{ $summary['formatted_discount_amount'] }}</span>
+                                        </div>
+                                    @endif
+                                    <div class="flex justify-between border-t border-gray-200 pt-2 text-base font-semibold text-gray-900 dark:border-gray-700 dark:text-white">
+                                        <span>{{ __('Total') }}</span>
+                                        <span>{{ $summary['formatted_total'] }}</span>
                                     </div>
                                 </div>
                                 <button type="submit" class="w-full rounded-lg bg-green-600 px-5 py-3 text-white shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
