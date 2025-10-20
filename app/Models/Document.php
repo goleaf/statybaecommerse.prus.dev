@@ -1,13 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\StatusScope;
+use App\Observers\AttributionObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Document
@@ -17,6 +22,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed $fillable
  * @property mixed $casts
  *
+ * @phpstan-use HasFactory<\Database\Factories\DocumentFactory>
+ *
+ * @method static \Database\Factories\DocumentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Document newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Document newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Document query()
@@ -24,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  */
 #[ScopedBy([StatusScope::class])]
+#[ObservedBy([AttributionObserver::class])]
 final class Document extends Model
 {
     use HasFactory;
@@ -47,6 +56,7 @@ final class Document extends Model
         'documentable_type',
         'documentable_id',
         'created_by',
+        'updated_by',
         'generated_at',
         'expires_at',
         'description',
@@ -59,10 +69,18 @@ final class Document extends Model
         'expires_at' => 'datetime',
         'is_public' => 'bool',
         'is_downloadable' => 'bool',
+        'created_by' => 'int',
+        'updated_by' => 'int',
     ];
+
+    protected $with = ['creator', 'updater'];
 
     /**
      * Handle template functionality with proper error handling.
+     *
+     * @return BelongsTo<DocumentTemplate, static>
+     *
+     * @phpstan-return BelongsTo<DocumentTemplate, Document>
      */
     public function template(): BelongsTo
     {
@@ -71,6 +89,10 @@ final class Document extends Model
 
     /**
      * Handle documentable functionality with proper error handling.
+     *
+     * @return MorphTo<Model, static>
+     *
+     * @phpstan-return MorphTo<Model, Document>
      */
     public function documentable(): MorphTo
     {
@@ -79,6 +101,10 @@ final class Document extends Model
 
     /**
      * Handle creator functionality with proper error handling.
+     *
+     * @return BelongsTo<User, static>
+     *
+     * @phpstan-return BelongsTo<User, Document>
      */
     public function creator(): BelongsTo
     {
@@ -86,7 +112,21 @@ final class Document extends Model
     }
 
     /**
+     * Handle updater functionality with proper error handling.
+     *
+     * @return BelongsTo<User, static>
+     *
+     * @phpstan-return BelongsTo<User, Document>
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**
      * Handle getVariablesUsed functionality with proper error handling.
+     *
+     * @return array<string, mixed>
      */
     public function getVariablesUsed(): array
     {
@@ -106,11 +146,11 @@ final class Document extends Model
      */
     public function getFileUrl(): ?string
     {
-        if (!$this->file_path) {
+        if (! $this->file_path) {
             return null;
         }
 
-        return asset('storage/' . $this->file_path);
+        return asset('storage/'.$this->file_path);
     }
 
     /**
@@ -148,9 +188,10 @@ final class Document extends Model
     /**
      * Handle scopeByStatus functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<Document>  $query
+     * @return Builder<Document>
      */
-    public function scopeByStatus($query, string $status)
+    public function scopeByStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
     }
@@ -158,9 +199,10 @@ final class Document extends Model
     /**
      * Handle scopeByFormat functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<Document>  $query
+     * @return Builder<Document>
      */
-    public function scopeByFormat($query, string $format)
+    public function scopeByFormat(Builder $query, string $format): Builder
     {
         return $query->where('format', $format);
     }
@@ -168,9 +210,10 @@ final class Document extends Model
     /**
      * Handle scopeOfStatus functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<Document>  $query
+     * @return Builder<Document>
      */
-    public function scopeOfStatus($query, string $status)
+    public function scopeOfStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
     }
@@ -178,9 +221,10 @@ final class Document extends Model
     /**
      * Handle scopeOfFormat functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<Document>  $query
+     * @return Builder<Document>
      */
-    public function scopeOfFormat($query, string $format)
+    public function scopeOfFormat(Builder $query, string $format): Builder
     {
         return $query->where('format', $format);
     }
@@ -188,10 +232,13 @@ final class Document extends Model
     /**
      * Handle scopeForModel functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<Document>  $query
+     * @return Builder<Document>
      */
-    public function scopeForModel($query, Model $model)
+    public function scopeForModel(Builder $query, Model $model): Builder
     {
-        return $query->where('documentable_type', get_class($model))->where('documentable_id', $model->id);
+        return $query
+            ->where('documentable_type', $model::class)
+            ->where('documentable_id', $model->getKey());
     }
 }

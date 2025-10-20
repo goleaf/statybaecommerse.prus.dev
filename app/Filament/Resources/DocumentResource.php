@@ -15,6 +15,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -22,17 +23,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class DocumentResource extends Resource
 {
     protected static ?string $model = Document::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-document';
@@ -42,9 +39,6 @@ final class DocumentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /**
-     * @var UnitEnum|string|null
-     */
     public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'System';
@@ -97,6 +91,23 @@ final class DocumentResource extends Resource
                                     ->label(__('admin.documents.description'))
                                     ->maxLength(65535)
                                     ->nullable(),
+                                Select::make('created_by')
+                                    ->label(__('documents.created_by'))
+                                    ->relationship('creator', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->default(function (): ?int {
+                                        $userId = Auth::id();
+
+                                        return $userId !== null ? (int) $userId : null;
+                                    })
+                                    ->nullable(),
+                                Select::make('updated_by')
+                                    ->label(__('documents.updated_by'))
+                                    ->relationship('updater', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable(),
                             ]),
                     ]),
             ]);
@@ -123,6 +134,16 @@ final class DocumentResource extends Resource
                     ->label(__('admin.documents.description'))
                     ->searchable()
                     ->limit(30),
+                TextColumn::make('creator.name')
+                    ->label(__('documents.created_by'))
+                    ->badge()
+                    ->color('success')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updater.name')
+                    ->label(__('documents.updated_by'))
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->dateTime()
@@ -181,8 +202,8 @@ final class DocumentResource extends Resource
         return ['name', 'description'];
     }
 
-    public static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): string
     {
-        return (string) self::$model::count();
+        return (string) Document::count();
     }
 }
