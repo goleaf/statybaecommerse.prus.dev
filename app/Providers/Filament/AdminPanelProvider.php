@@ -13,6 +13,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\SpatieLaravelMediaLibraryPlugin\FilamentSpatieLaravelMediaLibraryPlugin;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -107,9 +108,12 @@ final class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-language'),
             ])
             ->when(app()->environment('testing'),
-                fn (Panel $p) => $p->plugins([]),
+                fn (Panel $p) => $p->plugins([
+                    FilamentSpatieLaravelMediaLibraryPlugin::make(),
+                ]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
+                    FilamentSpatieLaravelMediaLibraryPlugin::make(),
                 ]))
             // Remove custom Vite theme to ensure default Filament styles load
             // ->viteTheme('resources/css/filament-enhancements.css')
