@@ -6,13 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,8 +16,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -55,7 +56,7 @@ final class CouponResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Section::make(__('coupons.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -98,10 +99,14 @@ final class CouponResource extends Resource
                                 ->helperText(__('coupons.value_help')),
                             TextInput::make('minimum_amount')
                                 ->label(__('coupons.minimum_amount'))
+                                ->numeric()
+                                ->nullable()
                                 ->prefix('€')
                                 ->minValue(0),
                             TextInput::make('maximum_discount')
                                 ->label(__('coupons.maximum_discount'))
+                                ->numeric()
+                                ->nullable()
                                 ->prefix('€')
                                 ->minValue(0),
                         ]),
@@ -112,17 +117,23 @@ final class CouponResource extends Resource
                         ->schema([
                             TextInput::make('usage_limit')
                                 ->label(__('coupons.usage_limit'))
+                                ->numeric()
+                                ->nullable()
                                 ->minValue(1)
                                 ->helperText(__('coupons.usage_limit_help')),
                             TextInput::make('usage_limit_per_user')
                                 ->label(__('coupons.usage_limit_per_user'))
+                                ->numeric()
+                                ->nullable()
                                 ->helperText(__('coupons.usage_limit_per_user_help')),
                             TextInput::make('used_count')
                                 ->label(__('coupons.used_count'))
+                                ->numeric()
                                 ->default(0)
                                 ->disabled(),
                             TextInput::make('remaining_uses')
                                 ->label(__('coupons.remaining_uses'))
+                                ->numeric()
                                 ->default(0)
                                 ->disabled(),
                         ]),
@@ -202,8 +213,8 @@ final class CouponResource extends Resource
                     ->limit(50),
                 TextColumn::make('type')
                     ->label(__('coupons.type'))
-                    ->formatStateUsing(fn (string $state): string => __("coupons.types.{$state}"))
-                    ->color(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("coupons.types.{$state}") : '—')
+                    ->color(fn (?string $state): string => match ($state) {
                         'percentage' => 'green',
                         'fixed' => 'blue',
                         'free_shipping' => 'purple',
@@ -211,11 +222,17 @@ final class CouponResource extends Resource
                     }),
                 TextColumn::make('value')
                     ->label(__('coupons.value'))
-                    ->formatStateUsing(function ($state, $record): string {
+                    ->formatStateUsing(function ($state, Coupon $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
-                        } elseif ($record->type === 'free_shipping') {
+                            return is_null($state) ? '—' : $state.'%';
+                        }
+
+                        if ($record->type === 'free_shipping') {
                             return __('coupons.free_shipping');
+                        }
+
+                        if (is_null($state)) {
+                            return '—';
                         }
 
                         return '€'.number_format((float) $state, 2);
@@ -228,7 +245,7 @@ final class CouponResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('used_count')
                     ->label(__('coupons.used_count'))
-                    ->color(fn ($state, $record): string => $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
+                    ->color(fn ($state, Coupon $record): string => $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
                 TextColumn::make('remaining_uses')
                     ->label(__('coupons.remaining_uses'))
                     ->color(fn ($state): string => $state <= 0 ? 'danger' : 'success'),
@@ -297,17 +314,11 @@ final class CouponResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                DeleteAction::make(),
                 Action::make('toggle_active')
-                    ->label(function ($record): string {
-                        return $record && $record->is_active ? __('coupons.deactivate') : __('coupons.activate');
-                    })
-                    ->icon(function ($record): string {
-                        return $record && $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye';
-                    })
-                    ->color(function ($record): string {
-                        return $record && $record->is_active ? 'warning' : 'success';
-                    })
+                    ->label(fn (?Coupon $record): string => $record && $record->is_active ? __('coupons.deactivate') : __('coupons.activate'))
+                    ->icon(fn (?Coupon $record): string => $record && $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (?Coupon $record): string => $record && $record->is_active ? 'warning' : 'success')
                     ->action(function (Coupon $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
 
