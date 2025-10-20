@@ -26,7 +26,11 @@ final class NotificationApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonFragment(['success' => true])
-            ->assertJsonStructure(['data', 'pagination']);
+            ->assertJsonStructure([
+                'data',
+                'meta' => ['query', 'pagination'],
+                'links' => ['first', 'last', 'prev', 'next'],
+            ]);
     }
 
     public function test_notifications_index_requires_authentication(): void
