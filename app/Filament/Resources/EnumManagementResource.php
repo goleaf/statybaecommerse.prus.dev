@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -32,6 +33,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -40,9 +42,12 @@ final class EnumManagementResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
-
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-squares-2x2';
+    }
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
