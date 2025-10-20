@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\AuthorizationRole;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Order;
@@ -28,9 +29,9 @@ final class EnhancedFilamentSeeder extends Seeder
 
     private function createAdminUser(): void
     {
-        $adminRole = Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $adminRole = Role::query()->firstOrCreate(['name' => AuthorizationRole::ADMIN->value, 'guard_name' => 'web']);
 
-        $permissions = AuthorizationMatrix::permissionsForRole('admin');
+        $permissions = AuthorizationMatrix::permissionsForRole(AuthorizationRole::ADMIN);
 
         collect($permissions)->each(
             fn (string $permission) => Permission::query()->firstOrCreate([
@@ -70,7 +71,7 @@ final class EnhancedFilamentSeeder extends Seeder
             ]
         );
 
-        $admin->assignRole('admin');
+        $admin->assignRole(AuthorizationRole::ADMIN->value);
 
         $this->command->info('✅ Admin user created: admin@statybaecommerse.prus.dev / admin123');
     }
