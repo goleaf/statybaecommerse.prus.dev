@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExportStatus;
+use App\Models\Export;
+use App\Services\Export\ExportService;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Http\RedirectResponse;
@@ -19,21 +22,38 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class ExportController extends Controller
 {
+    public function __construct(private readonly ExportService $service)
+    {
+    }
+
     /**
      * Display a listing of the resource with pagination and filtering.
      */
     public function index(): ViewContract
     {
-        $disk = Storage::disk('public');
-        $dir = 'exports';
-        $files = [];
-        if ($disk->exists($dir)) {
-            foreach ($disk->files($dir) as $path) {
-                $files[] = ['name' => basename($path), 'path' => $path, 'size' => $disk->size($path), 'url' => $disk->url($path)];
-            }
-        }
+        $exports = Export::query()
+            ->whereNotNull('artifact_path')
+            ->latest('requested_at')
+            ->get();
 
-        return view('exports.index', ['files' => collect($files)->sortBy('name')->values()->all()]);
+        $files = $exports->map(function (Export $export): array {
+            $disk = $export->artifact_disk ?? config('filesystems.exports_disk', 'public');
+            $path = $export->artifact_path;
+
+            $size = null;
+            if ($path && Storage::disk($disk)->exists($path)) {
+                $size = Storage::disk($disk)->size($path);
+            }
+
+            return [
+                'name' => $export->artifact_filename ?? basename((string) $path),
+                'path' => $path,
+                'size' => $size,
+                'url' => $this->service->downloadUrl($export, 60),
+            ];
+        })->filter(fn (array $file): bool => $file['path'] !== null)->values()->all();
+
+        return view('exports.index', ['files' => $files]);
     }
 
     /**
@@ -41,11 +61,21 @@ class ExportController extends Controller
      */
     public function download(string $filename): HttpResponse|StreamedResponse|RedirectResponse
     {
+        $export = Export::query()
+            ->where('artifact_filename', $filename)
+            ->orWhere('uuid', pathinfo($filename, PATHINFO_FILENAME))
+            ->first();
+
+        if ($export instanceof Export && $export->status === ExportStatus::Completed) {
+            return redirect()->away($this->service->downloadUrl($export));
+        }
+
         $path = 'exports/'.$filename;
         $disk = Storage::disk('public');
         if (! $disk->exists($path)) {
             return redirect()->route('exports.index')->with('error', __('File not found.'));
         }
+
         try {
             return Response::streamDownload(function () use ($disk, $path): void {
                 echo $disk->get($path);
