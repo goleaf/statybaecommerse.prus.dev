@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use BackedEnum;
 use App\Models\VariantAnalytics;
@@ -44,6 +46,8 @@ use Filament\Forms\Form;
  */
 final class VariantAnalyticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = VariantAnalytics::class;
 
     /** @var string|\BackedEnum|null */

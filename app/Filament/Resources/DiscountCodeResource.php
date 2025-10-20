@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Models\DiscountCode;
 use BackedEnum;
@@ -35,17 +37,13 @@ use Filament\Forms\Form;
 
 final class DiscountCodeResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = DiscountCode::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Marketing';
-    }
+    
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

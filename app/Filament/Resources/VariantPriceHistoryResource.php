@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use BackedEnum;
 use App\Models\VariantPriceHistory;
@@ -15,6 +17,8 @@ use Filament\Forms\Form;
 
 final class VariantPriceHistoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = VariantPriceHistory::class;
 
     /** @var string|\BackedEnum|null */
@@ -24,10 +28,7 @@ final class VariantPriceHistoryResource extends Resource
 
     protected static ?int $navigationSort = 20;
 
-    public static function getNavigationGroup(): string|UnitEnum|null
-    {
-        return 'System';
-    }
+    
 
     public static function form(Form $form): Form
     {

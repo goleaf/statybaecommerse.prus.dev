@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
 use BackedEnum;
@@ -42,21 +44,17 @@ use Filament\Forms\Form;
  */
 final class PriceListItemResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = PriceListItem::class;
 
     protected static ?int $navigationSort = 16;
 
     protected static ?string $recordTitleAttribute = 'product.name';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-currency-euro';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.

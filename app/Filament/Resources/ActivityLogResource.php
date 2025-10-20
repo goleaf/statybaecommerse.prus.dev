@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ActivityLogResource\Pages;
 use Filament\Actions\Action;
 use Filament\Resources\Resource;
@@ -16,10 +18,9 @@ use UnitEnum;
 
 final class ActivityLogResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = Activity::class;
 
@@ -31,10 +32,7 @@ final class ActivityLogResource extends Resource
 
     protected static ?string $pluralModelLabel = null;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-document-text';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

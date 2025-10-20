@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsTagResource\Pages;
 use App\Models\NewsTag;
@@ -39,17 +41,13 @@ use Filament\Forms\Form;
 
 final class NewsTagResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsTag::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return NavigationGroup::News;
-    }
+    
 
     protected static ?int $navigationSort = 4;
 

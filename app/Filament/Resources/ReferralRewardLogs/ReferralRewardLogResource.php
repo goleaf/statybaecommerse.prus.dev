@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Filament\Resources\ReferralRewardLogs;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralRewardLogs\Pages\CreateReferralRewardLog;
 use UnitEnum;
@@ -18,6 +19,8 @@ use Filament\Forms\Form;
 
 class ReferralRewardLogResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralRewardLog::class;
 
     /** @var string|\BackedEnum|null */

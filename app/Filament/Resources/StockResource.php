@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\StockResource\Pages;
 use BackedEnum;
 use App\Models\Inventory;
@@ -39,6 +41,8 @@ use Filament\Forms\Form;
  */
 final class StockResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Inventory::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';

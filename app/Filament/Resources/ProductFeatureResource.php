@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use BackedEnum;
 use App\Filament\Resources\ProductFeatureResource\Pages;
@@ -22,6 +24,8 @@ use Filament\Forms\Form;
 
 final class ProductFeatureResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductFeature::class;
 
     /** @var string|\BackedEnum|null */

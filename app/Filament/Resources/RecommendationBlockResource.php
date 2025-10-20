@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use BackedEnum;
 use App\Models\RecommendationBlock;
@@ -34,6 +36,8 @@ use Filament\Forms\Form;
  */
 final class RecommendationBlockResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = RecommendationBlock::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Products';
@@ -50,10 +54,7 @@ final class RecommendationBlockResource extends Resource
         return __('recommendation_blocks.title');
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

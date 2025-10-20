@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Models\Customer;
 use BackedEnum;
@@ -36,17 +38,13 @@ use UnitEnum;
 
 final class CustomerResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Customer::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-users';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Users';
-    }
+    
 
     protected static ?int $navigationSort = 2;
 

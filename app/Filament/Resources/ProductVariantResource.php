@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Enums\NavigationIcon;
 use App\Filament\Resources\ProductVariantResource\Pages;
@@ -53,6 +55,8 @@ use Filament\Forms\Form;
  */
 final class ProductVariantResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductVariant::class;
 
     protected static ?int $navigationSort = 3;
@@ -74,15 +78,9 @@ final class ProductVariantResource extends Resource
         return __('product_variants.single');
     }
 
-    public static function getNavigationIcon(): string|\BackedEnum|Htmlable|null
-    {
-        return 'heroicon-o-squares-2x2';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    
 
     public static function form(Form $form): Form
     {

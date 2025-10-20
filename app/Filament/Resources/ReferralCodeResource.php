@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use BackedEnum;
 use App\Models\ReferralCampaign;
@@ -34,6 +36,8 @@ use Filament\Forms\Form;
 
 final class ReferralCodeResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralCode::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';

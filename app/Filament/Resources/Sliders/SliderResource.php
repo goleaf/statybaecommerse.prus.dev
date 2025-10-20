@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
 use BackedEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 final class SliderResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Slider::class;
 
     /** @var string|\BackedEnum|null */

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\RecommendationConfigResource\Pages;
 use BackedEnum;
 use App\Models\RecommendationConfig;
@@ -27,6 +29,8 @@ use Filament\Forms\Form;
 
 final class RecommendationConfigResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = RecommendationConfig::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Analytics';

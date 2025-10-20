@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use BackedEnum;
 use App\Models\UserProductInteraction;
@@ -38,6 +40,8 @@ use Filament\Forms\Form;
 
 final class UserProductInteractionResource extends Resource
 {
+    use HasNav;
+
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string

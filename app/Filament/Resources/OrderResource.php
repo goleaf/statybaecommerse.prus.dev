@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
@@ -51,6 +53,8 @@ use Filament\Forms\Form;
  */
 final class OrderResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Order::class;
 
     protected static ?int $navigationSort = 1;
@@ -63,15 +67,9 @@ final class OrderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'orders.models.orders';
 
-    public static function getNavigationIcon(): string|\BackedEnum|null
-    {
-        return 'heroicon-o-shopping-bag';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    
 
     /**
      * Get the navigation label with translation support.

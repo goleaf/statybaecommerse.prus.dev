@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Filament\Resources\ProductSimilarities;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ProductSimilarities\Pages\CreateProductSimilarity;
 use UnitEnum;
@@ -18,6 +19,8 @@ use Filament\Forms\Form;
 
 class ProductSimilarityResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductSimilarity::class;
 
     /** @var string|\BackedEnum|null */

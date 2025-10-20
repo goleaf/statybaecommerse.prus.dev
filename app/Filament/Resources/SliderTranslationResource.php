@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SliderTranslationResource\Pages;
 use BackedEnum;
 use App\Models\Slider;
@@ -32,6 +34,8 @@ use Filament\Forms\Form;
  */
 final class SliderTranslationResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SliderTranslation::class;
 
     /** @var string|\BackedEnum|null */

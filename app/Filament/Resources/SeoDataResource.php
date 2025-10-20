@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use BackedEnum;
 use App\Filament\Resources\SeoDataResource\Pages;
@@ -44,6 +46,8 @@ use Filament\Forms\Form;
 
 final class SeoDataResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SeoData::class;
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;

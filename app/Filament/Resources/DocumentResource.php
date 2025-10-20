@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
 use BackedEnum;
@@ -28,15 +30,14 @@ use Filament\Forms\Form;
 
 final class DocumentResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Document::class;
 
     /**
      * @var string|\BackedEnum|null
      */
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-document';
-    }
+    
 
     protected static ?int $navigationSort = 20;
 
@@ -45,10 +46,7 @@ final class DocumentResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NormalSettingResource\Pages;
 use BackedEnum;
 use App\Models\NormalSetting;
@@ -23,6 +25,8 @@ use Filament\Forms\Form;
 
 final class NormalSettingResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NormalSetting::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'System';

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
@@ -26,6 +28,8 @@ use Filament\Forms\Form;
 
 final class ProductHistoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductHistory::class;
 
     /** @var string|\BackedEnum|null */

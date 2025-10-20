@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantImageResource\Pages;
 use BackedEnum;
 use App\Models\ProductVariant;
@@ -46,15 +48,14 @@ use Filament\Forms\Form;
  */
 final class VariantImageResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = VariantImage::class;
 
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-photo';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
-    {
-        return 'Inventory';
-    }
+    
 
     protected static ?int $navigationSort = 15;
 

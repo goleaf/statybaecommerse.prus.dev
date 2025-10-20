@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Filament\Resources\Channels;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\Channels\Pages\CreateChannel;
 use App\Filament\Resources\Channels\Pages\EditChannel;
@@ -19,12 +20,11 @@ use Filament\Forms\Form;
 
 class ChannelResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Channel::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-rectangle-stack';
-    }
+    
 
     public static function form(Form $form): Form
     {

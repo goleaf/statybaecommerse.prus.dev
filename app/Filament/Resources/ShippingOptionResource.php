@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
 use BackedEnum;
@@ -34,15 +36,11 @@ use Filament\Forms\Form;
  */
 final class ShippingOptionResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Settings';
-    }
+    use HasNav;
 
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-truck';
-    }
+    
+
+    
 
     protected static ?string $model = ShippingOption::class;
 

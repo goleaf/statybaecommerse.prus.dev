@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -32,6 +34,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class CartItemResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CartItem::class;
 
     protected static ?int $navigationSort = 3;

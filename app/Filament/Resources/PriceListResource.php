@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\PriceListResource\Pages;
 use BackedEnum;
 use App\Models\PriceList;
@@ -35,6 +37,8 @@ use Filament\Forms\Form;
  */
 final class PriceListResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = PriceList::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Products';
@@ -48,10 +52,7 @@ final class PriceListResource extends Resource
         return __('price_lists.title');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Products';
-    }
+    
 
     public static function getPluralModelLabel(): string
     {

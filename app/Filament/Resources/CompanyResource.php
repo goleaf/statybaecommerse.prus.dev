@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Actions\BulkActionGroup;
@@ -22,6 +24,8 @@ use Filament\Forms\Form;
 
 final class CompanyResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Company::class;
 
     /**

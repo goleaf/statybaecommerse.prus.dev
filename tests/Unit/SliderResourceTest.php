@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Filament\Resources\SliderResource;
 use App\Models\Slider;
+use App\Support\Nav;
 
 it('can load SliderResource class', function () {
     expect(class_exists(SliderResource::class))->toBeTrue();
@@ -18,7 +19,9 @@ it('can get SliderResource model', function () {
 });
 
 it('can get SliderResource navigation group', function () {
-    expect(SliderResource::getNavigationGroup())->toBe('Content');
+    expect(SliderResource::getNavigationGroup())->toBe(
+        Nav::groupForResource(SliderResource::class)
+    );
 });
 
 it('can get SliderResource navigation label', function () {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages;
 use BackedEnum;
 use App\Models\SystemSettingCategory;
@@ -37,6 +39,8 @@ use Filament\Forms\Form;
  */
 final class SystemSettingCategoryTranslationResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSettingCategoryTranslation::class;
 
     protected static ?int $navigationSort = 15;

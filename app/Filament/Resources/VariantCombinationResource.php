@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use BackedEnum;
 use App\Models\VariantCombination;
@@ -42,6 +44,8 @@ use Filament\Forms\Form;
  */
 final class VariantCombinationResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = VariantCombination::class;
 
     /** @var string|\BackedEnum|null */

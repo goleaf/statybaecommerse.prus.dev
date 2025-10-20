@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\UserBehaviorResource\Pages;
 use BackedEnum;
 use App\Models\User;
@@ -42,6 +44,8 @@ use Filament\Forms\Form;
  */
 final class UserBehaviorResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = UserBehavior::class;
 
     /** @var string|\BackedEnum|null */

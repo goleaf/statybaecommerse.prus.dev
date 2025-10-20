@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ChannelResource\Pages;
 use App\Models\Channel;
 use BackedEnum;
@@ -33,21 +35,17 @@ use UnitEnum;
  */
 final class ChannelResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Channel::class;
 
     protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Settings';
-    }
+    
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-rectangle-stack';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

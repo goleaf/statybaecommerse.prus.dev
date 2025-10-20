@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
@@ -51,6 +53,8 @@ if (! class_exists(Form::class) && class_exists(Schema::class)) {
  */
 final class AddressResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Address::class;
 
     protected static ?int $navigationSort = 3;
@@ -66,10 +70,7 @@ final class AddressResource extends Resource
     /**
      * Get navigation group
      */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Orders';
-    }
+    
 
     /**
      * Get model label

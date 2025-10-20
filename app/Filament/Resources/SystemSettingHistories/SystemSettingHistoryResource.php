@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingHistories;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SystemSettingHistories\Pages\CreateSystemSettingHistory;
 use UnitEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 class SystemSettingHistoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSettingHistory::class;
 
     /** @var string|\BackedEnum|null */

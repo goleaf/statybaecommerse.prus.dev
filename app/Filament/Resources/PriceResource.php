@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\PriceResource\Pages;
 use BackedEnum;
 use App\Models\Price;
@@ -19,6 +21,8 @@ use Filament\Forms\Form;
 
 final class PriceResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Price::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Products';

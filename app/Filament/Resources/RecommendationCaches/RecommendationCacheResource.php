@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationCaches;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\RecommendationCaches\Pages\CreateRecommendationCache;
 use UnitEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 class RecommendationCacheResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = RecommendationCache::class;
 
     /** @var string|\BackedEnum|null */

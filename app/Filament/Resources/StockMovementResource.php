@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\StockMovementResource\Pages;
 use BackedEnum;
 use App\Models\StockMovement;
@@ -33,6 +35,8 @@ use Filament\Forms\Form;
  */
 final class StockMovementResource extends Resource
 {
+    use HasNav;
+
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 

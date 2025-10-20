@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use BackedEnum;
@@ -18,17 +20,13 @@ use Filament\Forms\Form;
 
 final class PartnerTierResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = PartnerTier::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-star';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Marketing';
-    }
+    
 
     protected static ?int $navigationSort = 2;
 

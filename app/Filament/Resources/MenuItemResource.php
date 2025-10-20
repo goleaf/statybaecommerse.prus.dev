@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -32,6 +34,8 @@ use Filament\Forms\Form;
  */
 final class MenuItemResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = MenuItem::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';

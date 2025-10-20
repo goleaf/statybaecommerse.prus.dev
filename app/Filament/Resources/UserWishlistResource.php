@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\UserWishlistResource\Pages;
 use BackedEnum;
 use App\Models\UserWishlist;
@@ -36,12 +38,11 @@ use Filament\Forms\Form;
  */
 final class UserWishlistResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = UserWishlist::class;
 
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-heart';
-    }
+    
 
     /**
      * @var UnitEnum|string|null

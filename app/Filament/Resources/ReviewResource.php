@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReviewResource\Pages;
 use BackedEnum;
 use App\Models\Review;
@@ -40,6 +42,8 @@ use Filament\Forms\Form;
 
 final class ReviewResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Review::class;
 
     /** @var string|\BackedEnum|null */

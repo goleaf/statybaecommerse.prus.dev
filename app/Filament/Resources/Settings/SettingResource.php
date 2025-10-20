@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Settings;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\Settings\Pages\CreateSetting;
 use UnitEnum;
@@ -20,6 +21,8 @@ use Filament\Forms\Form;
 
 class SettingResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Setting::class;
 
     /** @var string|\BackedEnum|null */

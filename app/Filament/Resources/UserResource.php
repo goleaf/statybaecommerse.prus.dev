@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\UserResource\Pages;
 use BackedEnum;
 use App\Models\User;
@@ -37,6 +39,8 @@ use UnitEnum;
  */
 final class UserResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = User::class;
 
     protected static ?int $navigationSort = 1;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use BackedEnum;
 use App\Models\Attribute;
@@ -43,6 +45,8 @@ use Filament\Forms\Form;
  */
 final class VariantAttributeValueResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = VariantAttributeValue::class;
 
     /** @var string|\BackedEnum|null */

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
 use Filament\Actions\Action;
@@ -33,17 +35,13 @@ use Filament\Forms\Form;
 
 final class ReferralStatisticsResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Referral';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = ReferralStatistics::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-chart-bar-square';
-    }
+    
 
     protected static ?int $navigationSort = 14;
 
