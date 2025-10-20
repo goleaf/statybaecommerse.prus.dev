@@ -123,6 +123,13 @@ return [
             'handler' => NullHandler::class,
         ],
 
+        'maintenance' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/maintenance.log'),
+            'level' => env('DATA_TRANSFER_LOG_LEVEL', 'info'),
+            'replace_placeholders' => true,
+        ],
+
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
