@@ -6,7 +6,6 @@ namespace App\Filament\Pages;
 
 use App\Services\Shared\ComponentPerformanceService;
 use BackedEnum;
-use UnitEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
@@ -21,6 +20,11 @@ use UnitEnum;
 
 final class CacheMaintenance extends Page
 {
+    /**
+     * Navigation icon that Filament displays for this page.
+     *
+     * @var string|BackedEnum|null Filament navigation icon identifier.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
