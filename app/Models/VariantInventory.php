@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 /**
  * VariantInventory
@@ -107,6 +109,11 @@ final class VariantInventory extends Model
     public function stockMovements(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(StockMovement::class, 'variant_inventory_id');
+    }
+
+    public function stockReservations(): HasMany
+    {
+        return $this->hasMany(StockReservation::class);
     }
 
     /**
@@ -239,16 +246,60 @@ final class VariantInventory extends Model
     /**
      * Reserve stock for an order.
      */
-    public function reserveStock(int $quantity): bool
-    {
-        if ($this->available < $quantity) {
+    public function reserveStock(
+        int $quantity,
+        ?\DateTimeInterface $expiresAt = null,
+        array $meta = [],
+        ?string $referenceType = null,
+        ?string $referenceId = null
+    ): bool {
+        if ($quantity <= 0) {
             return false;
         }
 
-        $this->reserved += $quantity;
-        $this->available = $this->stock - $this->reserved;
+        $created = DB::transaction(function () use ($quantity, $expiresAt, $meta, $referenceType, $referenceId) {
+            $inventory = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-        return $this->save();
+            $activeReservations = StockReservation::query()
+                ->where('variant_inventory_id', $inventory->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->get();
+
+            $currentReserved = (int) $activeReservations->sum('quantity');
+            $available = max(0, $inventory->stock - $currentReserved);
+
+            if ($available < $quantity) {
+                return false;
+            }
+
+            $inventory->stockReservations()->create([
+                'quantity' => $quantity,
+                'status' => StockReservation::STATUS_RESERVED,
+                'reserved_at' => now(),
+                'expires_at' => $expiresAt,
+                'meta' => $meta ?: null,
+                'reference_type' => $referenceType,
+                'reference_id' => $referenceId,
+            ]);
+
+            $inventory->forceFill([
+                'reserved' => $currentReserved + $quantity,
+                'available' => max(0, $inventory->stock - ($currentReserved + $quantity)),
+            ])->save();
+
+            $this->setRawAttributes($inventory->getAttributes(), true);
+
+            return true;
+        });
+
+        if (! $created) {
+            return false;
+        }
+
+        $this->refresh();
+
+        return true;
     }
 
     /**
@@ -256,14 +307,67 @@ final class VariantInventory extends Model
      */
     public function releaseStock(int $quantity): bool
     {
-        if ($this->reserved < $quantity) {
+        if ($quantity <= 0) {
             return false;
         }
 
-        $this->reserved -= $quantity;
-        $this->available = $this->stock - $this->reserved;
+        $released = DB::transaction(function () use ($quantity) {
+            $inventory = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-        return $this->save();
+            $reservations = StockReservation::query()
+                ->where('variant_inventory_id', $inventory->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->orderBy('reserved_at')
+                ->get();
+
+            $currentReserved = (int) $reservations->sum('quantity');
+
+            if ($currentReserved < $quantity) {
+                return false;
+            }
+
+            $remaining = $quantity;
+
+            foreach ($reservations as $reservation) {
+                if ($remaining <= 0) {
+                    break;
+                }
+
+                if ($reservation->quantity <= $remaining) {
+                    $amount = $reservation->quantity;
+                    $reservation->release();
+                    $remaining -= $amount;
+                } else {
+                    $reservation->release($remaining);
+                    $remaining = 0;
+                }
+            }
+
+            $updatedReserved = (int) StockReservation::query()
+                ->where('variant_inventory_id', $inventory->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->get()
+                ->sum('quantity');
+
+            $inventory->forceFill([
+                'reserved' => $updatedReserved,
+                'available' => max(0, $inventory->stock - $updatedReserved),
+            ])->save();
+
+            $this->setRawAttributes($inventory->getAttributes(), true);
+
+            return true;
+        });
+
+        if (! $released) {
+            return false;
+        }
+
+        $this->refresh();
+
+        return true;
     }
 
     /**
@@ -271,11 +375,39 @@ final class VariantInventory extends Model
      */
     public function addStock(int $quantity): bool
     {
-        $this->stock += $quantity;
-        $this->available = $this->stock - $this->reserved;
-        $this->last_restocked_at = now();
+        if ($quantity <= 0) {
+            return false;
+        }
 
-        return $this->save();
+        $added = DB::transaction(function () use ($quantity) {
+            $inventory = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            $currentReserved = (int) StockReservation::query()
+                ->where('variant_inventory_id', $inventory->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->get()
+                ->sum('quantity');
+
+            $inventory->forceFill([
+                'stock' => $inventory->stock + $quantity,
+                'reserved' => $currentReserved,
+                'available' => max(0, ($inventory->stock + $quantity) - $currentReserved),
+                'last_restocked_at' => now(),
+            ])->save();
+
+            $this->setRawAttributes($inventory->getAttributes(), true);
+
+            return true;
+        });
+
+        if (! $added) {
+            return false;
+        }
+
+        $this->refresh();
+
+        return true;
     }
 
     /**
@@ -283,14 +415,42 @@ final class VariantInventory extends Model
      */
     public function removeStock(int $quantity): bool
     {
-        if ($this->stock < $quantity) {
+        if ($quantity <= 0) {
             return false;
         }
 
-        $this->stock -= $quantity;
-        $this->available = $this->stock - $this->reserved;
+        $removed = DB::transaction(function () use ($quantity) {
+            $inventory = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
 
-        return $this->save();
+            $currentReserved = (int) StockReservation::query()
+                ->where('variant_inventory_id', $inventory->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->get()
+                ->sum('quantity');
+
+            if (($inventory->stock - $quantity) < $currentReserved) {
+                return false;
+            }
+
+            $inventory->forceFill([
+                'stock' => $inventory->stock - $quantity,
+                'reserved' => $currentReserved,
+                'available' => max(0, ($inventory->stock - $quantity) - $currentReserved),
+            ])->save();
+
+            $this->setRawAttributes($inventory->getAttributes(), true);
+
+            return true;
+        });
+
+        if (! $removed) {
+            return false;
+        }
+
+        $this->refresh();
+
+        return true;
     }
 
     public function adjustStock(int $quantity, string $reason = 'manual_adjustment'): bool
@@ -315,7 +475,9 @@ final class VariantInventory extends Model
      */
     public function updateAvailableStock(): bool
     {
-        $this->available = max(0, $this->stock - $this->reserved);
+        $reserved = (int) $this->stockReservations()->active()->sum('quantity');
+        $this->reserved = $reserved;
+        $this->available = max(0, $this->stock - $reserved);
 
         return $this->save();
     }
