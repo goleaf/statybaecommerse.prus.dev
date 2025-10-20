@@ -36,14 +36,14 @@ final class AttributeValue extends Model
 
     protected $table = 'attribute_values';
 
-    protected $fillable = ['attribute_id', 'value', 'slug', 'color_code', 'sort_order', 'is_enabled', 'description', 'hex_color', 'image', 'metadata', 'display_value', 'is_active'];
+    protected $fillable = ['attribute_id', 'value', 'slug', 'color_code', 'sort_order', 'is_enabled', 'description', 'hex_color', 'image', 'metadata', 'display_value', 'is_active', 'is_default'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['sort_order' => 'integer', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'metadata' => 'array'];
+        return ['sort_order' => 'integer', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_default' => 'boolean', 'metadata' => 'array'];
     }
 
     protected string $translationModel = \App\Models\Translations\AttributeValueTranslation::class;
