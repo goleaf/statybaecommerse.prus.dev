@@ -131,6 +131,7 @@ return [
     'stock_reserved' => 'Stock successfully reserved',
     'stock_unreserved' => 'Reservation successfully cancelled',
     'insufficient_stock' => 'Insufficient stock',
+    'export_job_queued' => 'Export queued successfully. The file will appear on the Exports page shortly.',
     'bulk_stock_adjusted' => ':count stock records successfully adjusted',
     'bulk_tracking_updated' => ':count stock records tracking successfully updated',
     'stock_restocked' => 'Stock successfully restocked',

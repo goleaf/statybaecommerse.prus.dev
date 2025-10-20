@@ -614,5 +614,6 @@
     "admin.help.zone_enabled": "Ar zona aktyvi ir naudojama",
     "admin.help.zone_default": "Ar ši zona yra numatytoji naujoms šalims",
     "admin.help.zone_metadata": "Papildomi duomenys JSON formatu",
-    "admin.help.zone_countries": "Šiai zonai priskirtos šalys"
+    "admin.help.zone_countries": "Šiai zonai priskirtos šalys",
+    "inventory.export_job_queued": "Eksporto užduotis įtraukta į eilę. Failas netrukus pasirodys eksporto puslapyje."
 }

@@ -131,6 +131,7 @@ return [
     'stock_reserved' => 'Atsargos sėkmingai rezervuotos',
     'stock_unreserved' => 'Rezervacija sėkmingai atšaukta',
     'insufficient_stock' => 'Nepakanka atsargų',
+    'export_job_queued' => 'Eksporto užduotis įtraukta į eilę. Failas netrukus pasirodys eksporto puslapyje.',
     'bulk_stock_adjusted' => ':count atsargų įrašų sėkmingai pakoreguota',
     'bulk_tracking_updated' => ':count atsargų įrašų sekimas sėkmingai atnaujintas',
     'stock_restocked' => 'Atsargos sėkmingai papildytos',
