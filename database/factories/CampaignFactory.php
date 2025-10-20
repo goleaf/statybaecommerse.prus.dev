@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Campaign;
+use App\Models\CampaignCustomerSegment;
+use App\Models\CampaignProductTarget;
+use App\Models\CampaignSchedule;
+use App\Models\CustomerGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Campaign>
@@ -23,15 +28,15 @@ final class CampaignFactory extends Factory
         $slug = $baseSlug;
         $counter = 1;
         while (\App\Models\Campaign::where('slug', $slug)->exists()) {
-            $slug = $baseSlug.'-'.$counter;
+            $slug = $baseSlug . '-' . $counter;
             $counter++;
         }
 
         return [
-            'name' => $name,
-            'slug' => $slug,
-            'starts_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
-            'ends_at' => $this->faker->dateTimeBetween('now', '+3 months'),
+            'name'       => $name,
+            'slug'       => $slug,
+            'starts_at'  => $this->faker->dateTimeBetween('-1 week', 'now'),
+            'ends_at'    => $this->faker->dateTimeBetween('now', '+3 months'),
             'channel_id' => function () {
                 $existingChannels = \App\Models\Channel::query()->get();
                 if ($existingChannels->isNotEmpty()) {
@@ -40,54 +45,94 @@ final class CampaignFactory extends Factory
 
                 return \App\Models\Channel::factory();
             },
-            'zone_id' => null,
-            'status' => 'active',
+            'zone_id'   => null,
+            'status'    => 'active',
             'is_active' => true,
-            'metadata' => [
+            'metadata'  => [
                 'source' => $this->faker->randomElement(['manual', 'automated', 'imported']),
-                'tags' => $this->faker->words(3),
+                'tags'   => $this->faker->words(3),
             ],
-            'is_featured' => $this->faker->boolean(20),
+            'is_featured'        => $this->faker->boolean(20),
             'send_notifications' => $this->faker->boolean(80),
-            'track_conversions' => $this->faker->boolean(90),
-            'max_uses' => $this->faker->numberBetween(100, 10000),
-            'budget_limit' => $this->faker->randomFloat(2, 500, 50000),
+            'track_conversions'  => $this->faker->boolean(90),
+            'max_uses'           => $this->faker->numberBetween(100, 10000),
+            'budget_limit'       => $this->faker->randomFloat(2, 500, 50000),
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Campaign $campaign): void {
+            CampaignProductTarget::factory()
+                ->category()
+                ->for($campaign)
+                ->state($this->ensureActiveState('campaign_product_targets'))
+                ->create();
+
+            CampaignCustomerSegment::factory()
+                ->demographic()
+                ->for($campaign)
+                ->state(array_merge(
+                    ['customer_group_id' => CustomerGroup::factory()],
+                    $this->ensureActiveState('campaign_customer_segments'),
+                ))
+                ->create();
+
+            CampaignSchedule::factory()
+                ->daily()
+                ->for($campaign)
+                ->state($this->ensureActiveState('campaign_schedules'))
+                ->create();
+        });
+    }
+
+    /**
+     * Ensure the generated state only contains active flag when the column exists.
+     *
+     * @return array<string, mixed>
+     */
+    private function ensureActiveState(string $table): array
+    {
+        if (! Schema::hasColumn($table, 'is_active')) {
+            return [];
+        }
+
+        return ['is_active' => true];
     }
 
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
-            'ends_at' => $this->faker->dateTimeBetween('now', '+2 months'),
+            'ends_at'   => $this->faker->dateTimeBetween('now', '+2 months'),
         ]);
     }
 
     public function scheduled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'scheduled',
+            'status'    => 'scheduled',
             'starts_at' => $this->faker->dateTimeBetween('now', '+1 month'),
-            'ends_at' => $this->faker->dateTimeBetween('+1 month', '+3 months'),
+            'ends_at'   => $this->faker->dateTimeBetween('+1 month', '+3 months'),
         ]);
     }
 
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-3 months', '-1 month'),
-            'ends_at' => $this->faker->dateTimeBetween('-1 month', '-1 week'),
+            'ends_at'   => $this->faker->dateTimeBetween('-1 month', '-1 week'),
         ]);
     }
 
     public function draft(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'draft',
+            'status'    => 'draft',
             'starts_at' => null,
-            'ends_at' => null,
+            'ends_at'   => null,
         ]);
     }
 
@@ -102,7 +147,7 @@ final class CampaignFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'type' => 'email',
+                'type'    => 'email',
                 'subject' => $this->faker->sentence(6),
                 'content' => $this->faker->paragraphs(8, true),
             ]),
@@ -113,11 +158,11 @@ final class CampaignFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'type' => 'banner',
-                'banner_image' => $this->faker->imageUrl(1200, 600, 'business'),
+                'type'            => 'banner',
+                'banner_image'    => $this->faker->imageUrl(1200, 600, 'business'),
                 'banner_alt_text' => $this->faker->sentence(8),
-                'cta_text' => $this->faker->randomElement(['Shop Now', 'Learn More', 'Get Started']),
-                'cta_url' => $this->faker->url(),
+                'cta_text'        => $this->faker->randomElement(['Shop Now', 'Learn More', 'Get Started']),
+                'cta_url'         => $this->faker->url(),
             ]),
         ]);
     }
@@ -126,10 +171,10 @@ final class CampaignFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'type' => 'social',
+                'type'               => 'social',
                 'social_media_ready' => true,
-                'meta_title' => $this->faker->sentence(10),
-                'meta_description' => $this->faker->paragraph(2),
+                'meta_title'         => $this->faker->sentence(10),
+                'meta_description'   => $this->faker->paragraph(2),
             ]),
         ]);
     }
@@ -138,11 +183,11 @@ final class CampaignFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'total_views' => $this->faker->numberBetween(50000, 200000),
-                'total_clicks' => $this->faker->numberBetween(5000, 20000),
+                'total_views'       => $this->faker->numberBetween(50000, 200000),
+                'total_clicks'      => $this->faker->numberBetween(5000, 20000),
                 'total_conversions' => $this->faker->numberBetween(500, 2000),
-                'total_revenue' => $this->faker->randomFloat(2, 10000, 100000),
-                'conversion_rate' => $this->faker->randomFloat(2, 5, 25),
+                'total_revenue'     => $this->faker->randomFloat(2, 10000, 100000),
+                'conversion_rate'   => $this->faker->randomFloat(2, 5, 25),
             ]),
         ]);
     }
@@ -151,11 +196,11 @@ final class CampaignFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'total_views' => $this->faker->numberBetween(0, 1000),
-                'total_clicks' => $this->faker->numberBetween(0, 50),
+                'total_views'       => $this->faker->numberBetween(0, 1000),
+                'total_clicks'      => $this->faker->numberBetween(0, 50),
                 'total_conversions' => $this->faker->numberBetween(0, 5),
-                'total_revenue' => $this->faker->randomFloat(2, 0, 100),
-                'conversion_rate' => $this->faker->randomFloat(2, 0, 2),
+                'total_revenue'     => $this->faker->randomFloat(2, 0, 100),
+                'conversion_rate'   => $this->faker->randomFloat(2, 0, 2),
             ]),
         ]);
     }

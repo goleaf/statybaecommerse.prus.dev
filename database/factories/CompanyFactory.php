@@ -22,11 +22,11 @@ final class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->company(),
-            'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->phoneNumber(),
-            'address' => fake()->address(),
-            'website' => fake()->url(),
+            'name'     => fake()->company(),
+            'email'    => fake()->unique()->safeEmail(),
+            'phone'    => fake()->phoneNumber(),
+            'address'  => fake()->address(),
+            'website'  => fake()->url(),
             'industry' => fake()->randomElement([
                 'Technology',
                 'Healthcare',
@@ -39,13 +39,13 @@ final class CompanyFactory extends Factory
                 'Media',
                 'Transportation',
             ]),
-            'size' => fake()->randomElement(['small', 'medium', 'large']),
+            'size'        => fake()->randomElement(['small', 'medium', 'large']),
             'description' => fake()->paragraph(),
-            'is_active' => fake()->boolean(80),  // 80% chance of being active
-            'metadata' => [
-                'founded_year' => fake()->year(),
+            'is_active'   => true,
+            'metadata'    => [
+                'founded_year'   => fake()->year(),
                 'employee_count' => fake()->numberBetween(1, 10000),
-                'revenue' => fake()->numberBetween(100000, 10000000),
+                'revenue'        => fake()->numberBetween(100000, 10000000),
             ],
         ];
     }
