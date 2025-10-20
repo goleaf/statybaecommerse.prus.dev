@@ -1,11 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Fix all Filament navigation group type issues
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+cd "$ROOT_DIR"
 
 echo "Fixing navigation group type issues in Filament resources..."
 
-# Find all PHP files in Filament Resources directory
-find app/Filament/Resources -name "*.php" -type f | while read file; do
+find app/Filament/Resources -name "*.php" -type f | while read -r file; do
     echo "Processing: $file"
     
     # Remove type declarations from navigationGroup properties
