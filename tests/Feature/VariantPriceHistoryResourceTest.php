@@ -303,3 +303,34 @@ it('handles price decreases correctly', function () {
     expect($priceHistory->isIncrease())->toBeFalse();
     expect($priceHistory->isDecrease())->toBeTrue();
 });
+
+it('sorts price histories by the calculated price change delta', function () {
+    $variant = ProductVariant::factory()->create();
+
+    $largestIncrease = VariantPriceHistory::factory()->create([
+        'variant_id' => $variant->id,
+        'old_price' => 10.00,
+        'new_price' => 20.00,
+    ]);
+
+    $smallerIncrease = VariantPriceHistory::factory()->create([
+        'variant_id' => $variant->id,
+        'old_price' => 10.00,
+        'new_price' => 12.00,
+    ]);
+
+    $decrease = VariantPriceHistory::factory()->create([
+        'variant_id' => $variant->id,
+        'old_price' => 10.00,
+        'new_price' => 5.00,
+    ]);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(ListVariantPriceHistories::class)
+        ->sortTable('price_change', 'desc')
+        ->assertCanSeeTableRecords([
+            $largestIncrease,
+            $smallerIncrease,
+            $decrease,
+        ], inOrder: true);
+});
