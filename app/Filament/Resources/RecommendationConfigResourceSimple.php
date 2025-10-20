@@ -12,6 +12,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -19,8 +21,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -84,11 +84,11 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->options([
                                     'collaborative' => __('recommendation_configs_simple.algorithm_types.collaborative'),
                                     'content_based' => __('recommendation_configs_simple.algorithm_types.content_based'),
-                                    'hybrid' => __('recommendation_configs_simple.algorithm_types.hybrid'),
-                                    'popularity' => __('recommendation_configs_simple.algorithm_types.popularity'),
-                                    'trending' => __('recommendation_configs_simple.algorithm_types.trending'),
-                                    'similarity' => __('recommendation_configs_simple.algorithm_types.similarity'),
-                                    'custom' => __('recommendation_configs_simple.algorithm_types.custom'),
+                                    'hybrid'        => __('recommendation_configs_simple.algorithm_types.hybrid'),
+                                    'popularity'    => __('recommendation_configs_simple.algorithm_types.popularity'),
+                                    'trending'      => __('recommendation_configs_simple.algorithm_types.trending'),
+                                    'similarity'    => __('recommendation_configs_simple.algorithm_types.similarity'),
+                                    'custom'        => __('recommendation_configs_simple.algorithm_types.custom'),
                                 ])
                                 ->required()
                                 ->default('collaborative'),
@@ -284,12 +284,12 @@ final class RecommendationConfigResourceSimple extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'collaborative' => 'blue',
                         'content_based' => 'green',
-                        'hybrid' => 'purple',
-                        'popularity' => 'orange',
-                        'trending' => 'pink',
-                        'similarity' => 'indigo',
-                        'custom' => 'gray',
-                        default => 'gray',
+                        'hybrid'        => 'purple',
+                        'popularity'    => 'orange',
+                        'trending'      => 'pink',
+                        'similarity'    => 'indigo',
+                        'custom'        => 'gray',
+                        default         => 'gray',
                     }),
                 TextColumn::make('min_score')
                     ->label(__('recommendation_configs_simple.min_score'))
@@ -403,11 +403,11 @@ final class RecommendationConfigResourceSimple extends Resource
                     ->options([
                         'collaborative' => __('recommendation_configs_simple.algorithm_types.collaborative'),
                         'content_based' => __('recommendation_configs_simple.algorithm_types.content_based'),
-                        'hybrid' => __('recommendation_configs_simple.algorithm_types.hybrid'),
-                        'popularity' => __('recommendation_configs_simple.algorithm_types.popularity'),
-                        'trending' => __('recommendation_configs_simple.algorithm_types.trending'),
-                        'similarity' => __('recommendation_configs_simple.algorithm_types.similarity'),
-                        'custom' => __('recommendation_configs_simple.algorithm_types.custom'),
+                        'hybrid'        => __('recommendation_configs_simple.algorithm_types.hybrid'),
+                        'popularity'    => __('recommendation_configs_simple.algorithm_types.popularity'),
+                        'trending'      => __('recommendation_configs_simple.algorithm_types.trending'),
+                        'similarity'    => __('recommendation_configs_simple.algorithm_types.similarity'),
+                        'custom'        => __('recommendation_configs_simple.algorithm_types.custom'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_configs_simple.is_active'))
@@ -519,10 +519,10 @@ final class RecommendationConfigResourceSimple extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationConfigSimples::route('/'),
+            'index'  => Pages\ListRecommendationConfigSimples::route('/'),
             'create' => Pages\CreateRecommendationConfigSimple::route('/create'),
-            'view' => Pages\ViewRecommendationConfigSimple::route('/{record}'),
-            'edit' => Pages\EditRecommendationConfigSimple::route('/{record}/edit'),
+            'view'   => Pages\ViewRecommendationConfigSimple::route('/{record}'),
+            'edit'   => Pages\EditRecommendationConfigSimple::route('/{record}/edit'),
         ];
     }
 }
