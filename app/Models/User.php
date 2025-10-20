@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
@@ -47,7 +48,14 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class])]
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
-    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
+    use HasApiTokens;
+    use HasFactory;
+    use HasRoles;
+    use HasSafeSerialization;
+    use HasTranslations;
+    use LogsActivity;
+    use Notifiable;
+    use SoftDeletes;
 
     /**
      * Handle booted functionality with proper error handling.

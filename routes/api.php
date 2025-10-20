@@ -21,5 +21,5 @@ Route::prefix('api/v1')
     });
 
 Route::get('exports/download/{export:uuid}', SignedExportDownloadController::class)
-    ->middleware(['signed'])
+    ->middleware(['signed', 'auth:sanctum', 'throttle:api.exports'])
     ->name('exports.signed-download');
