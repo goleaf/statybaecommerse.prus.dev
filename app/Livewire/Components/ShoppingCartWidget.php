@@ -8,6 +8,7 @@ use App\Models\CartItem;
 use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\Product;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
@@ -206,21 +207,17 @@ final class ShoppingCartWidget extends Component
     protected function calculateCartSummary(): void
     {
         $cartItems = $this->getCartItems();
-        $subtotal = $cartItems->sum(fn ($item) => $item->price * $item->quantity);
-        $discountAmount = 0;
-        $taxAmount = 0;
-        $shippingAmount = 0;
-        // Apply discount if available
+        $subtotal = (float) $cartItems->sum(fn ($item) => $item->price * $item->quantity);
+        $discountAmount = 0.0;
+
         if ($this->appliedDiscount) {
             $discountAmount = $this->calculateDiscountAmount($subtotal);
         }
-        // Calculate tax (example: 21% VAT for Lithuania)
-        $taxRate = app_setting('tax_rate', 0.21);
-        $taxAmount = ($subtotal - $discountAmount) * $taxRate;
-        // Calculate shipping (simplified)
-        $shippingAmount = $subtotal > app_setting('free_shipping_threshold', 50) ? 0 : app_setting('shipping_cost', 5);
-        $total = $subtotal - $discountAmount + $taxAmount + $shippingAmount;
-        $this->cartSummary = ['items_count' => $cartItems->sum('quantity'), 'subtotal' => $subtotal, 'discount_amount' => $discountAmount, 'tax_amount' => $taxAmount, 'shipping_amount' => $shippingAmount, 'total' => $total];
+
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discountAmount);
+        $summary = $breakdown->toSummary();
+
+        $this->cartSummary = ['items_count' => (int) $cartItems->sum('quantity')] + $summary;
     }
 
     /**

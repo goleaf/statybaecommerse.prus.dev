@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Support\Contracts\Entities;
 
+use App\Data\Pricing\PriceBreakdown;
 use App\Models\Order;
+use App\Services\Pricing\PriceConfiguration;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -44,6 +46,9 @@ final class OrderContract
     {
         $order->loadMissing(['items']);
 
+        $configuration = app(PriceConfiguration::class);
+        $breakdown = PriceBreakdown::fromOrder($order, $configuration);
+
         return [
             'id' => $order->getKey(),
             'number' => (string) $order->number,
@@ -51,14 +56,7 @@ final class OrderContract
                 'state' => (string) $order->status,
                 'payment_state' => $order->payment_status,
             ],
-            'totals' => [
-                'subtotal' => (float) $order->subtotal,
-                'tax' => (float) ($order->tax_amount ?? 0),
-                'shipping' => (float) ($order->shipping_amount ?? 0),
-                'discount' => (float) ($order->discount_amount ?? 0),
-                'total' => (float) $order->total,
-                'currency' => $order->currency ?? config('app.currency', 'EUR'),
-            ],
+            'totals' => $breakdown->toSummary(),
             'items' => $order->items->map(static fn ($item): array => [
                 'id' => $item->getKey(),
                 'product_id' => $item->product_id,

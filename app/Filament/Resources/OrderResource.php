@@ -8,6 +8,7 @@ use App\Data\ExportRequestData;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use App\Services\Pricing\PriceCalculator;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;
@@ -249,9 +250,11 @@ final class OrderResource extends Resource
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
                             $discount = (float) $get('discount_amount') ?? 0;
-                            $total = $subtotal + $tax + $shipping - $discount;
+                            $taxable = max(0.0, $subtotal - $discount);
+                            $rate = $taxable > 0 ? $tax / $taxable : null;
+                            $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discount, $shipping, $rate);
 
-                            return '€'.number_format($total, 2);
+                            return $breakdown->toSummary()['formatted_total'];
                         }),
                     Hidden::make('total')
                         ->default(function (\Filament\Schemas\Components\Utilities\Get $get): float {
@@ -259,8 +262,11 @@ final class OrderResource extends Resource
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
                             $discount = (float) $get('discount_amount') ?? 0;
+                            $taxable = max(0.0, $subtotal - $discount);
+                            $rate = $taxable > 0 ? $tax / $taxable : null;
+                            $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discount, $shipping, $rate);
 
-                            return $subtotal + $tax + $shipping - $discount;
+                            return $breakdown->total;
                         }),
                 ])
                 ->collapsible(),
