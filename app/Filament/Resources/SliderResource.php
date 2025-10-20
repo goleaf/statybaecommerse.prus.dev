@@ -50,7 +50,7 @@ final class SliderResource extends Resource
      */
     public static function getNavigationLabel(): string
     {
-        return __('sliders.title');
+        return __('sliders.navigation_label');
     }
 
     /**
