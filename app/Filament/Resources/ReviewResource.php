@@ -183,7 +183,7 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.fields.rating'))
                     ->sortable()
                     ->alignCenter()
-                    ->formatStateUsing(fn (int $state): string => str_repeat('⭐', $state)),
+                    ->formatStateUsing(fn (?int $state): string => str_repeat('⭐', max(0, (int) $state))),
                 BadgeColumn::make('status')
                     ->label(__('reviews.fields.status'))
                     ->getStateUsing(fn (Review $record): string => $record->getStatus())
@@ -395,13 +395,13 @@ final class ReviewResource extends Resource
                         TextEntry::make('rating')
                             ->label(__('reviews.fields.rating'))
                             ->badge()
-                            ->color(fn (int $state): string => match ($state) {
+                            ->color(fn (?int $state): string => match ($state) {
                                 1, 2 => 'danger',
                                 3 => 'warning',
                                 4, 5 => 'success',
                                 default => 'gray',
                             })
-                            ->formatStateUsing(fn (int $state): string => str_repeat('⭐', $state)),
+                            ->formatStateUsing(fn (?int $state): string => str_repeat('⭐', max(0, (int) $state))),
                     ])
                     ->columns(2),
                 InfolistSection::make(__('reviews.sections.content'))
