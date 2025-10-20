@@ -8,7 +8,7 @@ use App\Filament\Resources\SystemSettingResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-final class EditSystemSetting extends EditRecord
+class EditSystemSetting extends EditRecord
 {
     protected static string $resource = SystemSettingResource::class;
 
