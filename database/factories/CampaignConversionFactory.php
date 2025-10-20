@@ -29,7 +29,7 @@ final class CampaignConversionFactory extends Factory
             'conversion_type' => $this->faker->randomElement(['purchase', 'signup', 'download', 'subscription', 'lead', 'custom']),
             'conversion_value' => $this->faker->randomFloat(2, 10, 1000),
             'status' => $this->faker->randomElement(['completed', 'pending', 'confirmed', 'cancelled']),
-            'converted_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
+            'converted_at' => now(),
             'session_id' => $this->faker->uuid(),
             'conversion_data' => [
                 'source' => $this->faker->randomElement(['google', 'facebook', 'twitter', 'linkedin']),

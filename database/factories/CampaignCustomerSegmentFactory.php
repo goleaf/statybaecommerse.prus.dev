@@ -36,7 +36,7 @@ final class CampaignCustomerSegmentFactory extends Factory
             'custom_conditions' => $this->generateCustomConditions($segmentType),
             'track_performance' => fake()->boolean(80),
             'auto_optimize' => fake()->boolean(30),
-            'is_active' => fake()->boolean(85),
+            'is_active' => true,
             'sort_order' => fake()->numberBetween(1, 100),
         ];
     }
