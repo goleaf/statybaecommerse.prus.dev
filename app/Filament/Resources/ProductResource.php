@@ -14,10 +14,10 @@ use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManage
 use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Models\Product;
-use App\Support\Authorization\AuthorizationMatrix;
 use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\ProductExport;
+use App\Services\Export\ExportService;
+use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -36,6 +36,7 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -54,8 +55,6 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * ProductResource
@@ -305,6 +304,18 @@ final class ProductResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $formats = config('export.formats', []);
+
+        if ($formats === []) {
+            $formats = ['csv' => \App\Services\Export\Writers\CsvExportWriter::class];
+        }
+
+        $formatOptions = collect(array_keys($formats))
+            ->mapWithKeys(fn (string $format): array => [$format => strtoupper($format)])
+            ->all();
+
+        $defaultFormat = array_key_first($formats) ?? 'csv';
+
         return $table
             ->columns([
                 ImageColumn::make('main_image')
@@ -493,24 +504,23 @@ final class ProductResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     BulkAction::make('export_selected')
-                        ->label(__('Export selected'))
+                        ->label(__('exports.filament.bulk_action.label'))
+                        ->modalHeading(__('exports.filament.bulk_action.modal_heading', ['label' => self::getPluralModelLabel()]))
+                        ->modalDescription(__('exports.filament.bulk_action.modal_description'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
                         ->form([
                             Select::make('format')
-                                ->label(__('Format'))
-                                ->options([
-                                    'csv' => 'CSV',
-                                    'xlsx' => 'XLSX',
-                                    'pdf' => 'PDF',
-                                ])
-                                ->default('csv')
+                                ->label(__('exports.filament.bulk_action.format_label'))
+                                ->options($formatOptions)
+                                ->default($defaultFormat)
                                 ->required(),
                             CheckboxList::make('columns')
-                                ->label(__('Columns'))
+                                ->label(__('exports.filament.bulk_action.columns_label'))
                                 ->options(fn () => collect(app(ProductExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
                                 ->default(fn () => app(ProductExport::class)->defaultColumns())
                                 ->columns(2)
+                                ->helperText(__('exports.filament.bulk_action.columns_help'))
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
@@ -529,8 +539,8 @@ final class ProductResource extends Resource
                             $service->queue($request);
 
                             Notification::make()
-                                ->title(__('Export queued'))
-                                ->body(__('You will receive a notification once the export has finished.'))
+                                ->title(__('exports.filament.bulk_action.success'))
+                                ->body(__('exports.filament.bulk_action.success_body'))
                                 ->success()
                                 ->send();
                         })

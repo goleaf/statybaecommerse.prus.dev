@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
-use App\Http\Controllers\Api\SignedExportDownloadController;
+use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\V1\HealthController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +30,6 @@ Route::prefix('api/v1')
         });
     });
 
-Route::get('exports/download/{export:uuid}', SignedExportDownloadController::class)
+Route::get('exports/{export:uuid}/download', ExportDownloadController::class)
     ->middleware(['signed'])
-    ->name('exports.signed-download');
+    ->name('api.exports.download');

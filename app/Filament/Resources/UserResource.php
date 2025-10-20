@@ -1,15 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\UserExport;
-use BackedEnum;
+use App\Services\Export\ExportService;
+use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -23,7 +24,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -107,10 +107,10 @@ final class UserResource extends Resource
                         TextInput::make('password')
                             ->label(__('users.fields.password'))
                             ->password()
-                            ->required(fn(string $context): bool => $context === 'create')
+                            ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8)
-                            ->dehydrated(fn($state) => filled($state))
-                            ->dehydrateStateUsing(fn($state) => bcrypt($state)),
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
                         Select::make('locale')
                             ->label(__('users.fields.locale'))
                             ->options([
@@ -145,6 +145,18 @@ final class UserResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        $formats = config('export.formats', []);
+
+        if ($formats === []) {
+            $formats = ['csv' => \App\Services\Export\Writers\CsvExportWriter::class];
+        }
+
+        $formatOptions = collect(array_keys($formats))
+            ->mapWithKeys(fn (string $format): array => [$format => strtoupper($format)])
+            ->all();
+
+        $defaultFormat = array_key_first($formats) ?? 'csv';
+
         return $table
             ->columns([
                 ImageColumn::make('avatar')
@@ -163,7 +175,7 @@ final class UserResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('users.fields.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'lt' => 'success',
                         'en' => 'info',
                         default => 'gray',
@@ -200,24 +212,23 @@ final class UserResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     BulkAction::make('export_selected')
-                        ->label(__('Export selected'))
+                        ->label(__('exports.filament.bulk_action.label'))
+                        ->modalHeading(__('exports.filament.bulk_action.modal_heading', ['label' => self::getPluralModelLabel()]))
+                        ->modalDescription(__('exports.filament.bulk_action.modal_description'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
                         ->form([
                             Select::make('format')
-                                ->label(__('Format'))
-                                ->options([
-                                    'csv' => 'CSV',
-                                    'xlsx' => 'XLSX',
-                                    'pdf' => 'PDF',
-                                ])
-                                ->default('csv')
+                                ->label(__('exports.filament.bulk_action.format_label'))
+                                ->options($formatOptions)
+                                ->default($defaultFormat)
                                 ->required(),
                             CheckboxList::make('columns')
-                                ->label(__('Columns'))
+                                ->label(__('exports.filament.bulk_action.columns_label'))
                                 ->options(fn () => collect(app(UserExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
                                 ->default(fn () => app(UserExport::class)->defaultColumns())
                                 ->columns(2)
+                                ->helperText(__('exports.filament.bulk_action.columns_help'))
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
@@ -236,8 +247,8 @@ final class UserResource extends Resource
                             $service->queue($request);
 
                             Notification::make()
-                                ->title(__('Export queued'))
-                                ->body(__('You will receive a notification once the export has finished.'))
+                                ->title(__('exports.filament.bulk_action.success'))
+                                ->body(__('exports.filament.bulk_action.success_body'))
                                 ->success()
                                 ->send();
                         })
