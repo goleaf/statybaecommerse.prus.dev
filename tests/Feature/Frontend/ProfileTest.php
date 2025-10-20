@@ -32,7 +32,13 @@ final class ProfileTest extends TestCase
 
     public function test_edit_page_handles_missing_countries_table(): void
     {
-        Schema::dropIfExists('countries');
+        Schema::shouldReceive('hasTable')
+            ->with('countries')
+            ->andReturnFalse();
+
+        Schema::shouldReceive('hasTable')
+            ->withArgs(static fn (string $table): bool => $table !== 'countries')
+            ->andReturnTrue();
 
         $user = User::factory()->create();
 
@@ -42,6 +48,8 @@ final class ProfileTest extends TestCase
             ->assertOk()
             ->assertViewIs('profile.edit')
             ->assertViewHas('countries', static fn ($countries): bool => $countries instanceof Collection && $countries->isEmpty());
+
+        Schema::flushFacadeCache();
     }
 
     public function test_user_can_update_profile_information(): void
@@ -153,8 +161,17 @@ final class ProfileTest extends TestCase
 
     public function test_user_can_create_address_when_lookup_tables_are_missing(): void
     {
-        Schema::dropIfExists('countries');
-        Schema::dropIfExists('cities');
+        Schema::shouldReceive('hasTable')
+            ->with('countries')
+            ->andReturnFalse();
+
+        Schema::shouldReceive('hasTable')
+            ->with('cities')
+            ->andReturnFalse();
+
+        Schema::shouldReceive('hasTable')
+            ->withArgs(static fn (string $table): bool => ! in_array($table, ['countries', 'cities'], true))
+            ->andReturnTrue();
 
         $user = User::factory()->create();
 
@@ -178,6 +195,8 @@ final class ProfileTest extends TestCase
             'city' => 'Vilnius',
             'postal_code' => '01103',
         ]);
+
+        Schema::flushFacadeCache();
     }
 
     public function test_user_can_update_existing_address(): void
