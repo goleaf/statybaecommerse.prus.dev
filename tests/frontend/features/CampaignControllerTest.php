@@ -77,6 +77,80 @@ final class CampaignControllerTest extends TestCase
         $response->assertDontSee($otherCampaign->trans('name'));
     }
 
+    public function test_can_view_featured_campaigns_page(): void
+    {
+        $featuredCampaign = Campaign::factory()->create([
+            'is_featured' => true,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        Campaign::factory()->create([
+            'is_featured' => false,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.featured'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('campaigns.featured');
+        $response->assertViewHas('campaigns');
+        $response->assertSee($featuredCampaign->trans('name'));
+    }
+
+    public function test_can_view_campaigns_by_type_page(): void
+    {
+        $emailCampaign = Campaign::factory()->create([
+            'type' => 'email',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $smsCampaign = Campaign::factory()->create([
+            'type' => 'sms',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.by-type', ['type' => 'email']));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('campaigns.by-type');
+        $response->assertViewHas('campaigns');
+        $response->assertSee($emailCampaign->trans('name'));
+        $response->assertDontSee($smsCampaign->trans('name'));
+    }
+
+    public function test_can_view_campaign_search_page(): void
+    {
+        $matchingCampaign = Campaign::factory()->create([
+            'name' => 'Holiday Specials',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        Campaign::factory()->create([
+            'name' => 'Everyday Deals',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $response = $this->get(route('frontend.campaigns.search', ['q' => 'Holiday']));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('campaigns.search');
+        $response->assertViewHas('campaigns');
+        $response->assertSee($matchingCampaign->trans('name'));
+        $response->assertSee('Holiday');
+    }
+
     public function test_can_view_single_campaign(): void
     {
         $category = Category::factory()->create();
