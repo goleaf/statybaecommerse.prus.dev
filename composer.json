@@ -177,6 +177,48 @@
         ],
         "docs:full": [
             "php artisan docs:full"
+        ],
+        "diagnose:filament-pages": [
+            "@php artisan filament:diagnose-pages"
+        ],
+        "scan:filament-pages": [
+            "@php artisan filament:scan-resource-pages"
+        ],
+        "scan:filament-uninitialized": [
+            "@php artisan filament:scan-uninitialized-pages"
+        ],
+        "filament:analyze": [
+            "@php artisan filament:analyze"
+        ],
+        "filament:fix-form-schema": [
+            "@php artisan filament:fix-form-schema"
+        ],
+        "filament:fix-navigation": [
+            "@php artisan filament:navigation-groups:fix-all"
+        ],
+        "filament:fix-navigation-comprehensive": [
+            "@php artisan filament:navigation-groups:fix-comprehensive"
+        ],
+        "filament:fix-navigation-recursive": [
+            "@php artisan filament:navigation-groups:fix-recursive"
+        ],
+        "filament:fix-navigation-final": [
+            "@php artisan filament:navigation-groups:fix-final --skip-tests"
+        ],
+        "filament:fix-critical": [
+            "@php artisan filament:fix-critical-errors"
+        ],
+        "filament:fix-simple": [
+            "@php artisan filament:fix-simple-issues"
+        ],
+        "app:test-analytics": [
+            "@php artisan app:test-analytics-simple"
+        ],
+        "app:test-brand": [
+            "@php artisan app:test-brand-resource"
+        ],
+        "app:test-seeders": [
+            "@php artisan app:test-seeders"
         ]
     },
     "extra": {
