@@ -15,21 +15,11 @@ use UnitEnum;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
-    /**
-     * @var string|null
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
-    /**
-     * @var string|null
-     */
     protected static $navigationLabel = 'Enh. E-commerce Overview';
 
-    /**
-     * @var string|null
-     */
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Dashboard';
+    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
 
