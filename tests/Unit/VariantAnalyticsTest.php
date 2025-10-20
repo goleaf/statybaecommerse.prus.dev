@@ -244,30 +244,26 @@ final class VariantAnalyticsTest extends TestCase
         $this->assertEquals(500.00, $analytics->revenue);
     }
 
-    // TODO: Fix this test - there's a unique constraint issue
-    // public function test_record_analytics_updates_existing_record(): void
-    // {
-    //     // Arrange
-    //     $variant = ProductVariant::factory()->create();
-    //     $date = '2025-12-25'; // Use a fixed unique date
-    //     $existingAnalytics = VariantAnalytics::factory()
-    //         ->withVariant($variant)
-    //         ->forDate($date)
-    //         ->create(['views' => 50]);
+    public function test_record_analytics_updates_existing_record(): void
+    {
+        $variant = ProductVariant::factory()->create();
+        $date = '2025-12-25';
 
-    //     $data = ['views' => 150];
+        $existingAnalytics = VariantAnalytics::factory()
+            ->withVariant($variant)
+            ->forDate($date)
+            ->create(['views' => 50]);
 
-    //     // Act - Use the same variant and date to test update functionality
-    //     $analytics = VariantAnalytics::recordAnalytics($variant->id, $date, $data);
+        $data = ['views' => 150];
 
-    //     // Assert
-    //     $this->assertEquals($existingAnalytics->id, $analytics->id);
-    //     $this->assertEquals(150, $analytics->views);
-    //     $this->assertEquals($variant->id, $analytics->variant_id);
+        $analytics = VariantAnalytics::recordAnalytics($variant->id, $date, $data);
 
-    //     // Verify the record was actually updated, not created new
-    //     $this->assertDatabaseCount('variant_analytics', 1);
-    // }
+        $this->assertEquals($existingAnalytics->id, $analytics->id);
+        $this->assertEquals(150, $analytics->views);
+        $this->assertEquals($variant->id, $analytics->variant_id);
+
+        $this->assertDatabaseCount('variant_analytics', 1);
+    }
 
     public function test_increment_metric_updates_correctly(): void
     {

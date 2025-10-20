@@ -5,19 +5,42 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Category;
+use Illuminate\Contracts\View\View;
+
+use function now;
 
 final class CategoryController extends Controller
 {
-    public function index(Request $request)
+    public function index(): View
     {
-        // TODO: Implement category listing
-        return response()->json(['message' => 'Category listing not implemented yet']);
+        $categories = Category::query()
+            ->withoutGlobalScopes()
+            ->where('is_visible', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'description']);
+
+        return view('frontend.categories.index', [
+            'categories' => $categories,
+        ]);
     }
 
-    public function show(string $id)
+    public function show(Category $category): View
     {
-        // TODO: Implement category details
-        return response()->json(['message' => 'Category details not implemented yet', 'id' => $id]);
+        $category->load(['media', 'translations', 'children']);
+
+        $products = $category->products()
+            ->withoutGlobalScopes()
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->with(['media', 'prices.currency', 'brand'])
+            ->paginate(12);
+
+        return view('frontend.categories.show', [
+            'category' => $category,
+            'childCategories' => $category->children,
+            'products' => $products,
+        ]);
     }
 }
