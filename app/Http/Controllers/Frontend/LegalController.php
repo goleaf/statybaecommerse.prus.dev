@@ -12,28 +12,36 @@ class LegalController extends Controller
 {
     public function privacy(): View
     {
-        $legal = Legal::where('slug', 'privacy-policy')->first();
+        $legal = Legal::query()
+            ->with('translations')
+            ->firstWhere('key', 'privacy-policy');
 
         return view('frontend.legal.privacy', compact('legal'));
     }
 
     public function terms(): View
     {
-        $legal = Legal::where('slug', 'terms-of-service')->first();
+        $legal = Legal::query()
+            ->with('translations')
+            ->firstWhere('key', 'terms-of-use');
 
         return view('frontend.legal.terms', compact('legal'));
     }
 
     public function cookies(): View
     {
-        $legal = Legal::where('slug', 'cookie-policy')->first();
+        $legal = Legal::query()
+            ->with('translations')
+            ->firstWhere('key', 'cookie-policy');
 
         return view('frontend.legal.cookies', compact('legal'));
     }
 
     public function returns(): View
     {
-        $legal = Legal::where('slug', 'return-policy')->first();
+        $legal = Legal::query()
+            ->with('translations')
+            ->firstWhere('key', 'return-policy');
 
         return view('frontend.legal.returns', compact('legal'));
     }

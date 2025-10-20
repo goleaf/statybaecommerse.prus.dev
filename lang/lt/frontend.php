@@ -679,4 +679,9 @@ return [
         'subscribe_button' => 'Prenumeruoti',
         'privacy_notice' => 'Privatumo pranešimas',
     ],
+    'legal' => [
+        'required' => 'Privalomas',
+        'last_updated' => 'Paskutinį kartą atnaujinta',
+        'document_unavailable' => 'Šis dokumentas šiuo metu nepasiekiamas. Dėl pagalbos susisiekite su mumis.',
+    ],
 ];
