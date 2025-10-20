@@ -246,7 +246,9 @@ final class AttributeResource extends Resource
                     }),
                 TextColumn::make('group_name')
                     ->label(__('attributes.group'))
-                    ->formatStateUsing(fn (string $state): string => __("attributes.groups.{$state}"))
+                    ->formatStateUsing(fn (?string $state): string => $state
+                        ? __("attributes.groups.{$state}")
+                        : __('attributes.none'))
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('options_count')
