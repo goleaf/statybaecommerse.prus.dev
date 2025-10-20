@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Livewire\Home;
 
 use App\Models\Collection as ProductCollection;
+use App\Services\Shared\CacheService as SharedCacheService;
+use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -24,7 +25,7 @@ final class CollectionsShowcase extends Component implements HasSchemas
     {
         $cacheKey = sprintf('home:collections:%s', app()->getLocale());
 
-        return Cache::remember($cacheKey, 300, function () {
+        return app(SharedCacheService::class)->rememberLong($cacheKey, function () {
             $locale = app()->getLocale();
 
             return ProductCollection::query()
@@ -37,7 +38,7 @@ final class CollectionsShowcase extends Component implements HasSchemas
                 ->active()
                 ->ordered()
                 ->get();
-        });
+        }, 300, CacheTagHelper::collections());
     }
 
     public function collectionsSchema(Schema $schema): Schema
