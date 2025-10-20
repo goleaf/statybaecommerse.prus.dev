@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => 'Флаги функций',
+    'plural' => 'Флаги функций',
+    'single' => 'Флаг функции',
+    'basic_information' => 'Основная информация',
+    'name' => 'Название',
+    'key' => 'Ключ',
+    'description' => 'Описание',
+    'status' => 'Статус',
+    'is_active' => 'Активен',
+    'is_enabled' => 'Включен',
+    'is_global' => 'Глобальный',
+    'scheduling' => 'Планирование',
+    'starts_at' => 'Начало',
+    'ends_at' => 'Окончание',
+    'configuration' => 'Конфигурация',
+    'environment' => 'Окружение',
+    'category' => 'Категория',
+    'priority' => 'Приоритет',
+    'conditions' => 'Условия',
+    'condition_key' => 'Ключ условия',
+    'condition_value' => 'Значение условия',
+    'created_at' => 'Создано',
+];
