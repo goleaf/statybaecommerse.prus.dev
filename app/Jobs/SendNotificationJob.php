@@ -25,6 +25,21 @@ final class SendNotificationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 3;
+
+    /**
+     * Define retry backoff windows (in seconds).
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [60, 180, 360];
+    }
+
+    /**
      * Initialize the class instance with required dependencies.
      */
     public function __construct(public Notification $notification, public array $channels = ['database']) {}

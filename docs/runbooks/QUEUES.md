@@ -26,6 +26,40 @@ QUEUE_CONNECTION=database php artisan queue:work --queue=reports,exports,default
 3. Failed jobs will automatically retry up to three times with the defined backoff. Inspect logs (`storage/logs/laravel.log`) for additional context before retrying manually with `php artisan queue:retry <id>`.
 4. When introducing new heavy flows, prefer creating dedicated queues and document them here so operations can size workers appropriately.
 
+## Retry policy
+
+Each queued job now exposes an explicit retry limit so worker behaviour is deterministic regardless of the `--tries` flag. Backoff windows are expressed in seconds.
+
+| Job | Queue | Max retries | Backoff |
+| --- | --- | --- | --- |
+| `App\\Jobs\\CheckLowStockJob` | `default` | 2 | 60, 300 |
+| `App\\Jobs\\ClearApplicationCacheJob` | `default` | 1 | – |
+| `App\\Jobs\\GenerateMediaVariantsJob` | `default` | 3 | 30, 120, 300 |
+| `App\\Jobs\\GenerateReportsJob` | `reports` | 3 | 60, 120, 300 |
+| `App\\Jobs\\GenerateStockExport` | `exports` | 3 | 60, 120, 300 |
+| `App\\Jobs\\ImportInventoryChunk` | `default` | 5 | 30, 90, 180, 300, 600 |
+| `App\\Jobs\\ImportPricesChunk` | `default` | 5 | 30, 90, 180, 300, 600 |
+| `App\\Jobs\\ImportProductsChunk` | `default` | 5 | 30, 90, 180, 300, 600 |
+| `App\\Jobs\\ProcessExportJob` | `default` | 3 | 60, 120, 300 |
+| `App\\Jobs\\RebuildSearchIndexJob` | `default` | 1 | – |
+| `App\\Jobs\\RunMinimalSeedJob` | `default` | 1 | – |
+| `App\\Jobs\\SendContactMessageJob` | `default` | 3 | 60, 120, 240 |
+| `App\\Jobs\\SendNotificationJob` | `default` | 3 | 60, 180, 360 |
+
+## Dead-letter queue & spike alerts
+
+- Jobs that exhaust their retries are copied to the `dead_letter_jobs` table (UUID, payload, and exception metadata) for investigation. Call `$deadLetter->requeue()` from a console REPL to push the job back onto its original queue once the root cause is fixed.
+- Queue failures are bucketed in five-minute windows by default. When the number of terminal failures within a window exceeds `QUEUE_FAILURE_SPIKE_THRESHOLD` (default 5) a system notification is broadcast to admins describing the spike and pointing at the most recent dead-letter entry.
+- Tune behaviour via the new configuration keys in `.env`:
+  ```ini
+  QUEUE_DEAD_LETTER_ENABLED=true
+  QUEUE_DEAD_LETTER_QUEUE=dead-letter
+  QUEUE_FAILURE_ALERTS=true
+  QUEUE_FAILURE_SPIKE_THRESHOLD=5
+  QUEUE_FAILURE_SPIKE_WINDOW=300
+  ```
+  Set `QUEUE_FAILURE_ALERTS=false` in non-production environments if you do not want notifications during local development.
+
 ## Troubleshooting
 - If local testing relies on the `sync` driver, queued jobs run inline. Switch to `database` (or another async driver) when you need to validate background behaviour, and remember to start a worker before running the scenario.
 - Use `Queue::fake()` in automated tests to assert job dispatch without requiring a live worker.
