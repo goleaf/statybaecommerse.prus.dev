@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralCampaignResource\Pages;
-use BackedEnum;
 use App\Models\ReferralCampaign;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -15,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -25,14 +28,11 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 final class ReferralCampaignResource extends Resource
 {
     protected static ?string $model = ReferralCampaign::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-megaphone';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 14;
 
@@ -162,7 +162,7 @@ final class ReferralCampaignResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'discount' => 'success',
                         'credit' => 'info',
                         'points' => 'warning',
@@ -173,12 +173,12 @@ final class ReferralCampaignResource extends Resource
                     ->label(__('admin.referral_campaigns.max_referrals_per_user'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn($state) => $state ?: __('admin.common.unlimited')),
+                    ->formatStateUsing(fn ($state) => $state ?: __('admin.common.unlimited')),
                 TextColumn::make('max_total_referrals')
                     ->label(__('admin.referral_campaigns.max_total_referrals'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn($state) => $state ?: __('admin.common.unlimited')),
+                    ->formatStateUsing(fn ($state) => $state ?: __('admin.common.unlimited')),
                 IconColumn::make('is_active')
                     ->label(__('admin.referral_campaigns.is_active'))
                     ->boolean()

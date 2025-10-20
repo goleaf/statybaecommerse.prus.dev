@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserBehaviorResource\Pages;
-use BackedEnum;
 use App\Models\User;
 use App\Models\UserBehavior;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -21,6 +21,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -33,8 +34,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 /**
  * UserBehaviorResource
  *
@@ -44,8 +43,7 @@ final class UserBehaviorResource extends Resource
 {
     protected static ?string $model = UserBehavior::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
@@ -175,7 +173,7 @@ final class UserBehaviorResource extends Resource
                 TextColumn::make('behavior_type')
                     ->label(__('admin.user_behaviors.behavior_type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'view' => 'info',
                         'click' => 'success',
                         'add_to_cart' => 'warning',
@@ -259,16 +257,16 @@ final class UserBehaviorResource extends Resource
                 TernaryFilter::make('has_product')
                     ->label(__('admin.user_behaviors.has_product'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('product_id'),
-                        false: fn(Builder $query) => $query->whereNull('product_id'),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->whereNotNull('product_id'),
+                        false: fn (Builder $query) => $query->whereNull('product_id'),
+                        blank: fn (Builder $query) => $query,
                     ),
                 TernaryFilter::make('has_category')
                     ->label(__('admin.user_behaviors.has_category'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('category_id'),
-                        false: fn(Builder $query) => $query->whereNull('category_id'),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->whereNotNull('category_id'),
+                        false: fn (Builder $query) => $query->whereNull('category_id'),
+                        blank: fn (Builder $query) => $query,
                     ),
                 Filter::make('created_at')
                     ->form([
@@ -281,25 +279,25 @@ final class UserBehaviorResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
                 Filter::make('recent_behaviors')
                     ->label(__('admin.user_behaviors.recent_behaviors'))
-                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
+                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
                 Filter::make('today')
                     ->label(__('admin.user_behaviors.today'))
-                    ->query(fn(Builder $query): Builder => $query->whereDate('created_at', today())),
+                    ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today())),
                 Filter::make('this_week')
                     ->label(__('admin.user_behaviors.this_week'))
-                    ->query(fn(Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])),
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])),
                 Filter::make('this_month')
                     ->label(__('admin.user_behaviors.this_month'))
-                    ->query(fn(Builder $query): Builder => $query->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)),
+                    ->query(fn (Builder $query): Builder => $query->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)),
             ])
             ->actions([
                 ViewAction::make(),
@@ -381,7 +379,7 @@ final class UserBehaviorResource extends Resource
                     ->label(__('admin.user_behaviors.analytics_dashboard'))
                     ->icon('heroicon-o-chart-pie')
                     ->color('primary')
-                    ->url(fn(): string => route('filament.admin.resources.user-behaviors.analytics')),
+                    ->url(fn (): string => route('filament.admin.resources.user-behaviors.analytics')),
                 Action::make('export_all')
                     ->label(__('admin.user_behaviors.export_all'))
                     ->icon('heroicon-o-arrow-down-tray')

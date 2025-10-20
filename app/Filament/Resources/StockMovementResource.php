@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockMovementResource\Pages;
-use BackedEnum;
 use App\Models\StockMovement;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -15,16 +15,14 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * StockMovementResource
@@ -33,12 +31,8 @@ use Filament\Forms\Form;
  */
 final class StockMovementResource extends Resource
 {
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    /**
-     * @var UnitEnum|string|null
-     */
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 3;
@@ -146,7 +140,7 @@ final class StockMovementResource extends Resource
                 TextColumn::make('type')
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'in' => 'success',
                         'out' => 'danger',
                         'adjustment' => 'warning',
@@ -186,8 +180,8 @@ final class StockMovementResource extends Resource
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
                         return $query
-                            ->when($data['moved_from'] ?? null, fn($q, $date) => $q->whereDate('moved_at', '>=', $date))
-                            ->when($data['moved_to'] ?? null, fn($q, $date) => $q->whereDate('moved_at', '<=', $date));
+                            ->when($data['moved_from'] ?? null, fn ($q, $date) => $q->whereDate('moved_at', '>=', $date))
+                            ->when($data['moved_to'] ?? null, fn ($q, $date) => $q->whereDate('moved_at', '<=', $date));
                     }),
             ])
             ->actions([
