@@ -14,6 +14,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\ValidateCodeStyleCommand::class,
         \App\Console\Commands\CodeStyleWatchCommand::class,
         \App\Console\Commands\DemonstrateTimeoutCommand::class,
+        \App\Console\Commands\GenerateApiSpecCommand::class,
         \App\Console\Commands\GenerateReportsCommand::class,
         \App\Console\Commands\CheckRefreshDatabaseCommand::class,
     ];
