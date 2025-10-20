@@ -29,15 +29,31 @@ final class ListProductVariants extends ListRecords
 
             'in_stock' => Tab::make(__('product_variants.tabs.in_stock'))
                 ->icon('heroicon-o-check-circle')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('track_inventory', false)->orWhere('quantity', '>', 0)),
+                ->modifyQueryUsing(
+                    fn (Builder $query) => $query->where(
+                        function (Builder $stockQuery): void {
+                            $stockQuery
+                                ->where('track_inventory', false)
+                                ->orWhere('available_quantity', '>', 0);
+                        }
+                    )
+                ),
 
             'low_stock' => Tab::make(__('product_variants.tabs.low_stock'))
                 ->icon('heroicon-o-exclamation-triangle')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('track_inventory', true)->whereRaw('quantity <= low_stock_threshold')),
+                ->modifyQueryUsing(
+                    fn (Builder $query) => $query
+                        ->where('track_inventory', true)
+                        ->whereColumn('available_quantity', '<=', 'low_stock_threshold')
+                ),
 
             'out_of_stock' => Tab::make(__('product_variants.tabs.out_of_stock'))
                 ->icon('heroicon-o-x-circle')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('track_inventory', true)->where('quantity', '<=', 0)),
+                ->modifyQueryUsing(
+                    fn (Builder $query) => $query
+                        ->where('track_inventory', true)
+                        ->where('available_quantity', '<=', 0)
+                ),
 
             'size_variants' => Tab::make(__('product_variants.tabs.size_variants'))
                 ->icon('heroicon-o-cube')
