@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\DocumentServiceContract;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\User;
 use App\Notifications\DocumentGenerated;
+use App\Support\Storage\SecureStorage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
@@ -21,7 +22,7 @@ use RuntimeException;
  *
  * Service class containing DocumentService business logic, external integrations, and complex operations with proper error handling and logging.
  */
-final class DocumentService
+final class DocumentService implements DocumentServiceContract
 {
     /**
      * Handle generateDocument functionality with proper error handling.

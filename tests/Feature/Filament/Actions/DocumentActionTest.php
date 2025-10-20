@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Actions;
 
+use App\Contracts\DocumentServiceContract;
 use App\Filament\Actions\DocumentAction;
+use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\User;
 use Filament\Actions\Action;
+use Filament\Schemas\Schema;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use LogicException;
 use Tests\TestCase;
 
 final class DocumentActionTest extends TestCase
@@ -26,7 +32,7 @@ final class DocumentActionTest extends TestCase
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
 
-        $this->template = DocumentTemplate::factory()->create([
+        $this->template = DocumentTemplate::factory()->active()->create([
             'name' => 'Test Template',
             'content' => 'Test content with {{VARIABLE}}',
         ]);
@@ -61,15 +67,22 @@ final class DocumentActionTest extends TestCase
     public function test_action_form_has_required_fields(): void
     {
         $action = DocumentAction::make();
-        $schema = $action->getSchema();
+        $schema = $action->getSchema(Schema::make());
 
-        expect($schema->getComponents())
+        expect($schema)
+            ->not->toBeNull()
+            ->and($schema?->getComponents())
             ->toHaveCount(3);  // template_id, format, title
     }
 
-    public function test_can_generate_document_successfully(): void
+    public function test_generates_html_document_response(): void
     {
         $action = DocumentAction::make();
+        $handler = $action->getActionFunction();
+
+        $this->assertNotNull($handler);
+
+        $record = User::factory()->create(['name' => 'Jane Doe']);
 
         $data = [
             'template_id' => $this->template->id,
@@ -77,26 +90,102 @@ final class DocumentActionTest extends TestCase
             'title' => 'Test Document',
         ];
 
-        $model = new class
+        $document = Document::make([
+            'title' => $data['title'],
+            'content' => '<p>Generated</p>',
+        ]);
+
+        $service = $this->makeDocumentServiceFake(
+            $document,
+            function (DocumentTemplate $template, User $passedRecord, array $variables, ?string $title) use ($record, $data): void {
+                expect($template->is($this->template))->toBeTrue();
+                expect($passedRecord->is($record))->toBeTrue();
+                expect($variables['MODEL_ID'])->toBe($record->getKey());
+                expect($variables['MODEL_TYPE'])->toBe($record->getMorphClass());
+                expect($variables['NAME'])->toBe($record->name);
+                expect($title)->toBe($data['title']);
+            }
+        );
+
+        $response = $handler($record, $data, $service);
+
+        expect($response)
+            ->toBeInstanceOf(Response::class)
+            ->and($response->getContent())
+            ->toBe($document->content)
+            ->and($response->headers->get('Content-Type'))
+            ->toBe('text/html');
+    }
+
+    public function test_generates_pdf_document_redirect(): void
+    {
+        $action = DocumentAction::make();
+        $handler = $action->getActionFunction();
+
+        $this->assertNotNull($handler);
+
+        $record = User::factory()->create();
+
+        $data = [
+            'template_id' => $this->template->id,
+            'format' => 'pdf',
+            'title' => 'Test PDF Document',
+        ];
+
+        $document = Document::make([
+            'title' => $data['title'],
+            'content' => '<p>Generated</p>',
+        ]);
+
+        $service = $this->makeDocumentServiceFake(
+            $document,
+            function (): void {
+                // No additional assertions beyond invocation.
+            },
+            function (Document $generated): string {
+                return 'https://example.test/document.pdf';
+            }
+        );
+
+        $response = $handler($record, $data, $service);
+
+        expect($response)
+            ->toBeInstanceOf(RedirectResponse::class)
+            ->and($response->getTargetUrl())
+            ->toBe('https://example.test/document.pdf');
+    }
+
+    private function makeDocumentServiceFake(Document $document, callable $assertion, ?callable $pdfHandler = null): DocumentServiceContract
+    {
+        return new class($document, $assertion, $pdfHandler) implements DocumentServiceContract
         {
-            public function getKey()
+            /** @var callable */
+            private $assertion;
+
+            /** @var callable|null */
+            private $pdfHandler;
+
+            public function __construct(private Document $document, callable $assertion, ?callable $pdfHandler)
             {
-                return 1;
+                $this->assertion = $assertion;
+                $this->pdfHandler = $pdfHandler;
             }
 
-            public function getMorphClass()
+            public function generateDocument(DocumentTemplate $template, \Illuminate\Database\Eloquent\Model $relatedModel, array $variables = [], ?string $title = null, bool $sendNotification = false): Document
             {
-                return 'TestModel';
+                ($this->assertion)($template, $relatedModel, $variables, $title);
+
+                return $this->document;
+            }
+
+            public function generatePdf(Document $document): string
+            {
+                if ($this->pdfHandler === null) {
+                    throw new LogicException('generatePdf should not be called.');
+                }
+
+                return ($this->pdfHandler)($document);
             }
         };
-
-        // Test that the action can be called (we can't actually test the full execution without proper setup)
-        expect($action)
-            ->toBeInstanceOf(Action::class);
-
-        // Test that the action has the correct form fields
-        $schema = $action->getSchema();
-        expect($schema->getComponents())
-            ->toHaveCount(3);
     }
 }
