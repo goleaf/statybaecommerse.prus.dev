@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * VariantAnalytics
@@ -136,12 +138,14 @@ final class VariantAnalytics extends Model
      */
     public static function recordAnalytics(
         int $variantId,
-        string|\DateTime $date,
+        string|DateTimeInterface $date,
         array $data = []
     ): self {
+        $normalizedDate = self::normalizeDate($date);
+
         $defaultData = [
             'variant_id' => $variantId,
-            'date' => $date,
+            'date' => $normalizedDate,
             'views' => $data['views'] ?? 0,
             'clicks' => $data['clicks'] ?? 0,
             'add_to_cart' => $data['add_to_cart'] ?? 0,
@@ -151,9 +155,18 @@ final class VariantAnalytics extends Model
         ];
 
         return self::updateOrCreate(
-            ['variant_id' => $variantId, 'date' => $date],
+            ['variant_id' => $variantId, 'date' => $normalizedDate],
             $defaultData
         );
+    }
+
+    private static function normalizeDate(string|DateTimeInterface $date): string
+    {
+        if ($date instanceof DateTimeInterface) {
+            return Carbon::instance($date)->toDateString();
+        }
+
+        return Carbon::parse($date)->toDateString();
     }
 
     /**
