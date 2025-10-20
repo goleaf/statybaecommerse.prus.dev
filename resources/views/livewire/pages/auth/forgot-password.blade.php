@@ -1,5 +1,9 @@
 <?php
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -15,9 +19,10 @@ new #[Layout('components.layouts.base')] class extends Component {
             'email' => ['required', 'string', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
+        $this->ensureIsNotRateLimited();
+
+        RateLimiter::hit($this->throttleKey(), $this->decaySeconds());
+
         $status = Password::sendResetLink($this->only('email'));
 
         if ($status != Password::RESET_LINK_SENT) {
@@ -29,6 +34,42 @@ new #[Layout('components.layouts.base')] class extends Component {
         $this->reset('email');
 
         session()->flash('status', __($status));
+    }
+
+    private function ensureIsNotRateLimited(): void
+    {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
+            return;
+        }
+
+        event(new Lockout(request()));
+
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'email' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => (int) ceil($seconds / 60),
+            ]),
+        ]);
+    }
+
+    private function throttleKey(): string
+    {
+        $ip = request()->ip();
+        $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
+
+        return Str::transliterate('password-reset|'.Str::lower($this->email).'|'.$ipAddress);
+    }
+
+    private function maxAttempts(): int
+    {
+        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'max_attempts', 5));
+    }
+
+    private function decaySeconds(): int
+    {
+        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'decay_seconds', 300));
     }
 }; ?>
 

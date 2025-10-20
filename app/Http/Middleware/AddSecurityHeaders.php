@@ -9,7 +9,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class SecurityHeaders
+final class AddSecurityHeaders
 {
     public function __construct(private readonly ConfigRepository $config) {}
 
@@ -18,19 +18,19 @@ final class SecurityHeaders
         /** @var Response $response */
         $response = $next($request);
 
-        if (! $this->config->get('security-headers.enabled', true)) {
+        if (! $this->config->get('security.headers.enabled', true)) {
             return $response;
         }
 
-        $this->applyHeaders($response);
+        $this->applyStaticHeaders($response);
         $this->applyContentSecurityPolicy($response);
 
         return $response;
     }
 
-    private function applyHeaders(Response $response): void
+    private function applyStaticHeaders(Response $response): void
     {
-        $headers = $this->config->get('security-headers.headers', []);
+        $headers = $this->config->get('security.headers.values', []);
         if (! is_array($headers)) {
             return;
         }
@@ -52,7 +52,7 @@ final class SecurityHeaders
 
     private function applyContentSecurityPolicy(Response $response): void
     {
-        $directives = $this->config->get('security-headers.content_security_policy', []);
+        $directives = $this->config->get('security.headers.content_security_policy', []);
         if (! is_array($directives) || $directives === []) {
             return;
         }
