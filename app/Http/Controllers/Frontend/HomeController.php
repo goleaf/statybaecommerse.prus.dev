@@ -5,13 +5,25 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Services\Frontend\HomepageDataProvider;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 final class HomeController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(private readonly HomepageDataProvider $homepageData)
     {
-        // TODO: Implement homepage
-        return response()->json(['message' => 'Homepage not implemented yet']);
+    }
+
+    public function index(Request $request): View
+    {
+        return view('frontend.home.index', [
+            'stats' => $this->homepageData->stats(),
+            'featuredProducts' => $this->homepageData->featuredProducts(),
+            'newArrivals' => $this->homepageData->newArrivals(),
+            'trendingProducts' => $this->homepageData->trendingProducts(),
+            'topCategories' => $this->homepageData->topCategories(),
+            'topBrands' => $this->homepageData->topBrands(),
+        ]);
     }
 }
