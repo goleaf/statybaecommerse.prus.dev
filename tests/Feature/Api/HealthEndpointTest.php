@@ -19,7 +19,11 @@ final class HealthEndpointTest extends TestCase
         $response = $this->getJson('/api/v1/health');
 
         $response->assertOk();
-        $response->assertHeader('Cache-Control', 'no-store, max-age=0');
+        $cacheControl = $response->headers->get('Cache-Control');
+
+        $this->assertIsString($cacheControl);
+        $this->assertStringContainsString('no-store', $cacheControl);
+        $this->assertStringContainsString('max-age=0', $cacheControl);
         $response->assertHeader('Pragma', 'no-cache');
         $response->assertJsonPath('status', 'ok');
         $response->assertJsonStructure([
@@ -28,10 +32,14 @@ final class HealthEndpointTest extends TestCase
             'checks' => [
                 'database' => ['status', 'latency_ms'],
                 'cache' => ['status', 'latency_ms'],
+                'disk' => ['status', 'latency_ms'],
             ],
         ]);
 
-        $this->assertArrayNotHasKey('queue', $response->json('checks'));
+        $checks = $response->json('checks');
+
+        $this->assertIsArray($checks);
+        $this->assertArrayNotHasKey('queue', $checks);
     }
 
     public function test_ready_endpoint_includes_queue_check_when_asynchronous_queue_configured(): void
@@ -44,6 +52,11 @@ final class HealthEndpointTest extends TestCase
         $response->assertJsonPath('status', 'ok');
         $response->assertJsonPath('checks.queue.status', 'ok');
         $this->assertSame('database', $response->json('checks.queue.meta.connection'));
+
+        $checks = $response->json('checks');
+
+        $this->assertIsArray($checks);
+        $this->assertArrayHasKey('disk', $checks);
     }
 
     public function test_ready_endpoint_returns_service_unavailable_on_failed_check(): void
@@ -75,7 +88,11 @@ final class HealthEndpointTest extends TestCase
         }
 
         $response->assertStatus(503);
-        $response->assertHeader('Cache-Control', 'no-store, max-age=0');
+        $cacheControl = $response->headers->get('Cache-Control');
+
+        $this->assertIsString($cacheControl);
+        $this->assertStringContainsString('no-store', $cacheControl);
+        $this->assertStringContainsString('max-age=0', $cacheControl);
         $response->assertHeader('Pragma', 'no-cache');
         $response->assertJsonPath('status', 'error');
         $response->assertJsonPath('checks.database.status', 'failed');
