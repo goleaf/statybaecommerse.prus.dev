@@ -7,7 +7,7 @@ namespace App\Filament\Resources\SystemSettingResource\Pages;
 use App\Filament\Resources\SystemSettingResource;
 use Filament\Resources\Pages\CreateRecord;
 
-final class CreateSystemSetting extends CreateRecord
+class CreateSystemSetting extends CreateRecord
 {
     protected static string $resource = SystemSettingResource::class;
 
