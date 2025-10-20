@@ -23,7 +23,8 @@ final class ProductFeatureResource extends Resource
 {
     protected static ?string $model = ProductFeature::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    /** @var string|BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-star';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
@@ -40,10 +41,10 @@ final class ProductFeatureResource extends Resource
             Forms\Components\Select::make('feature_type')
                 ->options([
                     'specification' => 'Specification',
-                    'benefit' => 'Benefit',
-                    'feature' => 'Feature',
-                    'technical' => 'Technical',
-                    'performance' => 'Performance',
+                    'benefit'       => 'Benefit',
+                    'feature'       => 'Feature',
+                    'technical'     => 'Technical',
+                    'performance'   => 'Performance',
                 ])
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
@@ -72,8 +73,8 @@ final class ProductFeatureResource extends Resource
                         'primary' => 'specification',
                         'success' => 'benefit',
                         'warning' => 'feature',
-                        'info' => 'technical',
-                        'danger' => 'performance',
+                        'info'    => 'technical',
+                        'danger'  => 'performance',
                     ]),
                 Tables\Columns\TextColumn::make('feature_key'),
                 Tables\Columns\TextColumn::make('feature_value')
@@ -111,9 +112,9 @@ final class ProductFeatureResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductFeatures::route('/'),
+            'index'  => Pages\ListProductFeatures::route('/'),
             'create' => Pages\CreateProductFeature::route('/create'),
-            'edit' => Pages\EditProductFeature::route('/{record}/edit'),
+            'edit'   => Pages\EditProductFeature::route('/{record}/edit'),
         ];
     }
 }
