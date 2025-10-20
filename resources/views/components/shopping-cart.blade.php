@@ -30,7 +30,8 @@
                         @if ($showImages)
                             <div class="flex-shrink-0">
                                 <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden">
-                                    <img src="{{ $item['image'] ?? asset('images/placeholder-product.jpg') }}"
+                                    @php($image = $item['main_image'] ?? $item['thumbnail'] ?? ($item['image'] ?? null))
+                                    <img src="{{ $image ?? asset('images/placeholder-product.jpg') }}"
                                          alt="{{ $item['name'] }}"
                                          class="w-full h-full object-cover">
                                 </div>

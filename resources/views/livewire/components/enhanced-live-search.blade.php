@@ -257,9 +257,10 @@
                         <div class="flex items-center space-x-4">
                             <!-- Enhanced Result Image -->
                             <div class="flex-shrink-0">
-                                @if($result['image'])
-                                    <img 
-                                        src="{{ $result['image'] }}" 
+                                @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                                @if($image)
+                                    <img
+                                        src="{{ $image }}"
                                         alt="{{ $result['title'] }}"
                                         class="w-16 h-16 object-cover rounded-lg shadow-sm"
                                     />

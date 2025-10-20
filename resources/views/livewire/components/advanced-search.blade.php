@@ -224,8 +224,9 @@
                     <div class="flex items-center space-x-3">
                         {{-- Result Image --}}
                         <div class="flex-shrink-0">
-                            @if($result['image'])
-                                <img src="{{ $result['image'] }}" 
+                            @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                            @if($image)
+                                <img src="{{ $image }}"
                                      alt="{{ $result['title'] }}"
                                      class="w-12 h-12 rounded-lg object-cover bg-gray-100" />
                             @else
