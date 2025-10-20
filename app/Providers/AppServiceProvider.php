@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Filament\Components\LiveNotificationFeed;
 use App\Services\DocumentService;
+use App\Support\Logging\LogContext;
+use App\Support\Logging\StructuredLogger;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
@@ -36,6 +38,11 @@ class AppServiceProvider extends ServiceProvider
                 \App\Console\Commands\ImportInventory::class,
             ]);
         }
+
+        $this->app->scoped(LogContext::class, static fn (): LogContext => new LogContext());
+        $this->app->scoped(StructuredLogger::class, function ($app): StructuredLogger {
+            return new StructuredLogger($app->make(LogContext::class));
+        });
     }
 
     public function boot(): void
