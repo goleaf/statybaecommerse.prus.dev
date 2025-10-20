@@ -171,3 +171,18 @@ it('validates ends_at is after starts_at', function () {
         ])
         ->assertSessionHasErrors(['ends_at']);
 });
+
+it('duplicates discounts with unique slugs', function () {
+    $discount = Discount::factory()->create([
+        'name' => 'Holiday Special',
+        'slug' => 'holiday-special',
+    ]);
+
+    $firstCopy = DiscountResource::duplicateDiscount($discount);
+    $secondCopy = DiscountResource::duplicateDiscount($discount);
+
+    expect($firstCopy->slug)->toBe('holiday-special-copy');
+    expect($secondCopy->slug)->toBe('holiday-special-copy-2');
+
+    expect(Discount::withoutGlobalScopes()->whereIn('id', [$firstCopy->id, $secondCopy->id])->count())->toBe(2);
+});
