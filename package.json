@@ -15,7 +15,8 @@
         "test": "php artisan test",
         "e2e:smoke": "node scripts/e2e-smoke.mjs",
         "e2e:routes": "node scripts/check-routes.mjs",
-        "e2e:console": "node scripts/check-console.mjs"
+        "e2e:console": "node scripts/check-console.mjs",
+        "lighthouse": "node scripts/lighthouse-check.mjs"
     },
     "devDependencies": {
         "@modelcontextprotocol/sdk": "1.0.0",
@@ -31,6 +32,7 @@
         "laravel-vite-plugin": "2.0.0",
         "node-fetch": "3.3.2",
         "playwright": "1.47.2",
+        "lighthouse": "12.1.0",
         "sass": "1.77.8",
         "sass-embedded": "1.92.1",
         "tailwindcss": "4.1.12",
