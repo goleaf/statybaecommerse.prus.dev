@@ -24,6 +24,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -234,7 +235,7 @@ final class NewsTagResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('activate')
+                Action::make('activate')
                     ->label(__('admin.news_tags.actions.activate'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -245,7 +246,7 @@ final class NewsTagResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableBulkAction::make('deactivate')
+                Action::make('deactivate')
                     ->label(__('admin.news_tags.actions.deactivate'))
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
@@ -256,7 +257,7 @@ final class NewsTagResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableBulkAction::make('duplicate')
+                Action::make('duplicate')
                     ->label(__('admin.news_tags.actions.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
