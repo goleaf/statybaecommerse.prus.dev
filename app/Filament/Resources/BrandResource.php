@@ -18,7 +18,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 final class BrandResource extends Resource
 {
@@ -127,7 +128,7 @@ final class BrandResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, SchemaSet $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                ->afterStateUpdated(fn (string $operation, $state, SchemaSet $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                             TextInput::make('slug')
                                 ->label(__('brands.slug'))
                                 ->required()
@@ -145,7 +146,7 @@ final class BrandResource extends Resource
                 ]),
             Section::make(__('brands.media'))
                 ->schema([
-                    FileUpload::make('logo')
+                    SpatieMediaLibraryFileUpload::make('logo')
                         ->label(__('brands.logo'))
                         ->image()
                         ->imageEditor()
@@ -154,16 +155,20 @@ final class BrandResource extends Resource
                             '16:9',
                             '4:3',
                         ])
-                        ->directory('brands/logos')
+                        ->collection('logo')
+                        ->maxFiles(1)
+                        ->preserveFilenames()
                         ->visibility('private'),
-                    FileUpload::make('banner')
+                    SpatieMediaLibraryFileUpload::make('banner')
                         ->label(__('brands.banner'))
                         ->image()
                         ->imageEditor()
                         ->imageEditorAspectRatios([
                             '21:9',
                         ])
-                        ->directory('brands/banners')
+                        ->collection('banner')
+                        ->maxFiles(1)
+                        ->preserveFilenames()
                         ->visibility('private'),
                 ]),
             Section::make(__('brands.seo'))
@@ -204,6 +209,7 @@ final class BrandResource extends Resource
             ->columns([
                 ImageColumn::make('logo')
                     ->label(__('brands.logo'))
+                    ->collection('logo')
                     ->circular()
                     ->size(40),
                 TextColumn::make('name')
@@ -390,10 +396,10 @@ final class BrandResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBrands::route('/'),
+            'index'  => Pages\ListBrands::route('/'),
             'create' => Pages\CreateBrand::route('/create'),
-            'view' => Pages\ViewBrand::route('/{record}'),
-            'edit' => Pages\EditBrand::route('/{record}/edit'),
+            'view'   => Pages\ViewBrand::route('/{record}'),
+            'edit'   => Pages\EditBrand::route('/{record}/edit'),
         ];
     }
 }
