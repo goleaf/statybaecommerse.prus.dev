@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -27,6 +28,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -165,6 +167,19 @@ final class FeatureFlagResource extends Resource
                         ->valueLabel(__('feature_flags.condition_value'))
                         ->columnSpanFull(),
                 ]),
+            Section::make('Attribution')
+                ->visible(fn (?FeatureFlag $record): bool => $record !== null)
+                ->components([
+                    Grid::make(2)
+                        ->components([
+                            Placeholder::make('created_by_display')
+                                ->label(__('system.created_by'))
+                                ->content(fn (?FeatureFlag $record): string => $record?->created_by_display ?? '—'),
+                            Placeholder::make('updated_by_display')
+                                ->label(__('system.updated_by'))
+                                ->content(fn (?FeatureFlag $record): string => $record?->updated_by_display ?? '—'),
+                        ]),
+                ]),
         ]);
     }
 
@@ -228,6 +243,28 @@ final class FeatureFlagResource extends Resource
                     ->label(__('feature_flags.created_at'))
                     ->dateTime()
                     ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_by_display')
+                    ->label(__('system.created_by'))
+                    ->formatStateUsing(fn (FeatureFlag $record): string => $record->created_by_display ?? '—')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where(function (Builder $scopedQuery) use ($search): void {
+                            $scopedQuery
+                                ->whereHas('creator', fn (Builder $creatorQuery): Builder => $creatorQuery->where('name', 'like', "%{$search}%"))
+                                ->orWhere('created_by_name', 'like', "%{$search}%");
+                        });
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_by_display')
+                    ->label(__('system.updated_by'))
+                    ->formatStateUsing(fn (FeatureFlag $record): string => $record->updated_by_display ?? '—')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where(function (Builder $scopedQuery) use ($search): void {
+                            $scopedQuery
+                                ->whereHas('updater', fn (Builder $updaterQuery): Builder => $updaterQuery->where('name', 'like', "%{$search}%"))
+                                ->orWhere('updated_by_name', 'like', "%{$search}%");
+                        });
+                    })
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
