@@ -26,6 +26,7 @@ class AdminPanelProvider extends PanelProvider
                     'primary' => Color::Blue,
                 ])
                 ->resources([
+                    \App\Filament\Resources\ApiKeyResource::class,
                     \App\Filament\Resources\OrderShippingResource::class,
                     \App\Filament\Resources\PartnerResource::class,
                     \App\Filament\Resources\PartnerTierResource::class,

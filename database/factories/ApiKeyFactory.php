@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Models\ApiKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ApiKey>
@@ -34,8 +33,10 @@ final class ApiKeyFactory extends Factory
 
         $scopes = $this->faker->randomElements($availableScopes, $this->faker->numberBetween(1, 3));
 
+        $credentials = ApiKey::generateCredentials();
+
         return [
-            'key' => Str::upper(bin2hex(random_bytes(16))),
+            'key' => $credentials['hashed'],
             'name' => sprintf('%s API Access', $this->faker->company()),
             'scopes' => array_values($scopes),
             'rate_limit' => $this->faker->numberBetween(100, 1000),

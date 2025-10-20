@@ -16,6 +16,7 @@ return [
         'system' => 'Sistema',
         'reports' => 'Ataskaitos',
     ],
+    'api_keys' => 'API raktai',
     'user_impersonation' => 'Vartotojų apsimetimas',
     'user_management' => 'Vartotojų valdymas',
 ];
