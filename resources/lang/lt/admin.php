@@ -6,6 +6,7 @@ return array (
   array (
     'dashboard' => 'Valdymo skydas',
     'catalog' => 'Katalogas',
+    'commerce' => 'Komercija',
     'orders' => 'Užsakymai',
     'customers' => 'Klientai',
     'marketing' => 'Rinkodara',
