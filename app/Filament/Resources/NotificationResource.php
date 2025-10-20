@@ -7,10 +7,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -20,9 +24,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -65,9 +66,9 @@ final class NotificationResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            SchemaSection::make(__('admin.notifications.form.sections.basic_information'))
+            Section::make(__('admin.notifications.form.sections.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Select::make('user_id')
                                 ->label(__('admin.notifications.form.fields.user'))
@@ -90,10 +91,12 @@ final class NotificationResource extends Resource
                         ->label(__('admin.notifications.form.fields.body'))
                         ->required()
                         ->rows(4),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Toggle::make('is_read')
                                 ->label(__('admin.notifications.form.fields.is_read'))
+                                ->disabled()
+                                ->dehydrated(false)
                                 ->default(false)
                                 ->columnSpan(1),
                             DateTimePicker::make('read_at')
@@ -102,7 +105,7 @@ final class NotificationResource extends Resource
                         ]),
                 ])
                 ->columns(1),
-            SchemaSection::make(__('admin.notifications.form.sections.metadata'))
+            Section::make(__('admin.notifications.form.sections.metadata'))
                 ->schema([
                     Placeholder::make('created_at')
                         ->label(__('admin.notifications.form.fields.created_at'))
@@ -178,10 +181,10 @@ final class NotificationResource extends Resource
                     ]),
                 Filter::make('is_read')
                     ->label(__('admin.notifications.filters.read'))
-                    ->query(fn (Builder $query): Builder => $query->where('is_read', true)),
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('read_at')),
                 Filter::make('unread')
                     ->label(__('admin.notifications.filters.unread'))
-                    ->query(fn (Builder $query): Builder => $query->where('is_read', false)),
+                    ->query(fn (Builder $query): Builder => $query->whereNull('read_at')),
                 DateFilter::make('created_at')
                     ->label(__('admin.notifications.filters.created_at')),
                 Filter::make('recent')
@@ -191,23 +194,25 @@ final class NotificationResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('mark_as_read')
+                TableAction::make('mark_as_read')
                     ->label(__('admin.notifications.actions.mark_as_read'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
+                    ->visible(fn (Notification $record): bool => ! $record->is_read)
                     ->action(function (Notification $record): void {
-                        $record->update(['is_read' => true, 'read_at' => now()]);
+                        $record->update(['read_at' => now()]);
                         FilamentNotification::make()
                             ->title(__('admin.notifications.marked_as_read'))
                             ->success()
                             ->send();
                     }),
-                TableBulkAction::make('mark_as_unread')
+                TableAction::make('mark_as_unread')
                     ->label(__('admin.notifications.actions.mark_as_unread'))
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
+                    ->visible(fn (Notification $record): bool => $record->is_read)
                     ->action(function (Notification $record): void {
-                        $record->update(['is_read' => false, 'read_at' => null]);
+                        $record->update(['read_at' => null]);
                         FilamentNotification::make()
                             ->title(__('admin.notifications.marked_as_unread'))
                             ->success()
@@ -223,7 +228,7 @@ final class NotificationResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each(function (Notification $record): void {
-                                $record->update(['is_read' => true, 'read_at' => now()]);
+                                $record->update(['read_at' => now()]);
                             });
                             FilamentNotification::make()
                                 ->title(__('admin.notifications.bulk_marked_as_read'))
@@ -236,7 +241,7 @@ final class NotificationResource extends Resource
                         ->color('gray')
                         ->action(function (Collection $records): void {
                             $records->each(function (Notification $record): void {
-                                $record->update(['is_read' => false, 'read_at' => null]);
+                                $record->update(['read_at' => null]);
                             });
                             FilamentNotification::make()
                                 ->title(__('admin.notifications.bulk_marked_as_unread'))

@@ -94,11 +94,11 @@ it('performs search when query is set', function (): void {
         ->model(Product::class)
         ->setSearchQuery('Test');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults('Test'));
 
     expect($searchResults)->toHaveCount(2);
-    expect($searchResults->pluck('label')->toArray())->toContain('Test Product 1');
-    expect($searchResults->pluck('label')->toArray())->toContain('Test Product 2');
+    expect($searchResults->values()->toArray())->toContain('Test Product 1');
+    expect($searchResults->values()->toArray())->toContain('Test Product 2');
 });
 
 it('respects minimum search length', function (): void {
@@ -109,7 +109,7 @@ it('respects minimum search length', function (): void {
         ->minSearchLength(5)
         ->setSearchQuery('Te');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults('Te'));
 
     expect($searchResults)->toHaveCount(0);
 });
@@ -122,7 +122,7 @@ it('limits search results', function (): void {
         ->maxSearchResults(5)
         ->setSearchQuery('Test');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults('Test'));
 
     expect($searchResults)->toHaveCount(5);
 });
@@ -135,7 +135,7 @@ it('uses custom search field', function (): void {
         ->searchField('description')
         ->setSearchQuery('Test');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults('Test'));
 
     expect($searchResults)->toHaveCount(1);
 });
@@ -144,7 +144,7 @@ it('returns empty results for invalid model class', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->setSearchQuery('test');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults('test'));
 
     expect($searchResults)->toHaveCount(0);
 });
@@ -156,7 +156,7 @@ it('returns empty results for empty search query', function (): void {
         ->model(Product::class)
         ->setSearchQuery('');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults(''));
 
     expect($searchResults)->toHaveCount(0);
 });
@@ -206,7 +206,7 @@ it('handles search with no results', function (): void {
         ->model(Product::class)
         ->setSearchQuery('NonExistent');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults('Nonexistent Product Name'));
 
     expect($searchResults)->toHaveCount(0);
 });

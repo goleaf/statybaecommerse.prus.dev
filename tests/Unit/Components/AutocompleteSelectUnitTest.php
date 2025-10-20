@@ -81,7 +81,7 @@ it('returns empty results for invalid model class', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->setSearchQuery('test');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults('test'));
 
     expect($searchResults)->toHaveCount(0);
 });
@@ -91,7 +91,7 @@ it('returns empty results for empty search query', function (): void {
         ->model(Product::class)
         ->setSearchQuery('');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = collect($component->getSearchResults(''));
 
     expect($searchResults)->toHaveCount(0);
 });
