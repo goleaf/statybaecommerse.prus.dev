@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domain\Product\Collections;
+
+use App\Domain\Product\Entities\ProductImage;
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
+use Traversable;
+
+/**
+ * @implements IteratorAggregate<int, ProductImage>
+ */
+final class ProductImageCollection implements IteratorAggregate, Countable
+{
+    /** @var list<ProductImage> */
+    private array $items;
+
+    /**
+     * @param list<ProductImage> $items
+     */
+    public function __construct(array $items = [])
+    {
+        $this->items = $items;
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->items);
+    }
+
+    public function count(): int
+    {
+        return count($this->items);
+    }
+
+    public function first(): ?ProductImage
+    {
+        return $this->items[0] ?? null;
+    }
+
+    /**
+     * @return list<ProductImage>
+     */
+    public function toArray(): array
+    {
+        return $this->items;
+    }
+}
