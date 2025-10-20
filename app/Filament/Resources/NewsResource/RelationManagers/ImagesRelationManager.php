@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
+use App\Support\Storage\SecureStorage;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -67,7 +68,7 @@ final class ImagesRelationManager extends RelationManager
                     ->label(__('news.fields.image'))
                     ->size(60)
                     ->square()
-                    ->disk('public'),
+                    ->getStateUsing(fn ($record) => $record->file_path ? SecureStorage::temporarySignedUrl($record->file_path) : null),
                 Tables\Columns\TextColumn::make('alt_text')
                     ->label(__('news.fields.alt_text'))
                     ->searchable()

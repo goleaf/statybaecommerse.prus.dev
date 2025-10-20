@@ -86,7 +86,10 @@ final class DocumentResource extends Resource
                                 FileUpload::make('file_path')
                                     ->label(__('admin.documents.file'))
                                     ->required()
-                                    ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'image/*']),
+                                    ->directory('documents')
+                                    ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'image/jpeg', 'image/png', 'image/webp'])
+                                    ->allowedFileExtensions(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp'])
+                                    ->maxSize(10 * 1024),
                                 Textarea::make('description')
                                     ->label(__('admin.documents.description'))
                                     ->maxLength(65535)

@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
@@ -567,9 +568,9 @@ final class XmlCatalogService
             $dir = 'product-images/'.(string) $product->id;
             $filename = 'image-'.$index.'-'.Str::random(8).'.'.$extension;
             $path = $dir.'/'.$filename;
-            Storage::disk('public')->put($path, $contents);
+            Storage::disk(SecureStorage::disk())->put($path, $contents);
 
-            return 'storage/'.$path;
+            return SecureStorage::temporarySignedUrl($path);
         } catch (\Throwable $e) {
             return '';
         }

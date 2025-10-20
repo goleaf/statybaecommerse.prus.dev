@@ -51,8 +51,8 @@ title(__('users.profile'));
                     <!-- Avatar Section -->
                     <div class="text-center">
                         <div class="relative inline-block">
-                            <img 
-                                src="{{ $user->avatar_url ? Storage::disk('public')->url($user->avatar_url) : $user->generateGravatarUrl() }}" 
+                            <img
+                                src="{{ $user->avatar_url }}"
                                 alt="{{ $user->name }}"
                                 class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-white shadow-lg"
                                 id="avatar-preview"

@@ -82,7 +82,7 @@ title(__('users.wishlist'));
                         <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 relative">
                             @if($item->productVariant && $item->productVariant->product && $item->productVariant->product->featured_image)
                                 <img 
-                                    src="{{ Storage::disk('public')->url($item->productVariant->product->featured_image) }}" 
+                                    src="{{ $item->productVariant->product->featured_image ? \App\Support\Storage\SecureStorage::temporarySignedUrl($item->productVariant->product->featured_image) : '' }}"
                                     alt="{{ $item->productVariant->product->name }}"
                                     class="h-64 w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
                                 >

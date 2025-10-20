@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -71,7 +72,7 @@ final class NewsImage extends Model
      */
     public function getUrlAttribute(): string
     {
-        return asset('storage/'.$this->file_path);
+        return SecureStorage::temporarySignedUrl($this->file_path);
     }
 
     /**
@@ -82,7 +83,7 @@ final class NewsImage extends Model
         $pathInfo = pathinfo($this->file_path);
         $thumbnailPath = $pathInfo['dirname'].'/thumbnails/'.$pathInfo['filename'].'_thumb.'.$pathInfo['extension'];
 
-        return asset('storage/'.$thumbnailPath);
+        return SecureStorage::temporarySignedUrl($thumbnailPath);
     }
 
     /**

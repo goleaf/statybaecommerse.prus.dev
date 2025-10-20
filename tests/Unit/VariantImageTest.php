@@ -8,6 +8,7 @@ use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\VariantImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -183,7 +184,8 @@ class VariantImageTest extends TestCase
 
     public function test_can_check_if_image_exists(): void
     {
-        Storage::fake('public');
+        $disk = SecureStorage::disk();
+        Storage::fake($disk);
 
         $variantImage = VariantImage::factory()->create([
             'image_path' => 'variant-images/test-image.jpg',
@@ -193,7 +195,7 @@ class VariantImageTest extends TestCase
         $this->assertFalse($variantImage->image_exists);
 
         // Create the file
-        Storage::disk('public')->put('variant-images/test-image.jpg', 'fake content');
+        Storage::disk($disk)->put('variant-images/test-image.jpg', 'fake content');
 
         $this->assertTrue($variantImage->image_exists);
     }

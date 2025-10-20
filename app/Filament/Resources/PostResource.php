@@ -132,13 +132,13 @@ final class PostResource extends Resource
                             ->label(__('posts.featured_image'))
                             ->image()
                             ->directory('posts')
-                            ->visibility('public'),
+                            ->visibility('private'),
                         FileUpload::make('gallery')
                             ->label(__('posts.gallery'))
                             ->image()
                             ->multiple()
                             ->directory('posts/gallery')
-                            ->visibility('public'),
+                            ->visibility('private'),
                     ]),
                 Section::make(__('posts.seo'))
                     ->schema([

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use App\Models\Document;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Attachment;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -46,8 +47,13 @@ final class DocumentGenerated extends Notification
         }
         // Attach PDF if available and requested
         if ($this->attachPdf && $this->document->isPdf() && $this->document->file_path) {
-            if (Storage::disk('public')->exists($this->document->file_path)) {
-                $message->attach(Attachment::fromStorageDisk('public', $this->document->file_path)->as($this->document->title.'.pdf')->withMime('application/pdf'));
+            $disk = SecureStorage::disk();
+            if (Storage::disk($disk)->exists($this->document->file_path)) {
+                $message->attach(
+                    Attachment::fromStorageDisk($disk, $this->document->file_path)
+                        ->as($this->document->title.'.pdf')
+                        ->withMime('application/pdf')
+                );
             }
         }
         $message->line(__('documents.email.footer', [], $locale));

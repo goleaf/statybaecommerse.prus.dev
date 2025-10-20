@@ -148,7 +148,7 @@ final class CategoryResource extends Resource
                             '4:3',
                         ])
                         ->directory('categories/images')
-                        ->visibility('public'),
+                        ->visibility('private'),
                     FileUpload::make('banner')
                         ->label(__('categories.banner'))
                         ->image()
@@ -157,7 +157,7 @@ final class CategoryResource extends Resource
                             '21:9',
                         ])
                         ->directory('categories/banners')
-                        ->visibility('public'),
+                        ->visibility('private'),
                 ]),
             Section::make(__('categories.appearance'))
                 ->schema([
