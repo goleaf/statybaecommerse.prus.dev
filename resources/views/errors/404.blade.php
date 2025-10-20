@@ -2,10 +2,10 @@
     $locale = app()->getLocale();
 @endphp
 
-@extends('errors.layout', [
+@extends('errors.4xx', [
     'code' => '404',
-    'title' => __('Page Not Found'),
-    'description' => __('The page you are looking for could not be found. It might have been moved, deleted, or you entered the wrong URL.'),
+    'title' => __('We couldn\'t find that page'),
+    'description' => __('The page you are looking for may have been moved or no longer exists. Double-check the address or explore one of the helpful links below.'),
     'showSearch' => true,
     'primaryAction' => [
         'label' => __('Go Home'),
@@ -17,22 +17,22 @@
     ],
     'links' => [
         [
-            'label' => __('Categories'),
+            'label' => __('Browse Categories'),
             'url' => route('localized.categories.index', ['locale' => $locale]),
             'icon' => 'categories',
         ],
         [
-            'label' => __('Products'),
+            'label' => __('Shop Products'),
             'url' => route('products.index', ['locale' => $locale]) ?? url('/products'),
             'icon' => 'products',
         ],
         [
-            'label' => __('Brands'),
+            'label' => __('Discover Brands'),
             'url' => route('localized.brands.index', ['locale' => $locale]),
             'icon' => 'brands',
         ],
         [
-            'label' => __('Cart'),
+            'label' => __('View Cart'),
             'url' => route('cart.index', ['locale' => $locale]) ?? url('/cart'),
             'icon' => 'cart',
         ],
