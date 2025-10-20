@@ -8,13 +8,13 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 
 class FeatureFlagForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 TextInput::make('name')
                     ->required(),
@@ -52,12 +52,12 @@ class FeatureFlagForm
                     ->columnSpanFull(),
                 Placeholder::make('created_by_display')
                     ->label(__('system.created_by'))
-                    ->content(fn (?FeatureFlag $record): string => $record?->created_by_display ?? '—')
+                    ->content(fn (?FeatureFlag $record): string => $record === null ? '—' : ($record->created_by_display ?? '—'))
                     ->visible(fn (?FeatureFlag $record): bool => $record !== null)
                     ->columnSpanFull(),
                 Placeholder::make('updated_by_display')
                     ->label(__('system.updated_by'))
-                    ->content(fn (?FeatureFlag $record): string => $record?->updated_by_display ?? '—')
+                    ->content(fn (?FeatureFlag $record): string => $record === null ? '—' : ($record->updated_by_display ?? '—'))
                     ->visible(fn (?FeatureFlag $record): bool => $record !== null)
                     ->columnSpanFull(),
                 DateTimePicker::make('last_activated'),
