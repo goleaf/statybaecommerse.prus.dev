@@ -8,8 +8,11 @@ on:
 
 jobs:
   phpunit:
-    name: PHPUnit
+    name: "PHPUnit (PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl, pdo_sqlite
           coverage: xdebug
 
@@ -58,8 +61,11 @@ jobs:
           path: build/coverage.xml
 
   php-compat:
-    name: PHP Compatibility
+    name: "PHP Compatibility (PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -67,7 +73,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl, pdo_sqlite
           coverage: none
 
