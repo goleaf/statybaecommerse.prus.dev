@@ -13,13 +13,7 @@ use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction as TableBulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Exception;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
@@ -31,6 +25,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -41,6 +42,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -137,14 +139,20 @@ final class WishlistItemResource extends Resource
                                     ->createOptionUsing(function (array $data): int {
                                         return UserWishlist::create($data)->getKey();
                                     }),
-                                Select::make('user_id')
+                                Placeholder::make('wishlist_user')
                                     ->label(__('admin.wishlist_items.fields.user'))
-                                    ->relationship('wishlist.user', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->disabled()
-                                    ->dehydrated(false),
+                                    ->content(function (callable $get): string {
+                                        $wishlistId = $get('wishlist_id');
+
+                                        if (! $wishlistId) {
+                                            return '';
+                                        }
+
+                                        $wishlist = UserWishlist::with('user')->find($wishlistId);
+
+                                        return $wishlist?->user?->name ?? '';
+                                    })
+                                    ->columnSpanFull(),
                             ]),
                         FormGrid::make(2)
                             ->schema([
@@ -155,7 +163,7 @@ final class WishlistItemResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->live()
-                                    ->afterStateUpdated(function ($state, callable $set) {
+                                    ->afterStateUpdated(function ($state, callable $set): void {
                                         if ($state) {
                                             $product = Product::find($state);
                                             if ($product && $product->variants()->exists()) {
@@ -250,7 +258,7 @@ final class WishlistItemResource extends Resource
 
                                 return view('components.product-image', [
                                     'image' => $product->featured_image,
-                                    'alt' => $product->name,
+                                    'alt'   => $product->name,
                                 ])->render();
                             })
                             ->columnSpanFull(),
@@ -264,7 +272,7 @@ final class WishlistItemResource extends Resource
 
                                 $product = Product::find($productId);
 
-                                return $product ? \Str::limit($product->description, 200) : '';
+                                return $product ? Str::limit($product->description, 200) : '';
                             })
                             ->columnSpanFull(),
                     ])
@@ -503,17 +511,17 @@ final class WishlistItemResource extends Resource
                             try {
                                 // Create cart item logic here
                                 CartItem::create([
-                                    'user_id' => $record->wishlist->user_id,
+                                    'user_id'    => $record->wishlist->user_id,
                                     'product_id' => $record->product_id,
                                     'variant_id' => $record->variant_id,
-                                    'quantity' => $record->quantity,
+                                    'quantity'   => $record->quantity,
                                 ]);
 
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.moved_to_cart_successfully'))
                                     ->success()
                                     ->send();
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.move_to_cart_error'))
                                     ->danger()
@@ -547,10 +555,10 @@ final class WishlistItemResource extends Resource
                                 $moved = 0;
                                 foreach ($records as $record) {
                                     CartItem::create([
-                                        'user_id' => $record->wishlist->user_id,
+                                        'user_id'    => $record->wishlist->user_id,
                                         'product_id' => $record->product_id,
                                         'variant_id' => $record->variant_id,
-                                        'quantity' => $record->quantity,
+                                        'quantity'   => $record->quantity,
                                     ]);
                                     $moved++;
                                 }
@@ -559,7 +567,7 @@ final class WishlistItemResource extends Resource
                                     ->title(__('admin.wishlist_items.bulk_moved_to_cart_successfully', ['count' => $moved]))
                                     ->success()
                                     ->send();
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.bulk_move_to_cart_error'))
                                     ->danger()
@@ -607,10 +615,10 @@ final class WishlistItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWishlistItems::route('/'),
+            'index'  => Pages\ListWishlistItems::route('/'),
             'create' => Pages\CreateWishlistItem::route('/create'),
-            'view' => Pages\ViewWishlistItem::route('/{record}'),
-            'edit' => Pages\EditWishlistItem::route('/{record}/edit'),
+            'view'   => Pages\ViewWishlistItem::route('/{record}'),
+            'edit'   => Pages\EditWishlistItem::route('/{record}/edit'),
         ];
     }
 }
