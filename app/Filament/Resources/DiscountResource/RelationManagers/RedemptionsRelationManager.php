@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
+use App\Models\DiscountRedemption;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -25,38 +26,51 @@ final class RedemptionsRelationManager extends RelationManager
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('code_id')
+                    ->label('Discount Code')
+                    ->relationship('code', 'code')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                 Forms\Components\Select::make('user_id')
+                    ->label('User')
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
-                Forms\Components\TextInput::make('order_id')
-                    ->label('Order ID')
+                Forms\Components\Select::make('order_id')
+                    ->label('Order')
+                    ->relationship('order', 'number')
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\TextInput::make('amount_saved')
+                    ->label('Amount Saved')
                     ->numeric()
-                    ->helperText('Associated order ID'),
-                Forms\Components\TextInput::make('discount_amount')
-                    ->label('Discount Amount')
-                    ->numeric()
+                    ->minValue(0)
                     ->step(0.01)
                     ->required(),
-                Forms\Components\TextInput::make('original_amount')
-                    ->label('Original Amount')
-                    ->numeric()
-                    ->step(0.01)
+                Forms\Components\TextInput::make('currency_code')
+                    ->label('Currency')
+                    ->maxLength(3)
+                    ->default('EUR')
                     ->required(),
-                Forms\Components\TextInput::make('final_amount')
-                    ->label('Final Amount')
-                    ->numeric()
-                    ->step(0.01)
-                    ->required(),
-                Forms\Components\TextInput::make('discount_code_id')
-                    ->label('Discount Code ID')
-                    ->numeric()
-                    ->helperText('Specific code used (if any)'),
+                Forms\Components\Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'redeemed' => 'Redeemed',
+                        'cancelled' => 'Cancelled',
+                        'refunded' => 'Refunded',
+                        'expired' => 'Expired',
+                    ])
+                    ->default('pending'),
                 Forms\Components\DateTimePicker::make('redeemed_at')
                     ->label('Redeemed At')
                     ->default(now())
                     ->required(),
+                Forms\Components\Textarea::make('notes')
+                    ->label('Notes')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -65,31 +79,33 @@ final class RedemptionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('user.name')
             ->columns([
+                Tables\Columns\TextColumn::make('code.code')
+                    ->label('Code')
+                    ->badge()
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Customer')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('order_id')
-                    ->label('Order ID')
-                    ->sortable()
+                Tables\Columns\TextColumn::make('order.number')
+                    ->label('Order')
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('original_amount')
-                    ->label('Original Amount')
-                    ->money('EUR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('discount_amount')
-                    ->label('Discount Amount')
-                    ->money('EUR')
+                Tables\Columns\TextColumn::make('amount_saved')
+                    ->label('Amount Saved')
                     ->sortable()
-                    ->color('success'),
-                Tables\Columns\TextColumn::make('final_amount')
-                    ->label('Final Amount')
-                    ->money('EUR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('discount_code.code')
-                    ->label('Code Used')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn ($state, DiscountRedemption $record): string => $state === null
+                        ? '-' : number_format((float) $state, 2).' '.($record->currency_code ?? 'EUR')),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'redeemed',
+                        'secondary' => 'refunded',
+                        'danger' => 'cancelled',
+                        'gray' => 'expired',
+                    ]),
                 Tables\Columns\TextColumn::make('redeemed_at')
                     ->label('Redeemed At')
                     ->dateTime()
@@ -103,8 +119,12 @@ final class RedemptionsRelationManager extends RelationManager
                     ->query(fn (Builder $query): Builder => $query->whereMonth('redeemed_at', now()->month))
                     ->label('This Month'),
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
