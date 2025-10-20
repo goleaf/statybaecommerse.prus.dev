@@ -10,6 +10,7 @@ use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Get;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Resources\Resource;
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Filament\Notifications\Notification;
 
 class NewsResource extends Resource
@@ -49,11 +51,31 @@ class NewsResource extends Resource
                         ->maxLength(255)
                         ->live()
                         ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                    Forms\Components\Hidden::make('current_locale')
+                        ->default(fn (): string => app()->getLocale())
+                        ->dehydrated(false),
                     Forms\Components\TextInput::make('slug')
                         ->label(__('news.fields.slug'))
                         ->required()
                         ->maxLength(255)
-                        ->unique(News::class, 'slug', ignoreRecord: true),
+                        ->rules(function (Get $get, ?News $record): array {
+                            $locale = $get('current_locale') ?? app()->getLocale();
+
+                            $rule = Rule::unique('news_translations', 'slug')
+                                ->where(fn ($query) => $query->where('locale', $locale));
+
+                            if ($record) {
+                                $translationId = $record->translations()
+                                    ->where('locale', $locale)
+                                    ->value('id');
+
+                                if ($translationId) {
+                                    $rule->ignore($translationId);
+                                }
+                            }
+
+                            return [$rule];
+                        }),
                     Forms\Components\Textarea::make('excerpt')
                         ->label(__('news.fields.excerpt'))
                         ->maxLength(500)
