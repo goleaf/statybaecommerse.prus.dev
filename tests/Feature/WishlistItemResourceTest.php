@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
@@ -195,6 +196,67 @@ class WishlistItemResourceTest extends TestCase
             ->assertCanNotSeeTableRecords(
                 WishlistItem::where('wishlist_id', $anotherWishlist->id)->get()
             );
+    }
+
+    /**
+     * @test
+     */
+    public function move_to_cart_action_creates_cart_item_with_correct_pricing(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Livewire::test(\App\Filament\Resources\WishlistItemResource\Pages\ListWishlistItems::class)
+            ->callTableAction('move_to_cart', $this->wishlistItem)
+            ->assertHasNoTableActionErrors();
+
+        $cartItem = CartItem::first();
+
+        $this->assertNotNull($cartItem);
+        $this->assertSame($this->wishlist->user_id, $cartItem->user_id);
+        $this->assertSame($this->product->id, $cartItem->product_id);
+        $this->assertSame($this->variant->id, $cartItem->product_variant_id);
+        $this->assertEquals(129.99, (float) $cartItem->unit_price);
+        $this->assertEquals(259.98, (float) $cartItem->total_price);
+        $this->assertEquals(129.99, (float) $cartItem->price);
+        $this->assertSame(2, $cartItem->quantity);
+        $this->assertEquals(129.99, (float) ($cartItem->product_snapshot['price'] ?? 0));
+    }
+
+    /**
+     * @test
+     */
+    public function bulk_move_to_cart_uses_product_pricing_when_variant_missing(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $productWithoutVariant = Product::factory()->create([
+            'name' => 'Simple Product',
+            'price' => 200.00,
+            'sale_price' => 150.00,
+        ]);
+
+        $wishlistItemWithoutVariant = WishlistItem::factory()->create([
+            'wishlist_id' => $this->wishlist->id,
+            'product_id' => $productWithoutVariant->id,
+            'variant_id' => null,
+            'quantity' => 4,
+        ]);
+
+        Livewire::test(\App\Filament\Resources\WishlistItemResource\Pages\ListWishlistItems::class)
+            ->callTableBulkAction('move_to_cart', [$wishlistItemWithoutVariant])
+            ->assertHasNoTableActionErrors();
+
+        $cartItem = CartItem::query()
+            ->where('product_id', $productWithoutVariant->id)
+            ->first();
+
+        $this->assertNotNull($cartItem);
+        $this->assertNull($cartItem->product_variant_id);
+        $this->assertEquals(150.00, (float) $cartItem->unit_price);
+        $this->assertEquals(600.00, (float) $cartItem->total_price);
+        $this->assertEquals(150.00, (float) $cartItem->price);
+        $this->assertSame(4, $cartItem->quantity);
+        $this->assertEquals(150.00, (float) ($cartItem->product_snapshot['price'] ?? 0));
     }
 
     /**
