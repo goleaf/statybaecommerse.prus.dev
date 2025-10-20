@@ -279,9 +279,13 @@ final class PriceListItemResource extends Resource
                     ->native(false),
                 Filter::make('valid_now')
                     ->label(__('price_list_items.valid_now'))
-                    ->query(fn (Builder $query): Builder => $query->where('valid_from', '<=', now())->where(function (Builder $query): void {
-                        $query->whereNull('valid_until')->orWhere('valid_until', '>=', now());
-                    }))
+                    ->query(fn (Builder $query): Builder => $query
+                        ->where(function (Builder $query): void {
+                            $query->whereNull('valid_from')->orWhere('valid_from', '<=', now());
+                        })
+                        ->where(function (Builder $query): void {
+                            $query->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+                        }))
                     ->toggle(),
                 Filter::make('expired')
                     ->label(__('price_list_items.expired'))
