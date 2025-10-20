@@ -68,7 +68,8 @@ final class ProductImageResource extends Resource
                     ->label('Product')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('alt_text')
-                    ->limit(30),
+                    ->limit(30)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('sort_order'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
