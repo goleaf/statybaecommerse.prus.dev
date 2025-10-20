@@ -19,7 +19,10 @@ class FeatureFlagForm
                 TextInput::make('name')
                     ->required(),
                 TextInput::make('key')
-                    ->required(),
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true)
+                    ->rules(['alpha_dash']),
                 Textarea::make('description')
                     ->columnSpanFull(),
                 Toggle::make('is_active')
