@@ -29,6 +29,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 final class OrderShippingResource extends Resource
@@ -70,7 +71,24 @@ final class OrderShippingResource extends Resource
                 ->schema([
                     Select::make('order_id')
                         ->label(__('admin.order_shippings.order'))
-                        ->options(Order::pluck('number', 'id'))
+                        ->relationship(
+                            name: 'order',
+                            titleAttribute: 'number',
+                            modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+                        )
+                        ->getOptionLabelFromRecordUsing(
+                            static fn (Order $record): string => $record->number ?? __('Order #:id', ['id' => $record->getKey()]),
+                        )
+                        ->getOptionLabelUsing(
+                            static fn (int|string|null $value): ?string => match (true) {
+                                $value === null => null,
+                                default         => optional(
+                                    Order::query()
+                                        ->withoutGlobalScopes()
+                                        ->find($value),
+                                )->number ?? __('Order #:id', ['id' => $value]),
+                            },
+                        )
                         ->required()
                         ->searchable()
                         ->preload(),
@@ -165,7 +183,7 @@ final class OrderShippingResource extends Resource
                     })
                     ->colors([
                         'warning' => 'pending',
-                        'info' => 'shipped',
+                        'info'    => 'shipped',
                         'success' => 'delivered',
                     ]),
                 TextColumn::make('shipped_at')
@@ -197,7 +215,24 @@ final class OrderShippingResource extends Resource
             ->filters([
                 SelectFilter::make('order_id')
                     ->label(__('admin.order_shippings.order'))
-                    ->options(Order::pluck('number', 'id'))
+                    ->relationship(
+                        name: 'order',
+                        titleAttribute: 'number',
+                        modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+                    )
+                    ->getOptionLabelFromRecordUsing(
+                        static fn (Order $record): string => $record->number ?? __('Order #:id', ['id' => $record->getKey()]),
+                    )
+                    ->getOptionLabelUsing(
+                        static fn (int|string|null $value): ?string => match (true) {
+                            $value === null => null,
+                            default         => optional(
+                                Order::query()
+                                    ->withoutGlobalScopes()
+                                    ->find($value),
+                            )->number ?? __('Order #:id', ['id' => $value]),
+                        },
+                    )
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('carrier_name')
@@ -261,10 +296,10 @@ final class OrderShippingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrderShippings::route('/'),
+            'index'  => Pages\ListOrderShippings::route('/'),
             'create' => Pages\CreateOrderShipping::route('/create'),
-            'view' => Pages\ViewOrderShipping::route('/{record}'),
-            'edit' => Pages\EditOrderShipping::route('/{record}/edit'),
+            'view'   => Pages\ViewOrderShipping::route('/{record}'),
+            'edit'   => Pages\EditOrderShipping::route('/{record}/edit'),
         ];
     }
 }
