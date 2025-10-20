@@ -37,6 +37,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 use Filament\Forms\Form;
 
@@ -49,6 +50,31 @@ final class BrandResource extends Resource
         $user = auth()->user();
 
         return $user?->can('browse_brands') ?? false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Brand::class);
+    }
+
+    public static function canView(Brand $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Brand::class);
+    }
+
+    public static function canEdit(Brand $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Brand $record): bool
+    {
+        return Gate::allows('delete', $record);
     }
 
     public static function getEloquentQuery(): Builder

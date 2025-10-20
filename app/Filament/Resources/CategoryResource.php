@@ -32,6 +32,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 use Filament\Forms\Form;
@@ -43,6 +44,31 @@ final class CategoryResource extends Resource
     public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'System';
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Category::class);
+    }
+
+    public static function canView(Category $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Category::class);
+    }
+
+    public static function canEdit(Category $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Category $record): bool
+    {
+        return Gate::allows('delete', $record);
     }
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null

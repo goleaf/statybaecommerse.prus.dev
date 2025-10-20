@@ -33,6 +33,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 use Filament\Forms\Form;
@@ -58,6 +59,31 @@ final class OrderResource extends Resource
     protected static ?string $recordTitleAttribute = 'number';
 
     protected static ?string $navigationLabel = 'orders.navigation.orders';
+
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Order::class);
+    }
+
+    public static function canView(Order $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Order::class);
+    }
+
+    public static function canEdit(Order $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Order $record): bool
+    {
+        return Gate::allows('delete', $record);
+    }
 
     protected static ?string $modelLabel = 'orders.models.order';
 
