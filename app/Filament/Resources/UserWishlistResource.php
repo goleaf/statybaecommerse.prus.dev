@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserWishlistResource\Pages;
 use App\Models\UserWishlist;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -36,7 +37,7 @@ final class UserWishlistResource extends Resource
 {
     protected static ?string $model = UserWishlist::class;
 
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-heart';
     }
@@ -197,10 +198,10 @@ final class UserWishlistResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserWishlists::route('/'),
+            'index'  => Pages\ListUserWishlists::route('/'),
             'create' => Pages\CreateUserWishlist::route('/create'),
-            'view' => Pages\ViewUserWishlist::route('/{record}'),
-            'edit' => Pages\EditUserWishlist::route('/{record}/edit'),
+            'view'   => Pages\ViewUserWishlist::route('/{record}'),
+            'edit'   => Pages\EditUserWishlist::route('/{record}/edit'),
         ];
     }
 }
