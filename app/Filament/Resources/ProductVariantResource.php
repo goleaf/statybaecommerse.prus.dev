@@ -307,10 +307,10 @@ final class ProductVariantResource extends Resource
                                     ]),
                                 Section::make('Additional Data')
                                     ->schema([
-                                        KeyValue::make('metadata')
-                                            ->label(__('product_variants.fields.metadata'))
-                                            ->keyLabel(__('product_variants.fields.metadata_key'))
-                                            ->valueLabel(__('product_variants.fields.metadata_value')),
+                                        KeyValue::make('variant_metadata')
+                                            ->label(__('product_variants.fields.variant_metadata'))
+                                            ->keyLabel(__('product_variants.fields.variant_metadata_key'))
+                                            ->valueLabel(__('product_variants.fields.variant_metadata_value')),
                                     ]),
                             ]),
                     ])
