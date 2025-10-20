@@ -17,9 +17,10 @@ A curated map of the most useful documents for day-to-day development and operat
 - [CHANGELOG](CHANGELOG.md) – curated log of significant migrations and releases.
 
 ## Platform Features & Domain Guides
-- [FILAMENT_V4_IMPLEMENTATION_SUMMARY](FILAMENT_V4_IMPLEMENTATION_SUMMARY.md) – guidance for building UI with Filament v4 conventions.
-- [NEWS_RESOURCE_IMPLEMENTATION_SUMMARY](NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md) – example of a fully instrumented admin resource.
-- [COMPANY_RESOURCE_ANALYSIS](../COMPANY_RESOURCE_ANALYSIS.md) – dissection of a complex resource and how it interacts with the broader platform.
+- [Analysis & Summary Index](analysis/INDEX.md) – hub listing every research, audit, and rollout summary for quick navigation.
+- [FILAMENT_V4_IMPLEMENTATION_SUMMARY](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md) – guidance for building UI with Filament v4 conventions.
+- [NEWS_RESOURCE_IMPLEMENTATION_SUMMARY](analysis/NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md) – example of a fully instrumented admin resource.
+- [COMPANY_RESOURCE_ANALYSIS](analysis/COMPANY_RESOURCE_ANALYSIS.md) – dissection of a complex resource and how it interacts with the broader platform.
 - [PRODUCT_VARIANTS_IMPLEMENTATION_SUMMARY](PRODUCT_VARIANTS_IMPLEMENTATION_SUMMARY.md) & [PRODUCT_VARIANTS_SUMMARY](PRODUCT_VARIANTS_SUMMARY.md) – catalog configuration and pricing references.
 - [RECOMMENDATION_SYSTEM_IMPLEMENTATION](RECOMMENDATION_SYSTEM_IMPLEMENTATION.md) & [SMART_RECOMMENDATION_SYSTEM_COMPLETE](SMART_RECOMMENDATION_SYSTEM_COMPLETE.md) – recommendation pipelines and ML-adjacent routines.
 - [REFERRAL_SYSTEM_IMPLEMENTATION](REFERRAL_SYSTEM_IMPLEMENTATION.md) – loyalty/referral programme overview.
