@@ -151,13 +151,16 @@ final class ProductComparisonResource extends Resource
                             ->label(__('product_comparisons.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
+                        $createdFrom = data_get($data, 'created_from');
+                        $createdUntil = data_get($data, 'created_until');
+
                         return $query
                             ->when(
-                                $data['created_from'],
+                                $createdFrom,
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
-                                $data['created_until'],
+                                $createdUntil,
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
