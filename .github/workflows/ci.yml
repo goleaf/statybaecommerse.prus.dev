@@ -84,21 +84,63 @@ jobs:
             public/openapi.json
             public/openapi.yaml
 
-      - name: Run test suite
-        run: composer test:ci
+      - name: Run unit tests
+        id: unit-tests
+        continue-on-error: true
+        run: |
+          set +e
+          php artisan test --testsuite=Unit --log-junit build/junit-unit.xml
+          status=$?
+          echo "exit_code=${status}" >> "$GITHUB_OUTPUT"
+          exit ${status}
+
+      - name: Run feature tests with coverage
+        id: feature-tests
+        continue-on-error: true
+        run: |
+          set +e
+          php artisan test --testsuite=Feature --log-junit build/junit-feature.xml --coverage-clover build/coverage.xml
+          status=$?
+          echo "exit_code=${status}" >> "$GITHUB_OUTPUT"
+          exit ${status}
+
+      - name: Evaluate test results
+        if: always()
+        run: |
+          unit_status="${{ steps.unit-tests.outputs.exit_code }}"
+          feature_status="${{ steps.feature-tests.outputs.exit_code }}"
+
+          if [ -z "${unit_status}" ]; then
+            echo "::error::Unit test suite did not report a status."
+            exit 1
+          fi
+
+          if [ -z "${feature_status}" ]; then
+            echo "::error::Feature test suite did not report a status."
+            exit 1
+          fi
+
+          if [ "${unit_status}" != "0" ] || [ "${feature_status}" != "0" ]; then
+            echo "::error::One or more Laravel test suites failed."
+            exit 1
+          fi
 
       - name: Publish unit test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: build/junit.xml
+          files: |
+            build/junit-unit.xml
+            build/junit-feature.xml
 
-      - name: Upload junit report
+      - name: Upload junit reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: phpunit-junit
-          path: build/junit.xml
+          path: |
+            build/junit-unit.xml
+            build/junit-feature.xml
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -110,6 +152,8 @@ jobs:
   php-compat:
     name: PHP Compatibility
     runs-on: ubuntu-latest
+    needs: phpunit
+    if: always()
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
