@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
+use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use UnitEnum;
@@ -17,8 +18,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     /**
      * @var string|null
      */
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     /**
      * @var string|null

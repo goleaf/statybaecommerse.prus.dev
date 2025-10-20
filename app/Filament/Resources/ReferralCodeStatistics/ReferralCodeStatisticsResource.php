@@ -5,25 +5,22 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ReferralCodeStatistics;
 
 use App\Filament\Resources\ReferralCodeStatistics\Pages\CreateReferralCodeStatistics;
-use UnitEnum;
-use BackedEnum;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\EditReferralCodeStatistics;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\ListReferralCodeStatistics;
 use App\Filament\Resources\ReferralCodeStatistics\Schemas\ReferralCodeStatisticsForm;
 use App\Filament\Resources\ReferralCodeStatistics\Tables\ReferralCodeStatisticsTable;
 use App\Models\ReferralCodeStatistics;
+use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
-use Filament\Forms\Form;
 
 class ReferralCodeStatisticsResource extends Resource
 {
     protected static ?string $model = ReferralCodeStatistics::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
-use BackedEnum;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -19,6 +19,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -34,8 +35,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 /**
  * VariantAttributeValueResource
  *
@@ -45,8 +44,7 @@ final class VariantAttributeValueResource extends Resource
 {
     protected static ?string $model = VariantAttributeValue::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-tag';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 

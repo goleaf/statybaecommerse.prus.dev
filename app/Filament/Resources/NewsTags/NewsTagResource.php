@@ -5,25 +5,22 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsTags;
 
 use App\Filament\Resources\NewsTags\Pages\CreateNewsTag;
-use UnitEnum;
-use BackedEnum;
 use App\Filament\Resources\NewsTags\Pages\EditNewsTag;
 use App\Filament\Resources\NewsTags\Pages\ListNewsTags;
 use App\Filament\Resources\NewsTags\Schemas\NewsTagForm;
 use App\Filament\Resources\NewsTags\Tables\NewsTagsTable;
 use App\Models\NewsTag;
+use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
-use Filament\Forms\Form;
 
 class NewsTagResource extends Resource
 {
     protected static ?string $model = NewsTag::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

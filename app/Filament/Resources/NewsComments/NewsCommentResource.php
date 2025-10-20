@@ -5,25 +5,22 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsComments;
 
 use App\Filament\Resources\NewsComments\Pages\CreateNewsComment;
-use UnitEnum;
-use BackedEnum;
 use App\Filament\Resources\NewsComments\Pages\EditNewsComment;
 use App\Filament\Resources\NewsComments\Pages\ListNewsComments;
 use App\Filament\Resources\NewsComments\Schemas\NewsCommentForm;
 use App\Filament\Resources\NewsComments\Tables\NewsCommentsTable;
 use App\Models\NewsComment;
+use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
-use Filament\Forms\Form;
 
 class NewsCommentResource extends Resource
 {
     protected static ?string $model = NewsComment::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

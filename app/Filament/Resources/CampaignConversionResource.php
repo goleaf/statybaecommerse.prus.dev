@@ -9,10 +9,13 @@ use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignConversion;
 use App\Models\User;
+use BackedEnum;
+use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -21,11 +24,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms;
-use BackedEnum;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * CampaignConversionResource
@@ -36,8 +35,7 @@ final class CampaignConversionResource extends Resource
 {
     protected static ?string $model = CampaignConversion::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rocket-launch';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rocket-launch';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
 

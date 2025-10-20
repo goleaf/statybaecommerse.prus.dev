@@ -3,25 +3,22 @@
 namespace App\Filament\Resources\ProductSimilarities;
 
 use App\Filament\Resources\ProductSimilarities\Pages\CreateProductSimilarity;
-use UnitEnum;
-use BackedEnum;
 use App\Filament\Resources\ProductSimilarities\Pages\EditProductSimilarity;
 use App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities;
 use App\Filament\Resources\ProductSimilarities\Schemas\ProductSimilarityForm;
 use App\Filament\Resources\ProductSimilarities\Tables\ProductSimilaritiesTable;
 use App\Models\ProductSimilarity;
+use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
-use Filament\Forms\Form;
 
 class ProductSimilarityResource extends Resource
 {
     protected static ?string $model = ProductSimilarity::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
