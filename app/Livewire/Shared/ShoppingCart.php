@@ -83,13 +83,13 @@ final class ShoppingCart extends Component
 
                 if ($attributeValues->isNotEmpty()) {
                     $variantAttributes = $attributeValues
-                        ->mapWithKeys(fn($value): array => [
+                        ->mapWithKeys(fn ($value): array => [
                             $value->attribute->name => $value->value,
                         ])
                         ->toArray();
 
                     $snapshotName .= ' ('.collect($variantAttributes)
-                        ->map(fn($value, $key) => sprintf('%s: %s', $key, $value))
+                        ->map(fn ($value, $key) => sprintf('%s: %s', $key, $value))
                         ->implode(', ').')';
                 }
             }

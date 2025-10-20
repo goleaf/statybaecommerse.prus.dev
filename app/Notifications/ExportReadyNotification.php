@@ -16,8 +16,7 @@ final class ExportReadyNotification extends Notification
     public function __construct(
         private readonly Export $export,
         private readonly string $downloadUrl,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {

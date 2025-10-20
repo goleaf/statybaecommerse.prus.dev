@@ -141,7 +141,7 @@ final class ProductImageGallery extends Component
     {
         $variant = $this->product
             ->variants()
-            ->with(['images' => fn($query) => $query->orderBy('sort_order')])
+            ->with(['images' => fn ($query) => $query->orderBy('sort_order')])
             ->find($variantId);
 
         if (! $variant) {

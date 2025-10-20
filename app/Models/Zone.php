@@ -19,4 +19,3 @@ final class Zone extends Model
         'is_enabled',
     ];
 }
-

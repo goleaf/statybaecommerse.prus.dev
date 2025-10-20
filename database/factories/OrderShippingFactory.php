@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -27,7 +29,7 @@ final class OrderShippingFactory extends Factory
             'dimensions' => '30x20x10',
             'base_cost' => fake()->randomFloat(2, 1, 50),
             'insurance_cost' => fake()->randomFloat(2, 0, 10),
-            'total_cost' => fn(array $attributes) => ($attributes['base_cost'] ?? 0) + ($attributes['insurance_cost'] ?? 0),
+            'total_cost' => fn (array $attributes) => ($attributes['base_cost'] ?? 0) + ($attributes['insurance_cost'] ?? 0),
             'metadata' => [],
             'status' => fake()->randomElement(['pending', 'processing', 'shipped', 'delivered']),
             'is_delivered' => false,

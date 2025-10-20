@@ -51,7 +51,7 @@ final class Export extends Model
 
     protected static function booted(): void
     {
-        static::creating(function (self $export): void {
+        self::creating(function (self $export): void {
             if (! $export->getAttribute('uuid')) {
                 $export->setAttribute('uuid', (string) Str::uuid());
             }

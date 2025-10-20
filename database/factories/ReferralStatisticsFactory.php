@@ -33,4 +33,3 @@ final class ReferralStatisticsFactory extends Factory
         ];
     }
 }
-

@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 final class ProductContract
 {
     public const CONTRACT = 'product';
+
     public const VERSION = 'v1';
 
     public static function schemaPath(): string

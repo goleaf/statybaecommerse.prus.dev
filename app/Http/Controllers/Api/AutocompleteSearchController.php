@@ -36,7 +36,7 @@ final class AutocompleteSearchController extends Controller
 
         try {
             /** @var Model $model */
-            $model = new $modelClass();
+            $model = new $modelClass;
 
             $query = $model->newQuery()
                 ->where($searchField, 'like', '%'.Str::of($searchQuery)->trim().'%')

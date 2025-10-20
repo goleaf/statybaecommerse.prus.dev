@@ -6,20 +6,16 @@ namespace App\Services\Discounts;
 
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Http\Request;
 
 final class DiscountContextBuilder
 {
-    public function __construct(private readonly Session $session)
-    {
-    }
+    public function __construct(private readonly Session $session) {}
 
     /**
-     * @param  Request  $request
-     * @param  string|null  $code
      * @return array<string, mixed>
      */
     public function fromRequest(Request $request, ?string $code = null): array
@@ -37,7 +33,6 @@ final class DiscountContextBuilder
 
     /**
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string|null  $code
      * @return array<string, mixed>
      */
     public function fromSession($user, ?string $code = null): array
@@ -47,7 +42,6 @@ final class DiscountContextBuilder
 
     /**
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string|null  $code
      * @param  array<string, mixed>  $cartPayload
      * @return array<string, mixed>
      */
@@ -165,8 +159,8 @@ final class DiscountContextBuilder
             }
 
             try {
-                $tier = DB::table($pivot . ' as pu')
-                    ->join($table . ' as p', 'p.id', '=', 'pu.partner_id')
+                $tier = DB::table($pivot.' as pu')
+                    ->join($table.' as p', 'p.id', '=', 'pu.partner_id')
                     ->where('pu.user_id', $userId)
                     ->value('p.tier');
 

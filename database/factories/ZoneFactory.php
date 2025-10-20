@@ -32,4 +32,3 @@ final class ZoneFactory extends Factory
         ]);
     }
 }
-

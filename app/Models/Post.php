@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Post
@@ -128,7 +129,7 @@ final class Post extends Model implements HasMedia
     public function trans(string $field, ?string $locale = null): mixed
     {
         $locale = $locale ?? app()->getLocale();
-        $translationField = $field . '_translations';
+        $translationField = $field.'_translations';
         if (property_exists($this, $translationField)) {
             $translations = $this->{$translationField} ?? [];
 
@@ -290,7 +291,7 @@ final class Post extends Model implements HasMedia
         $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
         foreach ($translationFields as $field) {
             if (isset($data[$field])) {
-                $translationField = $field . '_translations';
+                $translationField = $field.'_translations';
                 $translations = $this->{$translationField} ?? [];
                 $translations[$locale] = $data[$field];
                 $this->{$translationField} = $translations;
@@ -308,9 +309,9 @@ final class Post extends Model implements HasMedia
         $translation = [];
         $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
         foreach ($translationFields as $field) {
-            $translationField = $field . '_translations';
+            $translationField = $field.'_translations';
             $translations = $this->{$translationField} ?? [];
-            if (!isset($translations[$locale])) {
+            if (! isset($translations[$locale])) {
                 $translations[$locale] = $this->{$field};
                 $this->{$translationField} = $translations;
             }

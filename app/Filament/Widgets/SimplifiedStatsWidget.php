@@ -10,10 +10,10 @@ use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class SimplifiedStatsWidget extends BaseWidget
 {

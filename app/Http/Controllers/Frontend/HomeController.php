@@ -11,9 +11,7 @@ use Illuminate\Http\Request;
 
 final class HomeController extends Controller
 {
-    public function __construct(private readonly HomepageCatalogueDataProvider $dataProvider)
-    {
-    }
+    public function __construct(private readonly HomepageCatalogueDataProvider $dataProvider) {}
 
     public function index(Request $request): View
     {

@@ -22,9 +22,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class ExportController extends Controller
 {
-    public function __construct(private readonly ExportService $service)
-    {
-    }
+    public function __construct(private readonly ExportService $service) {}
 
     /**
      * Display a listing of the resource with pagination and filtering.
