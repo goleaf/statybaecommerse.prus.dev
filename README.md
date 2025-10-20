@@ -55,7 +55,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 | Area | Location(s) | Notes |
 | --- | --- | --- |
 | HTTP entrypoints | `routes/web.php`, `routes/api.php`, `routes/admin.php` | Inertia/Volt storefront routes live in `web.php`; Filament registers admin routes in `AdminPanelProvider`. |
-| Filament admin | `app/Filament/**` | Resources, widgets, custom pages, and global actions follow Filament v4 conventions outlined in [docs/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md](docs/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md). |
+| Filament admin | `app/Filament/**` | Resources, widgets, custom pages, and global actions follow Filament v4 conventions outlined in [docs/analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md](docs/analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md). |
 | Domain models & data | `app/Models`, `app/Data`, `database/migrations`, `database/factories`, `database/seeders` | Data objects use `spatie/laravel-data`; factories and multilingual seeders ensure parity between Lithuanian and English content. |
 | Business services | `app/Services`, `app/Actions`, `app/Support` | Encapsulated workflows (pricing, availability, marketing, search) with helper traits for caching and localization. |
 | Background processing | `app/Jobs`, `app/Listeners`, `app/Notifications`, `app/Console` | Horizon manages queues; recurring tasks registered through `Console/Kernel.php`. |
@@ -86,7 +86,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 
 ## Further reading
 - Start with [docs/INDEX.md](docs/INDEX.md) for a curated guide to deployment runbooks, feature deep-dives, and historical archives.
-- Need domain-level context? Check [COMPANY_RESOURCE_ANALYSIS.md](COMPANY_RESOURCE_ANALYSIS.md) and the project summaries in `docs/`.
+- Need domain-level context? Check [docs/analysis/COMPANY_RESOURCE_ANALYSIS.md](docs/analysis/COMPANY_RESOURCE_ANALYSIS.md) and the project summaries in `docs/`.
 - Want a system tour? Review [docs/ARCHITECTURE_OVERVIEW.md](docs/ARCHITECTURE_OVERVIEW.md) for component breakdowns and integration diagrams.
 
 Happy building!
