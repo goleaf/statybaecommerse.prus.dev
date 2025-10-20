@@ -13,11 +13,19 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Exists;
 
 final class ProfileController extends Controller
 {
+    private ?bool $countriesTableExists = null;
+
+    private ?bool $citiesTableExists = null;
+
+    private ?bool $customersTableExists = null;
+
     public function index(Request $request): View
     {
         /** @var User $user */
@@ -42,7 +50,7 @@ final class ProfileController extends Controller
         return view('profile.edit', [
             'user' => $user,
             'customer' => $this->resolveCustomerForUser($user),
-            'countries' => Country::query()->orderBy('name')->get(['id', 'name', 'cca2']),
+            'countries' => $this->resolveCountries(),
         ]);
     }
 
@@ -59,8 +67,8 @@ final class ProfileController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string', 'max:500'],
             'postal_code' => ['nullable', 'string', 'max:20'],
-            'country_id' => ['nullable', 'integer', 'exists:countries,id'],
-            'city_id' => ['nullable', 'integer', 'exists:cities,id'],
+            'country_id' => $this->countryRule(),
+            'city_id' => $this->cityRule(),
         ]);
 
         $user->forceFill([
@@ -93,7 +101,7 @@ final class ProfileController extends Controller
             'user' => $user,
             'addresses' => $addresses,
             'addressTypes' => AddressType::options(),
-            'countries' => Country::query()->orderBy('name')->get(['id', 'name', 'cca2']),
+            'countries' => $this->resolveCountries(),
         ]);
     }
 
@@ -162,8 +170,8 @@ final class ProfileController extends Controller
             'state' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['required', 'string', 'max:20'],
             'country_code' => ['required', 'string', 'size:2'],
-            'country_id' => ['nullable', 'integer', 'exists:countries,id'],
-            'city_id' => ['nullable', 'integer', 'exists:cities,id'],
+            'country_id' => $this->countryRule(),
+            'city_id' => $this->cityRule(),
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -213,7 +221,7 @@ final class ProfileController extends Controller
 
     private function resolveCustomerForUser(User $user): ?Customer
     {
-        if (! Schema::hasTable('customers')) {
+        if (! $this->customersTableExists()) {
             return null;
         }
 
@@ -224,7 +232,7 @@ final class ProfileController extends Controller
 
     private function updateCustomerRecord(User $user, array $validated, string $originalEmail): void
     {
-        if (! Schema::hasTable('customers')) {
+        if (! $this->customersTableExists()) {
             return;
         }
 
@@ -249,5 +257,69 @@ final class ProfileController extends Controller
         }
 
         $customer->save();
+    }
+
+    /**
+     * @return array<int, string|Exists>
+     */
+    private function countryRule(): array
+    {
+        $rules = ['nullable', 'integer'];
+
+        if ($this->countriesTableExists()) {
+            $rules[] = Rule::exists('countries', 'id');
+        }
+
+        return $rules;
+    }
+
+    /**
+     * @return array<int, string|Exists>
+     */
+    private function cityRule(): array
+    {
+        $rules = ['nullable', 'integer'];
+
+        if ($this->citiesTableExists()) {
+            $rules[] = Rule::exists('cities', 'id');
+        }
+
+        return $rules;
+    }
+
+    private function resolveCountries(): Collection
+    {
+        if (! $this->countriesTableExists()) {
+            return collect();
+        }
+
+        return Country::query()->orderBy('name')->get(['id', 'name', 'cca2']);
+    }
+
+    private function countriesTableExists(): bool
+    {
+        if ($this->countriesTableExists === null) {
+            $this->countriesTableExists = Schema::hasTable('countries');
+        }
+
+        return $this->countriesTableExists;
+    }
+
+    private function citiesTableExists(): bool
+    {
+        if ($this->citiesTableExists === null) {
+            $this->citiesTableExists = Schema::hasTable('cities');
+        }
+
+        return $this->citiesTableExists;
+    }
+
+    private function customersTableExists(): bool
+    {
+        if ($this->customersTableExists === null) {
+            $this->customersTableExists = Schema::hasTable('customers');
+        }
+
+        return $this->customersTableExists;
     }
 }
