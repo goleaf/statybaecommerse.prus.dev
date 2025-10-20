@@ -2,6 +2,7 @@
 
 return [
     'navigation' => [
+        'home' => 'Home',
         'products' => 'Products',
         'campaigns' => 'Campaigns',
         'orders' => 'Orders',
