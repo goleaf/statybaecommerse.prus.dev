@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -66,17 +68,62 @@ final class NotificationService
      *
      * @return Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getUserNotifications(User $user, int $perPage = 25, ?string $type = null, ?bool $read = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getUserNotifications(User $user, int $perPage = 25, ?string $type = null, ?bool $read = null): LengthAwarePaginator
     {
-        $query = Notification::forUser($user->id);
+        $query = $this->applyFilters(Notification::forUser($user->id), $type, $read);
+
+        return $query->latest()->paginate($perPage);
+    }
+
+    /**
+     * Aggregate statistics for the authenticated user's notifications.
+     */
+    public function getUserNotificationStats(User $user): array
+    {
+        $baseQuery = Notification::forUser($user->id);
+
+        return [
+            'total' => (clone $baseQuery)->count(),
+            'read' => (clone $baseQuery)->read()->count(),
+            'unread' => (clone $baseQuery)->unread()->count(),
+            'urgent' => (clone $baseQuery)->urgent()->count(),
+        ];
+    }
+
+    /**
+     * Mark all notifications as unread for the given user.
+     */
+    public function markAllAsUnreadForUser(User $user): int
+    {
+        return Notification::markAllAsUnreadForUser($user->id);
+    }
+
+    /**
+     * Search notifications for the authenticated user.
+     */
+    public function searchNotifications(string $query, User $user, ?string $type = null, ?bool $read = null, int $perPage = 25): LengthAwarePaginator
+    {
+        $builder = $this->applyFilters(Notification::forUser($user->id), $type, $read)
+            ->where(function (Builder $searchQuery) use ($query): void {
+                $searchQuery->where('data->title', 'like', '%'.$query.'%')
+                    ->orWhere('data->message', 'like', '%'.$query.'%')
+                    ->orWhere('data->type', 'like', '%'.$query.'%');
+            });
+
+        return $builder->latest()->paginate($perPage);
+    }
+
+    private function applyFilters(Builder $query, ?string $type, ?bool $read): Builder
+    {
         if ($type) {
             $query->byType($type);
         }
+
         if ($read !== null) {
             $query = $read ? $query->read() : $query->unread();
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query;
     }
 
     /**
