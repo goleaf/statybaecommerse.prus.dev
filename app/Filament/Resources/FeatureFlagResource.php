@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
@@ -55,6 +57,14 @@ final class FeatureFlagResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('feature_flags.title');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
     }
 
     /**
