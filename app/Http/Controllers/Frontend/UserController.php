@@ -15,6 +15,7 @@ use App\Http\Requests\Frontend\UpdateUserProfileRequest;
 use App\Http\Requests\Frontend\UpdateUserSocialLinksRequest;
 use App\Models\Document;
 use App\Models\User;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -89,14 +90,19 @@ final class UserController extends Controller
     {
         $user = Auth::user();
         // Delete old avatar if exists
-        if ($user->avatar_url && Storage::disk('public')->exists($user->avatar_url)) {
-            Storage::disk('public')->delete($user->avatar_url);
+        $disk = SecureStorage::disk();
+        if ($user->avatar_url && Storage::disk($disk)->exists($user->avatar_url)) {
+            Storage::disk($disk)->delete($user->avatar_url);
         }
         // Store new avatar
-        $avatarPath = $request->file('avatar')->store('avatars', 'public');
+        $avatarPath = $request->file('avatar')->store('avatars', $disk);
         $user->update(['avatar_url' => $avatarPath]);
 
-        return response()->json(['success' => true, 'avatar_url' => Storage::disk('public')->url($avatarPath), 'message' => __('users.avatar_updated_successfully')]);
+        return response()->json([
+            'success' => true,
+            'avatar_url' => SecureStorage::temporarySignedUrl($avatarPath),
+            'message' => __('users.avatar_updated_successfully'),
+        ]);
     }
 
     /**
@@ -198,11 +204,14 @@ final class UserController extends Controller
         if ($document->documentable_id !== $user->id || $document->documentable_type !== User::class) {
             abort(403, __('users.unauthorized_document_access'));
         }
-        if (! Storage::disk('public')->exists($document->file_path)) {
+        $disk = SecureStorage::disk();
+        if (! Storage::disk($disk)->exists($document->file_path)) {
             abort(404, __('users.document_not_found'));
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->filename ?? 'document.pdf');
+        $filename = $document->filename ?? SecureStorage::filename($document->file_path);
+
+        return Storage::disk($disk)->download($document->file_path, $filename);
     }
 
     /**

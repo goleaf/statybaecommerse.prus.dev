@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Jobs\GenerateMediaVariantsJob;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -164,7 +165,7 @@ final class MediaService
 
             $metadata = [
                 'path' => $path,
-                'url' => $disk->url($path),
+                'url' => SecureStorage::temporarySignedUrl($path),
                 'width' => $dimensions[0] ?? null,
                 'height' => $dimensions[1] ?? null,
                 'size' => $disk->size($path),
@@ -242,7 +243,7 @@ final class MediaService
 
         return [
             'path' => $relativePath,
-            'url' => $disk->url($relativePath),
+            'url' => SecureStorage::temporarySignedUrl($relativePath),
             'width' => $dimensions[0] ?? null,
             'height' => $dimensions[1] ?? null,
             'size' => $disk->size($relativePath),

@@ -11,6 +11,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response as HttpResponse;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -35,7 +36,7 @@ class ExportController extends Controller
             ->get();
 
         $files = $exports->map(function (Export $export): array {
-            $disk = $export->artifact_disk ?? config('filesystems.exports_disk', 'public');
+            $disk = $export->artifact_disk ?? config('media-security.disk', 'secure-media');
             $path = $export->artifact_path;
 
             $size = null;
@@ -69,7 +70,7 @@ class ExportController extends Controller
         }
 
         $path = 'exports/'.$filename;
-        $disk = Storage::disk('public');
+        $disk = Storage::disk(SecureStorage::disk());
         if (! $disk->exists($path)) {
             return redirect()->route('exports.index')->with('error', __('File not found.'));
         }

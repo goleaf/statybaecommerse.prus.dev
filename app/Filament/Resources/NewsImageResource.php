@@ -8,6 +8,7 @@ use App\Filament\Resources\NewsImageResource\Pages;
 use App\Models\News;
 use App\Models\NewsImage;
 use BackedEnum;
+use App\Support\Storage\SecureStorage;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -102,7 +103,7 @@ final class NewsImageResource extends Resource
                                             ->required()
                                             ->image()
                                             ->directory('news-images')
-                                            ->visibility('public')
+                                            ->visibility('private')
                                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
                                             ->maxSize(5120)  // 5MB
                                             ->imageEditor()
@@ -377,7 +378,11 @@ final class NewsImageResource extends Resource
                     Action::make('download')
                         ->label(__('admin.news_images.download'))
                         ->icon('heroicon-o-arrow-down-tray')
-                        ->url(fn (NewsImage $record) => asset('storage/'.$record->file_path))
+                        ->url(fn (NewsImage $record) => SecureStorage::temporarySignedUrl(
+                            $record->file_path,
+                            now()->addMinutes((int) config('media-security.url_lifetime', 30)),
+                            true
+                        ))
                         ->openUrlInNewTab(),
                     DeleteAction::make()
                         ->label(__('admin.common.delete'))

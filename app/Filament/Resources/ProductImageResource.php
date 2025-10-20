@@ -47,7 +47,7 @@ final class ProductImageResource extends Resource
                     ->label('Image')
                     ->image()
                     ->directory('product-images')
-                    ->visibility('public'),
+                    ->visibility('private'),
                 Forms\Components\TextInput::make('alt_text')
                     ->label('Alt Text')
                     ->maxLength(255),

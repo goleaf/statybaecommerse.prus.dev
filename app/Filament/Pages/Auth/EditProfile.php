@@ -64,7 +64,7 @@ class EditProfile extends BaseEditProfile
                                 '1:1',
                             ])
                             ->directory('avatars')
-                            ->visibility('public'),
+                            ->visibility('private'),
                     ])
                     ->columns(2),
                 Section::make(__('admin.profile.professional_information'))
