@@ -17,7 +17,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
-class ReferralCodeUsageLogResource extends Resource
+final class ReferralCodeUsageLogResource extends Resource
 {
     protected static ?string $model = ReferralCodeUsageLog::class;
 
@@ -46,9 +46,9 @@ class ReferralCodeUsageLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralCodeUsageLogs::route('/'),
+            'index'  => ListReferralCodeUsageLogs::route('/'),
             'create' => CreateReferralCodeUsageLog::route('/create'),
-            'edit' => EditReferralCodeUsageLog::route('/{record}/edit'),
+            'edit'   => EditReferralCodeUsageLog::route('/{record}/edit'),
         ];
     }
 }
