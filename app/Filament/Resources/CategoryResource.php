@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -22,9 +18,15 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -33,13 +35,21 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class CategoryResource extends Resource
 {
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static ?string $model = Category::class;
 
     public static function shouldRegisterNavigation(): bool
@@ -82,16 +92,6 @@ final class CategoryResource extends Resource
         return AuthorizationMatrix::check('categories', 'update');
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
-
     public static function getPluralModelLabel(): string
     {
         return __('categories.plural');
@@ -114,7 +114,11 @@ final class CategoryResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                ->afterStateUpdated(function (string $operation, $state, Set $set): void {
+                                    if ($operation === 'create') {
+                                        $set('slug', Str::slug($state));
+                                    }
+                                }),
                             TextInput::make('slug')
                                 ->label(__('categories.slug'))
                                 ->unique(ignoreRecord: true)
@@ -267,7 +271,7 @@ final class CategoryResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
+                ViewAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
                 EditAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
@@ -330,10 +334,10 @@ final class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
+            'index'  => Pages\ListCategories::route('/'),
             'create' => Pages\CreateCategory::route('/create'),
-            'view' => Pages\ViewCategory::route('/{record}'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'view'   => Pages\ViewCategory::route('/{record}'),
+            'edit'   => Pages\EditCategory::route('/{record}/edit'),
         ];
     }
 }
