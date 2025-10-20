@@ -4,6 +4,8 @@ return [
     // Basic inventory terms
     'title' => 'Atsargų valdymas',
     'subtitle' => 'Stebėkite ir valdykite savo produktų atsargas',
+    'single' => 'Atsarga',
+    'plural' => 'Atsargos',
     'total_products' => 'Iš viso produktų',
     'in_stock' => 'Yra atsargose',
     'low_stock' => 'Mažai atsargų',
