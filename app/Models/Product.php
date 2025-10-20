@@ -10,6 +10,7 @@ use App\Models\Scopes\VisibleScope;
 use App\Observers\ProductObserver;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -102,8 +103,9 @@ final class Product extends Model implements HasMedia
      */
     public function reservedQuantity(): int
     {
-        // For simple products, no reservations for now
-        return 0;
+        return (int) $this->stockReservations()
+            ->active()
+            ->sum('quantity');
     }
 
     /**
@@ -277,17 +279,54 @@ final class Product extends Model implements HasMedia
     /**
      * Handle decreaseStock functionality with proper error handling.
      */
-    public function decreaseStock(int $quantity): bool
+    public function decreaseStock(int $quantity, ?StockReservation $reservation = null): bool
     {
+        if ($quantity <= 0) {
+            return false;
+        }
+
         if (! $this->manage_stock) {
             return true;
-            // Always allow if not tracking
         }
-        if ($this->availableQuantity() < $quantity) {
+
+        $decreased = DB::transaction(function () use ($quantity, $reservation): bool {
+            $product = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            $activeReservations = StockReservation::query()
+                ->where('product_id', $product->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->get();
+
+            $reserved = (int) $activeReservations->sum('quantity');
+
+            if (($product->stock_quantity - $reserved) < $quantity) {
+                return false;
+            }
+
+            $product->decrement('stock_quantity', $quantity);
+
+            if ($reservation !== null) {
+                $lockedReservation = StockReservation::query()
+                    ->whereKey($reservation->getKey())
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($lockedReservation !== null) {
+                    $lockedReservation->consume(min($quantity, $lockedReservation->quantity));
+                }
+            }
+
+            $this->setRawAttributes($product->getAttributes(), true);
+
+            return true;
+        });
+
+        if (! $decreased) {
             return false;
-            // Not enough stock
         }
-        $this->decrement('stock_quantity', $quantity);
+
+        $this->refresh();
 
         return true;
     }
@@ -297,9 +336,80 @@ final class Product extends Model implements HasMedia
      */
     public function increaseStock(int $quantity): void
     {
-        if ($this->manage_stock) {
-            $this->increment('stock_quantity', $quantity);
+        if ($quantity <= 0 || ! $this->manage_stock) {
+            return;
         }
+
+        DB::transaction(function () use ($quantity): void {
+            $product = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+            $product->increment('stock_quantity', $quantity);
+            $this->setRawAttributes($product->getAttributes(), true);
+        });
+
+        $this->refresh();
+    }
+
+    public function reserveStock(
+        int $quantity,
+        ?\DateTimeInterface $expiresAt = null,
+        array $meta = [],
+        ?string $referenceType = null,
+        ?string $referenceId = null
+    ): ?StockReservation {
+        if ($quantity <= 0 || ! $this->manage_stock) {
+            return null;
+        }
+
+        $reservation = DB::transaction(function () use ($quantity, $expiresAt, $meta, $referenceType, $referenceId): ?StockReservation {
+            $product = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            $reserved = (int) StockReservation::query()
+                ->where('product_id', $product->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->get()
+                ->sum('quantity');
+
+            if (($product->stock_quantity - $reserved) < $quantity) {
+                return null;
+            }
+
+            return $product->stockReservations()->create([
+                'quantity' => $quantity,
+                'status' => StockReservation::STATUS_RESERVED,
+                'reserved_at' => now(),
+                'expires_at' => $expiresAt,
+                'meta' => $meta ?: null,
+                'reference_type' => $referenceType,
+                'reference_id' => $referenceId,
+            ]);
+        });
+
+        $this->refresh();
+
+        return $reservation;
+    }
+
+    public function releaseReservation(StockReservation $reservation, ?int $quantity = null): void
+    {
+        DB::transaction(function () use ($reservation, $quantity): void {
+            $lockedReservation = StockReservation::query()
+                ->whereKey($reservation->getKey())
+                ->lockForUpdate()
+                ->first();
+
+            if ($lockedReservation === null) {
+                return;
+            }
+
+            if ($lockedReservation->product_id !== $this->getKey()) {
+                return;
+            }
+
+            $lockedReservation->release($quantity);
+        });
+
+        $this->refresh();
     }
 
     /**
@@ -345,6 +455,11 @@ final class Product extends Model implements HasMedia
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
+    }
+
+    public function stockReservations(): HasMany
+    {
+        return $this->hasMany(StockReservation::class);
     }
 
     /**
