@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 final class UserContract
 {
     public const CONTRACT = 'user';
+
     public const VERSION = 'v1';
 
     public static function schemaPath(): string

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\AnalyticsResource\Pages;
 
@@ -9,4 +11,3 @@ final class AnalyticsDashboard extends ListRecords
 {
     protected static string $resource = AnalyticsResource::class;
 }
-

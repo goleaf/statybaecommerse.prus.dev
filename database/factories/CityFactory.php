@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -39,21 +41,21 @@ final class CityFactory extends Factory
 
     public function capital(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_capital' => true,
         ]);
     }
 
     public function forCountry(Country $country): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'country_id' => $country->id,
         ]);
     }
 
     public function withRegion(Region $region): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'region_id' => $region->id,
             'country_id' => $region->country_id,
         ]);

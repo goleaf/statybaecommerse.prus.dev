@@ -26,8 +26,8 @@ if (! function_exists('app_setting')) {
 
 // Removed legacy shopper_setting - use app_setting instead
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
 
 if (! function_exists('current_currency')) {
@@ -283,7 +283,6 @@ if (! function_exists('app_placeholder_url')) {
         return asset('images/placeholder.jpg');
     }
 }
-
 
 if (! function_exists('media_img')) {
     /**

@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\ProductSimilarities\Schemas;
 
 use App\Models\Product;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Schema;
 
 class ProductSimilarityForm

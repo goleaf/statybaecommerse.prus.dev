@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Document;
-use App\Models\User;
 use App\Http\Requests\Frontend\DeactivateAccountRequest;
 use App\Http\Requests\Frontend\DeleteAccountRequest;
 use App\Http\Requests\Frontend\UpdateUserAvatarRequest;
@@ -15,6 +13,8 @@ use App\Http\Requests\Frontend\UpdateUserPasswordRequest;
 use App\Http\Requests\Frontend\UpdateUserPrivacySettingsRequest;
 use App\Http\Requests\Frontend\UpdateUserProfileRequest;
 use App\Http\Requests\Frontend\UpdateUserSocialLinksRequest;
+use App\Models\Document;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\ProductTranslation;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductHistory;
+use App\Models\Translations\ProductTranslation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -185,7 +187,7 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->state([
                 'field_name' => 'description',
                 'old_value' => $product->description,
-                'new_value' => $product->description . ' Papildytas informacija apie dažomumą.',
+                'new_value' => $product->description.' Papildytas informacija apie dažomumą.',
                 'description' => 'Description enriched with paintability details.',
                 'metadata' => ['reason' => 'seo_optimization'] + $baseMetadata,
                 'created_at' => Carbon::create(2024, 12, 5, 10, 5),

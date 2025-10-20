@@ -11,9 +11,7 @@ final class CartService
 {
     private const SESSION_KEY = 'cart';
 
-    public function __construct(private readonly Session $session)
-    {
-    }
+    public function __construct(private readonly Session $session) {}
 
     public function getCount(?int $userId, ?string $sessionId): int
     {

@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\CollectionTranslation;
 use App\Models\Collection;
+use App\Models\Translations\CollectionTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Database\Seeders\Data\HouseBuilderCollections;
 use Illuminate\Database\Seeder;
@@ -62,9 +64,9 @@ class CollectionSeeder extends Seeder
                 if ($existingTranslation) {
                     $existingTranslation->update([
                         'name' => $translation['name'],
-                        'slug' => $locale === 'lt' ? $slug : $slug . '-' . $locale,
+                        'slug' => $locale === 'lt' ? $slug : $slug.'-'.$locale,
                         'description' => $translation['description'],
-                        'meta_title' => $translation['name'] . ' | ' . config('app.name'),
+                        'meta_title' => $translation['name'].' | '.config('app.name'),
                         'meta_description' => $translation['description'],
                         'meta_keywords' => $translation['keywords'] ?? [],
                     ]);
@@ -75,9 +77,9 @@ class CollectionSeeder extends Seeder
                         ->state([
                             'locale' => $locale,
                             'name' => $translation['name'],
-                            'slug' => $locale === 'lt' ? $slug : $slug . '-' . $locale,
+                            'slug' => $locale === 'lt' ? $slug : $slug.'-'.$locale,
                             'description' => $translation['description'],
-                            'meta_title' => $translation['name'] . ' | ' . config('app.name'),
+                            'meta_title' => $translation['name'].' | '.config('app.name'),
                             'meta_description' => $translation['description'],
                             'meta_keywords' => $translation['keywords'] ?? [],
                         ])
@@ -94,12 +96,12 @@ class CollectionSeeder extends Seeder
     private function ensureCollectionMedia(Collection $collection, string $label): void
     {
         try {
-            if (!$collection->hasMedia('images')) {
+            if (! $collection->hasMedia('images')) {
                 $imagePath = $this->imageGenerator->generateCollectionImage($label);
                 $collection
                     ->addMedia($imagePath)
                     ->withCustomProperties(['source' => 'generated'])
-                    ->usingName($label . ' Image')
+                    ->usingName($label.' Image')
                     ->toMediaCollection('images');
 
                 if (file_exists($imagePath)) {
@@ -107,12 +109,12 @@ class CollectionSeeder extends Seeder
                 }
             }
 
-            if (!$collection->hasMedia('banner')) {
-                $bannerPath = $this->imageGenerator->generateCollectionImage($label . ' Banner');
+            if (! $collection->hasMedia('banner')) {
+                $bannerPath = $this->imageGenerator->generateCollectionImage($label.' Banner');
                 $collection
                     ->addMedia($bannerPath)
                     ->withCustomProperties(['source' => 'generated'])
-                    ->usingName($label . ' Banner')
+                    ->usingName($label.' Banner')
                     ->toMediaCollection('banner');
 
                 if (file_exists($bannerPath)) {
@@ -120,14 +122,14 @@ class CollectionSeeder extends Seeder
                 }
             }
         } catch (\Throwable $exception) {
-            $this->command?->warn('CollectionSeeder: failed to generate imagery for ' . $collection->slug . ': ' . $exception->getMessage());
+            $this->command?->warn('CollectionSeeder: failed to generate imagery for '.$collection->slug.': '.$exception->getMessage());
         }
     }
 
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en,ru,de')))
-            ->map(fn($locale) => trim($locale))
+            ->map(fn ($locale) => trim($locale))
             ->filter()
             ->unique()
             ->values()

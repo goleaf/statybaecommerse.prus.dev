@@ -35,8 +35,7 @@ final class MediaService
 
     public function __construct(
         private readonly Dispatcher $dispatcher
-    ) {
-    }
+    ) {}
 
     /**
      * Store an uploaded file and queue responsive variants.

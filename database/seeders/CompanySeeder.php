@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -129,6 +131,6 @@ final class CompanySeeder extends Seeder
                 ->create();
         });
 
-        $this->command->info('Created ' . count($companiesData) . ' construction companies using factories');
+        $this->command->info('Created '.count($companiesData).' construction companies using factories');
     }
 }

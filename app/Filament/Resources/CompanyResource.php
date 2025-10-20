@@ -8,6 +8,7 @@ use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -17,8 +18,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-
-use Filament\Forms\Form;
 
 final class CompanyResource extends Resource
 {
@@ -44,7 +43,6 @@ final class CompanyResource extends Resource
      * Configure the Filament form schema with fields and validation.
      *
      * @param  Form  $schema
-     * @return Form
      */
     public static function form(Form $form): Form
     {

@@ -10,9 +10,7 @@ use Illuminate\Support\Str;
 
 final class SimpleJsonSchemaValidator
 {
-    public function __construct(private readonly Filesystem $filesystem)
-    {
-    }
+    public function __construct(private readonly Filesystem $filesystem) {}
 
     /**
      * Validate the given payload against the JSON schema located at the provided path.

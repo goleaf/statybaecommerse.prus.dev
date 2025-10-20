@@ -29,5 +29,3 @@ final class CouponUsageFactory extends Factory
         ];
     }
 }
-
-

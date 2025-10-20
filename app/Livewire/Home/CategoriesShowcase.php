@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
@@ -33,7 +35,7 @@ final class CategoriesShowcase extends Component implements HasSchemas
             ViewEntry::make('categories')
                 ->label('')
                 ->view('livewire.home.partials.categories-grid')
-                ->viewData(fn(): array => [
+                ->viewData(fn (): array => [
                     'categories' => $this->categoryList(),
                 ]),
         ]);

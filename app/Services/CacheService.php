@@ -7,9 +7,9 @@ namespace App\Services;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\Cache\CacheKeys;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
-use App\Support\Cache\CacheKeys;
 
 /**
  * CacheService
