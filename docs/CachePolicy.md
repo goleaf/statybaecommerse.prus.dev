@@ -24,6 +24,7 @@ Use the helper when attaching cache tags to keep invalidation consistent:
 - `CacheKeys::categoryTag($categoryId)` → `category:{id}`
 - `CacheKeys::brandTag($brandId)` → `brand:{id}`
 - `CacheKeys::homeTag()` and `CacheKeys::dashboardTag()` for broad UI groupings
+- `CacheKeys::productAggregateTag()` / `CacheKeys::userAggregateTag()` / `CacheKeys::orderAggregateTag()` for repository- or metric-level aggregates
 
 Tagging ensures that refreshing a product or category can invalidate related home and dashboard fragments without manual key enumeration.
 
@@ -32,8 +33,18 @@ Tagging ensures that refreshing a product or category can invalidate related hom
 - Product mutations should clear featured, trending, and navigation caches using the product/category/brand tags.
 - Category structure changes must clear navigation trees (`CacheKeys::categoryNavigationTree()`) and home catalogue lookups.
 - Dashboard metrics rely on short TTLs but still respect `CacheKeys::dashboardTag()` for forced refreshes during deployments.
+- Product, user, and order observers flush the aggregate tags above on `created`, `updated`, `deleted`, `restored`, and `forceDeleted` so repository counts and dashboard snapshots never drift. When cache tags are unavailable (e.g. array store), the observers fall back to forgetting `CacheKeys::productTotalCount()`, `CacheKeys::userTotalCount()`, and the locale-aware dashboard metric keys.
 
 Where Redis tags are unavailable, fall back to targeted `Cache::forget()` calls that leverage the centralized builders.
+
+## Repository & Dashboard Metrics
+
+- `App\Repositories\ProductRepository::count()` and `App\Repositories\UserRepository::count()` cache totals for the default connection using `CacheKeys::productTotalCount()` / `CacheKeys::userTotalCount()` with aggregate + dashboard tags. Passing a non-default connection bypasses caching to keep verification workflows accurate.
+- `App\Services\Dashboard\DashboardMetricsRepository` now tags the fast-path metrics:
+  - `orders_today` & `revenue_last_seven_days` → `CacheKeys::orderAggregateTag()`
+  - `new_users_today` → `CacheKeys::userAggregateTag()`
+  - `low_stock_items` → `CacheKeys::productAggregateTag()`
+- The observers described above provide deterministic invalidation so cached values refresh immediately after underlying data changes.
 
 ## Extending `CacheKeys`
 

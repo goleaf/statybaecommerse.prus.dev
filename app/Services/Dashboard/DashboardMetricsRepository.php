@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Scopes\ActiveScope;
 use App\Models\User;
+use App\Support\Cache\CacheKeys;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Support\Facades\Cache;
@@ -26,7 +27,7 @@ final class DashboardMetricsRepository
                 ->whereBetween('created_at', [$startOfDay, $endOfDay])
                 ->whereNull('deleted_at')
                 ->count();
-        });
+        }, [CacheKeys::orderAggregateTag()]);
     }
 
     public function revenueLastSevenDays(): float
@@ -44,7 +45,7 @@ final class DashboardMetricsRepository
                 ->sum('total');
 
             return (float) $total;
-        });
+        }, [CacheKeys::orderAggregateTag()]);
     }
 
     public function newUsersToday(): int
@@ -58,7 +59,7 @@ final class DashboardMetricsRepository
                 ->whereBetween('created_at', [$startOfDay, $endOfDay])
                 ->whereNull('deleted_at')
                 ->count();
-        });
+        }, [CacheKeys::userAggregateTag()]);
     }
 
     public function lowStockItems(): int
@@ -82,13 +83,20 @@ final class DashboardMetricsRepository
                     });
                 })
                 ->count();
-        });
+        }, [CacheKeys::productAggregateTag()]);
     }
 
-    private function remember(string $key, Closure $callback): mixed
+    private function remember(string $key, Closure $callback, array $tags = []): mixed
     {
-        $ttl = (int) Config::get('dashboard.cache_ttl', 60);
-        $cacheKey = sprintf('dashboard.metrics.%s.%s', app()->getLocale(), $key);
+        $ttl = (int) Config::get('dashboard.cache_ttl', CacheKeys::TTL_MINUTE);
+        $ttl = $ttl > 0 ? $ttl : CacheKeys::TTL_MINUTE;
+        $cacheKey = CacheKeys::dashboardMetric($key, app()->getLocale());
+
+        if (Cache::supportsTags()) {
+            $tagSet = array_values(array_unique(array_merge([CacheKeys::dashboardTag()], $tags)));
+
+            return Cache::tags($tagSet)->remember($cacheKey, now()->addSeconds($ttl), $callback);
+        }
 
         return Cache::remember($cacheKey, now()->addSeconds($ttl), $callback);
     }
