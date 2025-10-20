@@ -11,19 +11,21 @@ use App\Models\CampaignConversion;
 use App\Models\User;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
 use UnitEnum;
 
 /**
@@ -46,7 +48,9 @@ final class CampaignConversionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Marketing';
+        return self::$navigationGroup instanceof NavigationGroup
+            ? self::$navigationGroup->label()
+            : self::$navigationGroup;
     }
 
     public static function getPluralModelLabel(): string
@@ -76,7 +80,7 @@ final class CampaignConversionResource extends Resource
                                 ->preload()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $campaign = Campaign::find($state);
                                         if ($campaign) {
@@ -98,7 +102,7 @@ final class CampaignConversionResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $user = User::find($state);
                                         if ($user) {
@@ -145,7 +149,7 @@ final class CampaignConversionResource extends Resource
                     ->label(__('campaign_conversions.campaign'))
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('user.name')
+                TextColumn::make('customer.name')
                     ->label(__('campaign_conversions.user'))
                     ->sortable(),
                 IconColumn::make('is_converted')
@@ -154,7 +158,7 @@ final class CampaignConversionResource extends Resource
                     ->sortable(),
                 TextColumn::make('conversion_value')
                     ->label(__('campaign_conversions.conversion_value'))
-                    ->money('EUR')
+                    ->formatStateUsing(fn ($state, CampaignConversion $record) => Number::currency((float) $state, $record->conversion_currency ?? 'EUR', locale: app()->getLocale()))
                     ->alignCenter(),
                 TextColumn::make('created_at')
                     ->label(__('campaign_conversions.created_at'))
@@ -170,15 +174,24 @@ final class CampaignConversionResource extends Resource
                     ->trueLabel(__('campaign_conversions.conversions_only'))
                     ->falseLabel(__('campaign_conversions.non_conversions_only'))
                     ->native(false),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaignConversions::route('/'),
+            'index'  => Pages\ListCampaignConversions::route('/'),
             'create' => Pages\CreateCampaignConversion::route('/create'),
-            'edit' => Pages\EditCampaignConversion::route('/{record}/edit'),
+            'edit'   => Pages\EditCampaignConversion::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaignConversion::route('/{record}'),
         ];
     }
 }
