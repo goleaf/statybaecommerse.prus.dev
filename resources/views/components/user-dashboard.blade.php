@@ -294,7 +294,7 @@
                             <div
                                  class="border border-gray-200 rounded-xl p-3 hover:shadow-medium transition-shadow duration-200">
                                 <div class="w-full h-24 bg-gray-100 rounded-lg mb-2 overflow-hidden">
-                                    <img src="{{ $item->getFirstMediaUrl('images') ?? asset('images/placeholder-product.jpg') }}"
+                                    <img src="{{ $item->getFirstMediaUrl('images') ?? product_placeholder_url('medium') }}"
                                          alt="{{ $item->name }}" class="w-full h-full object-cover">
                                 </div>
                                 <h3 class="font-medium text-gray-900 text-sm line-clamp-2">{{ $item->name }}</h3>
