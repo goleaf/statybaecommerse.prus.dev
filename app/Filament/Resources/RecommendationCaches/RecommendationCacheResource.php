@@ -5,25 +5,21 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationCaches;
 
 use App\Filament\Resources\RecommendationCaches\Pages\CreateRecommendationCache;
-use UnitEnum;
-use BackedEnum;
 use App\Filament\Resources\RecommendationCaches\Pages\EditRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\ListRecommendationCaches;
 use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;
 use App\Filament\Resources\RecommendationCaches\Tables\RecommendationCachesTable;
 use App\Models\RecommendationCache;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
-use Filament\Forms\Form;
 
 class RecommendationCacheResource extends Resource
 {
     protected static ?string $model = RecommendationCache::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

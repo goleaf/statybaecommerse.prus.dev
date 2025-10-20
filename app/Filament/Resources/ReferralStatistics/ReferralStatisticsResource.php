@@ -3,25 +3,21 @@
 namespace App\Filament\Resources\ReferralStatistics;
 
 use App\Filament\Resources\ReferralStatistics\Pages\CreateReferralStatistics;
-use UnitEnum;
 use App\Filament\Resources\ReferralStatistics\Pages\EditReferralStatistics;
 use App\Filament\Resources\ReferralStatistics\Pages\ListReferralStatistics;
 use App\Filament\Resources\ReferralStatistics\Schemas\ReferralStatisticsForm;
 use App\Filament\Resources\ReferralStatistics\Tables\ReferralStatisticsTable;
 use App\Models\ReferralStatistics;
-use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
-use Filament\Forms\Form;
 
 class ReferralStatisticsResource extends Resource
 {
     protected static ?string $model = ReferralStatistics::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
