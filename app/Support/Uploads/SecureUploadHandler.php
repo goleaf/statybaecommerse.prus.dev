@@ -10,12 +10,11 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Spatie\Image\Image;
+use Throwable;
 
 final class SecureUploadHandler
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function configure(FileUpload $component): void
     {
@@ -29,10 +28,9 @@ final class SecureUploadHandler
             ->visibility('private')
             ->preserveFilenames(false)
             ->maxSize($maxSizeKb)
-            ->acceptedFileTypes(self::allowedMimeTypes())
-            ->allowedFileExtensions(self::allowedExtensions())
-            ->sanitizeFileNameUsing(fn (TemporaryUploadedFile $file): string => self::sanitizedFileName($file))
-            ->saveUploadedFileUsing(fn (TemporaryUploadedFile $file, string $directory, ?string $diskName): string => self::storeUploadedFile($file, $directory, $diskName ?? $disk));
+            ->acceptedFileTypes(self::acceptedFileTypes())
+            ->getUploadedFileNameForStorageUsing(fn (TemporaryUploadedFile $file): string => self::sanitizedFileName($file))
+            ->saveUploadedFileUsing(fn (FileUpload $component, TemporaryUploadedFile $file): string => self::storeUploadedFile($file, (string) ($component->getDirectory() ?? ''), $component->getDiskName()));
     }
 
     /**
@@ -53,6 +51,22 @@ final class SecureUploadHandler
         $extensions = array_values(array_filter(array_map('strval', config('media-security.allowed_extensions', []))));
 
         return $extensions !== [] ? $extensions : ['jpg', 'jpeg', 'png', 'webp'];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function acceptedFileTypes(): array
+    {
+        $types = array_merge(
+            self::allowedMimeTypes(),
+            array_map(
+                static fn (string $extension): string => '.' . ltrim($extension, '.'),
+                self::allowedExtensions(),
+            ),
+        );
+
+        return array_values(array_unique($types));
     }
 
     private static function storeUploadedFile(TemporaryUploadedFile $file, string $directory, string $disk): string
@@ -122,7 +136,7 @@ final class SecureUploadHandler
             Image::load($realPath)
                 ->strip()
                 ->save();
-        } catch (\Throwable) {
+        } catch (Throwable) {
             throw ValidationException::withMessages([
                 'file' => __('validation.image', ['attribute' => 'file']),
             ]);
@@ -141,8 +155,8 @@ final class SecureUploadHandler
         }
 
         $random = Str::random(12);
-        $suffix = $extension !== '' ? '.'.$extension : '';
+        $suffix = $extension !== '' ? '.' . $extension : '';
 
-        return $sanitized.'-'.$random.$suffix;
+        return $sanitized . '-' . $random . $suffix;
     }
 }

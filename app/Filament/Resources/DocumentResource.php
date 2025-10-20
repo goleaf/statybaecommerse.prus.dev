@@ -74,11 +74,11 @@ final class DocumentResource extends Resource
                                 Select::make('type')
                                     ->label(__('admin.documents.type'))
                                     ->options([
-                                        'pdf' => 'PDF',
-                                        'doc' => 'DOC',
-                                        'docx' => 'DOCX',
-                                        'xls' => 'XLS',
-                                        'xlsx' => 'XLSX',
+                                        'pdf'   => 'PDF',
+                                        'doc'   => 'DOC',
+                                        'docx'  => 'DOCX',
+                                        'xls'   => 'XLS',
+                                        'xlsx'  => 'XLSX',
                                         'image' => 'Image',
                                         'other' => 'Other',
                                     ])
@@ -96,8 +96,16 @@ final class DocumentResource extends Resource
                                         'image/jpeg',
                                         'image/png',
                                         'image/webp',
+                                        '.pdf',
+                                        '.doc',
+                                        '.docx',
+                                        '.xls',
+                                        '.xlsx',
+                                        '.jpg',
+                                        '.jpeg',
+                                        '.png',
+                                        '.webp',
                                     ])
-                                    ->allowedFileExtensions(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp'])
                                     ->maxSize(10 * 1024),
                                 Textarea::make('description')
                                     ->label(__('admin.documents.description'))
@@ -171,11 +179,11 @@ final class DocumentResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('admin.documents.type'))
                     ->options([
-                        'pdf' => 'PDF',
-                        'doc' => 'DOC',
-                        'docx' => 'DOCX',
-                        'xls' => 'XLS',
-                        'xlsx' => 'XLSX',
+                        'pdf'   => 'PDF',
+                        'doc'   => 'DOC',
+                        'docx'  => 'DOCX',
+                        'xls'   => 'XLS',
+                        'xlsx'  => 'XLSX',
                         'image' => 'Image',
                         'other' => 'Other',
                     ]),
@@ -202,10 +210,10 @@ final class DocumentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDocuments::route('/'),
+            'index'  => Pages\ListDocuments::route('/'),
             'create' => Pages\CreateDocument::route('/create'),
-            'view' => Pages\ViewDocument::route('/{record}'),
-            'edit' => Pages\EditDocument::route('/{record}/edit'),
+            'view'   => Pages\ViewDocument::route('/{record}'),
+            'edit'   => Pages\EditDocument::route('/{record}/edit'),
         ];
     }
 

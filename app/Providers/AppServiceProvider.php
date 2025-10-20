@@ -15,17 +15,18 @@ use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
-use App\Support\Storage\SecureStorage;
-use App\Support\Uploads\SecureUploadHandler;
 use App\Support\Health\HealthReporter;
+use App\Support\Storage\SecureStorage;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
+use App\Support\Uploads\SecureUploadHandler;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
 use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
+use Artisan;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
@@ -42,7 +43,13 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
+
+use function in_array;
+use function is_array;
+
 use Livewire\Livewire;
+use Storage;
+use Throwable;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -84,8 +91,10 @@ class AppServiceProvider extends ServiceProvider
         if (class_exists(\Filament\Tables\Columns\ImageColumn::class)) {
             \Filament\Tables\Columns\ImageColumn::configureUsing(
                 static function (\Filament\Tables\Columns\ImageColumn $column): void {
-                    $column->formatStateUsing(
-                        static function ($state): ?string {
+                    $column->state(
+                        static function (\Filament\Tables\Columns\ImageColumn $column): mixed {
+                            $state = $column->getStateFromRecord();
+
                             if (! is_string($state) || $state === '') {
                                 return $state;
                             }
@@ -114,7 +123,7 @@ class AppServiceProvider extends ServiceProvider
         // Set default currency for Number helper (EUR by default)
         try {
             Number::useCurrency(config('shared.localization.default_currency', 'EUR'));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Safe fallback if Number is unavailable
         }
 
@@ -136,21 +145,21 @@ class AppServiceProvider extends ServiceProvider
             $schedule->call(function (): void {
                 $base = storage_path('app/import');
                 $map = [
-                    'products.csv' => 'import:products',
-                    'prices.csv' => 'import:prices',
+                    'products.csv'  => 'import:products',
+                    'prices.csv'    => 'import:prices',
                     'inventory.csv' => 'import:inventory',
                 ];
                 foreach ($map as $file => $cmd) {
-                    $path = $base.DIRECTORY_SEPARATOR.$file;
+                    $path = $base . DIRECTORY_SEPARATOR . $file;
                     if (is_file($path)) {
-                        \Artisan::call($cmd, ['path' => $path, '--chunk' => 500]);
+                        Artisan::call($cmd, ['path' => $path, '--chunk' => 500]);
                     }
                 }
             })->dailyAt('03:00')->name('imports:nightly')->withoutOverlapping();
             $schedule->call(function (): void {
                 // Rotate exports older than 7 days with timeout protection
                 $timeout = now()->addMinutes(3);  // 3 minute timeout for export rotation
-                $disk = \Storage::disk(SecureStorage::disk());
+                $disk = Storage::disk(SecureStorage::disk());
                 $dir = 'exports';
                 if ($disk->exists($dir)) {
                     $files = collect($disk->files($dir))
@@ -169,13 +178,13 @@ class AppServiceProvider extends ServiceProvider
         // Use localized Markdown templates for auth notifications
         ResetPassword::toMailUsing(function ($notifiable, string $url) {
             $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
-            $minutes = (int) config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
+            $minutes = (int) config('auth.passwords.' . config('auth.defaults.passwords') . '.expire');
 
             return (new MailMessage)
                 ->locale($locale)
                 ->subject(__('mail.reset_password_subject', [], $locale))
                 ->markdown('emails.auth.password-reset', [
-                    'url' => $url,
+                    'url'     => $url,
                     'minutes' => $minutes,
                 ]);
         });
@@ -192,7 +201,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Configure document service global variables for e-commerce (skip during console commands)
-        if (! $this->app->runningInConsole() && ! \in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+        if (! $this->app->runningInConsole() && ! in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
             $this->configureDocumentVariables();
         }
 
@@ -220,7 +229,7 @@ class AppServiceProvider extends ServiceProvider
                 JsonResponse::macro('assertHasNoBulkActionErrors', function () {
                     return $this;
                 });
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // ignore macro registration failures
             }
         }
@@ -233,10 +242,10 @@ class AppServiceProvider extends ServiceProvider
 
             return [
                 'trace' => [
-                    'trace_id' => $context->traceId(),
+                    'trace_id'       => $context->traceId(),
                     'parent_span_id' => $context->spanId(),
                     'correlation_id' => $context->correlationId(),
-                    'trace_flags' => $context->traceFlags(),
+                    'trace_flags'    => $context->traceFlags(),
                 ],
             ];
         });
@@ -245,7 +254,7 @@ class AppServiceProvider extends ServiceProvider
             $payload = $event->job->payload();
             $trace = $payload['trace'] ?? null;
 
-            if (\is_array($trace)) {
+            if (is_array($trace)) {
                 Trace::store(TraceContext::generate(
                     traceId: (string) ($trace['trace_id'] ?? ''),
                     parentSpanId: (string) ($trace['parent_span_id'] ?? ''),
@@ -319,7 +328,7 @@ class AppServiceProvider extends ServiceProvider
         try {
             $service = app(DocumentService::class);
             $availableVariables = $service->getAvailableVariables();
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             if ($this->app->runningInConsole()) {
                 // During console bootstrap (e.g. migrations, tests) the cache tables may not be available yet.
                 return;
@@ -334,63 +343,63 @@ class AppServiceProvider extends ServiceProvider
         config([
             'documents.global_variables' => array_merge($availableVariables, [
                 // Company information
-                '$COMPANY_NAME' => config('app.name', 'E-Commerce Store'),
+                '$COMPANY_NAME'    => config('app.name', 'E-Commerce Store'),
                 '$COMPANY_ADDRESS' => config('app.company_address', ''),
-                '$COMPANY_PHONE' => config('app.company_phone', ''),
-                '$COMPANY_EMAIL' => config('app.company_email', config('mail.from.address')),
+                '$COMPANY_PHONE'   => config('app.company_phone', ''),
+                '$COMPANY_EMAIL'   => config('app.company_email', config('mail.from.address')),
                 '$COMPANY_WEBSITE' => config('app.url'),
-                '$COMPANY_VAT' => config('app.company_vat', ''),
+                '$COMPANY_VAT'     => config('app.company_vat', ''),
                 // Current date/time variables (year-month-day format)
-                '$CURRENT_DATE' => now()->format(config('datetime.formats.date', 'Y-m-d')),
+                '$CURRENT_DATE'     => now()->format(config('datetime.formats.date', 'Y-m-d')),
                 '$CURRENT_DATETIME' => now()->format(config('datetime.formats.datetime_full', 'Y-m-d H:i:s')),
-                '$CURRENT_YEAR' => now()->year,
-                '$CURRENT_MONTH' => now()->format('F'),
-                '$CURRENT_DAY' => now()->format('d'),
+                '$CURRENT_YEAR'     => now()->year,
+                '$CURRENT_MONTH'    => now()->format('F'),
+                '$CURRENT_DAY'      => now()->format('d'),
                 // E-commerce specific variables
                 '$STORE_CURRENCY' => config('app.currency', 'EUR'),
-                '$STORE_LOCALE' => app()->getLocale(),
+                '$STORE_LOCALE'   => app()->getLocale(),
                 '$STORE_TIMEZONE' => config('app.timezone'),
                 // Order variables
-                '$ORDER_NUMBER' => 'Order Number',
-                '$ORDER_DATE' => 'Order Date',
-                '$ORDER_TOTAL' => 'Order Total',
-                '$ORDER_SUBTOTAL' => 'Order Subtotal',
-                '$ORDER_TAX' => 'Order Tax',
-                '$ORDER_SHIPPING' => 'Order Shipping',
-                '$ORDER_DISCOUNT' => 'Order Discount',
-                '$ORDER_STATUS' => 'Order Status',
-                '$ORDER_PAYMENT_METHOD' => 'Payment Method',
+                '$ORDER_NUMBER'          => 'Order Number',
+                '$ORDER_DATE'            => 'Order Date',
+                '$ORDER_TOTAL'           => 'Order Total',
+                '$ORDER_SUBTOTAL'        => 'Order Subtotal',
+                '$ORDER_TAX'             => 'Order Tax',
+                '$ORDER_SHIPPING'        => 'Order Shipping',
+                '$ORDER_DISCOUNT'        => 'Order Discount',
+                '$ORDER_STATUS'          => 'Order Status',
+                '$ORDER_PAYMENT_METHOD'  => 'Payment Method',
                 '$ORDER_SHIPPING_METHOD' => 'Shipping Method',
                 // Customer variables
-                '$CUSTOMER_NAME' => 'Customer Name',
+                '$CUSTOMER_NAME'       => 'Customer Name',
                 '$CUSTOMER_FIRST_NAME' => 'Customer First Name',
-                '$CUSTOMER_LAST_NAME' => 'Customer Last Name',
-                '$CUSTOMER_EMAIL' => 'Customer Email',
-                '$CUSTOMER_PHONE' => 'Customer Phone',
-                '$CUSTOMER_COMPANY' => 'Customer Company',
-                '$CUSTOMER_GROUP' => 'Customer Group',
+                '$CUSTOMER_LAST_NAME'  => 'Customer Last Name',
+                '$CUSTOMER_EMAIL'      => 'Customer Email',
+                '$CUSTOMER_PHONE'      => 'Customer Phone',
+                '$CUSTOMER_COMPANY'    => 'Customer Company',
+                '$CUSTOMER_GROUP'      => 'Customer Group',
                 // Address variables
-                '$BILLING_ADDRESS' => 'Billing Address',
-                '$BILLING_CITY' => 'Billing City',
-                '$BILLING_COUNTRY' => 'Billing Country',
-                '$BILLING_POSTAL_CODE' => 'Billing Postal Code',
-                '$SHIPPING_ADDRESS' => 'Shipping Address',
-                '$SHIPPING_CITY' => 'Shipping City',
-                '$SHIPPING_COUNTRY' => 'Shipping Country',
+                '$BILLING_ADDRESS'      => 'Billing Address',
+                '$BILLING_CITY'         => 'Billing City',
+                '$BILLING_COUNTRY'      => 'Billing Country',
+                '$BILLING_POSTAL_CODE'  => 'Billing Postal Code',
+                '$SHIPPING_ADDRESS'     => 'Shipping Address',
+                '$SHIPPING_CITY'        => 'Shipping City',
+                '$SHIPPING_COUNTRY'     => 'Shipping Country',
                 '$SHIPPING_POSTAL_CODE' => 'Shipping Postal Code',
                 // Product variables
-                '$PRODUCT_NAME' => 'Product Name',
-                '$PRODUCT_SKU' => 'Product SKU',
-                '$PRODUCT_PRICE' => 'Product Price',
+                '$PRODUCT_NAME'        => 'Product Name',
+                '$PRODUCT_SKU'         => 'Product SKU',
+                '$PRODUCT_PRICE'       => 'Product Price',
                 '$PRODUCT_DESCRIPTION' => 'Product Description',
-                '$PRODUCT_BRAND' => 'Product Brand',
-                '$PRODUCT_CATEGORY' => 'Product Category',
-                '$PRODUCT_WEIGHT' => 'Product Weight',
-                '$PRODUCT_DIMENSIONS' => 'Product Dimensions',
+                '$PRODUCT_BRAND'       => 'Product Brand',
+                '$PRODUCT_CATEGORY'    => 'Product Category',
+                '$PRODUCT_WEIGHT'      => 'Product Weight',
+                '$PRODUCT_DIMENSIONS'  => 'Product Dimensions',
                 // Brand and category variables
-                '$BRAND_NAME' => 'Brand Name',
-                '$BRAND_DESCRIPTION' => 'Brand Description',
-                '$CATEGORY_NAME' => 'Category Name',
+                '$BRAND_NAME'           => 'Brand Name',
+                '$BRAND_DESCRIPTION'    => 'Brand Description',
+                '$CATEGORY_NAME'        => 'Category Name',
                 '$CATEGORY_DESCRIPTION' => 'Category Description',
             ]),
         ]);
@@ -426,14 +435,14 @@ class AppServiceProvider extends ServiceProvider
                 $model instanceof \App\Models\DiscountCondition) {
             try {
                 Cache::tags(['discounts'])->flush();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
         }
     }
 
     private function shouldConfigureDocumentVariables(): bool
     {
-        if (\in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+        if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
             return false;
         }
 
