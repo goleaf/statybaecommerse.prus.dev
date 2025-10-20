@@ -46,7 +46,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\OrderController::class, 'index'])->name('index');
         Route::get('/{order}', [App\Http\Controllers\Frontend\OrderController::class, 'show'])->name('show');
         Route::post('/{order}/cancel', [App\Http\Controllers\Frontend\OrderController::class, 'cancel'])->name('cancel');
-        Route::post('/{order}/return', [App\Http\Controllers\Frontend\OrderController::class, 'return'])->name('return');
+        Route::post('/{order}/return', [App\Http\Controllers\Frontend\OrderController::class, 'requestReturn'])->name('return');
     });
 
     // Cart
