@@ -36,7 +36,7 @@ final class DocumentTemplateResource extends Resource
 {
     public static function getNavigationGroup(): UnitEnum|string|null
     {
-        return 'System';
+        return 'Documents';
     }
 
     protected static ?string $model = DocumentTemplate::class;
