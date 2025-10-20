@@ -16,9 +16,40 @@
         ? route('status.page', ['locale' => $locale])
         : url('/status');
 
+    $supportTitle = $supportTitle ?? __('Need some help?');
+    $supportDescription = $supportDescription ?? __('If this keeps happening, contact our support team and include the reference ID below so we can investigate quickly.');
+
     $resolvedCode = isset($exception) && method_exists($exception, 'getStatusCode')
         ? (string) $exception->getStatusCode()
         : ((string) ($code ?? '4xx'));
+
+    $request = function_exists('request') ? request() : null;
+    $correlationId = $correlationId ?? null;
+    $correlationHeaderConfig = config('app.correlation_header', 'X-Correlation-ID');
+    $correlationHeader = is_string($correlationHeaderConfig) && $correlationHeaderConfig !== ''
+        ? $correlationHeaderConfig
+        : 'X-Correlation-ID';
+
+    if ($request !== null) {
+        $attributeCorrelation = $request->attributes->get('correlation_id');
+        if (is_string($attributeCorrelation) && $attributeCorrelation !== '') {
+            $correlationId = $attributeCorrelation;
+        }
+
+        if ($correlationId === null) {
+            $headerCorrelation = (string) $request->headers->get($correlationHeader, '');
+            if ($headerCorrelation !== '') {
+                $correlationId = $headerCorrelation;
+            }
+        }
+    }
+
+    if ($correlationId === null && app()->bound('request_correlation_id')) {
+        $resolvedCorrelation = app()->make('request_correlation_id');
+        if (is_string($resolvedCorrelation) && $resolvedCorrelation !== '') {
+            $correlationId = $resolvedCorrelation;
+        }
+    }
 @endphp
 
 @extends('errors.layout', [
@@ -33,6 +64,11 @@
         'label' => __('Contact Support'),
         'url' => $contactUrl,
     ],
+    'correlationId' => $correlationId,
+    'supportTitle' => $supportTitle,
+    'supportDescription' => $supportDescription,
+    'supportPageUrl' => $supportUrl,
+    'statusPageUrl' => $statusUrl,
     'links' => $links ?? [
         [
             'label' => __('Visit Support Center'),
