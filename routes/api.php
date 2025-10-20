@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\SignedExportDownloadController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')
@@ -16,6 +17,10 @@ Route::prefix('api/v1')
         Route::get('/ready', [HealthController::class, 'ready'])
             ->middleware(['throttle:api.default'])
             ->name('ready');
+
+        Route::get('/search', SearchController::class)
+            ->middleware(['throttle:api.default'])
+            ->name('search');
 
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('/user', AuthenticatedUserController::class)
