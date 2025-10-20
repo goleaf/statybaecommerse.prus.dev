@@ -276,6 +276,14 @@ final class Order extends Model
     }
 
     /**
+     * Determine if the order can be returned.
+     */
+    public function canRequestReturn(): bool
+    {
+        return in_array($this->status, ['delivered', 'completed']);
+    }
+
+    /**
      * Handle getTotalItemsCountAttribute functionality with proper error handling.
      */
     public function getTotalItemsCountAttribute(): int

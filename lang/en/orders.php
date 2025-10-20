@@ -50,6 +50,7 @@ return [
         'delivered' => 'Delivered',
         'completed' => 'Completed',
         'cancelled' => 'Cancelled',
+        'returned' => 'Returned',
     ],
 
     // Payment statuses
@@ -219,5 +220,7 @@ return [
         'cannot_delete' => 'You cannot delete this order',
         'cannot_cancel' => 'You cannot cancel this order',
         'cancelled_successfully' => 'Order cancelled successfully',
+        'cannot_request_return' => 'You cannot request a return for this order',
+        'return_requested_successfully' => 'Return request submitted successfully',
     ],
 ];
