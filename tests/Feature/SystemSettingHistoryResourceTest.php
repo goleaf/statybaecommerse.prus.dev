@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\SystemSettingHistoryResource;
+use App\Filament\Resources\SystemSettingHistories\Pages\CreateSystemSettingHistory;
+use App\Filament\Resources\SystemSettingHistories\Pages\EditSystemSettingHistory;
+use App\Filament\Resources\SystemSettingHistories\Pages\ListSystemSettingHistories;
+use App\Filament\Resources\SystemSettingHistories\Pages\ViewSystemSettingHistory;
+use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingHistory;
@@ -54,7 +58,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->assertCanSeeTableRecords(SystemSettingHistory::all());
     }
 
@@ -62,7 +66,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\CreateSystemSettingHistory::class)
+        Livewire::test(CreateSystemSettingHistory::class)
             ->fillForm([
                 'system_setting_id' => $this->systemSetting->id,
                 'changed_by' => $this->adminUser->id,
@@ -94,7 +98,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ViewSystemSettingHistory::class, [
+        Livewire::test(ViewSystemSettingHistory::class, [
             'record' => $history->getKey(),
         ])
             ->assertFormSet([
@@ -114,7 +118,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\EditSystemSettingHistory::class, [
+        Livewire::test(EditSystemSettingHistory::class, [
             'record' => $history->getKey(),
         ])
             ->fillForm([
@@ -140,7 +144,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\EditSystemSettingHistory::class, [
+        Livewire::test(EditSystemSettingHistory::class, [
             'record' => $history->getKey(),
         ])
             ->callAction('delete')
@@ -169,7 +173,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->filterTable('system_setting_id', $this->systemSetting->id)
             ->assertCanSeeTableRecords(SystemSettingHistory::where('system_setting_id', $this->systemSetting->id)->get())
             ->assertCanNotSeeTableRecords(SystemSettingHistory::where('system_setting_id', $setting2->id)->get());
@@ -190,7 +194,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->filterTable('changed_by', $this->adminUser->id)
             ->assertCanSeeTableRecords(SystemSettingHistory::where('changed_by', $this->adminUser->id)->get())
             ->assertCanNotSeeTableRecords(SystemSettingHistory::where('changed_by', $user2->id)->get());
@@ -211,7 +215,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->searchTable('Test')
             ->assertCanSeeTableRecords(SystemSettingHistory::where('change_reason', 'like', '%Test%')->get())
             ->assertCanNotSeeTableRecords(SystemSettingHistory::where('change_reason', 'like', '%Different%')->get());
@@ -228,7 +232,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->callTableAction('restore_value', $history)
             ->assertHasNoActionErrors();
 
@@ -247,7 +251,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->callTableBulkAction('export_history', SystemSettingHistory::all())
             ->assertHasNoBulkActionErrors();
     }
@@ -256,7 +260,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\CreateSystemSettingHistory::class)
+        Livewire::test(CreateSystemSettingHistory::class)
             ->fillForm([
                 'changed_by' => $this->adminUser->id,
                 'change_reason' => 'Test change',
@@ -269,7 +273,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\CreateSystemSettingHistory::class)
+        Livewire::test(CreateSystemSettingHistory::class)
             ->fillForm([
                 'system_setting_id' => $this->systemSetting->id,
                 'change_reason' => 'Test change',
@@ -282,7 +286,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\CreateSystemSettingHistory::class)
+        Livewire::test(CreateSystemSettingHistory::class)
             ->fillForm([
                 'system_setting_id' => $this->systemSetting->id,
                 'changed_by' => $this->adminUser->id,
@@ -297,7 +301,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\CreateSystemSettingHistory::class)
+        Livewire::test(CreateSystemSettingHistory::class)
             ->fillForm([
                 'system_setting_id' => $this->systemSetting->id,
                 'changed_by' => $this->adminUser->id,
@@ -354,7 +358,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\CreateSystemSettingHistory::class)
+        Livewire::test(CreateSystemSettingHistory::class)
             ->assertFormExists()
             ->assertFormFieldExists('system_setting_id')
             ->assertFormFieldExists('changed_by')
@@ -374,7 +378,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->assertCanSeeTableColumns([
                 'systemSetting.key',
                 'user.name',
@@ -390,7 +394,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->assertCanSeeTableFilters([
                 'system_setting_id',
                 'changed_by',
@@ -407,7 +411,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->assertCanSeeTableActions([
                 'view',
                 'edit',
@@ -419,7 +423,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class)
+        Livewire::test(ListSystemSettingHistories::class)
             ->assertCanSeeBulkActions([
                 'delete',
                 'export_history',
@@ -442,7 +446,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        $component = Livewire::test(SystemSettingHistoryResource\Pages\ListSystemSettingHistories::class);
+        $component = Livewire::test(ListSystemSettingHistories::class);
 
         // Should be able to see restore action for record with old value
         $component->assertCanSeeTableAction('restore_value', $historyWithOldValue);
