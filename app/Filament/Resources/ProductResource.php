@@ -29,9 +29,13 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -39,10 +43,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -52,10 +52,10 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -65,6 +65,8 @@ use UnitEnum;
  */
 final class ProductResource extends Resource
 {
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cube';
+
     protected static ?string $model = Product::class;
 
     public static function shouldRegisterNavigation(): bool
@@ -105,11 +107,6 @@ final class ProductResource extends Resource
     public static function canRestore(Model $record): bool
     {
         return AuthorizationMatrix::check('products', 'update');
-    }
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-cube';
     }
 
     public static function getNavigationGroup(): UnitEnum|string|null
@@ -153,7 +150,9 @@ final class ProductResource extends Resource
                                                     ->required()
                                                     ->maxLength(255)
                                                     ->live()
-                                                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state))),
+                                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                                        $set('slug', Str::slug((string) $state));
+                                                    }),
                                                 TextInput::make('slug')
                                                     ->label(__('products.fields.slug'))
                                                     ->required()
@@ -185,8 +184,8 @@ final class ProductResource extends Resource
                                             ->textColors([
                                                 'primary' => '#1d4ed8',
                                                 'emerald' => '#047857',
-                                                'amber' => '#f59e0b',
-                                                'slate' => '#475569',
+                                                'amber'   => '#f59e0b',
+                                                'slate'   => '#475569',
                                             ]),
                                         Textarea::make('short_description')
                                             ->label(__('products.fields.short_description'))
@@ -276,9 +275,9 @@ final class ProductResource extends Resource
                                                 Select::make('status')
                                                     ->label(__('products.fields.status'))
                                                     ->options([
-                                                        'draft' => __('products.status.draft'),
+                                                        'draft'     => __('products.status.draft'),
                                                         'published' => __('products.status.published'),
-                                                        'archived' => __('products.status.archived'),
+                                                        'archived'  => __('products.status.archived'),
                                                     ])
                                                     ->default('draft'),
                                             ]),
@@ -374,16 +373,16 @@ final class ProductResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
-                        $state <= 0 => 'danger',
+                        $state <= 0  => 'danger',
                         $state <= 10 => 'warning',
-                        default => 'success',
+                        default      => 'success',
                     }),
                 BadgeColumn::make('status')
                     ->label(__('products.fields.status'))
                     ->colors([
-                        'draft' => 'gray',
+                        'draft'     => 'gray',
                         'published' => 'success',
-                        'archived' => 'warning',
+                        'archived'  => 'warning',
                     ]),
                 IconColumn::make('is_visible')
                     ->label(__('products.fields.is_visible'))
@@ -412,7 +411,7 @@ final class ProductResource extends Resource
                     ->toggleable(),
                 TextColumn::make('average_rating')
                     ->label(__('products.fields.average_rating'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1).' ⭐' : 'No ratings')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1) . ' ⭐' : 'No ratings')
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('published_at')
@@ -435,9 +434,9 @@ final class ProductResource extends Resource
                 SelectFilter::make('status')
                     ->label(__('products.filters.status'))
                     ->options([
-                        'draft' => __('products.status.draft'),
+                        'draft'     => __('products.status.draft'),
                         'published' => __('products.status.published'),
-                        'archived' => __('products.status.archived'),
+                        'archived'  => __('products.status.archived'),
                     ]),
                 TernaryFilter::make('is_visible')
                     ->label(__('products.fields.is_visible')),
@@ -541,9 +540,9 @@ final class ProductResource extends Resource
                             Select::make('format')
                                 ->label(__('Format'))
                                 ->options([
-                                    'csv' => 'CSV',
+                                    'csv'  => 'CSV',
                                     'xlsx' => 'XLSX',
-                                    'pdf' => 'PDF',
+                                    'pdf'  => 'PDF',
                                 ])
                                 ->default('csv')
                                 ->required(),
@@ -636,7 +635,7 @@ final class ProductResource extends Resource
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $records->each->update([
-                                'stock_quantity' => $data['stock_quantity'],
+                                'stock_quantity'      => $data['stock_quantity'],
                                 'low_stock_threshold' => $data['low_stock_threshold'],
                             ]);
                             Notification::make()
@@ -661,9 +660,9 @@ final class ProductResource extends Resource
 
                             $records->each(function ($product) use ($multiplier): void {
                                 $product->update([
-                                    'price' => round($product->price * $multiplier, 2),
+                                    'price'         => round($product->price * $multiplier, 2),
                                     'compare_price' => $product->compare_price ? round($product->compare_price * $multiplier, 2) : null,
-                                    'cost_price' => $product->cost_price ? round($product->cost_price * $multiplier, 2) : null,
+                                    'cost_price'    => $product->cost_price ? round($product->cost_price * $multiplier, 2) : null,
                                 ]);
                             });
 
@@ -722,10 +721,10 @@ final class ProductResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
+            'index'  => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
-            'view' => Pages\ViewProduct::route('/{record}'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'view'   => Pages\ViewProduct::route('/{record}'),
+            'edit'   => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
 }
