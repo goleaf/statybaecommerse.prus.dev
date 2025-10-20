@@ -19,6 +19,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -110,19 +111,19 @@ final class DocumentTemplateResource extends Resource
                             Select::make('type')
                                 ->label(__('document_templates.type'))
                                 ->options([
-                                    'invoice' => __('document_templates.types.invoice'),
-                                    'receipt' => __('document_templates.types.receipt'),
-                                    'quote' => __('document_templates.types.quote'),
+                                    'invoice'  => __('document_templates.types.invoice'),
+                                    'receipt'  => __('document_templates.types.receipt'),
+                                    'quote'    => __('document_templates.types.quote'),
                                     'contract' => __('document_templates.types.contract'),
-                                    'report' => __('document_templates.types.report'),
+                                    'report'   => __('document_templates.types.report'),
                                 ])
                                 ->required(),
                             Select::make('category')
                                 ->label(__('document_templates.category'))
                                 ->options([
-                                    'financial' => __('document_templates.categories.financial'),
-                                    'legal' => __('document_templates.categories.legal'),
-                                    'marketing' => __('document_templates.categories.marketing'),
+                                    'financial'   => __('document_templates.categories.financial'),
+                                    'legal'       => __('document_templates.categories.legal'),
+                                    'marketing'   => __('document_templates.categories.marketing'),
                                     'operational' => __('document_templates.categories.operational'),
                                 ])
                                 ->required(),
@@ -153,22 +154,22 @@ final class DocumentTemplateResource extends Resource
                     ->label(__('document_templates.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'invoice' => 'success',
-                        'receipt' => 'info',
-                        'quote' => 'warning',
+                        'invoice'  => 'success',
+                        'receipt'  => 'info',
+                        'quote'    => 'warning',
                         'contract' => 'danger',
-                        'report' => 'gray',
-                        default => 'gray',
+                        'report'   => 'gray',
+                        default    => 'gray',
                     }),
                 TextColumn::make('category')
                     ->label(__('document_templates.category'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'financial' => 'success',
-                        'legal' => 'danger',
-                        'marketing' => 'info',
+                        'financial'   => 'success',
+                        'legal'       => 'danger',
+                        'marketing'   => 'info',
                         'operational' => 'warning',
-                        default => 'gray',
+                        default       => 'gray',
                     }),
                 IconColumn::make('is_active')
                     ->label(__('document_templates.is_active'))
@@ -188,18 +189,18 @@ final class DocumentTemplateResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('document_templates.type'))
                     ->options([
-                        'invoice' => __('document_templates.types.invoice'),
-                        'receipt' => __('document_templates.types.receipt'),
-                        'quote' => __('document_templates.types.quote'),
+                        'invoice'  => __('document_templates.types.invoice'),
+                        'receipt'  => __('document_templates.types.receipt'),
+                        'quote'    => __('document_templates.types.quote'),
                         'contract' => __('document_templates.types.contract'),
-                        'report' => __('document_templates.types.report'),
+                        'report'   => __('document_templates.types.report'),
                     ]),
                 SelectFilter::make('category')
                     ->label(__('document_templates.category'))
                     ->options([
-                        'financial' => __('document_templates.categories.financial'),
-                        'legal' => __('document_templates.categories.legal'),
-                        'marketing' => __('document_templates.categories.marketing'),
+                        'financial'   => __('document_templates.categories.financial'),
+                        'legal'       => __('document_templates.categories.legal'),
+                        'marketing'   => __('document_templates.categories.marketing'),
                         'operational' => __('document_templates.categories.operational'),
                     ]),
                 TernaryFilter::make('is_active')
@@ -208,7 +209,20 @@ final class DocumentTemplateResource extends Resource
             ->actions([
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, DocumentTemplate $record): void {
+                        if (! $record->documents()->exists()) {
+                            return;
+                        }
+
+                        Notification::make()
+                            ->title(__('document_templates.notifications.delete_has_documents.title'))
+                            ->body(__('document_templates.notifications.delete_has_documents.body'))
+                            ->warning()
+                            ->send();
+
+                        $action->halt();
+                    }),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
@@ -234,10 +248,10 @@ final class DocumentTemplateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDocumentTemplates::route('/'),
+            'index'  => Pages\ListDocumentTemplates::route('/'),
             'create' => Pages\CreateDocumentTemplate::route('/create'),
-            'view' => Pages\ViewDocumentTemplate::route('/{record}'),
-            'edit' => Pages\EditDocumentTemplate::route('/{record}/edit'),
+            'view'   => Pages\ViewDocumentTemplate::route('/{record}'),
+            'edit'   => Pages\EditDocumentTemplate::route('/{record}/edit'),
         ];
     }
 }
