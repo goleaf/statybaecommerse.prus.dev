@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\View\Creators;
 
 use App\Services\SEOService;
+use App\Support\Seo\LocaleUrlGenerator;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\View\View;
 
 /**
@@ -16,7 +18,8 @@ use Illuminate\Contracts\View\View;
 final class SeoDataCreator
 {
     public function __construct(
-        private readonly SEOService $seoService
+        private readonly SEOService $seoService,
+        private readonly LocaleUrlGenerator $localeUrlGenerator
     ) {}
 
     /**
@@ -41,6 +44,7 @@ final class SeoDataCreator
             'ogType' => $seoData['og_type'],
             'twitterCard' => $seoData['twitter_card'],
             'structuredData' => $seoData['structured_data'],
+            'alternateLocales' => $seoData['alternate_locales'],
         ]);
     }
 
@@ -60,6 +64,7 @@ final class SeoDataCreator
             'og_type' => 'website',
             'twitter_card' => 'summary_large_image',
             'structured_data' => [],
+            'alternate_locales' => $this->localeUrlGenerator->fallbackAlternateLocales(),
         ];
 
         // Generate view-specific SEO data
@@ -73,7 +78,17 @@ final class SeoDataCreator
         };
 
         // Merge with default data
-        return array_merge($defaultSeo, $seoData);
+        $resolvedSeo = array_merge($defaultSeo, $seoData);
+
+        if (! isset($resolvedSeo['canonical_url']) || ! is_string($resolvedSeo['canonical_url'])) {
+            $resolvedSeo['canonical_url'] = $this->resolveCanonicalUrl();
+        }
+
+        if (! isset($resolvedSeo['alternate_locales']) || ! is_array($resolvedSeo['alternate_locales']) || $resolvedSeo['alternate_locales'] === []) {
+            $resolvedSeo['alternate_locales'] = $this->resolveAlternateLocales($viewData);
+        }
+
+        return $resolvedSeo;
     }
 
     /**
@@ -96,6 +111,17 @@ final class SeoDataCreator
             'og_image' => $product->featured_image_url ?: og_placeholder_url(),
             'og_type' => 'product',
             'structured_data' => $this->generateProductStructuredData($product),
+            'canonical_url' => $this->localeUrlGenerator->localizedRoute(
+                'localized.products.show',
+                ['product' => $this->localeUrlGenerator->translatedValue($product, app()->getLocale(), 'getTranslatedSlug', 'slug', 'slug') ?? $product->slug],
+                app()->getLocale()
+            ) ?: route('frontend.products.show', $product),
+            'alternate_locales' => $this->localeUrlGenerator->generateAlternates(
+                'localized.products.show',
+                fn (string $locale) => (
+                    ($slug = $this->localeUrlGenerator->translatedValue($product, $locale, 'getTranslatedSlug', 'slug', 'slug'))
+                ) ? ['product' => $slug] : null
+            ),
         ];
     }
 
@@ -118,6 +144,17 @@ final class SeoDataCreator
             'og_description' => $category->getTranslatedDescription() ?: __('seo.category_default_description', ['name' => $category->getTranslatedName()]),
             'og_image' => $category->image_url ?: og_placeholder_url(),
             'structured_data' => $this->generateCategoryStructuredData($category),
+            'canonical_url' => $this->localeUrlGenerator->localizedRoute(
+                'localized.categories.show',
+                ['category' => $this->localeUrlGenerator->translatedValue($category, app()->getLocale(), 'getTranslatedSlug', 'slug', 'slug') ?? $category->slug],
+                app()->getLocale()
+            ) ?: route('frontend.categories.show', $category),
+            'alternate_locales' => $this->localeUrlGenerator->generateAlternates(
+                'localized.categories.show',
+                fn (string $locale) => (
+                    ($slug = $this->localeUrlGenerator->translatedValue($category, $locale, 'getTranslatedSlug', 'slug', 'slug'))
+                ) ? ['category' => $slug] : null
+            ),
         ];
     }
 
@@ -140,6 +177,17 @@ final class SeoDataCreator
             'og_description' => $brand->getTranslatedDescription() ?: __('seo.brand_default_description', ['name' => $brand->getTranslatedName()]),
             'og_image' => $brand->logo_url ?: og_placeholder_url(),
             'structured_data' => $this->generateBrandStructuredData($brand),
+            'canonical_url' => $this->localeUrlGenerator->localizedRoute(
+                'localized.brands.show',
+                ['slug' => $this->localeUrlGenerator->translatedValue($brand, app()->getLocale(), 'getTranslatedSlug', 'slug', 'slug') ?? $brand->slug],
+                app()->getLocale()
+            ) ?: route('frontend.brands.show', $brand),
+            'alternate_locales' => $this->localeUrlGenerator->generateAlternates(
+                'localized.brands.show',
+                fn (string $locale) => (
+                    ($slug = $this->localeUrlGenerator->translatedValue($brand, $locale, 'getTranslatedSlug', 'slug', 'slug'))
+                ) ? ['slug' => $slug] : null
+            ),
         ];
     }
 
@@ -155,7 +203,88 @@ final class SeoDataCreator
             'og_title' => __('seo.shop_title'),
             'og_description' => __('seo.shop_description'),
             'structured_data' => $this->generateShopStructuredData(),
+            'canonical_url' => $this->localeUrlGenerator->localizedRoute('localized.home', [], app()->getLocale()) ?: url('/'.app()->getLocale()),
+            'alternate_locales' => $this->localeUrlGenerator->generateAlternates(
+                'localized.home',
+                fn (string $locale) => []
+            ),
         ];
+    }
+
+    private function resolveCanonicalUrl(): string
+    {
+        $route = request()->route();
+        if (! $route) {
+            return url()->current();
+        }
+
+        $name = $route->getName();
+        $locale = app()->getLocale();
+        $parameters = $route->parameters();
+
+        if (is_string($name) && str_starts_with($name, 'localized.')) {
+            return route($name, array_merge($parameters, ['locale' => $locale]));
+        }
+
+        if (is_string($name) && str_starts_with($name, 'frontend.')) {
+            $localizedName = str_replace('frontend.', 'localized.', $name);
+            if ($localizedName !== $name && Route::has($localizedName)) {
+                return route($localizedName, array_merge($parameters, ['locale' => $locale]));
+            }
+        }
+
+        return url()->current();
+    }
+
+    /**
+     * @param  array<string, mixed>  $viewData
+     * @return array<string, string>
+     */
+    private function resolveAlternateLocales(array $viewData): array
+    {
+        $route = request()->route();
+        if (! $route) {
+            return $this->localeUrlGenerator->fallbackAlternateLocales();
+        }
+
+        $name = $route->getName();
+        $parameters = $route->parameters();
+
+        if (isset($viewData['product'])) {
+            return $this->localeUrlGenerator->generateAlternates(
+                'localized.products.show',
+                fn (string $locale) => (
+                    ($slug = $this->localeUrlGenerator->translatedValue($viewData['product'], $locale, 'getTranslatedSlug', 'slug', 'slug'))
+                ) ? ['product' => $slug] : null
+            );
+        }
+
+        if (isset($viewData['category'])) {
+            return $this->localeUrlGenerator->generateAlternates(
+                'localized.categories.show',
+                fn (string $locale) => (
+                    ($slug = $this->localeUrlGenerator->translatedValue($viewData['category'], $locale, 'getTranslatedSlug', 'slug', 'slug'))
+                ) ? ['category' => $slug] : null
+            );
+        }
+
+        if (isset($viewData['brand'])) {
+            return $this->localeUrlGenerator->generateAlternates(
+                'localized.brands.show',
+                fn (string $locale) => (
+                    ($slug = $this->localeUrlGenerator->translatedValue($viewData['brand'], $locale, 'getTranslatedSlug', 'slug', 'slug'))
+                ) ? ['slug' => $slug] : null
+            );
+        }
+
+        if (is_string($name) && str_starts_with($name, 'localized.')) {
+            return $this->localeUrlGenerator->generateAlternates(
+                $name,
+                fn (string $locale) => array_merge($parameters, ['locale' => $locale])
+            );
+        }
+
+        return $this->localeUrlGenerator->fallbackAlternateLocales();
     }
 
     /**
