@@ -136,16 +136,20 @@ final class MenuItemResource extends Resource
                 TextColumn::make('url')
                     ->label(__('admin.menu_items.url'))
                     ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
                         if ($state === null || $state === '') {
                             return null;
                         }
 
-                        $state = (string) $state;
+                        $stateString = (string) $state;
 
-                        return strlen($state) > 30 ? $state : null;
+                        if (strlen($stateString) <= 30) {
+                            return null;
+                        }
+
+                        return $stateString;
                     }),
                 TextColumn::make('route_name')
                     ->label(__('admin.menu_items.route_name'))
