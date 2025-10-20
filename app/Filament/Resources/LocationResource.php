@@ -355,9 +355,11 @@ final class LocationResource extends Resource
                         'no' => __('locations.without_coordinates'),
                     ])
                     ->query(function (Builder $query, array $data): void {
-                        if ($data['value'] === 'yes') {
+                        $value = $data['value'] ?? null;
+
+                        if ($value === 'yes') {
                             $query->whereNotNull('latitude')->whereNotNull('longitude');
-                        } elseif ($data['value'] === 'no') {
+                        } elseif ($value === 'no') {
                             $query->where(function ($q) {
                                 $q->whereNull('latitude')->orWhereNull('longitude');
                             });
@@ -370,9 +372,11 @@ final class LocationResource extends Resource
                         'no' => __('locations.without_opening_hours'),
                     ])
                     ->query(function (Builder $query, array $data): void {
-                        if ($data['value'] === 'yes') {
+                        $value = $data['value'] ?? null;
+
+                        if ($value === 'yes') {
                             $query->whereNotNull('opening_hours');
-                        } elseif ($data['value'] === 'no') {
+                        } elseif ($value === 'no') {
                             $query->whereNull('opening_hours');
                         }
                     }),
