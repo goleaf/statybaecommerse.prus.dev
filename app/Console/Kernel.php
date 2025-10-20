@@ -25,6 +25,8 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\BackupVerifyCommand::class,
         \App\Console\Commands\I18nAuditCommand::class,
         \App\Console\Commands\ValidateContractCommand::class,
+        \App\Console\Commands\DataExportCommand::class,
+        \App\Console\Commands\DataImportCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
