@@ -9,8 +9,10 @@ import preset from './vendor/filament/support/tailwind.config.preset';
 export default {
   presets: [preset],
   content: [
-    './storage/framework/views/*.php',
-    './resources/views/**/*.blade.php',
+    './resources/**/*.blade.php',
+    './resources/**/*.vue',
+    './app/Livewire/**/*.php',
+    './vendor/filament/**/resources/**/*.blade.php',
     './vendor/laravelcm/livewire-slide-overs/resources/views/*.blade.php',
     './vendor/wire-elements/modal/resources/views/*.blade.php',
     './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
