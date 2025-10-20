@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Contracts\HealthReporter as HealthReporterContract;
+use App\Contracts\SystemNotificationSender;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
@@ -14,7 +15,9 @@ use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
+use App\Services\LiveNotificationService;
 use App\Support\Health\HealthReporter;
+use App\Support\Queue\QueueFailureHandler;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
@@ -28,7 +31,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
@@ -39,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
+        $this->app->singleton(SystemNotificationSender::class, LiveNotificationService::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -52,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerModelObservers();
+        $this->registerQueueMonitoring();
 
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
@@ -183,6 +190,13 @@ class AppServiceProvider extends ServiceProvider
                 // ignore macro registration failures
             }
         }
+    }
+
+    private function registerQueueMonitoring(): void
+    {
+        Queue::failing(function (JobFailed $event): void {
+            app(QueueFailureHandler::class)->handle($event);
+        });
     }
 
     private function registerModelObservers(): void
