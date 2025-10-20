@@ -33,6 +33,17 @@ return [
         'social_share' => 'Social Share',
         'custom' => 'Custom',
     ],
+    // Tabs
+    'tabs' => [
+        'all' => 'All events',
+        'page_views' => 'Page views',
+        'clicks' => 'Clicks',
+        'purchases' => 'Purchases',
+        'signups' => 'Signups',
+        'today' => 'Events today',
+        'this_week' => 'Events this week',
+        'this_month' => 'Events this month',
+    ],
     // User Information
     'user_information' => 'User Information',
     'user' => 'User',
