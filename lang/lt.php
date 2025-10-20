@@ -79,6 +79,7 @@ return [
                     'campaign_name' => 'Kampanijos pavadinimas',
                     'campaign_status' => 'Kampanijos būsena',
                     'campaign_type' => 'Kampanijos tipas',
+                    'status' => 'Būsena',
                     'schedule_type' => 'Grafiko tipas',
                     'schedule_status' => 'Grafiko būsena',
                     'schedule_config' => 'Grafiko konfigūracija',

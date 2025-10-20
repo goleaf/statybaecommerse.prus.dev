@@ -21,6 +21,7 @@ return [
             'next_run_at' => 'Next Run At',
             'last_run_at' => 'Last Run At',
             'is_active' => 'Is Active',
+            'status' => 'Status',
             'schedule_config' => 'Schedule Configuration',
             'config_key' => 'Config Key',
             'config_value' => 'Config Value',
