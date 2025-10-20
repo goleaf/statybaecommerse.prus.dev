@@ -29,42 +29,42 @@ final class ViewVariantAnalytics extends ViewRecord
     {
         return $schema
             ->components([
-                Section::make(__('filament::variant_analytics.basic_info'))
+                Section::make(__('admin.variant_analytics.basic_info'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('variant.name')
-                                    ->label(__('filament::variant_analytics.variant'))
+                                    ->label(__('admin.variant_analytics.variant'))
                                     ->columnSpan(1),
 
                                 TextEntry::make('date')
-                                    ->label(__('filament::variant_analytics.date'))
+                                    ->label(__('admin.variant_analytics.date'))
                                     ->date()
                                     ->columnSpan(1),
                             ]),
                     ]),
 
-                Section::make(__('filament::variant_analytics.metrics'))
+                Section::make(__('admin.variant_analytics.metrics'))
                     ->schema([
                         Grid::make(4)
                             ->schema([
                                 TextEntry::make('views')
-                                    ->label(__('filament::variant_analytics.views'))
+                                    ->label(__('admin.variant_analytics.views'))
                                     ->numeric()
                                     ->columnSpan(1),
 
                                 TextEntry::make('clicks')
-                                    ->label(__('filament::variant_analytics.clicks'))
+                                    ->label(__('admin.variant_analytics.clicks'))
                                     ->numeric()
                                     ->columnSpan(1),
 
                                 TextEntry::make('add_to_cart')
-                                    ->label(__('filament::variant_analytics.add_to_cart'))
+                                    ->label(__('admin.variant_analytics.add_to_cart'))
                                     ->numeric()
                                     ->columnSpan(1),
 
                                 TextEntry::make('purchases')
-                                    ->label(__('filament::variant_analytics.purchases'))
+                                    ->label(__('admin.variant_analytics.purchases'))
                                     ->numeric()
                                     ->columnSpan(1),
                             ]),
@@ -72,41 +72,41 @@ final class ViewVariantAnalytics extends ViewRecord
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('revenue')
-                                    ->label(__('filament::variant_analytics.revenue'))
+                                    ->label(__('admin.variant_analytics.revenue'))
                                     ->money('EUR')
                                     ->columnSpan(1),
 
                                 TextEntry::make('conversion_rate')
-                                    ->label(__('filament::variant_analytics.conversion_rate'))
+                                    ->label(__('admin.variant_analytics.conversion_rate'))
                                     ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                                     ->columnSpan(1),
                             ]),
                     ]),
 
-                Section::make(__('filament::variant_analytics.calculated_metrics'))
+                Section::make(__('admin.variant_analytics.calculated_metrics'))
                     ->schema([
                         Grid::make(4)
                             ->schema([
                                 TextEntry::make('click_through_rate')
-                                    ->label(__('filament::variant_analytics.ctr'))
+                                    ->label(__('admin.variant_analytics.ctr'))
                                     ->getStateUsing(fn ($record) => $record->click_through_rate)
                                     ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('add_to_cart_rate')
-                                    ->label(__('filament::variant_analytics.atc_rate'))
+                                    ->label(__('admin.variant_analytics.atc_rate'))
                                     ->getStateUsing(fn ($record) => $record->add_to_cart_rate)
                                     ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('purchase_rate')
-                                    ->label(__('filament::variant_analytics.purchase_rate'))
+                                    ->label(__('admin.variant_analytics.purchase_rate'))
                                     ->getStateUsing(fn ($record) => $record->purchase_rate)
                                     ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('average_revenue_per_purchase')
-                                    ->label(__('filament::variant_analytics.avg_revenue'))
+                                    ->label(__('admin.variant_analytics.avg_revenue'))
                                     ->getStateUsing(fn ($record) => $record->average_revenue_per_purchase)
                                     ->money('EUR')
                                     ->columnSpan(1),
