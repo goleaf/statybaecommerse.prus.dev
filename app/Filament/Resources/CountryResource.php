@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CountryResource\Pages;
+use App\Filament\Resources\CountryResource\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManager;
+use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationManager;
+use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
 use Exception;
 use Filament\Actions\Action;
@@ -403,7 +407,10 @@ final class CountryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AddressesRelationManager::class,
+            CitiesRelationManager::class,
+            CustomersRelationManager::class,
+            UsersRelationManager::class,
         ];
     }
 
