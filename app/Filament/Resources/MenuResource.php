@@ -12,7 +12,9 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,8 +22,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -223,8 +223,12 @@ final class MenuResource extends Resource
                     ->action(function (Menu $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
 
+                        $title = $record->is_active
+                            ? __('menus.activated_successfully')
+                            : __('menus.deactivated_successfully');
+
                         Notification::make()
-                            ->title($record->is_active ? __('menus.activated_successfully') : __('menus.deactivated_successfully'))
+                            ->title($title)
                             ->success()
                             ->send();
                     })
