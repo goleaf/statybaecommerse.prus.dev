@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,9 +24,14 @@ final class VariantAnalyticsFactory extends Factory
         $addToCart = fake()->numberBetween(1, $clicks);
         $purchases = fake()->numberBetween(1, $addToCart);
 
+        $bucketDate = Carbon::parse(fake()->dateTimeBetween('-30 days', 'now'))->startOfDay();
+        $productFactory = Product::factory();
+
         return [
-            'variant_id' => ProductVariant::factory(),
-            'date' => fake()->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
+            'product_id' => $productFactory,
+            'variant_id' => ProductVariant::factory()->for($productFactory, 'product'),
+            'date' => $bucketDate->toDateString(),
+            'date_bucket' => sprintf('%s:%s', VariantAnalytics::BUCKET_DAILY, $bucketDate->toDateString()),
             'views' => $views,
             'clicks' => $clicks,
             'add_to_cart' => $addToCart,
@@ -76,14 +82,20 @@ final class VariantAnalyticsFactory extends Factory
     public function withVariant(ProductVariant $variant): static
     {
         return $this->state(fn (array $attributes) => [
+            'product_id' => $variant->product_id,
             'variant_id' => $variant->id,
         ]);
     }
 
     public function forDate(string $date): static
     {
-        return $this->state(fn (array $attributes) => [
-            'date' => Carbon::parse($date)->toDateString(),
-        ]);
+        return $this->state(function (array $attributes) use ($date) {
+            $normalized = Carbon::parse($date)->toDateString();
+
+            return [
+                'date' => $normalized,
+                'date_bucket' => sprintf('%s:%s', VariantAnalytics::BUCKET_DAILY, $normalized),
+            ];
+        });
     }
 }
