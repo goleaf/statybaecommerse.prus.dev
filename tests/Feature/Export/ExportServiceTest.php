@@ -8,14 +8,11 @@ use App\Jobs\ProcessExportJob;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\ExportReadyNotification;
-use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\OrderExport;
+use App\Services\Export\ExportService;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
-
-uses(TestCase::class);
 
 test('it queues and processes exports', function (): void {
     config()->set('filesystems.default', 'public');
