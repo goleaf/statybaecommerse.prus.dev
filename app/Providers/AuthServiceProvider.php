@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\AdminUser;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Order;
@@ -37,17 +38,19 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Allow administrators to bypass all authorization checks
+        // Allow privileged admin roles to bypass granular authorization checks
         Gate::before(function ($user, ?string $ability = null) {
-            if (method_exists($user, 'hasRole') && ($user->hasRole('administrator') || $user->hasRole('super_admin'))) {
-                return true;
+            if (! $user instanceof AdminUser) {
+                return null;
             }
 
-            if (property_exists($user, 'is_admin') && (bool) $user->is_admin) {
-                return true;
+            if (! method_exists($user, 'hasRole')) {
+                return null;
             }
 
-            return null;
+            return $user->hasAnyRole(['administrator', 'super_admin'])
+                ? true
+                : null;
         });
 
         $permissions = (array) config('dashboard.permissions');
