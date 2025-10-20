@@ -10,6 +10,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 final class Kernel extends ConsoleKernel
 {
     protected $commands = [
+        \App\Console\Commands\AuditDatabaseIndexesCommand::class,
         \App\Console\Commands\FixCodeStyleCommand::class,
         \App\Console\Commands\ValidateCodeStyleCommand::class,
         \App\Console\Commands\CodeStyleWatchCommand::class,
