@@ -7,6 +7,7 @@ namespace App\Actions;
 use App\Mail\OrderPlaced;
 use App\Models\Country;
 use App\Models\Order;
+use App\Services\Pricing\PriceCalculator;
 use Darryldecode\Cart\Facades\CartFacade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,7 @@ class CreateOrder
             ]) : $shippingAddress;
             // Totals
             // @phpstan-ignore-next-line
+            $cartContent = collect(CartFacade::session($sessionId)->getContent());
             $subtotal = Number::parseFloat(CartFacade::session($sessionId)->getSubTotal());
             $shippingTotal = Number::parseFloat(data_get($checkout, 'shipping_option.0.price', 0));
             $couponCode = strtoupper((string) data_get($checkout, 'coupon.code'));
@@ -76,13 +78,31 @@ class CreateOrder
             $engine = app(\App\Services\Discounts\DiscountEngine::class);
             $result = $engine->evaluate(['currency_code' => current_currency(), 'channel_id' => null, 'user_id' => optional($customer)->id, 'now' => now(), 'code' => $codeRow ? $couponCode : null, 'cart' => ['subtotal' => $subtotal, 'items' => []]]);
             $discountTotal = Number::parseFloat(data_get($result, 'discount_total_amount', 0));
-            $taxTotal = app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - (float) $discountTotal), null);
-            $grandTotal = max(0, round($subtotal - $discountTotal + $shippingTotal + $taxTotal, 2));
+            $calculator = app(PriceCalculator::class);
+            $breakdown = $calculator->calculate(
+                $cartContent->map(fn ($item) => ['price' => (float) $item->price, 'quantity' => (int) $item->quantity]),
+                $discountTotal,
+                $shippingTotal
+            );
             /** @var Order $order */
-            $order = Order::query()->create(['number' => generate_number(), 'customer_id' => $customer->id, 'currency_code' => current_currency(), 'shipping_address_id' => $shippingAddress->id, 'billing_address_id' => $billingAddress->id, 'shipping_option_id' => data_get($checkout, 'shipping_option')[0]['id'], 'payment_method_id' => data_get($checkout, 'payment')[0]['id'], 'payment_method' => (string) data_get($checkout, 'payment')[0]['name'], 'subtotal_amount' => round($subtotal, 2), 'discount_total_amount' => round($discountTotal, 2), 'tax_total_amount' => round($taxTotal, 2), 'shipping_total_amount' => round($shippingTotal, 2), 'grand_total_amount' => $grandTotal]);
+            $order = Order::query()->create([
+                'number' => generate_number(),
+                'customer_id' => $customer->id,
+                'currency_code' => current_currency(),
+                'shipping_address_id' => $shippingAddress->id,
+                'billing_address_id' => $billingAddress->id,
+                'shipping_option_id' => data_get($checkout, 'shipping_option')[0]['id'],
+                'payment_method_id' => data_get($checkout, 'payment')[0]['id'],
+                'payment_method' => (string) data_get($checkout, 'payment')[0]['name'],
+                'subtotal_amount' => $breakdown->subtotal,
+                'discount_total_amount' => $breakdown->discount,
+                'tax_total_amount' => $breakdown->tax,
+                'shipping_total_amount' => $breakdown->shipping,
+                'grand_total_amount' => $breakdown->total,
+            ]);
             // Items
             // @phpstan-ignore-next-line
-            foreach (CartFacade::session($sessionId)->getContent() as $item) {
+            foreach ($cartContent as $item) {
                 OrderItem::query()->create(['order_id' => $order->id, 'quantity' => $item->quantity, 'unit_price_amount' => $item->price, 'name' => $item->name, 'sku' => $item->associatedModel->sku, 'product_id' => $item->associatedModel->id, 'product_type' => $item->associatedModel->getMorphClass()]);
             }
             // Persist redemptions
@@ -106,7 +126,17 @@ class CreateOrder
                     // increment usage_count
                     DB::table('discount_codes')->where('id', $codeId)->increment('usage_count');
                 }
-                DB::table('discount_redemptions')->insert(['discount_id' => $discountId, 'code_id' => $codeId, 'order_id' => $order->id, 'user_id' => $customer->id, 'amount_saved' => round((float) ($applied['amount'] ?? 0), 2), 'currency_code' => current_currency(), 'redeemed_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
+                DB::table('discount_redemptions')->insert([
+                    'discount_id' => $discountId,
+                    'code_id' => $codeId,
+                    'order_id' => $order->id,
+                    'user_id' => $customer->id,
+                    'amount_saved' => $calculator->round((float) ($applied['amount'] ?? 0)),
+                    'currency_code' => current_currency(),
+                    'redeemed_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
             // Process payment (stub)
             try {
