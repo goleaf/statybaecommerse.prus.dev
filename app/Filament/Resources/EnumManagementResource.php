@@ -6,13 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -26,6 +20,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -34,17 +35,16 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class EnumManagementResource extends Resource
 {
-    protected static ?string $model = EnumValue::class;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static ?string $model = EnumValue::class;
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): string
     {
         return trans('admin.enums.navigation_groups.system');
     }
@@ -159,12 +159,12 @@ final class EnumManagementResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
-                        'order_status' => 'success',
-                        'payment_status' => 'warning',
-                        'shipping_status' => 'info',
-                        'user_role' => 'danger',
-                        'product_status' => 'secondary',
-                        default => 'gray',
+                        'order_status'     => 'success',
+                        'payment_status'   => 'warning',
+                        'shipping_status'  => 'info',
+                        'user_role'        => 'danger',
+                        'product_status'   => 'secondary',
+                        default            => 'gray',
                     }),
                 TextColumn::make('key')
                     ->label(trans('admin.enums.form.fields.key'))
@@ -325,14 +325,14 @@ final class EnumManagementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEnumManagement::route('/'),
-            'create' => Pages\CreateEnumManagement::route('/create'),
-            'view' => Pages\ViewEnumManagement::route('/{record}'),
-            'edit' => Pages\EditEnumManagement::route('/{record}/edit'),
-            'enums' => Pages\ListEnums::route('/enums'),
+            'index'       => Pages\ListEnumManagement::route('/'),
+            'create'      => Pages\CreateEnumManagement::route('/create'),
+            'view'        => Pages\ViewEnumManagement::route('/{record}'),
+            'edit'        => Pages\EditEnumManagement::route('/{record}/edit'),
+            'enums'       => Pages\ListEnums::route('/enums'),
             'create_enum' => Pages\CreateEnum::route('/enums/create'),
-            'view_enum' => Pages\ViewEnum::route('/enums/{record}'),
-            'edit_enum' => Pages\EditEnum::route('/enums/{record}/edit'),
+            'view_enum'   => Pages\ViewEnum::route('/enums/{record}'),
+            'edit_enum'   => Pages\EditEnum::route('/enums/{record}/edit'),
         ];
     }
 
@@ -372,8 +372,8 @@ final class EnumManagementResource extends Resource
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
-            trans('admin.enums.form.fields.value') => $record->value,
-            trans('admin.enums.form.fields.name') => $record->name,
+            trans('admin.enums.form.fields.value')       => $record->value,
+            trans('admin.enums.form.fields.name')        => $record->name,
             trans('admin.enums.form.fields.description') => $record->description,
         ];
     }

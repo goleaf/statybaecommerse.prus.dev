@@ -7,11 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -22,14 +17,18 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -41,21 +40,15 @@ use UnitEnum;
  */
 final class PriceListItemResource extends Resource
 {
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
+
     protected static ?string $model = PriceListItem::class;
 
     protected static ?int $navigationSort = 16;
 
-    protected static ?string $recordTitleAttribute = 'product.name';
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-currency-euro';
-    }
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    protected static ?string $recordTitleAttribute = 'display_name';
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
@@ -299,7 +292,7 @@ final class PriceListItemResource extends Resource
                     ->toggle(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (PriceListItem $record): string => $record->is_active ? __('price_list_items.deactivate') : __('price_list_items.activate'))
@@ -400,10 +393,10 @@ final class PriceListItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPriceListItems::route('/'),
+            'index'  => Pages\ListPriceListItems::route('/'),
             'create' => Pages\CreatePriceListItem::route('/create'),
-            'view' => Pages\ViewPriceListItem::route('/{record}'),
-            'edit' => Pages\EditPriceListItem::route('/{record}/edit'),
+            'view'   => Pages\ViewPriceListItem::route('/{record}'),
+            'edit'   => Pages\EditPriceListItem::route('/{record}/edit'),
         ];
     }
 }

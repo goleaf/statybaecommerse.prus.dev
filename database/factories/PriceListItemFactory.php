@@ -55,6 +55,7 @@ final class PriceListItemFactory extends Factory
                 'lt' => $this->faker->optional(0.3)->sentence(),
             ],
             'is_active'    => true,
+            'is_featured'  => $this->faker->boolean(30),
             'priority'     => $this->faker->numberBetween(1, 50),
             'min_quantity' => $minQuantity,
             'max_quantity' => $maxQuantity,
