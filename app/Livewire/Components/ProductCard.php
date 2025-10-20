@@ -121,7 +121,7 @@ final class ProductCard extends Component
      */
     public function getImageUrlProperty(): string
     {
-        return $this->product->getFirstMediaUrl('images', 'thumb') ?: asset('images/placeholder-product.png');
+        return $this->product->getFirstMediaUrl('images', 'thumb') ?: product_placeholder_url('thumb');
     }
 
     /**

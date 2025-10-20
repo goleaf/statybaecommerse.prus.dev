@@ -46,7 +46,7 @@
                 <div class="space-y-3 mb-4 max-h-64 overflow-y-auto">
                     {{-- Sample cart item - replace with actual cart items --}}
                     <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <img src="{{ asset('images/placeholder-product.jpg') }}"
+                        <img src="{{ product_placeholder_url('thumb') }}"
                              alt="Product"
                              class="w-12 h-12 object-cover rounded-lg">
                         <div class="flex-1">

@@ -2,7 +2,7 @@
     $title = $title ?? (View::shared('title') ?? config('app.name'));
     $desc = trim($description ?? (View::shared('description') ?? ''));
     $url = url()->current();
-    $image = $image ?? asset('og-image.jpg');
+    $image = $image ?? og_placeholder_url();
 @endphp
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="{{ config('app.name') }}" />

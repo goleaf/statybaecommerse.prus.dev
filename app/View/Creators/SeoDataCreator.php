@@ -56,7 +56,7 @@ final class SeoDataCreator
             'canonical_url' => request()->url(),
             'og_title' => config('app.name'),
             'og_description' => __('seo.default_description'),
-            'og_image' => asset('images/og-default.jpg'),
+            'og_image' => og_placeholder_url(),
             'og_type' => 'website',
             'twitter_card' => 'summary_large_image',
             'structured_data' => [],
@@ -93,7 +93,7 @@ final class SeoDataCreator
             'keywords' => $this->generateProductKeywords($product),
             'og_title' => $product->getTranslatedName(),
             'og_description' => $product->getTranslatedDescription() ?: __('seo.product_default_description', ['name' => $product->getTranslatedName()]),
-            'og_image' => $product->featured_image_url ?: asset('images/og-default.jpg'),
+            'og_image' => $product->featured_image_url ?: og_placeholder_url(),
             'og_type' => 'product',
             'structured_data' => $this->generateProductStructuredData($product),
         ];
@@ -116,7 +116,7 @@ final class SeoDataCreator
             'keywords' => $this->generateCategoryKeywords($category),
             'og_title' => $category->getTranslatedName(),
             'og_description' => $category->getTranslatedDescription() ?: __('seo.category_default_description', ['name' => $category->getTranslatedName()]),
-            'og_image' => $category->image_url ?: asset('images/og-default.jpg'),
+            'og_image' => $category->image_url ?: og_placeholder_url(),
             'structured_data' => $this->generateCategoryStructuredData($category),
         ];
     }
@@ -138,7 +138,7 @@ final class SeoDataCreator
             'keywords' => $this->generateBrandKeywords($brand),
             'og_title' => $brand->getTranslatedName(),
             'og_description' => $brand->getTranslatedDescription() ?: __('seo.brand_default_description', ['name' => $brand->getTranslatedName()]),
-            'og_image' => $brand->logo_url ?: asset('images/og-default.jpg'),
+            'og_image' => $brand->logo_url ?: og_placeholder_url(),
             'structured_data' => $this->generateBrandStructuredData($brand),
         ];
     }

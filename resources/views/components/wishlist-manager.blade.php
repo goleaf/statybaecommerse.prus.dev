@@ -53,7 +53,7 @@
                         {{-- Product Image --}}
                         @if ($showImages)
                             <div class="aspect-w-1 aspect-h-1 bg-gray-100 relative overflow-hidden">
-                                <img src="{{ $item->getFirstMediaUrl('images') ?? asset('images/placeholder-product.jpg') }}"
+                                <img src="{{ $item->getFirstMediaUrl('images') ?? product_placeholder_url('medium') }}"
                                      alt="{{ $item->name }}"
                                      class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
 

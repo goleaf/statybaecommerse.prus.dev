@@ -50,7 +50,7 @@ return [
     'seo' => [
         'default_title_suffix' => config('app.name'),
         'default_description_length' => 160,
-        'default_og_image' => '/images/og-default.jpg',
+        'default_og_image' => og_placeholder_url(),
         'structured_data_enabled' => true,
     ],
 
