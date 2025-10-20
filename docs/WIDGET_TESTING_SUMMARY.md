@@ -36,6 +36,11 @@
 - Updated test expectations to use correct translation keys
 - Added proper error handling for problematic model factories
 
+### **📊 Index Verification Updates (2025-02-15)**
+- Added dedicated `orders_created_at_index` (plus supporting `products` and `users` indexes) via `2025_02_15_120000_add_created_at_indexes.php` to align analytics widgets with time-based filters.
+- Refactored widgets (`ComprehensiveStatsWidget`, `EcommerceOverview`, `RealtimeAnalyticsWidget`, `EnhancedEcommerceOverview`, `SimplifiedStatsWidget`) and the `LiveDashboard` component to use the new `Order` date scopes.
+- Introduced `tests/Feature/Database/OrderCreatedAtIndexTest.php`, which captures SQLite `EXPLAIN QUERY PLAN` output and asserts the engine relies on `orders_created_at_index` for the `createdBetween`/`createdSince` scopes, ensuring analytics queries stay index-backed.
+
 ### **📈 Widget Categories Tested**
 
 #### **Statistics Widgets** (5 widgets)
