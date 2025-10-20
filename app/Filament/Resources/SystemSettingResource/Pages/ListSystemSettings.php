@@ -6,11 +6,11 @@ namespace App\Filament\Resources\SystemSettingResource\Pages;
 
 use App\Filament\Resources\SystemSettingResource;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListSystemSettings extends ListRecords
+class ListSystemSettings extends ListRecords
 {
     protected static string $resource = SystemSettingResource::class;
 
@@ -31,7 +31,7 @@ final class ListSystemSettings extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('system_settings.tabs.all')),
+            'all'     => Tab::make(__('system_settings.tabs.all')),
             'general' => Tab::make(__('system_settings.tabs.general'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'general'))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('category', 'general')->count()),

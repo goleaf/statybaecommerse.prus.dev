@@ -8,7 +8,7 @@ use App\Filament\Resources\SystemSettingResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewSystemSetting extends ViewRecord
+class ViewSystemSetting extends ViewRecord
 {
     protected static string $resource = SystemSettingResource::class;
 
@@ -26,7 +26,7 @@ final class ViewSystemSetting extends ViewRecord
         $record = $this->getRecord();
 
         return $view->with([
-            '__record_id' => $record->getKey(),
+            '__record_id'  => $record->getKey(),
             '__record_key' => $record->key ?? null,
         ]);
     }
