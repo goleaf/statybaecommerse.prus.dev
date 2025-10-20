@@ -12,16 +12,18 @@ use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Filament\Notifications\Notification;
+use RuntimeException;
 
 class NewsResource extends Resource
 {
@@ -168,7 +170,7 @@ class NewsResource extends Resource
                     ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
                     ->colors([
                         'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
-                        'info' => fn (?ModerationState $state): bool => $state === ModerationState::Review,
+                        'info'    => fn (?ModerationState $state): bool => $state === ModerationState::Review,
                         'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
                     ])
                     ->sortable(),
@@ -237,9 +239,9 @@ class NewsResource extends Resource
                     ->visible(fn (News $record): bool => $record->moderation_state === ModerationState::Draft)
                     ->action(function (News $record): void {
                         $record->update([
-                            'moderation_state' => ModerationState::Review,
+                            'moderation_state'        => ModerationState::Review,
                             'submitted_for_review_at' => now(),
-                            'is_visible' => false,
+                            'is_visible'              => false,
                         ]);
 
                         activity()
@@ -270,23 +272,23 @@ class NewsResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new \RuntimeException('Approvals require an authenticated user.');
+                            throw new RuntimeException('Approvals require an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $userId, $data): void {
                             $record->approvals()->create([
-                                'user_id' => $userId,
-                                'decision' => 'approved',
-                                'notes' => $data['notes'] ?? null,
+                                'user_id'    => $userId,
+                                'decision'   => 'approved',
+                                'notes'      => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
                                 'moderation_state' => ModerationState::Published,
-                                'approved_at' => now(),
-                                'approved_by_id' => $userId,
-                                'is_visible' => true,
-                                'published_at' => $record->published_at ?? now(),
+                                'approved_at'      => now(),
+                                'approved_by_id'   => $userId,
+                                'is_visible'       => true,
+                                'published_at'     => $record->published_at ?? now(),
                             ]);
                         });
 
@@ -318,23 +320,23 @@ class NewsResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new \RuntimeException('Return to draft requires an authenticated user.');
+                            throw new RuntimeException('Return to draft requires an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $userId, $data): void {
                             $record->approvals()->create([
-                                'user_id' => $userId,
-                                'decision' => 'returned',
-                                'notes' => $data['notes'] ?? null,
+                                'user_id'    => $userId,
+                                'decision'   => 'returned',
+                                'notes'      => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
-                                'moderation_state' => ModerationState::Draft,
+                                'moderation_state'        => ModerationState::Draft,
                                 'submitted_for_review_at' => null,
-                                'approved_at' => null,
-                                'approved_by_id' => null,
-                                'is_visible' => false,
+                                'approved_at'             => null,
+                                'approved_by_id'          => null,
+                                'is_visible'              => false,
                             ]);
                         });
 
@@ -441,18 +443,23 @@ class NewsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNews::route('/'),
+            'index'  => Pages\ListNews::route('/'),
             'create' => Pages\CreateNews::route('/create'),
-            'view' => Pages\ViewNews::route('/{record}'),
-            'edit' => Pages\EditNews::route('/{record}/edit'),
+            'view'   => Pages\ViewNews::route('/{record}'),
+            'edit'   => Pages\EditNews::route('/{record}/edit'),
         ];
     }
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
+        $query = parent::getEloquentQuery();
+
+        if (in_array(SoftDeletes::class, class_uses_recursive(static::getModel()))) {
+            $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+        }
+
+        return $query;
     }
 }
