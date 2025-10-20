@@ -508,7 +508,14 @@ Route::middleware('auth')->group(function (): void {
 // API routes for frontend
 Route::prefix('api')->group(function (): void {
     Route::get('/products/search', [App\Http\Controllers\Api\ProductController::class, 'search'])->name('api.products.search');
+    Route::get('/products/catalog', [App\Http\Controllers\Api\ProductController::class, 'catalog'])->name('api.products.catalog');
+    Route::get('/products/{product:slug}', [App\Http\Controllers\Api\ProductController::class, 'show'])->name('api.products.show');
     Route::get('/categories/tree', [App\Http\Controllers\Api\CategoryController::class, 'tree'])->name('api.categories.tree');
+    Route::get('/categories', [App\Http\Controllers\Api\CategoryController::class, 'index'])->name('api.categories.index');
+    Route::get('/categories/{category:slug}', [App\Http\Controllers\Api\CategoryController::class, 'show'])->name('api.categories.show');
+    Route::get('/brands', [App\Http\Controllers\Api\BrandController::class, 'index'])->name('api.brands.index');
+    Route::get('/brands/{brand:slug}', [App\Http\Controllers\Api\BrandController::class, 'show'])->name('api.brands.show');
+    Route::middleware('auth')->get('/orders/{order:number}', [App\Http\Controllers\Api\OrderController::class, 'show'])->name('api.orders.show');
 });
 
 // Public utility endpoints
