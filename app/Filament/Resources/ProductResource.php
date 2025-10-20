@@ -244,8 +244,10 @@ final class ProductResource extends Resource
                                             ->label(__('products.fields.images'))
                                             ->image()
                                             ->multiple()
+                                            ->relationship('images', 'path')
                                             ->directory('products')
-                                            ->visibility('private')
+                                            ->disk('public')
+                                            ->visibility('public')
                                             ->reorderable()
                                             ->appendFiles(),
                                     ]),
