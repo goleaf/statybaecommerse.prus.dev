@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -114,7 +116,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
                 'key' => 'meta_title',
                 'display_name' => 'Default Meta Title',
                 'type' => 'string',
-                'value' => config('app.name') . ' - Online Store',
+                'value' => config('app.name').' - Online Store',
                 'group' => 'seo',
                 'description' => 'Default meta title for pages',
                 'is_public' => true,
@@ -200,7 +202,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
         foreach ($permissions as $permission) {
             $existingPermission = Permission::where('name', $permission)->first();
 
-            if (!$existingPermission) {
+            if (! $existingPermission) {
                 Permission::factory()
                     ->state(['name' => $permission])
                     ->create();
@@ -212,7 +214,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
     {
         // Inventory Manager role
         $inventoryManager = Role::where('name', 'inventory_manager')->first();
-        if (!$inventoryManager) {
+        if (! $inventoryManager) {
             $inventoryManager = Role::factory()
                 ->state(['name' => 'inventory_manager'])
                 ->create();
@@ -232,7 +234,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
         // Customer Service role
         $customerService = Role::where('name', 'customer_service')->first();
-        if (!$customerService) {
+        if (! $customerService) {
             $customerService = Role::factory()
                 ->state(['name' => 'customer_service'])
                 ->create();
@@ -251,7 +253,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
         // Analytics Manager role
         $analyticsManager = Role::where('name', 'analytics_manager')->first();
-        if (!$analyticsManager) {
+        if (! $analyticsManager) {
             $analyticsManager = Role::factory()
                 ->state(['name' => 'analytics_manager'])
                 ->create();
@@ -273,7 +275,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
     {
         // Inventory Manager User
         $inventoryManager = User::where('email', 'inventory@example.com')->first();
-        if (!$inventoryManager) {
+        if (! $inventoryManager) {
             $inventoryManager = User::factory()
                 ->state([
                     'email' => 'inventory@example.com',
@@ -291,7 +293,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
         // Customer Service User
         $customerService = User::where('email', 'support@example.com')->first();
-        if (!$customerService) {
+        if (! $customerService) {
             $customerService = User::factory()
                 ->state([
                     'email' => 'support@example.com',
@@ -309,7 +311,7 @@ final class ComprehensiveFilamentSeeder extends Seeder
 
         // Analytics Manager User
         $analyticsManager = User::where('email', 'analytics@example.com')->first();
-        if (!$analyticsManager) {
+        if (! $analyticsManager) {
             $analyticsManager = User::factory()
                 ->state([
                     'email' => 'analytics@example.com',
@@ -340,23 +342,23 @@ final class ComprehensiveFilamentSeeder extends Seeder
                     $updateData = [];
 
                     // Only update columns that exist
-                    if (!$product->meta_title && $product->name) {
+                    if (! $product->meta_title && $product->name) {
                         $updateData['meta_title'] = $product->name;
                     }
 
-                    if (!$product->is_featured) {
+                    if (! $product->is_featured) {
                         $updateData['is_featured'] = fake()->boolean(15);  // 15% featured
                     }
 
-                    if (!$product->sort_order) {
+                    if (! $product->sort_order) {
                         $updateData['sort_order'] = fake()->numberBetween(1, 1000);
                     }
 
-                    if (!$product->published_at) {
+                    if (! $product->published_at) {
                         $updateData['published_at'] = fake()->dateTimeBetween('-6 months', 'now');
                     }
 
-                    if (!empty($updateData)) {
+                    if (! empty($updateData)) {
                         try {
                             $product->update($updateData);
                         } catch (\Exception $e) {

@@ -11,12 +11,11 @@ use App\Filament\Resources\UserProductInteractions\Schemas\UserProductInteractio
 use App\Filament\Resources\UserProductInteractions\Tables\UserProductInteractionsTable;
 use App\Models\UserProductInteraction;
 use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
-
-use Filament\Forms\Form;
 
 class UserProductInteractionResource extends Resource
 {

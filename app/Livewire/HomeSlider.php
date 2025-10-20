@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Livewire;
 
@@ -25,7 +27,7 @@ final class HomeSlider extends Component
 
         return Cache::remember(CacheKeys::homeSliders($locale), CacheKeys::TTL_FIVE_MINUTES, function () use ($locale) {
             return Slider::query()
-                ->with(['translations' => fn($q) => $q->where('locale', $locale)])
+                ->with(['translations' => fn ($q) => $q->where('locale', $locale)])
                 ->active()
                 ->ordered()
                 ->get();
@@ -51,7 +53,7 @@ final class HomeSlider extends Component
 
     public function toggleAutoPlay(): void
     {
-        $this->autoPlay = !$this->autoPlay;
+        $this->autoPlay = ! $this->autoPlay;
     }
 
     public function render(): View

@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Translations\CampaignTranslation;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
@@ -10,6 +11,7 @@ use App\Models\CampaignCustomerSegment;
 use App\Models\CampaignProductTarget;
 use App\Models\CampaignSchedule;
 use App\Models\CampaignView;
+use App\Models\Translations\CampaignTranslation;
 use Faker\Factory as FakerFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -31,25 +33,25 @@ final class CampaignSeeder extends Seeder
         }
 
         $campaigns->each(function (Campaign $campaign): void {
-            if (!$campaign->views()->exists()) {
+            if (! $campaign->views()->exists()) {
                 $campaign->views()->saveMany(
                     CampaignView::factory()->count(20)->make()
                 );
             }
 
-            if (!$campaign->clicks()->exists()) {
+            if (! $campaign->clicks()->exists()) {
                 $campaign->clicks()->saveMany(
                     CampaignClick::factory()->count(10)->make()
                 );
             }
 
-            if (!$campaign->conversions()->exists()) {
+            if (! $campaign->conversions()->exists()) {
                 $campaign->conversions()->saveMany(
                     CampaignConversion::factory()->count(5)->make()
                 );
             }
 
-            if (!$campaign->customerSegments()->exists()) {
+            if (! $campaign->customerSegments()->exists()) {
                 // Create unique customer segments to avoid constraint violations
                 $segments = collect();
                 $existingGroups = \App\Models\CustomerGroup::query()->inRandomOrder()->limit(10)->get();
@@ -73,7 +75,7 @@ final class CampaignSeeder extends Seeder
                 }
             }
 
-            if (!$campaign->productTargets()->exists()) {
+            if (! $campaign->productTargets()->exists()) {
                 // Create unique product targets to avoid constraint violations
                 $targets = collect();
 
@@ -108,7 +110,7 @@ final class CampaignSeeder extends Seeder
                 }
             }
 
-            if (!$campaign->schedules()->exists()) {
+            if (! $campaign->schedules()->exists()) {
                 $campaign->schedules()->saveMany(
                     CampaignSchedule::factory()->count(2)->make()
                 );
@@ -242,8 +244,8 @@ final class CampaignSeeder extends Seeder
         $metaTitle = $isDefaultLocale ? $baseMetaTitle : sprintf('%s - %s', $faker->sentence(3), $faker->words(2, true));
         $metaDescription = $isDefaultLocale ? $baseMetaDescription : $faker->sentence(16);
 
-        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-' . $campaign->id);
-        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase . '-' . $locale);
+        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-'.$campaign->id);
+        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase.'-'.$locale);
 
         return [
             'name' => $name,
@@ -272,11 +274,11 @@ final class CampaignSeeder extends Seeder
     private function localizedBannerAltText(string $locale, string $campaignName): string
     {
         return match ($locale) {
-            'lt' => $campaignName . ' kampanijos baneris',
-            'en' => $campaignName . ' campaign banner',
-            'de' => 'Kampagnenbanner ' . $campaignName,
-            'ru' => 'Баннер кампании ' . $campaignName,
-            default => $campaignName . ' banner',
+            'lt' => $campaignName.' kampanijos baneris',
+            'en' => $campaignName.' campaign banner',
+            'de' => 'Kampagnenbanner '.$campaignName,
+            'ru' => 'Баннер кампании '.$campaignName,
+            default => $campaignName.' banner',
         };
     }
 
@@ -294,7 +296,7 @@ final class CampaignSeeder extends Seeder
     private function supportedLocales(): array
     {
         return collect(explode(',', (string) config('app.supported_locales', 'lt,en')))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -335,7 +337,7 @@ final class CampaignSeeder extends Seeder
         } catch (QueryException $exception) {
             if ($this->isMissingTableException($exception, 'campaign_clicks')) {
                 $this->skipCampaignClickSeeding = true;
-                $this->command?->warn('Skipping campaign click seeding: ' . $exception->getMessage());
+                $this->command?->warn('Skipping campaign click seeding: '.$exception->getMessage());
 
                 return;
             }
@@ -355,7 +357,7 @@ final class CampaignSeeder extends Seeder
         } catch (QueryException $exception) {
             if ($this->isMissingTableException($exception, 'campaign_conversions')) {
                 $this->skipCampaignConversionSeeding = true;
-                $this->command?->warn('Skipping campaign conversion seeding: ' . $exception->getMessage());
+                $this->command?->warn('Skipping campaign conversion seeding: '.$exception->getMessage());
 
                 return;
             }

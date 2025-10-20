@@ -149,7 +149,7 @@ final class ApiKeyResourceTest extends TestCase
         $labels = ApiKeyScope::options();
         foreach (ApiKeyScope::cases() as $case) {
             $this->assertArrayHasKey($case->value, $labels);
-            $this->assertSame(__("api_keys.scopes." . str_replace('.', '_', $case->value) . '.label'), $labels[$case->value]);
+            $this->assertSame(__('api_keys.scopes.'.str_replace('.', '_', $case->value).'.label'), $labels[$case->value]);
         }
     }
 

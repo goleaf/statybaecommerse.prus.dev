@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -144,8 +146,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $generalCategory = SystemSettingCategory::where('slug', 'general')->first();
 
-        if (!$generalCategory) {
+        if (! $generalCategory) {
             $this->command->warn('General category not found, skipping general settings');
+
             return;
         }
 
@@ -264,8 +267,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $ecommerceCategory = SystemSettingCategory::where('slug', 'ecommerce')->first();
 
-        if (!$ecommerceCategory) {
+        if (! $ecommerceCategory) {
             $this->command->warn('E-commerce category not found, skipping e-commerce settings');
+
             return;
         }
 
@@ -376,8 +380,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $emailCategory = SystemSettingCategory::where('slug', 'email')->first();
 
-        if (!$emailCategory) {
+        if (! $emailCategory) {
             $this->command->warn('Email category not found, skipping email settings');
+
             return;
         }
 
@@ -467,8 +472,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $paymentCategory = SystemSettingCategory::where('slug', 'payment')->first();
 
-        if (!$paymentCategory) {
+        if (! $paymentCategory) {
             $this->command->warn('Payment category not found, skipping payment settings');
+
             return;
         }
 
@@ -525,8 +531,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $shippingCategory = SystemSettingCategory::where('slug', 'shipping')->first();
 
-        if (!$shippingCategory) {
+        if (! $shippingCategory) {
             $this->command->warn('Shipping category not found, skipping shipping settings');
+
             return;
         }
 
@@ -582,8 +589,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $seoCategory = SystemSettingCategory::where('slug', 'seo')->first();
 
-        if (!$seoCategory) {
+        if (! $seoCategory) {
             $this->command->warn('SEO category not found, skipping SEO settings');
+
             return;
         }
 
@@ -728,8 +736,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $apiCategory = SystemSettingCategory::where('slug', 'api')->first();
 
-        if (!$apiCategory) {
+        if (! $apiCategory) {
             $this->command->warn('API category not found, skipping API settings');
+
             return;
         }
 
@@ -779,8 +788,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $appearanceCategory = SystemSettingCategory::where('slug', 'appearance')->first();
 
-        if (!$appearanceCategory) {
+        if (! $appearanceCategory) {
             $this->command->warn('Appearance category not found, skipping appearance settings');
+
             return;
         }
 
@@ -842,8 +852,9 @@ final class SystemSettingsSeeder extends Seeder
     {
         $notificationCategory = SystemSettingCategory::where('slug', 'notifications')->first();
 
-        if (!$notificationCategory) {
+        if (! $notificationCategory) {
             $this->command->warn('Notifications category not found, skipping notification settings');
+
             return;
         }
 

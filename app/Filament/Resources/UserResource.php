@@ -1,15 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\UserExport;
-use BackedEnum;
+use App\Services\Export\ExportService;
+use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -23,7 +24,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -107,10 +107,10 @@ final class UserResource extends Resource
                         TextInput::make('password')
                             ->label(__('users.fields.password'))
                             ->password()
-                            ->required(fn(string $context): bool => $context === 'create')
+                            ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8)
-                            ->dehydrated(fn($state) => filled($state))
-                            ->dehydrateStateUsing(fn($state) => bcrypt($state)),
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
                         Select::make('locale')
                             ->label(__('users.fields.locale'))
                             ->options([
@@ -163,7 +163,7 @@ final class UserResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('users.fields.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'lt' => 'success',
                         'en' => 'info',
                         default => 'gray',

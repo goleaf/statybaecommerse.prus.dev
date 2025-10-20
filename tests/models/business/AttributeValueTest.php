@@ -33,7 +33,7 @@ final class AttributeValueTest extends TestCase
 
     public function test_fillable_columns_match_schema(): void
     {
-        $fillable = (new AttributeValue())->getFillable();
+        $fillable = (new AttributeValue)->getFillable();
 
         $expected = [
             'attribute_id',

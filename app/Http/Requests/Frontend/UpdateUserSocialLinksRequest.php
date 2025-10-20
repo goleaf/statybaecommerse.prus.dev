@@ -19,7 +19,7 @@ class UpdateUserSocialLinksRequest extends FormRequest
         return [
             'social_links' => ['nullable', 'array'],
             'social_links.*.platform' => ['required', 'string', 'in:facebook,twitter,instagram,linkedin,youtube,tiktok,github,website'],
-            'social_links.*.url' => ['required', new UrlRule()],
+            'social_links.*.url' => ['required', new UrlRule],
         ];
     }
 
