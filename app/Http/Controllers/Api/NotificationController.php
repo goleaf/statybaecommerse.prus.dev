@@ -13,8 +13,12 @@ use App\Http\Requests\Api\NotificationStatsRequest;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * NotificationController
@@ -34,13 +38,16 @@ final class NotificationController extends Controller
     public function index(NotificationIndexRequest $request): JsonResponse
     {
         $user = Auth::user();
-        $validated = $request->validated();
-        $perPage = (int) ($validated['per_page'] ?? 25);
-        $type = $validated['type'] ?? null;
-        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
-        $notifications = $this->notificationService->getUserNotifications($user, $perPage, $type, $read);
+        $input = array_merge($request->query(), $request->validated());
+        $listQuery = ListQueryValidator::fromArray($input, $this->notificationListDefinition());
+        $notifications = $this->notificationService->getUserNotifications($user, $listQuery);
 
-        return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
+        return response()->json([
+            'success' => true,
+            'data' => $notifications->items(),
+            'meta' => ListResponse::meta($listQuery, $notifications),
+            'links' => ListResponse::links($notifications),
+        ]);
     }
 
     /**
@@ -141,13 +148,59 @@ final class NotificationController extends Controller
     public function search(NotificationSearchRequest $request): JsonResponse
     {
         $user = Auth::user();
-        $validated = $request->validated();
-        $query = $validated['q'];
-        $type = $validated['type'] ?? null;
-        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
-        $perPage = (int) ($validated['per_page'] ?? 25);
-        $notifications = $this->notificationService->searchNotifications($query, $user, $type, $read, $perPage);
+        $input = array_merge($request->query(), $request->validated());
+        $listQuery = ListQueryValidator::fromArray($input, $this->notificationListDefinition(includeSearch: true));
+        $notifications = $this->notificationService->searchNotifications($user, $listQuery);
 
-        return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
+        return response()->json([
+            'success' => true,
+            'data' => $notifications->items(),
+            'meta' => ListResponse::meta($listQuery, $notifications),
+            'links' => ListResponse::links($notifications),
+        ]);
+    }
+
+    private function notificationListDefinition(bool $includeSearch = false): ListQueryDefinition
+    {
+        $filters = [
+            'type' => [
+                'type' => 'string',
+                'callback' => static function (Builder $builder, string $type): void {
+                    $builder->byType($type);
+                },
+            ],
+            'read' => [
+                'type' => 'bool',
+                'nullable' => true,
+                'callback' => static function (Builder $builder, bool $read): void {
+                    $read ? $builder->read() : $builder->unread();
+                },
+            ],
+        ];
+
+        if ($includeSearch) {
+            $filters['q'] = [
+                'type' => 'string',
+                'callback' => static function (Builder $builder, string $term): void {
+                    $builder->where(function (Builder $query) use ($term): void {
+                        $query->where('data->title', 'like', '%'.$term.'%')
+                            ->orWhere('data->message', 'like', '%'.$term.'%')
+                            ->orWhere('data->type', 'like', '%'.$term.'%');
+                    });
+                },
+            ];
+        }
+
+        return new ListQueryDefinition(
+            filters: $filters,
+            sortable: [
+                'created_at' => ['column' => 'notifications.created_at', 'default_direction' => 'desc'],
+                'type' => ['column' => 'notifications.type'],
+            ],
+            defaultSort: 'created_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 25,
+            maxPerPage: 100,
+        );
     }
 }
