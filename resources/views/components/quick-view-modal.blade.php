@@ -231,14 +231,30 @@
                             <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ __('Key Features') }}</h3>
                             <ul class="space-y-2">
                                 @foreach ($product->features as $feature)
-                                    <li class="flex items-start gap-2">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none"
-                                             stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-gray-700">{{ $feature->name }}</span>
-                                    </li>
+                                    @php
+                                        $rawLabel = $feature->feature_key ?? $feature->key ?? $feature->name ?? null;
+                                        $label = $rawLabel ? \Illuminate\Support\Str::of($rawLabel)->replace(['_', '-'], ' ')->headline() : null;
+                                        $value = $feature->feature_value ?? $feature->value ?? null;
+                                    @endphp
+
+                                    @if ($label || $value)
+                                        <li class="flex items-start gap-2">
+                                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none"
+                                                 stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            <span class="text-gray-700">
+                                                @if ($label)
+                                                    <span class="font-medium text-gray-900">{{ $label }}</span>
+                                                @endif
+
+                                                @if ($value)
+                                                    <span class="text-gray-600 @if ($label) ml-1 @endif">{{ $value }}</span>
+                                                @endif
+                                            </span>
+                                        </li>
+                                    @endif
                                 @endforeach
                             </ul>
                         </div>
