@@ -23,7 +23,7 @@ final class AttributeResourceTest extends TestCase
 
         // Create a test user for authentication
         $this->adminUser = \App\Models\User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -39,22 +39,33 @@ final class AttributeResourceTest extends TestCase
             ->assertCanSeeTableRecords($attributes);
     }
 
+    public function test_list_attributes_handles_null_group_name(): void
+    {
+        // Arrange
+        $attribute = Attribute::factory()->create(['group_name' => null]);
+
+        // Act & Assert
+        Livewire::actingAs($this->adminUser)
+            ->test(ListAttributes::class)
+            ->assertCanSeeTableRecords([$attribute]);
+    }
+
     public function test_can_create_attribute(): void
     {
         // Arrange
         $attributeData = [
-            'name' => 'Test Attribute',
-            'slug' => 'test-attribute',
-            'description' => 'Test attribute description',
-            'type' => 'text',
-            'input_type' => 'text',
-            'is_required' => true,
+            'name'          => 'Test Attribute',
+            'slug'          => 'test-attribute',
+            'description'   => 'Test attribute description',
+            'type'          => 'text',
+            'input_type'    => 'text',
+            'is_required'   => true,
             'is_filterable' => true,
             'is_searchable' => true,
-            'is_active' => true,
-            'group_name' => 'general',
-            'sort_order' => 1,
-            'options' => [],
+            'is_active'     => true,
+            'group_name'    => 'general',
+            'sort_order'    => 1,
+            'options'       => [],
         ];
 
         // Act & Assert
@@ -65,10 +76,10 @@ final class AttributeResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('attributes', [
-            'name' => 'Test Attribute',
-            'slug' => 'test-attribute',
+            'name'        => 'Test Attribute',
+            'slug'        => 'test-attribute',
             'description' => 'Test attribute description',
-            'type' => 'text',
+            'type'        => 'text',
         ]);
     }
 
@@ -86,7 +97,7 @@ final class AttributeResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('attributes', [
-            'id' => $attribute->id,
+            'id'   => $attribute->id,
             'name' => $newName,
         ]);
     }
@@ -170,7 +181,7 @@ final class AttributeResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('attributes', [
-            'id' => $attribute->id,
+            'id'        => $attribute->id,
             'is_active' => false,
         ]);
     }
@@ -188,7 +199,7 @@ final class AttributeResourceTest extends TestCase
 
         foreach ($attributes as $attribute) {
             $this->assertDatabaseHas('attributes', [
-                'id' => $attribute->id,
+                'id'        => $attribute->id,
                 'is_active' => true,
             ]);
         }
@@ -207,7 +218,7 @@ final class AttributeResourceTest extends TestCase
 
         foreach ($attributes as $attribute) {
             $this->assertDatabaseHas('attributes', [
-                'id' => $attribute->id,
+                'id'        => $attribute->id,
                 'is_active' => false,
             ]);
         }
@@ -287,20 +298,20 @@ final class AttributeResourceTest extends TestCase
     {
         // Arrange
         $attributeData = [
-            'name' => 'Test Select Attribute',
-            'type' => 'select',
+            'name'    => 'Test Select Attribute',
+            'type'    => 'select',
             'options' => [
                 [
-                    'value' => 'option1',
-                    'label' => 'Option 1',
+                    'value'      => 'option1',
+                    'label'      => 'Option 1',
                     'sort_order' => 1,
-                    'is_active' => true,
+                    'is_active'  => true,
                 ],
                 [
-                    'value' => 'option2',
-                    'label' => 'Option 2',
+                    'value'      => 'option2',
+                    'label'      => 'Option 2',
                     'sort_order' => 2,
-                    'is_active' => true,
+                    'is_active'  => true,
                 ],
             ],
         ];
@@ -390,7 +401,7 @@ final class AttributeResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('attributes', [
-            'id' => $attribute->id,
+            'id'               => $attribute->id,
             'validation_rules' => $validationRules,
         ]);
     }
@@ -411,7 +422,7 @@ final class AttributeResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('attributes', [
-            'id' => $attribute->id,
+            'id'         => $attribute->id,
             'min_length' => 5,
             'max_length' => 100,
         ]);
@@ -433,7 +444,7 @@ final class AttributeResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('attributes', [
-            'id' => $attribute->id,
+            'id'        => $attribute->id,
             'min_value' => 0,
             'max_value' => 1000,
         ]);
