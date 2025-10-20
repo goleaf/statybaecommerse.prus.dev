@@ -17,7 +17,7 @@ final class VariantPerformanceChart extends ChartWidget
     protected function getData(): array
     {
         // Get analytics data for the last 30 days
-        $analytics = VariantAnalytics::select([
+        $analytics = VariantAnalytics::daily()->select([
             DB::raw('DATE(date) as date'),
             DB::raw('SUM(views) as total_views'),
             DB::raw('SUM(clicks) as total_clicks'),

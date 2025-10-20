@@ -677,11 +677,24 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function recordDailyAnalytics(string $metric, int $amount = 1): void
     {
-        $today = now()->toDateString();
+        $timestamp = now();
+        $metrics = [$metric => $amount];
 
-        VariantAnalytics::recordAnalytics($this->id, $today, [
-            $metric => $amount,
-        ]);
+        VariantAnalytics::recordAnalytics(
+            $this->id,
+            $timestamp,
+            $metrics,
+            VariantAnalytics::BUCKET_DAILY,
+            $this->product_id
+        );
+
+        VariantAnalytics::recordAnalytics(
+            $this->id,
+            $timestamp,
+            $metrics,
+            VariantAnalytics::BUCKET_WEEKLY,
+            $this->product_id
+        );
     }
 
     /**
