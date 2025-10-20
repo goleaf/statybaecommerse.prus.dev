@@ -9,21 +9,21 @@ use App\Models\Attribute;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -33,6 +33,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -44,6 +45,9 @@ final class VariantAttributeValueResource extends Resource
 {
     protected static ?string $model = VariantAttributeValue::class;
 
+    /**
+     * @var BackedEnum|string|null Navigation icon for the resource.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -79,7 +83,7 @@ final class VariantAttributeValueResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, $set) {
+                                ->afterStateUpdated(function ($state, $set): void {
                                     if ($state) {
                                         $variant = ProductVariant::find($state);
                                         if ($variant) {
@@ -101,7 +105,7 @@ final class VariantAttributeValueResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, $set) {
+                                ->afterStateUpdated(function ($state, $set): void {
                                     if ($state) {
                                         $attribute = Attribute::find($state);
                                         if ($attribute) {
@@ -124,9 +128,9 @@ final class VariantAttributeValueResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(function ($state, $set) {
+                                ->afterStateUpdated(function ($state, $set): void {
                                     if ($state) {
-                                        $set('attribute_value_slug', \Str::slug($state));
+                                        $set('attribute_value_slug', Str::slug($state));
                                     }
                                 }),
                             TextInput::make('attribute_value_display')
@@ -318,7 +322,7 @@ final class VariantAttributeValueResource extends Resource
                     ->color('info')
                     ->action(function (VariantAttributeValue $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->attribute_value = $record->attribute_value.' (Copy)';
+                        $newRecord->attribute_value = $record->attribute_value . ' (Copy)';
                         $newRecord->save();
                         Notification::make()
                             ->title(__('admin.variant_attribute_values.duplicated_successfully'))
@@ -412,10 +416,10 @@ final class VariantAttributeValueResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantAttributeValues::route('/'),
+            'index'  => Pages\ListVariantAttributeValues::route('/'),
             'create' => Pages\CreateVariantAttributeValue::route('/create'),
-            'view' => Pages\ViewVariantAttributeValue::route('/{record}'),
-            'edit' => Pages\EditVariantAttributeValue::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantAttributeValue::route('/{record}'),
+            'edit'   => Pages\EditVariantAttributeValue::route('/{record}/edit'),
         ];
     }
 }
