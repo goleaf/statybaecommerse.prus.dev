@@ -7,22 +7,21 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -252,10 +251,10 @@ final class ReferralCodeResource extends Resource
                     ->label('deactivate')
                     ->action(fn (ReferralCode $record) => $record->update(['is_active' => false])),
                 Action::make('copy_url')
-                    ->label('copy_url')
-                    ->action(function (ReferralCode $record): void {
-                        Notification::make()->title(__('referral_codes.notifications.url_copied'))->send();
-                    }),
+                    ->label(__('referral_codes.actions.copy_url'))
+                    ->icon('heroicon-m-clipboard')
+                    ->copyable(fn (ReferralCode $record): string => route('referrals.track', ['code' => $record->code]))
+                    ->successNotificationTitle(__('referral_codes.notifications.url_copied')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -289,6 +288,15 @@ final class ReferralCodeResource extends Resource
             'create' => Pages\CreateReferralCode::route('/create'),
             'view'   => Pages\ViewReferralCode::route('/{record}'),
             'edit'   => Pages\EditReferralCode::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeStatsWidget::class,
+            \App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeUsageChartWidget::class,
+            \App\Filament\Resources\ReferralCodeResource\Widgets\TopReferralCodesWidget::class,
         ];
     }
 
