@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantCombinationResource\Pages;
+use App\Models\Product;
 use App\Models\VariantCombination;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -47,7 +48,7 @@ final class VariantCombinationResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 19;
 
     public static function getNavigationLabel(): string
     {
@@ -80,13 +81,15 @@ final class VariantCombinationResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set) {
+                                    ->afterStateUpdated(function ($state, callable $set): void {
                                         if ($state) {
-                                            $product = \App\Models\Product::find($state);
+                                            $product = Product::find($state);
                                             if ($product && $product->attributes()->exists()) {
                                                 $attributes = $product->attributes()->pluck('name', 'id')->toArray();
                                                 $set('available_attributes', $attributes);
                                             }
+                                        } else {
+                                            $set('available_attributes', []);
                                         }
                                     }),
                                 Toggle::make('is_available')
@@ -106,8 +109,7 @@ final class VariantCombinationResource extends Resource
                             ->helperText(__('admin.variant_combinations.attribute_combinations_help'))
                             ->addActionLabel(__('admin.variant_combinations.add_attribute'))
                             ->deleteActionLabel(__('admin.variant_combinations.remove_attribute'))
-                            ->reorderable()
-                            ->collapsible(),
+                            ->reorderable(),
                     ]),
                 Section::make(__('admin.variant_combinations.additional_information'))
                     ->description(__('admin.variant_combinations.additional_information_description'))
@@ -149,7 +151,7 @@ final class VariantCombinationResource extends Resource
                     ->formatStateUsing(function ($state) {
                         if (is_array($state)) {
                             return collect($state)->map(function ($value, $key) {
-                                return $key.': '.$value;
+                                return $key . ': ' . $value;
                             })->join(', ');
                         }
 
@@ -159,7 +161,11 @@ final class VariantCombinationResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return mb_strlen($state) > 50 ? $state : null;
                     })
                     ->searchable()
                     ->sortable(),
@@ -168,7 +174,7 @@ final class VariantCombinationResource extends Resource
                     ->formatStateUsing(fn ($state) => $state ? __('admin.variant_combinations.available') : __('admin.variant_combinations.unavailable'))
                     ->colors([
                         'success' => fn ($state) => $state,
-                        'danger' => fn ($state) => ! $state,
+                        'danger'  => fn ($state) => ! $state,
                     ])
                     ->sortable(),
                 TextColumn::make('combination_hash')
@@ -213,8 +219,8 @@ final class VariantCombinationResource extends Resource
                     ->falseLabel(__('admin.variant_combinations.unavailable_only')),
                 Filter::make('valid_combinations')
                     ->label(__('admin.variant_combinations.valid_combinations_only'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('product', function (Builder $query) {
-                        $query->whereHas('attributes');
+                    ->query(fn (Builder $query): Builder => $query->whereHas('product', function (Builder $query): Builder {
+                        return $query->whereHas('attributes');
                     }))
                     ->toggle(),
                 Filter::make('recent_combinations')
@@ -231,7 +237,7 @@ final class VariantCombinationResource extends Resource
                     ->label(__('admin.variant_combinations.generate_combinations'))
                     ->icon('heroicon-o-cog-6-tooth')
                     ->color('primary')
-                    ->action(function () {
+                    ->action(function (): void {
                         Notification::make()
                             ->title(__('admin.variant_combinations.combinations_generation_started'))
                             ->success()
@@ -320,7 +326,7 @@ final class VariantCombinationResource extends Resource
                         ->icon('heroicon-o-document-duplicate')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            $records->each(function (VariantCombination $record) {
+                            $records->each(function (VariantCombination $record): void {
                                 $newRecord = $record->replicate();
                                 $newRecord->save();
                             });
@@ -365,10 +371,10 @@ final class VariantCombinationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantCombinations::route('/'),
+            'index'  => Pages\ListVariantCombinations::route('/'),
             'create' => Pages\CreateVariantCombination::route('/create'),
-            'view' => Pages\ViewVariantCombination::route('/{record}'),
-            'edit' => Pages\EditVariantCombination::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantCombination::route('/{record}'),
+            'edit'   => Pages\EditVariantCombination::route('/{record}/edit'),
         ];
     }
 }
