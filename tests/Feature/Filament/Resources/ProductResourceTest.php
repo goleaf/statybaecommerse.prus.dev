@@ -13,6 +13,7 @@ use App\Models\Export;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -300,5 +301,45 @@ final class ProductResourceTest extends TestCase
             ->assertDontSee('Hidden Draft Product');
 
         $this->assertNotNull(Product::withoutGlobalScopes()->find($draft->id));
+    }
+
+    public function test_product_images_are_uploaded_and_displayed(): void
+    {
+        config(['filesystems.default' => 'public']);
+        Storage::fake('public');
+
+        $image = UploadedFile::fake()->image('product.jpg');
+
+        Livewire::test(CreateProduct::class)
+            ->fillForm([
+                'name' => 'Image Product',
+                'slug' => 'image-product',
+                'sku' => 'IMG-001',
+                'price' => 49.99,
+                'status' => 'draft',
+                'is_visible' => true,
+                'stock_quantity' => 5,
+                'low_stock_threshold' => 1,
+                'images' => [$image],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $product = Product::query()->with('images')->first();
+
+        $this->assertNotNull($product);
+        $this->assertCount(1, $product->images);
+
+        $storedPath = $product->images->first()->path;
+
+        Storage::disk('public')->assertExists($storedPath);
+        $this->assertSame(Storage::disk('public')->url($storedPath), $product->main_image);
+
+        Livewire::test(EditProduct::class, ['record' => $product->getRouteKey()])
+            ->assertSet('data.images', [$storedPath]);
+
+        Livewire::test(ListProducts::class)
+            ->call('loadTable')
+            ->assertTableColumnStateSet('main_image', $product->main_image, $product);
     }
 }
