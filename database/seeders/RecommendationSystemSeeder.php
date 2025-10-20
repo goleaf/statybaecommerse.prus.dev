@@ -482,6 +482,7 @@ class RecommendationSystemSeeder extends Seeder
                 $user = $users->random();
                 $product = $products->random();
                 $interactionType = fake()->randomElement($interactionTypes);
+                $isAnonymous = fake()->boolean(25);
 
                 return [
                     'user_id' => $user->id,
@@ -489,6 +490,9 @@ class RecommendationSystemSeeder extends Seeder
                     'interaction_type' => $interactionType,
                     'rating' => $interactionType === 'review' ? fake()->randomFloat(2, 1, 5) : null,
                     'count' => fake()->numberBetween(1, 10),
+                    'notes' => fake()->optional()->realText(140),
+                    'is_anonymous' => $isAnonymous,
+                    'ip_address' => $isAnonymous ? null : fake()->ipv4(),
                     'first_interaction' => fake()->dateTimeBetween('-30 days', 'now'),
                     'last_interaction' => fake()->dateTimeBetween('-7 days', 'now'),
                 ];
