@@ -104,6 +104,7 @@ final class NewsImageResource extends Resource
                                             ->label(__('admin.news_images.file_path'))
                                             ->required()
                                             ->image()
+                                            ->disk(SecureStorage::disk())
                                             ->directory('news-images')
                                             ->visibility('private')
                                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
@@ -120,7 +121,8 @@ final class NewsImageResource extends Resource
                                                     return;
                                                 }
 
-                                                $disk = Storage::disk(SecureStorage::disk());
+                                                $diskName = SecureStorage::disk();
+                                                $disk = Storage::disk($diskName);
 
                                                 if (! $disk->exists($state)) {
                                                     return;
@@ -132,12 +134,10 @@ final class NewsImageResource extends Resource
                                                 $imageInfo = null;
                                                 $imagePath = null;
 
-                                                if (method_exists($disk, 'path')) {
-                                                    try {
-                                                        $imagePath = $disk->path($state);
-                                                    } catch (Throwable) {
-                                                        $imagePath = null;
-                                                    }
+                                                try {
+                                                    $imagePath = Storage::disk($diskName)->path($state);
+                                                } catch (Throwable) {
+                                                    $imagePath = null;
                                                 }
 
                                                 if ($imagePath && is_file($imagePath)) {
