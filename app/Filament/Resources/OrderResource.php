@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
@@ -568,17 +570,7 @@ final class OrderResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    BulkAction::make('export_orders')
-                        ->label(__('orders.export'))
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('gray')
-                        ->action(function (Collection $records): void {
-                            Notification::make()
-                                ->title(__('orders.export_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
+                    RequestExportBulkAction::make(ExportType::ORDERS),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

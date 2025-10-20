@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ExportDownloadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -51,3 +52,9 @@ Route::post('/autocomplete-search', function (Request $request) {
         return response()->json(['results' => []], 500);
     }
 })->name('api.autocomplete.search');
+
+Route::middleware(['auth:sanctum'])->prefix('v1')->group(function (): void {
+    Route::get('exports/{export}', ExportDownloadController::class)
+        ->middleware('signed')
+        ->name('api.exports.download');
+});
