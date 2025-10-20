@@ -9,6 +9,7 @@ use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\Document;
 use App\Models\EmailCampaign;
+use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
@@ -188,6 +189,7 @@ class AppServiceProvider extends ServiceProvider
         DiscountRedemption::observe($observer);
         Document::observe($observer);
         EmailCampaign::observe($observer);
+        FeatureFlag::observe($observer);
         SystemSetting::observe($observer);
     }
 

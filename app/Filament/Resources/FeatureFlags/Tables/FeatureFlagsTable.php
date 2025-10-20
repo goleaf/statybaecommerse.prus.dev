@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\FeatureFlags\Tables;
 
+use App\Models\FeatureFlag;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class FeatureFlagsTable
 {
@@ -57,10 +59,26 @@ class FeatureFlagsTable
                     ->searchable(),
                 TextColumn::make('approval_status')
                     ->searchable(),
-                TextColumn::make('created_by')
-                    ->searchable(),
-                TextColumn::make('updated_by')
-                    ->searchable(),
+                TextColumn::make('created_by_display')
+                    ->label(__('system.created_by'))
+                    ->formatStateUsing(fn (FeatureFlag $record): string => $record->created_by_display ?? '—')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where(function (Builder $scopedQuery) use ($search): void {
+                            $scopedQuery
+                                ->whereHas('creator', fn (Builder $creatorQuery): Builder => $creatorQuery->where('name', 'like', "%{$search}%"))
+                                ->orWhere('created_by_name', 'like', "%{$search}%");
+                        });
+                    }),
+                TextColumn::make('updated_by_display')
+                    ->label(__('system.updated_by'))
+                    ->formatStateUsing(fn (FeatureFlag $record): string => $record->updated_by_display ?? '—')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where(function (Builder $scopedQuery) use ($search): void {
+                            $scopedQuery
+                                ->whereHas('updater', fn (Builder $updaterQuery): Builder => $updaterQuery->where('name', 'like', "%{$search}%"))
+                                ->orWhere('updated_by_name', 'like', "%{$search}%");
+                        });
+                    }),
                 TextColumn::make('last_activated')
                     ->dateTime()
                     ->sortable(),
