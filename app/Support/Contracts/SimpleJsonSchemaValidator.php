@@ -34,6 +34,22 @@ final class SimpleJsonSchemaValidator
     }
 
     /**
+     * Validate the given payload against the provided schema definition.
+     *
+     * @return array<int, string>
+     */
+    public function validateInline(array $payload, array $schema, ?array $rootSchema = null): array
+    {
+        if ($schema === []) {
+            return ['Schema definition cannot be empty.'];
+        }
+
+        $root = $rootSchema ?? $schema;
+
+        return $this->validateAgainstSchema($payload, $schema, '$', $root);
+    }
+
+    /**
      * Recursively validate the payload using the provided schema definition.
      *
      * @param  array<string, mixed>|mixed  $data
