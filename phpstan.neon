@@ -10,6 +10,7 @@ parameters:
     - config
   scanFiles:
     - stubs/phpstan/livewire-components.php
+    - stubs/optional-packages.php
   checkExplicitMixed: true
   checkImplicitMixed: true
   checkMissingTypehints: true
