@@ -4,37 +4,47 @@ declare(strict_types=1);
 
 namespace App\Support;
 
-/**
- * Application-wide error code definitions for consistent API and UI messaging.
- */
 final class ErrorCodes
 {
     /**
-     * Code for resources that cannot be found (HTTP 404).
+     * Generic HTTP & framework level errors.
      */
-    public const NOT_FOUND = 'error.not_found';
+    public const SERVER_ERROR = 'server.error';
+
+    public const BAD_REQUEST = 'http.bad_request';
+
+    public const NOT_FOUND = 'http.not_found';
+
+    public const METHOD_NOT_ALLOWED = 'http.method_not_allowed';
+
+    public const TOO_MANY_REQUESTS = 'http.too_many_requests';
+
+    public const UNAUTHORIZED = 'auth.unauthorized';
+
+    public const FORBIDDEN = 'auth.forbidden';
+
+    public const VALIDATION_FAILED = 'validation.failed';
 
     /**
-     * Code for unexpected server failures (HTTP 500).
+     * Domain level error codes.
      */
-    public const SERVER_ERROR = 'error.server';
+    public const ORDER_NOT_FOUND = 'orders.not_found';
+
+    public const INVENTORY_INSUFFICIENT = 'inventory.insufficient';
 
     /**
-     * Code for validation failures when provided data is invalid.
+     * Returns the canonical translation key for a given error code.
      */
-    public const VALIDATION_FAILED = 'error.validation';
-
-    /**
-     * Code for requests made without proper authentication.
-     */
-    public const UNAUTHORIZED = 'error.unauthorized';
-
-    /**
-     * Code for requests that are authenticated but lack permission.
-     */
-    public const FORBIDDEN = 'error.forbidden';
-
-    private function __construct()
+    public static function translationKey(string $errorCode): string
     {
+        return 'errors.'.$errorCode;
+    }
+
+    /**
+     * Returns the normalized translation key used by the TranslationService implementation.
+     */
+    public static function normalizedTranslationKey(string $errorCode): string
+    {
+        return str_replace('.', '_', self::translationKey($errorCode));
     }
 }
