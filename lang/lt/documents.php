@@ -54,6 +54,7 @@ return [
     'format' => 'Formatas',
     'file_path' => 'Failo kelias',
     'created_by' => 'Sukūrė',
+    'updated_by' => 'Atnaujino',
     'created_at' => 'Sukurta',
     'created_from' => 'Sukurta nuo',
     'created_until' => 'Sukurta iki',

@@ -30,6 +30,7 @@ return [
             'documentable_type' => 'Susijusio modelio tipas',
             'documentable_id' => 'Susijusio modelio ID',
             'created_by' => 'Sukūrė',
+            'updated_by' => 'Atnaujino',
             'created_at' => 'Sukurta',
             'generated_at' => 'Sugeneruota',
             'file_path' => 'Failo kelias',
