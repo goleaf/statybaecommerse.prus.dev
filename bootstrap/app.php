@@ -5,13 +5,16 @@ use App\Http\Middleware\AttachCorrelationId;
 use App\Http\Middleware\AddSecurityHeaders;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
+use App\Support\ErrorCodes;
+use App\Support\RequestContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
+use Throwable;
 
 require_once __DIR__.'/../app/Support/filament_compat.php';
 
@@ -50,45 +53,15 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (DomainException $exception, Request $request) {
-            $availableLocales = TranslationService::getAvailableLocales();
-            $preferred = $request->getPreferredLanguage($availableLocales);
-            $currentLocale = app()->getLocale();
-            $locale = is_string($preferred) && $preferred !== ''
-                ? $preferred
-                : ($currentLocale !== ''
-                    ? $currentLocale
-                    : TranslationService::getDefaultLocale());
-
-            if (! in_array($locale, $availableLocales, true)) {
-                $locale = TranslationService::getDefaultLocale();
-            }
-
-            app()->setLocale($locale);
-            app()->instance('request_locale', $locale);
+            $locale = RequestContext::resolveLocale($request);
+            $traceId = RequestContext::resolveTraceId($request);
+            $correlationHeader = RequestContext::correlationHeader();
 
             $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
 
-            $attributeCorrelationRaw = $request->attributes->get('correlation_id');
-            $attributeCorrelationId = is_string($attributeCorrelationRaw) ? $attributeCorrelationRaw : null;
-
-            if ($attributeCorrelationId !== null && $attributeCorrelationId !== '') {
-                $correlationId = $attributeCorrelationId;
-            } elseif (app()->bound('request_correlation_id')) {
-                $resolvedCorrelation = app()->make('request_correlation_id');
-                $correlationId = is_string($resolvedCorrelation) && $resolvedCorrelation !== ''
-                    ? $resolvedCorrelation
-                    : Str::uuid()->toString();
-            } else {
-                $correlationId = Str::uuid()->toString();
-            }
-
-            $correlationHeaderConfig = config('app.correlation_header', 'X-Correlation-ID');
-            $correlationHeader = is_string($correlationHeaderConfig) && $correlationHeaderConfig !== ''
-                ? $correlationHeaderConfig
-                : 'X-Correlation-ID';
-
             Log::withContext([
-                'correlation_id' => $correlationId,
+                'trace_id' => $traceId,
+                'correlation_id' => $traceId,
                 'locale' => $locale,
                 'error_code' => $exception->errorCode(),
                 'request_path' => $request->path(),
@@ -109,7 +82,8 @@ return Application::configure(basePath: dirname(__DIR__))
                     'locale' => $locale,
                 ],
                 'meta' => [
-                    'correlation_id' => $correlationId,
+                    'trace_id' => $traceId,
+                    'correlation_id' => $traceId,
                     'timestamp' => now()->toIso8601String(),
                 ],
             ];
@@ -120,7 +94,63 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()
                 ->json($payload, $exception->status())
-                ->header($correlationHeader, $correlationId)
+                ->header($correlationHeader, $traceId)
+                ->header('Content-Language', $locale);
+        });
+
+        $exceptions->render(function (Throwable $throwable, Request $request) {
+            if ($throwable instanceof DomainException) {
+                return null;
+            }
+
+            $locale = RequestContext::resolveLocale($request);
+            $traceId = RequestContext::resolveTraceId($request);
+            $correlationHeader = RequestContext::correlationHeader();
+
+            Log::withContext([
+                'trace_id' => $traceId,
+                'correlation_id' => $traceId,
+                'locale' => $locale,
+                'request_path' => $request->path(),
+                'request_method' => $request->method(),
+            ]);
+
+            Log::error('Unhandled exception rendered.', [
+                'exception' => $throwable::class,
+                'message' => $throwable->getMessage(),
+            ]);
+
+            if (RequestContext::isApiRequest($request)) {
+                $message = Lang::get('errors.messages.server_error', [], $locale);
+                if ($message === 'errors.messages.server_error') {
+                    $message = __('Something went wrong. Please try again later.', [], $locale);
+                }
+
+                $payload = [
+                    'error' => [
+                        'code' => ErrorCodes::SERVER_ERROR,
+                        'message' => $message,
+                        'locale' => $locale,
+                    ],
+                    'meta' => [
+                        'trace_id' => $traceId,
+                        'correlation_id' => $traceId,
+                        'timestamp' => now()->toIso8601String(),
+                    ],
+                ];
+
+                return response()
+                    ->json($payload, 500)
+                    ->header($correlationHeader, $traceId)
+                    ->header('Content-Language', $locale);
+            }
+
+            return response()
+                ->view('errors.unexpected', [
+                    'traceId' => $traceId,
+                    'correlationId' => $traceId,
+                ], 500)
+                ->header($correlationHeader, $traceId)
                 ->header('Content-Language', $locale);
         });
     })
