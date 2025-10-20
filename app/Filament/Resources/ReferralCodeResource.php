@@ -7,11 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
@@ -22,6 +17,12 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -85,7 +86,7 @@ final class ReferralCodeResource extends Resource
                         Select::make('reward_type')
                             ->label(__('referral.form.reward_type'))
                             ->options([
-                                'fixed' => 'fixed',
+                                'fixed'      => 'fixed',
                                 'percentage' => 'percentage',
                             ])
                             ->required(),
@@ -180,7 +181,7 @@ final class ReferralCodeResource extends Resource
                 SelectFilter::make('by_reward_type')
                     ->label(__('referral.filters.reward_type'))
                     ->options([
-                        'fixed' => 'fixed',
+                        'fixed'      => 'fixed',
                         'percentage' => 'percentage',
                     ]),
                 SelectFilter::make('user_id')
@@ -202,10 +203,10 @@ final class ReferralCodeResource extends Resource
                             return $query;
                         }
 
-                        return $query->where(function (Builder $q) {
+                        return $query->where(function (Builder $q): void {
                             $q
                                 ->where('is_active', false)
-                                ->orWhere(function (Builder $q2) {
+                                ->orWhere(function (Builder $q2): void {
                                     $q2->whereNotNull('expires_at')->where('expires_at', '<=', now());
                                 });
                         });
@@ -214,7 +215,7 @@ final class ReferralCodeResource extends Resource
                     ->label('source')
                     ->options([
                         'admin' => 'admin',
-                        'user' => 'user',
+                        'user'  => 'user',
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['value'] ?? null;
@@ -225,11 +226,6 @@ final class ReferralCodeResource extends Resource
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
-                // Alias for legacy Tables DeleteAction class reference in tests
-                Action::make(\Filament\Tables\Actions\DeleteAction::class)
-                    ->requiresConfirmation()
-                    ->color('danger')
-                    ->action(fn (ReferralCode $record) => $record->delete()),
                 Action::make('deactivate')
                     ->label('deactivate')
                     ->action(fn (ReferralCode $record) => $record->update(['is_active' => false])),
@@ -241,10 +237,10 @@ final class ReferralCodeResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Action::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('deactivate')
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => false])),
-                    Action::make('activate')
+                    BulkAction::make('activate')
                         ->label('activate')
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => true])),
                     DeleteBulkAction::make(),
@@ -267,10 +263,10 @@ final class ReferralCodeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralCodes::route('/'),
+            'index'  => Pages\ListReferralCodes::route('/'),
             'create' => Pages\CreateReferralCode::route('/create'),
-            'view' => Pages\ViewReferralCode::route('/{record}'),
-            'edit' => Pages\EditReferralCode::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralCode::route('/{record}'),
+            'edit'   => Pages\EditReferralCode::route('/{record}/edit'),
         ];
     }
 
