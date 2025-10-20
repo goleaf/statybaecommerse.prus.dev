@@ -40,6 +40,16 @@ final class ErrorCodes
     public const FORBIDDEN = 'error.forbidden';
 
     /**
+     * Code returned when an order record cannot be located.
+     */
+    public const ORDER_NOT_FOUND = 'orders.not_found';
+
+    /**
+     * Code returned when available inventory cannot satisfy a request.
+     */
+    public const INVENTORY_INSUFFICIENT = 'inventory.insufficient';
+
+    /**
      * Registry of error code descriptions keyed by the machine-readable code.
      *
      * @var array<string, string>
@@ -50,11 +60,11 @@ final class ErrorCodes
         self::VALIDATION_FAILED => 'Provided data failed validation checks.',
         self::UNAUTHORIZED => 'Request lacks valid authentication credentials.',
         self::FORBIDDEN => 'Authenticated request does not have permission to access the resource.',
+        self::ORDER_NOT_FOUND => 'Requested order record is missing.',
+        self::INVENTORY_INSUFFICIENT => 'Inventory could not satisfy the requested quantity.',
     ];
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Retrieve all registered error codes.
