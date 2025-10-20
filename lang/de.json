@@ -112,5 +112,6 @@
     "admin.help.zone_countries": "Länder, die zu dieser Zone gehören",
     "admin.widgets.recent_orders": "Neueste Bestellungen",
     "admin.widgets.low_stock_alerts": "Niedriger-Bestand-Warnungen",
-    "analytics.orders_overview": "Bestellübersicht"
+    "analytics.orders_overview": "Bestellübersicht",
+    "inventory.export_job_queued": "Export wurde in die Warteschlange gestellt. Die Datei erscheint in Kürze auf der Exportseite."
 }

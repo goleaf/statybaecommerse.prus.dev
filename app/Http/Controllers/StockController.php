@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GenerateStockExport;
 use App\Models\Location;
 use App\Models\Partner;
 use App\Models\VariantInventory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\LazyCollection;
 use Illuminate\View\View;
 
 /**
@@ -174,35 +175,14 @@ final class StockController extends Controller
 
     /**
      * Handle exportStock functionality with proper error handling.
-     *
-     * @return Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function exportStock(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function exportStock(Request $request): RedirectResponse
     {
-        $query = VariantInventory::with(['variant.product', 'location', 'supplier']);
-        // Apply filters
-        if ($request->filled('location_id')) {
-            $query->where('location_id', $request->get('location_id'));
-        }
-        if ($request->filled('supplier_id')) {
-            $query->where('supplier_id', $request->get('supplier_id'));
-        }
-        if ($request->filled('status')) {
-            $query->where('status', $request->get('status'));
-        }
-        $filename = 'stock_export_'.now()->format('Y-m-d_H-i-s').'.csv';
+        $filters = $request->only(['location_id', 'supplier_id', 'status', 'stock_status', 'search']);
+        GenerateStockExport::dispatch($filters, $request->user()?->id);
 
-        return response()->streamDownload(function () use ($query) {
-            $handle = fopen('php://output', 'w');
-            // CSV headers
-            fputcsv($handle, [__('inventory.product'), __('inventory.variant'), __('inventory.location'), __('inventory.supplier'), __('inventory.current_stock'), __('inventory.reserved'), __('inventory.available'), __('inventory.cost_per_unit'), __('inventory.stock_value'), __('inventory.status'), __('inventory.expiry_date'), __('inventory.created_at')]);
-            // Use LazyCollection with timeout to prevent long-running export operations
-            $timeout = now()->addMinutes(15);
-            // 15 minute timeout for stock exports
-            $query->cursor()->takeUntilTimeout($timeout)->each(function ($item) use ($handle) {
-                fputcsv($handle, [$item->variant->product->name, $item->variant->display_name, $item->location->name, $item->supplier?->name ?? '', $item->stock, $item->reserved, $item->available_stock, $item->cost_per_unit, $item->stock_value, $item->stock_status_label, $item->expiry_date?->format('Y-m-d') ?? '', $item->created_at->format('Y-m-d H:i:s')]);
-            });
-            fclose($handle);
-        }, $filename, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="'.$filename.'"']);
+        return redirect()
+            ->route('exports.index')
+            ->with('success', __('inventory.export_job_queued'));
     }
 }
