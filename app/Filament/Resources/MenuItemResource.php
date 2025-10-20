@@ -73,7 +73,7 @@ final class MenuItemResource extends Resource
                                     ->options(
                                         static fn (): array => Menu::withoutGlobalScopes()
                                             ->pluck('name', 'id')
-                                            ->all()
+                                            ->toArray()
                                     )
                                     ->required()
                                     ->searchable(),
@@ -83,7 +83,7 @@ final class MenuItemResource extends Resource
                                         static fn (): array => MenuItem::withoutGlobalScopes()
                                             ->whereNull('parent_id')
                                             ->pluck('label', 'id')
-                                            ->all()
+                                            ->toArray()
                                     )
                                     ->searchable()
                                     ->preload(),
@@ -177,7 +177,7 @@ final class MenuItemResource extends Resource
                     ->options(
                         static fn (): array => Menu::withoutGlobalScopes()
                             ->pluck('name', 'id')
-                            ->all()
+                            ->toArray()
                     )
                     ->searchable(),
                 SelectFilter::make('parent_id')
@@ -186,7 +186,7 @@ final class MenuItemResource extends Resource
                         static fn (): array => MenuItem::withoutGlobalScopes()
                             ->whereNull('parent_id')
                             ->pluck('label', 'id')
-                            ->all()
+                            ->toArray()
                     )
                     ->searchable(),
                 TernaryFilter::make('is_visible')
