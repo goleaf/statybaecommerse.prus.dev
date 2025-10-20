@@ -7,13 +7,14 @@ namespace App\Livewire\Home;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
+use App\Services\Shared\CacheService as SharedCacheService;
+use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -52,7 +53,7 @@ final class ProductShelf extends Component implements HasSchemas
     {
         $cacheKey = sprintf('home:shelf:%s:%d:%s', $this->preset, $this->limit, app()->getLocale());
 
-        return Cache::remember($cacheKey, 60, function (): EloquentCollection {
+        return app(SharedCacheService::class)->rememberShort($cacheKey, function (): EloquentCollection {
             $locale = app()->getLocale();
 
             $query = Product::query()
@@ -96,7 +97,7 @@ final class ProductShelf extends Component implements HasSchemas
             };
 
             return $query->limit($this->limit)->get();
-        });
+        }, 60, CacheTagHelper::products());
     }
 
     public function productShelf(Schema $schema): Schema
