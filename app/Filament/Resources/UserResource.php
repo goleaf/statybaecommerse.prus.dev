@@ -188,7 +188,7 @@ final class UserResource extends Resource
                 ImageColumn::make('avatar')
                     ->label(__('users.fields.avatar'))
                     ->circular()
-                    ->defaultImageUrl(url('/images/default-avatar.png')),
+                    ->defaultImageUrl(url('/images/logo.svg')),
                 TextColumn::make('name')
                     ->label(__('users.fields.name'))
                     ->searchable()
