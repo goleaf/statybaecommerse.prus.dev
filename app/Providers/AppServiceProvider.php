@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Filament\Components\LiveNotificationFeed;
+use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
@@ -67,10 +68,12 @@ class AppServiceProvider extends ServiceProvider
         // Legacy Shopper components removed - using native Filament resources
 
         Model::saved(function ($model): void {
+            app(CacheInvalidationService::class)->flushForModel($model);
             $this->flushSitemapIfCatalog($model);
             $this->flushDiscountsIfNeeded($model);
         });
         Model::deleted(function ($model): void {
+            app(CacheInvalidationService::class)->flushForModel($model);
             $this->flushSitemapIfCatalog($model);
             $this->flushDiscountsIfNeeded($model);
         });
