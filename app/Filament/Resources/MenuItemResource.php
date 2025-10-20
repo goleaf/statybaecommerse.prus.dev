@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
+use App\Models\Scopes\VisibleScope;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -24,6 +25,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -68,12 +70,21 @@ final class MenuItemResource extends Resource
                             ->schema([
                                 Select::make('menu_id')
                                     ->label(__('admin.menu_items.menu'))
-                                    ->options(Menu::pluck('name', 'id'))
+                                    ->options(
+                                        static fn (): array => Menu::withoutGlobalScopes()
+                                            ->pluck('name', 'id')
+                                            ->all()
+                                    )
                                     ->required()
                                     ->searchable(),
                                 Select::make('parent_id')
                                     ->label(__('admin.menu_items.parent'))
-                                    ->options(MenuItem::whereNull('parent_id')->pluck('label', 'id'))
+                                    ->options(
+                                        static fn (): array => MenuItem::withoutGlobalScopes()
+                                            ->whereNull('parent_id')
+                                            ->pluck('label', 'id')
+                                            ->all()
+                                    )
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -157,11 +168,20 @@ final class MenuItemResource extends Resource
             ->filters([
                 SelectFilter::make('menu_id')
                     ->label(__('admin.menu_items.menu'))
-                    ->options(Menu::pluck('name', 'id'))
+                    ->options(
+                        static fn (): array => Menu::withoutGlobalScopes()
+                            ->pluck('name', 'id')
+                            ->all()
+                    )
                     ->searchable(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.menu_items.parent'))
-                    ->options(MenuItem::whereNull('parent_id')->pluck('label', 'id'))
+                    ->options(
+                        static fn (): array => MenuItem::withoutGlobalScopes()
+                            ->whereNull('parent_id')
+                            ->pluck('label', 'id')
+                            ->all()
+                    )
                     ->searchable(),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.menu_items.is_visible')),
@@ -188,10 +208,15 @@ final class MenuItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMenuItems::route('/'),
+            'index'  => Pages\ListMenuItems::route('/'),
             'create' => Pages\CreateMenuItem::route('/create'),
-            'view' => Pages\ViewMenuItem::route('/{record}'),
-            'edit' => Pages\EditMenuItem::route('/{record}/edit'),
+            'view'   => Pages\ViewMenuItem::route('/{record}'),
+            'edit'   => Pages\EditMenuItem::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([VisibleScope::class]);
     }
 }
