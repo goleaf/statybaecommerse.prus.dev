@@ -61,7 +61,7 @@ final class NormalSettingResourceTest extends TestCase
             'key' => 'test_setting',
             'value' => 'test_value',
             'description' => 'Test description',
-            'type' => 'string',
+            'type' => 'text',
             'is_public' => true,
             'is_encrypted' => false,
             'is_active' => true,
@@ -72,7 +72,7 @@ final class NormalSettingResourceTest extends TestCase
         $this->assertDatabaseHas('enhanced_settings', [
             'key' => 'test_setting',
             'value' => 'test_value',
-            'type' => 'string',
+            'type' => 'text',
         ]);
     }
 
@@ -110,7 +110,7 @@ final class NormalSettingResourceTest extends TestCase
             'key' => 'updated_setting',
             'value' => 'updated_value',
             'description' => 'Updated description',
-            'type' => 'integer',
+            'type' => 'number',
             'is_public' => false,
             'is_encrypted' => true,
             'is_active' => false,
@@ -122,18 +122,18 @@ final class NormalSettingResourceTest extends TestCase
             'id' => $setting->id,
             'key' => 'updated_setting',
             'value' => 'updated_value',
-            'type' => 'integer',
+            'type' => 'number',
         ]);
     }
 
     public function test_can_filter_normal_settings_by_type(): void
     {
-        NormalSetting::factory()->create(['type' => 'string']);
-        NormalSetting::factory()->create(['type' => 'integer']);
+        NormalSetting::factory()->create(['type' => 'text']);
+        NormalSetting::factory()->create(['type' => 'number']);
 
         $this->actingAs($this->admin);
 
-        $response = $this->get('/admin/normal-settings?filter[type]=string');
+        $response = $this->get('/admin/normal-settings?filter[type]=text');
 
         $response->assertStatus(200);
     }
@@ -200,8 +200,8 @@ final class NormalSettingResourceTest extends TestCase
 
     public function test_can_sort_normal_settings_by_type(): void
     {
-        NormalSetting::factory()->create(['type' => 'string']);
-        NormalSetting::factory()->create(['type' => 'integer']);
+        NormalSetting::factory()->create(['type' => 'text']);
+        NormalSetting::factory()->create(['type' => 'number']);
 
         $this->actingAs($this->admin);
 
