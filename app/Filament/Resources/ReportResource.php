@@ -518,8 +518,10 @@ final class ReportResource extends Resource
                         RepeatableEntry::make('filters')
                             ->label(__('reports.fields.filters'))
                             ->table([
-                                TableColumn::make(__('reports.fields.filter_key')),
-                                TableColumn::make(__('reports.fields.filter_value')),
+                                TableColumn::make('key')
+                                    ->label(__('reports.fields.filter_key')),
+                                TableColumn::make('value')
+                                    ->label(__('reports.fields.filter_value')),
                             ])
                             ->schema([
                                 TextEntry::make('key')
@@ -536,8 +538,10 @@ final class ReportResource extends Resource
                         RepeatableEntry::make('settings')
                             ->label(__('reports.fields.settings'))
                             ->table([
-                                TableColumn::make(__('reports.fields.setting_key')),
-                                TableColumn::make(__('reports.fields.setting_value')),
+                                TableColumn::make('key')
+                                    ->label(__('reports.fields.setting_key')),
+                                TableColumn::make('value')
+                                    ->label(__('reports.fields.setting_value')),
                             ])
                             ->schema([
                                 TextEntry::make('key')
@@ -554,8 +558,10 @@ final class ReportResource extends Resource
                         RepeatableEntry::make('metadata')
                             ->label(__('reports.fields.metadata'))
                             ->table([
-                                TableColumn::make(__('reports.fields.metadata_key')),
-                                TableColumn::make(__('reports.fields.metadata_value')),
+                                TableColumn::make('key')
+                                    ->label(__('reports.fields.metadata_key')),
+                                TableColumn::make('value')
+                                    ->label(__('reports.fields.metadata_value')),
                             ])
                             ->schema([
                                 TextEntry::make('key')
