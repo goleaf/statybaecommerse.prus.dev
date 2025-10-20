@@ -8,27 +8,30 @@ use App\Filament\Resources\SystemResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use BackedEnum;
-use Filament\Actions\Action as TableAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -69,11 +72,11 @@ final class SystemResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static ?string $navigationLabel = 'system.title';
+    protected static ?string $navigationLabel = null;
 
-    protected static ?string $modelLabel = 'system.single';
+    protected static ?string $modelLabel = null;
 
-    protected static ?string $pluralModelLabel = 'system.plural';
+    protected static ?string $pluralModelLabel = null;
 
     protected static ?string $recordTitleAttribute = 'key';
 
@@ -115,45 +118,29 @@ final class SystemResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 Tabs::make('System Configuration')
                     ->tabs([
                         Tab::make('Basic Settings')
                             ->icon('heroicon-o-cog-6-tooth')
-                            ->components([
+                            ->schema([
                                 Section::make('System Information')
                                     ->description(__('system.core_configuration'))
-                                    ->components([
+                                    ->schema([
                                         Grid::make(2)
-                                            ->components([
+                                            ->schema([
                                                 TextInput::make('key')
                                                     ->label(__('system.setting_key'))
                                                     ->required()
                                                     ->maxLength(255)
                                                     ->unique(ignoreRecord: true)
-                                                    ->helperText(__('system.setting_key_help'))
-                                                    ->columnSpan(1),
+                                                    ->helperText(__('system.setting_key_help')),
                                                 Select::make('category_id')
                                                     ->label(__('system.category'))
                                                     ->relationship('category', 'name')
                                                     ->searchable()
                                                     ->preload()
                                                     ->required()
-                                                    ->afterStateUpdated(function ($state, callable $set) {
-                                                        if (is_array($state)) {
-                                                            $payload = [
-                                                                'name' => $state['name'] ?? null,
-                                                                'description' => $state['description'] ?? null,
-                                                                'color' => $state['color'] ?? null,
-                                                                'parent_id' => $state['parent_id'] ?? null,
-                                                                'icon' => $state['icon'] ?? null,
-                                                                'sort_order' => $state['sort_order'] ?? 0,
-                                                                'is_active' => $state['is_active'] ?? true,
-                                                            ];
-                                                            $category = SystemSettingCategory::create(array_filter($payload, fn ($v) => $v !== null));
-                                                            $set('category_id', (int) $category->getKey());
-                                                        }
-                                                    })
                                                     ->createOptionForm([
                                                         TextInput::make('name')
                                                             ->label(__('system.category_name'))
@@ -184,40 +171,21 @@ final class SystemResource extends Resource
                                                     ])
                                                     ->createOptionUsing(function (array $data): int {
                                                         $payload = [
-                                                            'name' => $data['name'] ?? null,
+                                                            'name'        => $data['name'] ?? null,
                                                             'description' => $data['description'] ?? null,
-                                                            'color' => $data['color'] ?? null,
-                                                            'parent_id' => $data['parent_id'] ?? null,
-                                                            'icon' => $data['icon'] ?? null,
-                                                            'sort_order' => $data['sort_order'] ?? 0,
-                                                            'is_active' => $data['is_active'] ?? true,
+                                                            'color'       => $data['color'] ?? null,
+                                                            'parent_id'   => $data['parent_id'] ?? null,
+                                                            'icon'        => $data['icon'] ?? null,
+                                                            'sort_order'  => $data['sort_order'] ?? 0,
+                                                            'is_active'   => $data['is_active'] ?? true,
                                                         ];
 
                                                         $category = SystemSettingCategory::create(array_filter(
                                                             $payload,
-                                                            fn ($v) => $v !== null
+                                                            fn ($value) => $value !== null
                                                         ));
 
                                                         return (int) $category->getKey();
-                                                    })
-                                                    ->columnSpan(1)
-                                                    ->dehydrateStateUsing(function ($state) {
-                                                        if (is_array($state)) {
-                                                            $payload = [
-                                                                'name' => $state['name'] ?? null,
-                                                                'description' => $state['description'] ?? null,
-                                                                'color' => $state['color'] ?? null,
-                                                                'parent_id' => $state['parent_id'] ?? null,
-                                                                'icon' => $state['icon'] ?? null,
-                                                                'sort_order' => $state['sort_order'] ?? 0,
-                                                                'is_active' => $state['is_active'] ?? true,
-                                                            ];
-                                                            $category = SystemSettingCategory::create(array_filter($payload, fn ($v) => $v !== null));
-
-                                                            return (int) $category->getKey();
-                                                        }
-
-                                                        return $state;
                                                     }),
                                             ]),
                                         TextInput::make('name')
@@ -236,7 +204,7 @@ final class SystemResource extends Resource
                                             ->rows(2)
                                             ->helperText(__('system.help_text_help')),
                                         Grid::make(2)
-                                            ->components([
+                                            ->schema([
                                                 TextInput::make('group')
                                                     ->label(__('system.group'))
                                                     ->maxLength(100)
@@ -250,32 +218,98 @@ final class SystemResource extends Resource
                                         Select::make('type')
                                             ->label(__('system.setting_type'))
                                             ->options([
-                                                'string' => __('system.type_string'),
-                                                'integer' => __('system.type_integer'),
-                                                'boolean' => __('system.type_boolean'),
-                                                'json' => __('system.type_json'),
-                                                'array' => __('system.type_array'),
-                                                'file' => __('system.type_file'),
-                                                'color' => __('system.type_color'),
-                                                'date' => __('system.type_date'),
+                                                'string'   => __('system.type_string'),
+                                                'integer'  => __('system.type_integer'),
+                                                'boolean'  => __('system.type_boolean'),
+                                                'json'     => __('system.type_json'),
+                                                'array'    => __('system.type_array'),
+                                                'file'     => __('system.type_file'),
+                                                'color'    => __('system.type_color'),
+                                                'date'     => __('system.type_date'),
                                                 'datetime' => __('system.type_datetime'),
-                                                'email' => __('system.type_email'),
-                                                'url' => __('system.type_url'),
+                                                'email'    => __('system.type_email'),
+                                                'url'      => __('system.type_url'),
                                                 'password' => __('system.type_password'),
-                                                'float' => __('system.type_float'),
-                                                'text' => __('system.type_text'),
-                                                'select' => __('system.type_select'),
+                                                'float'    => __('system.type_float'),
+                                                'text'     => __('system.type_text'),
+                                                'select'   => __('system.type_select'),
                                             ])
                                             ->reactive()
                                             ->required()
                                             ->helperText(__('system.setting_type_help')),
                                     ]),
                                 Section::make('Value Configuration')
-                                    ->components([
+                                    ->schema([
                                         TextInput::make('value')
                                             ->label(__('system.setting_value'))
-                                            ->visible(fn (callable $get) => in_array($get('type'), ['string', 'integer', 'email', 'url', 'password', 'float', 'text']))
+                                            ->visible(fn (Get $get): bool => in_array($get('type'), ['string', 'integer', 'email', 'url', 'password', 'float', 'text'], true))
+                                            ->dehydrated(fn (Get $get): bool => in_array($get('type'), ['string', 'integer', 'email', 'url', 'password', 'float', 'text'], true))
                                             ->helperText(__('system.setting_value_help')),
+                                        Toggle::make('value')
+                                            ->label(__('system.enabled'))
+                                            ->visible(fn (Get $get): bool => $get('type') === 'boolean')
+                                            ->dehydrated(fn (Get $get): bool => $get('type') === 'boolean')
+                                            ->helperText(__('system.enabled_help')),
+                                        ColorPicker::make('value')
+                                            ->label(__('system.color_value'))
+                                            ->visible(fn (Get $get): bool => $get('type') === 'color')
+                                            ->dehydrated(fn (Get $get): bool => $get('type') === 'color')
+                                            ->helperText(__('system.color_value_help')),
+                                        DateTimePicker::make('value')
+                                            ->label(__('system.date_time'))
+                                            ->visible(fn (Get $get): bool => $get('type') === 'datetime')
+                                            ->dehydrated(fn (Get $get): bool => $get('type') === 'datetime')
+                                            ->helperText(__('system.date_time_help')),
+                                        DateTimePicker::make('value')
+                                            ->label(__('system.date'))
+                                            ->displayFormat('Y-m-d')
+                                            ->visible(fn (Get $get): bool => $get('type') === 'date')
+                                            ->dehydrated(fn (Get $get): bool => $get('type') === 'date')
+                                            ->helperText(__('system.date_help')),
+                                        FileUpload::make('value')
+                                            ->label(__('system.file_upload'))
+                                            ->visible(fn (Get $get): bool => $get('type') === 'file')
+                                            ->dehydrated(fn (Get $get): bool => $get('type') === 'file')
+                                            ->helperText(__('system.file_upload_help')),
+                                        Select::make('value')
+                                            ->label(__('system.select_value'))
+                                            ->visible(fn (Get $get): bool => $get('type') === 'select')
+                                            ->options(function (Get $get): array {
+                                                $options = $get('options');
+
+                                                if (is_array($options)) {
+                                                    return collect($options)
+                                                        ->filter(fn ($label): bool => is_scalar($label))
+                                                        ->map(fn ($label): string => (string) $label)
+                                                        ->all();
+                                                }
+
+                                                if (is_string($options)) {
+                                                    $decoded = json_decode($options, true);
+
+                                                    if (is_array($decoded)) {
+                                                        return collect($decoded)
+                                                            ->filter(fn ($label): bool => is_scalar($label))
+                                                            ->map(fn ($label): string => (string) $label)
+                                                            ->all();
+                                                    }
+                                                }
+
+                                                return [];
+                                            })
+                                            ->dehydrated(fn (Get $get): bool => $get('type') === 'select')
+                                            ->helperText(__('system.select_value_help')),
+                                        KeyValue::make('value')
+                                            ->label(__('system.key_value_pairs'))
+                                            ->visible(fn (Get $get): bool => $get('type') === 'json')
+                                            ->dehydrated(fn (Get $get): bool => $get('type') === 'json')
+                                            ->helperText(__('system.key_value_pairs_help')),
+                                        Textarea::make('value')
+                                            ->label(__('system.array_items'))
+                                            ->visible(fn (Get $get): bool => $get('type') === 'array')
+                                            ->dehydrated(fn (Get $get): bool => $get('type') === 'array')
+                                            ->helperText(__('system.array_items_help'))
+                                            ->rows(3),
                                         TextInput::make('default_value')
                                             ->label(__('system.default_value'))
                                             ->helperText(__('system.default_value_help')),
@@ -287,53 +321,18 @@ final class SystemResource extends Resource
                                             ->label(__('system.tooltip'))
                                             ->maxLength(500)
                                             ->helperText(__('system.tooltip_help')),
-                                        Toggle::make('value')
-                                            ->label(__('system.enabled'))
-                                            ->visible(fn (callable $get) => $get('type') === 'boolean')
-                                            ->helperText(__('system.enabled_help')),
-                                        ColorPicker::make('value')
-                                            ->label(__('system.color_value'))
-                                            ->visible(fn (callable $get) => $get('type') === 'color')
-                                            ->helperText(__('system.color_value_help')),
-                                        DateTimePicker::make('value')
-                                            ->label(__('system.date_time'))
-                                            ->visible(fn (callable $get) => $get('type') === 'datetime')
-                                            ->helperText(__('system.date_time_help')),
-                                        DateTimePicker::make('value')
-                                            ->label(__('system.date'))
-                                            ->displayFormat('Y-m-d')
-                                            ->visible(fn (callable $get) => $get('type') === 'date')
-                                            ->helperText(__('system.date_help')),
-                                        FileUpload::make('value')
-                                            ->label(__('system.file_upload'))
-                                            ->visible(fn (callable $get) => $get('type') === 'file')
-                                            ->helperText(__('system.file_upload_help')),
-                                        Select::make('value')
-                                            ->label(__('system.select_value'))
-                                            ->visible(fn (callable $get) => $get('type') === 'select')
-                                            ->options(fn (callable $get) => json_decode($get('options') ?? '{}', true) ?? [])
-                                            ->helperText(__('system.select_value_help')),
-                                        KeyValue::make('value')
-                                            ->label(__('system.key_value_pairs'))
-                                            ->visible(fn (callable $get) => $get('type') === 'json')
-                                            ->helperText(__('system.key_value_pairs_help')),
                                         Textarea::make('options')
                                             ->label(__('system.options'))
-                                            ->visible(fn (callable $get) => in_array($get('type'), ['select', 'json']))
+                                            ->visible(fn (Get $get): bool => in_array($get('type'), ['select', 'json'], true))
                                             ->helperText(__('system.options_help'))
-                                            ->rows(3),
-                                        Textarea::make('value')
-                                            ->label(__('system.array_items'))
-                                            ->visible(fn (callable $get) => $get('type') === 'array')
-                                            ->helperText(__('system.array_items_help'))
                                             ->rows(3),
                                     ]),
                             ]),
                         Tab::make('Advanced Settings')
                             ->icon('heroicon-o-adjustments-horizontal')
-                            ->components([
+                            ->schema([
                                 Section::make('Validation & Constraints')
-                                    ->components([
+                                    ->schema([
                                         Textarea::make('validation_rules')
                                             ->label(__('system.validation_rules'))
                                             ->helperText(__('system.validation_rules_help'))
@@ -354,7 +353,7 @@ final class SystemResource extends Resource
                                             ->default('production')
                                             ->helperText(__('system.environment_help')),
                                         Grid::make(2)
-                                            ->components([
+                                            ->schema([
                                                 Checkbox::make('is_required')
                                                     ->label(__('system.required_setting'))
                                                     ->helperText(__('system.required_setting_help')),
@@ -369,44 +368,44 @@ final class SystemResource extends Resource
                                                     ->helperText(__('system.public_setting_help')),
                                                 Checkbox::make('is_active')
                                                     ->label(__('system.is_active'))
-                                                    ->helperText(__('system.is_active_help'))
-                                                    ->default(true),
+                                                    ->default(true)
+                                                    ->helperText(__('system.is_active_help')),
                                                 Checkbox::make('is_cacheable')
                                                     ->label(__('system.is_cacheable'))
                                                     ->helperText(__('system.is_cacheable_help')),
                                             ]),
                                     ]),
                                 Section::make('Access Control')
-                                    ->components([
+                                    ->schema([
                                         Select::make('permission_required')
                                             ->label(__('system.required_permission'))
                                             ->options([
-                                                'admin' => __('system.permission_admin'),
+                                                'admin'   => __('system.permission_admin'),
                                                 'manager' => __('system.permission_manager'),
-                                                'user' => __('system.permission_user'),
-                                                'system' => __('system.permission_system'),
+                                                'user'    => __('system.permission_user'),
+                                                'system'  => __('system.permission_system'),
                                             ])
                                             ->helperText(__('system.required_permission_help')),
                                         Select::make('updated_by')
                                             ->label(__('system.updated_by'))
                                             ->relationship('updatedBy', 'name')
-                                            ->default(auth()->id())
+                                            ->default(fn (): ?int => auth()->id())
                                             ->disabled()
                                             ->helperText(__('system.updated_by_help')),
                                     ]),
                                 Section::make('System Integration')
-                                    ->components([
+                                    ->schema([
                                         TextInput::make('cache_key')
                                             ->label(__('system.cache_key'))
                                             ->helperText(__('system.cache_key_help')),
                                         Select::make('cache_ttl')
                                             ->label(__('system.cache_ttl'))
                                             ->options([
-                                                0 => __('system.no_cache'),
-                                                60 => __('system.1_minute'),
-                                                300 => __('system.5_minutes'),
-                                                900 => __('system.15_minutes'),
-                                                3600 => __('system.1_hour'),
+                                                0     => __('system.no_cache'),
+                                                60    => __('system.1_minute'),
+                                                300   => __('system.5_minutes'),
+                                                900   => __('system.15_minutes'),
+                                                3600  => __('system.1_hour'),
                                                 86400 => __('system.1_day'),
                                             ])
                                             ->default(3600)
@@ -415,9 +414,9 @@ final class SystemResource extends Resource
                             ]),
                         Tab::make('Translations')
                             ->icon('heroicon-o-language')
-                            ->components([
+                            ->schema([
                                 Section::make('Multi-language Support')
-                                    ->components([
+                                    ->schema([
                                         Repeater::make('translations')
                                             ->label(__('system.translations'))
                                             ->relationship('translations')
@@ -448,9 +447,9 @@ final class SystemResource extends Resource
                             ]),
                         Tab::make('Dependencies & Relations')
                             ->icon('heroicon-o-link')
-                            ->components([
+                            ->schema([
                                 Section::make('Dependencies')
-                                    ->components([
+                                    ->schema([
                                         Repeater::make('dependencies')
                                             ->label(__('system.dependencies'))
                                             ->relationship('dependencies')
@@ -474,7 +473,7 @@ final class SystemResource extends Resource
                                             ->minItems(0)
                                             ->dehydrated(false)
                                             ->collapsible()
-                                            ->itemLabel(fn (array $state): ?string => $state['dependsOn']['name'] ?? null),
+                                            ->itemLabel(fn (array $state): ?string => isset($state['dependsOn']['name']) && is_string($state['dependsOn']['name']) ? $state['dependsOn']['name'] : null),
                                     ]),
                             ]),
                     ])
@@ -503,25 +502,25 @@ final class SystemResource extends Resource
                     ->label(__('system.category'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'General' => 'gray',
-                        'Security' => 'red',
+                        'General'     => 'gray',
+                        'Security'    => 'red',
                         'Performance' => 'blue',
-                        'UI/UX' => 'green',
-                        'API' => 'purple',
-                        default => 'gray',
+                        'UI/UX'       => 'green',
+                        'API'         => 'purple',
+                        default       => 'gray',
                     })
                     ->sortable(),
                 TextColumn::make('type')
                     ->label(__('system.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'string' => 'gray',
+                        'string'  => 'gray',
                         'integer' => 'blue',
                         'boolean' => 'green',
-                        'json' => 'purple',
-                        'array' => 'yellow',
-                        'file' => 'red',
-                        default => 'gray',
+                        'json'    => 'purple',
+                        'array'   => 'yellow',
+                        'file'    => 'red',
+                        default   => 'gray',
                     }),
                 TextColumn::make('group')
                     ->label(__('system.group'))
@@ -591,29 +590,29 @@ final class SystemResource extends Resource
                     ->searchable(),
                 SelectFilter::make('type')
                     ->options([
-                        'string' => __('system.type_string'),
-                        'integer' => __('system.type_integer'),
-                        'boolean' => __('system.type_boolean'),
-                        'json' => __('system.type_json'),
-                        'array' => __('system.type_array'),
-                        'file' => __('system.type_file'),
-                        'color' => __('system.type_color'),
-                        'date' => __('system.type_date'),
+                        'string'   => __('system.type_string'),
+                        'integer'  => __('system.type_integer'),
+                        'boolean'  => __('system.type_boolean'),
+                        'json'     => __('system.type_json'),
+                        'array'    => __('system.type_array'),
+                        'file'     => __('system.type_file'),
+                        'color'    => __('system.type_color'),
+                        'date'     => __('system.type_date'),
                         'datetime' => __('system.type_datetime'),
-                        'email' => __('system.type_email'),
-                        'url' => __('system.type_url'),
+                        'email'    => __('system.type_email'),
+                        'url'      => __('system.type_url'),
                         'password' => __('system.type_password'),
-                        'float' => __('system.type_float'),
-                        'text' => __('system.type_text'),
-                        'select' => __('system.type_select'),
+                        'float'    => __('system.type_float'),
+                        'text'     => __('system.type_text'),
+                        'select'   => __('system.type_select'),
                     ]),
                 SelectFilter::make('group')
                     ->options([
-                        'general' => __('system.group_general'),
-                        'security' => __('system.group_security'),
+                        'general'     => __('system.group_general'),
+                        'security'    => __('system.group_security'),
                         'performance' => __('system.group_performance'),
-                        'ui_ux' => __('system.group_ui_ux'),
-                        'api' => __('system.group_api'),
+                        'ui_ux'       => __('system.group_ui_ux'),
+                        'api'         => __('system.group_api'),
                     ]),
                 TernaryFilter::make('is_required')
                     ->label(__('system.required_settings'))
@@ -650,12 +649,12 @@ final class SystemResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                DeleteAction::make(),
                 TableAction::make('clear_cache')
                     ->label(__('system.clear_cache'))
                     ->icon('heroicon-o-trash')
                     ->color('warning')
-                    ->action(function (SystemSetting $record) {
+                    ->action(function (SystemSetting $record): void {
                         Cache::forget($record->cache_key ?? $record->key);
                         \Filament\Notifications\Notification::make()
                             ->title(__('system.cache_cleared'))
@@ -670,13 +669,13 @@ final class SystemResource extends Resource
                     ->color('info')
                     ->action(function (SystemSetting $record) {
                         $data = [
-                            'key' => $record->key,
-                            'name' => $record->name,
-                            'value' => $record->value,
-                            'type' => $record->type,
+                            'key'      => $record->key,
+                            'name'     => $record->name,
+                            'value'    => $record->value,
+                            'type'     => $record->type,
                             'category' => $record->category->name ?? null,
                         ];
-                        $filename = "setting_{$record->key}_".now()->format('Y-m-d_H-i-s').'.json';
+                        $filename = "setting_{$record->key}_" . now()->format('Y-m-d_H-i-s') . '.json';
 
                         return response()
                             ->json($data)
@@ -686,13 +685,13 @@ final class SystemResource extends Resource
                     ->label(__('system.view_dependencies'))
                     ->icon('heroicon-o-link')
                     ->color('info')
-                    ->action(function (SystemSetting $record) {
+                    ->action(function (SystemSetting $record): void {
                         $dependencies = $record->dependencies()->with('dependsOn')->get();
                         $dependents = $record->dependents()->with('setting')->get();
 
                         $message = __('system.dependencies_info', [
                             'dependencies_count' => $dependencies->count(),
-                            'dependents_count' => $dependents->count(),
+                            'dependents_count'   => $dependents->count(),
                         ]);
 
                         \Filament\Notifications\Notification::make()
@@ -706,7 +705,7 @@ final class SystemResource extends Resource
                     ->label(__('system.view_history'))
                     ->icon('heroicon-o-clock')
                     ->color('info')
-                    ->action(function (SystemSetting $record) {
+                    ->action(function (SystemSetting $record): void {
                         $history = $record->history()->with('user')->limit(5)->get();
                         $message = __('system.history_info', ['count' => $history->count()]);
 
@@ -721,12 +720,11 @@ final class SystemResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    TableAction::make('clear_all_cache')
+                    BulkAction::make('clear_all_cache')
                         ->label(__('system.clear_all_cache'))
                         ->icon('heroicon-o-trash')
                         ->color('warning')
-                        ->accessSelectedRecords()
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $cleared = 0;
                             foreach ($records as $record) {
                                 if (! empty($record->cache_key)) {
@@ -740,34 +738,32 @@ final class SystemResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    TableAction::make('export_selected')
+                    BulkAction::make('export_selected')
                         ->label(__('system.export_selected'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('info')
-                        ->accessSelectedRecords()
                         ->action(function (Collection $records) {
                             $data = $records->map(function (SystemSetting $record) {
                                 return [
-                                    'key' => $record->key,
-                                    'name' => $record->name,
-                                    'value' => $record->value,
-                                    'type' => $record->type,
+                                    'key'      => $record->key,
+                                    'name'     => $record->name,
+                                    'value'    => $record->value,
+                                    'type'     => $record->type,
                                     'category' => $record->category->name ?? null,
                                 ];
                             });
-                            $filename = 'system_settings_'.now()->format('Y-m-d_H-i-s').'.json';
+                            $filename = 'system_settings_' . now()->format('Y-m-d_H-i-s') . '.json';
 
                             return response()
                                 ->json($data->toArray())
                                 ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
                         }),
-                    TableAction::make('activate_selected')
+                    BulkAction::make('activate_selected')
                         ->label(__('system.activate_selected'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->accessSelectedRecords()
-                        ->action(function (Collection $records) {
-                            $records->each(function (SystemSetting $record) {
+                        ->action(function (Collection $records): void {
+                            $records->each(function (SystemSetting $record): void {
                                 $record->update(['is_active' => true]);
                             });
                             \Filament\Notifications\Notification::make()
@@ -776,13 +772,12 @@ final class SystemResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    TableAction::make('deactivate_selected')
+                    BulkAction::make('deactivate_selected')
                         ->label(__('system.deactivate_selected'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->accessSelectedRecords()
-                        ->action(function (Collection $records) {
-                            $records->each(function (SystemSetting $record) {
+                        ->action(function (Collection $records): void {
+                            $records->each(function (SystemSetting $record): void {
                                 $record->update(['is_active' => false]);
                             });
                             \Filament\Notifications\Notification::make()
@@ -798,14 +793,14 @@ final class SystemResource extends Resource
                     ->label(__('system.system_health'))
                     ->icon('heroicon-o-heart')
                     ->color('success')
-                    ->action(function () {
+                    ->action(function (): void {
                         $health = [
-                            'database' => DB::connection()->getPdo() ? 'Connected' : 'Disconnected',
-                            'cache' => Cache::store()->getStore() ? 'Available' : 'Unavailable',
-                            'settings_count' => SystemSetting::count(),
+                            'database'         => DB::connection()->getPdo() ? 'Connected' : 'Disconnected',
+                            'cache'            => Cache::store()->getStore() ? 'Available' : 'Unavailable',
+                            'settings_count'   => SystemSetting::count(),
                             'categories_count' => SystemSettingCategory::count(),
-                            'memory_usage' => memory_get_usage(true),
-                            'disk_free' => disk_free_space('/'),
+                            'memory_usage'     => memory_get_usage(true),
+                            'disk_free'        => disk_free_space('/'),
                         ];
                         \Filament\Notifications\Notification::make()
                             ->title(__('system.system_health_check'))
@@ -816,7 +811,7 @@ final class SystemResource extends Resource
                 TableAction::make('optimize_system')
                     ->label(__('system.optimize_system'))
                     ->icon('heroicon-o-wrench-screwdriver')
-                    ->action(function () {
+                    ->action(function (): void {
                         Artisan::call('config:cache');
                         Artisan::call('route:cache');
                         Artisan::call('view:cache');
@@ -830,7 +825,7 @@ final class SystemResource extends Resource
                     ->label(__('system.clear_all_caches'))
                     ->icon('heroicon-o-trash')
                     ->color('warning')
-                    ->action(function () {
+                    ->action(function (): void {
                         Artisan::call('cache:clear');
                         Artisan::call('config:clear');
                         Artisan::call('route:clear');
@@ -852,10 +847,10 @@ final class SystemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystems::route('/'),
+            'index'  => Pages\ListSystems::route('/'),
             'create' => Pages\CreateSystem::route('/create'),
-            'view' => Pages\ViewSystem::route('/{record}'),
-            'edit' => Pages\EditSystem::route('/{record}/edit'),
+            'view'   => Pages\ViewSystem::route('/{record}'),
+            'edit'   => Pages\EditSystem::route('/{record}/edit'),
         ];
     }
 
@@ -876,8 +871,8 @@ final class SystemResource extends Resource
 
         return match (true) {
             $count > 100 => 'success',
-            $count > 50 => 'warning',
-            default => 'danger',
+            $count > 50  => 'warning',
+            default      => 'danger',
         };
     }
 }
