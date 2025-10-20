@@ -60,7 +60,7 @@ final class CustomerManagementResourceTest extends TestCase
                 'phone' => $newCustomerData->phone,
                 'is_active' => true,
                 'is_verified' => false,
-                'customer_group_id' => $customerGroup->id,
+                'customerGroups' => [$customerGroup->id],
                 'preferred_language' => 'lt',
                 'preferred_currency' => 'EUR',
                 'newsletter_subscription' => false,
@@ -75,6 +75,13 @@ final class CustomerManagementResourceTest extends TestCase
             'phone' => $newCustomerData->phone,
             'is_active' => true,
             'is_verified' => false,
+        ]);
+
+        $createdCustomer = User::where('email', $newCustomerData->email)->firstOrFail();
+
+        $this->assertDatabaseHas('customer_group_user', [
+            'user_id' => $createdCustomer->id,
+            'customer_group_id' => $customerGroup->id,
         ]);
     }
 
@@ -119,11 +126,14 @@ final class CustomerManagementResourceTest extends TestCase
         $customerGroup1 = CustomerGroup::factory()->create(['name' => 'VIP']);
         $customerGroup2 = CustomerGroup::factory()->create(['name' => 'Regular']);
 
-        $customer1 = User::factory()->create(['customer_group_id' => $customerGroup1->id]);
-        $customer2 = User::factory()->create(['customer_group_id' => $customerGroup2->id]);
+        $customer1 = User::factory()->create();
+        $customer1->customerGroups()->attach($customerGroup1->id);
+
+        $customer2 = User::factory()->create();
+        $customer2->customerGroups()->attach($customerGroup2->id);
 
         Livewire::test(ListCustomers::class)
-            ->filterTable('customer_group_id', $customerGroup1->id)
+            ->filterTable('customerGroups', $customerGroup1->id)
             ->assertCanSeeTableRecords([$customer1])
             ->assertCanNotSeeTableRecords([$customer2]);
     }
@@ -235,7 +245,8 @@ final class CustomerManagementResourceTest extends TestCase
     public function test_customer_relationships(): void
     {
         $customerGroup = CustomerGroup::factory()->create();
-        $customer = User::factory()->create(['customer_group_id' => $customerGroup->id]);
+        $customer = User::factory()->create();
+        $customer->customerGroups()->attach($customerGroup->id);
 
         // Create related records
         $order = Order::factory()->create(['user_id' => $customer->id]);
@@ -244,7 +255,7 @@ final class CustomerManagementResourceTest extends TestCase
         $discountRedemption = DiscountRedemption::factory()->create(['user_id' => $customer->id]);
 
         // Test relationships
-        $this->assertEquals($customerGroup->id, $customer->customerGroup->id);
+        $this->assertTrue($customer->customerGroups->contains($customerGroup));
         $this->assertTrue($customer->orders->contains($order));
         $this->assertTrue($customer->reviews->contains($review));
         $this->assertTrue($customer->cartItems->contains($cartItem));
