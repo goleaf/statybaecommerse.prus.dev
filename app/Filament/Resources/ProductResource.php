@@ -305,6 +305,8 @@ final class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultPaginationPageOption(25)
+            ->paginationPageOptions([25, 50, 100])
             ->columns([
                 ImageColumn::make('main_image')
                     ->label(__('products.fields.image'))
@@ -538,7 +540,7 @@ final class ProductResource extends Resource
                     BulkAction::make('publish')
                         ->label(__('products.actions.publish'))
                         ->icon('heroicon-o-eye')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['status' => 'published', 'is_visible' => true]);
                             Notification::make()
                                 ->title(__('products.notifications.published'))
@@ -549,7 +551,7 @@ final class ProductResource extends Resource
                     BulkAction::make('unpublish')
                         ->label(__('products.actions.unpublish'))
                         ->icon('heroicon-o-eye-slash')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['status' => 'draft', 'is_visible' => false]);
                             Notification::make()
                                 ->title(__('products.notifications.unpublished'))
@@ -560,7 +562,7 @@ final class ProductResource extends Resource
                     BulkAction::make('feature')
                         ->label(__('products.actions.feature'))
                         ->icon('heroicon-o-star')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_featured' => true]);
                             Notification::make()
                                 ->title(__('products.notifications.featured'))
@@ -571,7 +573,7 @@ final class ProductResource extends Resource
                     BulkAction::make('unfeature')
                         ->label(__('products.actions.unfeature'))
                         ->icon('heroicon-o-star')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_featured' => false]);
                             Notification::make()
                                 ->title(__('products.notifications.unfeatured'))
@@ -592,7 +594,7 @@ final class ProductResource extends Resource
                                 ->numeric()
                                 ->default(5),
                         ])
-                        ->action(function (Collection $records, array $data) {
+                        ->action(function (Collection $records, array $data): void {
                             $records->each->update([
                                 'stock_quantity' => $data['stock_quantity'],
                                 'low_stock_threshold' => $data['low_stock_threshold'],
@@ -613,11 +615,11 @@ final class ProductResource extends Resource
                                 ->suffix('%')
                                 ->helperText(__('products.helpers.price_increase')),
                         ])
-                        ->action(function (Collection $records, array $data) {
+                        ->action(function (Collection $records, array $data): void {
                             $percentage = $data['price_increase_percentage'] ?? 0;
                             $multiplier = 1 + ($percentage / 100);
 
-                            $records->each(function ($product) use ($multiplier) {
+                            $records->each(function ($product) use ($multiplier): void {
                                 $product->update([
                                     'price' => round($product->price * $multiplier, 2),
                                     'compare_price' => $product->compare_price ? round($product->compare_price * $multiplier, 2) : null,
@@ -636,6 +638,24 @@ final class ProductResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * @return Builder<Product>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'brand:id,name',
+                'primaryImage',
+            ])
+            ->withCount([
+                'reviews as approved_reviews_count' => fn (Builder $query): Builder => $query->where('is_approved', true),
+            ])
+            ->withAvg([
+                'reviews as approved_reviews_avg_rating' => fn (Builder $query): Builder => $query->where('is_approved', true),
+            ], 'rating');
     }
 
     public static function getRelations(): array
