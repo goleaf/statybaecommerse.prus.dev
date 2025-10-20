@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Services\Cart\CartService;
 use App\Services\Shared\CacheService;
 use App\Services\Shared\ProductService;
 use App\Services\Shared\TranslationService;
@@ -82,7 +83,7 @@ final class SharedComponentServiceProvider extends ServiceProvider
     private function registerViewComposers(): void
     {
         // Share common data with all views
-        view()->composer('*', function ($view) {
+        view()->composer('*', function ($view): void {
             $view->with([
                 'currentLocale' => app()->getLocale(),
                 'currentCurrency' => current_currency(),
@@ -92,7 +93,7 @@ final class SharedComponentServiceProvider extends ServiceProvider
         });
 
         // Share navigation data
-        view()->composer(['components.layouts.header', 'livewire.components.enhanced-navigation'], function ($view) {
+        view()->composer(['components.layouts.header', 'livewire.components.enhanced-navigation'], function ($view): void {
             $view->with([
                 'topCategories' => $this->getTopCategories(),
                 'featuredBrands' => $this->getFeaturedBrands(),
@@ -102,17 +103,19 @@ final class SharedComponentServiceProvider extends ServiceProvider
 
     private function getCartCount(): int
     {
-        $cart = session('cart', []);
+        $userIdentifier = auth()->id();
+        $userId = is_numeric($userIdentifier) ? (int) $userIdentifier : null;
+        $summary = app(CartService::class)->getSummary($userId, session()->getId());
 
-        return array_sum(array_column($cart, 'quantity'));
+        return (int) $summary['count'];
     }
 
-    private function getTopCategories()
+    private function getTopCategories(): mixed
     {
         return app(CacheService::class)->rememberLong(
             'navigation.top_categories.'.app()->getLocale(),
             fn () => \App\Models\Category::query()
-                ->with(['translations' => function ($q) {
+                ->with(['translations' => function ($q): void {
                     $q->where('locale', app()->getLocale());
                 }])
                 ->where('is_visible', true)
@@ -123,12 +126,12 @@ final class SharedComponentServiceProvider extends ServiceProvider
         );
     }
 
-    private function getFeaturedBrands()
+    private function getFeaturedBrands(): mixed
     {
         return app(CacheService::class)->rememberLong(
             'navigation.featured_brands.'.app()->getLocale(),
             fn () => \App\Models\Brand::query()
-                ->with(['translations' => function ($q) {
+                ->with(['translations' => function ($q): void {
                     $q->where('locale', app()->getLocale());
                 }])
                 ->where('is_enabled', true)
