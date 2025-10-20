@@ -104,6 +104,7 @@ return [
         'activate' => 'Activate',
         'pause' => 'Pause',
         'complete' => 'Complete',
+        'view_details' => 'View details',
     ],
     // Messages
     'messages' => [
@@ -116,6 +117,7 @@ return [
         'scheduled' => 'Campaign scheduled',
         'test_sent' => 'Test email sent',
         'no_campaigns' => 'No campaigns found',
+        'no_campaigns_description' => 'Try adjusting your filters or check back later for new campaigns.',
         'campaign_not_found' => 'Campaign not found',
         'insufficient_budget' => 'Insufficient budget',
         'campaign_expired' => 'Campaign expired',
@@ -186,6 +188,32 @@ return [
         'avg_conversion_rate_description' => 'Average conversion percentage',
         'avg_ctr' => 'Avg CTR',
         'avg_ctr_description' => 'Average click-through rate',
+    ],
+    'index' => [
+        'description' => 'Explore our latest marketing initiatives and discover campaigns tailored to your interests.',
+    ],
+    'featured' => [
+        'title' => 'Featured Campaigns',
+        'description' => 'Discover highlighted campaigns delivering standout offers and experiences.',
+        'empty_title' => 'No featured campaigns right now',
+        'empty_description' => 'Please check back soon for newly curated featured campaigns.',
+    ],
+    'by_type' => [
+        'title' => ':type campaigns',
+        'heading' => ':type campaigns',
+        'description' => 'Browse active :type campaigns tailored to this channel.',
+        'empty_title' => 'No :type campaigns available',
+        'empty_description' => 'Try exploring another campaign type to discover more offers.',
+    ],
+    'search' => [
+        'title' => 'Search results for ":query"',
+        'title_default' => 'Search campaigns',
+        'description' => 'Campaigns matching ":query".',
+        'description_default' => 'Search across all campaigns to find the right offer for you.',
+        'empty_title' => 'No campaigns matched ":query"',
+        'empty_description' => 'Try different keywords or adjust your search filters.',
+        'empty_title_default' => 'Start exploring campaigns',
+        'empty_description_default' => 'Use the search to discover campaigns by name, description, or channel.',
     ],
     // Frontend
     'frontend' => [
