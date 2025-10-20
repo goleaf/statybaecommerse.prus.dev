@@ -64,11 +64,11 @@ final class RecommendationConfigResource extends Resource
                                 ->options([
                                     'collaborative' => 'collaborative',
                                     'content_based' => 'content_based',
-                                    'hybrid' => 'hybrid',
-                                    'popularity' => 'popularity',
-                                    'trending' => 'trending',
-                                    'cross_sell' => 'cross_sell',
-                                    'up_sell' => 'up_sell',
+                                    'hybrid'        => 'hybrid',
+                                    'popularity'    => 'popularity',
+                                    'trending'      => 'trending',
+                                    'cross_sell'    => 'cross_sell',
+                                    'up_sell'       => 'up_sell',
                                 ])
                                 ->required()
                                 ->native(false),
@@ -164,11 +164,11 @@ final class RecommendationConfigResource extends Resource
                     ->options([
                         'collaborative' => 'collaborative',
                         'content_based' => 'content_based',
-                        'hybrid' => 'hybrid',
-                        'popularity' => 'popularity',
-                        'trending' => 'trending',
-                        'cross_sell' => 'cross_sell',
-                        'up_sell' => 'up_sell',
+                        'hybrid'        => 'hybrid',
+                        'popularity'    => 'popularity',
+                        'trending'      => 'trending',
+                        'cross_sell'    => 'cross_sell',
+                        'up_sell'       => 'up_sell',
                     ]),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_config.fields.is_active')),
@@ -197,7 +197,10 @@ final class RecommendationConfigResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationConfigs::route('/'),
+            'index'  => Pages\ListRecommendationConfigs::route('/'),
+            'create' => Pages\CreateRecommendationConfig::route('/create'),
+            'view'   => Pages\ViewRecommendationConfig::route('/{record}'),
+            'edit'   => Pages\EditRecommendationConfig::route('/{record}/edit'),
         ];
     }
 }
