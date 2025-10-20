@@ -8,6 +8,7 @@ use App\Data\SearchQueryData;
 use App\Repositories\Search\BrandSearchRepository;
 use App\Repositories\Search\CategorySearchRepository;
 use App\Repositories\Search\ProductSearchRepository;
+use App\Services\Search\ScoutSearchEngine;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -28,9 +29,9 @@ final class SearchService
         private readonly CategorySearchRepository $categoryRepository,
         private readonly BrandSearchRepository $brandRepository,
         private readonly SearchRankingService $rankingService,
-        private readonly SearchCacheService $cacheService
-    ) {
-    }
+        private readonly SearchCacheService $cacheService,
+        private readonly ScoutSearchEngine $scoutSearchEngine
+    ) {}
 
     /**
      * Handle search functionality with proper error handling.
@@ -50,8 +51,10 @@ final class SearchService
         ]);
         $cacheKey = $this->cacheService->generateCacheKey($queryData->query(), $cachePayload);
 
-        if ($cached = $this->cacheService->getCachedResults($cacheKey)) {
-            if (isset($cached['meta'])) {
+        $cached = $this->cacheService->getCachedResults($cacheKey);
+
+        if (is_array($cached)) {
+            if (isset($cached['meta']) && is_array($cached['meta'])) {
                 $cached['meta']['cached'] = true;
             }
 
@@ -111,16 +114,34 @@ final class SearchService
      */
     private function collectBuckets(SearchQueryData $queryData): array
     {
-        $perPage = $queryData->perPage();
-        $limits = [
-            'product' => max(1, (int) ceil($perPage * self::PRODUCT_RATIO * 2)),
-            'category' => max(1, (int) ceil($perPage * self::CATEGORY_RATIO * 2)),
-            'brand' => max(1, (int) ceil($perPage * self::BRAND_RATIO * 2)),
-        ];
+        if ($this->shouldUseScout()) {
+            return $this->collectBucketsUsingScout($queryData);
+        }
 
-        $limits['product'] = max($limits['product'], $perPage);
-        $limits['category'] = max($limits['category'], (int) ceil($perPage / 2));
-        $limits['brand'] = max($limits['brand'], (int) ceil($perPage / 2));
+        return $this->collectBucketsUsingDatabase($queryData);
+    }
+
+    private function legacyQueryData(string $query, ?int $limit): SearchQueryData
+    {
+        $perPage = $limit ?? SearchQueryData::DEFAULT_PER_PAGE;
+
+        return SearchQueryData::fromArray([
+            'query' => $query,
+            'page' => 1,
+            'per_page' => $perPage,
+            'types' => ['product', 'category', 'brand'],
+        ], [
+            'source' => 'legacy-search',
+            'locale' => app()->getLocale(),
+        ]);
+    }
+
+    /**
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function collectBucketsUsingDatabase(SearchQueryData $queryData): array
+    {
+        $limits = $this->resolveBucketLimits($queryData->perPage());
 
         $buckets = [];
 
@@ -141,18 +162,52 @@ final class SearchService
         return $buckets;
     }
 
-    private function legacyQueryData(string $query, ?int $limit): SearchQueryData
+    /**
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function collectBucketsUsingScout(SearchQueryData $queryData): array
     {
-        $perPage = $limit ?? SearchQueryData::DEFAULT_PER_PAGE;
+        $limits = $this->resolveBucketLimits($queryData->perPage());
 
-        return SearchQueryData::fromArray([
-            'query' => $query,
-            'page' => 1,
-            'per_page' => $perPage,
-            'types' => ['product', 'category', 'brand'],
-        ], [
-            'source' => 'legacy-search',
-            'locale' => app()->getLocale(),
-        ]);
+        $buckets = [];
+
+        foreach ($queryData->types() as $type) {
+            if ($type === 'product') {
+                $buckets['product'] = $this->scoutSearchEngine->searchProducts($queryData, $limits['product']);
+            }
+
+            if ($type === 'category') {
+                $buckets['category'] = $this->scoutSearchEngine->searchCategories($queryData, $limits['category']);
+            }
+
+            if ($type === 'brand') {
+                $buckets['brand'] = $this->scoutSearchEngine->searchBrands($queryData, $limits['brand']);
+            }
+        }
+
+        return $buckets;
+    }
+
+    /**
+     * @return array{product: int, category: int, brand: int}
+     */
+    private function resolveBucketLimits(int $perPage): array
+    {
+        $limits = [
+            'product' => max(1, (int) ceil($perPage * self::PRODUCT_RATIO * 2)),
+            'category' => max(1, (int) ceil($perPage * self::CATEGORY_RATIO * 2)),
+            'brand' => max(1, (int) ceil($perPage * self::BRAND_RATIO * 2)),
+        ];
+
+        $limits['product'] = max($limits['product'], $perPage);
+        $limits['category'] = max($limits['category'], (int) ceil($perPage / 2));
+        $limits['brand'] = max($limits['brand'], (int) ceil($perPage / 2));
+
+        return $limits;
+    }
+
+    private function shouldUseScout(): bool
+    {
+        return config('search.driver') === 'scout' && config('search.scout.enabled');
     }
 }

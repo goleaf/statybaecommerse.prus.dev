@@ -45,7 +45,7 @@ final class SearchCacheService
             // Update cache statistics
             $this->updateCacheStatistics($key, $query, count($results));
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Search cache storage failed: '.$e->getMessage());
         }
     }
@@ -67,7 +67,7 @@ final class SearchCacheService
             }
 
             return null;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Search cache retrieval failed: '.$e->getMessage());
 
             return null;
@@ -124,7 +124,7 @@ final class SearchCacheService
             }
 
             return $deleted;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Cache pattern clearing failed: '.$e->getMessage());
 
             return 0;
@@ -153,7 +153,7 @@ final class SearchCacheService
             }
 
             return $removed;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Cache optimization failed: '.$e->getMessage());
 
             return 0;
@@ -210,7 +210,7 @@ final class SearchCacheService
     {
         try {
             Redis::setex($key, $ttl, json_encode($data));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Redis storage failed: '.$e->getMessage());
         }
     }
@@ -233,7 +233,7 @@ final class SearchCacheService
             $stats['query_counts'][$query] = ($stats['query_counts'][$query] ?? 0) + 1;
 
             Cache::put($statsKey, $stats, self::ANALYTICS_TTL);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Cache statistics update failed: '.$e->getMessage());
         }
     }

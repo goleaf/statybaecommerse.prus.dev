@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories\Search;
 
 use App\Data\SearchQueryData;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
@@ -18,6 +19,8 @@ final class ProductSearchRepository extends AbstractSearchRepository
     protected function searchStatement(int $limit): string
     {
         $limit = max(1, $limit);
+        $metricColumns = $this->metricProjection();
+        $statusFilter = Schema::hasColumn('products', 'status') ? "  AND p.status = 'published'\n" : '';
 
         return <<<SQL
 SELECT
@@ -28,9 +31,7 @@ SELECT
     p.description,
     p.price,
     p.is_featured,
-    p.sales_count,
-    p.reviews_count,
-    p.average_rating,
+{$metricColumns}
     p.sku,
     b.name AS brand_name,
     COALESCE(pt.name, '') AS translated_name,
@@ -41,7 +42,7 @@ LEFT JOIN product_translations AS pt ON pt.product_id = p.id AND pt.locale = ?
 WHERE p.is_visible = 1
   AND p.published_at IS NOT NULL
   AND p.published_at <= ?
-  AND p.slug IS NOT NULL
+{$statusFilter}  AND p.slug IS NOT NULL
   AND p.price IS NOT NULL
   AND p.price > 0
   AND (
@@ -139,5 +140,32 @@ SQL;
         }
 
         return $score;
+    }
+
+    private function metricProjection(): string
+    {
+        static $columns;
+
+        if ($columns === null) {
+            $columns = [
+                'sales_count' => Schema::hasColumn('products', 'sales_count'),
+                'reviews_count' => Schema::hasColumn('products', 'reviews_count'),
+                'average_rating' => Schema::hasColumn('products', 'average_rating'),
+            ];
+        }
+
+        $selects = [
+            $columns['sales_count']
+                ? '    p.sales_count as sales_count,'
+                : '    0 as sales_count,',
+            $columns['reviews_count']
+                ? '    p.reviews_count as reviews_count,'
+                : '    0 as reviews_count,',
+            $columns['average_rating']
+                ? '    p.average_rating as average_rating,'
+                : '    0 as average_rating,',
+        ];
+
+        return implode("\n", $selects);
     }
 }

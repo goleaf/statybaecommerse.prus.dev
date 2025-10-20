@@ -21,6 +21,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -38,6 +40,22 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property mixed $table
  * @property string $translationModel
  * @property array $translatable
+ * @property int $id
+ * @property string $name
+ * @property string|null $slug
+ * @property string|null $short_description
+ * @property string|null $description
+ * @property string|null $sku
+ * @property float|string|null $price
+ * @property bool $is_featured
+ * @property bool $is_visible
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property-read Brand|null $brand
+ * @property-read string|null $thumbnail
+ * @property-read string|null $main_image
+ * @property-read int $sales_count
+ * @property-read int $reviews_count
+ * @property-read float $average_rating
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
@@ -49,7 +67,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
 final class Product extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, Searchable, SoftDeletes;
     use HasProductPricing;
     use HasTranslations;
     use InteractsWithMedia;
@@ -72,6 +90,60 @@ final class Product extends Model implements HasMedia
 
     // Translation fields that should be handled by the translation system
     protected array $translatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
+
+    public function shouldBeSearchable(): bool
+    {
+        if (config('search.driver') !== 'scout' || ! config('search.scout.enabled')) {
+            return false;
+        }
+
+        if (! $this->is_visible || empty($this->slug)) {
+            return false;
+        }
+
+        if ($this->published_at === null) {
+            return false;
+        }
+
+        if ($this->published_at instanceof Carbon && $this->published_at->isFuture()) {
+            return false;
+        }
+
+        $price = $this->price;
+
+        return $price !== null && (float) $price > 0.0;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        $this->loadMissing('brand');
+
+        $price = (float) ($this->price ?? 0.0);
+        $locale = app()->getLocale();
+        $publishedAt = $this->published_at;
+
+        return [
+            'id' => $this->getKey(),
+            'type' => 'product',
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'short_description' => $this->short_description,
+            'description' => $this->description,
+            'translated_name' => $this->trans('name', $locale),
+            'translated_description' => $this->trans('description', $locale),
+            'price' => $price,
+            'brand_name' => $this->brand?->name,
+            'sales_count' => (int) ($this->sales_count ?? 0),
+            'reviews_count' => (int) ($this->reviews_count ?? 0),
+            'average_rating' => (float) ($this->average_rating ?? 0),
+            'is_featured' => (bool) $this->is_featured,
+            'published_at' => $publishedAt instanceof Carbon ? $publishedAt->toDateTimeString() : null,
+            'is_visible' => (bool) $this->is_visible,
+        ];
+    }
 
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
@@ -445,7 +517,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestApprovedReview(): HasOne
     {
-        return $this->reviews()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->reviews()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('is_approved', true);
         });
     }
@@ -578,7 +650,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestPriceChange(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('field_name', 'price');
         });
     }
@@ -588,7 +660,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestStockUpdate(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('field_name', 'stock_quantity');
         });
     }
@@ -598,7 +670,7 @@ final class Product extends Model implements HasMedia
      */
     public function currentPrice(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max', 'id' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max', 'id' => 'max'], function ($query): void {
             $query->where('field_name', 'price')->where('created_at', '<=', now());
         });
     }
@@ -756,7 +828,7 @@ final class Product extends Model implements HasMedia
      */
     public function scopeByCategory($query, int $categoryId)
     {
-        return $query->whereHas('categories', function ($q) use ($categoryId) {
+        return $query->whereHas('categories', function ($q) use ($categoryId): void {
             $q->where('category_id', $categoryId);
         });
     }
@@ -768,7 +840,7 @@ final class Product extends Model implements HasMedia
      */
     public function scopeByCollection($query, int $collectionId)
     {
-        return $query->whereHas('collections', function ($q) use ($collectionId) {
+        return $query->whereHas('collections', function ($q) use ($collectionId): void {
             $q->where('collection_id', $collectionId);
         });
     }
@@ -1119,7 +1191,7 @@ final class Product extends Model implements HasMedia
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -1195,7 +1267,7 @@ final class Product extends Model implements HasMedia
         $query = Product::published()->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations']);
         // First try to get products from same categories
         if (! empty($categoryIds)) {
-            $query->whereHas('categories', function ($q) use ($categoryIds) {
+            $query->whereHas('categories', function ($q) use ($categoryIds): void {
                 $q->whereIn('category_id', $categoryIds);
             });
         }
@@ -1232,7 +1304,7 @@ final class Product extends Model implements HasMedia
             return collect();
         }
 
-        return Product::published()->whereHas('categories', function ($query) use ($categoryIds) {
+        return Product::published()->whereHas('categories', function ($query) use ($categoryIds): void {
             $query->whereIn('category_id', $categoryIds);
         })->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
@@ -1265,7 +1337,7 @@ final class Product extends Model implements HasMedia
         $minPrice = $currentPrice * (1 - $priceRange);
         $maxPrice = $currentPrice * (1 + $priceRange);
 
-        return Product::published()->where('id', '!=', $this->id)->where(function ($query) use ($minPrice, $maxPrice) {
+        return Product::published()->where('id', '!=', $this->id)->where(function ($query) use ($minPrice, $maxPrice): void {
             $query->whereBetween('price', [$minPrice, $maxPrice])->orWhereBetween('sale_price', [$minPrice, $maxPrice]);
         })->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }

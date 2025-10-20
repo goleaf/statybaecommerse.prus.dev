@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories\Search;
 
 use App\Data\SearchQueryData;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 final class BrandSearchRepository extends AbstractSearchRepository
@@ -17,6 +18,8 @@ final class BrandSearchRepository extends AbstractSearchRepository
     protected function searchStatement(int $limit): string
     {
         $limit = max(1, $limit);
+        $brandFilters = $this->brandVisibilityFilter();
+        $productFilters = $this->productPublicationFilter();
 
         return <<<SQL
 SELECT
@@ -30,11 +33,8 @@ SELECT
 FROM brands AS b
 JOIN products AS p ON p.brand_id = b.id
 LEFT JOIN brand_translations AS bt ON bt.brand_id = b.id AND bt.locale = ?
-WHERE b.is_enabled = 1
+WHERE 1 = 1{$brandFilters}{$productFilters}
   AND b.slug IS NOT NULL
-  AND p.is_visible = 1
-  AND p.published_at IS NOT NULL
-  AND p.published_at <= ?
   AND (
         LOWER(b.name) LIKE ?
         OR LOWER(b.description) LIKE ?
@@ -60,16 +60,20 @@ SQL;
         $query = Str::lower($queryData->query());
         $wildcard = $this->wildcard($query);
 
-        return [
-            $locale,
-            now()->toDateTimeString(),
-            $wildcard,
-            $wildcard,
-            $wildcard,
-            $wildcard,
-            $query,
-            $wildcard,
-        ];
+        $bindings = [$locale];
+
+        if ($this->shouldFilterByPublishedAt()) {
+            $bindings[] = now()->toDateTimeString();
+        }
+
+        $bindings[] = $wildcard;
+        $bindings[] = $wildcard;
+        $bindings[] = $wildcard;
+        $bindings[] = $wildcard;
+        $bindings[] = $query;
+        $bindings[] = $wildcard;
+
+        return $bindings;
     }
 
     protected function mapRow(object $row, SearchQueryData $queryData): array
@@ -115,5 +119,61 @@ SQL;
         $score += min((int) $row->products_count, 20);
 
         return $score;
+    }
+
+    private function brandVisibilityFilter(): string
+    {
+        static $clauses;
+
+        if ($clauses === null) {
+            $parts = [];
+
+            if (Schema::hasColumn('brands', 'is_enabled')) {
+                $parts[] = '  AND b.is_enabled = 1';
+            }
+
+            if (Schema::hasColumn('brands', 'is_active')) {
+                $parts[] = '  AND b.is_active = 1';
+            }
+
+            if (Schema::hasColumn('brands', 'is_visible')) {
+                $parts[] = '  AND b.is_visible = 1';
+            }
+
+            $clauses = $parts ? "\n".implode("\n", $parts) : '';
+        }
+
+        return $clauses;
+    }
+
+    private function productPublicationFilter(): string
+    {
+        static $clauses;
+
+        if ($clauses === null) {
+            $parts = [];
+
+            if (Schema::hasColumn('products', 'is_visible')) {
+                $parts[] = '  AND p.is_visible = 1';
+            }
+
+            if (Schema::hasColumn('products', 'published_at')) {
+                $parts[] = '  AND p.published_at IS NOT NULL';
+                $parts[] = '  AND p.published_at <= ?';
+            }
+
+            if (Schema::hasColumn('products', 'status')) {
+                $parts[] = "  AND p.status = 'published'";
+            }
+
+            $clauses = $parts ? "\n".implode("\n", $parts) : '';
+        }
+
+        return $clauses;
+    }
+
+    private function shouldFilterByPublishedAt(): bool
+    {
+        return Schema::hasColumn('products', 'published_at');
     }
 }
