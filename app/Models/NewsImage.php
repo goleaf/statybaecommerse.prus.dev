@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
-use App\Support\Storage\SecureStorage;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -72,7 +71,11 @@ final class NewsImage extends Model
      */
     public function getUrlAttribute(): string
     {
-        return SecureStorage::temporarySignedUrl($this->file_path);
+        if (filter_var($this->file_path, FILTER_VALIDATE_URL)) {
+            return $this->file_path;
+        }
+
+        return url('storage/' . ltrim($this->file_path, '/'));
     }
 
     /**
@@ -81,9 +84,9 @@ final class NewsImage extends Model
     public function getThumbnailUrlAttribute(): string
     {
         $pathInfo = pathinfo($this->file_path);
-        $thumbnailPath = $pathInfo['dirname'].'/thumbnails/'.$pathInfo['filename'].'_thumb.'.$pathInfo['extension'];
+        $thumbnailPath = $pathInfo['dirname'] . '/thumbnails/' . $pathInfo['filename'] . '_thumb.' . $pathInfo['extension'];
 
-        return SecureStorage::temporarySignedUrl($thumbnailPath);
+        return url('storage/' . ltrim($thumbnailPath, '/'));
     }
 
     /**
@@ -91,7 +94,14 @@ final class NewsImage extends Model
      */
     public function isImage(): bool
     {
-        return str_starts_with($this->mime_type, 'image/');
+        $mime = (string) ($this->mime_type ?? '');
+
+        return $mime !== '' && str_starts_with($mime, 'image/');
+    }
+
+    public function getIsImageAttribute(): bool
+    {
+        return $this->isImage();
     }
 
     /**
@@ -99,12 +109,15 @@ final class NewsImage extends Model
      */
     public function getFileSizeFormattedAttribute(): string
     {
-        $bytes = $this->file_size;
+        $bytes = (float) ($this->file_size ?? 0);
         $units = ['B', 'KB', 'MB', 'GB'];
-        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
+        $i = 0;
+
+        while ($bytes >= 1024 && $i < count($units) - 1) {
             $bytes /= 1024;
+            $i++;
         }
 
-        return round($bytes, 2).' '.$units[$i];
+        return number_format($bytes, 2, '.', '') . ' ' . $units[$i];
     }
 }

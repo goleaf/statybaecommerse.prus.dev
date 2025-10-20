@@ -33,7 +33,7 @@ abstract class TestCase extends BaseTestCase
 
         Config::set('database.default', 'sqlite');
         Config::set('database.connections.sqlite.database', ':memory:');
-        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
@@ -135,5 +135,10 @@ abstract class TestCase extends BaseTestCase
         $locales = array_filter(array_merge($configured, $appConfigured, [$fallback]));
 
         return array_values(array_unique($locales));
+    }
+
+    protected function assertStringContains(string $needle, string $haystack, string $message = ''): void
+    {
+        $this->assertStringContainsString($needle, $haystack, $message);
     }
 }
