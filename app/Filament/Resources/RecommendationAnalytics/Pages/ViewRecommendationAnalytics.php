@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationAnalytics\Pages;
 
 use App\Filament\Resources\RecommendationAnalytics\RecommendationAnalyticsResource;
-use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Actions\EditAction;
+use Filament\Resources\Pages\ViewRecord;
 
-final class ListRecommendationAnalytics extends ListRecords
+final class ViewRecommendationAnalytics extends ViewRecord
 {
     protected static string $resource = RecommendationAnalyticsResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            EditAction::make(),
         ];
     }
 }
