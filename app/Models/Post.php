@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\PublishedScope;
+use App\Services\Security\HtmlContentSanitizer;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -98,7 +99,11 @@ final class Post extends Model implements HasMedia
         $locale = $locale ?? app()->getLocale();
         $translations = $this->content_translations ?? [];
 
-        return $translations[$locale] ?? $this->content;
+        $content = (string) ($translations[$locale] ?? $this->content ?? '');
+
+        $sanitized = app(HtmlContentSanitizer::class)->sanitize($content);
+
+        return $sanitized ?? '';
     }
 
     /**

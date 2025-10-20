@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\PublishedScope;
+use App\Services\Security\HtmlContentSanitizer;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -126,7 +127,12 @@ final class Legal extends Model
      */
     public function getTranslatedContent(?string $locale = null): ?string
     {
-        return $this->trans('content', $locale);
+        $content = $this->trans('content', $locale);
+        if ($content === null || ! is_string($content)) {
+            return null;
+        }
+
+        return app(HtmlContentSanitizer::class)->sanitize($content);
     }
 
     /**
