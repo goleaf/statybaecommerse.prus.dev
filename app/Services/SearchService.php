@@ -4,206 +4,115 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Product;
+use App\Data\SearchQueryData;
+use App\Repositories\Search\BrandSearchRepository;
+use App\Repositories\Search\CategorySearchRepository;
+use App\Repositories\Search\ProductSearchRepository;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\LazyCollection;
 
-/**
- * SearchService
- *
- * Service class containing SearchService business logic, external integrations, and complex operations with proper error handling and logging.
- */
 final class SearchService
 {
-    /**
-     * Handle search functionality with proper error handling.
-     */
-    public function search(string $query, int $limit = 10): array
+    private CacheRepository $cache;
+
+    public function __construct(
+        private readonly ProductSearchRepository $productRepository,
+        private readonly CategorySearchRepository $categoryRepository,
+        private readonly BrandSearchRepository $brandRepository,
+        ?CacheRepository $cache = null,
+    ) {
+        $this->cache = $cache ?? Cache::store();
+    }
+
+    public function aggregate(SearchQueryData $query, array $limits = []): array
     {
-        $cacheKey = "search_results_{$query}_{$limit}_".app()->getLocale();
+        $limits = $this->normalizeLimits($query, $limits);
+        $cacheKey = $this->cacheKey($query, $limits);
 
-        return Cache::remember($cacheKey, 300, function () use ($query, $limit) {
-            $results = [];
-            // Search products
-            $products = $this->searchProducts($query, (int) ceil($limit * 0.6));
-            $results = array_merge($results, $products);
-            // Search categories
-            $categories = $this->searchCategories($query, (int) ceil($limit * 0.2));
-            $results = array_merge($results, $categories);
-            // Search brands
-            $brands = $this->searchBrands($query, (int) ceil($limit * 0.2));
-            $results = array_merge($results, $brands);
+        return $this->cache->remember($cacheKey, now()->addSeconds(120), function () use ($query, $limits) {
+            $products = $this->productRepository->search($query, $limits['products']);
+            $categories = $this->categoryRepository->search($query, $limits['categories']);
+            $brands = $this->brandRepository->search($query, $limits['brands']);
 
-            // Sort by relevance and limit results
-            return array_slice($results, 0, $limit);
+            return [
+                'products' => $products,
+                'categories' => $categories,
+                'brands' => $brands,
+                'meta' => [
+                    'query' => $query->q,
+                    'sort' => $query->sort(),
+                    'page' => $query->page(),
+                    'per_page' => $query->perPage(),
+                    'filters' => [
+                        'brand' => $query->brandIds(),
+                        'category' => $query->categoryIds(),
+                        'price_min' => $query->price_min,
+                        'price_max' => $query->price_max,
+                    ],
+                ],
+            ];
         });
     }
 
-    /**
-     * Handle searchProducts functionality with proper error handling.
-     */
-    private function searchProducts(string $query, int $limit): array
+    public function search(string $term, int $limit = 10): array
     {
-        $locale = app()->getLocale();
-        $searchTerm = '%'.str_replace(['%', '_'], ['\%', '\_'], $query).'%';
-        // Use LazyCollection with timeout to prevent long-running search operations
-        $timeout = now()->addSeconds(10);
+        $limit = (int) min(max($limit, 1), SearchQueryData::MAX_PER_PAGE);
+        $query = new SearchQueryData(q: $term, per_page: $limit);
+        $limits = [
+            'products' => min((int) ceil($limit * 0.6), SearchQueryData::MAX_PER_PAGE),
+            'categories' => min((int) ceil($limit * 0.2), SearchQueryData::MAX_PER_PAGE),
+            'brands' => min((int) ceil($limit * 0.2), SearchQueryData::MAX_PER_PAGE),
+        ];
 
-        // 10 second timeout for product search
-        return Product::query()->with(['media', 'brand', 'categories'])->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())->where(function ($q) use ($searchTerm, $locale) {
-            $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhere('sku', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
-                $sq->selectRaw('1')->from('product_translations as t')->whereColumn('t.product_id', 'products.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
-                    $tw->where('t.name', 'like', $searchTerm)->orWhere('t.description', 'like', $searchTerm);
-                });
-            });
-        })->orderByRaw("\n                CASE \n                    WHEN name LIKE ? THEN 1\n                    WHEN sku LIKE ? THEN 2\n                    WHEN description LIKE ? THEN 3\n                    ELSE 4\n                END\n            ", ["%{$query}%", "%{$query}%", "%{$query}%"])->cursor()->takeUntilTimeout($timeout)->skipWhile(function (Product $product) {
-            // Skip products that are not properly configured for search results
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
-        })->take($limit)->map(function (Product $product) use ($query) {
-            return ['id' => $product->id, 'type' => 'product', 'title' => $product->name, 'subtitle' => $product->brand?->name, 'description' => $product->short_description ?: $product->description, 'price' => $product->price, 'formatted_price' => number_format((float) $product->price, 2).' €', 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => route('products.show', $product->slug), 'relevance_score' => $this->calculateProductRelevance($product, $query)];
-        })->sortByDesc('relevance_score')->values()->toArray();
+        $results = $this->aggregate($query, $limits);
+
+        return collect([$results['products']['items'], $results['categories']['items'], $results['brands']['items']])
+            ->collapse()
+            ->sortByDesc('score')
+            ->take($limit)
+            ->values()
+            ->map(function (array $item) {
+                $item['relevance_score'] = $item['score'];
+                unset($item['score']);
+
+                return $item;
+            })
+            ->all();
     }
 
-    /**
-     * Handle searchCategories functionality with proper error handling.
-     */
-    private function searchCategories(string $query, int $limit): array
-    {
-        $locale = app()->getLocale();
-        $searchTerm = '%'.str_replace(['%', '_'], ['\%', '\_'], $query).'%';
-
-        return Category::query()->with(['media'])->where('is_visible', true)->where(function ($q) use ($searchTerm, $locale) {
-            $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
-                $sq->selectRaw('1')->from('category_translations as t')->whereColumn('t.category_id', 'categories.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
-                    $tw->where('t.name', 'like', $searchTerm)->orWhere('t.description', 'like', $searchTerm);
-                });
-            });
-        })->withCount('products')->groupBy('categories.id')->having('products_count', '>', 0)->limit($limit)->get()->skipWhile(function (Category $category) {
-            // Skip categories that are not properly configured for search results
-            return empty($category->name) || ! $category->is_visible || empty($category->slug) || $category->products_count <= 0;
-        })->map(function (Category $category) use ($query) {
-            return ['id' => $category->id, 'type' => 'category', 'title' => $category->name, 'subtitle' => __('frontend.search.category_with_products', ['count' => $category->products_count]), 'description' => $category->description, 'image' => $category->getFirstMediaUrl('images', 'thumb'), 'url' => route('categories.show', $category->slug), 'relevance_score' => $this->calculateCategoryRelevance($category, $query)];
-        })->sortByDesc('relevance_score')->values()->toArray();
-    }
-
-    /**
-     * Handle searchBrands functionality with proper error handling.
-     */
-    private function searchBrands(string $query, int $limit): array
-    {
-        $locale = app()->getLocale();
-        $searchTerm = '%'.str_replace(['%', '_'], ['\%', '\_'], $query).'%';
-
-        return Brand::query()->with(['media'])->where('is_enabled', true)->where(function ($q) use ($searchTerm, $locale) {
-            $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
-                $sq->selectRaw('1')->from('brand_translations as t')->whereColumn('t.brand_id', 'brands.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
-                    $tw->where('t.name', 'like', $searchTerm)->orWhere('t.description', 'like', $searchTerm);
-                });
-            });
-        })->withCount('products')->groupBy('brands.id')->having('products_count', '>', 0)->limit($limit)->get()->skipWhile(function (Brand $brand) {
-            // Skip brands that are not properly configured for search results
-            return empty($brand->name) || ! $brand->is_enabled || empty($brand->slug) || $brand->products_count <= 0;
-        })->map(function (Brand $brand) use ($query) {
-            return ['id' => $brand->id, 'type' => 'brand', 'title' => $brand->name, 'subtitle' => __('frontend.search.brand_with_products', ['count' => $brand->products_count]), 'description' => $brand->description, 'image' => $brand->getFirstMediaUrl('logo', 'thumb'), 'url' => route('brands.show', $brand->slug), 'relevance_score' => $this->calculateBrandRelevance($brand, $query)];
-        })->sortByDesc('relevance_score')->values()->toArray();
-    }
-
-    /**
-     * Handle calculateProductRelevance functionality with proper error handling.
-     */
-    private function calculateProductRelevance(Product $product, string $query): int
-    {
-        $score = 0;
-        $query = strtolower($query);
-        // Exact name match gets highest score
-        if (strtolower($product->name) === $query) {
-            $score += 100;
-        } elseif (str_contains(strtolower($product->name), $query)) {
-            $score += 50;
-        }
-        // SKU match gets high score
-        if (str_contains(strtolower($product->sku), $query)) {
-            $score += 40;
-        }
-        // Description match gets medium score
-        if (str_contains(strtolower($product->description), $query)) {
-            $score += 20;
-        }
-        // Featured products get bonus
-        if ($product->is_featured) {
-            $score += 10;
-        }
-        // Products with images get bonus
-        if ($product->hasMedia('images')) {
-            $score += 5;
-        }
-
-        return $score;
-    }
-
-    /**
-     * Handle calculateCategoryRelevance functionality with proper error handling.
-     */
-    private function calculateCategoryRelevance(Category $category, string $query): int
-    {
-        $score = 0;
-        $query = strtolower($query);
-        // Exact name match gets highest score
-        if (strtolower($category->name) === $query) {
-            $score += 100;
-        } elseif (str_contains(strtolower($category->name), $query)) {
-            $score += 50;
-        }
-        // Description match gets medium score
-        if (str_contains(strtolower($category->description), $query)) {
-            $score += 20;
-        }
-        // Categories with more products get bonus
-        $score += min($category->products_count, 20);
-
-        return $score;
-    }
-
-    /**
-     * Handle calculateBrandRelevance functionality with proper error handling.
-     */
-    private function calculateBrandRelevance(Brand $brand, string $query): int
-    {
-        $score = 0;
-        $query = strtolower($query);
-        // Exact name match gets highest score
-        if (strtolower($brand->name) === $query) {
-            $score += 100;
-        } elseif (str_contains(strtolower($brand->name), $query)) {
-            $score += 50;
-        }
-        // Description match gets medium score
-        if (str_contains(strtolower($brand->description), $query)) {
-            $score += 20;
-        }
-        // Brands with more products get bonus
-        $score += min($brand->products_count, 20);
-
-        return $score;
-    }
-
-    /**
-     * Handle clearCache functionality with proper error handling.
-     */
     public function clearCache(): void
     {
-        Cache::flush();
+        $this->cache->flush();
     }
 
-    /**
-     * Handle clearSearchCache functionality with proper error handling.
-     */
     public function clearSearchCache(string $query): void
     {
-        $pattern = "search_results_{$query}_*";
-        // Note: This is a simplified cache clearing. In production, you might want to use Redis with pattern matching
-        Cache::forget("search_results_{$query}_10_".app()->getLocale());
+        $this->cache->flush();
+    }
+
+    private function cacheKey(SearchQueryData $query, array $limits): string
+    {
+        return $this->cacheNamespace().'|'.app()->getLocale().'|'.$query->normalizedCacheKey().'|'.md5(json_encode($limits, JSON_THROW_ON_ERROR));
+    }
+
+    private function cacheNamespace(): string
+    {
+        return 'search:aggregate';
+    }
+
+    private function normalizeLimits(SearchQueryData $query, array $limits): array
+    {
+        $defaults = [
+            'products' => $query->perPage(),
+            'categories' => min(5, $query->perPage()),
+            'brands' => min(5, $query->perPage()),
+        ];
+
+        $merged = array_merge($defaults, Arr::only($limits, ['products', 'categories', 'brands']));
+
+        return collect($merged)
+            ->map(fn ($value) => (int) min(max((int) $value, 1), SearchQueryData::MAX_PER_PAGE))
+            ->all();
     }
 }
