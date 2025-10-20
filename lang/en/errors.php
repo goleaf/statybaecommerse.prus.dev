@@ -19,4 +19,10 @@ return [
 
     // @translators: Indicates the user is logged in but does not have permission for the action.
     ErrorCodes::FORBIDDEN => 'Access forbidden',
+
+    // @translators: Displayed when an order number could not be located in the system.
+    ErrorCodes::ORDER_NOT_FOUND => 'Order :order could not be found.',
+
+    // @translators: Shown when there is not enough stock to fulfill a request for a SKU.
+    ErrorCodes::INVENTORY_INSUFFICIENT => 'Inventory for SKU :sku is unavailable.',
 ];
