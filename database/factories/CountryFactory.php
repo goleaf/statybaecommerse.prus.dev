@@ -221,4 +221,39 @@ final class CountryFactory extends Factory
             'description' => 'A country in Northern Europe',
         ]);
     }
+
+    public function lithuania(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => ['lt' => 'Lietuva', 'en' => 'Lithuania'],
+            'name_official' => 'Lietuvos Respublika',
+            'description' => 'Lietuvos Respublika Baltijos regione.',
+            'cca2' => 'LT',
+            'cca3' => 'LTU',
+            'ccn3' => '440',
+            'code' => 'LT',
+            'iso_code' => 'LT',
+            'currency_code' => 'EUR',
+            'currency_symbol' => '€',
+            'phone_code' => '370',
+            'phone_calling_code' => '370',
+            'flag' => 'lt.png',
+            'svg_flag' => 'lt.svg',
+            'region' => 'Europe',
+            'subregion' => 'Northern Europe',
+            'latitude' => 55.1694,
+            'longitude' => 23.8813,
+            'currencies' => ['EUR' => 'Euro'],
+            'languages' => ['lt' => 'Lithuanian', 'en' => 'English'],
+            'timezones' => ['Europe/Vilnius' => 'Vilnius'],
+            'timezone' => 'Europe/Vilnius',
+            'is_active' => true,
+            'is_enabled' => true,
+            'is_eu_member' => true,
+            'requires_vat' => true,
+            'vat_rate' => 21.0,
+            'metadata' => ['capital' => 'Vilnius'],
+            'sort_order' => 1,
+        ]);
+    }
 }
