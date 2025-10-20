@@ -1,9 +1,24 @@
 <?php
 
+use App\Logging\CustomizeFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
+
+$sentryDsn = (string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN', ''));
+$sentryAvailable = $sentryDsn !== '' && class_exists(\Sentry\Laravel\Integration::class);
+
+$configuredStackChannels = array_filter(array_map(
+    static fn (string $channel): ?string => $channel !== '' ? $channel : null,
+    explode(',', (string) env('LOG_STACK', 'daily'))
+));
+
+if ($sentryAvailable) {
+    $configuredStackChannels[] = 'sentry';
+}
+
+$stackChannels = $configuredStackChannels === [] ? ['daily'] : array_values(array_unique($configuredStackChannels));
 
 return [
 
@@ -54,7 +69,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => $stackChannels,
             'ignore_exceptions' => false,
         ],
 
@@ -71,6 +86,9 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
+            'tap' => [
+                CustomizeFormatter::class,
+            ],
         ],
 
         'slack' => [
@@ -103,6 +121,11 @@ return [
             ],
             'formatter' => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'sentry' => [
+            'driver' => 'sentry',
+            'level' => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
         ],
 
         'syslog' => [
