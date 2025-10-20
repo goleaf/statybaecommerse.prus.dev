@@ -25,6 +25,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -85,7 +86,7 @@ final class ReferralCodeResource extends Resource
                         Select::make('reward_type')
                             ->label(__('referral.form.reward_type'))
                             ->options([
-                                'fixed' => 'fixed',
+                                'fixed'      => 'fixed',
                                 'percentage' => 'percentage',
                             ])
                             ->required(),
@@ -165,22 +166,32 @@ final class ReferralCodeResource extends Resource
             ])
             ->filters([
                 // Alias filter expected by tests
-                SelectFilter::make('active')
+                TernaryFilter::make('active')
+                    ->attribute('is_active')
                     ->label(__('referral.filters.is_active'))
-                    ->options(['1' => 'active', '0' => 'inactive'])
+                    ->trueLabel('active')
+                    ->falseLabel('inactive')
+                    ->default(true)
                     ->query(function (Builder $query, array $data): Builder {
-                        $value = $data['value'] ?? null;
-                        if ($value === null) {
+                        $rawState = array_key_exists('value', $data) ? $data['value'] : true;
+
+                        if ($rawState === null || $rawState === '') {
                             return $query;
                         }
 
-                        return $query->where('is_active', $value === '1');
+                        $shouldShowActive = filter_var($rawState, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+                        if ($shouldShowActive === null) {
+                            return $query;
+                        }
+
+                        return $query->where('is_active', $shouldShowActive);
                     }),
                 // Keep reward type filter
                 SelectFilter::make('by_reward_type')
                     ->label(__('referral.filters.reward_type'))
                     ->options([
-                        'fixed' => 'fixed',
+                        'fixed'      => 'fixed',
                         'percentage' => 'percentage',
                     ]),
                 SelectFilter::make('user_id')
@@ -202,10 +213,10 @@ final class ReferralCodeResource extends Resource
                             return $query;
                         }
 
-                        return $query->where(function (Builder $q) {
+                        return $query->where(function (Builder $q): void {
                             $q
                                 ->where('is_active', false)
-                                ->orWhere(function (Builder $q2) {
+                                ->orWhere(function (Builder $q2): void {
                                     $q2->whereNotNull('expires_at')->where('expires_at', '<=', now());
                                 });
                         });
@@ -214,7 +225,7 @@ final class ReferralCodeResource extends Resource
                     ->label('source')
                     ->options([
                         'admin' => 'admin',
-                        'user' => 'user',
+                        'user'  => 'user',
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['value'] ?? null;
@@ -267,10 +278,10 @@ final class ReferralCodeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralCodes::route('/'),
+            'index'  => Pages\ListReferralCodes::route('/'),
             'create' => Pages\CreateReferralCode::route('/create'),
-            'view' => Pages\ViewReferralCode::route('/{record}'),
-            'edit' => Pages\EditReferralCode::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralCode::route('/{record}'),
+            'edit'   => Pages\EditReferralCode::route('/{record}/edit'),
         ];
     }
 
