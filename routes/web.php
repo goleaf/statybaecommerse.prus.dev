@@ -504,6 +504,13 @@ Route::middleware('auth')->group(function (): void {
 Route::prefix('api')->group(function (): void {
     Route::get('/products/search', [App\Http\Controllers\Api\ProductController::class, 'search'])->name('api.products.search');
     Route::get('/categories/tree', [App\Http\Controllers\Api\CategoryController::class, 'tree'])->name('api.categories.tree');
+    Route::get('/brands', [App\Http\Controllers\Api\BrandController::class, 'index'])->name('api.brands.index');
+    Route::get('/brands/{brand}', [App\Http\Controllers\Api\BrandController::class, 'show'])->name('api.brands.show');
+
+    Route::middleware('auth')->group(function (): void {
+        Route::get('/orders/{order}', [App\Http\Controllers\Api\OrderController::class, 'show'])->name('api.orders.show');
+        Route::get('/user/profile', [App\Http\Controllers\Api\UserController::class, 'profile'])->name('api.user.profile');
+    });
 });
 
 // Public utility endpoints

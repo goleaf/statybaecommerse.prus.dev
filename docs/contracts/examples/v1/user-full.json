@@ -1,0 +1,14 @@
+{
+  "id": 21,
+  "email": "meistras@example.lt",
+  "name": "Meistras Stalius",
+  "roles": ["customer", "contractor"],
+  "meta": {
+    "first_name": "Meistras",
+    "last_name": "Stalius",
+    "preferred_locale": "lt",
+    "phone": "+37060000000",
+    "company": "Statybų sprendimai, UAB",
+    "created_at": "2024-07-15T12:45:00+00:00"
+  }
+}

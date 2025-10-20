@@ -16,6 +16,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\DemonstrateTimeoutCommand::class,
         \App\Console\Commands\GenerateReportsCommand::class,
         \App\Console\Commands\CheckRefreshDatabaseCommand::class,
+        \App\Console\Commands\ValidateContractCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
