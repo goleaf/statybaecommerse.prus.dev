@@ -39,9 +39,25 @@ final class CustomerGroup extends Model
     protected $fillable = [
         'name',
         'code',
+        'color',
+        'icon',
         'description',
         'slug',
         'discount_percentage',
+        'discount_fixed',
+        'minimum_order_amount',
+        'credit_limit',
+        'payment_terms',
+        'has_special_pricing',
+        'has_volume_discounts',
+        'can_view_prices',
+        'can_place_orders',
+        'can_view_catalog',
+        'can_use_coupons',
+        'is_active',
+        'is_default',
+        'sort_order',
+        'type',
         'is_enabled',
         'metadata',
         'conditions',
@@ -53,10 +69,22 @@ final class CustomerGroup extends Model
     protected function casts(): array
     {
         return [
-            'discount_percentage' => 'decimal:2',
-            'is_enabled' => 'boolean',
-            'metadata' => 'array',
-            'conditions' => 'array',
+            'discount_percentage'  => 'decimal:2',
+            'discount_fixed'       => 'decimal:2',
+            'minimum_order_amount' => 'decimal:2',
+            'credit_limit'         => 'decimal:2',
+            'has_special_pricing'  => 'boolean',
+            'has_volume_discounts' => 'boolean',
+            'can_view_prices'      => 'boolean',
+            'can_place_orders'     => 'boolean',
+            'can_view_catalog'     => 'boolean',
+            'can_use_coupons'      => 'boolean',
+            'is_active'            => 'boolean',
+            'is_default'           => 'boolean',
+            'is_enabled'           => 'boolean',
+            'metadata'             => 'array',
+            'conditions'           => 'array',
+            'sort_order'           => 'integer',
         ];
     }
 
@@ -95,7 +123,7 @@ final class CustomerGroup extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -105,7 +133,7 @@ final class CustomerGroup extends Model
     /**
      * Handle scopeWithDiscount functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithDiscount($query)
     {
@@ -147,7 +175,7 @@ final class CustomerGroup extends Model
     /**
      * Get metadata field value
      *
-     * @param  mixed  $default
+     * @param  mixed $default
      * @return mixed
      */
     public function getMetadata(string $key, $default = null)
@@ -158,7 +186,7 @@ final class CustomerGroup extends Model
     /**
      * Set metadata field value
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function setMetadata(string $key, $value): void
     {

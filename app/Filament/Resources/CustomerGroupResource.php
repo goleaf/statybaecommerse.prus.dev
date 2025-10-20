@@ -6,11 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -20,13 +16,20 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Validation\Rule;
 
 final class CustomerGroupResource extends Resource
 {
@@ -68,6 +71,22 @@ final class CustomerGroupResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
+                    Grid::make(2)
+                        ->schema([
+                            ColorPicker::make('color')
+                                ->label(__('customer_groups.color'))
+                                ->nullable(),
+                            TextInput::make('icon')
+                                ->label(__('customer_groups.icon'))
+                                ->maxLength(64)
+                                ->datalist([
+                                    'users',
+                                    'star',
+                                    'crown',
+                                    'sparkles',
+                                    'building-storefront',
+                                ]),
+                        ]),
                     Textarea::make('description')
                         ->label(__('customer_groups.description'))
                         ->rows(3)
@@ -88,8 +107,26 @@ final class CustomerGroupResource extends Resource
                                 ->helperText(__('customer_groups.discount_percentage_help')),
                             TextInput::make('discount_fixed')
                                 ->label(__('customer_groups.discount_fixed'))
+                                ->numeric()
+                                ->step(0.01)
+                                ->minValue(0)
                                 ->prefix('€')
                                 ->helperText(__('customer_groups.discount_fixed_help')),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('minimum_order_amount')
+                                ->label(__('customer_groups.minimum_order_amount'))
+                                ->numeric()
+                                ->step(0.01)
+                                ->minValue(0)
+                                ->prefix('€'),
+                            TextInput::make('credit_limit')
+                                ->label(__('customer_groups.credit_limit'))
+                                ->numeric()
+                                ->step(0.01)
+                                ->minValue(0)
+                                ->prefix('€'),
                         ]),
                     Grid::make(2)
                         ->schema([
@@ -100,6 +137,17 @@ final class CustomerGroupResource extends Resource
                                 ->label(__('customer_groups.has_volume_discounts'))
                                 ->default(false),
                         ]),
+                    Select::make('payment_terms')
+                        ->label(__('customer_groups.payment_terms'))
+                        ->options([
+                            'due_on_receipt' => __('customer_groups.payment_terms_due_on_receipt'),
+                            'net_15'         => __('customer_groups.payment_terms_net_15'),
+                            'net_30'         => __('customer_groups.payment_terms_net_30'),
+                            'net_45'         => __('customer_groups.payment_terms_net_45'),
+                            'net_60'         => __('customer_groups.payment_terms_net_60'),
+                        ])
+                        ->default('net_30')
+                        ->rules([Rule::in(['due_on_receipt', 'net_15', 'net_30', 'net_45', 'net_60'])]),
                 ]),
             Section::make(__('customer_groups.permissions'))
                 ->schema([
@@ -140,10 +188,10 @@ final class CustomerGroupResource extends Resource
                             Select::make('type')
                                 ->label(__('customer_groups.type'))
                                 ->options([
-                                    'regular' => __('customer_groups.types.regular'),
-                                    'vip' => __('customer_groups.types.vip'),
+                                    'regular'   => __('customer_groups.types.regular'),
+                                    'vip'       => __('customer_groups.types.vip'),
                                     'wholesale' => __('customer_groups.types.wholesale'),
-                                    'retail' => __('customer_groups.types.retail'),
+                                    'retail'    => __('customer_groups.types.retail'),
                                     'corporate' => __('customer_groups.types.corporate'),
                                 ])
                                 ->default('regular'),
@@ -169,26 +217,54 @@ final class CustomerGroupResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('gray'),
+                ColorColumn::make('color')
+                    ->label(__('customer_groups.color'))
+                    ->copyable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('icon')
+                    ->label(__('customer_groups.icon'))
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('type')
                     ->label(__('customer_groups.type'))
                     ->formatStateUsing(fn (string $state): string => __("customer_groups.types.{$state}"))
                     ->color(fn (string $state): string => match ($state) {
-                        'regular' => 'blue',
-                        'vip' => 'gold',
+                        'regular'   => 'blue',
+                        'vip'       => 'gold',
                         'wholesale' => 'green',
-                        'retail' => 'purple',
+                        'retail'    => 'purple',
                         'corporate' => 'orange',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 TextColumn::make('discount_percentage')
                     ->label(__('customer_groups.discount_percentage'))
                     ->numeric()
-                    ->formatStateUsing(fn ($state): string => $state ? $state.'%' : '-')
+                    ->formatStateUsing(fn ($state): string => $state ? $state . '%' : '-')
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('discount_fixed')
                     ->label(__('customer_groups.discount_fixed'))
                     ->money('EUR'),
+                TextColumn::make('minimum_order_amount')
+                    ->label(__('customer_groups.minimum_order_amount'))
+                    ->money('EUR')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('credit_limit')
+                    ->label(__('customer_groups.credit_limit'))
+                    ->money('EUR')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('payment_terms')
+                    ->label(__('customer_groups.payment_terms'))
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'due_on_receipt' => __('customer_groups.payment_terms_due_on_receipt'),
+                        'net_15'         => __('customer_groups.payment_terms_net_15'),
+                        'net_30'         => __('customer_groups.payment_terms_net_30'),
+                        'net_45'         => __('customer_groups.payment_terms_net_45'),
+                        'net_60'         => __('customer_groups.payment_terms_net_60'),
+                        default          => '-'
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('customers_count')
                     ->label(__('customer_groups.customers_count'))
                     ->counts('customers')
@@ -225,10 +301,10 @@ final class CustomerGroupResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'regular' => __('customer_groups.types.regular'),
-                        'vip' => __('customer_groups.types.vip'),
+                        'regular'   => __('customer_groups.types.regular'),
+                        'vip'       => __('customer_groups.types.vip'),
                         'wholesale' => __('customer_groups.types.wholesale'),
-                        'retail' => __('customer_groups.types.retail'),
+                        'retail'    => __('customer_groups.types.retail'),
                         'corporate' => __('customer_groups.types.corporate'),
                     ]),
                 TernaryFilter::make('is_active')
@@ -328,10 +404,10 @@ final class CustomerGroupResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomerGroups::route('/'),
+            'index'  => Pages\ListCustomerGroups::route('/'),
             'create' => Pages\CreateCustomerGroup::route('/create'),
-            'view' => Pages\ViewCustomerGroup::route('/{record}'),
-            'edit' => Pages\EditCustomerGroup::route('/{record}/edit'),
+            'view'   => Pages\ViewCustomerGroup::route('/{record}'),
+            'edit'   => Pages\EditCustomerGroup::route('/{record}/edit'),
         ];
     }
 }
