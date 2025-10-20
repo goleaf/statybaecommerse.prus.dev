@@ -18,4 +18,11 @@ final class EditVariantStockHistory extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['quantity_change'] = ($data['new_quantity'] ?? 0) - ($data['old_quantity'] ?? 0);
+
+        return $data;
+    }
 }
