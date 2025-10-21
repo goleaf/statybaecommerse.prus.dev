@@ -13,6 +13,7 @@
         "awcodes/overlook": "^3.0",
         "barryvdh/laravel-dompdf": "^3.1",
         "bezhansalleh/filament-shield": "^4.0",
+        "defstudio/filament-searchable-input": "^4.0",
         "dutchcodingcompany/filament-socialite": "^3.0",
         "eightynine/filament-advanced-widgets": "^4.0",
         "encoredigitalgroup/filament-helpers": "^4.0@rc",

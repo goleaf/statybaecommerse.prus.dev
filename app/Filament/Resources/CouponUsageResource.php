@@ -6,6 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\CouponUsage;
+use App\Support\Search\CouponSearch;
+use App\Support\Search\CustomerSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -21,6 +24,7 @@ use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -60,18 +64,58 @@ final class CouponUsageResource extends Resource
                                 ->schema([
                                     Grid::make(2)
                                         ->schema([
-                                            Select::make('coupon_id')
+                                            SearchableInput::make('coupon_id')
                                                 ->label(__('admin.coupon_usages.form.fields.coupon'))
-                                                ->relationship('coupon', 'code')
-                                                ->searchable()
-                                                ->preload()
-                                                ->required(),
-                                            Select::make('user_id')
+                                                ->placeholder(__('admin.coupon_usages.form.fields.coupon'))
+                                                ->required()
+                                                ->searchUsing(fn (string $search): array => CouponSearch::byCode($search))
+                                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CouponUsage $record): void {
+                                                    if ($state === null || ! $record?->coupon) {
+                                                        return;
+                                                    }
+
+                                                    $label = trim(sprintf('%s — %s', (string) ($record->coupon->code ?? ''), (string) ($record->coupon->name ?? '')));
+
+                                                    $component
+                                                        ->state((string) $state)
+                                                        ->options([
+                                                            (string) $record->coupon_id => $label,
+                                                        ]);
+                                                })
+                                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                                    if ($state === null || $state === '') {
+                                                        return;
+                                                    }
+
+                                                    $set('coupon_id', (int) $state);
+                                                }),
+                                            SearchableInput::make('user_id')
                                                 ->label(__('admin.coupon_usages.form.fields.user'))
-                                                ->relationship('user', 'name')
-                                                ->searchable()
-                                                ->preload()
-                                                ->required(),
+                                                ->placeholder('Name, email or phone')
+                                                ->required()
+                                                ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
+                                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CouponUsage $record): void {
+                                                    if ($state === null || ! $record?->user) {
+                                                        return;
+                                                    }
+
+                                                    $label = trim(sprintf('%s <%s>', (string) ($record->user->name ?? ''), (string) ($record->user->email ?? '')));
+
+                                                    $component
+                                                        ->state((string) $state)
+                                                        ->options([
+                                                            (string) $record->user_id => $label,
+                                                        ]);
+                                                })
+                                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                                    if ($state === null || $state === '') {
+                                                        return;
+                                                    }
+
+                                                    $set('user_id', (int) $state);
+                                                }),
                                             Select::make('order_id')
                                                 ->label(__('admin.coupon_usages.form.fields.order'))
                                                 ->relationship('order', 'id')
