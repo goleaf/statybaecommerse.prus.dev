@@ -34,6 +34,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 /**
@@ -43,6 +44,8 @@ use UnitEnum;
  */
 final class PriceListItemResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = PriceListItem::class;
 
     protected static ?int $navigationSort = 16;

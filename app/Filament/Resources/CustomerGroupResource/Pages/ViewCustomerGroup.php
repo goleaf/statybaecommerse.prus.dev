@@ -7,14 +7,19 @@ namespace App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Filament\Resources\CustomerGroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable;
 
 final class ViewCustomerGroup extends ViewRecord
 {
+    use Translatable;
+
     protected static string $resource = CustomerGroupResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            LocaleSwitcher::make(),
             Actions\EditAction::make(),
         ];
     }

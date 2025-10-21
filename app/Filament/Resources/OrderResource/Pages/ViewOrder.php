@@ -13,14 +13,19 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable;
 
 final class ViewOrder extends ViewRecord
 {
+    use Translatable;
+
     protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            LocaleSwitcher::make(),
             Actions\EditAction::make(),
         ];
     }
@@ -38,11 +43,11 @@ final class ViewOrder extends ViewRecord
 
                             return $record->items
                                 ->map(fn (OrderItem $item): array => [
-                                    'product' => $item->product?->name ?? $item->name,
-                                    'sku' => $item->sku,
+                                    'product'  => $item->product?->name ?? $item->name,
+                                    'sku'      => $item->sku,
                                     'quantity' => $item->quantity,
-                                    'price' => $item->unit_price ?? $item->price,
-                                    'total' => $item->total,
+                                    'price'    => $item->unit_price ?? $item->price,
+                                    'total'    => $item->total,
                                 ])
                                 ->values()
                                 ->all();
