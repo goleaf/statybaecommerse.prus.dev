@@ -18,12 +18,12 @@ Reusable search helpers live in `app/Support/Search/`:
 
 | Service | Purpose |
 | --- | --- |
-| `ProductSearch` | Provides free-text and rich product suggestions (value/label/data) for SKU/barcode/name lookups. |
+| `ProductSearch` | Provides free-text and rich product suggestions with normalised payload metadata for SKU/barcode/name lookups. |
 | `CustomerSearch` | Returns customer matches keyed by name/email/phone. |
 | `AddressSearch` | Supplies formatted address suggestions, city lists, and city metadata. |
 | `CouponSearch` | Exposes coupon code/name lookups. |
 
-Each service scopes queries, limits results to 15 entries, and returns either plain strings or `SearchResult` DTOs with metadata ready for Filament callbacks.
+Each service scopes queries, limits results to 15 entries, and returns either plain strings or `SearchResult` DTOs. The `App\Support\Search\SearchResultPayload` helper now ensures every DTO exposes a predictable `{ id, label, payload }` structure so Filament components and Livewire actions only need to read from the nested `payload` array.
 
 ### Theme requirements
 

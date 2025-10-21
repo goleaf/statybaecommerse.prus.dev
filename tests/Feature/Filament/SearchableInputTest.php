@@ -9,6 +9,7 @@ use App\Filament\Resources\PriceResource;
 use App\Filament\Resources\ProductRequestResource;
 use App\Filament\Resources\WishlistItemResource;
 use App\Models\Product;
+use App\Support\Search\SearchResultPayload;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Form;
 use Illuminate\Database\Schema\Blueprint;
@@ -66,6 +67,13 @@ it('exposes product search results through the form component', function (string
     expect($results)
         ->not()->toBeEmpty()
         ->and($results[0]->value())
+        ->toBeString();
+
+    $normalised = SearchResultPayload::hydrate($results[0]);
+
+    expect($normalised['payload'])
+        ->toHaveKey('sku')
+        ->and($normalised['payload']['name'])
         ->toBeString();
 })->with([
     OrderItemResource::class,

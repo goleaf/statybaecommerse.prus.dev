@@ -52,13 +52,13 @@ final class ProductSearch
                 $rawPrice = $product->getAttribute('price');
                 $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
 
-                $result
-                    ->withData('product_id', $product->getKey())
-                    ->withData('sku', $rawSku ?? '')
-                    ->withData('name', self::resolveName($product))
-                    ->withData('price', $price);
-
-                return $result;
+                // Attach the full metadata payload so Livewire and PHP callbacks share the same structure.
+                return SearchResultPayload::normalise($result, [
+                    'product_id' => $product->getKey(),
+                    'sku'        => $rawSku ?? '',
+                    'name'       => self::resolveName($product),
+                    'price'      => $price,
+                ]);
             })
             ->all();
     }

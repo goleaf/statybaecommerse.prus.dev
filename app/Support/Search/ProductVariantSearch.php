@@ -52,16 +52,16 @@ final class ProductVariantSearch
 
                 $result = SearchResult::make((string) ($identifier ?? ''), $label !== '' ? $label : __('orders.lookups.variant_unknown'));
 
-                $result
-                    ->withData('variant_id', $variant->getKey())
-                    ->withData('sku', $sku)
-                    ->withData('name', $name)
-                    ->withData('price', $price)
-                    ->withData('product_id', $variant->getAttribute('product_id'))
-                    ->withData('product_sku', $productSku)
-                    ->withData('product_name', $productName);
-
-                return $result;
+                // Bundle both the variant details and parent product context into the payload.
+                return SearchResultPayload::normalise($result, [
+                    'variant_id'   => $variant->getKey(),
+                    'sku'          => $sku,
+                    'name'         => $name,
+                    'price'        => $price,
+                    'product_id'   => $variant->getAttribute('product_id'),
+                    'product_sku'  => $productSku,
+                    'product_name' => $productName,
+                ]);
             })
             ->all();
     }
@@ -129,4 +129,3 @@ final class ProductVariantSearch
         return '';
     }
 }
-

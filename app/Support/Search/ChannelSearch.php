@@ -30,13 +30,13 @@ final class ChannelSearch
 
                 $result = SearchResult::make((string) ($identifier ?? ''), $label);
 
-                $result
-                    ->withData('channel_id', $channel->getKey())
-                    ->withData('name', self::stringValue($channel->getAttribute('name')))
-                    ->withData('code', self::stringValue($channel->getAttribute('code')))
-                    ->withData('type', self::stringValue($channel->getAttribute('type')));
-
-                return $result;
+                // Ship the identifying and descriptive channel data together inside the payload.
+                return SearchResultPayload::normalise($result, [
+                    'channel_id' => $channel->getKey(),
+                    'name'       => self::stringValue($channel->getAttribute('name')),
+                    'code'       => self::stringValue($channel->getAttribute('code')),
+                    'type'       => self::stringValue($channel->getAttribute('type')),
+                ]);
             })
             ->all();
     }
@@ -88,4 +88,3 @@ final class ChannelSearch
         return is_string($value) ? $value : '';
     }
 }
-

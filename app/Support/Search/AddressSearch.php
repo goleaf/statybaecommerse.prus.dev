@@ -70,12 +70,12 @@ final class AddressSearch
                 $identifier = $city->getKey();
                 $result = SearchResult::make((string) ($identifier ?? ''), $label);
 
-                $result
-                    ->withData('city_id', $city->getKey())
-                    ->withData('code', $code)
-                    ->withData('country_code', $country);
-
-                return $result;
+                // Provide the city metadata inside the normalised payload for downstream consumers.
+                return SearchResultPayload::normalise($result, [
+                    'city_id'      => $city->getKey(),
+                    'code'         => $code,
+                    'country_code' => $country,
+                ]);
             })
             ->all();
     }
@@ -98,11 +98,10 @@ final class AddressSearch
 
                 $result = SearchResult::make((string) ($identifier ?? ''), $label);
 
-                $result
-                    ->withData('address_id', $address->getKey())
-                    ->withData('payload', self::payload($address));
-
-                return $result;
+                // Merge the flattened address fields into the payload alongside the identifier.
+                return SearchResultPayload::normalise($result, array_merge([
+                    'address_id' => $address->getKey(),
+                ], self::payload($address)));
             })
             ->all();
     }
