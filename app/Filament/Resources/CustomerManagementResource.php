@@ -12,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -32,6 +31,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CustomerManagementResource extends Resource
 {
@@ -78,7 +78,7 @@ final class CustomerManagementResource extends Resource
                                 ->label(__('customers.phone'))
                                 ->tel()
                                 ->maxLength(20),
-                            DateTimePicker::make('email_verified_at')
+                            Flatpickr::makeDateTime('email_verified_at')
                                 ->label(__('customers.email_verified_at'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
@@ -120,7 +120,7 @@ final class CustomerManagementResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('date_of_birth')
+                            Flatpickr::makeDateTime('date_of_birth')
                                 ->label(__('customers.date_of_birth'))
                                 ->displayFormat('Y-m-d'),
                             Select::make('gender')
@@ -232,9 +232,9 @@ final class CustomerManagementResource extends Resource
                     ->label(__('customers.orders_count')),
                 Filter::make('created_at')
                     ->form([
-                        Forms\Components\DatePicker::make('created_from')
+                        Flatpickr::makeDate('created_from')
                             ->label(__('customers.created_from')),
-                        Forms\Components\DatePicker::make('created_until')
+                        Flatpickr::makeDate('created_until')
                             ->label(__('customers.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

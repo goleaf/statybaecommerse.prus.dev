@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -29,6 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * FeatureFlagResource
@@ -119,10 +119,10 @@ final class FeatureFlagResource extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            DateTimePicker::make('starts_at')
+                            Flatpickr::makeDateTime('starts_at')
                                 ->label(__('feature_flags.starts_at'))
                                 ->nullable(),
-                            DateTimePicker::make('ends_at')
+                            Flatpickr::makeDateTime('ends_at')
                                 ->label(__('feature_flags.ends_at'))
                                 ->nullable(),
                         ]),

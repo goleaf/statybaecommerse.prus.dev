@@ -11,7 +11,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -27,6 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralCampaignResource extends Resource
 {
@@ -80,10 +80,10 @@ final class ReferralCampaignResource extends Resource
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
                                     ->default(true),
-                                DatePicker::make('start_date')
+                                Flatpickr::makeDate('start_date')
                                     ->label(__('admin.referral_campaigns.start_date'))
                                     ->nullable(),
-                                DatePicker::make('end_date')
+                                Flatpickr::makeDate('end_date')
                                     ->label(__('admin.referral_campaigns.end_date'))
                                     ->nullable(),
                             ]),

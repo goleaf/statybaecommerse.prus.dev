@@ -10,6 +10,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Support\Filament\Components\Flatpickr;
 
 class UserRelationManager extends BaseRelationManager
 {
@@ -37,7 +38,7 @@ class UserRelationManager extends BaseRelationManager
                         Forms\Components\TextInput::make('phone')
                             ->tel()
                             ->maxLength(255),
-                        Forms\Components\DateTimePicker::make('email_verified_at')
+                        Flatpickr::makeDateTime('email_verified_at')
                             ->label('Email Verified At'),
                         Forms\Components\Select::make('status')
                             ->options([
