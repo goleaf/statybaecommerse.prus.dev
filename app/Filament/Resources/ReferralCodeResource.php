@@ -29,6 +29,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
 
 final class ReferralCodeResource extends Resource
@@ -53,16 +54,18 @@ final class ReferralCodeResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
-                        TextInput::make('title')
-                            ->label(__('referral.form.title'))
-                            ->required()
-                            ->maxLength(255)
-                            ->translatable(),
-                        Textarea::make('description')
-                            ->label(__('referral.form.description'))
-                            ->maxLength(65535)
-                            ->nullable()
-                            ->translatable(),
+                        LanguageTabs::make([
+                            TextInput::make('title')
+                                ->label(__('referral.form.title'))
+                                ->required()
+                                ->maxLength(255)
+                                ->translatable(),
+                            Textarea::make('description')
+                                ->label(__('referral.form.description'))
+                                ->maxLength(65535)
+                                ->nullable()
+                                ->translatable(),
+                        ])->columnSpanFull(),
                         Toggle::make('is_active')
                             ->label(__('referral.form.is_active'))
                             ->inline(false)
