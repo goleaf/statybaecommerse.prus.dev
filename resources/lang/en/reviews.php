@@ -81,5 +81,6 @@ return [
         'no_content' => 'No content',
         'no_metadata' => 'No metadata',
         'metadata_json' => 'Enter JSON metadata',
+        'no_rating' => 'No rating available',
     ],
 ];
