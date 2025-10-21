@@ -6,10 +6,12 @@ namespace App\Filament\Resources\NewsResource\Pages;
 
 use App\Enums\ModerationState;
 use App\Filament\Resources\NewsResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\NewsResource\Widgets\NewsPerformanceChart;
+use App\Filament\Resources\NewsResource\Widgets\NewsResourceStats;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListNews extends ListRecords
@@ -22,6 +24,20 @@ final class ListNews extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            NewsResourceStats::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            NewsPerformanceChart::class,
         ];
     }
 
