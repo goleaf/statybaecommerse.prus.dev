@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignConversionResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CampaignConversionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 final class ListCampaignConversions extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CampaignConversionResource::class;
 
     protected function getHeaderActions(): array

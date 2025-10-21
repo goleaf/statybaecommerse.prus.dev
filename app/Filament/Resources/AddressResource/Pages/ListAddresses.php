@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AddressResource\Pages;
 
 use App\Enums\AddressType;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AddressResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListAddresses extends ListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = AddressResource::class;

@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\SystemSettingResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListSystemSettings extends ListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = SystemSettingResource::class;
@@ -34,7 +36,7 @@ class ListSystemSettings extends ListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all'     => WidgetTab::make(__('system_settings.tabs.all'))
+            'all' => WidgetTab::make(__('system_settings.tabs.all'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
             'general' => WidgetTab::make(__('system_settings.tabs.general'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'general'))

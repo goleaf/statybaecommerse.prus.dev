@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsResource\Pages;
 
 use App\Enums\ModerationState;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NewsResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListNews extends ListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = NewsResource::class;

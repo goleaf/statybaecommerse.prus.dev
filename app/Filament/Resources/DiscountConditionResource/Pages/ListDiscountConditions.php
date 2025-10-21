@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountConditionResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\DiscountConditionResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListDiscountConditions extends ListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = DiscountConditionResource::class;
