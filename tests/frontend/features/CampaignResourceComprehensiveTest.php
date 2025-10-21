@@ -301,8 +301,10 @@ it('can filter campaigns by date range', function (): void {
 
     Livewire::test(ListCampaigns::class)
         ->filterTable('created_at', [
-            'created_from' => now()->subDays(5)->format('Y-m-d'),
-            'created_until' => now()->subDays(1)->format('Y-m-d'),
+            'range' => [
+                'start' => now()->subDays(5)->format('Y-m-d'),
+                'end' => now()->subDays(1)->format('Y-m-d'),
+            ],
         ])
         ->assertCanSeeTableRecords([$recentCampaign])
         ->assertCanNotSeeTableRecords([$oldCampaign, $newCampaign]);

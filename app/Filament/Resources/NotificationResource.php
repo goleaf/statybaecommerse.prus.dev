@@ -12,6 +12,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -25,7 +26,7 @@ use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
+use App\Support\Filament\Filters\SingleDateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -182,8 +183,19 @@ final class NotificationResource extends Resource
                 Filter::make('unread')
                     ->label(__('admin.notifications.filters.unread'))
                     ->query(fn (Builder $query): Builder => $query->where('is_read', false)),
-                DateFilter::make('created_at')
-                    ->label(__('admin.notifications.filters.created_at')),
+                Filter::make('created_at')
+                    ->label(__('admin.notifications.filters.created_at'))
+                    ->form([
+                        Flatpickr::make('value')
+                            ->label(__('admin.notifications.filters.created_at'))
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => SingleDateFilter::apply(
+                        $query,
+                        $data['value'] ?? null,
+                        'created_at',
+                    )),
                 Filter::make('recent')
                     ->label(__('admin.notifications.filters.recent'))
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
