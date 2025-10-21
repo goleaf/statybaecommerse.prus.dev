@@ -7,6 +7,9 @@ namespace App\Providers\Filament;
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+
+use function class_exists;
+
 use Filament\Contracts\Plugin as FilamentPlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
@@ -28,19 +31,20 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentExcel\FilamentExport;
-use function class_exists;
 
 final class AdminPanelProvider extends PanelProvider
 {
     public function boot(): void
     {
-        FilamentExport::createExportUrlUsing(
-            static fn ($export): string => URL::temporarySignedRoute(
-                'exports.signed-download',
-                now()->addMinutes(60),
-                ['export' => $export],
-            ),
-        );
+        if (class_exists(FilamentExport::class)) {
+            FilamentExport::createExportUrlUsing(
+                static fn ($export): string => URL::temporarySignedRoute(
+                    'exports.signed-download',
+                    now()->addMinutes(60),
+                    ['export' => $export],
+                ),
+            );
+        }
     }
 
     public function panel(Panel $panel): Panel
@@ -139,24 +143,45 @@ final class AdminPanelProvider extends PanelProvider
      */
     private function configuredPlugins(): array
     {
-        return array_values(array_filter([
-            FilamentShieldPlugin::make(),
-            $this->makeFullCalendarPlugin(),
-            TableLayoutTogglePlugin::make()
+        $plugins = [];
+
+        if (class_exists(FilamentShieldPlugin::class)) {
+            $plugins[] = FilamentShieldPlugin::make();
+        }
+
+        if ($fullCalendar = $this->makeFullCalendarPlugin()) {
+            $plugins[] = $fullCalendar;
+        }
+
+        if (class_exists(TableLayoutTogglePlugin::class)) {
+            $tableLayoutPlugin = TableLayoutTogglePlugin::make()
                 ->setDefaultLayout('grid')
-                ->persistLayoutUsing(
-                    persister: LocalStoragePersister::class,
-                    cacheStore: 'redis',
-                    cacheTtl: 60 * 24,
-                )
                 ->shareLayoutBetweenPages(false)
                 ->displayToggleAction()
                 ->toggleActionHook('tables::toolbar.search.after')
                 ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
-            FilamentNordThemePlugin::make(),
-            ResizedColumnPlugin::make()->preserveOnDB(),
-        ], static fn (?FilamentPlugin $plugin): bool => $plugin instanceof FilamentPlugin));
+                ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
+
+            if (class_exists(LocalStoragePersister::class)) {
+                $tableLayoutPlugin->persistLayoutUsing(
+                    persister: LocalStoragePersister::class,
+                    cacheStore: 'redis',
+                    cacheTtl: 60 * 24,
+                );
+            }
+
+            $plugins[] = $tableLayoutPlugin;
+        }
+
+        if (class_exists(FilamentNordThemePlugin::class)) {
+            $plugins[] = FilamentNordThemePlugin::make();
+        }
+
+        if (class_exists(ResizedColumnPlugin::class)) {
+            $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
+        }
+
+        return array_values($plugins);
     }
 
     /**
@@ -191,9 +216,6 @@ final class AdminPanelProvider extends PanelProvider
             ->all();
     }
 
-    /**
-     * @return \Filament\Contracts\Plugin|null
-     */
     private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
     {
         $pluginClass = 'Saade\\FilamentFullCalendar\\FilamentFullCalendarPlugin';
