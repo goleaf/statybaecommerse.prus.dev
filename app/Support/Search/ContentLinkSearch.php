@@ -70,16 +70,17 @@ final class ContentLinkSearch
                 $description = is_string($link['description'] ?? null) ? $link['description'] : '';
                 $key = is_string($link['key'] ?? null) ? $link['key'] : null;
 
-                $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'static')
-                    ->withData('description', $description);
+                $payload = [
+                    'type'        => 'static',
+                    'description' => $description,
+                ];
 
                 if ($key !== null) {
-                    $result->withData('key', $key);
+                    $payload['key'] = $key;
                 }
 
-                return $result;
+                // Normalise static link metadata without losing optional keys.
+                return SearchResultPayload::normalise(SearchResult::make($url, $label), $payload);
             })
             ->filter()
             ->values();
@@ -114,13 +115,12 @@ final class ContentLinkSearch
                 $name = self::resolveTranslatable($product->getAttribute('name'));
                 $label = trim(sprintf('%s • %s', self::typeLabel('product'), $name !== '' ? $name : (string) $product->getAttribute('slug')));
 
-                $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'product')
-                    ->withData('product_id', $product->getKey())
-                    ->withData('slug', $product->getAttribute('slug'));
-
-                return $result;
+                // Record the product identifiers required to resolve storefront URLs.
+                return SearchResultPayload::normalise(SearchResult::make($url, $label), [
+                    'type'       => 'product',
+                    'product_id' => $product->getKey(),
+                    'slug'       => $product->getAttribute('slug'),
+                ]);
             })
             ->filter()
             ->values();
@@ -155,13 +155,12 @@ final class ContentLinkSearch
                 $name = self::resolveTranslatable($category->getAttribute('name'));
                 $label = trim(sprintf('%s • %s', self::typeLabel('category'), $name !== '' ? $name : (string) $category->getAttribute('slug')));
 
-                $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'category')
-                    ->withData('category_id', $category->getKey())
-                    ->withData('slug', $category->getAttribute('slug'));
-
-                return $result;
+                // Bundle the category identifiers alongside the friendly label.
+                return SearchResultPayload::normalise(SearchResult::make($url, $label), [
+                    'type'        => 'category',
+                    'category_id' => $category->getKey(),
+                    'slug'        => $category->getAttribute('slug'),
+                ]);
             })
             ->filter()
             ->values();
@@ -196,13 +195,12 @@ final class ContentLinkSearch
                 $name = self::resolveTranslatable($collection->getAttribute('name'));
                 $label = trim(sprintf('%s • %s', self::typeLabel('collection'), $name !== '' ? $name : (string) $collection->getAttribute('slug')));
 
-                $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'collection')
-                    ->withData('collection_id', $collection->getKey())
-                    ->withData('slug', $collection->getAttribute('slug'));
-
-                return $result;
+                // Keep the collection context in the payload so the form remembers selections.
+                return SearchResultPayload::normalise(SearchResult::make($url, $label), [
+                    'type'          => 'collection',
+                    'collection_id' => $collection->getKey(),
+                    'slug'          => $collection->getAttribute('slug'),
+                ]);
             })
             ->filter()
             ->values();
@@ -245,13 +243,12 @@ final class ContentLinkSearch
 
                 $label = trim(sprintf('%s • %s', self::typeLabel('post'), $title !== '' ? $title : (string) $post->getAttribute('slug')));
 
-                $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'post')
-                    ->withData('post_id', $post->getKey())
-                    ->withData('slug', $post->getAttribute('slug'));
-
-                return $result;
+                // Persist the blog metadata so preview links can render without extra lookups.
+                return SearchResultPayload::normalise(SearchResult::make($url, $label), [
+                    'type'    => 'post',
+                    'post_id' => $post->getKey(),
+                    'slug'    => $post->getAttribute('slug'),
+                ]);
             })
             ->filter()
             ->values();

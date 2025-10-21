@@ -35,12 +35,12 @@ final class CouponSearch
                 $identifier = $coupon->getKey();
                 $result = SearchResult::make((string) ($identifier ?? ''), $label);
 
-                $result
-                    ->withData('coupon_id', $coupon->getKey())
-                    ->withData('code', $code)
-                    ->withData('name', $name);
-
-                return $result;
+                // Keep the coupon identifiers grouped inside the payload for consistent reads.
+                return SearchResultPayload::normalise($result, [
+                    'coupon_id' => $coupon->getKey(),
+                    'code'      => $code,
+                    'name'      => $name,
+                ]);
             })
             ->all();
     }
