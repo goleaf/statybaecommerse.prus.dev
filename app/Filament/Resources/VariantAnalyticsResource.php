@@ -8,12 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -25,6 +20,12 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -45,7 +46,7 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var string|BackedEnum|null
      */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
@@ -88,14 +89,18 @@ final class VariantAnalyticsResource extends Resource
                                                     ->searchable()
                                                     ->preload()
                                                     ->live()
-                                                    ->afterStateUpdated(function ($state, callable $set): void {
-                                                        if ($state) {
-                                                            $variant = \App\Models\ProductVariant::find($state);
-                                                            if ($variant) {
-                                                                $set('variant_name', $variant->name);
-                                                                $set('product_name', $variant->product->name ?? '');
-                                                            }
+                                                    ->afterStateUpdated(static function (int|string|null $state, callable $set): void {
+                                                        if ($state === null || $state === '') {
+                                                            return;
                                                         }
+
+                                                        $variant = \App\Models\ProductVariant::find($state);
+                                                        if ($variant === null) {
+                                                            return;
+                                                        }
+
+                                                        $set('variant_name', $variant->name);
+                                                        $set('product_name', $variant->product->name ?? '');
                                                     }),
                                                 Flatpickr::makeDate('date')
                                                     ->label(__('admin.variant_analytics.date'))
@@ -108,12 +113,12 @@ final class VariantAnalyticsResource extends Resource
                                             ->schema([
                                                 Placeholder::make('variant_name')
                                                     ->label(__('admin.variant_analytics.variant_name'))
-                                                    ->content(fn ($record) => $record?->variant?->name ?? '')
-                                                    ->visible(fn ($record) => $record !== null),
+                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->name ?? '')
+                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
                                                 Placeholder::make('product_name')
                                                     ->label(__('admin.variant_analytics.product_name'))
-                                                    ->content(fn ($record) => $record?->variant?->product?->name ?? '')
-                                                    ->visible(fn ($record) => $record !== null),
+                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->product?->name ?? '')
+                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
                                             ]),
                                     ]),
                             ]),
@@ -140,10 +145,11 @@ final class VariantAnalyticsResource extends Resource
                                                     ->suffix('clicks'),
                                                 Placeholder::make('click_through_rate')
                                                     ->label(__('admin.variant_analytics.ctr'))
-                                                    ->content(function (callable $get) {
+                                                    ->content(static function (callable $get): string {
                                                         $views = (float) $get('views');
                                                         $clicks = (float) $get('clicks');
-                                                        if ($views > 0) {
+
+                                                        if ($views > 0.0) {
                                                             return number_format(($clicks / $views) * 100, 2) . '%';
                                                         }
 
@@ -185,10 +191,11 @@ final class VariantAnalyticsResource extends Resource
                                             ->schema([
                                                 Placeholder::make('add_to_cart_rate')
                                                     ->label(__('admin.variant_analytics.atc_rate'))
-                                                    ->content(function (callable $get) {
+                                                    ->content(static function (callable $get): string {
                                                         $clicks = (float) $get('clicks');
                                                         $addToCart = (float) $get('add_to_cart');
-                                                        if ($clicks > 0) {
+
+                                                        if ($clicks > 0.0) {
                                                             return number_format(($addToCart / $clicks) * 100, 2) . '%';
                                                         }
 
@@ -196,10 +203,11 @@ final class VariantAnalyticsResource extends Resource
                                                     }),
                                                 Placeholder::make('purchase_rate')
                                                     ->label(__('admin.variant_analytics.purchase_rate'))
-                                                    ->content(function (callable $get) {
+                                                    ->content(static function (callable $get): string {
                                                         $addToCart = (float) $get('add_to_cart');
                                                         $purchases = (float) $get('purchases');
-                                                        if ($addToCart > 0) {
+
+                                                        if ($addToCart > 0.0) {
                                                             return number_format(($purchases / $addToCart) * 100, 2) . '%';
                                                         }
 
@@ -248,7 +256,7 @@ final class VariantAnalyticsResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->copyable()
-                    ->description(fn ($record) => $record->variant->product->name ?? ''),
+                    ->description(static fn (?VariantAnalytics $record): ?string => $record?->variant?->product?->name),
                 TextColumn::make('variant.sku')
                     ->label(__('admin.variant_analytics.sku'))
                     ->searchable()
@@ -276,12 +284,26 @@ final class VariantAnalyticsResource extends Resource
                     ->color('info'),
                 TextColumn::make('click_through_rate')
                     ->label(__('admin.variant_analytics.ctr'))
-                    ->getStateUsing(fn ($record) => $record->click_through_rate)
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->click_through_rate)
+                    ->formatStateUsing(static fn (float|int|null $state): string => number_format((float) $state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(fn ($state) => $state >= 5 ? 'success' : ($state >= 2 ? 'warning' : 'danger')),
+                    ->color(static function (float|int|null $state): string {
+                        if ($state === null) {
+                            return 'gray';
+                        }
+
+                        if ($state >= 5) {
+                            return 'success';
+                        }
+
+                        if ($state >= 2) {
+                            return 'warning';
+                        }
+
+                        return 'danger';
+                    }),
                 TextColumn::make('add_to_cart')
                     ->label(__('admin.variant_analytics.add_to_cart'))
                     ->numeric()
@@ -290,12 +312,26 @@ final class VariantAnalyticsResource extends Resource
                     ->color('warning'),
                 TextColumn::make('add_to_cart_rate')
                     ->label(__('admin.variant_analytics.atc_rate'))
-                    ->getStateUsing(fn ($record) => $record->add_to_cart_rate)
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->add_to_cart_rate)
+                    ->formatStateUsing(static fn (float|int|null $state): string => number_format((float) $state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(fn ($state) => $state >= 20 ? 'success' : ($state >= 10 ? 'warning' : 'danger')),
+                    ->color(static function (float|int|null $state): string {
+                        if ($state === null) {
+                            return 'gray';
+                        }
+
+                        if ($state >= 20) {
+                            return 'success';
+                        }
+
+                        if ($state >= 10) {
+                            return 'warning';
+                        }
+
+                        return 'danger';
+                    }),
                 TextColumn::make('purchases')
                     ->label(__('admin.variant_analytics.purchases'))
                     ->numeric()
@@ -304,12 +340,26 @@ final class VariantAnalyticsResource extends Resource
                     ->color('success'),
                 TextColumn::make('purchase_rate')
                     ->label(__('admin.variant_analytics.purchase_rate'))
-                    ->getStateUsing(fn ($record) => $record->purchase_rate)
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->purchase_rate)
+                    ->formatStateUsing(static fn (float|int|null $state): string => number_format((float) $state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(fn ($state) => $state >= 30 ? 'success' : ($state >= 15 ? 'warning' : 'danger')),
+                    ->color(static function (float|int|null $state): string {
+                        if ($state === null) {
+                            return 'gray';
+                        }
+
+                        if ($state >= 30) {
+                            return 'success';
+                        }
+
+                        if ($state >= 15) {
+                            return 'warning';
+                        }
+
+                        return 'danger';
+                    }),
                 TextColumn::make('revenue')
                     ->label(__('admin.variant_analytics.revenue'))
                     ->money('EUR')
@@ -318,37 +368,55 @@ final class VariantAnalyticsResource extends Resource
                     ->color('success'),
                 TextColumn::make('average_revenue_per_purchase')
                     ->label(__('admin.variant_analytics.avg_revenue'))
-                    ->getStateUsing(fn ($record) => $record->average_revenue_per_purchase)
+                    ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->average_revenue_per_purchase)
                     ->money('EUR')
                     ->sortable(false)
                     ->toggleable()
                     ->color('info'),
                 TextColumn::make('conversion_rate')
                     ->label(__('admin.variant_analytics.conversion_rate'))
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->formatStateUsing(static fn (float|int|null $state): string => number_format((float) $state, 2) . '%')
                     ->sortable()
                     ->toggleable()
                     ->badge()
-                    ->color(fn ($state) => $state >= 5 ? 'success' : ($state >= 2 ? 'warning' : 'danger')),
+                    ->color(static function (float|int|null $state): string {
+                        if ($state === null) {
+                            return 'gray';
+                        }
+
+                        if ($state >= 5) {
+                            return 'success';
+                        }
+
+                        if ($state >= 2) {
+                            return 'warning';
+                        }
+
+                        return 'danger';
+                    }),
                 BadgeColumn::make('performance_status')
                     ->label(__('admin.variant_analytics.performance_status'))
-                    ->getStateUsing(function ($record) {
-                        $conversionRate = $record->conversion_rate;
-                        $revenue = $record->revenue;
+                    ->getStateUsing(static function (VariantAnalytics $record): string {
+                        $conversionRate = (float) $record->conversion_rate;
+                        $revenue = (float) $record->revenue;
 
                         if ($conversionRate >= 5 && $revenue >= 100) {
                             return 'high';
-                        } elseif ($conversionRate >= 2 && $revenue >= 50) {
-                            return 'medium';
-                        } else {
-                            return 'low';
                         }
+
+                        if ($conversionRate >= 2 && $revenue >= 50) {
+                            return 'medium';
+                        }
+
+                        return 'low';
                     })
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'high'   => __('admin.variant_analytics.high_performing'),
-                        'medium' => __('admin.variant_analytics.medium_performing'),
-                        'low'    => __('admin.variant_analytics.low_performing'),
-                        default  => __('admin.variant_analytics.unknown')
+                    ->formatStateUsing(static function (?string $state): string {
+                        return match ($state) {
+                            'high'   => __('admin.variant_analytics.high_performing'),
+                            'medium' => __('admin.variant_analytics.medium_performing'),
+                            'low'    => __('admin.variant_analytics.low_performing'),
+                            default  => __('admin.variant_analytics.unknown'),
+                        };
                     })
                     ->colors([
                         'success' => 'high',
@@ -477,8 +545,8 @@ final class VariantAnalyticsResource extends Resource
                     ->trueLabel(__('admin.variant_analytics.last_7_days'))
                     ->falseLabel(__('admin.variant_analytics.older_than_7_days'))
                     ->queries(
-                        true: fn (Builder $query) => $query->where('date', '>=', now()->subDays(7)),
-                        false: fn (Builder $query) => $query->where('date', '<', now()->subDays(7)),
+                        true: static fn (Builder $query): Builder => $query->where('date', '>=', now()->subDays(7)),
+                        false: static fn (Builder $query): Builder => $query->where('date', '<', now()->subDays(7)),
                     ),
             ])
             ->actions([
