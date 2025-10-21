@@ -8,12 +8,14 @@ use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -288,22 +290,17 @@ final class OrderItemResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Forms\Components\DatePicker::make('created_from')
-                            ->label(__('order_items.created_from')),
-                        Forms\Components\DatePicker::make('created_until')
-                            ->label(__('order_items.created_until')),
+                        Flatpickr::make('range')
+                            ->label(__('order_items.created_at'))
+                            ->rangePicker()
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
