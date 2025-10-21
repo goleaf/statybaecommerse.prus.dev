@@ -34,8 +34,9 @@ final class DashboardLowStockTable extends BaseTableWidget
         return trans('admin/dashboard.tables.low_stock');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query(fn () => $this->tableRepository->lowStockProductsQuery()->limit(10))
             ->columns([

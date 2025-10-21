@@ -19,8 +19,9 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Translations';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Forms\Components\Select::make('locale')
@@ -55,8 +56,9 @@ final class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('name')
             ->columns([

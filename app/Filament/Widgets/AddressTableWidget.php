@@ -25,8 +25,9 @@ final class AddressTableWidget extends BaseWidget
     /**
      * Get table
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query(
                 Address::query()

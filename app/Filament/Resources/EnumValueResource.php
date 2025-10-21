@@ -36,10 +36,20 @@ final class EnumValueResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
+    /** @var string|\BackedEnum|\UnitEnum|null Provide a consistent icon for value maintenance. */
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
+    /** @var string|\BackedEnum|\UnitEnum|null Keep enum value tools inside the System cluster. */
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
@@ -69,6 +79,7 @@ final class EnumValueResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
@@ -146,6 +157,7 @@ final class EnumValueResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('type')

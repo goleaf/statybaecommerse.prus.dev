@@ -16,8 +16,9 @@ final class RecentOrdersWidget extends BaseWidget
 
     protected static ?int $sort = 2;
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query(fn (): Builder => Order::query()
                 ->withoutGlobalScopes()

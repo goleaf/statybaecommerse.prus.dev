@@ -26,7 +26,7 @@ final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    public static function getNavigationIcon(): \BackedEnum|string|null
+    public static function getNavigationIcon(): \BackedEnum|\UnitEnum|string|null
     {
         return 'heroicon-o-globe-alt';
     }
@@ -40,13 +40,15 @@ final class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return CountryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return CountriesTable::configure($table);
     }
 

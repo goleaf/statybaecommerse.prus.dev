@@ -29,8 +29,9 @@ final class TopSellingProductsWidget extends BaseWidget
         return __('analytics.top_selling_products');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         $query = Product::query()
             ->select(['products.*'])
             ->leftJoin('order_items', 'order_items.product_id', '=', 'products.id')

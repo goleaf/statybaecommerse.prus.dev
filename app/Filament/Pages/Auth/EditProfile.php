@@ -17,8 +17,9 @@ use App\Support\Filament\Components\Flatpickr;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->components([
                 Section::make(__('admin.profile.personal_information'))

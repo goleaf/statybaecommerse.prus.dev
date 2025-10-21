@@ -16,8 +16,9 @@ abstract class BaseListRecords extends ListRecords
     use HasResizableColumns;
     use HasToggleableTable;
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         $table = parent::table($table);
 
         return $this->applyToggleableTableLayout($table);

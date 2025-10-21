@@ -20,8 +20,9 @@ final class ImagesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Images';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->components([
                 Forms\Components\FileUpload::make('file_path')
@@ -59,8 +60,9 @@ final class ImagesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('alt_text')
             ->columns([

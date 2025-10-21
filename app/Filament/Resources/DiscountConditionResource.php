@@ -9,7 +9,6 @@ use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionCh
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionStatsWidget;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionTableWidget;
 use App\Models\DiscountCondition;
-use BackedEnum;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
@@ -48,9 +47,11 @@ final class DiscountConditionResource extends Resource
     protected static ?string $model = DiscountCondition::class;
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
+    protected static $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
     public static function getNavigationGroup(): ?string
     {
@@ -72,8 +73,9 @@ final class DiscountConditionResource extends Resource
         return __('discount_conditions.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Tabs::make('discount_condition')
@@ -173,8 +175,9 @@ final class DiscountConditionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('discount.name')

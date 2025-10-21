@@ -20,8 +20,9 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
 
     protected ?string $pollingInterval = '30s';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query(
                 DiscountRedemption::query()

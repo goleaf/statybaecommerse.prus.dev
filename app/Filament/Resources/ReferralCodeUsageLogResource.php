@@ -11,7 +11,6 @@ use App\Models\ReferralCodeUsageLog;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
-use UnitEnum;
 
 /**
  * ReferralCodeUsageLogResource
@@ -26,7 +25,12 @@ final class ReferralCodeUsageLogResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'ip_address';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -43,13 +47,15 @@ final class ReferralCodeUsageLogResource extends Resource
         return __('admin.referral_code_usage_logs.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return ReferralCodeUsageLogFormSchema::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return ReferralCodeUsageLogsTableSchema::configure($table);
     }
 

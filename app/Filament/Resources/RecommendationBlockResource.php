@@ -35,7 +35,12 @@ final class RecommendationBlockResource extends Resource
 {
     protected static ?string $model = RecommendationBlock::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 13;
 
@@ -73,8 +78,9 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('recommendation_blocks.basic_information'))
                 ->schema([
@@ -159,8 +165,9 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')

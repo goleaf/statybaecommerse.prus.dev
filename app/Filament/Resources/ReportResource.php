@@ -49,7 +49,7 @@ final class ReportResource extends Resource
     protected static ?string $model = Report::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var string|\BackedEnum|\UnitEnum|null
      */
     public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
@@ -75,8 +75,9 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->columns(3)
             ->schema([
@@ -211,8 +212,9 @@ final class ReportResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')
