@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
+use Filament\Forms\Components\Combobox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -163,11 +164,13 @@ final class CollectionResource extends Resource
                 ->columns(2),
             Section::make(__('collections.collection_info'))
                 ->components([
-                    Select::make('products')
+                    Combobox::make('products')
                         ->label(__('translations.products'))
                         ->relationship('products', 'name')
                         ->multiple()
                         ->searchable()
+                        ->boxSearchs()
+                        ->height('350px')
                         ->preload(),
                 ]),
             Section::make(__('collections.seo_info'))
