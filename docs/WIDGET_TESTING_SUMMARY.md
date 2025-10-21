@@ -36,6 +36,11 @@
 - Updated test expectations to use correct translation keys
 - Added proper error handling for problematic model factories
 
+### **📊 Index Verification Updates (2025-02-15)**
+- Added dedicated `orders_created_at_index` (plus supporting `products` and `users` indexes) through `2025_02_15_120000_add_created_at_indexes.php` so analytics workloads consistently use timestamp coverage.
+- Refined analytics widgets and the `Order` model to rely on the reusable `createdBetween`, `createdSince`, and `createdOnDate` scopes, keeping dashboard queries aligned with the new index helpers.
+- Introduced `tests/Feature/Database/OrderCreatedAtIndexTest.php` to assert the SQLite query plan references `orders_created_at_index`, preventing future regressions.
+
 ### **📈 Widget Categories Tested**
 
 #### **Statistics Widgets** (5 widgets)
