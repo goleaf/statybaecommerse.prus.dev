@@ -24,6 +24,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -113,6 +114,11 @@ final class AdminPanelProvider extends PanelProvider
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
+                    FilamentFullCalendarPlugin::make()
+                        ->selectable(true)
+                        ->editable(true)
+                        ->timezone('Europe/Vilnius')
+                        ->locale('lt'),
                     TableLayoutTogglePlugin::make()
                         ->setDefaultLayout('grid')
                         ->persistLayoutUsing(
