@@ -16,6 +16,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use UnitEnum;
+
 final class UserImpersonation extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
