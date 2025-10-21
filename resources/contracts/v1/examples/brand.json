@@ -1,20 +1,20 @@
 {
-  "contract": "brand",
-  "version": "v1",
-  "data": {
-    "item": {
-      "id": 5,
-      "slug": "demo-brand",
-      "name": "Demo Brand",
-      "description": "An illustrative brand for contract validation.",
-      "website": "https://brand.example.com",
-      "products_count": 24,
-      "links": {
-        "self": "https://example.com/brands/demo-brand"
-      }
+    "contract": "brand",
+    "version": "v1",
+    "data": {
+        "item": {
+            "id": 5,
+            "slug": "demo-brand",
+            "name": "Demo Brand",
+            "description": "An illustrative brand for contract validation.",
+            "website": "https://brand.example.com",
+            "products_count": 24,
+            "links": {
+                "self": "https://example.com/brands/demo-brand"
+            }
+        }
+    },
+    "meta": {
+        "generated_at": "2024-01-01T00:00:00+00:00"
     }
-  },
-  "meta": {
-    "generated_at": "2024-01-01T00:00:00+00:00"
-  }
 }

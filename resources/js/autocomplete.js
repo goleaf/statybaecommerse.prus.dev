@@ -1,6 +1,6 @@
 /**
  * Enhanced Autocomplete Component
- * 
+ *
  * A standalone JavaScript component for autocomplete functionality
  * that can be used with any API endpoint.
  */
@@ -19,7 +19,7 @@ class AutocompleteComponent {
             onSelect: null,
             onClear: null,
             placeholder: 'Search...',
-            ...options
+            ...options,
         };
 
         this.selectedIndex = -1;
@@ -43,9 +43,10 @@ class AutocompleteComponent {
     }
 
     setupInput() {
-        this.input = typeof this.options.input === 'string' 
-            ? document.querySelector(this.options.input)
-            : this.options.input;
+        this.input =
+            typeof this.options.input === 'string'
+                ? document.querySelector(this.options.input)
+                : this.options.input;
 
         if (!this.input) {
             throw new Error('Input element not found');
@@ -59,9 +60,10 @@ class AutocompleteComponent {
 
     setupContainer() {
         if (this.options.container) {
-            this.container = typeof this.options.container === 'string'
-                ? document.querySelector(this.options.container)
-                : this.options.container;
+            this.container =
+                typeof this.options.container === 'string'
+                    ? document.querySelector(this.options.container)
+                    : this.options.container;
         } else {
             this.container = this.createContainer();
         }
@@ -101,9 +103,9 @@ class AutocompleteComponent {
 
     handleInput(event) {
         const query = event.target.value.trim();
-        
+
         clearTimeout(this.debounceTimer);
-        
+
         if (query.length >= this.options.minLength) {
             this.debounceTimer = setTimeout(() => {
                 this.performSearch(query);
@@ -167,7 +169,9 @@ class AutocompleteComponent {
         this.showLoading();
 
         try {
-            const response = await fetch(`${this.options.apiUrl}?q=${encodeURIComponent(query)}&limit=${this.options.maxResults}`);
+            const response = await fetch(
+                `${this.options.apiUrl}?q=${encodeURIComponent(query)}&limit=${this.options.maxResults}`,
+            );
             const data = await response.json();
 
             if (data.success) {
@@ -405,7 +409,7 @@ class AutocompleteComponent {
         this.input.removeEventListener('focus', this.handleFocus);
         this.input.removeEventListener('blur', this.handleBlur);
         document.removeEventListener('click', this.handleOutsideClick);
-        
+
         if (this.container && this.container.parentNode) {
             this.container.parentNode.removeChild(this.container);
         }
