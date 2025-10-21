@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
 use App\Models\Scopes\ActiveScope;
@@ -17,7 +18,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -95,20 +95,20 @@ final class RecommendationBlockResource extends Resource
                         ->label(__('recommendation_blocks.type'))
                         ->options([
                             'featured' => __('recommendation_blocks.featured'),
-                            'related' => __('recommendation_blocks.related'),
-                            'similar' => __('recommendation_blocks.similar'),
+                            'related'  => __('recommendation_blocks.related'),
+                            'similar'  => __('recommendation_blocks.similar'),
                             'trending' => __('recommendation_blocks.trending'),
-                            'recent' => __('recommendation_blocks.recent'),
+                            'recent'   => __('recommendation_blocks.recent'),
                         ])
                         ->required()
                         ->native(false),
                     Select::make('position')
                         ->label(__('recommendation_blocks.position'))
                         ->options([
-                            'top' => __('recommendation_blocks.top'),
-                            'bottom' => __('recommendation_blocks.bottom'),
+                            'top'     => __('recommendation_blocks.top'),
+                            'bottom'  => __('recommendation_blocks.bottom'),
                             'sidebar' => __('recommendation_blocks.sidebar'),
-                            'inline' => __('recommendation_blocks.inline'),
+                            'inline'  => __('recommendation_blocks.inline'),
                         ])
                         ->required()
                         ->native(false),
@@ -118,7 +118,8 @@ final class RecommendationBlockResource extends Resource
                     Combobox::make('products')
                         ->label(__('recommendation_blocks.products'))
                         ->relationship('products', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                        ->boxSearchs()
+                        ->relationshipDefaults(preload: false)
+                        // Shared Combobox defaults apply JS rendering and search helpers.
                         ->height('320px')
                         ->afterStateHydrated(function ($state, callable $set): void {
                             $set('products', collect($state)->sort()->values()->all());
@@ -173,21 +174,21 @@ final class RecommendationBlockResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'featured' => 'success',
-                        'related' => 'info',
-                        'similar' => 'warning',
+                        'related'  => 'info',
+                        'similar'  => 'warning',
                         'trending' => 'danger',
-                        'recent' => 'gray',
-                        default => 'gray',
+                        'recent'   => 'gray',
+                        default    => 'gray',
                     }),
                 TextColumn::make('position')
                     ->label(__('recommendation_blocks.position'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'top' => 'success',
-                        'bottom' => 'info',
+                        'top'     => 'success',
+                        'bottom'  => 'info',
                         'sidebar' => 'warning',
-                        'inline' => 'danger',
-                        default => 'gray',
+                        'inline'  => 'danger',
+                        default   => 'gray',
                     }),
                 TextColumn::make('products_count')
                     ->label(__('recommendation_blocks.products_count'))
@@ -224,18 +225,18 @@ final class RecommendationBlockResource extends Resource
                     ->label(__('recommendation_blocks.type'))
                     ->options([
                         'featured' => __('recommendation_blocks.featured'),
-                        'related' => __('recommendation_blocks.related'),
-                        'similar' => __('recommendation_blocks.similar'),
+                        'related'  => __('recommendation_blocks.related'),
+                        'similar'  => __('recommendation_blocks.similar'),
                         'trending' => __('recommendation_blocks.trending'),
-                        'recent' => __('recommendation_blocks.recent'),
+                        'recent'   => __('recommendation_blocks.recent'),
                     ]),
                 SelectFilter::make('position')
                     ->label(__('recommendation_blocks.position'))
                     ->options([
-                        'top' => __('recommendation_blocks.top'),
-                        'bottom' => __('recommendation_blocks.bottom'),
+                        'top'     => __('recommendation_blocks.top'),
+                        'bottom'  => __('recommendation_blocks.bottom'),
                         'sidebar' => __('recommendation_blocks.sidebar'),
-                        'inline' => __('recommendation_blocks.inline'),
+                        'inline'  => __('recommendation_blocks.inline'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_blocks.is_active'))
@@ -263,9 +264,9 @@ final class RecommendationBlockResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationBlocks::route('/'),
+            'index'  => Pages\ListRecommendationBlocks::route('/'),
             'create' => Pages\CreateRecommendationBlock::route('/create'),
-            'edit' => Pages\EditRecommendationBlock::route('/{record}/edit'),
+            'edit'   => Pages\EditRecommendationBlock::route('/{record}/edit'),
         ];
     }
 

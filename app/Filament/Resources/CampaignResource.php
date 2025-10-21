@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -29,8 +31,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-use Novadaemon\FilamentCombobox\Combobox;
-use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignResource extends Resource
 {
@@ -86,10 +86,10 @@ final class CampaignResource extends Resource
                     Select::make('status')
                         ->label(self::label('campaigns.fields.status', 'Status'))
                         ->options([
-                            'draft' => self::label('campaigns.status.draft', 'Draft'),
-                            'active' => self::label('campaigns.status.active', 'Active'),
+                            'draft'     => self::label('campaigns.status.draft', 'Draft'),
+                            'active'    => self::label('campaigns.status.active', 'Active'),
                             'scheduled' => self::label('campaigns.status.scheduled', 'Scheduled'),
-                            'paused' => self::label('campaigns.status.paused', 'Paused'),
+                            'paused'    => self::label('campaigns.status.paused', 'Paused'),
                             'completed' => self::label('campaigns.status.completed', 'Completed'),
                             'cancelled' => self::label('campaigns.status.cancelled', 'Cancelled'),
                         ])
@@ -143,38 +143,38 @@ final class CampaignResource extends Resource
                     Combobox::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
-                        ->boxSearchs()
+                        ->relationshipDefaults()
+                        // Shared Combobox defaults cover preload, search, and JS styling.
                         ->height('360px')
                         ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_categories', 'Available categories'))
                         ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_categories', 'Selected categories'))
-                        ->preload()
                         ->columnSpanFull(),
                     Combobox::make('targetProducts')
                         ->label(self::label('campaigns.fields.target_products', 'Target products'))
                         ->relationship('targetProducts', 'name')
-                        ->boxSearchs()
+                        ->relationshipDefaults()
+                        // Shared Combobox defaults cover preload, search, and JS styling.
                         ->height('360px')
                         ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_products', 'Available products'))
                         ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_products', 'Selected products'))
-                        ->preload()
                         ->columnSpanFull(),
                     Combobox::make('targetCustomerGroups')
                         ->label(self::label('campaigns.fields.target_customer_groups', 'Target customer groups'))
                         ->relationship('targetCustomerGroups', 'name')
-                        ->boxSearchs()
+                        ->relationshipDefaults()
+                        // Shared Combobox defaults cover preload, search, and JS styling.
                         ->height('360px')
                         ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_customer_groups', 'Available customer groups'))
                         ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_customer_groups', 'Selected customer groups'))
-                        ->preload()
                         ->columnSpanFull(),
                     Combobox::make('discounts')
                         ->label(self::label('campaigns.fields.discounts', 'Discounts'))
                         ->relationship('discounts', 'name')
-                        ->boxSearchs()
+                        ->relationshipDefaults()
+                        // Shared Combobox defaults cover preload, search, and JS styling.
                         ->height('360px')
                         ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.discounts', 'Available discounts'))
                         ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.discounts', 'Selected discounts'))
-                        ->preload()
                         ->columnSpanFull(),
                 ]),
             SchemaSection::make(__('campaigns.sections.content'))
@@ -237,13 +237,13 @@ final class CampaignResource extends Resource
                 TextColumn::make('status')
                     ->label(self::label('campaigns.fields.status', 'Status'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.'.$state, Str::headline($state)))
+                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.' . $state, Str::headline($state)))
                     ->colors([
                         'primary' => fn (string $state): bool => in_array($state, ['draft', 'scheduled']),
                         'success' => fn (string $state): bool => $state === 'active',
                         'warning' => fn (string $state): bool => $state === 'paused',
-                        'info' => fn (string $state): bool => $state === 'completed',
-                        'danger' => fn (string $state): bool => $state === 'cancelled',
+                        'info'    => fn (string $state): bool => $state === 'completed',
+                        'danger'  => fn (string $state): bool => $state === 'cancelled',
                     ]),
                 IconColumn::make('is_active')
                     ->label(self::label('campaigns.fields.is_active', 'Active'))
@@ -269,7 +269,7 @@ final class CampaignResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('conversion_rate')
                     ->label(self::label('campaigns.fields.conversion_rate', 'Conversion rate'))
-                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2).'%')
+                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2) . '%')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('translations_count')
@@ -287,10 +287,10 @@ final class CampaignResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => self::label('campaigns.status.draft', 'Draft'),
-                        'active' => self::label('campaigns.status.active', 'Active'),
+                        'draft'     => self::label('campaigns.status.draft', 'Draft'),
+                        'active'    => self::label('campaigns.status.active', 'Active'),
                         'scheduled' => self::label('campaigns.status.scheduled', 'Scheduled'),
-                        'paused' => self::label('campaigns.status.paused', 'Paused'),
+                        'paused'    => self::label('campaigns.status.paused', 'Paused'),
                         'completed' => self::label('campaigns.status.completed', 'Completed'),
                         'cancelled' => self::label('campaigns.status.cancelled', 'Cancelled'),
                     ]),
@@ -300,7 +300,7 @@ final class CampaignResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(self::label('campaigns.fields.created_at', 'Created at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
@@ -337,10 +337,10 @@ final class CampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaigns::route('/'),
+            'index'  => Pages\ListCampaigns::route('/'),
             'create' => Pages\CreateCampaign::route('/create'),
-            'view' => Pages\ViewCampaign::route('/{record}'),
-            'edit' => Pages\EditCampaign::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaign::route('/{record}'),
+            'edit'   => Pages\EditCampaign::route('/{record}/edit'),
         ];
     }
 
