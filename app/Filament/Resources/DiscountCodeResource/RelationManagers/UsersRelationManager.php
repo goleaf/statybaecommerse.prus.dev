@@ -16,7 +16,7 @@ final class UsersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'users';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->components([
@@ -39,7 +39,7 @@ final class UsersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')

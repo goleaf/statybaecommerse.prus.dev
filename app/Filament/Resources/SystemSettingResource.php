@@ -70,7 +70,7 @@ class SystemSettingResource extends Resource
         return true;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -226,7 +226,7 @@ class SystemSettingResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

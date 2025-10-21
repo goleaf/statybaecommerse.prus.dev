@@ -40,7 +40,7 @@ final class CartItemResource extends Resource
      *
      * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 

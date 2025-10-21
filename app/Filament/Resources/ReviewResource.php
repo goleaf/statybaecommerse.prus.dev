@@ -44,7 +44,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|\BackedEnum|null Normalize Filament icon typing for consistency.
      */
-    protected static $navigationIcon = 'heroicon-o-star';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
@@ -53,7 +53,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|\BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static $navigationGroup = NavigationGroup::ContentManagement;
+    protected static string | \UnitEnum | null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {
@@ -78,7 +78,7 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -151,7 +151,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -393,7 +393,7 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([

@@ -19,7 +19,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Products';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -47,7 +47,7 @@ final class ProductsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')

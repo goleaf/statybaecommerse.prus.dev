@@ -22,10 +22,10 @@ final class VariantPriceHistoryResource extends Resource
     /**
      * Navigation icon override (string|\BackedEnum|null) for Filament v4 alignment.
      */
-    protected static $navigationIcon = 'heroicon-o-currency-euro';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static string | \UnitEnum | null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 

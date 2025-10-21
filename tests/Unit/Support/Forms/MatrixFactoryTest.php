@@ -3,12 +3,19 @@
 declare(strict_types=1);
 
 use App\Support\Forms\MatrixFactory;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Components\Component;
+use Filament\Support\Contracts\TranslatableContentDriver;
+use Livewire\Component as LivewireComponent;
+use Filament\Schemas\Components\Utilities\Get;
 use LaraZeus\MatrixChoice\Components\Matrix;
 
 it('builds a permissions section with module toggle grids', function (): void {
@@ -130,16 +137,40 @@ it('builds a checkbox matrix using the Zeus component', function (): void {
  */
 function evaluate_grid_schema(Grid $grid): array
 {
-    $reflection = new \ReflectionObject($grid);
-    $property = $reflection->getProperty('childComponents');
-    $property->setAccessible(true);
+    // Wrap the grid in a temporary schema so Filament assigns an evaluation container before retrieving child components.
+    return Schema::make(new class extends LivewireComponent implements HasSchemas {
+        public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
+        {
+            return null;
+        }
 
-    $value = $property->getValue($grid);
+        public function getOldSchemaState(string $statePath): mixed
+        {
+            return null;
+        }
 
-    if ($value instanceof \Closure) {
-        return $value(new Get($grid));
-    }
+        public function getSchemaComponent(string $key, bool $withHidden = false, ?Component $skipComponentChildContainersWhileSearching = null): Component | Action | ActionGroup | null
+        {
+            return null;
+        }
 
-    return $value ?? [];
+        public function getSchema(string $name): ?Schema
+        {
+            return null;
+        }
+
+        public function currentlyValidatingSchema(?Schema $schema): void
+        {
+            // No-op for testing harness.
+        }
+
+        public function getDefaultTestingSchemaName(): ?string
+        {
+            return null;
+        }
+    })
+        ->components([$grid])
+        ->getComponents()[0]
+        ->getChildComponents();
 }
 
