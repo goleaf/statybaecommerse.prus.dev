@@ -1,4 +1,6 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+# Ensure Husky uses the new v9 shim so commitlint runs with the repository toolchain.
+. "$(dirname "$0")/_/h"
 
+# Validate the commit message formatting before Git completes the commit.
 npx --no -- commitlint --edit "$1"
