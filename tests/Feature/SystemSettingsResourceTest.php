@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Enums\NavigationGroup;
+use App\Support\Nav;
 use App\Filament\Resources\SystemSettingsResource;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
@@ -324,7 +324,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_navigation_group_is_system(): void
     {
         $this->assertEquals(
-            NavigationGroup::System->value,
+            Nav::groupForResource(SystemSettingsResource::class),
             SystemSettingsResource::getNavigationGroup()
         );
     }
