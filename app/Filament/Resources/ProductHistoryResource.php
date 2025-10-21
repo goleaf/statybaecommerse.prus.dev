@@ -9,10 +9,13 @@ use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
+use BackedEnum;
+use DateTimeInterface;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -28,8 +31,7 @@ final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-clock';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
@@ -56,22 +58,19 @@ final class ProductHistoryResource extends Resource
             Section::make(__('product_history.basic_information'))
                 ->columns(2)
                 ->schema([
-                    Select::make('product_id')
-                        ->label(__('product_history.product'))
+                    SelectInput::make('product_id', __('product_history.product'))
                         ->relationship('product', 'name')
                         ->searchable()
                         ->preload()
                         ->required(),
-                    Select::make('user_id')
-                        ->label(__('product_history.user'))
+                    SelectInput::make('user_id', __('product_history.user'))
                         ->relationship('user', 'name')
                         ->preload(),
-                    Select::make('action')
-                        ->label(__('product_history.action'))
+                    SelectInput::make('action', __('product_history.action'))
                         ->required()
                         ->options(self::actionOptions()),
-                    TextInput::make('field_name')
-                        ->label(__('product_history.field_name'))
+                    TextInputInput::make('field_name', __('product_history.field_name'))
+                        ->columnSpan(1)
                         ->maxLength(255),
                 ]),
             Section::make(__('product_history.details'))
@@ -154,19 +153,30 @@ final class ProductHistoryResource extends Resource
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['from'] ?? null) {
-                            $indicators[] = __('product_history.from').': '.$data['from'];
+                        $from = self::formatDateFilterValue($data['from'] ?? null);
+                        if ($from !== null) {
+                            $indicators[] = __('product_history.from') . ': ' . $from;
                         }
-                        if ($data['until'] ?? null) {
-                            $indicators[] = __('product_history.until').': '.$data['until'];
+                        $until = self::formatDateFilterValue($data['until'] ?? null);
+                        if ($until !== null) {
+                            $indicators[] = __('product_history.until') . ': ' . $until;
                         }
 
                         return $indicators;
                     })
                     ->query(function (Builder $query, array $data): Builder {
+                        $from = self::formatDateFilterValue($data['from'] ?? null);
+                        $until = self::formatDateFilterValue($data['until'] ?? null);
+
                         return $query
-                            ->when($data['from'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
-                            ->when($data['until'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
+                            ->when(
+                                $from,
+                                static fn (Builder $query) => $query->whereDate('created_at', '>=', $from)
+                            )
+                            ->when(
+                                $until,
+                                static fn (Builder $query) => $query->whereDate('created_at', '<=', $until)
+                            );
                     }),
             ]);
     }
@@ -187,10 +197,10 @@ final class ProductHistoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductHistories::route('/'),
+            'index'  => Pages\ListProductHistories::route('/'),
             'create' => Pages\CreateProductHistory::route('/create'),
-            'view' => Pages\ViewProductHistory::route('/{record}'),
-            'edit' => Pages\EditProductHistory::route('/{record}/edit'),
+            'view'   => Pages\ViewProductHistory::route('/{record}'),
+            'edit'   => Pages\EditProductHistory::route('/{record}/edit'),
         ];
     }
 
@@ -200,16 +210,16 @@ final class ProductHistoryResource extends Resource
     private static function actionOptions(): array
     {
         return [
-            'created' => __('product_history.actions.created'),
-            'updated' => __('product_history.actions.updated'),
-            'deleted' => __('product_history.actions.deleted'),
-            'restored' => __('product_history.actions.restored'),
-            'price_changed' => __('product_history.actions.price_changed'),
-            'stock_updated' => __('product_history.actions.stock_updated'),
-            'status_changed' => __('product_history.actions.status_changed'),
+            'created'          => __('product_history.actions.created'),
+            'updated'          => __('product_history.actions.updated'),
+            'deleted'          => __('product_history.actions.deleted'),
+            'restored'         => __('product_history.actions.restored'),
+            'price_changed'    => __('product_history.actions.price_changed'),
+            'stock_updated'    => __('product_history.actions.stock_updated'),
+            'status_changed'   => __('product_history.actions.status_changed'),
             'category_changed' => __('product_history.actions.category_changed'),
-            'image_changed' => __('product_history.actions.image_changed'),
-            'custom' => __('product_history.actions.custom'),
+            'image_changed'    => __('product_history.actions.image_changed'),
+            'custom'           => __('product_history.actions.custom'),
         ];
     }
 
@@ -218,12 +228,12 @@ final class ProductHistoryResource extends Resource
         return match ($action) {
             'created' => 'success',
             'updated', 'category_changed', 'image_changed', 'custom' => 'primary',
-            'deleted' => 'danger',
-            'restored' => 'gray',
+            'deleted'       => 'danger',
+            'restored'      => 'gray',
             'price_changed' => 'warning',
             'stock_updated', 'stock_changed' => 'info',
             'status_changed' => 'purple',
-            default => 'secondary',
+            default          => 'secondary',
         };
     }
 
@@ -239,7 +249,9 @@ final class ProductHistoryResource extends Resource
             return (string) $value;
         }
 
-        return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $encoded = json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        return is_string($encoded) ? $encoded : null;
     }
 
     private static function decodeJsonFromTextarea(?string $value): mixed
@@ -275,10 +287,31 @@ final class ProductHistoryResource extends Resource
             if (count($flattened) === 1) {
                 $single = reset($flattened);
 
-                return is_scalar($single) ? (string) $single : json_encode($single, JSON_UNESCAPED_UNICODE);
+                if (is_scalar($single)) {
+                    return (string) $single;
+                }
+
+                $encodedSingle = json_encode($single, JSON_UNESCAPED_UNICODE);
+
+                return is_string($encodedSingle) ? $encodedSingle : '';
             }
         }
 
-        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        return is_string($encoded) ? $encoded : '';
+    }
+
+    private static function formatDateFilterValue(mixed $value): ?string
+    {
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+
+        if (is_string($value) && $value !== '') {
+            return $value;
+        }
+
+        return null;
     }
 }

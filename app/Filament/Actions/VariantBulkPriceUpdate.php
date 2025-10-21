@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Actions;
 
 use App\Models\ProductVariant;
+use App\Models\VariantPriceHistory;
+use Carbon\Carbon;
+use DateTimeInterface;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\DateTime\DateTimePicker as DateTimePickerInput;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Actions\Action;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,28 +27,25 @@ final class VariantBulkPriceUpdate extends Action
             ->icon('heroicon-o-currency-euro')
             ->color('warning')
             ->form([
-                Select::make('price_type')
-                    ->label(__('product_variants.fields.price_type'))
+                SelectInput::make('price_type', __('product_variants.fields.price_type'))
                     ->options([
-                        'price' => __('product_variants.price_types.regular'),
-                        'wholesale_price' => __('product_variants.price_types.wholesale'),
-                        'member_price' => __('product_variants.price_types.member'),
+                        'price'             => __('product_variants.price_types.regular'),
+                        'wholesale_price'   => __('product_variants.price_types.wholesale'),
+                        'member_price'      => __('product_variants.price_types.member'),
                         'promotional_price' => __('product_variants.price_types.promotional'),
                     ])
                     ->required()
                     ->default('price'),
-                Select::make('update_type')
-                    ->label(__('product_variants.fields.update_type'))
+                SelectInput::make('update_type', __('product_variants.fields.update_type'))
                     ->options([
                         'fixed_amount' => __('product_variants.update_types.fixed_amount'),
-                        'percentage' => __('product_variants.update_types.percentage'),
-                        'multiply_by' => __('product_variants.update_types.multiply_by'),
-                        'set_to' => __('product_variants.update_types.set_to'),
+                        'percentage'   => __('product_variants.update_types.percentage'),
+                        'multiply_by'  => __('product_variants.update_types.multiply_by'),
+                        'set_to'       => __('product_variants.update_types.set_to'),
                     ])
                     ->required()
                     ->default('percentage'),
-                TextInput::make('update_value')
-                    ->label(__('product_variants.fields.update_value'))
+                TextInputInput::make('update_value', __('product_variants.fields.update_value'))
                     ->numeric()
                     ->step(0.01)
                     ->required()
@@ -56,29 +56,27 @@ final class VariantBulkPriceUpdate extends Action
                 Toggle::make('update_compare_price')
                     ->label(__('product_variants.fields.update_compare_price'))
                     ->default(false),
-                Select::make('compare_price_action')
-                    ->label(__('product_variants.fields.compare_price_action'))
+                SelectInput::make('compare_price_action', __('product_variants.fields.compare_price_action'))
                     ->options([
-                        'no_change' => __('product_variants.compare_price_actions.no_change'),
-                        'match_new_price' => __('product_variants.compare_price_actions.match_new_price'),
-                        'increase_by_percentage' => __('product_variants.compare_price_actions.increase_by_percentage'),
+                        'no_change'                => __('product_variants.compare_price_actions.no_change'),
+                        'match_new_price'          => __('product_variants.compare_price_actions.match_new_price'),
+                        'increase_by_percentage'   => __('product_variants.compare_price_actions.increase_by_percentage'),
                         'increase_by_fixed_amount' => __('product_variants.compare_price_actions.increase_by_fixed_amount'),
                     ])
                     ->default('no_change')
                     ->visible(fn (callable $get) => $get('update_compare_price')),
-                TextInput::make('compare_price_value')
-                    ->label(__('product_variants.fields.compare_price_value'))
+                TextInputInput::make('compare_price_value', __('product_variants.fields.compare_price_value'))
                     ->numeric()
                     ->step(0.01)
                     ->visible(fn (callable $get) => $get('update_compare_price') && in_array($get('compare_price_action'), ['increase_by_percentage', 'increase_by_fixed_amount'])),
                 Toggle::make('set_sale_period')
                     ->label(__('product_variants.fields.set_sale_period'))
                     ->default(false),
-                DateTimePicker::make('sale_start_date')
+                DateTimePickerInput::make('sale_start_date', false)
                     ->label(__('product_variants.fields.sale_start_date'))
                     ->visible(fn (callable $get) => $get('set_sale_period'))
                     ->default(now()),
-                DateTimePicker::make('sale_end_date')
+                DateTimePickerInput::make('sale_end_date', false)
                     ->label(__('product_variants.fields.sale_end_date'))
                     ->visible(fn (callable $get) => $get('set_sale_period'))
                     ->default(now()->addDays(30)),
@@ -95,30 +93,37 @@ final class VariantBulkPriceUpdate extends Action
 
                     foreach ($records as $record) {
                         /** @var ProductVariant $record */
+                        $priceType = is_string($data['price_type'] ?? null) ? (string) $data['price_type'] : 'price';
+                        $updateType = is_string($data['update_type'] ?? null) ? (string) $data['update_type'] : 'fixed_amount';
+                        $updateValue = is_numeric($data['update_value'] ?? null)
+                            ? (float) $data['update_value']
+                            : 0.0;
 
                         // Skip sale items if not applying to them
-                        if (! $data['apply_to_sale_items'] && $record->is_on_sale) {
+                        $isSaleItem = (bool) $record->getAttribute('is_on_sale');
+                        if (! ($data['apply_to_sale_items'] ?? false) && $isSaleItem) {
                             $skippedCount++;
 
                             continue;
                         }
 
-                        $oldPrice = $record->{$data['price_type']} ?? 0;
+                        $priceAttribute = $record->getAttribute($priceType);
+                        $oldPrice = is_numeric($priceAttribute) ? (float) $priceAttribute : 0.0;
                         $newPrice = $oldPrice;
 
                         // Calculate new price based on update type
-                        switch ($data['update_type']) {
+                        switch ($updateType) {
                             case 'fixed_amount':
-                                $newPrice = $oldPrice + (float) $data['update_value'];
+                                $newPrice = $oldPrice + $updateValue;
                                 break;
                             case 'percentage':
-                                $newPrice = $oldPrice * (1 + ((float) $data['update_value'] / 100));
+                                $newPrice = $oldPrice * (1 + ($updateValue / 100));
                                 break;
                             case 'multiply_by':
-                                $newPrice = $oldPrice * (float) $data['update_value'];
+                                $newPrice = $oldPrice * $updateValue;
                                 break;
                             case 'set_to':
-                                $newPrice = (float) $data['update_value'];
+                                $newPrice = $updateValue;
                                 break;
                         }
 
@@ -126,45 +131,70 @@ final class VariantBulkPriceUpdate extends Action
                         $newPrice = max(0, $newPrice);
 
                         // Update the price
-                        $record->{$data['price_type']} = $newPrice;
+                        $record->forceFill([$priceType => $newPrice]);
 
                         // Update compare price if requested
-                        if ($data['update_compare_price']) {
-                            switch ($data['compare_price_action']) {
+                        if ($data['update_compare_price'] ?? false) {
+                            $compareAction = is_string($data['compare_price_action'] ?? null)
+                                ? (string) $data['compare_price_action']
+                                : 'no_change';
+                            $compareValue = is_numeric($data['compare_price_value'] ?? null)
+                                ? (float) $data['compare_price_value']
+                                : null;
+
+                            switch ($compareAction) {
                                 case 'match_new_price':
-                                    $record->compare_price = $newPrice;
+                                    $record->forceFill(['compare_price' => $newPrice]);
                                     break;
                                 case 'increase_by_percentage':
-                                    if ($data['compare_price_value']) {
-                                        $record->compare_price = $newPrice * (1 + ((float) $data['compare_price_value'] / 100));
+                                    if ($compareValue !== null) {
+                                        $record->forceFill(['compare_price' => $newPrice * (1 + ($compareValue / 100))]);
                                     }
                                     break;
                                 case 'increase_by_fixed_amount':
-                                    if ($data['compare_price_value']) {
-                                        $record->compare_price = $newPrice + (float) $data['compare_price_value'];
+                                    if ($compareValue !== null) {
+                                        $record->forceFill(['compare_price' => $newPrice + $compareValue]);
                                     }
                                     break;
                             }
                         }
 
                         // Set sale period if requested
-                        if ($data['set_sale_period']) {
-                            $record->is_on_sale = true;
-                            $record->sale_start_date = $data['sale_start_date'];
-                            $record->sale_end_date = $data['sale_end_date'];
+                        if ($data['set_sale_period'] ?? false) {
+                            $record->forceFill([
+                                'is_on_sale'      => true,
+                                'sale_start_date' => $data['sale_start_date'] ?? null,
+                                'sale_end_date'   => $data['sale_end_date'] ?? null,
+                            ]);
                         }
 
                         $record->save();
 
                         // Record price change history
-                        $record->recordPriceChange(
+                        $saleStartDate = $data['sale_start_date'] ?? null;
+                        $saleEndDate = $data['sale_end_date'] ?? null;
+                        $historyStartDate = $saleStartDate instanceof DateTimeInterface
+                            ? Carbon::instance($saleStartDate)
+                            : (is_string($saleStartDate) && $saleStartDate !== '' ? Carbon::parse($saleStartDate) : null);
+                        $historyEndDate = $saleEndDate instanceof DateTimeInterface
+                            ? Carbon::instance($saleEndDate)
+                            : (is_string($saleEndDate) && $saleEndDate !== '' ? Carbon::parse($saleEndDate) : null);
+
+                        $variantKey = $record->getAttribute($record->getKeyName());
+                        $variantId = is_numeric($variantKey) ? (int) $variantKey : 0;
+
+                        $changedBy = auth()->id();
+                        $changedById = is_numeric($changedBy) ? (int) $changedBy : null;
+
+                        VariantPriceHistory::recordPriceChange(
+                            $variantId,
                             $oldPrice,
                             $newPrice,
-                            $data['price_type'],
-                            $data['change_reason'] ?? 'Bulk price update',
-                            auth()->id(),
-                            $data['sale_start_date'] ?? null,
-                            $data['sale_end_date'] ?? null
+                            $priceType,
+                            is_string($data['change_reason'] ?? null) ? (string) $data['change_reason'] : 'Bulk price update',
+                            $changedById,
+                            $historyStartDate,
+                            $historyEndDate,
                         );
 
                         $updatedCount++;
