@@ -10,6 +10,9 @@ Filament v4 ships with built-in column resizing on every table definition. Our r
 1. Clear the persisted keys inside `users.preferences` (for example, via `php artisan tinker` and `Arr::forget($user->preferences, 'tables.*')`). The model cast will accept the updated array on save. 【F:app/Models/User.php†L90-L107】
 2. Ask the affected admin to refresh—Filament will fall back to the default widths and rehydrate fresh values.
 
+## Shared list record scaffolding
+- Role listings now extend `App\Filament\Pages\Support\BaseListRecords` so they inherit the shared table sizing hooks alongside the default header actions. Future resources with similar column sizing needs should follow the same inheritance pattern to avoid diverging configuration. 【F:app/Filament/Resources/RoleResource/Pages/ListRoles.php†L7-L24】
+
 ## Troubleshooting
 If resized columns appear stuck or styles look stale, rebuild the panel assets and hard refresh the browser:
 
