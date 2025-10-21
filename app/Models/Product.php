@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
 use App\Observers\ProductObserver;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -35,12 +37,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * Eloquent model representing the Product entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $fillable
- * @property mixed $casts
- * @property mixed $appends
- * @property mixed $table
+ * @property mixed  $fillable
+ * @property mixed  $casts
+ * @property mixed  $appends
+ * @property mixed  $table
  * @property string $translationModel
- * @property array $translatable
+ * @property array  $translatable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
@@ -50,7 +52,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 #[ObservedBy([ProductObserver::class])]
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
-final class Product extends Model implements HasMedia
+final class Product extends Model implements HasMedia, TranslatableRecord
 {
     use HasFactory, SoftDeletes;
     use HasProductPricing;
@@ -237,7 +239,7 @@ final class Product extends Model implements HasMedia
     {
         return [
             'length' => $this->length ?? 0,
-            'width' => $this->width ?? 0,
+            'width'  => $this->width ?? 0,
             'height' => $this->height ?? 0,
         ];
     }
@@ -353,7 +355,7 @@ final class Product extends Model implements HasMedia
 
     public function reserveStock(
         int $quantity,
-        ?\DateTimeInterface $expiresAt = null,
+        ?DateTimeInterface $expiresAt = null,
         array $meta = [],
         ?string $referenceType = null,
         ?string $referenceId = null
@@ -377,13 +379,13 @@ final class Product extends Model implements HasMedia
             }
 
             return $product->stockReservations()->create([
-                'quantity' => $quantity,
-                'status' => StockReservation::STATUS_RESERVED,
-                'reserved_at' => now(),
-                'expires_at' => $expiresAt,
-                'meta' => $meta ?: null,
+                'quantity'       => $quantity,
+                'status'         => StockReservation::STATUS_RESERVED,
+                'reserved_at'    => now(),
+                'expires_at'     => $expiresAt,
+                'meta'           => $meta ?: null,
                 'reference_type' => $referenceType,
-                'reference_id' => $referenceId,
+                'reference_id'   => $referenceId,
             ]);
         });
 
@@ -829,7 +831,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopePublished functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePublished($query)
     {
@@ -839,7 +841,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeFeatured functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeFeatured($query)
     {
@@ -849,7 +851,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeVisible functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeVisible($query)
     {
@@ -859,7 +861,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeByBrand functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByBrand($query, int $brandId)
     {
@@ -869,7 +871,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeByCategory functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCategory($query, int $categoryId)
     {
@@ -881,7 +883,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeByCollection functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCollection($query, int $collectionId)
     {
@@ -893,7 +895,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeInStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInStock($query)
     {
@@ -903,7 +905,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeLowStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeLowStock($query)
     {
@@ -913,7 +915,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeRequestable functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRequestable($query)
     {
@@ -923,7 +925,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeNeedsRestocking functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeNeedsRestocking($query)
     {
@@ -933,7 +935,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeWithRequests functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithRequests($query)
     {
@@ -1152,7 +1154,7 @@ final class Product extends Model implements HasMedia
         if (empty($images)) {
             return ['src' => null, 'srcset' => '', 'sizes' => '', 'alt' => $this->name];
         }
-        $srcset = [$images['xs'] ?? null ? $images['xs'].' 150w' : null, $images['sm'] ?? null ? $images['sm'].' 300w' : null, $images['md'] ?? null ? $images['md'].' 500w' : null, $images['lg'] ?? null ? $images['lg'].' 800w' : null, $images['xl'] ?? null ? $images['xl'].' 1200w' : null];
+        $srcset = [$images['xs'] ?? null ? $images['xs'] . ' 150w' : null, $images['sm'] ?? null ? $images['sm'] . ' 300w' : null, $images['md'] ?? null ? $images['md'] . ' 500w' : null, $images['lg'] ?? null ? $images['lg'] . ' 800w' : null, $images['xl'] ?? null ? $images['xl'] . ' 1200w' : null];
         $sizeKey = $defaultSize ?? 'md';
 
         return ['src' => $images[$sizeKey] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];
@@ -1273,7 +1275,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
@@ -1583,7 +1585,7 @@ final class Product extends Model implements HasMedia
         $name = $this->getTranslatedName($locale);
         $sku = $this->sku ? " ({$this->sku})" : '';
 
-        return $name.$sku;
+        return $name . $sku;
     }
 
     /**
