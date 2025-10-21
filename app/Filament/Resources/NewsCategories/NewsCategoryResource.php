@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategories;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
@@ -14,25 +15,35 @@ use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class NewsCategoryResource extends Resource
 {
     protected static ?string $model = NewsCategory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * @var string|BackedEnum|null Use the stack icon to mirror other content tools.
+     */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    /**
+     * @var string|BackedEnum|null Keep the resource grouped with other news modules.
+     */
+    protected static $navigationGroup = NavigationGroup::News;
+
+    public static function getNavigationGroup(): ?string
     {
-        return 'News';
+        // Delegate to the enum label for localisation support.
+        $group = self::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return NewsCategoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return NewsCategoriesTable::configure($table);
     }
