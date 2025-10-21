@@ -11,6 +11,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
 
+### Bug Fixes
+* Ensured the Feature Flag resource surfaces inactive and disabled toggles so administrators can audit rollout states without adjusting global scopes.
+
 ## [0.1.0] - 2025-10-20
 
 ### Features & Enhancements
