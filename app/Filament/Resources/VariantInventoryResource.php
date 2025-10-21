@@ -9,6 +9,7 @@ use App\Models\Location;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\ProductVariantSearch;
 use BackedEnum;
@@ -88,27 +89,36 @@ final class VariantInventoryResource extends Resource
                                     ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
+                                        // Delegate hydration to the helper described in docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static function (int $value): ?array {
+                                                $variant = ProductVariant::query()
+                                                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                                    ->with(['product:id,sku,name'])
+                                                    ->find($value);
 
-                                        $variant = ProductVariant::query()
-                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                            ->with(['product:id,sku,name'])
-                                            ->find($state);
+                                                if (! $variant instanceof ProductVariant) {
+                                                    return null;
+                                                }
 
-                                        if (! $variant instanceof ProductVariant) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
-                                            ]);
+                                                return [
+                                                    'value' => $variant->getKey(),
+                                                    'label' => ProductVariantSearch::label($variant),
+                                                ];
+                                            },
+                                        );
                                     })
                                     ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
+                                        if ($state === null || $state === '') {
+                                            // Reset variant linkage per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                            SearchableInputHelper::clear($set, ['variant_id' => null]);
+
+                                            return;
+                                        }
+
+                                        $set('variant_id', (int) $state);
                                     }),
                                 SearchableInput::make('location_id')
                                     ->label(__('admin.variant_inventory.location'))
@@ -117,26 +127,35 @@ final class VariantInventoryResource extends Resource
                                     ->searchUsing(fn (string $value): array => LocationSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
+                                        // Hydration routes through the shared helper (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static function (int $value): ?array {
+                                                $location = Location::query()
+                                                    ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                                    ->find($value);
 
-                                        $location = Location::query()
-                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                            ->find($state);
+                                                if (! $location instanceof Location) {
+                                                    return null;
+                                                }
 
-                                        if (! $location instanceof Location) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $location->getKey() => LocationSearch::label($location),
-                                            ]);
+                                                return [
+                                                    'value' => $location->getKey(),
+                                                    'label' => LocationSearch::label($location),
+                                                ];
+                                            },
+                                        );
                                     })
                                     ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
+                                        if ($state === null || $state === '') {
+                                            // Clearing removes cached payloads as documented in docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                            SearchableInputHelper::clear($set, ['location_id' => null]);
+
+                                            return;
+                                        }
+
+                                        $set('location_id', (int) $state);
                                     }),
                             ]),
                         Grid::make(2)

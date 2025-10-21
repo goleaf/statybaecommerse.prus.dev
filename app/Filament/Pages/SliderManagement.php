@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -126,13 +127,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                    if ($state === null || $state === '') {
+                                    // Follow docs/forms/SEARCHABLE_INPUT_METADATA.md helper guidance.
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                                    );
+                                })
+                                ->afterStateUpdated(function (?string $state, callable $set): void {
+                                    if ($state !== null && $state !== '') {
                                         return;
                                     }
 
-                                    $component
-                                        ->state($state)
-                                        ->options([$state => $state]);
+                                    // Reset the persisted URL per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                    SearchableInputHelper::clear($set, ['button_url' => null]);
                                 }),
                         ]),
                     ])
@@ -299,13 +307,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        if ($state === null || $state === '') {
+                                        // Keep hydration aligned with docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                                        );
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state !== null && $state !== '') {
                                             return;
                                         }
 
-                                        $component
-                                            ->state($state)
-                                            ->options([$state => $state]);
+                                        // Flush stale repeater URLs per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                        SearchableInputHelper::clear($set, ['link' => null]);
                                     }),
                             ])
                             ->collapsible()

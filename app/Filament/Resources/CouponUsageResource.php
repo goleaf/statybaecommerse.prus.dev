@@ -6,6 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\CouponUsage;
+use App\Models\Coupon;
+use App\Models\User;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\CouponSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -71,20 +74,32 @@ final class CouponUsageResource extends Resource
                                                 ->searchUsing(fn (string $search): array => CouponSearch::byCode($search))
                                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CouponUsage $record): void {
-                                                    if ($state === null || ! $record?->coupon) {
-                                                        return;
-                                                    }
+                                                    // Hydrate coupon lookup via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                                    SearchableInputHelper::hydrate(
+                                                        $component,
+                                                        $state,
+                                                        static function (int $value) use ($record): ?array {
+                                                            $coupon = $record?->coupon ?? Coupon::query()
+                                                                ->select(['id', 'code', 'name'])
+                                                                ->find($value);
 
-                                                    $label = trim(sprintf('%s — %s', (string) ($record->coupon->code ?? ''), (string) ($record->coupon->name ?? '')));
+                                                            if (! $coupon instanceof Coupon) {
+                                                                return null;
+                                                            }
 
-                                                    $component
-                                                        ->state((string) $state)
-                                                        ->options([
-                                                            (string) $record->coupon_id => $label,
-                                                        ]);
+                                                            $label = trim(sprintf('%s — %s', (string) ($coupon->code ?? ''), (string) ($coupon->name ?? '')));
+
+                                                            return [
+                                                                'value' => $coupon->getKey(),
+                                                                'label' => $label,
+                                                            ];
+                                                        },
+                                                    );
                                                 })
                                                 ->afterStateUpdated(function (?string $state, Set $set): void {
                                                     if ($state === null || $state === '') {
+                                                        SearchableInputHelper::clear($set, ['coupon_id' => null]);
+
                                                         return;
                                                     }
 
@@ -97,20 +112,32 @@ final class CouponUsageResource extends Resource
                                                 ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
                                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CouponUsage $record): void {
-                                                    if ($state === null || ! $record?->user) {
-                                                        return;
-                                                    }
+                                                    // Hydrate user lookup through helper as documented.
+                                                    SearchableInputHelper::hydrate(
+                                                        $component,
+                                                        $state,
+                                                        static function (int $value) use ($record): ?array {
+                                                            $user = $record?->user ?? User::query()
+                                                                ->select(['id', 'name', 'email'])
+                                                                ->find($value);
 
-                                                    $label = trim(sprintf('%s <%s>', (string) ($record->user->name ?? ''), (string) ($record->user->email ?? '')));
+                                                            if (! $user instanceof User) {
+                                                                return null;
+                                                            }
 
-                                                    $component
-                                                        ->state((string) $state)
-                                                        ->options([
-                                                            (string) $record->user_id => $label,
-                                                        ]);
+                                                            $label = trim(sprintf('%s <%s>', (string) ($user->name ?? ''), (string) ($user->email ?? '')));
+
+                                                            return [
+                                                                'value' => $user->getKey(),
+                                                                'label' => $label,
+                                                            ];
+                                                        },
+                                                    );
                                                 })
                                                 ->afterStateUpdated(function (?string $state, Set $set): void {
                                                     if ($state === null || $state === '') {
+                                                        SearchableInputHelper::clear($set, ['user_id' => null]);
+
                                                         return;
                                                     }
 

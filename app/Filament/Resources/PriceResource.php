@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
@@ -43,26 +44,31 @@ final class PriceResource extends Resource
                                     ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
+                                        // Hydrate via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md contract.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static function (int $value): ?array {
+                                                $product = Product::query()
+                                                    ->select(['id', 'sku', 'name'])
+                                                    ->find($value);
 
-                                        $product = Product::query()
-                                            ->select(['id', 'sku', 'name'])
-                                            ->find($state);
+                                                if (! $product instanceof Product) {
+                                                    return null;
+                                                }
 
-                                        if (! $product instanceof Product) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $product->getKey() => ProductSearch::label($product),
-                                            ]);
+                                                return [
+                                                    'value' => $product->getKey(),
+                                                    'label' => ProductSearch::label($product),
+                                                ];
+                                            },
+                                        );
                                     })
                                     ->afterStateUpdated(function (?string $state, Set $set): void {
                                         if ($state === null || $state === '') {
+                                            // Ensure cleared lookups drop the persisted id (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                            SearchableInputHelper::clear($set, ['product_id' => null]);
+
                                             return;
                                         }
 
