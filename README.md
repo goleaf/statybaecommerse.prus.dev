@@ -15,6 +15,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 ### Latest updates
+- Husky Git hook bootstrap script is restored so local commits keep running repository-defined quality checks while still surfacing the upstream deprecation warning for teams preparing for Husky v10.
 - Shipping option management screens now present accurate delivery windows even when the minimum day value is zero or one side of the range is missing, giving merchandisers clearer expectations when auditing carriers.
 
 ## Documentation
