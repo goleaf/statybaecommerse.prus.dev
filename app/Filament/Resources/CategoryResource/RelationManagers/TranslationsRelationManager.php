@@ -18,6 +18,7 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -80,13 +81,13 @@ final class TranslationsRelationManager extends RelationManager
                     ->label(__('translations.locale'))
                     ->badge()
                     ->color(fn ($state) => match ($state) {
-                        'en' => 'success',
-                        'lt' => 'info',
+                        'en'    => 'success',
+                        'lt'    => 'info',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'en' => 'English',
-                        'lt' => 'Lietuvių',
+                        'en'    => 'English',
+                        'lt'    => 'Lietuvių',
                         default => $state,
                     }),
                 TextColumn::make('name')
@@ -141,6 +142,7 @@ final class TranslationsRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make(),
             ])
             ->actions([

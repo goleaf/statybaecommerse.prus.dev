@@ -33,6 +33,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class OrdersRelationManager extends RelationManager
 {
@@ -112,15 +113,15 @@ class OrdersRelationManager extends RelationManager
                                     ->label(__('orders.status'))
                                     ->badge()
                                     ->color(fn (string $state): string => match ($state) {
-                                        'pending' => 'warning',
-                                        'confirmed' => 'info',
+                                        'pending'    => 'warning',
+                                        'confirmed'  => 'info',
                                         'processing' => 'primary',
-                                        'shipped' => 'success',
-                                        'delivered' => 'success',
-                                        'cancelled' => 'danger',
-                                        'refunded' => 'secondary',
-                                        'returned' => 'warning',
-                                        default => 'gray',
+                                        'shipped'    => 'success',
+                                        'delivered'  => 'success',
+                                        'cancelled'  => 'danger',
+                                        'refunded'   => 'secondary',
+                                        'returned'   => 'warning',
+                                        default      => 'gray',
                                     }),
                                 TextEntry::make('total_amount')
                                     ->label(__('orders.total_amount'))
@@ -174,13 +175,13 @@ class OrdersRelationManager extends RelationManager
                 BadgeColumn::make('status')
                     ->label(__('orders.status'))
                     ->colors([
-                        'warning' => fn ($state): bool => $state === 'pending',
-                        'info' => fn ($state): bool => $state === 'confirmed',
-                        'primary' => fn ($state): bool => $state === 'processing',
-                        'success' => fn ($state): bool => in_array($state, ['shipped', 'delivered']),
-                        'danger' => fn ($state): bool => $state === 'cancelled',
+                        'warning'   => fn ($state): bool => $state === 'pending',
+                        'info'      => fn ($state): bool => $state === 'confirmed',
+                        'primary'   => fn ($state): bool => $state === 'processing',
+                        'success'   => fn ($state): bool => in_array($state, ['shipped', 'delivered']),
+                        'danger'    => fn ($state): bool => $state === 'cancelled',
                         'secondary' => fn ($state): bool => $state === 'refunded',
-                        'warning' => fn ($state): bool => $state === 'returned',
+                        'warning'   => fn ($state): bool => $state === 'returned',
                     ]),
                 TextColumn::make('total_amount')
                     ->label(__('orders.total_amount'))
@@ -229,9 +230,9 @@ class OrdersRelationManager extends RelationManager
                 SelectFilter::make('payment_method')
                     ->label(__('orders.payment_method'))
                     ->options([
-                        'credit_card' => __('orders.payment_methods.credit_card'),
-                        'bank_transfer' => __('orders.payment_methods.bank_transfer'),
-                        'paypal' => __('orders.payment_methods.paypal'),
+                        'credit_card'      => __('orders.payment_methods.credit_card'),
+                        'bank_transfer'    => __('orders.payment_methods.bank_transfer'),
+                        'paypal'           => __('orders.payment_methods.paypal'),
                         'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
                     ]),
                 Filter::make('created_at')
@@ -254,6 +255,7 @@ class OrdersRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make()
                     ->label(__('orders.create_order')),
                 AssociateAction::make()

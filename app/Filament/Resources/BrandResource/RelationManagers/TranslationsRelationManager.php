@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -70,14 +71,14 @@ final class TranslationsRelationManager extends RelationManager
                     ->label(__('brands.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'success',
-                        'en' => 'primary',
-                        'de' => 'warning',
-                        'fr' => 'info',
-                        'es' => 'danger',
-                        'it' => 'secondary',
-                        'pl' => 'gray',
-                        'ru' => 'slate',
+                        'lt'    => 'success',
+                        'en'    => 'primary',
+                        'de'    => 'warning',
+                        'fr'    => 'info',
+                        'es'    => 'danger',
+                        'it'    => 'secondary',
+                        'pl'    => 'gray',
+                        'ru'    => 'slate',
                         default => 'gray',
                     })
                     ->sortable(),
@@ -142,6 +143,7 @@ final class TranslationsRelationManager extends RelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

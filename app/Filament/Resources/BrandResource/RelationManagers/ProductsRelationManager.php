@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ProductsRelationManager extends RelationManager
 {
@@ -84,7 +85,7 @@ final class ProductsRelationManager extends RelationManager
                     ->color(fn ($state) => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 5 => 'warning',
-                        default => 'success',
+                        default     => 'success',
                     }),
                 Tables\Columns\IconColumn::make('is_published')
                     ->label(__('admin.products.fields.is_published'))
@@ -111,6 +112,7 @@ final class ProductsRelationManager extends RelationManager
                     ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

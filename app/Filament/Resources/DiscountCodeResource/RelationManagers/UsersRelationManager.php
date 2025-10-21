@@ -11,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class UsersRelationManager extends RelationManager
 {
@@ -33,7 +34,7 @@ final class UsersRelationManager extends RelationManager
                     ->label(__('Type'))
                     ->options([
                         'customer' => __('Customer'),
-                        'admin' => __('Admin'),
+                        'admin'    => __('Admin'),
                     ])
                     ->required(),
             ]);
@@ -58,8 +59,8 @@ final class UsersRelationManager extends RelationManager
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'customer' => 'success',
-                        'admin' => 'primary',
-                        default => 'gray',
+                        'admin'    => 'primary',
+                        default    => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Created At'))
@@ -71,11 +72,12 @@ final class UsersRelationManager extends RelationManager
                     ->label(__('Type'))
                     ->options([
                         'customer' => __('Customer'),
-                        'admin' => __('Admin'),
+                        'admin'    => __('Admin'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])
             ->actions([

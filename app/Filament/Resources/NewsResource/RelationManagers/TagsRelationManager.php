@@ -13,6 +13,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class TagsRelationManager extends RelationManager
 {
@@ -91,10 +92,10 @@ final class TagsRelationManager extends RelationManager
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state >= 100 => 'danger',
-                        $state >= 50 => 'warning',
-                        $state >= 20 => 'info',
-                        $state >= 10 => 'success',
-                        default => 'gray',
+                        $state >= 50  => 'warning',
+                        $state >= 20  => 'info',
+                        $state >= 10  => 'success',
+                        default       => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('color')
                     ->label(__('news.fields.color'))
@@ -116,6 +117,7 @@ final class TagsRelationManager extends RelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

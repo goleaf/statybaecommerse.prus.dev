@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class CampaignsRelationManager extends RelationManager
 {
@@ -25,9 +26,9 @@ final class CampaignsRelationManager extends RelationManager
                     ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'draft' => __('campaigns.draft'),
-                        'active' => __('campaigns.active'),
-                        'paused' => __('campaigns.paused'),
+                        'draft'     => __('campaigns.draft'),
+                        'active'    => __('campaigns.active'),
+                        'paused'    => __('campaigns.paused'),
                         'completed' => __('campaigns.completed'),
                     ]),
             ]);
@@ -46,11 +47,11 @@ final class CampaignsRelationManager extends RelationManager
                     ->label(__('campaigns.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'draft' => 'gray',
-                        'paused' => 'warning',
+                        'active'    => 'success',
+                        'draft'     => 'gray',
+                        'paused'    => 'warning',
                         'completed' => 'info',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('budget')
                     ->label(__('campaigns.budget'))
@@ -65,13 +66,14 @@ final class CampaignsRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'draft' => __('campaigns.draft'),
-                        'active' => __('campaigns.active'),
-                        'paused' => __('campaigns.paused'),
+                        'draft'     => __('campaigns.draft'),
+                        'active'    => __('campaigns.active'),
+                        'paused'    => __('campaigns.paused'),
                         'completed' => __('campaigns.completed'),
                     ]),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make()
                     ->label(__('customer_groups.attach_campaign')),
             ])

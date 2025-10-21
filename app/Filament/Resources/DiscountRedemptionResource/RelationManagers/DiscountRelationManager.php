@@ -10,6 +10,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class DiscountRelationManager extends RelationManager
 {
@@ -37,8 +38,8 @@ class DiscountRelationManager extends RelationManager
                             ->columnSpanFull(),
                         Forms\Components\Select::make('type')
                             ->options([
-                                'percentage' => 'Percentage',
-                                'fixed' => 'Fixed Amount',
+                                'percentage'    => 'Percentage',
+                                'fixed'         => 'Fixed Amount',
                                 'free_shipping' => 'Free Shipping',
                             ])
                             ->required(),
@@ -68,10 +69,10 @@ class DiscountRelationManager extends RelationManager
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'percentage' => 'info',
-                        'fixed' => 'success',
+                        'percentage'    => 'info',
+                        'fixed'         => 'success',
                         'free_shipping' => 'warning',
-                        default => 'gray',
+                        default         => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->label('Value')
@@ -96,8 +97,8 @@ class DiscountRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'percentage' => 'Percentage',
-                        'fixed' => 'Fixed Amount',
+                        'percentage'    => 'Percentage',
+                        'fixed'         => 'Fixed Amount',
                         'free_shipping' => 'Free Shipping',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')
@@ -106,6 +107,7 @@ class DiscountRelationManager extends RelationManager
                     ->label('Enabled'),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

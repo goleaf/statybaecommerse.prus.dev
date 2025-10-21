@@ -22,6 +22,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class StockMovementsRelationManager extends RelationManager
 {
@@ -62,7 +63,7 @@ class StockMovementsRelationManager extends RelationManager
                 Select::make('type')
                     ->label(__('inventory.movement_type'))
                     ->options([
-                        'in' => __('inventory.stock_in'),
+                        'in'  => __('inventory.stock_in'),
                         'out' => __('inventory.stock_out'),
                     ])
                     ->required()
@@ -70,14 +71,14 @@ class StockMovementsRelationManager extends RelationManager
                 Select::make('reason')
                     ->label(__('inventory.reason'))
                     ->options([
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
+                        'sale'              => __('inventory.reason_sale'),
+                        'return'            => __('inventory.reason_return'),
+                        'adjustment'        => __('inventory.reason_adjustment'),
                         'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
+                        'restock'           => __('inventory.reason_restock'),
+                        'damage'            => __('inventory.reason_damage'),
+                        'theft'             => __('inventory.reason_theft'),
+                        'transfer'          => __('inventory.reason_transfer'),
                     ])
                     ->required()
                     ->searchable(),
@@ -110,9 +111,9 @@ class StockMovementsRelationManager extends RelationManager
                     ->label(__('inventory.movement_type'))
                     ->colors([
                         'success' => 'in',
-                        'danger' => 'out',
+                        'danger'  => 'out',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __('inventory.'.$state)),
+                    ->formatStateUsing(fn (string $state): string => __('inventory.' . $state)),
                 TextColumn::make('quantity')
                     ->label(__('inventory.quantity'))
                     ->sortable()
@@ -125,13 +126,13 @@ class StockMovementsRelationManager extends RelationManager
                         'primary' => 'sale',
                         'success' => 'return',
                         'warning' => 'adjustment',
-                        'info' => 'manual_adjustment',
+                        'info'    => 'manual_adjustment',
                         'success' => 'restock',
-                        'danger' => 'damage',
-                        'danger' => 'theft',
-                        'info' => 'transfer',
+                        'danger'  => 'damage',
+                        'danger'  => 'theft',
+                        'info'    => 'transfer',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __('inventory.reason_'.$state)),
+                    ->formatStateUsing(fn (string $state): string => __('inventory.reason_' . $state)),
                 TextColumn::make('reference')
                     ->label(__('inventory.reference'))
                     ->searchable()
@@ -154,20 +155,20 @@ class StockMovementsRelationManager extends RelationManager
                 SelectFilter::make('type')
                     ->label(__('inventory.movement_type'))
                     ->options([
-                        'in' => __('inventory.stock_in'),
+                        'in'  => __('inventory.stock_in'),
                         'out' => __('inventory.stock_out'),
                     ]),
                 SelectFilter::make('reason')
                     ->label(__('inventory.reason'))
                     ->options([
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
+                        'sale'              => __('inventory.reason_sale'),
+                        'return'            => __('inventory.reason_return'),
+                        'adjustment'        => __('inventory.reason_adjustment'),
                         'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
+                        'restock'           => __('inventory.reason_restock'),
+                        'damage'            => __('inventory.reason_damage'),
+                        'theft'             => __('inventory.reason_theft'),
+                        'transfer'          => __('inventory.reason_transfer'),
                     ])
                     ->multiple(),
                 Filter::make('recent')
@@ -181,13 +182,14 @@ class StockMovementsRelationManager extends RelationManager
                     ->query(fn (Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfYear())),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make()
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['user_id'] = auth()->id();
 
                         return $data;
                     })
-                    ->after(function ($record) {
+                    ->after(function ($record): void {
                         // Update the variant inventory stock based on movement
                         $variantInventory = $this->ownerRecord;
                         $quantity = $record->quantity;
@@ -210,7 +212,7 @@ class StockMovementsRelationManager extends RelationManager
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
-                    ->after(function ($record) {
+                    ->after(function ($record): void {
                         // Reverse the stock movement when deleting
                         $variantInventory = $this->ownerRecord;
                         $quantity = $record->quantity;
@@ -225,7 +227,7 @@ class StockMovementsRelationManager extends RelationManager
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->after(function ($records) {
+                        ->after(function ($records): void {
                             // Reverse all stock movements when bulk deleting
                             $variantInventory = $this->ownerRecord;
 

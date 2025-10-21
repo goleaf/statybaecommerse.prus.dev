@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class DiscountsRelationManager extends RelationManager
 {
@@ -45,10 +46,10 @@ final class DiscountsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('discounts.type'))
                     ->color(fn (string $state): string => match ($state) {
-                        'percentage' => 'success',
-                        'fixed' => 'warning',
+                        'percentage'    => 'success',
+                        'fixed'         => 'warning',
                         'free_shipping' => 'info',
-                        default => 'gray',
+                        default         => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('discounts.value'))
@@ -61,14 +62,15 @@ final class DiscountsRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'percentage' => __('discounts.percentage'),
-                        'fixed' => __('discounts.fixed'),
+                        'percentage'    => __('discounts.percentage'),
+                        'fixed'         => __('discounts.fixed'),
                         'free_shipping' => __('discounts.free_shipping'),
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label(__('discounts.is_active')),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make()
                     ->label(__('customer_groups.attach_discount')),
             ])

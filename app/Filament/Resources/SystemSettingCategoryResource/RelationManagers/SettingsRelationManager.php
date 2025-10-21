@@ -22,6 +22,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Str;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class SettingsRelationManager extends RelationManager
 {
@@ -45,7 +47,7 @@ final class SettingsRelationManager extends RelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state)))
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
                                 ->helperText(__('system_setting_categories.settings.key_help')),
 
                             TextInput::make('slug')
@@ -74,15 +76,15 @@ final class SettingsRelationManager extends RelationManager
                             Select::make('type')
                                 ->label(__('system_setting_categories.settings.type'))
                                 ->options([
-                                    'string' => 'String',
-                                    'integer' => 'Integer',
-                                    'boolean' => 'Boolean',
-                                    'array' => 'Array',
-                                    'json' => 'JSON',
-                                    'text' => 'Text',
-                                    'email' => 'Email',
-                                    'url' => 'URL',
-                                    'date' => 'Date',
+                                    'string'   => 'String',
+                                    'integer'  => 'Integer',
+                                    'boolean'  => 'Boolean',
+                                    'array'    => 'Array',
+                                    'json'     => 'JSON',
+                                    'text'     => 'Text',
+                                    'email'    => 'Email',
+                                    'url'      => 'URL',
+                                    'date'     => 'Date',
                                     'datetime' => 'DateTime',
                                 ])
                                 ->required()
@@ -150,17 +152,17 @@ final class SettingsRelationManager extends RelationManager
                     ->label(__('system_setting_categories.settings.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'string' => 'primary',
-                        'integer' => 'info',
-                        'boolean' => 'warning',
-                        'array' => 'success',
-                        'json' => 'danger',
-                        'text' => 'secondary',
-                        'email' => 'info',
-                        'url' => 'primary',
-                        'date' => 'success',
+                        'string'   => 'primary',
+                        'integer'  => 'info',
+                        'boolean'  => 'warning',
+                        'array'    => 'success',
+                        'json'     => 'danger',
+                        'text'     => 'secondary',
+                        'email'    => 'info',
+                        'url'      => 'primary',
+                        'date'     => 'success',
                         'datetime' => 'warning',
-                        default => 'gray',
+                        default    => 'gray',
                     })
                     ->sortable(),
 
@@ -210,15 +212,15 @@ final class SettingsRelationManager extends RelationManager
                 SelectFilter::make('type')
                     ->label(__('system_setting_categories.settings.type'))
                     ->options([
-                        'string' => 'String',
-                        'integer' => 'Integer',
-                        'boolean' => 'Boolean',
-                        'array' => 'Array',
-                        'json' => 'JSON',
-                        'text' => 'Text',
-                        'email' => 'Email',
-                        'url' => 'URL',
-                        'date' => 'Date',
+                        'string'   => 'String',
+                        'integer'  => 'Integer',
+                        'boolean'  => 'Boolean',
+                        'array'    => 'Array',
+                        'json'     => 'JSON',
+                        'text'     => 'Text',
+                        'email'    => 'Email',
+                        'url'      => 'URL',
+                        'date'     => 'Date',
                         'datetime' => 'DateTime',
                     ])
                     ->native(false),
@@ -229,6 +231,7 @@ final class SettingsRelationManager extends RelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make(),
             ])
             ->actions([

@@ -10,6 +10,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class CodeRelationManager extends RelationManager
 {
@@ -55,9 +56,9 @@ class CodeRelationManager extends RelationManager
                             ->default(true),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'active' => 'Active',
-                                'inactive' => 'Inactive',
-                                'expired' => 'Expired',
+                                'active'    => 'Active',
+                                'inactive'  => 'Inactive',
+                                'expired'   => 'Expired',
                                 'suspended' => 'Suspended',
                             ])
                             ->default('active'),
@@ -113,11 +114,11 @@ class CodeRelationManager extends RelationManager
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'gray',
-                        'expired' => 'danger',
+                        'active'    => 'success',
+                        'inactive'  => 'gray',
+                        'expired'   => 'danger',
                         'suspended' => 'warning',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
@@ -128,9 +129,9 @@ class CodeRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                        'expired' => 'Expired',
+                        'active'    => 'Active',
+                        'inactive'  => 'Inactive',
+                        'expired'   => 'Expired',
                         'suspended' => 'Suspended',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')
@@ -155,6 +156,7 @@ class CodeRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

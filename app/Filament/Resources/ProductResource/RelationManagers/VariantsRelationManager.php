@@ -14,6 +14,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class VariantsRelationManager extends RelationManager
 {
@@ -90,7 +91,7 @@ final class VariantsRelationManager extends RelationManager
                     ->color(fn ($state) => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 5 => 'warning',
-                        default => 'success',
+                        default     => 'success',
                     }),
                 Tables\Columns\TextColumn::make('weight')
                     ->suffix(' kg'),
@@ -114,6 +115,7 @@ final class VariantsRelationManager extends RelationManager
                     ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

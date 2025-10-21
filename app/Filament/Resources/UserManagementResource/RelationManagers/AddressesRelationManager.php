@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class AddressesRelationManager extends RelationManager
 {
@@ -36,7 +37,7 @@ final class AddressesRelationManager extends RelationManager
                 Forms\Components\TextInput::make('country'),
                 Forms\Components\Select::make('type')
                     ->options([
-                        'billing' => 'Billing',
+                        'billing'  => 'Billing',
                         'shipping' => 'Shipping',
                     ])
                     ->required(),
@@ -60,9 +61,9 @@ final class AddressesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'billing' => 'info',
+                        'billing'  => 'info',
                         'shipping' => 'success',
-                        default => 'gray',
+                        default    => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('is_default')
                     ->boolean(),
@@ -76,6 +77,7 @@ final class AddressesRelationManager extends RelationManager
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

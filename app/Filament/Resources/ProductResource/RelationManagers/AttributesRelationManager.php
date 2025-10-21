@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class AttributesRelationManager extends RelationManager
 {
@@ -37,13 +38,13 @@ final class AttributesRelationManager extends RelationManager
                             ->maxLength(500),
                         Forms\Components\Select::make('type')
                             ->options([
-                                'text' => __('attributes.types.text'),
-                                'number' => __('attributes.types.number'),
-                                'boolean' => __('attributes.types.boolean'),
-                                'select' => __('attributes.types.select'),
+                                'text'        => __('attributes.types.text'),
+                                'number'      => __('attributes.types.number'),
+                                'boolean'     => __('attributes.types.boolean'),
+                                'select'      => __('attributes.types.select'),
                                 'multiselect' => __('attributes.types.multiselect'),
-                                'date' => __('attributes.types.date'),
-                                'file' => __('attributes.types.file'),
+                                'date'        => __('attributes.types.date'),
+                                'file'        => __('attributes.types.file'),
                             ])
                             ->required(),
                     ]),
@@ -87,14 +88,14 @@ final class AttributesRelationManager extends RelationManager
                     ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'text' => 'blue',
-                        'number' => 'green',
-                        'boolean' => 'orange',
-                        'select' => 'purple',
+                        'text'        => 'blue',
+                        'number'      => 'green',
+                        'boolean'     => 'orange',
+                        'select'      => 'purple',
                         'multiselect' => 'pink',
-                        'date' => 'cyan',
-                        'file' => 'gray',
-                        default => 'gray',
+                        'date'        => 'cyan',
+                        'file'        => 'gray',
+                        default       => 'gray',
                     }),
 
                 Tables\Columns\TextColumn::make('value')
@@ -127,13 +128,13 @@ final class AttributesRelationManager extends RelationManager
                     ->label(__('products.attributes.attribute_type'))
                     ->relationship('attribute', 'type')
                     ->options([
-                        'text' => __('attributes.types.text'),
-                        'number' => __('attributes.types.number'),
-                        'boolean' => __('attributes.types.boolean'),
-                        'select' => __('attributes.types.select'),
+                        'text'        => __('attributes.types.text'),
+                        'number'      => __('attributes.types.number'),
+                        'boolean'     => __('attributes.types.boolean'),
+                        'select'      => __('attributes.types.select'),
                         'multiselect' => __('attributes.types.multiselect'),
-                        'date' => __('attributes.types.date'),
-                        'file' => __('attributes.types.file'),
+                        'date'        => __('attributes.types.date'),
+                        'file'        => __('attributes.types.file'),
                     ]),
 
                 Tables\Filters\TernaryFilter::make('is_visible')
@@ -151,6 +152,7 @@ final class AttributesRelationManager extends RelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

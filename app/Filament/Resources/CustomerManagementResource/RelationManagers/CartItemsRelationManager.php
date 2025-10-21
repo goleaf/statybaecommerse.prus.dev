@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
 use Filament\Actions\AssociateAction;
@@ -18,6 +20,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class CartItemsRelationManager extends RelationManager
 {
@@ -53,6 +56,7 @@ class CartItemsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make(),
                 AssociateAction::make(),
             ])
