@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Attribute;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\ProductVariantAttributeMatrixService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -32,6 +34,58 @@ class ProductVariantFactory extends Factory
             'is_default' => $this->faker->boolean(10),
             'is_enabled' => true,
             'attributes' => null,
+            'variant_attribute_matrix' => null,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this
+            ->afterMaking(function (ProductVariant $variant): void {
+                if (! empty($variant->variant_attribute_matrix)) {
+                    return;
+                }
+
+                $variant->variant_attribute_matrix = $this->generateDefaultMatrix($variant);
+            })
+            ->afterCreating(function (ProductVariant $variant): void {
+                $matrix = $variant->variant_attribute_matrix;
+
+                if (empty($matrix)) {
+                    $matrix = $this->generateDefaultMatrix($variant);
+
+                    if (empty($matrix)) {
+                        return;
+                    }
+
+                    $variant->forceFill(['variant_attribute_matrix' => $matrix])->save();
+                }
+
+                ProductVariantAttributeMatrixService::sync($variant->fresh(), $matrix);
+            });
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function generateDefaultMatrix(ProductVariant $variant): array
+    {
+        $product = $variant->product()->with(['attributes.values' => fn ($query) => $query->orderBy('sort_order')])->first();
+
+        $attributes = $product?->attributes;
+
+        if (blank($attributes)) {
+            $attributes = Attribute::query()
+                ->with(['values' => fn ($query) => $query->orderBy('sort_order')])
+                ->limit(2)
+                ->get();
+        }
+
+        return $attributes
+            ->filter(fn ($attribute) => $attribute->values->isNotEmpty())
+            ->mapWithKeys(fn ($attribute) => [
+                'attribute_'.$attribute->getKey() => $attribute->values->first()->getKey(),
+            ])
+            ->all();
     }
 }
