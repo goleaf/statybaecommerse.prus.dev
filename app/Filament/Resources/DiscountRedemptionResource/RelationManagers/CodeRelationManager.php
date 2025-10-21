@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Form;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class CodeRelationManager extends BaseRelationManager
 {
@@ -56,9 +58,9 @@ class CodeRelationManager extends BaseRelationManager
                             ->default(true),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'active' => 'Active',
-                                'inactive' => 'Inactive',
-                                'expired' => 'Expired',
+                                'active'    => 'Active',
+                                'inactive'  => 'Inactive',
+                                'expired'   => 'Expired',
                                 'suspended' => 'Suspended',
                             ])
                             ->default('active'),
@@ -114,11 +116,11 @@ class CodeRelationManager extends BaseRelationManager
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'gray',
-                        'expired' => 'danger',
+                        'active'    => 'success',
+                        'inactive'  => 'gray',
+                        'expired'   => 'danger',
                         'suspended' => 'warning',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
@@ -129,9 +131,9 @@ class CodeRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                        'expired' => 'Expired',
+                        'active'    => 'Active',
+                        'inactive'  => 'Inactive',
+                        'expired'   => 'Expired',
                         'suspended' => 'Suspended',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')
@@ -156,6 +158,15 @@ class CodeRelationManager extends BaseRelationManager
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

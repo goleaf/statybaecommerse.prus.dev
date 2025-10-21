@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Filament\Components\Flatpickr;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
@@ -172,9 +174,9 @@ final class ItemsRelationManager extends BaseRelationManager
 
                 Tables\Filters\Filter::make('valid_now')
                     ->label(__('price_list_items.valid_now'))
-                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $query) {
+                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $query): void {
                         $query->where('valid_from', '<=', now())
-                            ->where(function (Builder $query) {
+                            ->where(function (Builder $query): void {
                                 $query->whereNull('valid_until')
                                     ->orWhere('valid_until', '>=', now());
                             });
@@ -185,6 +187,15 @@ final class ItemsRelationManager extends BaseRelationManager
                     ->query(fn (Builder $query): Builder => $query->where('valid_until', '<', now())),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

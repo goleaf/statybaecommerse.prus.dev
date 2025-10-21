@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Form;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class UserRelationManager extends BaseRelationManager
 {
@@ -42,10 +44,10 @@ class UserRelationManager extends BaseRelationManager
                             ->label('Email Verified At'),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'active' => 'Active',
-                                'inactive' => 'Inactive',
+                                'active'    => 'Active',
+                                'inactive'  => 'Inactive',
                                 'suspended' => 'Suspended',
-                                'pending' => 'Pending',
+                                'pending'   => 'Pending',
                             ])
                             ->default('active'),
                         Forms\Components\Toggle::make('is_active')
@@ -81,11 +83,11 @@ class UserRelationManager extends BaseRelationManager
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'gray',
+                        'active'    => 'success',
+                        'inactive'  => 'gray',
                         'suspended' => 'danger',
-                        'pending' => 'warning',
-                        default => 'gray',
+                        'pending'   => 'warning',
+                        default     => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
@@ -99,10 +101,10 @@ class UserRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active'    => 'Active',
+                        'inactive'  => 'Inactive',
                         'suspended' => 'Suspended',
-                        'pending' => 'Pending',
+                        'pending'   => 'Pending',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active'),
@@ -110,6 +112,15 @@ class UserRelationManager extends BaseRelationManager
                     ->label('Email Verified'),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

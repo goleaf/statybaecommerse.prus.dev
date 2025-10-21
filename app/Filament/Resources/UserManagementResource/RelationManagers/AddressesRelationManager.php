@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class AddressesRelationManager extends BaseRelationManager
 {
@@ -36,7 +38,7 @@ final class AddressesRelationManager extends BaseRelationManager
                 Forms\Components\TextInput::make('country'),
                 Forms\Components\Select::make('type')
                     ->options([
-                        'billing' => 'Billing',
+                        'billing'  => 'Billing',
                         'shipping' => 'Shipping',
                     ])
                     ->required(),
@@ -60,9 +62,9 @@ final class AddressesRelationManager extends BaseRelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'billing' => 'info',
+                        'billing'  => 'info',
                         'shipping' => 'success',
-                        default => 'gray',
+                        default    => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('is_default')
                     ->boolean(),
@@ -76,6 +78,15 @@ final class AddressesRelationManager extends BaseRelationManager
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

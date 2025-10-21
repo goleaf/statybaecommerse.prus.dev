@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Support\Filament\Components\Flatpickr;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class PricesRelationManager extends BaseRelationManager
 {
@@ -51,8 +53,8 @@ final class PricesRelationManager extends BaseRelationManager
                     ->step(0.01),
                 Forms\Components\Select::make('type')
                     ->options([
-                        'regular' => 'Regular',
-                        'sale' => 'Sale',
+                        'regular'   => 'Regular',
+                        'sale'      => 'Sale',
                         'wholesale' => 'Wholesale',
                     ])
                     ->default('regular'),
@@ -88,10 +90,10 @@ final class PricesRelationManager extends BaseRelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'regular' => 'gray',
-                        'sale' => 'success',
+                        'regular'   => 'gray',
+                        'sale'      => 'success',
                         'wholesale' => 'warning',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('starts_at')
                     ->dateTime()
@@ -110,26 +112,35 @@ final class PricesRelationManager extends BaseRelationManager
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'regular' => 'Regular',
-                        'sale' => 'Sale',
+                        'regular'   => 'Regular',
+                        'sale'      => 'Sale',
                         'wholesale' => 'Wholesale',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_enabled'),
                 Tables\Filters\Filter::make('active')
                     ->query(fn (Builder $query): Builder => $query
                         ->where('is_enabled', true)
-                        ->where(function ($q) {
+                        ->where(function ($q): void {
                             $q
                                 ->whereNull('starts_at')
                                 ->orWhere('starts_at', '<=', now());
                         })
-                        ->where(function ($q) {
+                        ->where(function ($q): void {
                             $q
                                 ->whereNull('ends_at')
                                 ->orWhere('ends_at', '>=', now());
                         })),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

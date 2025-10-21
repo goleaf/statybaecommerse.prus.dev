@@ -1,16 +1,17 @@
 # Relation Manager Repeater quick-edit actions
 
-The `zvizvi/relation-manager-repeater` plugin (v2.x) is installed to provide bulk editing modals for high-volume HasMany relations. Each enabled relation manager now exposes a **Quick edit** header action that opens a repeater-powered modal and syncs the submitted rows back to the underlying relationship.
+The `zvizvi/relation-manager-repeater` plugin (v2.x) is installed to provide bulk editing modals for high-volume HasMany relations. Each enabled relation manager now exposes a **Quick edit** header action that opens a repeater-powered modal and syncs the submitted rows back to the underlying relationship. As of the latest admin refresh, any relation manager that renders a create action now pairs it with a repeater configured via `BaseRelationManager::getQuickEditSchema()`, ensuring we reuse the exact form schema plus a hidden `id` to keep updates idempotent.
 
 ## Enabled relation managers
 
-| Relation manager | Action label | Repeater highlights |
-| --- | --- | --- |
-| `ProductResource\RelationManagers\ImagesRelationManager` | **Quick edit images** | Reuses the image upload flow plus metadata fields, supports cloning/reordering, and keeps existing records stable through a hidden `id` input. |
-| `ProductResource\RelationManagers\VariantsRelationManager` | **Quick edit variants** | Focuses on pricing, inventory, and publish toggles; variant attributes stay editable in the standard form. |
-| `OrderResource\RelationManagers\OrderItemsRelationManager` | **Quick edit items** | Lets operators adjust quantity, pricing, and notes without reopening each row; product and SKU stay read-only safeguards. |
-| `UserResource\RelationManagers\AddressesRelationManager` | **Quick edit addresses** | Batches contact/address fields while keeping country lookups and default toggles. |
-| `CategoryResource\RelationManagers\TranslationsRelationManager` | **Quick edit translations** | Provides localized content fields with locale locking after creation to prevent duplicates. |
+Every HasMany relation manager that previously surfaced `CreateAction::make()` now ships with a quick-edit partner. Highlights worth calling out:
+
+- **Catalogues** – categories, brands, attributes, collections, price lists, and stock relations now let merchandisers batch-edit metadata without visiting each record individually.
+- **Customer data** – customer, user, and user-management relations (addresses, orders, referrals, loyalty) expose repeaters so support teams can triage cases faster.
+- **Marketing & content** – news, campaigns, discounts, coupons, and legal translations benefit from mirrored schemas for rapid proofreading or toggling visibility.
+- **Operations** – order shipping/documents, variant stock, and currency price relations gained inline adjustments to streamline fulfilment and finance reviews.
+
+Refer to the corresponding relation manager class (for example `Channels\RelationManagers\ProductsRelationManager`) to see the `RelationManagerRepeaterAction::make()` implementation and any context-specific modal wording.
 
 ## Usage tips
 
@@ -20,9 +21,4 @@ The `zvizvi/relation-manager-repeater` plugin (v2.x) is installed to provide bul
 
 ## Skipped relation managers
 
-Some relation managers were left unchanged because they rely on attach/detach flows or pivot data that the repeater cannot manage safely:
-
-- `CustomerManagementResource\RelationManagers\AddressesRelationManager` – uses associate/dissociate actions for a BelongsToMany pivot.
-- Any `*DocumentsRelationManager`, `*PartnersRelationManager`, etc. that expose complex pivots should continue using their existing attach/edit modals.
-
-Document additional skips in this file if you evaluate more relations in the future.
+Attach/detach-only relation managers without a native create action remain unchanged. Document any new skips here if future pivots or bespoke flows cannot rely on the repeater pattern.

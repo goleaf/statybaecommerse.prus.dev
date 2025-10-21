@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Form;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class DiscountRelationManager extends BaseRelationManager
 {
@@ -37,8 +39,8 @@ class DiscountRelationManager extends BaseRelationManager
                             ->columnSpanFull(),
                         Forms\Components\Select::make('type')
                             ->options([
-                                'percentage' => 'Percentage',
-                                'fixed' => 'Fixed Amount',
+                                'percentage'    => 'Percentage',
+                                'fixed'         => 'Fixed Amount',
                                 'free_shipping' => 'Free Shipping',
                             ])
                             ->required(),
@@ -68,10 +70,10 @@ class DiscountRelationManager extends BaseRelationManager
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'percentage' => 'info',
-                        'fixed' => 'success',
+                        'percentage'    => 'info',
+                        'fixed'         => 'success',
                         'free_shipping' => 'warning',
-                        default => 'gray',
+                        default         => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->label('Value')
@@ -96,8 +98,8 @@ class DiscountRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'percentage' => 'Percentage',
-                        'fixed' => 'Fixed Amount',
+                        'percentage'    => 'Percentage',
+                        'fixed'         => 'Fixed Amount',
                         'free_shipping' => 'Free Shipping',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')
@@ -106,6 +108,15 @@ class DiscountRelationManager extends BaseRelationManager
                     ->label('Enabled'),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])
