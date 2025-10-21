@@ -28,6 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Novadaemon\FilamentCombobox\Combobox;
 
 final class CampaignResource extends Resource
 {
@@ -137,32 +138,40 @@ final class CampaignResource extends Resource
                 ]),
             SchemaSection::make(__('campaigns.sections.targeting'))
                 ->schema([
-                    Select::make('targetCategories')
+                    Combobox::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
-                        ->multiple()
-                        ->searchable()
+                        ->boxSearchs()
+                        ->height('360px')
+                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_categories', 'Available categories'))
+                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_categories', 'Selected categories'))
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('targetProducts')
+                    Combobox::make('targetProducts')
                         ->label(self::label('campaigns.fields.target_products', 'Target products'))
                         ->relationship('targetProducts', 'name')
-                        ->multiple()
-                        ->searchable()
+                        ->boxSearchs()
+                        ->height('360px')
+                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_products', 'Available products'))
+                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_products', 'Selected products'))
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('targetCustomerGroups')
+                    Combobox::make('targetCustomerGroups')
                         ->label(self::label('campaigns.fields.target_customer_groups', 'Target customer groups'))
                         ->relationship('targetCustomerGroups', 'name')
-                        ->multiple()
-                        ->searchable()
+                        ->boxSearchs()
+                        ->height('360px')
+                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_customer_groups', 'Available customer groups'))
+                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_customer_groups', 'Selected customer groups'))
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('discounts')
+                    Combobox::make('discounts')
                         ->label(self::label('campaigns.fields.discounts', 'Discounts'))
                         ->relationship('discounts', 'name')
-                        ->multiple()
-                        ->searchable()
+                        ->boxSearchs()
+                        ->height('360px')
+                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.discounts', 'Available discounts'))
+                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.discounts', 'Selected discounts'))
                         ->preload()
                         ->columnSpanFull(),
                 ]),
