@@ -12,6 +12,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Content & marketing** features such as news, landing pages, SEO metadata, and email campaign tooling with automated translations.
 - **Operational dashboards** for activity logs, analytics, and background job health leveraging Laravel Horizon, Scout, and bespoke widgets.
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
+- **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ## Documentation
 - Start with the curated [documentation index](docs/INDEX.md) for the setup → deploy → data model → admin guide → troubleshooting path.
