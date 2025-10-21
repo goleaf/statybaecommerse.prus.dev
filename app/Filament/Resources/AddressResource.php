@@ -92,13 +92,13 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema using the v4 Schema class so the
-     * generated markup stays compatible with the updated Resource contract.
+     * Configure the Filament form schema using the Schema contract Filament v4
+     * ships with so we stay compatible with the upstream Resource signature.
      */
     public static function form(Schema $schema): Schema
     {
-        // Rely on the Schema instance provided by Filament v4 instead of the
-        // deprecated Form class, ensuring compatibility with the core API.
+        // We configure the passed-in Schema instance directly to respect the
+        // lifecycle hooks Filament expects when building the resource forms.
         return $schema->schema([
             Section::make(__('translations.address_information'))
                 ->schema([
