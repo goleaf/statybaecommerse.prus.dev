@@ -14,10 +14,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class PartnerTierResource extends Resource
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
@@ -25,8 +26,9 @@ final class PartnerTierResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form
             ->schema([
                 Forms\Components\Section::make(__('admin.partner_tiers.sections.basic_information'))
@@ -83,8 +85,9 @@ final class PartnerTierResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')

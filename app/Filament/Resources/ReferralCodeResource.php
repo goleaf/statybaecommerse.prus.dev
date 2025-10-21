@@ -31,6 +31,7 @@ use Illuminate\Support\Collection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use Filament\Schemas\Schema;
 
 final class ReferralCodeResource extends Resource
 {
@@ -39,8 +40,9 @@ final class ReferralCodeResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form
             ->components([
                 Section::make(__('referral.resource.referral_code.section.code_details'))
@@ -127,8 +129,9 @@ final class ReferralCodeResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->query(ReferralCode::query()->withoutGlobalScopes())
             ->columns([

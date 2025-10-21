@@ -36,6 +36,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
+use UnitEnum;
 
 final class ReviewResource extends Resource
 {
@@ -44,7 +46,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|\BackedEnum|null Normalize Filament icon typing for consistency.
      */
-    protected static $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
@@ -53,7 +55,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|\BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static $navigationGroup = NavigationGroup::ContentManagement;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {
@@ -78,8 +80,9 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form
             ->schema([
                 Section::make(__('reviews.sections.basic_info'))
@@ -151,8 +154,9 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('title')
@@ -393,8 +397,9 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 InfolistSection::make(__('reviews.sections.basic_info'))

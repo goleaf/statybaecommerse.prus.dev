@@ -13,6 +13,7 @@ use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class CategoriesRelationManager extends BaseRelationManager
 {
@@ -20,8 +21,9 @@ final class CategoriesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Categories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
         return $form
             ->components([
                 Forms\Components\Select::make('id')
@@ -69,8 +71,9 @@ final class CategoriesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('name')
             ->columns([

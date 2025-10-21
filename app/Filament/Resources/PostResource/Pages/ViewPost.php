@@ -13,6 +13,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
+use Filament\Schemas\Schema;
 
 final class ViewPost extends ViewRecord
 {
@@ -25,9 +26,10 @@ final class ViewPost extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        // Provide the view record infolist using the Schema-based API required by Filament v4.
+        return $schema->schema([
             ListEntry::make('postQuickLinks')
                 ->heading(__('Quick links'))
                 ->list()
