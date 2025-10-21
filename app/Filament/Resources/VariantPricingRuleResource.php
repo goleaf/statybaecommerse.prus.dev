@@ -6,11 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -20,8 +16,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -30,7 +31,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * VariantPricingRuleResource
@@ -82,7 +82,7 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -181,7 +181,7 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -210,12 +210,13 @@ final class VariantPricingRuleResource extends Resource
                 TextColumn::make('value')
                     ->label(__('variant_pricing_rules.value'))
                     ->numeric()
-                    ->formatStateUsing(function ($state, $record): string {
+                    ->formatStateUsing(function ($state, VariantPricingRule $record): string {
                         if ($record->type === 'percentage') {
                             return $state.'%';
                         }
 
-                        return Number::currency((float) $state, 'EUR');
+                        // Provide a predictable locale-aware currency string for administrators.
+                        return Number::currency((float) $state, 'EUR', locale: app()->getLocale());
                     }),
                 TextColumn::make('min_quantity')
                     ->label(__('variant_pricing_rules.min_quantity'))
@@ -274,7 +275,7 @@ final class VariantPricingRuleResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('toggle_active')
