@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
+use Closure;
+use DateInterval;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -25,25 +27,52 @@ final class CacheService
     /**
      * Handle rememberShort functionality with proper error handling.
      */
-    public function rememberShort(string $key, callable $callback, ?int $ttl = null): mixed
+    /**
+     * @template TValue
+     *
+     * @param  Closure(): TValue  $callback
+     * @param  array<int, string> $tags
+     * @return TValue
+     */
+    public function rememberShort(string $key, Closure $callback, int|DateInterval|null $ttl = null, array $tags = []): mixed
     {
-        return Cache::remember($key, $ttl ?? self::SHORT_TTL, $callback);
+        return $this->rememberWithTags($key, $ttl ?? self::SHORT_TTL, $callback, $tags);
     }
 
     /**
      * Handle rememberDefault functionality with proper error handling.
      */
-    public function rememberDefault(string $key, callable $callback, ?int $ttl = null): mixed
+    public function rememberDefault(string $key, Closure $callback, int|DateInterval|null $ttl = null, array $tags = []): mixed
     {
-        return Cache::remember($key, $ttl ?? self::DEFAULT_TTL, $callback);
+        return $this->rememberWithTags($key, $ttl ?? self::DEFAULT_TTL, $callback, $tags);
     }
 
     /**
      * Handle rememberLong functionality with proper error handling.
      */
-    public function rememberLong(string $key, callable $callback, ?int $ttl = null): mixed
+    public function rememberLong(string $key, Closure $callback, int|DateInterval|null $ttl = null, array $tags = []): mixed
     {
-        return Cache::remember($key, $ttl ?? self::LONG_TTL, $callback);
+        return $this->rememberWithTags($key, $ttl ?? self::LONG_TTL, $callback, $tags);
+    }
+
+    /**
+     * Store values using tags when available while falling back to classic remember.
+     *
+     * @template TValue
+     *
+     * @param  Closure(): TValue  $callback
+     * @param  array<int, string> $tags
+     * @return TValue
+     */
+    private function rememberWithTags(string $key, int|DateInterval $ttl, Closure $callback, array $tags = []): mixed
+    {
+        if ($tags !== [] && Cache::supportsTags()) {
+            $normalizedTags = array_values(array_unique($tags));
+
+            return Cache::tags($normalizedTags)->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
     }
 
     /**
