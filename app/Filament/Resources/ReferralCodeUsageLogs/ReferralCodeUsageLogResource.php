@@ -11,14 +11,13 @@ use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogFor
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable;
 use App\Models\ReferralCodeUsageLog;
 use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
-use Filament\Forms\Form;
-
-class ReferralCodeUsageLogResource extends Resource
+final class ReferralCodeUsageLogResource extends Resource
 {
     protected static ?string $model = ReferralCodeUsageLog::class;
 
@@ -47,9 +46,9 @@ class ReferralCodeUsageLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralCodeUsageLogs::route('/'),
+            'index'  => ListReferralCodeUsageLogs::route('/'),
             'create' => CreateReferralCodeUsageLog::route('/create'),
-            'edit' => EditReferralCodeUsageLog::route('/{record}/edit'),
+            'edit'   => EditReferralCodeUsageLog::route('/{record}/edit'),
         ];
     }
 }

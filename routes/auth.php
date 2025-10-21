@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Livewire\Pages;
@@ -8,9 +10,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {
     Route::get('register', \App\Livewire\Auth\Register::class)->name('register');
-    Route::get('login', \App\Livewire\Auth\Login::class)->name('login');
-    Route::view('forgot-password', 'livewire.pages.auth.forgot-password')->name('password.request');
-    Route::view('reset-password/{token}', 'livewire.pages.auth.reset-password')->name('password.reset');
+    Route::get('login', \App\Livewire\Auth\Login::class)
+        ->middleware('throttle:auth.login')
+        ->name('login');
+    Route::view('forgot-password', 'livewire.pages.auth.forgot-password')
+        ->middleware('throttle:auth.password-reset')
+        ->name('password.request');
+    Route::view('reset-password/{token}', 'livewire.pages.auth.reset-password')
+        ->middleware('throttle:auth.password-reset')
+        ->name('password.reset');
 });
 
 Route::middleware('auth')->group(function (): void {

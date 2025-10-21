@@ -29,9 +29,13 @@ final class ProductFeature extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'feature_type', 'feature_key', 'feature_value', 'weight'];
+    protected $fillable = ['product_id', 'feature_type', 'feature_key', 'feature_value', 'weight', 'is_active'];
 
-    protected $casts = ['feature_value' => 'decimal:6', 'weight' => 'decimal:4'];
+    protected $casts = [
+        'feature_value' => 'string',
+        'weight' => 'decimal:4',
+        'is_active' => 'boolean',
+    ];
 
     /**
      * Handle product functionality with proper error handling.

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Channels\RelationManagers;
+declare(strict_types=1);
 
-use Filament\Forms\Form;
+namespace App\Filament\Resources\Channels\RelationManagers;
 
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
@@ -13,18 +13,19 @@ use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class OrdersRelationManager extends RelationManager
+class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
     public function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 TextInput::make('number')
                     ->required()
                     ->maxLength(255),

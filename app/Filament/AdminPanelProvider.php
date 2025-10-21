@@ -4,17 +4,38 @@ declare(strict_types=1);
 
 namespace App\Filament;
 
+use App\Filament\Widgets\GeneralStatsOverview;
+use App\Filament\Widgets\SalesByMonthChart;
 use Filament\Enums\UserMenuPosition;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\StatsOverviewWidget;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use InvalidArgumentException;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function __construct(?ApplicationContract $app = null)
+    {
+        if (! $app instanceof ApplicationContract) {
+            $resolved = function_exists('app') ? app() : null;
+
+            if ($resolved instanceof ApplicationContract) {
+                $app = $resolved;
+            }
+        }
+
+        if (! $app instanceof ApplicationContract) {
+            throw new InvalidArgumentException('A Laravel application instance is required to construct the admin panel provider.');
+        }
+
+        parent::__construct($app);
+    }
+
     public function panel(Panel $panel): Panel
     {
-        if (app()->environment('testing')) {
+        if ($this->isTestingEnvironment()) {
             return $panel
                 ->default()
                 ->id('admin')
@@ -26,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
                     'primary' => Color::Blue,
                 ])
                 ->resources([
+                    \App\Filament\Resources\ApiKeyResource::class,
                     \App\Filament\Resources\OrderShippingResource::class,
                     \App\Filament\Resources\PartnerResource::class,
                     \App\Filament\Resources\PartnerTierResource::class,
@@ -40,6 +62,8 @@ class AdminPanelProvider extends PanelProvider
                 ])
                 ->pages([])
                 ->widgets([
+                    GeneralStatsOverview::class,
+                    SalesByMonthChart::class,
                     StatsOverviewWidget::class,
                 ])
                 ->middleware([
@@ -51,7 +75,8 @@ class AdminPanelProvider extends PanelProvider
                 ])
                 ->authMiddleware([
                     \Illuminate\Auth\Middleware\Authenticate::class,
-                ]);
+                ])
+                ->viteTheme('resources/css/filament/admin/theme.css');
         }
 
         return $panel
@@ -71,6 +96,8 @@ class AdminPanelProvider extends PanelProvider
                 //
             ])
             ->widgets([
+                GeneralStatsOverview::class,
+                SalesByMonthChart::class,
                 StatsOverviewWidget::class,
             ])
             ->middleware([
@@ -82,6 +109,26 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 \Illuminate\Auth\Middleware\Authenticate::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/admin/theme.css');
+    }
+
+    private function isTestingEnvironment(): bool
+    {
+        if (! function_exists('app')) {
+            return false;
+        }
+
+        $application = app();
+
+        if (! $application instanceof ApplicationContract) {
+            return false;
+        }
+
+        if (! method_exists($application, 'environment')) {
+            return false;
+        }
+
+        return $application->environment('testing');
     }
 }

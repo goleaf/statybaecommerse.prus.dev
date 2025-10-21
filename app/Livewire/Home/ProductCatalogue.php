@@ -8,6 +8,7 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\Cache\CacheKeys;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -61,7 +62,7 @@ final class ProductCatalogue extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return Cache::remember("home:catalogue:categories:{$locale}", 300, function (): array {
+        return Cache::remember(CacheKeys::homeCatalogueCategories($locale), CacheKeys::TTL_FIVE_MINUTES, function (): array {
             return Category::query()
                 ->where('is_visible', true)
                 ->orderBy('name')

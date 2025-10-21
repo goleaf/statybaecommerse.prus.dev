@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
+use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
+use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
+use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -20,11 +25,38 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use Illuminate\Support\Facades\URL;
+use pxlrbt\FilamentExcel\FilamentExport;
 
 final class AdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        FilamentExport::createExportUrlUsing(
+            static fn ($export): string => URL::temporarySignedRoute(
+                'exports.signed-download',
+                now()->addMinutes(60),
+                ['export' => $export],
+            ),
+        );
+    }
+
     public function panel(Panel $panel): Panel
     {
+        $resourceClasses = array_values(array_filter(
+            (array) config('filament.navigation.resources', []),
+            static fn (mixed $resource): bool => is_string($resource),
+        ));
+
+        /** @var array<class-string> $resourceClasses */
+        $pageClasses = array_values(array_filter(
+            (array) config('filament.navigation.pages', []),
+            static fn (mixed $page): bool => is_string($page),
+        ));
+
+        /** @var array<class-string> $pageClasses */
+
         return $panel
             ->default()
             ->id('admin')
@@ -41,24 +73,15 @@ final class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
-                'gray' => Color::Slate,
+                'gray'    => Color::Slate,
                 'success' => Color::Green,
                 'warning' => Color::Amber,
-                'danger' => Color::Red,
-                'info' => Color::Sky,
+                'danger'  => Color::Red,
+                'info'    => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->resources([
-                \App\Filament\Resources\SystemSettingResource::class,
-            ])
-            ->pages([
-                \App\Filament\Pages\Dashboard::class,
-                \App\Filament\Pages\SliderAnalytics::class,
-                \App\Filament\Pages\SliderManagement::class,
-                \App\Filament\Pages\InventoryManagement::class,
-                \App\Filament\Pages\AdvancedReports::class,
-                \App\Filament\Pages\UserImpersonation::class,
-            ])
+            ->resources($resourceClasses)
+            ->pages($pageClasses)
             ->widgets([
                 AccountWidget::class,
             ])
@@ -80,7 +103,6 @@ final class AdminPanelProvider extends PanelProvider
             // Disable database notifications polling to prevent auto-refresh on the main page
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarCollapsibleOnDesktop()
-            ->topNavigation()
             ->maxContentWidth('full')
             ->font('Inter')
             ->darkMode()
@@ -90,16 +112,8 @@ final class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts()
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
-            ->navigationGroups([
-                NavigationGroup::make()->label(__('admin.navigation.dashboard'))->icon('heroicon-o-home'),
-                NavigationGroup::make()->label(__('admin.navigation.commerce'))->icon('heroicon-o-shopping-bag'),
-                NavigationGroup::make()->label(__('admin.navigation.products'))->icon('heroicon-o-cube'),
-                NavigationGroup::make()->label(__('admin.navigation.marketing'))->icon('heroicon-o-megaphone'),
-                NavigationGroup::make()->label(__('admin.navigation.content'))->icon('heroicon-o-document-text'),
-                NavigationGroup::make()->label(__('admin.navigation.analytics'))->icon('heroicon-o-chart-bar'),
-                NavigationGroup::make()->label(__('admin.navigation.system'))->icon('heroicon-o-cog-6-tooth'),
-                NavigationGroup::make()->label('Recommendation System')->icon('heroicon-o-sparkles'),
-            ])
+            ->navigationGroups($this->configuredNavigationGroups())
+            ->userMenu(position: UserMenuPosition::Sidebar)
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
@@ -114,9 +128,61 @@ final class AdminPanelProvider extends PanelProvider
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
+                    FilamentFullCalendarPlugin::make()
+                        ->selectable(true)
+                        ->editable(true)
+                        ->timezone('Europe/Vilnius')
+                        ->locale('lt'),
+                    TableLayoutTogglePlugin::make()
+                        ->setDefaultLayout('grid')
+                        ->persistLayoutUsing(
+                            persister: LocalStoragePersister::class,
+                            cacheStore: 'redis',
+                            cacheTtl: 60 * 24,
+                        )
+                        ->shareLayoutBetweenPages(false)
+                        ->displayToggleAction()
+                        ->toggleActionHook('tables::toolbar.search.after')
+                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
+                    FilamentNordThemePlugin::make(),
+                    ResizedColumnPlugin::make()->preserveOnDB(),
                 ]))
-            // Remove custom Vite theme to ensure default Filament styles load
-            // ->viteTheme('resources/css/filament-enhancements.css')
+            // Enable the custom Filament theme so third-party plugin views (like the searchable input)
+            // are compiled with Tailwind during the build step.
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->spa();
+    }
+
+    /**
+     * Build Filament navigation groups from configuration.
+     *
+     * @return array<int, NavigationGroup>
+     */
+    private function configuredNavigationGroups(): array
+    {
+        $groupConfigurations = array_values(array_filter(
+            (array) config('filament.navigation.groups', []),
+            static fn (mixed $group): bool => is_array($group),
+        ));
+
+        /** @var array<int, array{label?: string, icon?: string|null, collapsed?: bool|null}> $groupConfigurations */
+
+        return collect($groupConfigurations)
+            ->map(static function (array $group, int|string $unused): NavigationGroup {
+                $navigationGroup = NavigationGroup::make()
+                    ->label(__($group['label'] ?? ''));
+
+                if (! empty($group['icon'])) {
+                    $navigationGroup->icon($group['icon']);
+                }
+
+                if (($group['collapsed'] ?? false) === true) {
+                    $navigationGroup->collapsed();
+                }
+
+                return $navigationGroup;
+            })
+            ->all();
     }
 }

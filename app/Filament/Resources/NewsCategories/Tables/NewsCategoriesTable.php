@@ -7,6 +7,7 @@ namespace App\Filament\Resources\NewsCategories\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -38,13 +39,14 @@ final class NewsCategoriesTable
                     ->label('Sort Order')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('color')
+                ColorColumn::make('color')
                     ->label('Color')
-                    ->badge()
-                    ->color(fn (string $state): string => $state),
-                TextColumn::make('icon')
+                    ->copyable()
+                    ->tooltip('Copy color'),
+                IconColumn::make('icon')
                     ->label('Icon')
-                    ->icon(fn (string $state): string => $state),
+                    ->icon(fn (?string $state): string => $state ?? 'heroicon-o-question-mark-circle')
+                    ->tooltip(fn (?string $state): string => $state ?? 'Not set'),
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()

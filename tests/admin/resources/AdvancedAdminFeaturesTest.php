@@ -4,34 +4,23 @@ declare(strict_types=1);
 
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\AdminAuthorizationSeeder;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
-    // Create permissions
-    $permissions = [
-        'view_admin_panel',
-        'view_any_product',
-        'create_product',
-        'edit_product',
-        'delete_product',
-        'view_any_order',
-        'create_order',
-        'edit_order',
-        'view_any_user',
-        'impersonate_users',
-    ];
+    $this->seed(AdminAuthorizationSeeder::class);
 
-    foreach ($permissions as $permission) {
+    $additionalPermissions = ['impersonate_users'];
+
+    foreach ($additionalPermissions as $permission) {
         Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
     }
 
-    // Create admin role with all permissions
-    $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
-    $adminRole->syncPermissions($permissions);
+    $adminRole = Role::findByName('administrator', 'web');
+    $adminRole->givePermissionTo($additionalPermissions);
 
-    // Create admin user
     $this->admin = User::factory()->create([
         'name' => 'Test Admin',
         'email' => 'admin@test.com',

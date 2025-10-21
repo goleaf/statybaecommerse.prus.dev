@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ProductHistoryResource\Pages;
 
 use App\Filament\Resources\ProductHistoryResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListProductHistories extends ListRecords
+final class ListProductHistories extends BaseListRecords
 {
     protected static string $resource = ProductHistoryResource::class;
 

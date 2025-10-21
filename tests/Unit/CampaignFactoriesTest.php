@@ -9,6 +9,8 @@ use App\Models\CampaignCustomerSegment;
 use App\Models\CampaignProductTarget;
 use App\Models\CampaignSchedule;
 use App\Models\CampaignView;
+use App\Models\CustomerGroup;
+use Illuminate\Support\Facades\Schema;
 
 it('creates campaign via factory with relationships', function () {
     $campaign = Campaign::factory()->active()->create();
@@ -17,7 +19,13 @@ it('creates campaign via factory with relationships', function () {
         ->not
         ->toBeNull()
         ->and($campaign->status)
-        ->toBe('active');
+        ->toBe('active')
+        ->and($campaign->productTargets()->count())
+        ->toBeGreaterThanOrEqual(1)
+        ->and($campaign->customerSegments()->count())
+        ->toBeGreaterThanOrEqual(1)
+        ->and($campaign->schedules()->count())
+        ->toBeGreaterThanOrEqual(1);
 
     CampaignView::factory()->count(2)->create([
         'campaign_id' => $campaign->id,
@@ -40,25 +48,43 @@ it('creates campaign via factory with relationships', function () {
 it('creates product target, customer segment and schedule via factories', function () {
     $campaign = Campaign::factory()->create();
 
-    // Insert only cross-DB columns to avoid missing-column failures
-    $target = CampaignProductTarget::factory()->category()->make(['campaign_id' => $campaign->id]);
-    \DB::table('campaign_product_targets')->insert([
-        'campaign_id' => $campaign->id,
-        'product_id' => $target->product_id,
-        'category_id' => $target->category_id,
-        'target_type' => 'category',
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-    CampaignCustomerSegment::factory()->demographic()->create(['campaign_id' => $campaign->id]);
-    CampaignSchedule::factory()->daily()->create(['campaign_id' => $campaign->id]);
+    $ensureActive = static fn (string $table) => Schema::hasColumn($table, 'is_active') ? ['is_active' => true] : [];
+
+    $target = CampaignProductTarget::factory()
+        ->category()
+        ->for($campaign)
+        ->state($ensureActive('campaign_product_targets'))
+        ->create();
+
+    $segment = CampaignCustomerSegment::factory()
+        ->demographic()
+        ->for($campaign)
+        ->state(array_merge(
+            ['customer_group_id' => CustomerGroup::factory()],
+            $ensureActive('campaign_customer_segments'),
+        ))
+        ->create();
+
+    $schedule = CampaignSchedule::factory()
+        ->daily()
+        ->for($campaign)
+        ->state($ensureActive('campaign_schedules'))
+        ->create();
+
+    $campaign->refresh();
 
     expect($campaign->productTargets()->count())
-        ->toBe(1)
+        ->toBeGreaterThanOrEqual(2)
+        ->and($campaign->productTargets()->pluck('id')->all())
+        ->toContain($target->id)
         ->and($campaign->customerSegments()->count())
-        ->toBe(1)
+        ->toBeGreaterThanOrEqual(2)
+        ->and($campaign->customerSegments()->pluck('id')->all())
+        ->toContain($segment->id)
         ->and($campaign->schedules()->count())
-        ->toBe(1);
+        ->toBeGreaterThanOrEqual(2)
+        ->and($campaign->schedules()->pluck('id')->all())
+        ->toContain($schedule->id);
 });
 
 // Seeder is heavy and out of scope for factory tests; covered elsewhere.

@@ -6,30 +6,36 @@ namespace App\Filament\Pages;
 
 use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
+use Illuminate\Support\Facades\Gate;
 
 class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationLabel = 'Dashboard';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';
 
-    public static function getNavigationIcon(): BackedEnum|string|null
+    public static function getNavigationLabel(): string
     {
-        return 'heroicon-o-home';
+        return trans('admin.navigation.dashboard');
     }
 
     public function getTitle(): string
     {
-        return __('admin.navigation.dashboard');
+        return trans('admin.navigation.dashboard');
     }
 
     public function getWidgets(): array
     {
         return [
-            // Simplified Comprehensive Statistics Widget
-            \App\Filament\Widgets\SimplifiedStatsWidget::class,
+            \App\Filament\Widgets\DashboardKpiWidget::class,
+            \App\Filament\Widgets\DashboardTimeSeriesWidget::class,
+            \App\Filament\Widgets\DashboardRecentOrdersTable::class,
+            \App\Filament\Widgets\DashboardLowStockTable::class,
+            \App\Filament\Widgets\DashboardRecentErrorsTable::class,
+            \App\Filament\Widgets\DashboardQuickActionsWidget::class,
+            \App\Filament\Widgets\CalendarWidget::class,
         ];
     }
 
@@ -45,6 +51,12 @@ class Dashboard extends BaseDashboard
 
     public static function canAccess(): bool
     {
-        return true;  // Temporarily allow access for testing
+        if (! auth()->check()) {
+            return false;
+        }
+
+        $abilities = array_values((array) config('dashboard.permissions'));
+
+        return Gate::any($abilities) || (bool) auth()->user()?->is_admin;
     }
 }

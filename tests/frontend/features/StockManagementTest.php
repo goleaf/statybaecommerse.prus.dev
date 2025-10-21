@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Jobs\GenerateStockExport;
 use App\Models\Location;
 use App\Models\Partner;
 use App\Models\Product;
@@ -12,6 +13,7 @@ use App\Models\StockMovement;
 use App\Models\User;
 use App\Models\VariantInventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 final class StockManagementTest extends TestCase
@@ -262,11 +264,16 @@ final class StockManagementTest extends TestCase
 
     public function test_can_export_stock(): void
     {
-        $response = $this->get(route('stock.export'));
+        Queue::fake();
 
-        $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $response->assertHeader('Content-Disposition', 'attachment; filename="stock_export_'.now()->format('Y-m-d_H-i-s').'.csv"');
+        $response = $this->post(route('stock.export'));
+
+        $response->assertRedirect(route('exports.index'));
+        $response->assertSessionHas('success', __('inventory.export_job_queued'));
+
+        Queue::assertPushed(GenerateStockExport::class, function (GenerateStockExport $job, string $queue): bool {
+            return $queue === 'exports' && $job->backoff() === [60, 120, 300];
+        });
     }
 
     public function test_can_view_stock_report(): void

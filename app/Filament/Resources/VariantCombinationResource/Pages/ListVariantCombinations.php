@@ -6,9 +6,9 @@ namespace App\Filament\Resources\VariantCombinationResource\Pages;
 
 use App\Filament\Resources\VariantCombinationResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListVariantCombinations extends ListRecords
+final class ListVariantCombinations extends BaseListRecords
 {
     protected static string $resource = VariantCombinationResource::class;
 

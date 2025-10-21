@@ -6,10 +6,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Support\Contracts\Entities\ProductContract;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use App\Traits\HandlesContentNegotiation;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 /**
@@ -38,11 +44,13 @@ final class ProductController extends Controller
         $filteredProducts = $products->skipWhile(function (Product $product) {
             return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
         });
-        $data = ['products' => $filteredProducts->map(function (Product $product) {
-            return ['id' => $product->id, 'name' => $product->name, 'slug' => $product->slug, 'sku' => $product->sku, 'price' => $product->price, 'sale_price' => $product->sale_price, 'brand' => $product->brand?->name, 'category' => $product->category?->name, 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => route('product.show', $product->slug), 'stock_quantity' => $product->stock_quantity ?? 0];
-        })->toArray(), 'query' => $query, 'total' => $filteredProducts->count(), 'limit' => $limit];
+        $payload = ProductContract::forCollection($filteredProducts, [
+            'query' => $query,
+            'total' => $filteredProducts->count(),
+            'limit' => $limit,
+        ]);
 
-        return $this->handleContentNegotiation($request, $data);
+        return $this->respondWithContract($request, $payload);
     }
 
     /**
@@ -50,34 +58,64 @@ final class ProductController extends Controller
      */
     public function catalog(Request $request): JsonResponse|View|Response
     {
-        $perPage = min((int) $request->get('per_page', 20), 100);
-        $category = $request->get('category');
-        $brand = $request->get('brand');
-        $sortBy = $request->get('sort_by', 'name');
-        $sortOrder = $request->get('sort_order', 'asc');
+        $definition = new ListQueryDefinition(
+            filters: [
+                'category' => [
+                    'type' => 'string',
+                    'callback' => static function (Builder $builder, string $slug): void {
+                        $builder->whereHas('category', static function (Builder $query) use ($slug): void {
+                            $query->where('slug', $slug);
+                        });
+                    },
+                ],
+                'brand' => [
+                    'type' => 'string',
+                    'callback' => static function (Builder $builder, string $slug): void {
+                        $builder->whereHas('brand', static function (Builder $query) use ($slug): void {
+                            $query->where('slug', $slug);
+                        });
+                    },
+                ],
+            ],
+            sortable: [
+                'name' => ['column' => 'products.name'],
+                'price' => ['column' => 'products.price'],
+                'created_at' => ['column' => 'products.created_at'],
+            ],
+            defaultSort: 'name',
+            defaultDirection: 'asc',
+            defaultPerPage: 20,
+            maxPerPage: 100,
+        );
+
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
         $query = Product::query()->where('is_visible', true)->with(['brand', 'media', 'category']);
-        if ($category) {
-            $query->whereHas('category', function ($q) use ($category) {
-                $q->where('slug', $category);
-            });
+        $listQuery->applyFilters($query);
+        $listQuery->applySorts($query);
+
+        if (! $listQuery->hasSort('name')) {
+            $query->orderBy('products.name');
         }
-        if ($brand) {
-            $query->whereHas('brand', function ($q) use ($brand) {
-                $q->where('slug', $brand);
-            });
-        }
-        $products = $query->orderBy($sortBy, $sortOrder)->get()->skipWhile(function (Product $product) {
+
+        $products = $query->get()->skipWhile(function (Product $product) {
             // Skip products that are not properly configured for catalog display
             return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
         });
         // Apply pagination manually after skipWhile filtering
         $total = $products->count();
-        $currentPage = (int) $request->get('page', 1);
+        $currentPage = $listQuery->page();
+        $perPage = $listQuery->perPage();
         $offset = ($currentPage - 1) * $perPage;
-        $paginatedProducts = $products->slice($offset, $perPage);
-        $paginatedData = new \Illuminate\Pagination\LengthAwarePaginator($paginatedProducts, $total, $perPage, $currentPage, ['path' => $request->url(), 'pageName' => 'page']);
+        $paginatedProducts = $products->slice($offset, $perPage)->values();
+        $paginatedData = new LengthAwarePaginator($paginatedProducts, $total, $perPage, $currentPage, ['path' => $request->url(), 'pageName' => 'page']);
 
-        return $this->handleProductContentNegotiation($request, $paginatedData);
+        $payload = ProductContract::forCollection($paginatedData, ListResponse::meta($listQuery, $paginatedData, [
+            'total' => $total,
+            'limit' => $perPage,
+        ]));
+
+        return $this->respondWithContract($request, $payload);
     }
 
     /**
@@ -86,12 +124,8 @@ final class ProductController extends Controller
     public function show(Request $request, Product $product): JsonResponse|View|Response
     {
         $product->load(['brand', 'media', 'category', 'variants']);
-        $data = ['product' => ['id' => $product->id, 'name' => $product->name, 'slug' => $product->slug, 'sku' => $product->sku, 'description' => $product->description, 'price' => $product->price, 'sale_price' => $product->sale_price, 'brand' => $product->brand?->name, 'category' => $product->category?->name, 'images' => $product->getMedia('images')->map(function ($media) {
-            return ['url' => $media->getUrl(), 'thumb' => $media->getUrl('thumb'), 'alt' => $media->getCustomProperty('alt', '')];
-        })->toArray(), 'variants' => $product->variants->map(function ($variant) {
-            return ['id' => $variant->id, 'name' => $variant->name, 'sku' => $variant->sku, 'price' => $variant->price, 'stock_quantity' => $variant->stock_quantity];
-        })->toArray(), 'stock_quantity' => $product->stock_quantity ?? 0, 'is_visible' => $product->is_visible, 'url' => route('product.show', $product->slug)]];
+        $payload = ProductContract::forProduct($product);
 
-        return $this->handleContentNegotiation($request, $data);
+        return $this->respondWithContract($request, $payload);
     }
 }

@@ -48,6 +48,11 @@ return [
         'settings' => 'Variant Settings',
     ],
 
+    'filters' => [
+        'product' => 'Product',
+        'product_placeholder' => 'Search by product name or SKU',
+    ],
+
     // Fields
     'fields' => [
         'product' => 'Product',
@@ -83,6 +88,9 @@ return [
         'track_inventory' => 'Track Inventory',
         'is_enabled' => 'Is Enabled',
         'attributes' => 'Attributes',
+        'variant_metadata' => 'Variant Metadata',
+        'variant_metadata_key' => 'Key',
+        'variant_metadata_value' => 'Value',
         'images' => 'Images',
         'seo_title_lt' => 'SEO Title (LT)',
         'seo_title_en' => 'SEO Title (EN)',
@@ -109,6 +117,9 @@ return [
         'set_sale_period' => 'Set Sale Period',
         'rating' => 'Rating',
         'available' => 'Available',
+        'variant_metadata' => 'Metadata',
+        'variant_metadata_key' => 'Key',
+        'variant_metadata_value' => 'Value',
         'badges' => 'Badges',
     ],
 

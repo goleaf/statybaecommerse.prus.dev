@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\AttributeValue;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
@@ -50,7 +49,7 @@ final class ProductVariant extends Model implements HasMedia
         'description_lt', 'description_en', 'price', 'compare_price', 'cost_price',
         'wholesale_price', 'member_price', 'promotional_price',
         'stock_quantity', 'reserved_quantity', 'available_quantity', 'sold_quantity',
-        'weight', 'track_inventory', 'is_default', 'is_enabled', 'barcode', 'attributes',
+        'weight', 'track_inventory', 'is_default', 'is_enabled', 'barcode', 'attributes', 'variant_attribute_matrix', 'variant_metadata',
         'is_on_sale', 'sale_start_date', 'sale_end_date', 'is_featured', 'is_new', 'is_bestseller',
         'seo_title_lt', 'seo_title_en', 'seo_description_lt', 'seo_description_en',
         'views_count', 'clicks_count', 'conversion_rate', 'variant_combination_hash',
@@ -86,6 +85,8 @@ final class ProductVariant extends Model implements HasMedia
             'clicks_count' => 'integer',
             'conversion_rate' => 'decimal:4',
             'attributes' => 'array',
+            'variant_attribute_matrix' => 'array',
+            'variant_metadata' => 'array',
         ];
     }
 
@@ -678,11 +679,24 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function recordDailyAnalytics(string $metric, int $amount = 1): void
     {
-        $today = now()->toDateString();
+        $timestamp = now();
+        $metrics = [$metric => $amount];
 
-        VariantAnalytics::recordAnalytics($this->id, $today, [
-            $metric => $amount,
-        ]);
+        VariantAnalytics::recordAnalytics(
+            $this->id,
+            $timestamp,
+            $metrics,
+            VariantAnalytics::BUCKET_DAILY,
+            $this->product_id
+        );
+
+        VariantAnalytics::recordAnalytics(
+            $this->id,
+            $timestamp,
+            $metrics,
+            VariantAnalytics::BUCKET_WEEKLY,
+            $this->product_id
+        );
     }
 
     /**

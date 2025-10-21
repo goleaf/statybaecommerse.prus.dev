@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
+use App\Data\Pricing\PriceBreakdown;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\Pricing\PriceCalculator;
+use App\Services\Cart\CartLifecycleService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -149,7 +152,7 @@ final class CheckoutProcess extends Component
         DB::transaction(function () use ($cartItems) {
             $order = $this->createOrder($cartItems);
             $this->createOrderItems($order, $cartItems);
-            $this->clearCart();
+            app(CartLifecycleService::class)->clearAfterCheckout(auth()->id(), Session::getId());
             session()->flash('order_number', $order->number);
             $this->redirect(route('order.confirmation', $order->number));
         });
@@ -162,14 +165,22 @@ final class CheckoutProcess extends Component
      */
     private function createOrder($cartItems): Order
     {
-        $subtotal = $cartItems->sum(fn ($item) => $item->price * $item->quantity);
-        $taxAmount = $subtotal * 0.21;
-        // Lithuanian VAT
-        $shippingAmount = $subtotal > 100 ? 0 : 5.99;
-        // Free shipping over €100
-        $total = $subtotal + $taxAmount + $shippingAmount;
+        $breakdown = $this->calculateBreakdown($cartItems);
 
-        return Order::create(['number' => 'LT-'.strtoupper(uniqid()), 'user_id' => auth()->id(), 'status' => 'pending', 'subtotal' => $subtotal, 'tax_amount' => $taxAmount, 'shipping_amount' => $shippingAmount, 'discount_amount' => 0, 'total' => $total, 'currency' => 'EUR', 'billing_address' => $this->getBillingAddress(), 'shipping_address' => $this->getShippingAddress(), 'notes' => $this->notes]);
+        return Order::create([
+            'number' => 'LT-'.strtoupper(uniqid()),
+            'user_id' => auth()->id(),
+            'status' => 'pending',
+            'subtotal' => $breakdown->subtotal,
+            'tax_amount' => $breakdown->tax,
+            'shipping_amount' => $breakdown->shipping,
+            'discount_amount' => $breakdown->discount,
+            'total' => $breakdown->total,
+            'currency' => $breakdown->currency,
+            'billing_address' => $this->getBillingAddress(),
+            'shipping_address' => $this->getShippingAddress(),
+            'notes' => $this->notes,
+        ]);
     }
 
     /**
@@ -190,14 +201,6 @@ final class CheckoutProcess extends Component
     private function getCartItems()
     {
         return CartItem::with('product')->where('session_id', Session::getId())->get();
-    }
-
-    /**
-     * Handle clearCart functionality with proper error handling.
-     */
-    private function clearCart(): void
-    {
-        CartItem::where('session_id', Session::getId())->delete();
     }
 
     /**
@@ -225,6 +228,19 @@ final class CheckoutProcess extends Component
      */
     public function render(): View
     {
-        return view('livewire.pages.checkout-process', ['cartItems' => $this->getCartItems(), 'subtotal' => $this->getCartItems()->sum(fn ($item) => $item->price * $item->quantity)]);
+        $items = $this->getCartItems();
+        $breakdown = $this->calculateBreakdown($items);
+
+        return view('livewire.pages.checkout-process', [
+            'cartItems' => $items,
+            'summary' => $breakdown->toSummary(),
+        ]);
+    }
+
+    private function calculateBreakdown($cartItems): PriceBreakdown
+    {
+        $subtotal = (float) $cartItems->sum(fn ($item) => $item->price * $item->quantity);
+
+        return app(PriceCalculator::class)->breakdown($subtotal);
     }
 }

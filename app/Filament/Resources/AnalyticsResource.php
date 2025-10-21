@@ -10,6 +10,8 @@ use App\Models\Order;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
+use App\Support\Filament\Filters\DateRangeFilter;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -65,7 +67,12 @@ final class AnalyticsResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('order_date')->label('order_date')->date()->toggleable(),
+                TextColumn::make('order_date')
+                    ->label(__('analytics.order_date'))
+                    ->date()
+                    ->sortable()
+                    ->getStateUsing(fn (Order $record) => $record->created_at)
+                    ->toggleable(),
                 TextColumn::make('user.name')->label('user.name')->toggleable(),
                 TextColumn::make('items_count')->label('items_count')->getStateUsing(fn (Order $record): int => method_exists($record, 'items') ? (int) $record->items()->count() : 0)->toggleable(),
                 TextColumn::make('total')->label('total')->money('EUR')->toggleable(),
@@ -82,12 +89,18 @@ final class AnalyticsResource extends Resource
                         'cancelled' => 'Cancelled',
                     ]),
                 Filter::make('created_at')
-                    ->form([])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when($data['created_from'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
-                    }),
+                    ->form([
+                        Flatpickr::make('range')
+                            ->label(__('analytics.from_date'))
+                            ->rangePicker()
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
                 Filter::make('high_value')
                     ->query(fn (Builder $query): Builder => $query->where('total', '>=', 500)),
                 Filter::make('this_month')

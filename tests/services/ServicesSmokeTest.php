@@ -57,6 +57,7 @@ $serviceClasses = [
     App\Services\ImportExport\XmlProvider::class,
     App\Services\ImportExport\ProviderRegistry::class,
     App\Services\ImportExport\ProviderInterface::class, // interface
+    App\Services\Export\ExportService::class,
 
     // Recommendations
     App\Services\Recommendations\BaseRecommendation::class, // abstract

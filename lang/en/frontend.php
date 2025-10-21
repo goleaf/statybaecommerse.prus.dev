@@ -2,6 +2,7 @@
 
 return [
     'navigation' => [
+        'home' => 'Home',
         'products' => 'Products',
         'campaigns' => 'Campaigns',
         'orders' => 'Orders',
@@ -370,5 +371,10 @@ return [
         'shipping_to' => 'Shipping to:',
         'change_zone' => 'change zone',
         'copyright' => '© 2025 Laravel, Inc. All rights reserved Made with Filament',
+    ],
+    'legal' => [
+        'required' => 'Required',
+        'last_updated' => 'Last updated',
+        'document_unavailable' => 'This document is currently unavailable. Please contact us for assistance.',
     ],
 ];

@@ -49,6 +49,9 @@ return [
         'max_weight' => 'Max svoris',
         'min_order_amount' => 'Min užsakymo suma',
         'max_order_amount' => 'Max užsakymo suma',
+        'availability' => 'Prieinamumas',
+        'shipping_matrix' => 'Pristatymo prieinamumo matrica',
+        'shipping_matrix_help' => 'Pažymėkite, kurie pristatymo metodai taikomi kiekvienai zonai.',
         'delivery' => 'Pristatymas',
         'estimated_days_min' => 'Min dienos',
         'estimated_days_max' => 'Max dienos',
@@ -70,6 +73,8 @@ return [
         'description' => 'Aprašymas',
         'button_text' => 'Mygtuko tekstas',
     ],
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
+    'product_history' => require __DIR__ . '/admin/product_history.php',
     'variant_combinations' => [
         'navigation_label' => 'Variantų kombinacijos',
         'plural_model_label' => 'Variantų kombinacijos',
@@ -405,5 +410,8 @@ return [
         'view' => 'Peržiūrėti',
         'edit' => 'Redaguoti',
         'delete_selected' => 'Ištrinti pasirinktus',
+        'none' => 'Nėra',
+        'yes' => 'Taip',
+        'no' => 'Ne',
     ],
 ];

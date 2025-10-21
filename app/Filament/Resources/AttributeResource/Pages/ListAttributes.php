@@ -6,9 +6,9 @@ namespace App\Filament\Resources\AttributeResource\Pages;
 
 use App\Filament\Resources\AttributeResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListAttributes extends ListRecords
+final class ListAttributes extends BaseListRecords
 {
     protected static string $resource = AttributeResource::class;
 

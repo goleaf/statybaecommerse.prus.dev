@@ -6,9 +6,9 @@ namespace App\Filament\Resources\EnumResource\Pages;
 
 use App\Filament\Resources\EnumResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListEnumValues extends ListRecords
+final class ListEnumValues extends BaseListRecords
 {
     protected static string $resource = EnumResource::class;
 

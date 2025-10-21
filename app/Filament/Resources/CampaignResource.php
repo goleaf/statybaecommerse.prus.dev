@@ -7,28 +7,31 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-
-use Filament\Forms\Form;
+use Novadaemon\FilamentCombobox\Combobox;
 
 final class CampaignResource extends Resource
 {
@@ -138,32 +141,40 @@ final class CampaignResource extends Resource
                 ]),
             SchemaSection::make(__('campaigns.sections.targeting'))
                 ->schema([
-                    Select::make('targetCategories')
+                    Combobox::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
-                        ->multiple()
-                        ->searchable()
+                        ->boxSearchs()
+                        ->height('360px')
+                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_categories', 'Available categories'))
+                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_categories', 'Selected categories'))
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('targetProducts')
+                    Combobox::make('targetProducts')
                         ->label(self::label('campaigns.fields.target_products', 'Target products'))
                         ->relationship('targetProducts', 'name')
-                        ->multiple()
-                        ->searchable()
+                        ->boxSearchs()
+                        ->height('360px')
+                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_products', 'Available products'))
+                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_products', 'Selected products'))
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('targetCustomerGroups')
+                    Combobox::make('targetCustomerGroups')
                         ->label(self::label('campaigns.fields.target_customer_groups', 'Target customer groups'))
                         ->relationship('targetCustomerGroups', 'name')
-                        ->multiple()
-                        ->searchable()
+                        ->boxSearchs()
+                        ->height('360px')
+                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_customer_groups', 'Available customer groups'))
+                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_customer_groups', 'Selected customer groups'))
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('discounts')
+                    Combobox::make('discounts')
                         ->label(self::label('campaigns.fields.discounts', 'Discounts'))
                         ->relationship('discounts', 'name')
-                        ->multiple()
-                        ->searchable()
+                        ->boxSearchs()
+                        ->height('360px')
+                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.discounts', 'Available discounts'))
+                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.discounts', 'Selected discounts'))
                         ->preload()
                         ->columnSpanFull(),
                 ]),
@@ -286,6 +297,19 @@ final class CampaignResource extends Resource
                     ]),
                 SelectFilter::make('channel_id')
                     ->relationship('channel', 'name'),
+                Filter::make('created_at')
+                    ->form([
+                        Flatpickr::make('range')
+                            ->label(self::label('campaigns.fields.created_at', 'Created at'))
+                            ->rangePicker()
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
                 TernaryFilter::make('is_active')
                     ->trueLabel(self::label('campaigns.filters.active', 'Active only'))
                     ->falseLabel(self::label('campaigns.filters.inactive', 'Inactive only'))

@@ -17,16 +17,17 @@ final class NormalSettingFactory extends Factory
     public function definition(): array
     {
         return [
-            'group' => $this->faker->randomElement(['general', 'email', 'payment', 'shipping', 'system']),
-            'key' => $this->faker->unique()->slug(2),
-            'locale' => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es']),
-            'value' => $this->faker->sentence(),
-            'type' => $this->faker->randomElement(['text', 'number', 'boolean', 'json', 'array']),
-            'description' => $this->faker->sentence(),
-            'is_public' => $this->faker->boolean(70),
-            'is_encrypted' => $this->faker->boolean(20),
+            'group'            => $this->faker->randomElement(['general', 'email', 'payment', 'shipping', 'system']),
+            'key'              => $this->faker->unique()->slug(2),
+            'locale'           => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es']),
+            'value'            => $this->faker->sentence(),
+            'type'             => $this->faker->randomElement(['text', 'number', 'boolean', 'json', 'array']),
+            'description'      => $this->faker->sentence(),
+            'is_public'        => $this->faker->boolean(70),
+            'is_encrypted'     => $this->faker->boolean(20),
+            'is_active'        => $this->faker->boolean(),
             'validation_rules' => $this->faker->optional(0.3)->randomElements(['required', 'min:1', 'max:255'], 2),
-            'sort_order' => $this->faker->numberBetween(1, 100),
+            'sort_order'       => $this->faker->numberBetween(1, 100),
         ];
     }
 
@@ -48,6 +49,20 @@ final class NormalSettingFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_encrypted' => true,
+        ]);
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
         ]);
     }
 

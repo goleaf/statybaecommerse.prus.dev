@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -13,15 +14,20 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use UnitEnum;
-
 final class UserImpersonation extends Page implements HasTable
 {
+    use ConfiguresToggleableTableLayout;
+    use HasToggleableTable;
     use InteractsWithTable;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'System';
+    }
 
     protected static ?string $title = 'User Impersonation';
 
@@ -31,7 +37,7 @@ final class UserImpersonation extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        return $table
+        $table = $table
             ->query(User::query()->where('is_admin', false))
             ->columns([
                 TextColumn::make('name')->label('Name')->searchable(),
@@ -49,19 +55,21 @@ final class UserImpersonation extends Page implements HasTable
                         Tables\Components\TextInput::make('title')->required(),
                         Tables\Components\Textarea::make('message')->required(),
                         Tables\Components\Select::make('type')->options([
-                            'info' => 'Info',
+                            'info'    => 'Info',
                             'success' => 'Success',
                             'warning' => 'Warning',
-                            'danger' => 'Danger',
+                            'danger'  => 'Danger',
                         ])->required(),
                     ])
                     ->action(function (User $record, array $data): void {
                         $record->notify(new \Illuminate\Notifications\Messages\BroadcastMessage([
-                            'title' => $data['title'],
+                            'title'   => $data['title'],
                             'message' => $data['message'],
-                            'type' => $data['type'],
+                            'type'    => $data['type'],
                         ]));
                     }),
             ]);
+
+        return $this->applyToggleableTableLayout($table);
     }
 }

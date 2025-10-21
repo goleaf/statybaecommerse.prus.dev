@@ -6,9 +6,9 @@ namespace App\Filament\Resources\NormalSettingTranslationResource\Pages;
 
 use App\Filament\Resources\NormalSettingTranslationResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListNormalSettingTranslations extends ListRecords
+final class ListNormalSettingTranslations extends BaseListRecords
 {
     protected static string $resource = NormalSettingTranslationResource::class;
 

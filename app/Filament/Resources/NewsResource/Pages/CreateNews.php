@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\Pages;
 
+use App\Enums\ModerationState;
+use App\Filament\Concerns\InteractsWithTranslationTabs;
+use App\Filament\Concerns\ManagesNewsTranslationTabs;
 use App\Filament\Resources\NewsResource;
 use Filament\Resources\Pages\CreateRecord;
 
 final class CreateNews extends CreateRecord
 {
+    use InteractsWithTranslationTabs, ManagesNewsTranslationTabs {
+        ManagesNewsTranslationTabs::getTranslatableFields insteadof InteractsWithTranslationTabs;
+        ManagesNewsTranslationTabs::mutateMainDataWithDefaultLocale insteadof InteractsWithTranslationTabs;
+        ManagesNewsTranslationTabs::syncTranslationRecords insteadof InteractsWithTranslationTabs;
+    }
+
     protected static string $resource = NewsResource::class;
 
     protected function getRedirectUrl(): string
@@ -18,12 +27,28 @@ final class CreateNews extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Set default values
-        $data['is_published'] = $data['is_published'] ?? false;
-        $data['is_featured'] = $data['is_featured'] ?? false;
-        $data['is_breaking'] = $data['is_breaking'] ?? false;
-        $data['published_at'] = $data['published_at'] ?? ($data['is_published'] ? now() : null);
+        [$data, $translations] = $this->extractTranslationsFromForm($data);
+        $this->languageTabsPayload = $this->ensureDefaultLocaleSlug(
+            $this->filterEmptyTranslations($translations)
+        );
+
+        $this->assertUniqueSlugs($this->languageTabsPayload);
+
+        $data['moderation_state'] = $data['moderation_state'] ?? ModerationState::Draft;
+        $data['is_visible'] = false;
+        $data['submitted_for_review_at'] = null;
+        $data['approved_at'] = null;
+        $data['approved_by_id'] = null;
 
         return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
+
+        if (method_exists(CreateRecord::class, 'afterCreate')) {
+            parent::afterCreate();
+        }
     }
 }

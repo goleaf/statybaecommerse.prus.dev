@@ -15,6 +15,51 @@ class CategoryFactory extends Factory
 {
     protected $model = Category::class;
 
+    private const PRESET_CATEGORIES = [
+        'tools' => [
+            'name' => 'Elektriniai įrankiai',
+            'slug' => 'elektriniai-irankiai',
+            'description' => 'Profesionalūs elektriniai įrankiai statybos darbams.',
+            'seo_title' => 'Elektriniai įrankiai',
+            'seo_description' => 'Platus elektrinių įrankių pasirinkimas profesionalams.',
+        ],
+        'fasteners' => [
+            'name' => 'Tvirtinimo elementai',
+            'slug' => 'tvirtinimo-elementai',
+            'description' => 'Varžtai, medsraigčiai ir kiti tvirtinimo elementai.',
+            'seo_title' => 'Tvirtinimo elementai',
+            'seo_description' => 'Atraskite tvirtinimo elementus įvairiems projektams.',
+        ],
+        'safety' => [
+            'name' => 'Saugos priemonės',
+            'slug' => 'saugos-priemones',
+            'description' => 'Darbo saugos priemonės statyboms.',
+            'seo_title' => 'Saugos priemonės',
+            'seo_description' => 'Apsauginiai drabužiai, akiniai ir kitos saugos priemonės.',
+        ],
+        'power-tools' => [
+            'name' => 'Smūginiai perforatoriai',
+            'slug' => 'smuginiai-perforatoriai',
+            'description' => 'Profesionalūs perforatoriai betonui ir mūrijimui.',
+            'seo_title' => 'Smūginiai perforatoriai',
+            'seo_description' => 'Galingi smūginiai perforatoriai intensyviam darbui.',
+        ],
+        'hand-tools' => [
+            'name' => 'Rankiniai įrankiai',
+            'slug' => 'rankiniai-irankiai',
+            'description' => 'Kasdieniam darbui skirti rankiniai įrankiai.',
+            'seo_title' => 'Rankiniai įrankiai',
+            'seo_description' => 'Rankinių įrankių pasirinkimas profesionalams ir mėgėjams.',
+        ],
+        'protective-gear' => [
+            'name' => 'Apsauginiai akiniai',
+            'slug' => 'apsauginiai-akiniai',
+            'description' => 'Apsauginiai akiniai darbui statybvietėje.',
+            'seo_title' => 'Apsauginiai akiniai',
+            'seo_description' => 'Patikimi apsauginiai akiniai saugiam darbui.',
+        ],
+    ];
+
     public function definition(): array
     {
         $lithuanianCategories = [
@@ -73,5 +118,46 @@ class CategoryFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'parent_id' => $parent->id,
         ]);
+    }
+
+    public function tools(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('tools'));
+    }
+
+    public function fasteners(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('fasteners'));
+    }
+
+    public function safety(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('safety'));
+    }
+
+    public function powerTools(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('power-tools'));
+    }
+
+    public function handTools(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('hand-tools'));
+    }
+
+    public function protectiveGear(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('protective-gear'));
+    }
+
+    private function preset(string $key): array
+    {
+        $preset = self::PRESET_CATEGORIES[$key] ?? [];
+
+        return array_merge([
+            'parent_id' => null,
+            'sort_order' => 0,
+            'is_visible' => true,
+        ], $preset);
     }
 }

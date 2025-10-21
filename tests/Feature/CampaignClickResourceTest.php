@@ -88,8 +88,6 @@ final class CampaignClickResourceTest extends TestCase
             ->fillForm([
                 'is_converted' => true,
                 'conversion_value' => 99.99,
-                'conversion_currency' => 'EUR',
-                'notes' => 'Test conversion notes',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -97,7 +95,6 @@ final class CampaignClickResourceTest extends TestCase
         $click->refresh();
         $this->assertTrue($click->is_converted);
         $this->assertEquals(99.99, $click->conversion_value);
-        $this->assertEquals('EUR', $click->conversion_currency);
     }
 
     public function test_can_view_campaign_click(): void

@@ -6,9 +6,9 @@ namespace App\Filament\Resources\CampaignConversionResource\Pages;
 
 use App\Filament\Resources\CampaignConversionResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListCampaignConversions extends ListRecords
+final class ListCampaignConversions extends BaseListRecords
 {
     protected static string $resource = CampaignConversionResource::class;
 

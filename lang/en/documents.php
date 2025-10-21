@@ -54,6 +54,7 @@ return [
     'format' => 'Format',
     'file_path' => 'File Path',
     'created_by' => 'Created By',
+    'updated_by' => 'Updated By',
     'created_at' => 'Created At',
     'created_from' => 'Created From',
     'created_until' => 'Created Until',

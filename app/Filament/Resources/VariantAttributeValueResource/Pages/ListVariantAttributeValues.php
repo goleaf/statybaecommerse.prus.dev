@@ -6,9 +6,9 @@ namespace App\Filament\Resources\VariantAttributeValueResource\Pages;
 
 use App\Filament\Resources\VariantAttributeValueResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListVariantAttributeValues extends ListRecords
+final class ListVariantAttributeValues extends BaseListRecords
 {
     protected static string $resource = VariantAttributeValueResource::class;
 

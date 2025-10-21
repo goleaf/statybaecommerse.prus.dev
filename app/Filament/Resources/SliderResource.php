@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
 use BackedEnum;
-use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -18,6 +17,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TableEditAction;
 use Filament\Tables\Actions\ViewAction as TableViewAction;
@@ -39,7 +39,7 @@ final class SliderResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
 
@@ -50,7 +50,7 @@ final class SliderResource extends Resource
      */
     public static function getNavigationLabel(): string
     {
-        return __('sliders.title');
+        return __('sliders.navigation_label');
     }
 
     /**
@@ -101,7 +101,7 @@ final class SliderResource extends Resource
                         ->label(__('sliders.image'))
                         ->image()
                         ->directory('sliders')
-                        ->visibility('public')
+                        ->disk('public')
                         ->columnSpanFull(),
                 ]),
             Section::make(__('sliders.appearance'))
@@ -140,6 +140,7 @@ final class SliderResource extends Resource
                 ImageColumn::make('image')
                     ->label(__('sliders.image'))
                     ->circular()
+                    ->disk('public')
                     ->size(50),
                 TextColumn::make('title')
                     ->label(__('sliders.title'))
@@ -173,7 +174,7 @@ final class SliderResource extends Resource
             ->actions([
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make(),
+                TableDeleteAction::make(),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
@@ -199,10 +200,10 @@ final class SliderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSliders::route('/'),
+            'index'  => Pages\ListSliders::route('/'),
             'create' => Pages\CreateSlider::route('/create'),
-            'view' => Pages\ViewSlider::route('/{record}'),
-            'edit' => Pages\EditSlider::route('/{record}/edit'),
+            'view'   => Pages\ViewSlider::route('/{record}'),
+            'edit'   => Pages\EditSlider::route('/{record}/edit'),
         ];
     }
 }

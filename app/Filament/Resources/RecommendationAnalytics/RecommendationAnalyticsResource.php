@@ -7,20 +7,45 @@ namespace App\Filament\Resources\RecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\CreateRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\EditRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\ListRecommendationAnalytics;
+use App\Filament\Resources\RecommendationAnalytics\Pages\ViewRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyticsForm;
 use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalyticsTable;
 use App\Models\RecommendationAnalytics;
 use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
-class RecommendationAnalyticsResource extends Resource
+final class RecommendationAnalyticsResource extends Resource
 {
     protected static ?string $model = RecommendationAnalytics::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+
+    protected static ?int $navigationSort = 8;
+
+    protected static ?string $recordTitleAttribute = 'action';
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'Analytics';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('recommendation_analytics.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('recommendation_analytics.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('recommendation_analytics.model_label');
+    }
 
     public static function form(Form $form): Form
     {
@@ -42,9 +67,10 @@ class RecommendationAnalyticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListRecommendationAnalytics::route('/'),
+            'index'  => ListRecommendationAnalytics::route('/'),
             'create' => CreateRecommendationAnalytics::route('/create'),
-            'edit' => EditRecommendationAnalytics::route('/{record}/edit'),
+            'view'   => ViewRecommendationAnalytics::route('/{record}'),
+            'edit'   => EditRecommendationAnalytics::route('/{record}/edit'),
         ];
     }
 }

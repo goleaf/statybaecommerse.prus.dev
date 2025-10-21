@@ -45,7 +45,7 @@ final class SliderComparisonTable extends BaseWidget
 
                         return $media ? $media->getUrl() : null;
                     })
-                    ->defaultImageUrl('/images/placeholder-slider.png')
+                    ->defaultImageUrl('/images/placeholder-slider.svg')
                     ->size(80)
                     ->square(),
                 TextColumn::make('title')

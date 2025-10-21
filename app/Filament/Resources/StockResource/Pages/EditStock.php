@@ -19,4 +19,14 @@ class EditStock extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function getBreadcrumb(): string
+    {
+        return (string) data_get($this->record, 'product_name', '');
+    }
+
+    public function getTitle(): string
+    {
+        return (string) data_get($this->record, 'product_name', '');
+    }
 }

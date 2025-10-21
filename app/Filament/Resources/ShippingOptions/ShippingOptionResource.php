@@ -42,9 +42,9 @@ class ShippingOptionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListShippingOptions::route('/'),
+            'index'  => ListShippingOptions::route('/'),
             'create' => CreateShippingOption::route('/create'),
-            'edit' => EditShippingOption::route('/{record}/edit'),
+            'edit'   => EditShippingOption::route('/{record}/edit'),
         ];
     }
 }

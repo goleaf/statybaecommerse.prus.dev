@@ -6,9 +6,9 @@ namespace App\Filament\Resources\VariantAnalyticsResource\Pages;
 
 use App\Filament\Resources\VariantAnalyticsResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListVariantAnalytics extends ListRecords
+final class ListVariantAnalytics extends BaseListRecords
 {
     protected static string $resource = VariantAnalyticsResource::class;
 

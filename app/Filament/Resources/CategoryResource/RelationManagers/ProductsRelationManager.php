@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
-use Filament\Forms\Form;
-
+use App\Support\Storage\SecureStorage;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Forms\Set;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\AttachAction;
 use Filament\Tables\Actions\DetachAction;
 use Filament\Tables\Actions\EditAction;
@@ -22,7 +22,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ProductsRelationManager extends RelationManager
+final class ProductsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'products';
 
@@ -78,7 +78,8 @@ final class ProductsRelationManager extends RelationManager
                 ImageColumn::make('image')
                     ->label(__('products.image'))
                     ->circular()
-                    ->size(40),
+                    ->size(40)
+                    ->getStateUsing(fn ($record) => $record->image ? SecureStorage::temporarySignedUrl($record->image) : null),
                 TextColumn::make('name')
                     ->label(__('products.name'))
                     ->searchable()

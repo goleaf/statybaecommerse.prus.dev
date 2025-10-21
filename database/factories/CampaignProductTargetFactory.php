@@ -69,7 +69,6 @@ final class CampaignProductTargetFactory extends Factory
         ]);
     }
 
-
     public function withCampaign(Campaign $campaign): static
     {
         return $this->state(fn (array $attributes) => [

@@ -6,9 +6,9 @@ namespace App\Filament\Resources\SystemSettingHistoryResource\Pages;
 
 use App\Filament\Resources\SystemSettingHistoryResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListSystemSettingHistories extends ListRecords
+final class ListSystemSettingHistories extends BaseListRecords
 {
     protected static string $resource = SystemSettingHistoryResource::class;
 

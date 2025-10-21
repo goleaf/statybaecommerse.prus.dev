@@ -323,7 +323,12 @@ final class AnalyticsEvent extends Model
      */
     public static function getEventTypeStats(): array
     {
-        return self::selectRaw('event_type, COUNT(*) as count')->groupBy('event_type')->orderBy('count', 'desc')->pluck('count', 'event_type')->toArray();
+        return static::queryForAdmin()
+            ->selectRaw('event_type, COUNT(*) as count')
+            ->groupBy('event_type')
+            ->orderBy('count', 'desc')
+            ->pluck('count', 'event_type')
+            ->toArray();
     }
 
     /**
@@ -331,7 +336,13 @@ final class AnalyticsEvent extends Model
      */
     public static function getDeviceTypeStats(): array
     {
-        return self::selectRaw('device_type, COUNT(*) as count')->whereNotNull('device_type')->groupBy('device_type')->orderBy('count', 'desc')->pluck('count', 'device_type')->toArray();
+        return static::queryForAdmin()
+            ->selectRaw('device_type, COUNT(*) as count')
+            ->whereNotNull('device_type')
+            ->groupBy('device_type')
+            ->orderBy('count', 'desc')
+            ->pluck('count', 'device_type')
+            ->toArray();
     }
 
     /**
@@ -339,7 +350,13 @@ final class AnalyticsEvent extends Model
      */
     public static function getBrowserStats(): array
     {
-        return self::selectRaw('browser, COUNT(*) as count')->whereNotNull('browser')->groupBy('browser')->orderBy('count', 'desc')->pluck('count', 'browser')->toArray();
+        return static::queryForAdmin()
+            ->selectRaw('browser, COUNT(*) as count')
+            ->whereNotNull('browser')
+            ->groupBy('browser')
+            ->orderBy('count', 'desc')
+            ->pluck('count', 'browser')
+            ->toArray();
     }
 
     /**
@@ -347,7 +364,22 @@ final class AnalyticsEvent extends Model
      */
     public static function getRevenueStats(): array
     {
-        return self::whereNotNull('value')->selectRaw('DATE(created_at) as date, SUM(value) as revenue')->groupBy('date')->orderBy('date', 'desc')->limit(30)->pluck('revenue', 'date')->toArray();
+        return static::queryForAdmin()
+            ->whereNotNull('value')
+            ->selectRaw('DATE(created_at) as date, SUM(value) as revenue')
+            ->groupBy('date')
+            ->orderBy('date', 'desc')
+            ->limit(30)
+            ->pluck('revenue', 'date')
+            ->toArray();
+    }
+
+    /**
+     * Build a query suitable for admin-only aggregate helpers.
+     */
+    protected static function queryForAdmin(): Builder
+    {
+        return static::query()->withoutGlobalScope(UserOwnedScope::class);
     }
 
     /**

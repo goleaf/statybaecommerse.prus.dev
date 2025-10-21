@@ -50,6 +50,7 @@ return [
         'delivered' => 'Pristatytas',
         'completed' => 'Užbaigtas',
         'cancelled' => 'Atšauktas',
+        'returned' => 'Grąžintas',
     ],
 
     // Payment statuses
@@ -219,5 +220,7 @@ return [
         'cannot_delete' => 'Negalite ištrinti šio užsakymo',
         'cannot_cancel' => 'Negalite atšaukti šio užsakymo',
         'cancelled_successfully' => 'Užsakymas sėkmingai atšauktas',
+        'cannot_request_return' => 'Negalite pateikti grąžinimo užklausos šiam užsakymui',
+        'return_requested_successfully' => 'Grąžinimo užklausa sėkmingai pateikta',
     ],
 ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ShippingOptions\Schemas;
 
 use Filament\Forms\Components\Textarea;
@@ -26,7 +28,7 @@ class ShippingOptionForm
                 TextInput::make('price')
                     ->required()
                     ->numeric()
-                    ->prefix('$'),
+                    ->prefix('€'),
                 TextInput::make('currency_code')
                     ->required()
                     ->default('EUR'),
@@ -43,9 +45,11 @@ class ShippingOptionForm
                 TextInput::make('max_weight')
                     ->numeric(),
                 TextInput::make('min_order_amount')
-                    ->numeric(),
+                    ->numeric()
+                    ->prefix('€'),
                 TextInput::make('max_order_amount')
-                    ->numeric(),
+                    ->numeric()
+                    ->prefix('€'),
                 TextInput::make('estimated_days_min')
                     ->numeric(),
                 TextInput::make('estimated_days_max')

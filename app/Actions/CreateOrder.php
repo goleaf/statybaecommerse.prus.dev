@@ -7,6 +7,8 @@ namespace App\Actions;
 use App\Mail\OrderPlaced;
 use App\Models\Country;
 use App\Models\Order;
+use App\Services\Cart\CartLifecycleService;
+use App\Services\Pricing\PriceCalculator;
 use Darryldecode\Cart\Facades\CartFacade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -76,10 +78,12 @@ class CreateOrder
             $engine = app(\App\Services\Discounts\DiscountEngine::class);
             $result = $engine->evaluate(['currency_code' => current_currency(), 'channel_id' => null, 'user_id' => optional($customer)->id, 'now' => now(), 'code' => $codeRow ? $couponCode : null, 'cart' => ['subtotal' => $subtotal, 'items' => []]]);
             $discountTotal = Number::parseFloat(data_get($result, 'discount_total_amount', 0));
-            $taxTotal = app(\App\Services\Taxes\TaxCalculator::class)->compute(max(0.0, $subtotal - (float) $discountTotal), null);
-            $grandTotal = max(0, round($subtotal - $discountTotal + $shippingTotal + $taxTotal, 2));
+            $shippingDiscount = Number::parseFloat(data_get($result, 'shipping.discount_amount', 0));
+            $shippingAmount = max(0.0, $shippingTotal - $shippingDiscount);
+            $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discountTotal, $shippingAmount);
+            $grandTotal = $breakdown->total;
             /** @var Order $order */
-            $order = Order::query()->create(['number' => generate_number(), 'customer_id' => $customer->id, 'currency_code' => current_currency(), 'shipping_address_id' => $shippingAddress->id, 'billing_address_id' => $billingAddress->id, 'shipping_option_id' => data_get($checkout, 'shipping_option')[0]['id'], 'payment_method_id' => data_get($checkout, 'payment')[0]['id'], 'payment_method' => (string) data_get($checkout, 'payment')[0]['name'], 'subtotal_amount' => round($subtotal, 2), 'discount_total_amount' => round($discountTotal, 2), 'tax_total_amount' => round($taxTotal, 2), 'shipping_total_amount' => round($shippingTotal, 2), 'grand_total_amount' => $grandTotal]);
+            $order = Order::query()->create(['number' => generate_number(), 'customer_id' => $customer->id, 'currency_code' => current_currency(), 'shipping_address_id' => $shippingAddress->id, 'billing_address_id' => $billingAddress->id, 'shipping_option_id' => data_get($checkout, 'shipping_option')[0]['id'], 'payment_method_id' => data_get($checkout, 'payment')[0]['id'], 'payment_method' => (string) data_get($checkout, 'payment')[0]['name'], 'subtotal_amount' => round($breakdown->subtotal, 2), 'discount_total_amount' => round($breakdown->discount, 2), 'tax_total_amount' => round($breakdown->tax, 2), 'shipping_total_amount' => round($breakdown->shipping, 2), 'grand_total_amount' => $grandTotal]);
             // Items
             // @phpstan-ignore-next-line
             foreach (CartFacade::session($sessionId)->getContent() as $item) {
@@ -120,8 +124,11 @@ class CreateOrder
                 // ignore payment errors in stub
             }
             // Clear cart
-            CartFacade::session($sessionId)->clear();
-            // @phpstan-ignore-line
+            app(CartLifecycleService::class)->clearAfterCheckout(
+                $customer?->id,
+                $sessionId,
+                $order->payment_status ?? null
+            );
             // Queue order confirmation email with user's preferred locale
             try {
                 $mailable = new OrderPlaced($order);

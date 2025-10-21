@@ -18,6 +18,7 @@ export default defineConfig({
         'resources/js/app.js',
         'resources/js/live-notifications.js',
         'resources/images/hero.png',
+        'vendor/andreia/filament-nord-theme/resources/css/theme.css',
       ],
       refresh: [
         ...refreshPaths,

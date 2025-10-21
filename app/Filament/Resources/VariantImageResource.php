@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\VariantImageResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantImage;
+use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -116,7 +117,7 @@ final class VariantImageResource extends Resource
                                 ->label(__('admin.variant_images.image'))
                                 ->image()
                                 ->directory('variant-images')
-                                ->visibility('public')
+                                ->visibility('private')
                                 ->required()
                                 ->imageEditor()
                                 ->imageEditorAspectRatios([
@@ -189,7 +190,12 @@ final class VariantImageResource extends Resource
                     ->size(80)
                     ->circular(false)
                     ->square()
-                    ->grow(false),
+                    ->grow(false)
+                    ->getStateUsing(
+                        fn ($record) => $record->image_path
+                            ? SecureStorage::temporarySignedUrl($record->image_path)
+                            : null
+                    ),
                 TextColumn::make('variant.name')
                     ->label(__('admin.variant_images.variant'))
                     ->sortable()

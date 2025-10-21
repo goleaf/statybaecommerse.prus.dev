@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -10,6 +12,9 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
+use App\Support\Search\ProductSearch;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction as TableBulkAction;
@@ -25,6 +30,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -37,10 +43,8 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
+use RuntimeException;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * WishlistItemResource
@@ -136,30 +140,66 @@ final class WishlistItemResource extends Resource
                                     ->createOptionUsing(function (array $data): int {
                                         return UserWishlist::create($data)->getKey();
                                     }),
-                                Select::make('user_id')
+                                Placeholder::make('user_name')
                                     ->label(__('admin.wishlist_items.fields.user'))
-                                    ->relationship('wishlist.user', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->disabled()
-                                    ->dehydrated(false),
+                                    ->content(function (callable $get): string {
+                                        $wishlistId = $get('wishlist_id');
+
+                                        if (! $wishlistId) {
+                                            return '-';
+                                        }
+
+                                        $wishlist = UserWishlist::with('user')->find($wishlistId);
+
+                                        return $wishlist?->user?->name ?? '-';
+                                    })
+                                    ->reactive(),
                             ]),
                         FormGrid::make(2)
                             ->schema([
-                                Select::make('product_id')
+                                SearchableInput::make('product_id')
                                     ->label(__('admin.wishlist_items.fields.product'))
-                                    ->relationship('product', 'name')
+                                    ->placeholder('SKU / EAN / name')
                                     ->required()
-                                    ->searchable()
-                                    ->preload()
                                     ->live()
-                                    ->afterStateUpdated(function ($state, callable $set) {
-                                        if ($state) {
-                                            $product = Product::find($state);
-                                            if ($product && $product->variants()->exists()) {
-                                                $set('variant_id', null);
-                                            }
+                                    ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?WishlistItem $record): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $product = $record?->product ?? Product::query()
+                                            ->select(['id', 'sku', 'name'])
+                                            ->find($state);
+
+                                        if (! $product instanceof Product) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $product->getKey() => ProductSearch::label($product),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $product = Product::query()
+                                            ->select(['id'])
+                                            ->find((int) $state);
+
+                                        if (! $product instanceof Product) {
+                                            return;
+                                        }
+
+                                        $set('product_id', $product->getKey());
+
+                                        if ($product->variants()->exists()) {
+                                            $set('variant_id', null);
                                         }
                                     }),
                                 Select::make('variant_id')
@@ -169,14 +209,14 @@ final class WishlistItemResource extends Resource
                                     ->preload()
                                     ->options(function (callable $get) {
                                         $productId = $get('product_id');
-                                        if (!$productId) {
+                                        if (! $productId) {
                                             return [];
                                         }
 
                                         return ProductVariant::where('product_id', $productId)
                                             ->pluck('name', 'id');
                                     })
-                                    ->visible(fn(callable $get) => $get('product_id') && Product::find($get('product_id'))?->variants()->exists()),
+                                    ->visible(fn (callable $get) => $get('product_id') && Product::find($get('product_id'))?->variants()->exists()),
                             ]),
                         FormGrid::make(3)
                             ->schema([
@@ -238,12 +278,12 @@ final class WishlistItemResource extends Resource
                             ->label(__('admin.wishlist_items.fields.product_image'))
                             ->content(function (callable $get) {
                                 $productId = $get('product_id');
-                                if (!$productId) {
+                                if (! $productId) {
                                     return __('admin.wishlist_items.no_product_selected');
                                 }
 
                                 $product = Product::find($productId);
-                                if (!$product || !$product->featured_image) {
+                                if (! $product || ! $product->featured_image) {
                                     return __('admin.wishlist_items.no_image');
                                 }
 
@@ -257,7 +297,7 @@ final class WishlistItemResource extends Resource
                             ->label(__('admin.wishlist_items.fields.product_description'))
                             ->content(function (callable $get) {
                                 $productId = $get('product_id');
-                                if (!$productId) {
+                                if (! $productId) {
                                     return '';
                                 }
 
@@ -310,7 +350,7 @@ final class WishlistItemResource extends Resource
                     ->color('primary'),
                 TextColumn::make('current_price')
                     ->label(__('admin.wishlist_items.fields.current_price'))
-                    ->getStateUsing(fn(WishlistItem $record): string => $record->formatted_current_price)
+                    ->getStateUsing(fn (WishlistItem $record): string => $record->formatted_current_price)
                     ->sortable()
                     ->money('EUR')
                     ->color('success'),
@@ -369,7 +409,7 @@ final class WishlistItemResource extends Resource
                 IconColumn::make('product.is_active')
                     ->label(__('admin.wishlist_items.fields.product_status'))
                     ->boolean()
-                    ->getStateUsing(fn(WishlistItem $record): bool => $record->product?->is_active ?? false)
+                    ->getStateUsing(fn (WishlistItem $record): bool => $record->product?->is_active ?? false)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('admin.wishlist_items.fields.created_at'))
@@ -401,8 +441,8 @@ final class WishlistItemResource extends Resource
                 TernaryFilter::make('has_variant')
                     ->label(__('admin.wishlist_items.filters.has_variant'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('variant_id'),
-                        false: fn(Builder $query) => $query->whereNull('variant_id'),
+                        true: fn (Builder $query) => $query->whereNotNull('variant_id'),
+                        false: fn (Builder $query) => $query->whereNull('variant_id'),
                     ),
                 Filter::make('user_id')
                     ->form([
@@ -414,7 +454,8 @@ final class WishlistItemResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $userId = $data['user_id'] ?? null;
-                        return $query->when($userId, fn(Builder $q): Builder => $q->whereHas('wishlist', fn(Builder $w): Builder => $w->where('user_id', $userId)));
+
+                        return $query->when($userId, fn (Builder $q): Builder => $q->whereHas('wishlist', fn (Builder $w): Builder => $w->where('user_id', $userId)));
                     }),
                 Filter::make('category_id')
                     ->form([
@@ -426,7 +467,8 @@ final class WishlistItemResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $categoryId = $data['category_id'] ?? null;
-                        return $query->when($categoryId, fn(Builder $q): Builder => $q->whereHas('product', fn(Builder $p): Builder => $p->where('category_id', $categoryId)));
+
+                        return $query->when($categoryId, fn (Builder $q): Builder => $q->whereHas('product', fn (Builder $p): Builder => $p->where('category_id', $categoryId)));
                     }),
                 Filter::make('brand_id')
                     ->form([
@@ -438,13 +480,14 @@ final class WishlistItemResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $brandId = $data['brand_id'] ?? null;
-                        return $query->when($brandId, fn(Builder $q): Builder => $q->whereHas('product', fn(Builder $p): Builder => $p->where('brand_id', $brandId)));
+
+                        return $query->when($brandId, fn (Builder $q): Builder => $q->whereHas('product', fn (Builder $p): Builder => $p->where('brand_id', $brandId)));
                     }),
                 TernaryFilter::make('product.is_active')
                     ->label(__('admin.wishlist_items.filters.active_products'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereHas('product', fn($q) => $q->where('is_active', true)),
-                        false: fn(Builder $query) => $query->whereHas('product', fn($q) => $q->where('is_active', false)),
+                        true: fn (Builder $query) => $query->whereHas('product', fn ($q) => $q->where('is_active', true)),
+                        false: fn (Builder $query) => $query->whereHas('product', fn ($q) => $q->where('is_active', false)),
                     ),
                 Filter::make('created_at')
                     ->form([
@@ -457,11 +500,11 @@ final class WishlistItemResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
                 Filter::make('price_range')
@@ -479,11 +522,11 @@ final class WishlistItemResource extends Resource
                         return $query
                             ->when(
                                 $data['min_price'],
-                                fn(Builder $query, $price): Builder => $query->whereHas('product', fn($q) => $q->where('price', '>=', $price)),
+                                fn (Builder $query, $price): Builder => $query->whereHas('product', fn ($q) => $q->where('price', '>=', $price)),
                             )
                             ->when(
                                 $data['max_price'],
-                                fn(Builder $query, $price): Builder => $query->whereHas('product', fn($q) => $q->where('price', '<=', $price)),
+                                fn (Builder $query, $price): Builder => $query->whereHas('product', fn ($q) => $q->where('price', '<=', $price)),
                             );
                     }),
             ])
@@ -497,13 +540,7 @@ final class WishlistItemResource extends Resource
                         ->color('success')
                         ->action(function (WishlistItem $record): void {
                             try {
-                                // Create cart item logic here
-                                CartItem::create([
-                                    'user_id' => $record->wishlist->user_id,
-                                    'product_id' => $record->product_id,
-                                    'variant_id' => $record->variant_id,
-                                    'quantity' => $record->quantity,
-                                ]);
+                                CartItem::create(self::buildCartItemPayload($record));
 
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.moved_to_cart_successfully'))
@@ -542,12 +579,7 @@ final class WishlistItemResource extends Resource
                             try {
                                 $moved = 0;
                                 foreach ($records as $record) {
-                                    CartItem::create([
-                                        'user_id' => $record->wishlist->user_id,
-                                        'product_id' => $record->product_id,
-                                        'variant_id' => $record->variant_id,
-                                        'quantity' => $record->quantity,
-                                    ]);
+                                    CartItem::create(self::buildCartItemPayload($record));
                                     $moved++;
                                 }
 
@@ -594,6 +626,72 @@ final class WishlistItemResource extends Resource
     {
         return [
             //
+        ];
+    }
+
+    /**
+     * Build the payload for creating a cart item from a wishlist record.
+     */
+    private static function buildCartItemPayload(WishlistItem $record): array
+    {
+        $record->loadMissing([
+            'wishlist',
+            'product',
+            'variant.attributes.attribute',
+        ]);
+
+        $product = $record->product;
+
+        if ($product === null) {
+            throw new RuntimeException('Wishlist item is missing an associated product.');
+        }
+
+        $variant = $record->variant;
+        $quantity = max(1, (int) $record->quantity);
+        $unitPrice = (float) ($variant?->price ?? $product->sale_price ?? $product->price ?? 0.0);
+        $totalPrice = round($unitPrice * $quantity, 2);
+
+        $variantAttributes = [];
+
+        if ($variant !== null) {
+            $attributeValues = $variant->attributes()->with('attribute')->get();
+
+            if ($attributeValues->isNotEmpty()) {
+                $variantAttributes = $attributeValues
+                    ->mapWithKeys(fn ($value): array => [
+                        $value->attribute->name => $value->value,
+                    ])
+                    ->toArray();
+            }
+        }
+
+        $snapshotName = $variant?->name ?? $product->name;
+
+        if (! empty($variantAttributes)) {
+            $snapshotName .= ' ('.collect($variantAttributes)
+                ->map(fn ($value, $key) => sprintf('%s: %s', $key, $value))
+                ->implode(', ').')';
+        }
+
+        $productSnapshot = array_filter([
+            'name' => $snapshotName,
+            'sku' => $variant?->sku ?? $product->sku,
+            'price' => $unitPrice,
+            'variant_id' => $variant?->getKey(),
+            'variant_attributes' => ! empty($variantAttributes) ? $variantAttributes : null,
+        ], static fn ($value) => $value !== null);
+
+        return [
+            'user_id' => $record->wishlist->user_id,
+            'product_id' => $product->getKey(),
+            'variant_id' => $variant?->getKey(),
+            'product_variant_id' => $variant?->getKey(),
+            'quantity' => $quantity,
+            'minimum_quantity' => $product->getMinimumQuantity(),
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
+            'price' => $unitPrice,
+            'product_snapshot' => $productSnapshot,
         ];
     }
 

@@ -47,9 +47,9 @@ final class NewsCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListNewsCategories::route('/'),
+            'index'  => ListNewsCategories::route('/'),
             'create' => CreateNewsCategory::route('/create'),
-            'edit' => EditNewsCategory::route('/{record}/edit'),
+            'edit'   => EditNewsCategory::route('/{record}/edit'),
         ];
     }
 }

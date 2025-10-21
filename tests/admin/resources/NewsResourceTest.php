@@ -150,15 +150,41 @@ it('validates unique slug when creating news', function () {
         'content' => 'Existing content',
     ]);
 
-    // This test would need to be implemented based on the actual form validation
-    // For now, we'll just test that the form can be submitted
     Livewire::actingAs($this->adminUser)
         ->test(NewsResource\Pages\CreateNews::class)
         ->fillForm([
-            'is_visible' => true,
+            'title' => 'Another News Article',
+            'slug' => 'existing-slug',
+            'content' => 'Some new content',
         ])
         ->call('create')
-        ->assertHasNoFormErrors();
+        ->assertHasFormErrors(['slug' => 'unique']);
+});
+
+it('validates unique slug when editing news', function () {
+    $originalNews = News::factory()->create();
+    $originalNews->translations()->create([
+        'locale' => 'en',
+        'title' => 'Original News',
+        'slug' => 'original-slug',
+        'content' => 'Original content',
+    ]);
+
+    $conflictingNews = News::factory()->create();
+    $conflictingNews->translations()->create([
+        'locale' => 'en',
+        'title' => 'Conflicting News',
+        'slug' => 'conflicting-slug',
+        'content' => 'Conflicting content',
+    ]);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(NewsResource\Pages\EditNews::class, ['record' => $originalNews->id])
+        ->fillForm([
+            'slug' => 'conflicting-slug',
+        ])
+        ->call('save')
+        ->assertHasFormErrors(['slug' => 'unique']);
 });
 
 it('validates slug length when creating news', function () {
@@ -384,6 +410,17 @@ it('can scope featured news', function () {
 
     expect($featuredResults)->toHaveCount(1);
     expect($featuredResults->first()->id)->toBe($featuredNews->id);
+});
+
+it('can filter breaking news tab without database errors', function () {
+    $breakingNews = News::factory()->create(['is_breaking' => true]);
+    $regularNews = News::factory()->create(['is_breaking' => false]);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(NewsResource\Pages\ListNews::class)
+        ->set('activeTab', 'breaking')
+        ->assertCanSeeTableRecords([$breakingNews])
+        ->assertCanNotSeeTableRecords([$regularNews]);
 });
 
 it('can search news by content', function () {

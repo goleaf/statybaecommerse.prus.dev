@@ -68,7 +68,7 @@
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0">
                                     <img 
-                                        src="{{ $item->product->getFirstMediaUrl('images', 'thumb') ?: asset('images/placeholder-product.png') }}"
+                                        src="{{ $item->product->getFirstMediaUrl('images', 'thumb') ?: product_placeholder_url('thumb') }}"
                                         alt="{{ $item->product->name }}"
                                         class="w-12 h-12 object-cover rounded-md"
                                     >

@@ -61,6 +61,8 @@ return [
         'weight_range' => 'Weight Range',
         'weight_from' => 'Weight From',
         'weight_to' => 'Weight To',
+        'product' => 'Product',
+        'product_placeholder' => 'Type to filter by product name or SKU',
     ],
     'actions' => [
         'publish' => 'Publish',

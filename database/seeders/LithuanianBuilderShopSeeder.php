@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\AuthorizationRole;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Authorization\AuthorizationMatrix;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -49,28 +51,28 @@ class LithuanianBuilderShopSeeder extends Seeder
 
     private function createRolesAndPermissions(): void
     {
-        // Create permissions
-        $permissions = [
-            'view_admin_panel',
-            'manage_products',
-            'manage_categories',
-            'manage_brands',
-            'manage_orders',
-            'manage_users',
-            'view_reports',
-        ];
+        $roles = [AuthorizationRole::ADMIN, AuthorizationRole::MANAGER];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        foreach ($roles as $role) {
+            $permissions = AuthorizationMatrix::permissionsForRole($role);
+
+            foreach ($permissions as $permission) {
+                Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+            }
+
+            $roleModel = Role::firstOrCreate(['name' => $role->value, 'guard_name' => 'web']);
+            $roleModel->syncPermissions($permissions);
         }
 
-        // Create roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $managerRole = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'web']);
+        $additionalPermissions = ['view_reports'];
 
-        // Assign permissions to roles
-        $adminRole->syncPermissions($permissions);
-        $managerRole->syncPermissions(['view_admin_panel', 'manage_products', 'manage_categories', 'manage_orders', 'view_reports']);
+        foreach ($additionalPermissions as $permission) {
+            $permissionModel = Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+
+            foreach ($roles as $role) {
+                Role::findByName($role->value, 'web')->givePermissionTo($permissionModel);
+            }
+        }
     }
 
     private function createAdminUsers(): void
@@ -86,7 +88,7 @@ class LithuanianBuilderShopSeeder extends Seeder
                 'preferred_locale' => 'lt',
             ]
         );
-        $admin->assignRole('admin');
+        $admin->assignRole(AuthorizationRole::ADMIN->value);
 
         $manager = User::firstOrCreate(
             ['email' => 'manager@statybaecommerse.lt'],
@@ -99,7 +101,7 @@ class LithuanianBuilderShopSeeder extends Seeder
                 'preferred_locale' => 'lt',
             ]
         );
-        $manager->assignRole('manager');
+        $manager->assignRole(AuthorizationRole::MANAGER->value);
     }
 
     private function createMainCategories(): array

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
 use Filament\Actions\Action;
@@ -40,16 +39,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class ReportResource extends Resource
 {
-    /**
-     * @var UnitEnum|string|null
-     */
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): string
     {
-        return NavigationGroup::Reports;
+        return __('navigation.groups.analytics');
     }
 
     protected static ?string $model = Report::class;
@@ -232,13 +227,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'sales' => 'success',
-                        'inventory' => 'info',
-                        'customer' => 'warning',
-                        'product' => 'primary',
-                        'financial' => 'danger',
-                        'analytics' => 'secondary',
-                        'custom' => 'gray',
+                        'success' => ['sales'],
+                        'info' => ['inventory'],
+                        'warning' => ['customer'],
+                        'primary' => ['product'],
+                        'danger' => ['financial'],
+                        'secondary' => ['analytics'],
+                        'gray' => ['custom'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
                 BadgeColumn::make('category')
@@ -246,13 +241,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'sales' => 'success',
-                        'marketing' => 'info',
-                        'operations' => 'warning',
-                        'finance' => 'danger',
-                        'customer_service' => 'primary',
-                        'inventory' => 'secondary',
-                        'analytics' => 'gray',
+                        'success' => ['sales'],
+                        'info' => ['marketing'],
+                        'warning' => ['operations'],
+                        'danger' => ['finance'],
+                        'primary' => ['customer_service'],
+                        'secondary' => ['inventory'],
+                        'gray' => ['analytics'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
                 TextColumn::make('generator.name')
@@ -349,7 +344,29 @@ final class ReportResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
+                Action::make('toggle_active')
+                    ->label(__('reports.actions.toggle_active'))
+                    ->icon('heroicon-o-power')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->action(function (Report $record): void {
+                        $record->update(['is_active' => ! $record->is_active]);
+
+                        $notification = Notification::make()
+                            ->title($record->is_active
+                                ? __('reports.notifications.activated')
+                                : __('reports.notifications.deactivated'));
+
+                        if ($record->is_active) {
+                            $notification->success();
+                        } else {
+                            $notification->warning();
+                        }
+
+                        $notification->send();
+                    }),
+                DeleteAction::make()
+                    ->using(fn (Report $record): bool => (bool) $record->forceDelete()),
                 Action::make('generate')
                     ->label(__('reports.actions.generate'))
                     ->icon('heroicon-o-arrow-down-tray')
@@ -373,7 +390,41 @@ final class ReportResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->using(function (
+                            DeleteBulkAction $action,
+                            \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|\Illuminate\Support\LazyCollection $records
+                        ): void {
+                            if (! $action->shouldFetchSelectedRecords()) {
+                                try {
+                                    $action->reportBulkProcessingSuccessfulRecordsCount(
+                                        $action->getSelectedRecordsQuery()->forceDelete(),
+                                    );
+                                } catch (\Throwable $exception) {
+                                    $action->reportCompleteBulkProcessingFailure();
+
+                                    report($exception);
+                                }
+
+                                return;
+                            }
+
+                            $isFirstException = true;
+
+                            $records->each(function (Report $record) use ($action, &$isFirstException): void {
+                                try {
+                                    $record->forceDelete() || $action->reportBulkProcessingFailure();
+                                } catch (\Throwable $exception) {
+                                    $action->reportBulkProcessingFailure();
+
+                                    if ($isFirstException) {
+                                        report($exception);
+
+                                        $isFirstException = false;
+                                    }
+                                }
+                            });
+                        }),
                     BulkAction::make('generate_all')
                         ->label(__('reports.actions.generate_all'))
                         ->icon('heroicon-o-arrow-down-tray')
@@ -482,7 +533,15 @@ final class ReportResource extends Resource
                             ->boolean(),
                         TextEntry::make('schedule_frequency')
                             ->label(__('reports.fields.schedule_frequency'))
-                            ->formatStateUsing(fn (string $state): string => __("reports.frequencies.{$state}"))
+                            ->formatStateUsing(
+                                function (?string $state): ?string {
+                                    if (blank($state)) {
+                                        return null;
+                                    }
+
+                                    return __("reports.frequencies.{$state}");
+                                }
+                            )
                             ->placeholder(__('reports.placeholders.no_schedule')),
                     ])
                     ->columns(2),

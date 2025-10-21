@@ -6,9 +6,9 @@ namespace App\Filament\Resources\VariantInventoryResource\Pages;
 
 use App\Filament\Resources\VariantInventoryResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListVariantInventories extends ListRecords
+class ListVariantInventories extends BaseListRecords
 {
     protected static string $resource = VariantInventoryResource::class;
 

@@ -53,7 +53,7 @@
                         {{-- Product Image --}}
                         @if ($showImages)
                             <div class="aspect-w-1 aspect-h-1 bg-gray-100 relative overflow-hidden">
-                                <img src="{{ $item->getFirstMediaUrl('images') ?? asset('images/placeholder-product.jpg') }}"
+                                <img src="{{ $item->getFirstMediaUrl('images') ?? product_placeholder_url('medium') }}"
                                      alt="{{ $item->name }}"
                                      class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
 
@@ -239,16 +239,16 @@
                 }
             },
 
-            addAllToCart() {
+            async addAllToCart() {
                 // Add all wishlist items to cart
                 const productIds = {{ $wishlistItems->pluck('id')->toJson() }};
 
-                productIds.forEach(productId => {
-                    // Add to cart logic
-                    fetch('/cart/add', {
+                await Promise.all(productIds.map(productId => {
+                    return fetch('/cart/items', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
                                 .getAttribute('content')
                         },
@@ -257,7 +257,7 @@
                             quantity: 1
                         })
                     });
-                });
+                }));
 
                 this.showNotification('{{ __('All items added to cart!') }}', 'success');
             },

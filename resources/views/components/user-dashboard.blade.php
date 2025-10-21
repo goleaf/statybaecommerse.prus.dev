@@ -124,7 +124,7 @@
                     <span class="text-sm font-medium text-gray-900">{{ __('View Orders') }}</span>
                 </a>
 
-                <a href="{{ route('wishlist.index', ['locale' => app()->getLocale()]) ?? '/wishlist' }}"
+                <a href="{{ route('frontend.wishlist.index') }}"
                    class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <svg class="w-8 h-8 text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -283,7 +283,7 @@
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('Wishlist') }}</h2>
-                        <a href="{{ route('wishlist.index', ['locale' => app()->getLocale()]) ?? '/wishlist' }}"
+                        <a href="{{ route('frontend.wishlist.index') }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
                             {{ __('View All') }}
                         </a>
@@ -294,7 +294,7 @@
                             <div
                                  class="border border-gray-200 rounded-xl p-3 hover:shadow-medium transition-shadow duration-200">
                                 <div class="w-full h-24 bg-gray-100 rounded-lg mb-2 overflow-hidden">
-                                    <img src="{{ $item->getFirstMediaUrl('images') ?? asset('images/placeholder-product.jpg') }}"
+                                    <img src="{{ $item->getFirstMediaUrl('images') ?? product_placeholder_url('medium') }}"
                                          alt="{{ $item->name }}" class="w-full h-full object-cover">
                                 </div>
                                 <h3 class="font-medium text-gray-900 text-sm line-clamp-2">{{ $item->name }}</h3>

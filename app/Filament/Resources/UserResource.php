@@ -1,15 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
-use BackedEnum;
 use App\Models\User;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\Exporters\UserExport;
+use App\Services\Export\ExportService;
+use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -17,7 +24,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -26,8 +32,11 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 use UnitEnum;
 
 /**
@@ -44,6 +53,46 @@ final class UserResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('users', 'viewAny');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return AuthorizationMatrix::check('users', 'viewAny');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'view');
+    }
+
+    public static function canCreate(): bool
+    {
+        return AuthorizationMatrix::check('users', 'create');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'update');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'delete');
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'delete');
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'update');
+    }
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
@@ -96,11 +145,15 @@ final class UserResource extends Resource
                         TextInput::make('password')
                             ->label(__('users.fields.password'))
                             ->password()
-                            ->required(fn(string $context): bool => $context === 'create')
+                            ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8)
-                            ->dehydrated(fn($state) => filled($state))
-                            ->dehydrateStateUsing(fn($state) => bcrypt($state)),
-                        Select::make('locale')
+                            ->dehydrated(fn (?string $state): bool => filled($state))
+                            ->dehydrateStateUsing(
+                                fn (?string $state): ?string => filled($state)
+                                    ? Hash::make($state)
+                                    : null,
+                            ),
+                        Select::make('preferred_locale')
                             ->label(__('users.fields.locale'))
                             ->options([
                                 'lt' => 'Lietuvių',
@@ -115,7 +168,7 @@ final class UserResource extends Resource
                     ->columns(1),
                 Section::make(__('users.sections.profile'))
                     ->schema([
-                        FileUpload::make('avatar')
+                        FileUpload::make('avatar_url')
                             ->label(__('users.fields.avatar'))
                             ->image()
                             ->directory('users/avatars')
@@ -136,10 +189,10 @@ final class UserResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('avatar')
+                ImageColumn::make('avatar_url')
                     ->label(__('users.fields.avatar'))
                     ->circular()
-                    ->defaultImageUrl(url('/images/default-avatar.png')),
+                    ->defaultImageUrl(url('/images/logo.svg')),
                 TextColumn::make('name')
                     ->label(__('users.fields.name'))
                     ->searchable()
@@ -149,12 +202,12 @@ final class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-                TextColumn::make('locale')
+                TextColumn::make('preferred_locale')
                     ->label(__('users.fields.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'lt' => 'success',
-                        'en' => 'info',
+                    ->color(fn (?string $state): string => match ($state) {
+                        'lt'    => 'success',
+                        'en'    => 'info',
                         default => 'gray',
                     }),
                 IconColumn::make('is_active')
@@ -170,7 +223,7 @@ final class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('locale')
+                SelectFilter::make('preferred_locale')
                     ->options([
                         'lt' => 'Lietuvių',
                         'en' => 'English',
@@ -179,34 +232,84 @@ final class UserResource extends Resource
                     ->label(__('users.fields.is_active')),
                 TernaryFilter::make('email_verified_at')
                     ->label(__('users.fields.email_verified')),
+                TrashedFilter::make(),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
+                DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('users', 'delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    BulkAction::make('export_selected')
+                        ->label(__('Export selected'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->form([
+                            Select::make('format')
+                                ->label(__('Format'))
+                                ->options([
+                                    'csv'  => 'CSV',
+                                    'xlsx' => 'XLSX',
+                                    'pdf'  => 'PDF',
+                                ])
+                                ->default('csv')
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('Columns'))
+                                ->options(fn () => collect(app(UserExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
+                                ->default(fn () => app(UserExport::class)->defaultColumns())
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $service */
+                            $service = app(ExportService::class);
+                            $columns = $data['columns'] ?? app(UserExport::class)->defaultColumns();
+                            $request = new ExportRequestData(
+                                name: __('Users Export'),
+                                exportable: UserExport::class,
+                                format: $data['format'],
+                                columns: $columns,
+                                recordIds: $records->pluck('id')->all(),
+                                userId: auth()->id(),
+                            );
+
+                            $service->queue($request);
+
+                            Notification::make()
+                                ->title(__('Export queued'))
+                                ->body(__('You will receive a notification once the export has finished.'))
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'viewAny')),
                     BulkAction::make('activate')
                         ->label(__('users.actions.activate'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('users.messages.bulk_activate_success'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
                     BulkAction::make('deactivate')
                         ->label(__('users.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('users.messages.bulk_deactivate_success'))
                                 ->success()
                                 ->send();
-                        }),
-                    DeleteBulkAction::make(),
+                        })
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'delete')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -218,9 +321,10 @@ final class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
+            'index'  => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view'   => Pages\ViewUser::route('/{record}'),
+            'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 }

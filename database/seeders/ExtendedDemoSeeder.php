@@ -24,6 +24,7 @@ use App\Models\User;
 use App\Models\VariantInventory;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Storage;
 
 final class ExtendedDemoSeeder extends Seeder
@@ -102,9 +103,9 @@ final class ExtendedDemoSeeder extends Seeder
 
                 // Add media if available
                 $path = 'demo/tshirt.jpg';
-                if (Storage::disk('public')->exists($path)) {
+                if (Storage::disk(SecureStorage::disk())->exists($path)) {
                     $product
-                        ->addMedia(Storage::disk('public')->path($path))
+                        ->addMedia(Storage::disk(SecureStorage::disk())->path($path))
                         ->toMediaCollection(config('media.storage.collection_name'));
                 }
             });

@@ -4,12 +4,22 @@
     'size' => 'md',
     'showText' => false,
     'variant' => 'default', // default, minimal, icon-only
+    'variantId' => null,
 ])
 
 @php
     $productId = $productId ?? ($product ? $product->id : null);
-    $isInWishlist =
-        auth()->check() && $productId ? auth()->user()->wishlist()->where('product_id', $productId)->exists() : false;
+    $variantId = $variantId ?? ($product?->pivot?->variant_id ?? null);
+    $defaultWishlist = auth()->check()
+        ? auth()->user()->wishlists()->where('is_default', true)->first()
+        : null;
+    $isInWishlist = $defaultWishlist && $productId
+        ? $defaultWishlist
+            ->items()
+            ->where('product_id', $productId)
+            ->when($variantId, fn ($query) => $query->where('variant_id', $variantId))
+            ->exists()
+        : false;
 
     $sizes = [
         'sm' => 'w-8 h-8',
@@ -20,7 +30,12 @@
     $sizeClass = $sizes[$size] ?? $sizes['md'];
 @endphp
 
-<div class="wishlist-button" x-data="wishlistButton()">
+<div class="wishlist-button" x-data='wishlistButton(@json([
+    "productId" => $productId,
+    "variantId" => $variantId,
+    "isInWishlist" => $isInWishlist,
+    "isAuthenticated" => auth()->check(),
+]))'>
     <button @click="toggleWishlist()"
             :disabled="loading"
             class="group relative {{ $sizeClass }} flex items-center justify-center rounded-full transition-all duration-200 transform hover:scale-110"
@@ -91,43 +106,79 @@
 </div>
 
 <script>
-    function wishlistButton() {
+    function wishlistButton(config) {
         return {
-            isInWishlist: @json($isInWishlist),
+            productId: config.productId,
+            variantId: config.variantId,
+            isInWishlist: Boolean(config.isInWishlist),
+            isAuthenticated: Boolean(config.isAuthenticated),
             loading: false,
             message: '',
             messageType: 'success',
 
             async toggleWishlist() {
-                if (this.loading || !{{ $productId ?? 'null' }}) return;
+                if (this.loading || !this.productId) {
+                    return;
+                }
+
+                if (!this.isAuthenticated) {
+                    window.location.href = '{{ route('login') }}';
+                    return;
+                }
 
                 this.loading = true;
                 this.message = '';
 
+                const isRemoving = this.isInWishlist;
+                const endpoint = isRemoving
+                    ? '{{ route('frontend.wishlist.remove') }}'
+                    : '{{ route('frontend.wishlist.add') }}';
+
+                const payload = {
+                    product_id: this.productId,
+                };
+
+                if (this.variantId) {
+                    payload.variant_id = this.variantId;
+                }
+
+                if (!isRemoving) {
+                    payload.quantity = 1;
+                }
+
                 try {
-                    const response = await fetch('/wishlist/toggle', {
-                        method: 'POST',
+                    const response = await fetch(endpoint, {
+                        method: isRemoving ? 'DELETE' : 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content')
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
-                        body: JSON.stringify({
-                            product_id: {{ $productId ?? 'null' }}
-                        })
+                        body: JSON.stringify(payload),
                     });
 
-                    const data = await response.json();
+                    let data = {};
+
+                    try {
+                        data = await response.json();
+                    } catch (error) {
+                        data = {};
+                    }
 
                     if (response.ok) {
-                        this.isInWishlist = data.in_wishlist;
+                        this.isInWishlist = !isRemoving;
                         this.messageType = 'success';
-                        this.message = data.in_wishlist ?
-                            '{{ __('Added to wishlist!') }}' :
-                            '{{ __('Removed from wishlist!') }}';
+                        this.message = data.message || (this.isInWishlist
+                            ? '{{ __('Added to wishlist!') }}'
+                            : '{{ __('Removed from wishlist!') }}');
 
-                        // Update wishlist count in header if exists
-                        this.updateWishlistCount(data.wishlist_count);
+                        if (data.item && Object.prototype.hasOwnProperty.call(data.item, 'variant_id')) {
+                            this.variantId = data.item.variant_id;
+                        }
+
+                        if (Object.prototype.hasOwnProperty.call(data, 'wishlist_count')) {
+                            this.updateWishlistCount(data.wishlist_count);
+                        }
                     } else {
                         this.messageType = 'error';
                         this.message = data.message || '{{ __('Something went wrong. Please try again.') }}';
@@ -138,7 +189,6 @@
                 } finally {
                     this.loading = false;
 
-                    // Clear message after 3 seconds
                     setTimeout(() => {
                         this.message = '';
                     }, 3000);
@@ -146,7 +196,6 @@
             },
 
             updateWishlistCount(count) {
-                // Update wishlist count in header/navigation if element exists
                 const countElement = document.querySelector('[data-wishlist-count]');
                 if (countElement) {
                     countElement.textContent = count;

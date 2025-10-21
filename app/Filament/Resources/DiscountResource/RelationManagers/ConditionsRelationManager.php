@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class ConditionsRelationManager extends RelationManager
+final class ConditionsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'conditions';
 

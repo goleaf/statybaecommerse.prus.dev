@@ -8,20 +8,21 @@ use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Exception;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -146,15 +147,15 @@ final class SystemSettingCategoryTranslationResource extends Resource
                         $state >= 90 => 'success',
                         $state >= 70 => 'warning',
                         $state >= 50 => 'info',
-                        default => 'danger',
+                        default      => 'danger',
                     })
-                    ->formatStateUsing(fn (int $state): string => $state.'%')
+                    ->formatStateUsing(fn (int $state): string => $state . '%')
                     ->toggleable(),
                 TextColumn::make('quality_score')
                     ->label(__('admin.system_setting_category_translations.quality_score'))
                     ->badge()
                     ->color(fn (SystemSettingCategoryTranslation $record): string => $record->quality_badge_color)
-                    ->formatStateUsing(fn (int $state): string => $state.'/100')
+                    ->formatStateUsing(fn (int $state): string => $state . '/100')
                     ->toggleable(),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
@@ -165,7 +166,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
             ->filters([
                 SelectFilter::make('system_setting_category_id')
                     ->label(__('admin.system_setting_category_translations.system_setting_category'))
-                    ->options(SystemSettingCategory::pluck('name', 'id'))
+                    ->options(SystemSettingCategory::query()->pluck('name', 'id')->toArray())
                     ->searchable(),
                 SelectFilter::make('locale')
                     ->label(__('admin.system_setting_category_translations.locale'))
@@ -174,13 +175,13 @@ final class SystemSettingCategoryTranslationResource extends Resource
                 SelectFilter::make('completeness')
                     ->label(__('admin.system_setting_category_translations.completeness'))
                     ->options([
-                        'complete' => __('admin.system_setting_category_translations.complete'),
+                        'complete'   => __('admin.system_setting_category_translations.complete'),
                         'incomplete' => __('admin.system_setting_category_translations.incomplete'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value'] ?? null) {
-                            'complete' => $query->whereNotNull('name')->whereNotNull('description'),
-                            'incomplete' => $query->where(function ($q) {
+                            'complete'   => $query->whereNotNull('name')->whereNotNull('description'),
+                            'incomplete' => $query->where(function ($q): void {
                                 $q->whereNull('name')->orWhereNull('description');
                             }),
                             default => $query,
@@ -189,30 +190,30 @@ final class SystemSettingCategoryTranslationResource extends Resource
                 SelectFilter::make('quality')
                     ->label(__('admin.system_setting_category_translations.quality'))
                     ->options([
-                        'high' => __('admin.system_setting_category_translations.high_quality'),
+                        'high'   => __('admin.system_setting_category_translations.high_quality'),
                         'medium' => __('admin.system_setting_category_translations.medium_quality'),
-                        'low' => __('admin.system_setting_category_translations.low_quality'),
+                        'low'    => __('admin.system_setting_category_translations.low_quality'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value'] ?? null) {
-                            'high' => $query->where(function ($q) {
+                            'high' => $query->where(function ($q): void {
                                 $q
                                     ->whereNotNull('name')
                                     ->whereNotNull('description')
                                     ->whereRaw('CHAR_LENGTH(name) >= 5')
                                     ->whereRaw('CHAR_LENGTH(description) >= 20');
                             }),
-                            'medium' => $query->where(function ($q) {
+                            'medium' => $query->where(function ($q): void {
                                 $q
                                     ->whereNotNull('name')
                                     ->whereNotNull('description')
-                                    ->where(function ($subQ) {
+                                    ->where(function ($subQ): void {
                                         $subQ
                                             ->whereRaw('CHAR_LENGTH(name) < 5')
                                             ->orWhereRaw('CHAR_LENGTH(description) < 20');
                                     });
                             }),
-                            'low' => $query->where(function ($q) {
+                            'low' => $query->where(function ($q): void {
                                 $q->whereNull('name')->orWhereNull('description');
                             }),
                             default => $query,
@@ -228,7 +229,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingCategoryTranslation $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->name = $record->name.' (Copy)';
+                        $newRecord->name = $record->name . ' (Copy)';
                         $newRecord->save();
 
                         Notification::make()
@@ -269,7 +270,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
                                 try {
                                     $record->duplicateForLocale($data['target_locale']);
                                     $duplicatedCount++;
-                                } catch (\Exception $e) {
+                                } catch (Exception $e) {
                                     // Skip if already exists or other error
                                 }
                             }
@@ -315,17 +316,17 @@ final class SystemSettingCategoryTranslationResource extends Resource
     {
         if (app()->environment('testing')) {
             return [
-                'index' => Pages\ListSystemSettingCategoryTranslations::route('/'),
+                'index'  => Pages\ListSystemSettingCategoryTranslations::route('/'),
                 'create' => Pages\CreateSystemSettingCategoryTranslation::route('/create'),
                 // Omit view/edit to avoid route conflicts with test stubs
             ];
         }
 
         return [
-            'index' => Pages\ListSystemSettingCategoryTranslations::route('/'),
+            'index'  => Pages\ListSystemSettingCategoryTranslations::route('/'),
             'create' => Pages\CreateSystemSettingCategoryTranslation::route('/create'),
-            'view' => Pages\ViewSystemSettingCategoryTranslation::route('/{record}'),
-            'edit' => Pages\EditSystemSettingCategoryTranslation::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingCategoryTranslation::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingCategoryTranslation::route('/{record}/edit'),
         ];
     }
 }

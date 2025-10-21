@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -20,34 +17,78 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class CategoryResource extends Resource
 {
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static ?string $model = Category::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function shouldRegisterNavigation(): bool
     {
-        return 'System';
+        return AuthorizationMatrix::check('categories', 'viewAny');
     }
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function canViewAny(): bool
     {
-        return 'heroicon-o-tag';
+        return AuthorizationMatrix::check('categories', 'viewAny');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return AuthorizationMatrix::check('categories', 'view');
+    }
+
+    public static function canCreate(): bool
+    {
+        return AuthorizationMatrix::check('categories', 'create');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return AuthorizationMatrix::check('categories', 'update');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('categories', 'delete');
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('categories', 'delete');
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return AuthorizationMatrix::check('categories', 'update');
     }
 
     public static function getPluralModelLabel(): string
@@ -62,22 +103,26 @@ final class CategoryResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        return $form->components([
             Section::make(__('categories.basic_information'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('categories.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
-                            TextInput::make('slug')
-                                ->label(__('categories.slug'))
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
-                        ]),
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('name')
+                            ->label(__('categories.name'))
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('slug')
+                            ->label(__('categories.slug'))
+                            ->required()
+                            ->maxLength(255),
+                        Textarea::make('description')
+                            ->label(__('categories.description'))
+                            ->rows(3),
+                        Textarea::make('short_description')
+                            ->label(__('categories.short_description'))
+                            ->rows(2)
+                            ->maxLength(500),
+                    ]),
                     Select::make('parent_id')
                         ->label(__('categories.parent_category'))
                         ->relationship('parent', 'name')
@@ -89,13 +134,9 @@ final class CategoryResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ]),
-                    Textarea::make('description')
-                        ->label(__('categories.description'))
-                        ->rows(3)
-                        ->columnSpanFull(),
                 ]),
             Section::make(__('categories.media'))
-                ->schema([
+                ->components([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
                         ->image()
@@ -106,7 +147,7 @@ final class CategoryResource extends Resource
                             '4:3',
                         ])
                         ->directory('categories/images')
-                        ->visibility('public'),
+                        ->visibility('private'),
                     FileUpload::make('banner')
                         ->label(__('categories.banner'))
                         ->image()
@@ -115,12 +156,12 @@ final class CategoryResource extends Resource
                             '21:9',
                         ])
                         ->directory('categories/banners')
-                        ->visibility('public'),
+                        ->visibility('private'),
                 ]),
             Section::make(__('categories.appearance'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
                                 ->hex(),
@@ -132,19 +173,21 @@ final class CategoryResource extends Resource
                         ]),
                 ]),
             Section::make(__('categories.seo'))
-                ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('categories.seo_title'))
-                        ->maxLength(255),
-                    Textarea::make('seo_description')
-                        ->label(__('categories.seo_description'))
-                        ->rows(2)
-                        ->maxLength(500),
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('seo_title')
+                            ->label(__('categories.seo_title'))
+                            ->maxLength(255),
+                        Textarea::make('seo_description')
+                            ->label(__('categories.seo_description'))
+                            ->rows(2)
+                            ->maxLength(500),
+                    ]),
                 ]),
             Section::make(__('categories.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
                                 ->default(true),
@@ -222,10 +265,13 @@ final class CategoryResource extends Resource
                     ->trueLabel(__('categories.featured_only'))
                     ->falseLabel(__('categories.not_featured'))
                     ->native(false),
+                TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
+                EditAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
                 Action::make('toggle_active')
                     ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
                     ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -237,11 +283,13 @@ final class CategoryResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'delete')),
                     BulkAction::make('activate')
                         ->label(__('categories.activate_selected'))
                         ->icon('heroicon-o-eye')
@@ -253,7 +301,8 @@ final class CategoryResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
                     BulkAction::make('deactivate')
                         ->label(__('categories.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
@@ -265,7 +314,8 @@ final class CategoryResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
                 ]),
             ])
             ->defaultSort('sort_order');
@@ -281,10 +331,10 @@ final class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
+            'index'  => Pages\ListCategories::route('/'),
             'create' => Pages\CreateCategory::route('/create'),
-            'view' => Pages\ViewCategory::route('/{record}'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'view'   => Pages\ViewCategory::route('/{record}'),
+            'edit'   => Pages\EditCategory::route('/{record}/edit'),
         ];
     }
 }

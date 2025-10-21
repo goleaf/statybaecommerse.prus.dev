@@ -6,9 +6,9 @@ namespace App\Filament\Resources\SystemSettingDependencyResource\Pages;
 
 use App\Filament\Resources\SystemSettingDependencyResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListSystemSettingDependencies extends ListRecords
+final class ListSystemSettingDependencies extends BaseListRecords
 {
     protected static string $resource = SystemSettingDependencyResource::class;
 

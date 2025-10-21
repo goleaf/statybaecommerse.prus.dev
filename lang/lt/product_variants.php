@@ -48,6 +48,11 @@ return [
         'settings' => 'Varianto Nustatymai',
     ],
 
+    'filters' => [
+        'product' => 'Produktas',
+        'product_placeholder' => 'Ieškokite pagal produkto pavadinimą arba SKU',
+    ],
+
     // Fields
     'fields' => [
         'product' => 'Produktas',
@@ -83,6 +88,9 @@ return [
         'track_inventory' => 'Sekti Atsargas',
         'is_enabled' => 'Įjungtas',
         'attributes' => 'Atributai',
+        'variant_metadata' => 'Papildomi varianto duomenys',
+        'variant_metadata_key' => 'Raktas',
+        'variant_metadata_value' => 'Reikšmė',
         'images' => 'Paveikslėliai',
         'seo_title_lt' => 'SEO Antraštė (LT)',
         'seo_title_en' => 'SEO Antraštė (EN)',
@@ -109,6 +117,9 @@ return [
         'set_sale_period' => 'Nustatyti Akcijos Laikotarpį',
         'rating' => 'Įvertinimas',
         'available' => 'Prieinama',
+        'variant_metadata' => 'Papildomi duomenys',
+        'variant_metadata_key' => 'Raktas',
+        'variant_metadata_value' => 'Reikšmė',
         'badges' => 'Žymės',
     ],
 
