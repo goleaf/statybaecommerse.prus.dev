@@ -86,19 +86,20 @@ it('can set search query', function (): void {
 });
 
 it('performs search when query is set', function (): void {
-    Product::factory()->create(['name' => 'Test Product 1']);
-    Product::factory()->create(['name' => 'Test Product 2']);
+    $firstProduct = Product::factory()->create(['name' => 'Test Product 1']);
+    $secondProduct = Product::factory()->create(['name' => 'Test Product 2']);
     Product::factory()->create(['name' => 'Another Item']);
 
     $component = AutocompleteSelect::make('test_field')
-        ->model(Product::class)
-        ->setSearchQuery('Test');
+        ->model(Product::class);
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('Test');
 
     expect($searchResults)->toHaveCount(2);
-    expect($searchResults->pluck('label')->toArray())->toContain('Test Product 1');
-    expect($searchResults->pluck('label')->toArray())->toContain('Test Product 2');
+    expect($searchResults)->toHaveKey($firstProduct->id);
+    expect($searchResults)->toHaveKey($secondProduct->id);
+    expect(array_values($searchResults))->toContain('Test Product 1');
+    expect(array_values($searchResults))->toContain('Test Product 2');
 });
 
 it('respects minimum search length', function (): void {
@@ -106,12 +107,11 @@ it('respects minimum search length', function (): void {
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
-        ->minSearchLength(5)
-        ->setSearchQuery('Te');
+        ->minSearchLength(5);
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('Te');
 
-    expect($searchResults)->toHaveCount(0);
+    expect($searchResults)->toBeEmpty();
 });
 
 it('limits search results', function (): void {
@@ -119,10 +119,9 @@ it('limits search results', function (): void {
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
-        ->maxSearchResults(5)
-        ->setSearchQuery('Test');
+        ->maxSearchResults(5);
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('Test');
 
     expect($searchResults)->toHaveCount(5);
 });
@@ -132,10 +131,9 @@ it('uses custom search field', function (): void {
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
-        ->searchField('description')
-        ->setSearchQuery('Test');
+        ->searchField('description');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('Test');
 
     expect($searchResults)->toHaveCount(1);
 });
@@ -144,21 +142,20 @@ it('returns empty results for invalid model class', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->setSearchQuery('test');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('test');
 
-    expect($searchResults)->toHaveCount(0);
+    expect($searchResults)->toBeEmpty();
 });
 
 it('returns empty results for empty search query', function (): void {
     Product::factory()->create(['name' => 'Test Product']);
 
     $component = AutocompleteSelect::make('test_field')
-        ->model(Product::class)
-        ->setSearchQuery('');
+        ->model(Product::class);
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('');
 
-    expect($searchResults)->toHaveCount(0);
+    expect($searchResults)->toBeEmpty();
 });
 
 it('provides correct view data', function (): void {
@@ -206,9 +203,60 @@ it('handles search with no results', function (): void {
         ->model(Product::class)
         ->setSearchQuery('NonExistent');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('NonExistent');
 
-    expect($searchResults)->toHaveCount(0);
+    expect($searchResults)->toBeEmpty();
+});
+
+it('caches results for identical search queries', function (): void {
+    $initialProduct = Product::factory()->create(['name' => 'Cached Result Product']);
+
+    $component = AutocompleteSelect::make('test_field')
+        ->model(Product::class);
+
+    $firstResults = $component->getSearchResults('Cached');
+
+    expect($firstResults)->toHaveCount(1);
+    expect($firstResults)->toHaveKey($initialProduct->id);
+
+    $newProduct = Product::factory()->create(['name' => 'Cached Result Product Extra']);
+
+    $secondResults = $component->getSearchResults('Cached');
+
+    expect($secondResults)->toEqual($firstResults);
+    expect($secondResults)->not->toHaveKey($newProduct->id);
+});
+
+it('refreshes results after clearing the search cache', function (): void {
+    Product::factory()->create(['name' => 'Initial Search Product']);
+
+    $component = AutocompleteSelect::make('test_field')
+        ->model(Product::class);
+
+    $initialResults = $component->getSearchResults('Initial');
+    expect($initialResults)->toHaveCount(1);
+
+    Product::factory()->create(['name' => 'Initial Search Product Two']);
+
+    $component->setSearchQuery(null);
+
+    $refreshedResults = $component->getSearchResults('Initial');
+
+    expect($refreshedResults)->toHaveCount(2);
+});
+
+it('supports multi term searches', function (): void {
+    Product::factory()->create(['name' => 'Incredible Test Product']);
+    Product::factory()->create(['name' => 'Test Gadget']);
+    Product::factory()->create(['name' => 'Product Sample']);
+
+    $component = AutocompleteSelect::make('test_field')
+        ->model(Product::class);
+
+    $results = $component->getSearchResults('Test Product');
+
+    expect($results)->toHaveCount(1);
+    expect(array_values($results))->toContain('Incredible Test Product');
 });
 
 it('can chain configuration methods', function (): void {
