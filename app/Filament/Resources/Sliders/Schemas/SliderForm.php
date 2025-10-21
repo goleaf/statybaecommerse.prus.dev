@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\FileUpload;
@@ -78,13 +79,20 @@ final class SliderForm
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        if ($state === null || $state === '') {
+                                        // Hydrate via helper to align with docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                                        );
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state !== null && $state !== '') {
                                             return;
                                         }
 
-                                        $component
-                                            ->state($state)
-                                            ->options([$state => $state]);
+                                        // Reset CTA URLs whenever lookup is cleared to avoid stale payloads.
+                                        SearchableInputHelper::clear($set, ['button_url' => null]);
                                     })
                                     ->columnSpan(1),
                             ]),
