@@ -13,9 +13,9 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Facades\FilamentNumber;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Support\Facades\FilamentNumber;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -29,11 +29,11 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * @var string|BackedEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
+     * @var string|BackedEnum|UnitEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
      */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    /** @var string|BackedEnum|UnitEnum|null Ensure inventory analytics stay grouped centrally. */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
