@@ -13,7 +13,7 @@ use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -29,7 +29,7 @@ final class ProductFeatureResource extends Resource
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Forms\Components\Select::make('product_id')
@@ -67,7 +67,7 @@ final class ProductFeatureResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

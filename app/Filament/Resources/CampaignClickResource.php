@@ -19,7 +19,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
@@ -67,9 +67,9 @@ final class CampaignClickResource extends Resource
      * Configure the Filament form schema with fields and validation.
      *
      * @param  Forms\Form  $schema
-     * @return Forms\Form
+     * @return Schemas\Form
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('campaign_clicks.basic_information'))
@@ -192,7 +192,7 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
