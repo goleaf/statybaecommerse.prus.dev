@@ -33,4 +33,4 @@
 ### Fixed
 - Reinstated the Husky shared bootstrap script so Git hooks run without deprecation notices or missing PATH exports during repository installs.
 - Captured the `sh -n .husky/_/husky.sh` smoke check that verifies the restored script syntax before publishing commits.
-- Normalized storefront autocomplete and recently viewed APIs to expose `main_image`/`thumbnail` data and updated Blade widgets to consume the refreshed media keys consistently.
+- Normalized storefront autocomplete and recently viewed APIs to expose `main_image`/`thumbnail` data, kept the legacy `image` alias for downstream caches, restricted results to published products, and updated Blade widgets to consume the refreshed media keys consistently.
