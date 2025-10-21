@@ -13,6 +13,7 @@ use App\Filament\Resources\ProductResource\RelationManagers\DocumentsRelationMan
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
+use App\Filament\Widgets\InlineCharts\ProductSales30DaysChart;
 use App\Models\Product;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\ProductExport;
@@ -57,6 +58,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart as InlineChartColumn;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
 
@@ -372,6 +374,13 @@ final class ProductResource extends Resource
                     ->label(__('products.fields.price'))
                     ->money('EUR')
                     ->sortable(),
+                InlineChartColumn::make('sales_30d')
+                    ->label(__('Sales (30d)'))
+                    ->chart(ProductSales30DaysChart::class)
+                    ->maxWidth(300)
+                    ->maxHeight(60)
+                    ->description(__('Last 30 days of sold units'))
+                    ->toggleable(),
                 TextColumn::make('stock_quantity')
                     ->label(__('products.fields.stock'))
                     ->sortable()

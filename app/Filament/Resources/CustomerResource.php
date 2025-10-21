@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
+use App\Filament\Widgets\InlineCharts\CustomerLtv12MonthsChart;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -26,6 +22,11 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Schemas\Components\Utilities\Set as SchemaSet;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -34,6 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart as InlineChartColumn;
 use UnitEnum;
 
 final class CustomerResource extends Resource
@@ -224,6 +226,13 @@ final class CustomerResource extends Resource
                     ->label(__('customers.orders_count'))
                     ->counts('orders')
                     ->sortable(),
+                InlineChartColumn::make('ltv_12m')
+                    ->label(__('LTV (12m)'))
+                    ->chart(CustomerLtv12MonthsChart::class)
+                    ->maxWidth(320)
+                    ->maxHeight(60)
+                    ->description(__('Monthly revenue (12m)'))
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->label(__('customers.created_at'))
                     ->dateTime()
