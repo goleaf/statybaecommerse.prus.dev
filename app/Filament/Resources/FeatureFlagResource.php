@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -48,6 +50,18 @@ final class FeatureFlagResource extends Resource
     protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    /**
+     * Ensure administrators can query every feature flag regardless of default scopes.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        // Removing the Active and Enabled scopes keeps disabled flags visible for auditing and reactivation.
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
+    }
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
