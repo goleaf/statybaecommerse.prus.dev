@@ -1,16 +1,16 @@
 # Relation Manager Repeater quick-edit actions
 
-The `zvizvi/relation-manager-repeater` plugin (v2.x) is installed to provide bulk editing modals for high-volume HasMany relations. Each enabled relation manager now exposes a **Quick edit** header action that opens a repeater-powered modal and syncs the submitted rows back to the underlying relationship.
+The `zvizvi/relation-manager-repeater` plugin (v2.x) is now rolled out across the Filament admin panel. Eligible HasMany relation managers expose a **Quick edit** header action that opens a repeater-powered modal and syncs the submitted rows back to the underlying relationship, keeping in-line adjustments fast without abandoning the table view.
 
 ## Enabled relation managers
 
-| Relation manager | Action label | Repeater highlights |
-| --- | --- | --- |
-| `ProductResource\RelationManagers\ImagesRelationManager` | **Quick edit images** | Reuses the image upload flow plus metadata fields, supports cloning/reordering, and keeps existing records stable through a hidden `id` input. |
-| `ProductResource\RelationManagers\VariantsRelationManager` | **Quick edit variants** | Focuses on pricing, inventory, and publish toggles; variant attributes stay editable in the standard form. |
-| `OrderResource\RelationManagers\OrderItemsRelationManager` | **Quick edit items** | Lets operators adjust quantity, pricing, and notes without reopening each row; product and SKU stay read-only safeguards. |
-| `UserResource\RelationManagers\AddressesRelationManager` | **Quick edit addresses** | Batches contact/address fields while keeping country lookups and default toggles. |
-| `CategoryResource\RelationManagers\TranslationsRelationManager` | **Quick edit translations** | Provides localized content fields with locale locking after creation to prevent duplicates. |
+| Resource | Relation manager | Relationship | Action label | Repeater highlights |
+| --- | --- | --- | --- | --- |
+| `ProductResource` | `ImagesRelationManager` | `HasMany images` | **Quick edit images** | Reuses the image upload flow plus metadata fields, supports cloning/reordering, and keeps existing records stable through a hidden `id` input. |
+| `ProductResource` | `VariantsRelationManager` | `HasMany variants` | **Quick edit variants** | Focuses on pricing, inventory, and publish toggles; variant attributes stay editable in the standard form. |
+| `OrderResource` | `OrderItemsRelationManager` | `HasMany orderItems` | **Quick edit items** | Lets operators adjust quantity, pricing, and notes without reopening each row; product and SKU stay read-only safeguards. |
+| `UserResource` | `AddressesRelationManager` | `HasMany addresses` | **Quick edit addresses** | Batches contact/address fields while keeping country lookups and default toggles. |
+| `CategoryResource` | `TranslationsRelationManager` | `HasMany translations` | **Quick edit translations** | Provides localized content fields with locale locking after creation to prevent duplicates. |
 
 ## Usage tips
 
@@ -18,11 +18,18 @@ The `zvizvi/relation-manager-repeater` plugin (v2.x) is installed to provide bul
 - Keep validation consistent by updating the relation manager form schema whenever you add/remove fields; the repeater mirrors that schema (plus the hidden `id`).
 - To adjust the quick-edit experience (labels, modal size, schema tweaks), edit the corresponding `RelationManagerRepeaterAction::make()` definition inside each relation manager.
 
-## Skipped relation managers
+## Eligibility guidance
 
-Some relation managers were left unchanged because they rely on attach/detach flows or pivot data that the repeater cannot manage safely:
+Use the repeater action for relations that:
 
-- `CustomerManagementResource\RelationManagers\AddressesRelationManager` – uses associate/dissociate actions for a BelongsToMany pivot.
-- Any `*DocumentsRelationManager`, `*PartnersRelationManager`, etc. that expose complex pivots should continue using their existing attach/edit modals.
+- Manage high-churn HasMany data where multiple rows frequently change together.
+- Share the same schema as the existing create/edit form so validation remains aligned.
+- Benefit from reordering, cloning, or quick toggles without exposing destructive pivot edits.
 
-Document additional skips in this file if you evaluate more relations in the future.
+Opt out of the action when a relation manager:
+
+- Relies on attach/detach flows (typical for BelongsToMany or pivot-heavy relationships).
+- Requires nested repeaters or deeply relational fields that do not serialize cleanly in the modal.
+- Performs side effects during save that assume single-record edits.
+
+When new relation managers are introduced, evaluate them against the criteria above and document the outcome here so the global rollout stays consistent.

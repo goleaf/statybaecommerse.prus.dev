@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Lang;
 use InvalidArgumentException;
 
 /**
@@ -104,6 +105,53 @@ final class ErrorCodes
     public static function describe(string $code): ?string
     {
         return self::DEFINITIONS[$code] ?? null;
+    }
+
+    /**
+     * Convert a dot-delimited error code into an underscore friendly key.
+     *
+     * The translation files store many lookups using snake case, so converting
+     * the error code ahead of time keeps all translation access consistent.
+     */
+    public static function key(string $code): string
+    {
+        return str_replace('.', '_', $code);
+    }
+
+    /**
+     * Build the translation lookup key for problem title strings.
+     */
+    public static function titleKey(string $code): string
+    {
+        return 'errors.titles.' . self::key($code);
+    }
+
+    /**
+     * Build the translation lookup key for detailed problem messages.
+     */
+    public static function messageKey(string $code): string
+    {
+        return 'errors.messages.' . self::key($code);
+    }
+
+    /**
+     * Resolve a localized title for the provided error code.
+     */
+    public static function title(string $code, ?string $locale = null): ?string
+    {
+        $translation = Lang::get(self::titleKey($code), [], $locale);
+
+        return $translation !== self::titleKey($code) ? $translation : null;
+    }
+
+    /**
+     * Resolve a localized message for the provided error code when available.
+     */
+    public static function message(string $code, ?string $locale = null): ?string
+    {
+        $translation = Lang::get(self::messageKey($code), [], $locale);
+
+        return $translation !== self::messageKey($code) ? $translation : null;
     }
 
     /**
