@@ -20,7 +20,7 @@ class CollectionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Collections';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([

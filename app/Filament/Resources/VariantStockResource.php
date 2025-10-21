@@ -41,7 +41,7 @@ final class VariantStockResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form->schema([
             Section::make('Stock Details')
@@ -116,7 +116,7 @@ final class VariantStockResource extends Resource
         return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([

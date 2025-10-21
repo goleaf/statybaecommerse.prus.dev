@@ -20,7 +20,7 @@ final class TagsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Tags';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->components([
@@ -60,7 +60,7 @@ final class TagsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('name')
