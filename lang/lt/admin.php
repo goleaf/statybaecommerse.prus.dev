@@ -33,6 +33,8 @@ return [
         'name' => 'Pavadinimas',
         'slug' => 'Slug',
         'carrier_name' => 'Vežėjo pavadinimas',
+        'zone' => 'Zona',
+        'zone_help' => 'Pasirinkite, kuriai pristatymo zonai galioja ši parinktis.',
         'service_type' => 'Paslaugos tipas',
         'service_types' => [
             'standard' => 'Standartinis',

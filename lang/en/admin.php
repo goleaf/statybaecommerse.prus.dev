@@ -33,6 +33,8 @@ return [
         'name' => 'Name',
         'slug' => 'Slug',
         'carrier_name' => 'Carrier Name',
+        'zone' => 'Zone',
+        'zone_help' => 'Choose which delivery zone this option covers.',
         'service_type' => 'Service Type',
         'service_types' => [
             'standard' => 'Standard',
