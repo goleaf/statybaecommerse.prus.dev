@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountConditionResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\DiscountConditionResource;
 use Filament\Actions;
 use Filament\Forms\Components\Tabs\Tab;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListDiscountConditions extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = DiscountConditionResource::class;
 
     protected function getHeaderActions(): array
@@ -24,7 +27,7 @@ final class ListDiscountConditions extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('discount_conditions.tabs.all')),
+            'all'    => Tab::make(__('discount_conditions.tabs.all')),
             'active' => Tab::make(__('discount_conditions.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),

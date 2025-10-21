@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CampaignResource;
 use Filament\Actions;
 use Filament\Forms\Components\Tabs\Tab;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListCampaigns extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CampaignResource::class;
 
     protected function getHeaderActions(): array
@@ -24,7 +27,7 @@ final class ListCampaigns extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make($this->label('campaigns.tabs.all', 'All')),
+            'all'    => Tab::make($this->label('campaigns.tabs.all', 'All')),
             'active' => Tab::make($this->label('campaigns.tabs.active', 'Active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'active'))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'active')->count()),

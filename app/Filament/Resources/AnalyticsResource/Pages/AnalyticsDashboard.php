@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AnalyticsResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AnalyticsResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -11,6 +12,8 @@ use Filament\Resources\Pages\ListRecords;
 
 final class AnalyticsDashboard extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = AnalyticsResource::class;
 
     /**

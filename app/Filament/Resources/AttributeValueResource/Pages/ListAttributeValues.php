@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeValueResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AttributeValueResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListAttributeValues extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = AttributeValueResource::class;
 
     protected function getHeaderActions(): array

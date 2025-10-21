@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AnalyticsEventResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AnalyticsEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListAnalyticsEvents extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = AnalyticsEventResource::class;
 
     protected function getHeaderActions(): array
@@ -24,7 +27,7 @@ final class ListAnalyticsEvents extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('analytics_events.tabs.all')),
+            'all'        => Tab::make(__('analytics_events.tabs.all')),
             'page_views' => Tab::make(__('analytics_events.tabs.page_views'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('event_type', 'page_view'))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('event_type', 'page_view')->count()),

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductImageResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ProductImageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 final class ListProductImages extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = ProductImageResource::class;
 
     protected function getHeaderActions(): array

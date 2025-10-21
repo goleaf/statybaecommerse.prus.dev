@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AddressResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AddressResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListAddresses extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = AddressResource::class;
 
     protected function getHeaderActions(): array

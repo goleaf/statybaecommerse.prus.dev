@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\InventoryResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\InventoryResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -13,6 +14,8 @@ use Illuminate\Http\Request;
 
 class ListInventories extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = InventoryResource::class;
 
     protected function getHeaderActions(): array

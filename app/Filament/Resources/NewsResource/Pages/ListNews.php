@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsResource\Pages;
 
 use App\Enums\ModerationState;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NewsResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListNews extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = NewsResource::class;
 
     protected function getHeaderActions(): array
@@ -25,7 +28,7 @@ final class ListNews extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('news.tabs.all')),
+            'all'   => Tab::make(__('news.tabs.all')),
             'draft' => Tab::make(__('news.tabs.draft'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Draft->value))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Draft->value)->count()),
