@@ -22,6 +22,7 @@ use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as SpatieTranslatableViewRecord;
+use Filament\Schemas\Schema;
 
 final class ViewOrder extends ViewRecord
 {
@@ -37,7 +38,7 @@ final class ViewOrder extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $infolist): Schema
     {
         return $infolist->schema([
             ListEntry::make('orderQuickLinks')

@@ -36,6 +36,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class NewsTagResource extends Resource
 {
@@ -63,7 +64,7 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
@@ -146,7 +147,7 @@ final class NewsTagResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

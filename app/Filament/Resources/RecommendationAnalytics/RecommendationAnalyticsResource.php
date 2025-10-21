@@ -15,6 +15,7 @@ use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class RecommendationAnalyticsResource extends Resource
 {
@@ -49,12 +50,12 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return RecommendationAnalyticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return RecommendationAnalyticsTable::configure($table);
     }

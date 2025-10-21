@@ -23,6 +23,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class RecommendationConfigResource extends Resource
 {
@@ -49,7 +50,7 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('recommendation_config.sections.basic_info'))
@@ -142,7 +143,7 @@ final class RecommendationConfigResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

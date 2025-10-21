@@ -15,6 +15,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class NewsCategoryResource extends Resource
 {
@@ -27,12 +28,12 @@ final class NewsCategoryResource extends Resource
         return 'News';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return NewsCategoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return NewsCategoriesTable::configure($table);
     }

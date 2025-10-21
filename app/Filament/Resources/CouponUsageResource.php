@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class CouponUsageResource extends Resource
 {
@@ -56,7 +57,7 @@ final class CouponUsageResource extends Resource
         return __('admin.coupon_usages.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->components([
             Tabs::make('coupon_usage_tabs')
@@ -190,7 +191,7 @@ final class CouponUsageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

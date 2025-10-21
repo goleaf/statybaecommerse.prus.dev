@@ -39,6 +39,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class UserProductInteractionResource extends Resource
 {
@@ -61,7 +62,7 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -189,7 +190,7 @@ final class UserProductInteractionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->deferLoading(false)

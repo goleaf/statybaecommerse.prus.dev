@@ -26,6 +26,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class VariantStockHistoryResource extends Resource
 {
@@ -53,7 +54,7 @@ final class VariantStockHistoryResource extends Resource
         return __('admin.variant_stock_histories.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('admin.variant_stock_histories.sections.basic_info'))
@@ -132,7 +133,7 @@ final class VariantStockHistoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

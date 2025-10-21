@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class CampaignsRelationManager extends BaseRelationManager
 {
@@ -16,7 +17,7 @@ final class CampaignsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'customer_groups.relation_campaigns';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -33,7 +34,7 @@ final class CampaignsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')

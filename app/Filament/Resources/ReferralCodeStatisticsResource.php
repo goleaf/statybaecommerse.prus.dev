@@ -23,6 +23,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 /**
  * ReferralCodeStatisticsResource
@@ -54,7 +55,7 @@ final class ReferralCodeStatisticsResource extends Resource
         return __('admin.referral_code_statistics.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -109,7 +110,7 @@ final class ReferralCodeStatisticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

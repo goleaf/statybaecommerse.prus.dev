@@ -16,6 +16,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class CategoriesRelationManager extends BaseRelationManager
 {
@@ -27,7 +28,7 @@ class CategoriesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Categories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->components([
@@ -48,7 +49,7 @@ class CategoriesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

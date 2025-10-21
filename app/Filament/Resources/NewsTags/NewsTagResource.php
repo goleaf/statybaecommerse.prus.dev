@@ -16,6 +16,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class NewsTagResource extends Resource
 {
@@ -23,12 +24,12 @@ class NewsTagResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return NewsTagForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return NewsTagsTable::configure($table);
     }

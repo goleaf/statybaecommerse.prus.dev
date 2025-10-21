@@ -33,7 +33,7 @@ final class LowStockAlertsWidget extends BaseWidget
         return self::$heading;
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query(

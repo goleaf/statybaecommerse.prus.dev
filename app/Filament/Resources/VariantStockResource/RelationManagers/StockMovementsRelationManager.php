@@ -19,6 +19,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -30,7 +31,7 @@ class StockMovementsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Stock Movements';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->components([
@@ -69,7 +70,7 @@ class StockMovementsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('quantity')

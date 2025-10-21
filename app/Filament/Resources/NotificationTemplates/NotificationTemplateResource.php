@@ -15,6 +15,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class NotificationTemplateResource extends Resource
 {
@@ -22,12 +23,12 @@ class NotificationTemplateResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return NotificationTemplateForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return NotificationTemplatesTable::configure($table);
     }

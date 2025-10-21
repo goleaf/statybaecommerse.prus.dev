@@ -72,7 +72,7 @@ final class DiscountConditionResource extends Resource
         return __('discount_conditions.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -173,7 +173,7 @@ final class DiscountConditionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -297,7 +297,7 @@ final class DiscountConditionResource extends Resource
             ->defaultSort('priority', 'asc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([

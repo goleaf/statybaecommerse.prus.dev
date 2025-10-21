@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class ProductTargetsRelationManager extends BaseRelationManager
 {
@@ -22,7 +23,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Targets';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Select::make('product_id')
@@ -41,7 +42,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

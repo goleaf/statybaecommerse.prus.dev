@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
 final class AddressesRelationManager extends BaseRelationManager
 {
@@ -21,7 +22,7 @@ final class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Addresses';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->components([
@@ -45,7 +46,7 @@ final class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')

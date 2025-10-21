@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class CustomerSegmentsRelationManager extends BaseRelationManager
 {
@@ -22,7 +23,7 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Customer Segments';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Select::make('customer_group_id')
@@ -40,7 +41,7 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

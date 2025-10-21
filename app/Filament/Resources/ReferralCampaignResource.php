@@ -27,6 +27,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use Filament\Schemas\Schema;
 
 final class ReferralCampaignResource extends Resource
 {
@@ -62,7 +63,7 @@ final class ReferralCampaignResource extends Resource
         return __('admin.referral_campaigns.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -144,7 +145,7 @@ final class ReferralCampaignResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

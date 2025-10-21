@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class SystemSettingDependencyResource extends Resource
 {
@@ -65,7 +66,7 @@ final class SystemSettingDependencyResource extends Resource
         return __('admin.system_setting_dependencies.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('admin.system_setting_dependencies.basic_information'))
@@ -117,7 +118,7 @@ final class SystemSettingDependencyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

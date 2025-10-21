@@ -31,6 +31,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class OrderShippingResource extends Resource
 {
@@ -63,7 +64,7 @@ final class OrderShippingResource extends Resource
         return __('admin.order_shippings.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('admin.order_shippings.basic_information'))
@@ -147,7 +148,7 @@ final class OrderShippingResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

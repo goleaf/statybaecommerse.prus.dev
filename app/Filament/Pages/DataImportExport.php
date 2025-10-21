@@ -15,6 +15,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Storage;
+use Filament\Schemas\Schema;
 
 final class DataImportExport extends Page
 {
@@ -35,7 +36,7 @@ final class DataImportExport extends Page
 
     public array|string|null $file = null;
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([

@@ -30,6 +30,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * SystemSettingResource
@@ -70,7 +71,7 @@ class SystemSettingResource extends Resource
         return true;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -226,7 +227,7 @@ class SystemSettingResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -33,6 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 /**
  * OrderItemsRelationManager
@@ -57,7 +58,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order items.
      */
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -181,7 +182,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order items.
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

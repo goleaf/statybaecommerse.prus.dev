@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class UsagesRelationManager extends BaseRelationManager
 {
@@ -25,7 +26,7 @@ final class UsagesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Usages';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Forms\Components\Select::make('user_id')
@@ -50,7 +51,7 @@ final class UsagesRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('used_at')

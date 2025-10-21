@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class ReferralsRelationManager extends BaseRelationManager
 {
@@ -19,7 +20,7 @@ final class ReferralsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin.sections.referrals';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -42,7 +43,7 @@ final class ReferralsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('referred.name')

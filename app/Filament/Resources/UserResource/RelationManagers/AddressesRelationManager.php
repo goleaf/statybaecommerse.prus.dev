@@ -19,6 +19,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 class AddressesRelationManager extends BaseRelationManager
 {
@@ -30,7 +31,7 @@ class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Addresses';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->components([
@@ -72,7 +73,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -30,6 +30,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * SliderResource
@@ -72,7 +73,7 @@ final class SliderResource extends Resource
         return __('sliders.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('sliders.basic_information'))
@@ -154,7 +155,7 @@ final class SliderResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

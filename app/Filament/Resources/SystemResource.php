@@ -43,6 +43,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 /**
  * System Resource - Comprehensive System Management
@@ -114,7 +115,7 @@ final class SystemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -487,7 +488,7 @@ final class SystemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

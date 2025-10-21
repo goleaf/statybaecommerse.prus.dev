@@ -24,6 +24,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class ProductRequestResource extends Resource
 {
@@ -53,7 +54,7 @@ final class ProductRequestResource extends Resource
         return __('product_requests.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -146,7 +147,7 @@ final class ProductRequestResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

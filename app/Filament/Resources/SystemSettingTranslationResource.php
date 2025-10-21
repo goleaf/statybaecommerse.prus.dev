@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Throwable;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 /**
  * SystemSettingTranslationResource
@@ -74,7 +75,7 @@ final class SystemSettingTranslationResource extends Resource
         return __('admin.system_setting_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -195,7 +196,7 @@ final class SystemSettingTranslationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
