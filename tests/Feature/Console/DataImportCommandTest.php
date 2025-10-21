@@ -22,18 +22,21 @@ it('restores foreign key enforcement after truncation failure', function (): voi
     });
 
     try {
-        $command = new class extends DataImportCommand
-        {
-            public function callTruncate(string $table): void
-            {
+        $command = new DataImportCommand;
+
+        // Bind a helper closure so we can access the protected truncateTable method without extending the final command.
+        $callTruncate = \Closure::bind(
+            function (string $table): void {
                 $this->truncateTable($table);
-            }
-        };
+            },
+            $command,
+            DataImportCommand::class,
+        );
 
         expect(foreignKeyState())->toBe(1);
 
         try {
-            $command->callTruncate('non_existing_table_for_failure');
+            $callTruncate('non_existing_table_for_failure');
         } catch (\Throwable $exception) {
             expect($exception)->toBeInstanceOf(\Throwable::class);
         }

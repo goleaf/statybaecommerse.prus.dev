@@ -9,6 +9,7 @@ use Filament\Actions\DetachAction;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class DocumentsRelationManager extends BaseRelationManager
 {
@@ -20,7 +21,7 @@ class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Documents';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

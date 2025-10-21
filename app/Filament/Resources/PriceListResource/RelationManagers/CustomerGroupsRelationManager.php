@@ -9,6 +9,7 @@ use Filament\Actions\DetachAction;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 
 final class CustomerGroupsRelationManager extends BaseRelationManager
@@ -20,7 +21,7 @@ final class CustomerGroupsRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.customer_groups.title');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

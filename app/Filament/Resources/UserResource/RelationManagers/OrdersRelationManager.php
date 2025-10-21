@@ -8,6 +8,7 @@ use Filament\Actions\ViewAction;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -19,7 +20,7 @@ class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Orders';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
