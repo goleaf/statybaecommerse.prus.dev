@@ -34,6 +34,9 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?int $navigationSort = 40;
 
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-sparkles';
 
     protected string $view = 'filament.pages.recommendation-system-management';

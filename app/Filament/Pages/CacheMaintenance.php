@@ -19,6 +19,9 @@ use Throwable;
 
 final class CacheMaintenance extends Page
 {
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): ?string
