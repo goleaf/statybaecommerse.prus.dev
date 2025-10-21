@@ -40,13 +40,13 @@ final class CustomerSearch
                 $identifier = $user->getKey();
                 $result = SearchResult::make((string) ($identifier ?? ''), $label);
 
-                $result
-                    ->withData('customer_id', $user->getKey())
-                    ->withData('email', $email)
-                    ->withData('phone', $phone)
-                    ->withData('name', $name);
-
-                return $result;
+                // Normalise customer metadata so the autocomplete component can hydrate consistently.
+                return SearchResultPayload::normalise($result, [
+                    'customer_id' => $user->getKey(),
+                    'email'       => $email,
+                    'phone'       => $phone,
+                    'name'        => $name,
+                ]);
             })
             ->all();
     }
