@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament;
 
+use App\Filament\Widgets\GeneralStatsOverview;
+use App\Filament\Widgets\SalesByMonthChart;
 use Filament\Enums\UserMenuPosition;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -60,6 +62,8 @@ class AdminPanelProvider extends PanelProvider
                 ])
                 ->pages([])
                 ->widgets([
+                    GeneralStatsOverview::class,
+                    SalesByMonthChart::class,
                     StatsOverviewWidget::class,
                 ])
                 ->middleware([
@@ -92,6 +96,8 @@ class AdminPanelProvider extends PanelProvider
                 //
             ])
             ->widgets([
+                GeneralStatsOverview::class,
+                SalesByMonthChart::class,
                 StatsOverviewWidget::class,
             ])
             ->middleware([
