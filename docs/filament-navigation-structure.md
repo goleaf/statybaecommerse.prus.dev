@@ -165,6 +165,13 @@ protected static $navigationIcon = 'heroicon-o-cube';
 protected static $navigationGroup = NavigationGroup::Products;
 ```
 
+### Table Configuration Guidelines
+- Use the consolidated `Filament\Tables` namespace (for example, `Tables\Actions\EditAction::make()`) to match Filament v4 stubs and avoid deprecated action aliases.
+- When composing nested labels (such as parent/child category names), prefer Laravel's `Str` helper for clarity over global string helpers.
+
+### Testing Panel Defaults
+- The admin panel provider now applies a shared base configuration and swaps to an empty resource/widget set during automated tests to prevent expensive boot-time initialization.
+
 ### Navigation Sort
 ```php
 protected static ?int $navigationSort = 1;

@@ -8,29 +8,12 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\TextInput;
+use BackedEnum;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Support\Facades\FilamentNumber;
 use Illuminate\Database\Eloquent\Builder;
@@ -46,17 +29,17 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * @var string|\BackedEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
+     * @var string|BackedEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    /** @var string|BackedEnum|null Ensure inventory analytics stay grouped centrally. */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {
         // Centralize the NavigationGroup handling to leverage enum labels.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
@@ -82,16 +65,16 @@ final class VariantAnalyticsResource extends Resource
     {
         return $form
             ->schema([
-                Tabs::make(__('admin.variant_analytics.tabs'))
+                Forms\Components\Tabs::make(__('admin.variant_analytics.tabs'))
                     ->tabs([
-                        Tab::make(__('admin.variant_analytics.basic_info'))
+                        Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.basic_info'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
-                                Section::make(__('admin.variant_analytics.basic_info'))
+                                Forms\Components\Section::make(__('admin.variant_analytics.basic_info'))
                                     ->schema([
-                                        Grid::make(2)
+                                        Forms\Components\Grid::make(2)
                                             ->schema([
-                                                Select::make('variant_id')
+                                                Forms\Components\Select::make('variant_id')
                                                     ->label(__('admin.variant_analytics.variant'))
                                                     ->relationship('variant', 'name')
                                                     ->required()
@@ -118,41 +101,41 @@ final class VariantAnalyticsResource extends Resource
                                                     ->maxDate(now())
                                                     ->live(),
                                             ]),
-                                        Grid::make(2)
+                                        Forms\Components\Grid::make(2)
                                             ->schema([
-                                                Placeholder::make('variant_name')
+                                                Forms\Components\Placeholder::make('variant_name')
                                                     ->label(__('admin.variant_analytics.variant_name'))
                                                     ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->name ?? '')
                                                     ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
-                                                Placeholder::make('product_name')
+                                                Forms\Components\Placeholder::make('product_name')
                                                     ->label(__('admin.variant_analytics.product_name'))
                                                     ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->product?->name ?? '')
                                                     ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
                                             ]),
                                     ]),
                             ]),
-                        Tab::make(__('admin.variant_analytics.metrics'))
+                        Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.metrics'))
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
-                                Section::make(__('admin.variant_analytics.traffic_metrics'))
+                                Forms\Components\Section::make(__('admin.variant_analytics.traffic_metrics'))
                                     ->schema([
-                                        Grid::make(3)
+                                        Forms\Components\Grid::make(3)
                                             ->schema([
-                                                TextInput::make('views')
+                                                Forms\Components\TextInput::make('views')
                                                     ->label(__('admin.variant_analytics.views'))
                                                     ->numeric()
                                                     ->minValue(0)
                                                     ->default(0)
                                                     ->live()
                                                     ->suffix('views'),
-                                                TextInput::make('clicks')
+                                                Forms\Components\TextInput::make('clicks')
                                                     ->label(__('admin.variant_analytics.clicks'))
                                                     ->numeric()
                                                     ->minValue(0)
                                                     ->default(0)
                                                     ->live()
                                                     ->suffix('clicks'),
-                                                Placeholder::make('click_through_rate')
+                                                Forms\Components\Placeholder::make('click_through_rate')
                                                     ->label(__('admin.variant_analytics.ctr'))
                                                     ->content(static function (callable $get): string {
                                                         $views = (float) $get('views');
@@ -168,25 +151,25 @@ final class VariantAnalyticsResource extends Resource
                                                     }),
                                             ]),
                                     ]),
-                                Section::make(__('admin.variant_analytics.conversion_metrics'))
+                                Forms\Components\Section::make(__('admin.variant_analytics.conversion_metrics'))
                                     ->schema([
-                                        Grid::make(3)
+                                        Forms\Components\Grid::make(3)
                                             ->schema([
-                                                TextInput::make('add_to_cart')
+                                                Forms\Components\TextInput::make('add_to_cart')
                                                     ->label(__('admin.variant_analytics.add_to_cart'))
                                                     ->numeric()
                                                     ->minValue(0)
                                                     ->default(0)
                                                     ->live()
                                                     ->suffix('adds'),
-                                                TextInput::make('purchases')
+                                                Forms\Components\TextInput::make('purchases')
                                                     ->label(__('admin.variant_analytics.purchases'))
                                                     ->numeric()
                                                     ->minValue(0)
                                                     ->default(0)
                                                     ->live()
                                                     ->suffix('purchases'),
-                                                TextInput::make('revenue')
+                                                Forms\Components\TextInput::make('revenue')
                                                     ->label(__('admin.variant_analytics.revenue'))
                                                     ->numeric()
                                                     ->minValue(0)
@@ -196,11 +179,11 @@ final class VariantAnalyticsResource extends Resource
                                                     ->prefix('€'),
                                             ]),
                                     ]),
-                                Section::make(__('admin.variant_analytics.calculated_metrics'))
+                                Forms\Components\Section::make(__('admin.variant_analytics.calculated_metrics'))
                                     ->schema([
-                                        Grid::make(3)
+                                        Forms\Components\Grid::make(3)
                                             ->schema([
-                                                Placeholder::make('add_to_cart_rate')
+                                                Forms\Components\Placeholder::make('add_to_cart_rate')
                                                     ->label(__('admin.variant_analytics.atc_rate'))
                                                     ->content(static function (callable $get): string {
                                                         $clicks = (float) $get('clicks');
@@ -214,7 +197,7 @@ final class VariantAnalyticsResource extends Resource
                                                         // Ensure even the zero state flows through the same formatter pipeline.
                                                         return FilamentNumber::format(0, 2) . '%';
                                                     }),
-                                                Placeholder::make('purchase_rate')
+                                                Forms\Components\Placeholder::make('purchase_rate')
                                                     ->label(__('admin.variant_analytics.purchase_rate'))
                                                     ->content(static function (callable $get): string {
                                                         $addToCart = (float) $get('add_to_cart');
@@ -228,7 +211,7 @@ final class VariantAnalyticsResource extends Resource
                                                         // Ensure even the zero state flows through the same formatter pipeline.
                                                         return FilamentNumber::format(0, 2) . '%';
                                                     }),
-                                                TextInput::make('conversion_rate')
+                                                Forms\Components\TextInput::make('conversion_rate')
                                                     ->label(__('admin.variant_analytics.conversion_rate'))
                                                     ->numeric()
                                                     ->minValue(0)
@@ -240,17 +223,17 @@ final class VariantAnalyticsResource extends Resource
                                             ]),
                                     ]),
                             ]),
-                        Tab::make(__('admin.variant_analytics.additional_data'))
+                        Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.additional_data'))
                             ->icon('heroicon-o-document-text')
                             ->schema([
-                                Section::make(__('admin.variant_analytics.additional_info'))
+                                Forms\Components\Section::make(__('admin.variant_analytics.additional_info'))
                                     ->schema([
-                                        KeyValue::make('additional_metrics')
+                                        Forms\Components\KeyValue::make('additional_metrics')
                                             ->label(__('admin.variant_analytics.additional_metrics'))
                                             ->keyLabel(__('admin.variant_analytics.metric_name'))
                                             ->valueLabel(__('admin.variant_analytics.metric_value'))
                                             ->helperText(__('admin.variant_analytics.additional_metrics_help')),
-                                        TextInput::make('notes')
+                                        Forms\Components\TextInput::make('notes')
                                             ->label(__('admin.variant_analytics.notes'))
                                             ->maxLength(1000)
                                             ->columnSpanFull(),
@@ -265,39 +248,39 @@ final class VariantAnalyticsResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('variant.name')
+                Tables\Columns\TextColumn::make('variant.name')
                     ->label(__('admin.variant_analytics.variant'))
                     ->searchable()
                     ->sortable()
                     ->toggleable()
                     ->copyable()
                     ->description(static fn (?VariantAnalytics $record): ?string => $record?->variant?->product?->name),
-                TextColumn::make('variant.sku')
+                Tables\Columns\TextColumn::make('variant.sku')
                     ->label(__('admin.variant_analytics.sku'))
                     ->searchable()
                     ->sortable()
                     ->toggleable()
                     ->copyable(),
-                TextColumn::make('date')
+                Tables\Columns\TextColumn::make('date')
                     ->label(__('admin.variant_analytics.date'))
                     ->date()
                     ->sortable()
                     ->toggleable()
                     ->badge()
                     ->color('primary'),
-                TextColumn::make('views')
+                Tables\Columns\TextColumn::make('views')
                     ->label(__('admin.variant_analytics.views'))
                     ->numeric()
                     ->sortable()
                     ->toggleable()
                     ->color('gray'),
-                TextColumn::make('clicks')
+                Tables\Columns\TextColumn::make('clicks')
                     ->label(__('admin.variant_analytics.clicks'))
                     ->numeric()
                     ->sortable()
                     ->toggleable()
                     ->color('info'),
-                TextColumn::make('click_through_rate')
+                Tables\Columns\TextColumn::make('click_through_rate')
                     ->label(__('admin.variant_analytics.ctr'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->click_through_rate)
                     ->formatStateUsing(static function (float|int|null $state): string {
@@ -322,13 +305,13 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'danger';
                     }),
-                TextColumn::make('add_to_cart')
+                Tables\Columns\TextColumn::make('add_to_cart')
                     ->label(__('admin.variant_analytics.add_to_cart'))
                     ->numeric()
                     ->sortable()
                     ->toggleable()
                     ->color('warning'),
-                TextColumn::make('add_to_cart_rate')
+                Tables\Columns\TextColumn::make('add_to_cart_rate')
                     ->label(__('admin.variant_analytics.atc_rate'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->add_to_cart_rate)
                     ->formatStateUsing(static function (float|int|null $state): string {
@@ -353,13 +336,13 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'danger';
                     }),
-                TextColumn::make('purchases')
+                Tables\Columns\TextColumn::make('purchases')
                     ->label(__('admin.variant_analytics.purchases'))
                     ->numeric()
                     ->sortable()
                     ->toggleable()
                     ->color('success'),
-                TextColumn::make('purchase_rate')
+                Tables\Columns\TextColumn::make('purchase_rate')
                     ->label(__('admin.variant_analytics.purchase_rate'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->purchase_rate)
                     ->formatStateUsing(static function (float|int|null $state): string {
@@ -384,20 +367,20 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'danger';
                     }),
-                TextColumn::make('revenue')
+                Tables\Columns\TextColumn::make('revenue')
                     ->label(__('admin.variant_analytics.revenue'))
                     ->money('EUR')
                     ->sortable()
                     ->toggleable()
                     ->color('success'),
-                TextColumn::make('average_revenue_per_purchase')
+                Tables\Columns\TextColumn::make('average_revenue_per_purchase')
                     ->label(__('admin.variant_analytics.avg_revenue'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->average_revenue_per_purchase)
                     ->money('EUR')
                     ->sortable(false)
                     ->toggleable()
                     ->color('info'),
-                TextColumn::make('conversion_rate')
+                Tables\Columns\TextColumn::make('conversion_rate')
                     ->label(__('admin.variant_analytics.conversion_rate'))
                     ->formatStateUsing(static function (float|int|null $state): string {
                         // Use FilamentNumber so table exports and renders share the same percentage formatter.
@@ -421,7 +404,7 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'danger';
                     }),
-                BadgeColumn::make('performance_status')
+                Tables\Columns\BadgeColumn::make('performance_status')
                     ->label(__('admin.variant_analytics.performance_status'))
                     ->getStateUsing(static function (VariantAnalytics $record): string {
                         $conversionRate = (float) $record->conversion_rate;
@@ -452,33 +435,33 @@ final class VariantAnalyticsResource extends Resource
                     ])
                     ->sortable(false)
                     ->toggleable(),
-                TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.variant_analytics.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('admin.variant_analytics.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('variant_id')
+                Tables\Filters\SelectFilter::make('variant_id')
                     ->label(__('admin.variant_analytics.variant'))
                     ->relationship('variant', 'name')
                     ->searchable()
                     ->preload()
                     ->multiple(),
-                SelectFilter::make('product_id')
+                Tables\Filters\SelectFilter::make('product_id')
                     ->label(__('admin.variant_analytics.product'))
                     ->relationship('variant.product', 'name')
                     ->searchable()
                     ->preload()
                     ->multiple(),
-                DateFilter::make('date')
+                Tables\Filters\DateFilter::make('date')
                     ->label(__('admin.variant_analytics.date')),
-                Filter::make('date_range')
+                Tables\Filters\Filter::make('date_range')
                     ->form([
                         Flatpickr::makeDate('date_from')
                             ->label(__('admin.variant_analytics.date_from')),
@@ -499,13 +482,13 @@ final class VariantAnalyticsResource extends Resource
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     }),
-                Filter::make('revenue_range')
+                Tables\Filters\Filter::make('revenue_range')
                     ->form([
-                        TextInput::make('revenue_from')
+                        Forms\Components\TextInput::make('revenue_from')
                             ->label(__('admin.variant_analytics.revenue_from'))
                             ->numeric()
                             ->step(0.01),
-                        TextInput::make('revenue_to')
+                        Forms\Components\TextInput::make('revenue_to')
                             ->label(__('admin.variant_analytics.revenue_to'))
                             ->numeric()
                             ->step(0.01),
@@ -524,14 +507,14 @@ final class VariantAnalyticsResource extends Resource
                                 fn (Builder $query, $amount): Builder => $query->where('revenue', '<=', $amount),
                             );
                     }),
-                Filter::make('conversion_rate_range')
+                Tables\Filters\Filter::make('conversion_rate_range')
                     ->form([
-                        TextInput::make('conversion_rate_from')
+                        Forms\Components\TextInput::make('conversion_rate_from')
                             ->label(__('admin.variant_analytics.conversion_rate_from'))
                             ->numeric()
                             ->step(0.01)
                             ->suffix('%'),
-                        TextInput::make('conversion_rate_to')
+                        Forms\Components\TextInput::make('conversion_rate_to')
                             ->label(__('admin.variant_analytics.conversion_rate_to'))
                             ->numeric()
                             ->step(0.01)
@@ -551,22 +534,22 @@ final class VariantAnalyticsResource extends Resource
                                 fn (Builder $query, $rate): Builder => $query->where('conversion_rate', '<=', $rate),
                             );
                     }),
-                Filter::make('high_performing')
+                Tables\Filters\Filter::make('high_performing')
                     ->label(__('admin.variant_analytics.high_performing'))
                     ->query(fn (Builder $query): Builder => $query->where('conversion_rate', '>=', 5.0)),
-                Filter::make('medium_performing')
+                Tables\Filters\Filter::make('medium_performing')
                     ->label(__('admin.variant_analytics.medium_performing'))
                     ->query(fn (Builder $query): Builder => $query->whereBetween('conversion_rate', [2.0, 5.0])),
-                Filter::make('low_performing')
+                Tables\Filters\Filter::make('low_performing')
                     ->label(__('admin.variant_analytics.low_performing'))
                     ->query(fn (Builder $query): Builder => $query->where('conversion_rate', '<', 2.0)),
-                Filter::make('has_purchases')
+                Tables\Filters\Filter::make('has_purchases')
                     ->label(__('admin.variant_analytics.has_purchases'))
                     ->query(fn (Builder $query): Builder => $query->where('purchases', '>', 0)),
-                Filter::make('has_revenue')
+                Tables\Filters\Filter::make('has_revenue')
                     ->label(__('admin.variant_analytics.has_revenue'))
                     ->query(fn (Builder $query): Builder => $query->where('revenue', '>', 0)),
-                TernaryFilter::make('is_recent')
+                Tables\Filters\TernaryFilter::make('is_recent')
                     ->label(__('admin.variant_analytics.is_recent'))
                     ->placeholder(__('admin.variant_analytics.all_records'))
                     ->trueLabel(__('admin.variant_analytics.last_7_days'))
@@ -576,10 +559,11 @@ final class VariantAnalyticsResource extends Resource
                         false: static fn (Builder $query): Builder => $query->where('date', '<', now()->subDays(7)),
                     ),
             ])
+            // Leverage the Tables\Actions namespace to stay aligned with Filament v4 conventions during table configuration.
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                Action::make('regenerate_metrics')
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('regenerate_metrics')
                     ->label(__('admin.variant_analytics.regenerate_metrics'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
@@ -592,7 +576,7 @@ final class VariantAnalyticsResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation(),
-                Action::make('duplicate')
+                Tables\Actions\Action::make('duplicate')
                     ->label(__('admin.variant_analytics.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
@@ -605,7 +589,7 @@ final class VariantAnalyticsResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Action::make('export_single')
+                Tables\Actions\Action::make('export_single')
                     ->label(__('admin.variant_analytics.export_single'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
@@ -618,9 +602,9 @@ final class VariantAnalyticsResource extends Resource
                     }),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    BulkAction::make('export_analytics')
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('export_analytics')
                         ->label(__('admin.variant_analytics.export_analytics'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('info')
@@ -632,7 +616,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    BulkAction::make('regenerate_metrics_bulk')
+                    Tables\Actions\BulkAction::make('regenerate_metrics_bulk')
                         ->label(__('admin.variant_analytics.regenerate_metrics_bulk'))
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
@@ -649,7 +633,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    BulkAction::make('duplicate_records')
+                    Tables\Actions\BulkAction::make('duplicate_records')
                         ->label(__('admin.variant_analytics.duplicate_records'))
                         ->icon('heroicon-o-document-duplicate')
                         ->color('gray')
@@ -668,7 +652,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    BulkAction::make('reset_metrics')
+                    Tables\Actions\BulkAction::make('reset_metrics')
                         ->label(__('admin.variant_analytics.reset_metrics'))
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('danger')
