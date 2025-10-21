@@ -1,0 +1,47 @@
+# Filament Searchable Input Integration
+
+This project uses the [`defstudio/filament-searchable-input`](https://filamentphp.com/plugins/defstudio-searchable-input) plugin to improve lookup experiences in the admin panel. The plugin is available across the following resources:
+
+- **Orders** – customer selection now relies on an autocomplete field that searches by name, email, or phone and persists the chosen `user_id`.
+- **Order Items** – product lookups support SKU/EAN/name searches and hydrate related fields (name, SKU, unit price) without additional queries.
+- **Addresses** – customer, address line, city, and city ID fields provide suggestions; selecting a city also synchronises the textual city and country code.
+- **Coupon Usages** – coupon and customer selectors use autocomplete for quick lookups.
+
+### Supporting services
+
+Reusable search helpers live in `app/Support/Search/`:
+
+| Service | Purpose |
+| --- | --- |
+| `ProductSearch` | Provides free-text and rich product suggestions (value/label/data) for SKU/barcode/name lookups. |
+| `CustomerSearch` | Returns customer matches keyed by name/email/phone. |
+| `AddressSearch` | Supplies formatted address suggestions, city lists, and city metadata. |
+| `CouponSearch` | Exposes coupon code/name lookups. |
+
+Each service scopes queries, limits results to 15 entries, and returns either plain strings or `SearchResult` DTOs with metadata ready for Filament callbacks.
+
+### Theme requirements
+
+The admin panel registers `resources/css/filament/admin/theme.css` as its custom theme. This stylesheet sources Filament app files, in-house components, and the plugin blade views so Tailwind can compile all utility classes:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '../../filament-enhancements.css';
+
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';
+@source '../../../../vendor/defstudio/filament-searchable-input/resources/**/*.blade.php';
+```
+
+### Testing
+
+Targeted Pest tests cover every search service and ensure the `OrderItemResource` form exposes the plugin’s `searchUsing` behaviour. Run the focused suite with:
+
+```bash
+php artisan test --group=searchable-input
+```
+
+The tests seed minimal data and assert formatted labels, metadata payloads, and live component responses.
