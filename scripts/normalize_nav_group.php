@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 // Normalizes all $navigationGroup declarations across app/Filament/** to typed UnitEnum|string|null
 
+if (! defined('UNIT_ENUM_IMPORT_STATEMENT')) {
+    // Normalised UnitEnum import literal keeps duplicate statements out of generated resources.
+    define('UNIT_ENUM_IMPORT_STATEMENT', 'use UnitEnum;');
+}
+
 $root = dirname(__DIR__);
 $targets = [
     $root.'/app/Filament/Resources',
@@ -36,8 +41,9 @@ function normalizeFile(string $path): bool
     $content = $orig;
 
     // Ensure import present
-    if (strpos($content, 'use UnitEnum;') === false) {
-        $content = preg_replace('/(use\s+[^;]+;\s*\n)(?!.*use UnitEnum;)/', "\$1use UnitEnum;\n", $content, 1) ?? $content;
+    if (strpos($content, UNIT_ENUM_IMPORT_STATEMENT) === false) {
+        $escapedImport = preg_quote(UNIT_ENUM_IMPORT_STATEMENT, '/');
+        $content = preg_replace("/(use\\s+[^;]+;\\s*\\n)(?!.*{$escapedImport})/", "\\$1".UNIT_ENUM_IMPORT_STATEMENT."\\n", $content, 1) ?? $content;
     }
 
     // Remove any @var UnitEnum|string|null docblock directly above property and convert to typed property

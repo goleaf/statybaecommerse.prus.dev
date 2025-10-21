@@ -45,7 +45,7 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
+     * @var string|\BackedEnum|null Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
      */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
