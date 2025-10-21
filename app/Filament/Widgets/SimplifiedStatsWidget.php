@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -127,7 +128,7 @@ class SimplifiedStatsWidget extends BaseWidget
             $endDate->toDateString()
         );
 
-        $chartData = Cache::remember($cacheKey, 60, function () use ($startDate, $endDate, $now) {
+        $chartData = $this->rememberDashboard($cacheKey, 60, function () use ($startDate, $endDate, $now) {
             $dateKeys = [];
             for ($i = 6; $i >= 0; $i--) {
                 $dateKeys[] = $now->copy()->subDays($i)->toDateString();
@@ -171,7 +172,7 @@ class SimplifiedStatsWidget extends BaseWidget
         $now = $this->getReferenceTime();
         $lastMonth = $now->copy()->subMonth();
 
-        return Cache::remember(CacheKeys::dashboardSummary(), CacheKeys::TTL_MINUTE, function () use ($lastMonth) {
+        return $this->rememberDashboard(CacheKeys::dashboardSummary(), CacheKeys::TTL_MINUTE, function () use ($lastMonth) {
             $orderStats = Order::query()
                 ->selectRaw('
                     SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
@@ -238,5 +239,17 @@ class SimplifiedStatsWidget extends BaseWidget
     protected function getReferenceTime(): Carbon
     {
         return $this->referenceTime ??= Carbon::now();
+    }
+
+    /**
+     * Store dashboard aggregates under a shared cache tag when supported.
+     */
+    private function rememberDashboard(string $key, int $ttl, callable $callback): array
+    {
+        if (Cache::supportsTags()) {
+            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
     }
 }
