@@ -32,6 +32,7 @@ A curated map of the most useful documents for day-to-day development and operat
 ### 5. Troubleshoot & Maintain
 - [TERMINAL_FREEZING_FIXES](TERMINAL_FREEZING_FIXES.md) – remedies for common local environment hiccups.
 - [Cache Policy](CachePolicy.md) – cache key conventions, TTLs, and when to refresh derived data.
+- [Collection Timeout Macros](TIMEOUT_COLLECTION_MACROS.md) – explains how the shared `takeUntilTimeout` helper guards long running loops.
 - [CURRENT_SYSTEM_STATUS](CURRENT_SYSTEM_STATUS.md) – snapshot of live issues, mitigations, and follow-up owners.
 - [Dependency automation schedule](operations/RENOVATE_OVERVIEW.md) – explains the Renovate rollup cadence and CI expectations.
 - [PR Branch Cleanup Workflow](../.github/workflows/pr-branch-cleanup.yml) – documents the automation that deletes local branches when pull requests close without merging; the job now ignores already-removed branches after validating the reference.
