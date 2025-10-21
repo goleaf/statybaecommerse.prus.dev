@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
 use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
@@ -124,6 +125,7 @@ final class AdminPanelProvider extends PanelProvider
                         ->toggleActionHook('tables::toolbar.search.after')
                         ->listLayoutButtonIcon('heroicon-o-list-bullet')
                         ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
+                    FilamentNordThemePlugin::make(),
                 ]))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
