@@ -8,8 +8,9 @@ use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -22,8 +23,11 @@ final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    /**
+     * Align the navigation icon property with Filament's typed base declaration so runtime
+     * package discovery does not crash when reflecting on the resource hierarchy.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -56,13 +60,13 @@ final class ActivityLogResource extends Resource
     }
 
     /**
-     * Define the create/edit form schema using the Filament v4 Form API.
-     * The resource remains read-only for now, so we return an empty schema
+     * Define the create/edit form schema using the Filament v4 Schema contract.
+     * The resource remains read-only for now, so we still return an empty schema
      * while keeping the hook available for future enhancements.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([]);
+        return $schema->schema([]);
     }
 
     /**
@@ -119,7 +123,7 @@ final class ActivityLogResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('Created At'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
