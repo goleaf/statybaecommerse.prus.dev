@@ -29,10 +29,13 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 final class ReferralCodeResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = ReferralCode::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
