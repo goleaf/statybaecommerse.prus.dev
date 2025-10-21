@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumResource\Pages;
 use App\Models\EnumValue;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -35,19 +35,25 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class EnumResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    /** @var string|\BackedEnum|null Align navigation metadata with BackedEnum compatibility. */
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+
+    /** @var string|\BackedEnum|null Anchor the resource to the System navigation area. */
+    protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return trans('admin.enums.navigation_groups.system');
+        // Use the centralized enum label to avoid duplicated translations.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     public static function getNavigationLabel(): string
@@ -65,7 +71,7 @@ final class EnumResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Tabs::make('enum_resource_tabs')
@@ -149,7 +155,7 @@ final class EnumResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

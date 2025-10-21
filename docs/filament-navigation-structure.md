@@ -149,7 +149,14 @@ public static function getNavigationGroup(): ?string
 
 ### Navigation Icon
 ```php
-protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cube';
+/** @var string|\BackedEnum|null */
+protected static $navigationIcon = 'heroicon-o-cube';
+```
+
+### Navigation Group Property
+```php
+/** @var string|\BackedEnum|null */
+protected static $navigationGroup = NavigationGroup::Products;
 ```
 
 ### Navigation Sort
@@ -186,3 +193,9 @@ The navigation structure is based on comprehensive route analysis including:
 - Customizable navigation for different user roles
 - Navigation analytics and usage tracking
 - Mobile-optimized navigation structure
+
+## Variant Price History Guardrail
+
+- The `VariantPriceHistoryResource` now **requires** `old_price` input so that Filament v4 callbacks have consistent numeric
+  data for change calculations.
+- Ensure form schemas enforce this requirement when extending or customizing the resource to maintain accurate audit trails.
