@@ -16,6 +16,7 @@ use App\Services\Recommendations\HybridRecommendation;
 use App\Services\Recommendations\PopularityRecommendation;
 use App\Services\Recommendations\TrendingRecommendation;
 use App\Services\Recommendations\UpSellRecommendation;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -62,7 +63,7 @@ final class RecommendationService
             $this->trackPerformance($blockName, $executionTime, $recommendations->count());
 
             return $recommendations;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Recommendation generation failed for block '{$blockName}'", ['error' => $e->getMessage(), 'user_id' => $user?->id, 'product_id' => $product?->id, 'context' => $context]);
 
             return $this->getFallbackRecommendations($user, $product, $context);
@@ -79,23 +80,31 @@ final class RecommendationService
         // Use LazyCollection with timeout to prevent long-running recommendation generation
         $timeout = now()->addSeconds(30);
         // 30 second timeout for recommendation generation
-        LazyCollection::make($configs)->takeUntilTimeout($timeout)->each(function ($config) use (&$allRecommendations, $user, $product, $context) {
+        LazyCollection::make($configs)->takeUntilTimeout($timeout)->each(function ($config) use (&$allRecommendations, $user, $product, $context): void {
             try {
                 $algorithm = $this->getAlgorithmInstance($config->type, $config->config);
                 $recommendations = $algorithm->getRecommendations($user, $product, $context);
                 if ($recommendations->isNotEmpty()) {
                     $allRecommendations = $allRecommendations->merge($recommendations);
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error("Algorithm '{$config->type}' failed", ['error' => $e->getMessage(), 'config_id' => $config->id]);
             }
         });
 
-        // Remove duplicates and limit results
-        return $allRecommendations->unique('id')->skipWhile(function ($product) {
-            // Skip products with low relevance scores or missing essential data
-            return $product->relevance_score < 0.3 || empty($product->name) || ! $product->is_visible || $product->price <= 0;
-        })->take($block->max_products);
+        // Remove duplicates and filter out low quality results before limiting
+        return $allRecommendations
+            ->filter(function ($product): bool {
+                // Guard against unexpected payloads and ensure only high-quality, merchandisable products surface
+                return $product instanceof Product
+                    && $product->relevance_score >= 0.3
+                    && ! empty($product->name)
+                    && $product->is_visible
+                    && $product->price > 0;
+            })
+            ->unique('id')
+            ->values()
+            ->take($block->max_products);
     }
 
     /**
@@ -103,17 +112,17 @@ final class RecommendationService
      */
     private function getAlgorithmInstance(string $type, array $config = []): BaseRecommendation
     {
-        $key = $type.'_'.md5(serialize($config));
+        $key = $type . '_' . md5(serialize($config));
         if (! isset($this->algorithmInstances[$key])) {
             $this->algorithmInstances[$key] = match ($type) {
                 'content_based' => new ContentBasedRecommendation($config),
                 'collaborative' => new CollaborativeFilteringRecommendation($config),
-                'hybrid' => new HybridRecommendation($config),
-                'popularity' => new PopularityRecommendation($config),
-                'trending' => new TrendingRecommendation($config),
-                'cross_sell' => new CrossSellRecommendation($config),
-                'up_sell' => new UpSellRecommendation($config),
-                default => new PopularityRecommendation($config),
+                'hybrid'        => new HybridRecommendation($config),
+                'popularity'    => new PopularityRecommendation($config),
+                'trending'      => new TrendingRecommendation($config),
+                'cross_sell'    => new CrossSellRecommendation($config),
+                'up_sell'       => new UpSellRecommendation($config),
+                default         => new PopularityRecommendation($config),
             };
         }
 
@@ -190,7 +199,7 @@ final class RecommendationService
             }
             // Update user preferences
             $this->updateUserPreferences($user, $product, $interactionType);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to track user interaction', ['error' => $e->getMessage(), 'user_id' => $user->id, 'product_id' => $product->id, 'interaction_type' => $interactionType]);
         }
     }
@@ -204,13 +213,13 @@ final class RecommendationService
             return;
         }
         $preferenceScore = match ($interactionType) {
-            'view' => 0.1,
-            'click' => 0.2,
-            'cart' => 0.4,
+            'view'     => 0.1,
+            'click'    => 0.2,
+            'cart'     => 0.4,
             'purchase' => 0.8,
             'wishlist' => 0.6,
-            'review' => 0.7,
-            default => 0.1,
+            'review'   => 0.7,
+            default    => 0.1,
         };
         // Update category preferences
         foreach ($product->categories as $category) {
@@ -261,13 +270,13 @@ final class RecommendationService
     {
         try {
             if ($blockName) {
-                RecommendationCache::whereHas('block', function ($query) use ($blockName) {
+                RecommendationCache::whereHas('block', function ($query) use ($blockName): void {
                     $query->where('name', $blockName);
                 })->delete();
             } else {
                 RecommendationCache::truncate();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Table might not exist yet, ignore
         }
         // Clear Laravel cache as well
@@ -285,7 +294,7 @@ final class RecommendationService
         }
         try {
             return ['block_name' => $blockName, 'total_requests' => RecommendationCache::where('block_id', $block->id)->where('created_at', '>=', now()->subDays($days))->sum('hit_count'), 'unique_requests' => RecommendationCache::where('block_id', $block->id)->where('created_at', '>=', now()->subDays($days))->count(), 'avg_products_per_request' => RecommendationCache::where('block_id', $block->id)->where('created_at', '>=', now()->subDays($days))->avg(DB::raw('JSON_LENGTH(recommendations)')), 'cache_hit_rate' => $this->calculateCacheHitRate($block->id, $days)];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ['block_name' => $blockName, 'total_requests' => 0, 'unique_requests' => 0, 'avg_products_per_request' => 0, 'cache_hit_rate' => 0];
         }
     }
@@ -300,7 +309,7 @@ final class RecommendationService
             $cacheHits = RecommendationCache::where('block_id', $blockId)->where('created_at', '>=', now()->subDays($days))->where('hit_count', '>', 0)->sum('hit_count');
 
             return $totalRequests > 0 ? $cacheHits / $totalRequests * 100 : 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0;
         }
     }
@@ -313,14 +322,14 @@ final class RecommendationService
         try {
             // Clean up expired cache entries
             RecommendationCache::expired()->delete();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Table might not exist yet, ignore
         }
         // Clean up old user behaviors (keep last 90 days)
         if (class_exists(\App\Models\UserBehavior::class)) {
             try {
                 \App\Models\UserBehavior::where('created_at', '<', now()->subDays(90))->delete();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Table might not exist yet, ignore
             }
         }
@@ -328,7 +337,7 @@ final class RecommendationService
         if (class_exists(\App\Models\ProductSimilarity::class)) {
             try {
                 \App\Models\ProductSimilarity::where('calculated_at', '<', now()->subDays(30))->delete();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Table might not exist yet, ignore
             }
         }
