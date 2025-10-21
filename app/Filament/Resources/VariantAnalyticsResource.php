@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
@@ -33,7 +34,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * VariantAnalyticsResource
@@ -47,12 +47,9 @@ final class VariantAnalyticsResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /**
-     * @var string|UnitEnum|null
-     */
-    protected static ?string $navigationGroup = 'Inventory';
+    protected static ?string $navigationGroup = NavigationGroup::Inventory->value;
 
     protected static ?int $navigationSort = 2;
 
