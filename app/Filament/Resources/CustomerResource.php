@@ -28,6 +28,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -188,6 +189,29 @@ final class CustomerResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Customer $record): array {
+                        return collect([
+                            filled($record->email) ? [
+                                'label' => __('Email :email', ['email' => $record->email]),
+                                'url' => 'mailto:'.$record->email,
+                                'icon' => 'heroicon-o-envelope',
+                                'color' => 'info',
+                            ] : null,
+                            filled($record->phone) ? [
+                                'label' => __('Call :phone', ['phone' => $record->phone]),
+                                'url' => 'tel:'.preg_replace('/[^0-9+]/', '', (string) $record->phone),
+                                'icon' => 'heroicon-o-phone',
+                                'color' => 'success',
+                            ] : null,
+                        ])
+                            ->filter()
+                            ->values()
+                            ->all();
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('email')
                     ->label(__('customers.email'))
                     ->searchable()
