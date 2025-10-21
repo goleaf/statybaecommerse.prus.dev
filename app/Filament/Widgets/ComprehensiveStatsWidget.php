@@ -10,6 +10,7 @@ use App\Models\Review;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Carbon;
 
 final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 {
@@ -17,15 +18,17 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
     public function getStats(): array
     {
+        $now = Carbon::now();
+
         $totalRevenue = (float) (Order::where('status', 'completed')
             ->sum('total') ?? 0);
 
         $monthlyRevenue = (float) (Order::where('status', 'completed')
-            ->whereMonth('created_at', now()->month)
+            ->createdThisMonth()
             ->sum('total') ?? 0);
 
         $lastMonthRevenue = (float) (Order::where('status', 'completed')
-            ->whereMonth('created_at', now()->subMonth()->month)
+            ->createdLastMonth()
             ->sum('total') ?? 0);
 
         $revenueChange = $lastMonthRevenue > 0
@@ -33,8 +36,8 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
             : 0;
 
         $totalOrders = (int) Order::count();
-        $monthlyOrders = (int) Order::whereMonth('created_at', now()->month)->count();
-        $lastMonthOrders = (int) Order::whereMonth('created_at', now()->subMonth()->month)->count();
+        $monthlyOrders = (int) Order::createdThisMonth()->count();
+        $lastMonthOrders = (int) Order::createdLastMonth()->count();
 
         $ordersChange = $lastMonthOrders > 0
             ? (($monthlyOrders - $lastMonthOrders) / $lastMonthOrders) * 100
@@ -45,7 +48,7 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
         $totalCustomers = (int) User::whereHas('orders')->count();
         $newCustomers = (int) User::whereHas('orders')
-            ->whereMonth('created_at', now()->month)
+            ->whereBetween('created_at', [$now->copy()->startOfMonth(), $now])
             ->count();
 
         $averageOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
@@ -54,38 +57,38 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
         $averageRating = (float) (Review::avg('rating') ?? 0);
 
         return [
-            Stat::make(__('Total Revenue'), '€'.number_format($totalRevenue, 2))
-                ->description($revenueChange >= 0 ? '+'.number_format($revenueChange, 1).'%' : number_format($revenueChange, 1).'%')
+            Stat::make(__('Total Revenue'), '€' . number_format($totalRevenue, 2))
+                ->description($revenueChange >= 0 ? '+' . number_format($revenueChange, 1) . '%' : number_format($revenueChange, 1) . '%')
                 ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueChange >= 0 ? 'success' : 'danger')
                 ->chart($this->getRevenueChart()),
-            Stat::make(__('Monthly Revenue'), '€'.number_format($monthlyRevenue, 2))
+            Stat::make(__('Monthly Revenue'), '€' . number_format($monthlyRevenue, 2))
                 ->description(__('This month'))
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
             Stat::make(__('Total Orders'), number_format($totalOrders))
-                ->description($ordersChange >= 0 ? '+'.number_format($ordersChange, 1).'%' : number_format($ordersChange, 1).'%')
+                ->description($ordersChange >= 0 ? '+' . number_format($ordersChange, 1) . '%' : number_format($ordersChange, 1) . '%')
                 ->descriptionIcon($ordersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($ordersChange >= 0 ? 'success' : 'danger')
                 ->chart($this->getOrdersChart()),
             Stat::make(__('Products'), number_format($totalProducts))
-                ->description(number_format($activeProducts).' '.__('active'))
+                ->description(number_format($activeProducts) . ' ' . __('active'))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('info'),
             Stat::make(__('Customers'), number_format($totalCustomers))
-                ->description(number_format($newCustomers).' '.__('new this month'))
+                ->description(number_format($newCustomers) . ' ' . __('new this month'))
                 ->descriptionIcon('heroicon-m-users')
                 ->color('warning'),
-            Stat::make(__('Avg Order Value'), '€'.number_format($averageOrderValue, 2))
+            Stat::make(__('Avg Order Value'), '€' . number_format($averageOrderValue, 2))
                 ->description(__('Per order'))
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
             Stat::make(__('Reviews'), number_format($totalReviews))
-                ->description(number_format($averageRating, 1).' '.__('avg rating'))
+                ->description(number_format($averageRating, 1) . ' ' . __('avg rating'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
             Stat::make(__('Conversion Rate'), '2.4%')
-                ->description('+0.3% '.__('from last month'))
+                ->description('+0.3% ' . __('from last month'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
         ];
@@ -93,8 +96,10 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
     private function getRevenueChart(): array
     {
+        $since = Carbon::now()->subDays(30);
+
         return Order::where('status', 'completed')
-            ->whereDate('created_at', '>=', now()->subDays(30))
+            ->createdSince($since)
             ->selectRaw('DATE(created_at) as date, SUM(total) as revenue')
             ->groupBy('date')
             ->orderBy('date')
@@ -104,7 +109,9 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
 
     private function getOrdersChart(): array
     {
-        return Order::whereDate('created_at', '>=', now()->subDays(30))
+        $since = Carbon::now()->subDays(30);
+
+        return Order::createdSince($since)
             ->selectRaw('DATE(created_at) as date, COUNT(*) as orders')
             ->groupBy('date')
             ->orderBy('date')

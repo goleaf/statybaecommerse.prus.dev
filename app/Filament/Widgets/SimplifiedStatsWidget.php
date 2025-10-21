@@ -51,19 +51,19 @@ class SimplifiedStatsWidget extends BaseWidget
         return [
             // === PRIMARY BUSINESS METRICS ===
             Stat::make(__('translations.total_revenue'), \Illuminate\Support\Number::currency($totalRevenue, 'EUR'))
-                ->description(__('translations.from_last_month').': '.\Illuminate\Support\Number::currency($lastMonthRevenue, 'EUR'))
+                ->description(__('translations.from_last_month') . ': ' . \Illuminate\Support\Number::currency($lastMonthRevenue, 'EUR'))
                 ->descriptionIcon($revenueGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueGrowth >= 0 ? 'success' : 'danger')
                 ->chart($this->getRevenueChart()),
 
             Stat::make(__('translations.total_orders'), \Illuminate\Support\Number::format($totalOrders))
-                ->description(__('translations.from_last_month').': '.\Illuminate\Support\Number::format($lastMonthOrders))
+                ->description(__('translations.from_last_month') . ': ' . \Illuminate\Support\Number::format($lastMonthOrders))
                 ->descriptionIcon($orderGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($orderGrowth >= 0 ? 'success' : 'danger')
                 ->chart($this->getOrdersChart()),
 
             Stat::make(__('translations.total_customers'), \Illuminate\Support\Number::format($totalUsers))
-                ->description(__('translations.new_customers_this_month').': '.\Illuminate\Support\Number::format($newUsersThisMonth))
+                ->description(__('translations.new_customers_this_month') . ': ' . \Illuminate\Support\Number::format($newUsersThisMonth))
                 ->descriptionIcon($userGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($userGrowth >= 0 ? 'success' : 'danger'),
 
@@ -74,7 +74,7 @@ class SimplifiedStatsWidget extends BaseWidget
 
             // === PRODUCT ECOSYSTEM ===
             Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts)) // Viso produktų
-                ->description(__('translations.active_products').': '.\Illuminate\Support\Number::format($activeProducts))
+                ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
 
@@ -90,11 +90,11 @@ class SimplifiedStatsWidget extends BaseWidget
 
             // === REVIEWS & RATINGS ===
             Stat::make(__('translations.total_reviews'), \Illuminate\Support\Number::format($totalReviews))
-                ->description(__('translations.approved_reviews').': '.\Illuminate\Support\Number::format($approvedReviews))
+                ->description(__('translations.approved_reviews') . ': ' . \Illuminate\Support\Number::format($approvedReviews))
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
 
-            Stat::make(__('translations.average_rating'), number_format((float) $avgRating, 1).'/5')
+            Stat::make(__('translations.average_rating'), number_format((float) $avgRating, 1) . '/5')
                 ->description(__('translations.customer_satisfaction'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
@@ -134,7 +134,7 @@ class SimplifiedStatsWidget extends BaseWidget
             }
 
             $orderStats = Order::query()
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->createdBetween($startDate, $endDate)
                 ->selectRaw('DATE(created_at) as date, SUM(CASE WHEN status != ? THEN total ELSE 0 END) as revenue, COUNT(*) as total_orders', ['cancelled'])
                 ->groupBy('date')
                 ->get()
@@ -142,7 +142,7 @@ class SimplifiedStatsWidget extends BaseWidget
                     return [
                         $row->date => [
                             'revenue' => (float) $row->revenue,
-                            'orders' => (int) $row->total_orders,
+                            'orders'  => (int) $row->total_orders,
                         ],
                     ];
                 })
@@ -159,7 +159,7 @@ class SimplifiedStatsWidget extends BaseWidget
 
             return [
                 'revenue' => $revenueChart,
-                'orders' => $ordersChart,
+                'orders'  => $ordersChart,
             ];
         });
 
@@ -209,27 +209,27 @@ class SimplifiedStatsWidget extends BaseWidget
 
             return [
                 'orders' => [
-                    'total_revenue' => (float) ($orderStats->total_revenue ?? 0),
+                    'total_revenue'      => (float) ($orderStats->total_revenue ?? 0),
                     'last_month_revenue' => (float) ($orderStats->last_month_revenue ?? 0),
-                    'total_orders' => (int) ($orderStats->total_orders ?? 0),
-                    'last_month_orders' => (int) ($orderStats->last_month_orders ?? 0),
+                    'total_orders'       => (int) ($orderStats->total_orders ?? 0),
+                    'last_month_orders'  => (int) ($orderStats->last_month_orders ?? 0),
                 ],
                 'users' => [
-                    'total_users' => (int) ($userStats->total_users ?? 0),
+                    'total_users'          => (int) ($userStats->total_users ?? 0),
                     'new_users_this_month' => (int) ($userStats->new_users_this_month ?? 0),
                 ],
                 'products' => [
-                    'total_products' => (int) ($productStats->total_products ?? 0),
+                    'total_products'  => (int) ($productStats->total_products ?? 0),
                     'active_products' => (int) ($productStats->active_products ?? 0),
                 ],
                 'catalog' => [
                     'total_categories' => (int) DB::table('categories')->count(),
-                    'total_brands' => (int) DB::table('brands')->count(),
+                    'total_brands'     => (int) DB::table('brands')->count(),
                 ],
                 'reviews' => [
-                    'total_reviews' => (int) ($reviewStats->total_reviews ?? 0),
+                    'total_reviews'    => (int) ($reviewStats->total_reviews ?? 0),
                     'approved_reviews' => (int) ($reviewStats->approved_reviews ?? 0),
-                    'avg_rating' => (float) ($reviewStats->avg_rating ?? 0),
+                    'avg_rating'       => (float) ($reviewStats->avg_rating ?? 0),
                 ],
             ];
         });

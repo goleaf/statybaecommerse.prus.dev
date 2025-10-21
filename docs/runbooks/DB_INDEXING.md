@@ -75,6 +75,16 @@ Run your migration locally or in staging. Example:
 php artisan migrate
 ```
 
+### Current coverage snapshot (February 2025)
+
+The analytics stack now relies on standalone `created_at` indexes for the busiest tables:
+
+- `orders_created_at_index`
+- `products_created_at_index`
+- `users_created_at_index`
+
+Use these indexes when filtering dashboards and widgets by date ranges. Prefer range predicates (`BETWEEN`, `>=`, `<=`) or the dedicated Eloquent scopes so the optimizer can select the correct index.
+
 If the migration only affects analytics tables, re-run the targeted audit to confirm that missing index warnings disappear.
 
 ## 4. Verify improvements

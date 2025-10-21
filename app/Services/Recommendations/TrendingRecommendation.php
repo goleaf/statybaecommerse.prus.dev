@@ -22,12 +22,12 @@ final class TrendingRecommendation extends BaseRecommendation
     {
         return [
             'max_results' => 10,
-            'min_score' => 0.1,
+            'min_score'   => 0.1,
             'time_window' => 7,
             // days
-            'trend_weights' => ['recent_sales' => 0.4, 'recent_views' => 0.3, 'recent_reviews' => 0.2, 'recent_wishlist' => 0.1],
-            'min_recent_activity' => 1,
-            'boost_new_products' => true,
+            'trend_weights'         => ['recent_sales' => 0.4, 'recent_views' => 0.3, 'recent_reviews' => 0.2, 'recent_wishlist' => 0.1],
+            'min_recent_activity'   => 1,
+            'boost_new_products'    => true,
             'new_product_threshold' => 30,
         ];
     }
@@ -121,8 +121,8 @@ final class TrendingRecommendation extends BaseRecommendation
      */
     private function getRecentSalesSubquery(int $timeWindow): \Illuminate\Database\Eloquent\Builder
     {
-        return \App\Models\OrderItem::query()->selectRaw('product_id, COUNT(*) as recent_sales')->whereHas('order', function ($query) use ($timeWindow) {
-            $query->whereIn('status', ['completed', 'delivered'])->where('created_at', '>=', now()->subDays($timeWindow));
+        return \App\Models\OrderItem::query()->selectRaw('product_id, COUNT(*) as recent_sales')->whereHas('order', function ($query) use ($timeWindow): void {
+            $query->whereIn('status', ['completed', 'delivered'])->createdSince(now()->subDays($timeWindow));
         })->groupBy('product_id');
     }
 
@@ -171,8 +171,8 @@ final class TrendingRecommendation extends BaseRecommendation
      */
     private function getPreviousSalesSubquery(int $timeWindow): \Illuminate\Database\Eloquent\Builder
     {
-        return \App\Models\OrderItem::query()->selectRaw('product_id, COUNT(*) as previous_sales')->whereHas('order', function ($query) use ($timeWindow) {
-            $query->whereIn('status', ['completed', 'delivered'])->whereBetween('created_at', [now()->subDays($timeWindow * 2), now()->subDays($timeWindow)]);
+        return \App\Models\OrderItem::query()->selectRaw('product_id, COUNT(*) as previous_sales')->whereHas('order', function ($query) use ($timeWindow): void {
+            $query->whereIn('status', ['completed', 'delivered'])->createdBetween(now()->subDays($timeWindow * 2), now()->subDays($timeWindow));
         })->groupBy('product_id');
     }
 
