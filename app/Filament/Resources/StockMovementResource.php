@@ -12,8 +12,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -26,6 +24,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * StockMovementResource
@@ -113,7 +112,7 @@ final class StockMovementResource extends Resource
                         ->label(__('stock_movement.fields.notes'))
                         ->maxLength(1000)
                         ->rows(3),
-                    DateTimePicker::make('moved_at')
+                    Flatpickr::make('moved_at')->asDateTime()
                         ->label(__('stock_movement.fields.moved_at'))
                         ->required()
                         ->default(now()),
@@ -174,10 +173,10 @@ final class StockMovementResource extends Resource
                     ->preload(),
                 Filter::make('moved_at')
                     ->form([
-                        DatePicker::make('moved_from')
+                        Flatpickr::make('moved_from')->asDate()
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.from')),
-                        DatePicker::make('moved_to')
+                        Flatpickr::make('moved_to')->asDate()
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.to')),
                     ])

@@ -9,7 +9,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -56,9 +56,7 @@ class ProductComparisonsTable
                     ->form([
                         Flatpickr::make('range')
                             ->label(__('product_comparisons.created_at'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

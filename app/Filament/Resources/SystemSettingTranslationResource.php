@@ -15,7 +15,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid as FormGrid;
 use Filament\Forms\Components\KeyValue;
@@ -41,6 +40,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Throwable;
 use UnitEnum;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * SystemSettingTranslationResource
@@ -344,8 +344,8 @@ final class SystemSettingTranslationResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->form([
-                        DatePicker::make('from')->label(__('admin.common.from')),
-                        DatePicker::make('until')->label(__('admin.common.until')),
+                        Flatpickr::make('from')->asDate()->label(__('admin.common.from')),
+                        Flatpickr::make('until')->asDate()->label(__('admin.common.until')),
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];

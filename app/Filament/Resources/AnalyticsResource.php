@@ -11,7 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -92,9 +92,7 @@ final class AnalyticsResource extends Resource
                     ->form([
                         Flatpickr::make('range')
                             ->label(__('analytics.from_date'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

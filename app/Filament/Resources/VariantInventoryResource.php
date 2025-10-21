@@ -13,7 +13,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
@@ -35,6 +34,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * VariantInventoryResource
@@ -155,7 +155,7 @@ final class VariantInventoryResource extends Resource
                             ]),
                         Grid::make(2)
                             ->schema([
-                                DatePicker::make('expiry_date')
+                                Flatpickr::make('expiry_date')->asDate()
                                     ->label(__('admin.variant_inventory.expiry_date')),
                                 TextInput::make('supplier_id')
                                     ->label(__('admin.variant_inventory.supplier_id'))
@@ -186,9 +186,9 @@ final class VariantInventoryResource extends Resource
                             ]),
                         Grid::make(2)
                             ->schema([
-                                DatePicker::make('last_restocked_at')
+                                Flatpickr::make('last_restocked_at')->asDate()
                                     ->label(__('admin.variant_inventory.last_restocked_at')),
-                                DatePicker::make('last_sold_at')
+                                Flatpickr::make('last_sold_at')->asDate()
                                     ->label(__('admin.variant_inventory.last_sold_at')),
                             ]),
                     ]),

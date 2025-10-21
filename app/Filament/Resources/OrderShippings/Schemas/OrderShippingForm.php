@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrderShippings\Schemas;
 
 use App\Models\Order;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 class OrderShippingForm
 {
@@ -52,9 +52,9 @@ class OrderShippingForm
                 TextInput::make('tracking_url')
                     ->url()
                     ->maxLength(500),
-                DateTimePicker::make('shipped_at'),
-                DateTimePicker::make('estimated_delivery'),
-                DateTimePicker::make('delivered_at'),
+                Flatpickr::make('shipped_at')->asDateTime(),
+                Flatpickr::make('estimated_delivery')->asDateTime(),
+                Flatpickr::make('delivered_at')->asDateTime(),
                 TextInput::make('weight')
                     ->numeric()
                     ->step(0.001)

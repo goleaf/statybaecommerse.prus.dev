@@ -13,7 +13,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -33,6 +32,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * SubscriberResource
@@ -158,7 +158,7 @@ final class SubscriberResource extends Resource
                                     ->label(__('subscribers.newsletter_subscription'))
                                     ->default(true),
                             ]),
-                        DateTimePicker::make('subscribed_at')
+                        Flatpickr::make('subscribed_at')->asDateTime()
                             ->label(__('subscribers.subscribed_at'))
                             ->default(now()),
                     ]),
@@ -265,9 +265,9 @@ final class SubscriberResource extends Resource
                     ->native(false),
                 Filter::make('subscribed_at')
                     ->form([
-                        Forms\Components\DatePicker::make('subscribed_from')
+                        Flatpickr::make('subscribed_from')->asDate()
                             ->label(__('subscribers.subscribed_from')),
-                        Forms\Components\DatePicker::make('subscribed_until')
+                        Flatpickr::make('subscribed_until')->asDate()
                             ->label(__('subscribers.subscribed_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

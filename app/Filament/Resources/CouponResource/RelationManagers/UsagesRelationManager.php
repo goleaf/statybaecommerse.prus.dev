@@ -13,6 +13,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class UsagesRelationManager extends BaseRelationManager
 {
@@ -42,7 +43,7 @@ final class UsagesRelationManager extends BaseRelationManager
                 ->numeric()
                 ->prefix('€')
                 ->required(),
-            Forms\Components\DateTimePicker::make('used_at')
+            Flatpickr::make('used_at')->asDateTime()
                 ->label(__('admin.coupons.additional_fields.used_at'))
                 ->required()
                 ->default(now()),
@@ -84,9 +85,9 @@ final class UsagesRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\Filter::make('used_at')
                     ->form([
-                        Forms\Components\DatePicker::make('used_from')
+                        Flatpickr::make('used_from')->asDate()
                             ->label(__('admin.coupons.additional_fields.used_from')),
-                        Forms\Components\DatePicker::make('used_until')
+                        Flatpickr::make('used_until')->asDate()
                             ->label(__('admin.coupons.additional_fields.used_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

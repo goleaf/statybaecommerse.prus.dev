@@ -13,7 +13,6 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -25,6 +24,7 @@ use Illuminate\Support\Str;
 use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Data\EventData;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class CalendarWidget extends FullCalendarWidget
 {
@@ -162,10 +162,10 @@ final class CalendarWidget extends FullCalendarWidget
             Toggle::make('is_featured')
                 ->label($this->translate('campaigns.fields.is_featured', 'Featured'))
                 ->default(false),
-            DateTimePicker::make('starts_at')
+            Flatpickr::make('starts_at')->asDateTime()
                 ->label($this->translate('campaigns.fields.start_date', 'Start date'))
                 ->seconds(false),
-            DateTimePicker::make('ends_at')
+            Flatpickr::make('ends_at')->asDateTime()
                 ->label($this->translate('campaigns.fields.end_date', 'End date'))
                 ->seconds(false),
         ];

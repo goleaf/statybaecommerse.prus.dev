@@ -24,8 +24,7 @@ use Filament\Actions\Exports\Export;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -321,9 +320,9 @@ final class OrderResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('shipped_at')
+                            Flatpickr::make('shipped_at')->asDateTime()
                                 ->label(__('orders.fields.shipped_at')),
-                            DateTimePicker::make('delivered_at')
+                            Flatpickr::make('delivered_at')->asDateTime()
                                 ->label(__('orders.fields.delivered_at')),
                         ]),
                     TextInput::make('tracking_number')
@@ -544,9 +543,7 @@ final class OrderResource extends Resource
                     ->form([
                         Flatpickr::make('range')
                             ->label(__('orders.created_at'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,
