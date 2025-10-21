@@ -12,7 +12,6 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -31,6 +30,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class DiscountCodeResource extends Resource
 {
@@ -154,11 +154,11 @@ final class DiscountCodeResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('valid_from')
+                            Flatpickr::make('valid_from')->asDateTime()
                                 ->label(__('discount_codes.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            DateTimePicker::make('valid_until')
+                            Flatpickr::make('valid_until')->asDateTime()
                                 ->label(__('discount_codes.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),

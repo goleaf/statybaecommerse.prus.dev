@@ -14,8 +14,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -123,7 +122,7 @@ final class UserBehaviorResource extends Resource
                             ->options(self::behaviorTypeOptions())
                             ->required()
                             ->searchable(),
-                        DateTimePicker::make('created_at')
+                        Flatpickr::make('created_at')->asDateTime()
                             ->label(__('admin.user_behaviors.created_at'))
                             ->default(now())
                             ->displayFormat('d/m/Y H:i:s'),
@@ -274,9 +273,7 @@ final class UserBehaviorResource extends Resource
                     ->form([
                         Flatpickr::make('range')
                             ->label(__('admin.user_behaviors.created_at'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

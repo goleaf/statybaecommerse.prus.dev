@@ -11,7 +11,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -23,6 +22,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class ReferralResource extends Resource
 {
@@ -67,9 +67,9 @@ final class ReferralResource extends Resource
                                 'cancelled' => 'Cancelled',
                             ])
                             ->required(),
-                        DatePicker::make('completed_at')
+                        Flatpickr::make('completed_at')->asDate()
                             ->nullable(),
-                        DatePicker::make('expires_at')
+                        Flatpickr::make('expires_at')->asDate()
                             ->nullable(),
                         TextInput::make('source')
                             ->maxLength(255)

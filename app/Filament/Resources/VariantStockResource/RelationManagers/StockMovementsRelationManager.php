@@ -6,7 +6,6 @@ namespace App\Filament\Resources\VariantStockResource\RelationManagers;
 
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -19,6 +18,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -63,7 +63,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                 Textarea::make('notes')
                     ->label(__('inventory.notes'))
                     ->rows(3),
-                DateTimePicker::make('moved_at')
+                Flatpickr::make('moved_at')->asDateTime()
                     ->label(__('inventory.moved_at'))
                     ->default(now()),
             ]);

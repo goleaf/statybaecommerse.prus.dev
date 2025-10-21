@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -36,6 +35,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class CouponResource extends Resource
 {
@@ -148,11 +148,11 @@ final class CouponResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('valid_from')
+                            Flatpickr::make('valid_from')->asDateTime()
                                 ->label(__('coupons.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            DateTimePicker::make('valid_until')
+                            Flatpickr::make('valid_until')->asDateTime()
                                 ->label(__('coupons.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),

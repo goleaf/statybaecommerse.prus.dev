@@ -11,7 +11,6 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -31,6 +30,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
 use UnitEnum;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * VariantPricingRuleResource
@@ -162,9 +162,9 @@ final class VariantPricingRuleResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('valid_from')
+                                Flatpickr::make('valid_from')->asDateTime()
                                     ->label(__('variant_pricing_rules.valid_from')),
-                                DateTimePicker::make('valid_until')
+                                Flatpickr::make('valid_until')->asDateTime()
                                     ->label(__('variant_pricing_rules.valid_until')),
                             ]),
                     ]),

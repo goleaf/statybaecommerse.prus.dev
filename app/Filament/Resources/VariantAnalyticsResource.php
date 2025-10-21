@@ -13,7 +13,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -35,6 +34,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * VariantAnalyticsResource
@@ -95,7 +95,7 @@ final class VariantAnalyticsResource extends Resource
                                                             }
                                                         }
                                                     }),
-                                                DatePicker::make('date')
+                                                Flatpickr::make('date')->asDate()
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
                                                     ->default(now())
@@ -383,9 +383,9 @@ final class VariantAnalyticsResource extends Resource
                     ->label(__('admin.variant_analytics.date')),
                 Filter::make('date_range')
                     ->form([
-                        DatePicker::make('date_from')
+                        Flatpickr::make('date_from')->asDate()
                             ->label(__('admin.variant_analytics.date_from')),
-                        DatePicker::make('date_until')
+                        Flatpickr::make('date_until')->asDate()
                             ->label(__('admin.variant_analytics.date_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

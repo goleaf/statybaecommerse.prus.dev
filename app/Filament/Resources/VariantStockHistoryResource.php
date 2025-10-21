@@ -7,8 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -224,9 +223,7 @@ final class VariantStockHistoryResource extends Resource
                     ->form([
                         Flatpickr::make('range')
                             ->label(__('admin.variant_stock_histories.filters.created_at'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,
