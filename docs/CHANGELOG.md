@@ -32,5 +32,6 @@
 
 ### Fixed
 - Introduced a centralized cache invalidation service that tags catalog, navigation, and dashboard caches so product/category updates instantly refresh storefront widgets and admin metrics.
+- Hardened cache invalidation fallbacks to avoid flushing the entire store when cache tags are unavailable by clearing home shelves, navigation menus, collection showcases, and dashboard metrics through targeted key builders.
 - Reinstated the Husky shared bootstrap script so Git hooks run without deprecation notices or missing PATH exports during repository installs.
 - Captured the `sh -n .husky/_/husky.sh` smoke check that verifies the restored script syntax before publishing commits.
