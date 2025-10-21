@@ -31,6 +31,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 final class CustomerManagementResource extends Resource
 {
@@ -227,6 +228,8 @@ final class CustomerManagementResource extends Resource
                     ->trueLabel(__('customers.active_only'))
                     ->falseLabel(__('customers.inactive_only'))
                     ->native(false),
+                ValueRangeFilter::make('orders_count')
+                    ->label(__('customers.orders_count')),
                 Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')

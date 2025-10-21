@@ -30,6 +30,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 final class CouponResource extends Resource
 {
@@ -85,8 +86,8 @@ final class CouponResource extends Resource
                             Select::make('type')
                                 ->label(__('coupons.type'))
                                 ->options([
-                                    'percentage' => __('coupons.types.percentage'),
-                                    'fixed' => __('coupons.types.fixed'),
+                                    'percentage'    => __('coupons.types.percentage'),
+                                    'fixed'         => __('coupons.types.fixed'),
                                     'free_shipping' => __('coupons.types.free_shipping'),
                                 ])
                                 ->default('percentage')
@@ -215,16 +216,16 @@ final class CouponResource extends Resource
                     ->label(__('coupons.type'))
                     ->formatStateUsing(fn (?string $state): string => $state ? __("coupons.types.{$state}") : '—')
                     ->color(fn (?string $state): string => match ($state) {
-                        'percentage' => 'green',
-                        'fixed' => 'blue',
+                        'percentage'    => 'green',
+                        'fixed'         => 'blue',
                         'free_shipping' => 'purple',
-                        default => 'gray',
+                        default         => 'gray',
                     }),
                 TextColumn::make('value')
                     ->label(__('coupons.value'))
                     ->formatStateUsing(function ($state, Coupon $record): string {
                         if ($record->type === 'percentage') {
-                            return is_null($state) ? '—' : $state.'%';
+                            return is_null($state) ? '—' : $state . '%';
                         }
 
                         if ($record->type === 'free_shipping') {
@@ -235,7 +236,7 @@ final class CouponResource extends Resource
                             return '—';
                         }
 
-                        return '€'.number_format((float) $state, 2);
+                        return '€' . number_format((float) $state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -257,7 +258,7 @@ final class CouponResource extends Resource
                     ->formatStateUsing(fn (bool $state): string => $state ? __('coupons.active') : __('coupons.inactive'))
                     ->colors([
                         'success' => true,
-                        'danger' => false,
+                        'danger'  => false,
                     ]),
                 IconColumn::make('is_public')
                     ->label(__('coupons.is_public'))
@@ -290,13 +291,25 @@ final class CouponResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'percentage' => __('coupons.types.percentage'),
-                        'fixed' => __('coupons.types.fixed'),
+                        'percentage'    => __('coupons.types.percentage'),
+                        'fixed'         => __('coupons.types.fixed'),
                         'free_shipping' => __('coupons.types.free_shipping'),
                     ]),
                 SelectFilter::make('customer_group_id')
                     ->relationship('customerGroup', 'name')
                     ->preload(),
+                ValueRangeFilter::make('minimum_amount')
+                    ->label(__('coupons.minimum_amount'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('value')
+                    ->label(__('coupons.value')),
+                ValueRangeFilter::make('usage_limit')
+                    ->label(__('coupons.usage_limit')),
+                ValueRangeFilter::make('used_count')
+                    ->label(__('coupons.used_count')),
                 TernaryFilter::make('is_active')
                     ->label(__('coupons.is_active'))
                     ->trueLabel(__('coupons.active_only'))
@@ -334,8 +347,8 @@ final class CouponResource extends Resource
                     ->color('info')
                     ->action(function (Coupon $record): void {
                         $newCoupon = $record->replicate();
-                        $newCoupon->code = $record->code.'_copy_'.time();
-                        $newCoupon->name = $record->name.' (Copy)';
+                        $newCoupon->code = $record->code . '_copy_' . time();
+                        $newCoupon->name = $record->name . ' (Copy)';
                         $newCoupon->used_count = 0;
                         $newCoupon->save();
 
@@ -395,10 +408,10 @@ final class CouponResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCoupons::route('/'),
+            'index'  => Pages\ListCoupons::route('/'),
             'create' => Pages\CreateCoupon::route('/create'),
-            'view' => Pages\ViewCoupon::route('/{record}'),
-            'edit' => Pages\EditCoupon::route('/{record}/edit'),
+            'view'   => Pages\ViewCoupon::route('/{record}'),
+            'edit'   => Pages\EditCoupon::route('/{record}/edit'),
         ];
     }
 }
