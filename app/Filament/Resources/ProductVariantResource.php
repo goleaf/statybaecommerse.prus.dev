@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages;
-use App\Filament\Support\MatrixFactory;
+use App\Support\Forms\MatrixFactory;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Product;
