@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "88675bffb87e532b54586b0d7ae34d76",
+    "content-hash": "7db8525f9c579382d6233b699027a074",
     "packages": [
         {
             "name": "andreia/filament-nord-theme",

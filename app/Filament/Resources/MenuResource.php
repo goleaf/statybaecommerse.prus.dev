@@ -32,18 +32,17 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * Navigation icon override (string|\BackedEnum|null) kept typed for Filament discovery.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -184,17 +183,13 @@ final class MenuResource extends Resource
                     ->color(fn (Menu $record): string => $record->is_active ? 'warning' : 'success')
                     ->requiresConfirmation()
                     ->action(function (Menu $record): void {
+                        // Flip the active flag before Filament resolves the success notification payload.
                         $record->update(['is_active' => ! $record->is_active]);
-
-                        $message = $record->is_active
-                            ? __('menus.activated_successfully')
-                            : __('menus.deactivated_successfully');
-
-                        Notification::make()
-                            ->success()
-                            ->title((string) $message)
-                            ->send();
-                    }),
+                    })
+                    ->successNotificationTitle(static fn (Menu $record): string => $record->is_active
+                        ? __('menus.activated_successfully')
+                        : __('menus.deactivated_successfully')
+                    ),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
