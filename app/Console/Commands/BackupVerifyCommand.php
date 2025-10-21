@@ -326,7 +326,9 @@ final class BackupVerifyCommand extends Command
             return;
         }
 
-        $command = sprintf('tar -xzf %s -C %s', escapeshellarg($archive), escapeshellarg($destination));
+        $tarBinary = $this->binary('tar', 'tar');
+        $flags = $this->archiveFlags('extract_flags', '-xzf');
+        $command = sprintf('%s %s %s -C %s', escapeshellarg($tarBinary), $flags, escapeshellarg($archive), escapeshellarg($destination));
         $process = Process::fromShellCommandline($command);
         $process->setTimeout(null);
         $process->mustRun();
@@ -395,7 +397,8 @@ final class BackupVerifyCommand extends Command
             return;
         }
 
-        $command = sprintf('sqlite3 %s < %s', escapeshellarg($databasePath), escapeshellarg($artifactPath));
+        $sqliteBinary = $this->binary('sqlite3', 'sqlite3');
+        $command = sprintf('%s %s < %s', escapeshellarg($sqliteBinary), escapeshellarg($databasePath), escapeshellarg($artifactPath));
         $process = Process::fromShellCommandline($command);
         $process->setTimeout(null);
         $process->mustRun();
@@ -420,8 +423,10 @@ final class BackupVerifyCommand extends Command
             throw new RuntimeException('MySQL verification username is not configured.');
         }
 
+        $mysqlBinary = $this->binary('mysql', 'mysql');
         $createCommand = sprintf(
-            'mysql --host=%s --port=%s --user=%s -e %s',
+            '%s --host=%s --port=%s --user=%s -e %s',
+            escapeshellarg($mysqlBinary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -435,7 +440,8 @@ final class BackupVerifyCommand extends Command
         $createProcess->mustRun();
 
         $importCommand = sprintf(
-            'mysql --host=%s --port=%s --user=%s %s < %s',
+            '%s --host=%s --port=%s --user=%s %s < %s',
+            escapeshellarg($mysqlBinary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -467,8 +473,10 @@ final class BackupVerifyCommand extends Command
             throw new RuntimeException('PostgreSQL verification username is not configured.');
         }
 
+        $psqlBinary = $this->binary('psql', 'psql');
         $dropCommand = sprintf(
-            'psql --host=%s --port=%s --username=%s --command %s',
+            '%s --host=%s --port=%s --username=%s --command %s',
+            escapeshellarg($psqlBinary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -476,7 +484,8 @@ final class BackupVerifyCommand extends Command
         );
 
         $createCommand = sprintf(
-            'psql --host=%s --port=%s --username=%s --command %s',
+            '%s --host=%s --port=%s --username=%s --command %s',
+            escapeshellarg($psqlBinary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -494,7 +503,8 @@ final class BackupVerifyCommand extends Command
         $createProcess->mustRun();
 
         $importCommand = sprintf(
-            'psql --host=%s --port=%s --username=%s --dbname=%s -f %s',
+            '%s --host=%s --port=%s --username=%s --dbname=%s -f %s',
+            escapeshellarg($psqlBinary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -547,5 +557,29 @@ final class BackupVerifyCommand extends Command
         $value = $this->option($name);
 
         return is_string($value) && $value !== '' ? $value : $default;
+    }
+
+    private function binary(string $key, string $default): string
+    {
+        $configured = config("backup.binaries.{$key}");
+
+        if (! is_string($configured) || $configured === '') {
+            return $default;
+        }
+
+        return $configured;
+    }
+
+    private function archiveFlags(string $key, string $default): string
+    {
+        $flags = config("backup.archive.{$key}", $default);
+
+        if (! is_string($flags)) {
+            return $default;
+        }
+
+        $trimmed = trim($flags);
+
+        return $trimmed !== '' ? $trimmed : $default;
     }
 }

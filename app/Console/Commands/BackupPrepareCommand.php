@@ -239,11 +239,17 @@ final class BackupPrepareCommand extends Command
         }
 
         $dumpPath = $backupPath.'/database.sql';
+        $binary = $this->binary('mysqldump', 'mysqldump');
+        $options = $this->commandOptions('backup.dump.mysql.options', '--single-transaction --routines --events');
+        $optionsPart = $options === '' ? '' : ' '.$options;
+
         $command = sprintf(
-            'mysqldump --host=%s --port=%s --user=%s --single-transaction --routines --events %s > %s',
+            '%s --host=%s --port=%s --user=%s%s %s > %s',
+            escapeshellarg($binary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
+            $optionsPart,
             escapeshellarg($database),
             escapeshellarg($dumpPath),
         );
@@ -281,11 +287,17 @@ final class BackupPrepareCommand extends Command
         }
 
         $dumpPath = $backupPath.'/database.sql';
+        $binary = $this->binary('pg_dump', 'pg_dump');
+        $options = $this->commandOptions('backup.dump.pgsql.options', '--no-owner --no-privileges');
+        $optionsPart = $options === '' ? '' : ' '.$options;
+
         $command = sprintf(
-            'pg_dump --host=%s --port=%s --username=%s --no-owner --no-privileges %s > %s',
+            '%s --host=%s --port=%s --username=%s%s %s > %s',
+            escapeshellarg($binary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
+            $optionsPart,
             escapeshellarg($database),
             escapeshellarg($dumpPath),
         );
@@ -317,7 +329,9 @@ final class BackupPrepareCommand extends Command
         }
 
         $archivePath = $backupPath.'/media.tar.gz';
-        $command = sprintf('tar -czf %s', escapeshellarg($archivePath));
+        $tarBinary = $this->binary('tar', 'tar');
+        $flags = $this->archiveFlags('create_flags', '-czf');
+        $command = sprintf('%s %s %s', escapeshellarg($tarBinary), $flags, escapeshellarg($archivePath));
 
         foreach ($mediaPaths as $path) {
             $command .= sprintf(' -C %s %s', escapeshellarg(dirname($path)), escapeshellarg(basename($path)));
@@ -332,7 +346,8 @@ final class BackupPrepareCommand extends Command
 
     private function resolveCommitHash(): ?string
     {
-        $process = Process::fromShellCommandline('git rev-parse HEAD', base_path());
+        $gitBinary = $this->binary('git', 'git');
+        $process = Process::fromShellCommandline(sprintf('%s rev-parse HEAD', escapeshellarg($gitBinary)), base_path());
         $process->run();
 
         if (! $process->isSuccessful()) {
@@ -369,5 +384,40 @@ final class BackupPrepareCommand extends Command
         }
 
         throw new RuntimeException(sprintf('Connection value for [%s] must be a scalar or null.', $key));
+    }
+
+    private function binary(string $key, string $default): string
+    {
+        $configured = config("backup.binaries.{$key}");
+
+        if (! is_string($configured) || $configured === '') {
+            return $default;
+        }
+
+        return $configured;
+    }
+
+    private function commandOptions(string $configKey, string $default): string
+    {
+        $options = config($configKey, $default);
+
+        if (! is_string($options)) {
+            return trim($default);
+        }
+
+        return trim($options);
+    }
+
+    private function archiveFlags(string $key, string $default): string
+    {
+        $flags = config("backup.archive.{$key}", $default);
+
+        if (! is_string($flags)) {
+            return $default;
+        }
+
+        $trimmed = trim($flags);
+
+        return $trimmed !== '' ? $trimmed : $default;
     }
 }
