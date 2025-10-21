@@ -18,6 +18,7 @@ i="${XDG_CONFIG_HOME:-$HOME/.config}/husky/init.sh"
 
 export PATH="node_modules/.bin:$PATH"
 # Ensure Git hooks execute using the repository's local toolchain so commands remain consistent across environments.
+# This guard also gives us one place to adapt whenever Husky v10 introduces its new bootstrap entrypoint semantics.
 sh -e "$s" "$@"
 c=$?
 
