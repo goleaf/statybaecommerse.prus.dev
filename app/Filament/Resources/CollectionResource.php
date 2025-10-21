@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
-use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -169,7 +169,6 @@ final class CollectionResource extends Resource
                         ->relationship('products', 'name')
                         ->multiple()
                         ->searchable()
-                        ->boxSearchs()
                         ->height('350px')
                         ->preload(),
                 ]),
