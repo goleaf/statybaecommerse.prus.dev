@@ -30,3 +30,7 @@ Follow these conventions when creating or updating content inside `/docs` to kee
 ## Index maintenance
 - After creating or moving any document, update [`INDEX.md`](INDEX.md) to include it in the appropriate section.
 - If you add a new subdirectory, include a short description in the Directory Overview so contributors understand where content belongs.
+
+## Automated checks
+- Keep binary assets out of the repository; the CI guard rejects documentation files larger than 2MB. Compress screenshots or split lengthy appendices to stay within the limit.
+- When updating large references, run `find docs -type f -size +2M` locally so CI passes on the first attempt.
