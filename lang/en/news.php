@@ -174,6 +174,16 @@ return [
         'sort_order' => 'Sort Order',
         'color' => 'Color',
     ],
+    'combobox' => [
+        'categories' => [
+            'available' => 'Available categories',
+            'selected' => 'Selected categories',
+        ],
+        'tags' => [
+            'available' => 'Available tags',
+            'selected' => 'Selected tags',
+        ],
+    ],
     // Filter translations
     'filters' => [
         'published_from' => 'Published From',
