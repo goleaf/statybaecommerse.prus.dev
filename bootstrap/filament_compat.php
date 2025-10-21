@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+// This bootstrap-level shim restores compatibility for Filament plugins that
+// still reference pre-v4 class names during Composer package discovery.
+// Keeping the aliases outside of PSR-4 autoloaded directories prevents
+// Composer from flagging the synthetic classes while ensuring they exist
+// whenever the application starts.
+
 namespace {
     if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
         class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
