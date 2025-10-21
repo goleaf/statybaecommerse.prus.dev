@@ -8,11 +8,11 @@ use App\Models\Product;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 class ProductSimilarityForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $form): Schema
     {
         return $form
             ->schema([

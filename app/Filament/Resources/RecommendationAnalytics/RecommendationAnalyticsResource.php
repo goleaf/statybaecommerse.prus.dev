@@ -12,10 +12,10 @@ use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyti
 use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalyticsTable;
 use App\Models\RecommendationAnalytics;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class RecommendationAnalyticsResource extends Resource
 {
@@ -47,7 +47,7 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return RecommendationAnalyticsForm::configure($form);
     }

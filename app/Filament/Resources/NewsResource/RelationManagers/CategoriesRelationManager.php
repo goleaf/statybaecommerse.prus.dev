@@ -9,10 +9,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class CategoriesRelationManager extends BaseRelationManager
 {
@@ -20,7 +20,7 @@ final class CategoriesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Categories';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $form
             ->components([

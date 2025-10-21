@@ -7,12 +7,12 @@ namespace App\Filament\Resources\ReferralStatistics\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Support\Filament\Components\Flatpickr;
 
 class ReferralStatisticsForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $form): Schema
     {
         return $form
             ->schema([

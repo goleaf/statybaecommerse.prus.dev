@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 class UserRelationManager extends BaseRelationManager
 {
@@ -22,7 +22,7 @@ class UserRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Users';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([

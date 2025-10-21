@@ -12,13 +12,13 @@ use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class PriceResource extends Resource
 {
@@ -28,7 +28,7 @@ final class PriceResource extends Resource
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([

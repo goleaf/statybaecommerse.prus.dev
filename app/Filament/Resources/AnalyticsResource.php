@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use App\Support\Filament\Filters\DateRangeFilter;
@@ -17,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class AnalyticsResource extends Resource
 {
@@ -58,7 +58,7 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form;
     }
