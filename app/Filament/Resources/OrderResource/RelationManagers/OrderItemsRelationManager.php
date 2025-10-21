@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Support\Search\ProductVariantSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -13,12 +16,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -63,26 +66,65 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ->components([
                         Grid::make(2)
                             ->components([
-                                Select::make('product_variant_id')
+                                SearchableInput::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
-                                    ->relationship('productVariant', 'name')
-                                    ->searchable()
-                                    ->preload()
+                                    ->placeholder(__('orders.lookups.variant_placeholder'))
                                     ->required()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
-                                        if ($state) {
-                                            $variant = ProductVariant::find($state);
-                                            if ($variant) {
-                                                $set('unit_price', $variant->price);
-                                                $set('total', $variant->price * ($get('quantity') ?? 1));
-                                                $set('product_id', $variant->product_id);
-                                                $set('name', $variant->name ?? ($variant->product->name ?? ''));
-                                                $set('sku', $variant->sku ?? ($variant->product->sku ?? ''));
-                                            }
+                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
                                         }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find($state);
+
+                                        if (! $variant instanceof ProductVariant) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
+                                            ]);
                                     })
-                                    ->prefixIcon('heroicon-o-cube'),
+                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                        if ($state === null || $state === '') {
+                                            $set('product_variant_id', null);
+
+                                            return;
+                                        }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find((int) $state);
+
+                                        if (! $variant instanceof ProductVariant) {
+                                            return;
+                                        }
+
+                                        $set('product_variant_id', $variant->getKey());
+                                        $set('product_id', $variant->getAttribute('product_id'));
+
+                                        $name = $variant->getAttribute('name') ?? optional($variant->product)->name ?? '';
+                                        $sku = $variant->getAttribute('sku') ?? optional($variant->product)->sku ?? '';
+
+                                        $set('name', is_string($name) ? $name : '');
+                                        $set('sku', is_string($sku) ? $sku : '');
+
+                                        $price = (float) ($variant->getAttribute('price') ?? 0);
+                                        $set('unit_price', $price);
+
+                                        $quantity = (int) ($get('quantity') ?? 1);
+                                        $discount = (float) ($get('discount_amount') ?? 0);
+                                        $set('total', ($price * $quantity) - $discount);
+                                    }),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()

@@ -6,7 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
+use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -89,10 +91,21 @@ final class SliderResource extends Resource
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
-                    TextInput::make('button_url')
+                    SearchableInput::make('button_url')
                         ->label(__('sliders.button_url'))
-                        ->url()
+                        ->placeholder(__('sliders.link_search.placeholder'))
                         ->maxLength(255)
+                        ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                        ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                        ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                            if ($state === null || $state === '') {
+                                return;
+                            }
+
+                            $component
+                                ->state($state)
+                                ->options([$state => $state]);
+                        })
                         ->columnSpanFull(),
                 ]),
             Section::make(__('sliders.media'))

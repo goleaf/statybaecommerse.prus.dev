@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
+use App\Support\Search\ContentLinkSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -43,10 +46,21 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                 TextInput::make('button_text')
                     ->label(__('translations.button_text'))
                     ->maxLength(255),
-                TextInput::make('button_url')
+                SearchableInput::make('button_url')
                     ->label(__('translations.button_url'))
-                    ->url()
-                    ->maxLength(255),
+                    ->placeholder(__('translations.slider_link_placeholder'))
+                    ->maxLength(255)
+                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                        if ($state === null || $state === '') {
+                            return;
+                        }
+
+                        $component
+                            ->state($state)
+                            ->options([$state => $state]);
+                    }),
                 ColorPicker::make('background_color')
                     ->label(__('translations.background_color'))
                     ->default('#ffffff'),
@@ -108,7 +122,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
             ->url(function () {
                 try {
                     return route('filament.admin.resources.sliders.index');
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return '#';
                 }
             })
