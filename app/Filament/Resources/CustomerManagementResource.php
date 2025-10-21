@@ -31,10 +31,13 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 final class CustomerManagementResource extends Resource
 {
+    use TranslatableResource;
+
     protected static ?string $model = User::class;
 
     /**
