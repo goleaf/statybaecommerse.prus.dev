@@ -35,6 +35,11 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
@@ -280,6 +285,11 @@ final class CustomerResource extends Resource
                     ->falseLabel(__('customers.inactive_only'))
                     ->native(false),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export'))
+                    ->exports(self::getCustomerExportPresets()),
+            ])
             ->actions([
                 EditAction::make(),
                 Action::make('toggle_active')
@@ -322,9 +332,41 @@ final class CustomerResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
+                    ExportBulkAction::make()
+                        ->label(__('Export selected'))
+                        ->exports(self::getCustomerExportPresets()),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * @return array<int, ExcelExport>
+     */
+    private static function getCustomerExportPresets(): array
+    {
+        return [
+            ExcelExport::make('visible_columns')
+                ->fromTable()
+                ->queue()
+                ->withChunkSize(500),
+            ExcelExport::make('ltv_snapshot')
+                ->fromTable()
+                ->withColumns([
+                    Column::make('name')
+                        ->heading(__('customers.name')),
+                    Column::make('email')
+                        ->heading(__('customers.email')),
+                    Column::make('orders_count')
+                        ->heading(__('customers.orders_count')),
+                    Column::make('ltv')
+                        ->heading(__('customers.ltv'))
+                        ->formatStateUsing(fn ($state, Customer $record): float => (float) $record->orders()->sum('total'))
+                        ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
+                ])
+                ->queue()
+                ->withChunkSize(500),
+        ];
     }
 
     /**

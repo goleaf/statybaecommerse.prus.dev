@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Repositories\ProductRepository;
-use App\Repositories\UserRepository;
+use App\Support\Backup\RepositoryRegistry;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -25,7 +25,7 @@ final class BackupPrepareCommand extends Command
 
     protected $description = 'Create a timestamped backup containing the database dump and media assets.';
 
-    public function handle(UserRepository $userRepository, ProductRepository $productRepository): int
+    public function handle(): int
     {
         $databaseDefault = config('database.default', 'sqlite');
         $databaseDefaultString = is_string($databaseDefault) ? $databaseDefault : 'sqlite';
@@ -42,7 +42,7 @@ final class BackupPrepareCommand extends Command
         $timestamp = CarbonImmutable::now()->format('Ymd_His');
         $tag = $this->option('tag');
         $directoryName = $tag !== null ? sprintf('%s_%s', $timestamp, Str::slug($tag)) : $timestamp;
-        $backupPath = $storageRoot.DIRECTORY_SEPARATOR.$directoryName;
+        $backupPath = $storageRoot . DIRECTORY_SEPARATOR . $directoryName;
 
         $this->components->info(sprintf('Starting backup for connection [%s] into %s', $connectionName, $backupPath));
 
@@ -73,19 +73,23 @@ final class BackupPrepareCommand extends Command
                 throw new RuntimeException('Failed to compute artifact checksums.');
             }
 
+            $repositoryRegistry = RepositoryRegistry::fromConfig($this->container());
+            $repositoryCounts = $repositoryRegistry->counts($connectionName);
+
             $metadata = [
-                'timestamp' => $timestamp,
-                'directory' => $directoryName,
+                'timestamp'  => $timestamp,
+                'directory'  => $directoryName,
                 'connection' => [
-                    'name' => $connectionName,
+                    'name'   => $connectionName,
                     'driver' => $databaseArtifact['driver'],
                 ],
-                'commit_hash' => $commitHash,
-                'media_paths' => $mediaPaths,
-                'artifacts' => [
+                'commit_hash'  => $commitHash,
+                'media_paths'  => $mediaPaths,
+                'repositories' => $repositoryRegistry->definitions(),
+                'artifacts'    => [
                     'database' => [
                         'filename' => basename($databaseArtifact['path']),
-                        'driver' => $databaseArtifact['driver'],
+                        'driver'   => $databaseArtifact['driver'],
                         'checksum' => $databaseChecksum,
                     ],
                     'media' => [
@@ -93,10 +97,7 @@ final class BackupPrepareCommand extends Command
                         'checksum' => $mediaChecksum,
                     ],
                 ],
-                'counts' => [
-                    'users' => $userRepository->count($connectionName),
-                    'products' => $productRepository->count($connectionName),
-                ],
+                'counts'       => $repositoryCounts,
                 'generated_at' => CarbonImmutable::now()->toIso8601String(),
             ];
 
@@ -106,13 +107,20 @@ final class BackupPrepareCommand extends Command
                 throw new RuntimeException('Failed to encode backup metadata.');
             }
 
-            File::put($backupPath.'/metadata.json', $metadataJson);
+            File::put($backupPath . '/metadata.json', $metadataJson);
 
             $this->components->info('Backup created successfully.');
             $this->newLine();
             $this->components->twoColumnDetail('Database artifact', $databaseArtifact['path']);
             $this->components->twoColumnDetail('Media archive', $mediaArtifact);
-            $this->components->twoColumnDetail('Metadata', $backupPath.'/metadata.json');
+            $this->components->twoColumnDetail('Metadata', $backupPath . '/metadata.json');
+
+            foreach ($repositoryCounts as $label => $count) {
+                $this->components->twoColumnDetail(
+                    sprintf('Records [%s]', Str::headline($label)),
+                    (string) $count,
+                );
+            }
 
             return self::SUCCESS;
         } catch (Throwable $exception) {
@@ -124,7 +132,7 @@ final class BackupPrepareCommand extends Command
     }
 
     /**
-     * @param  array<int, string>|null  $extraMediaPaths
+     * @param  array<int, string>|null $extraMediaPaths
      * @return array<int, string>
      */
     private function resolveMediaPaths(?array $extraMediaPaths): array
@@ -174,7 +182,7 @@ final class BackupPrepareCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $config
+     * @param  array<string, mixed>                $config
      * @return array{path: string, driver: string}
      */
     private function dumpDatabase(string $connection, array $config, string $backupPath): array
@@ -194,7 +202,7 @@ final class BackupPrepareCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $config
+     * @param  array<string, mixed>                $config
      * @return array{path: string, driver: string}
      */
     private function dumpSqliteDatabase(array $config, string $backupPath): array
@@ -209,17 +217,17 @@ final class BackupPrepareCommand extends Command
             throw new FileNotFoundException("SQLite database [{$databasePath}] not found.");
         }
 
-        $targetPath = $backupPath.'/database.sqlite';
+        $targetPath = $backupPath . '/database.sqlite';
         File::copy($databasePath, $targetPath);
 
         return [
-            'path' => $targetPath,
+            'path'   => $targetPath,
             'driver' => 'sqlite',
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $config
+     * @param  array<string, mixed>                $config
      * @return array{path: string, driver: string}
      */
     private function dumpMysqlDatabase(array $config, string $backupPath): array
@@ -238,12 +246,18 @@ final class BackupPrepareCommand extends Command
             throw new RuntimeException('MySQL username is not configured.');
         }
 
-        $dumpPath = $backupPath.'/database.sql';
+        $dumpPath = $backupPath . '/database.sql';
+        $binary = $this->binary('mysqldump', 'mysqldump');
+        $options = $this->commandOptions('backup.dump.mysql.options', '--single-transaction --routines --events');
+        $optionsPart = $options === '' ? '' : ' ' . $options;
+
         $command = sprintf(
-            'mysqldump --host=%s --port=%s --user=%s --single-transaction --routines --events %s > %s',
+            '%s --host=%s --port=%s --user=%s%s %s > %s',
+            escapeshellarg($binary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
+            $optionsPart,
             escapeshellarg($database),
             escapeshellarg($dumpPath),
         );
@@ -255,13 +269,13 @@ final class BackupPrepareCommand extends Command
         $process->mustRun();
 
         return [
-            'path' => $dumpPath,
+            'path'   => $dumpPath,
             'driver' => 'mysql',
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $config
+     * @param  array<string, mixed>                $config
      * @return array{path: string, driver: string}
      */
     private function dumpPostgresDatabase(array $config, string $backupPath): array
@@ -280,12 +294,18 @@ final class BackupPrepareCommand extends Command
             throw new RuntimeException('PostgreSQL username is not configured.');
         }
 
-        $dumpPath = $backupPath.'/database.sql';
+        $dumpPath = $backupPath . '/database.sql';
+        $binary = $this->binary('pg_dump', 'pg_dump');
+        $options = $this->commandOptions('backup.dump.pgsql.options', '--no-owner --no-privileges');
+        $optionsPart = $options === '' ? '' : ' ' . $options;
+
         $command = sprintf(
-            'pg_dump --host=%s --port=%s --username=%s --no-owner --no-privileges %s > %s',
+            '%s --host=%s --port=%s --username=%s%s %s > %s',
+            escapeshellarg($binary),
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
+            $optionsPart,
             escapeshellarg($database),
             escapeshellarg($dumpPath),
         );
@@ -297,27 +317,29 @@ final class BackupPrepareCommand extends Command
         $process->mustRun();
 
         return [
-            'path' => $dumpPath,
+            'path'   => $dumpPath,
             'driver' => 'pgsql',
         ];
     }
 
     /**
-     * @param  array<int, string>  $mediaPaths
+     * @param array<int, string> $mediaPaths
      */
     private function archiveMedia(array $mediaPaths, string $backupPath): string
     {
         if ($mediaPaths === []) {
             $this->components->warn('No media paths configured - skipping media archive generation.');
 
-            $placeholder = $backupPath.'/media.empty';
+            $placeholder = $backupPath . '/media.empty';
             File::put($placeholder, '');
 
             return $placeholder;
         }
 
-        $archivePath = $backupPath.'/media.tar.gz';
-        $command = sprintf('tar -czf %s', escapeshellarg($archivePath));
+        $archivePath = $backupPath . '/media.tar.gz';
+        $tarBinary = $this->binary('tar', 'tar');
+        $flags = $this->archiveFlags('create_flags', '-czf');
+        $command = sprintf('%s %s %s', escapeshellarg($tarBinary), $flags, escapeshellarg($archivePath));
 
         foreach ($mediaPaths as $path) {
             $command .= sprintf(' -C %s %s', escapeshellarg(dirname($path)), escapeshellarg(basename($path)));
@@ -332,7 +354,8 @@ final class BackupPrepareCommand extends Command
 
     private function resolveCommitHash(): ?string
     {
-        $process = Process::fromShellCommandline('git rev-parse HEAD', base_path());
+        $gitBinary = $this->binary('git', 'git');
+        $process = Process::fromShellCommandline(sprintf('%s rev-parse HEAD', escapeshellarg($gitBinary)), base_path());
         $process->run();
 
         if (! $process->isSuccessful()) {
@@ -340,6 +363,14 @@ final class BackupPrepareCommand extends Command
         }
 
         return trim($process->getOutput()) ?: null;
+    }
+
+    private function container(): Container
+    {
+        /** @var Container $container */
+        $container = $this->laravel;
+
+        return $container;
     }
 
     private function optionString(string $name, string $default): string
@@ -350,7 +381,7 @@ final class BackupPrepareCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $config
+     * @param array<string, mixed> $config
      */
     private function connectionValue(array $config, string $key, ?string $default = null): ?string
     {
@@ -369,5 +400,40 @@ final class BackupPrepareCommand extends Command
         }
 
         throw new RuntimeException(sprintf('Connection value for [%s] must be a scalar or null.', $key));
+    }
+
+    private function binary(string $key, string $default): string
+    {
+        $configured = config("backup.binaries.{$key}");
+
+        if (! is_string($configured) || $configured === '') {
+            return $default;
+        }
+
+        return $configured;
+    }
+
+    private function commandOptions(string $configKey, string $default): string
+    {
+        $options = config($configKey, $default);
+
+        if (! is_string($options)) {
+            return trim($default);
+        }
+
+        return trim($options);
+    }
+
+    private function archiveFlags(string $key, string $default): string
+    {
+        $flags = config("backup.archive.{$key}", $default);
+
+        if (! is_string($flags)) {
+            return $default;
+        }
+
+        $trimmed = trim($flags);
+
+        return $trimmed !== '' ? $trimmed : $default;
     }
 }

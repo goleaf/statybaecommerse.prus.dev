@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Data\ExportRequestData;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Models\Address;
+use App\Models\Channel;
 use App\Models\Order;
-use App\Services\Export\ExportColumn;
-use App\Services\Export\Exporters\OrderExport;
-use App\Services\Export\ExportService;
+use App\Models\Partner;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Search\AddressSearch;
+use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
+use App\Support\Search\PartnerSearch;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -24,9 +28,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -52,6 +53,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
@@ -298,18 +304,67 @@ final class OrderResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
+                            SearchableInput::make('billing_address_lookup')
+                                ->label(__('orders.lookups.billing_address'))
+                                ->placeholder(__('orders.lookups.address_placeholder'))
+                                ->searchUsing(fn (string $value): array => AddressSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if ($state === null) {
+                                        $set('billing_address', []);
+
+                                        return;
+                                    }
+
+                                    $address = Address::query()
+                                        ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+                                        ->find($state);
+
+                                    if (! $address instanceof Address) {
+                                        return;
+                                    }
+
+                                    $set('billing_address', AddressSearch::payload($address));
+                                })
+                                ->dehydrated(false),
+                            SearchableInput::make('shipping_address_lookup')
+                                ->label(__('orders.lookups.shipping_address'))
+                                ->placeholder(__('orders.lookups.address_placeholder'))
+                                ->searchUsing(fn (string $value): array => AddressSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if ($state === null) {
+                                        $set('shipping_address', []);
+
+                                        return;
+                                    }
+
+                                    $address = Address::query()
+                                        ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+                                        ->find($state);
+
+                                    if (! $address instanceof Address) {
+                                        return;
+                                    }
+
+                                    $set('shipping_address', AddressSearch::payload($address));
+                                })
+                                ->dehydrated(false),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
                             KeyValue::make('billing_address')
                                 ->label(__('orders.fields.billing_address'))
-                                ->keyLabel(__('orders.fields.order_number'))
-                                ->valueLabel(__('orders.fields.customer_name'))
+                                ->keyLabel(__('orders.lookups.address_field'))
+                                ->valueLabel(__('orders.lookups.address_value'))
                                 ->addActionLabel(__('orders.actions.create'))
-                                ->helperText(__('orders.fields.billing_address')),
+                                ->default([]),
                             KeyValue::make('shipping_address')
                                 ->label(__('orders.fields.shipping_address'))
-                                ->keyLabel(__('orders.fields.order_number'))
-                                ->valueLabel(__('orders.fields.customer_name'))
+                                ->keyLabel(__('orders.lookups.address_field'))
+                                ->valueLabel(__('orders.lookups.address_value'))
                                 ->addActionLabel(__('orders.actions.create'))
-                                ->helperText(__('orders.fields.shipping_address')),
+                                ->default([]),
                         ]),
                 ])
                 ->collapsible(),
@@ -319,9 +374,9 @@ final class OrderResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('shipped_at')
+                            Flatpickr::makeDateTime('shipped_at')
                                 ->label(__('orders.fields.shipped_at')),
-                            DateTimePicker::make('delivered_at')
+                            Flatpickr::makeDateTime('delivered_at')
                                 ->label(__('orders.fields.delivered_at')),
                         ]),
                     TextInput::make('tracking_number')
@@ -340,16 +395,60 @@ final class OrderResource extends Resource
                         ->helperText(__('orders.fields.internal_notes')),
                     Grid::make(3)
                         ->schema([
-                            Select::make('channel_id')
-                                ->label(__('orders.fields.customer'))
-                                ->relationship('channel', 'name')
-                                ->searchable()
-                                ->preload(),
-                            Select::make('partner_id')
-                                ->label(__('orders.fields.customer'))
-                                ->relationship('partner', 'name')
-                                ->searchable()
-                                ->preload(),
+                            SearchableInput::make('channel_id')
+                                ->label(__('orders.fields.channel'))
+                                ->placeholder(__('orders.lookups.channel_placeholder'))
+                                ->searchUsing(fn (string $value): array => ChannelSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    if ($state === null) {
+                                        return;
+                                    }
+
+                                    $channel = Channel::query()
+                                        ->select(['id', 'name', 'code', 'type'])
+                                        ->find($state);
+
+                                    if (! $channel instanceof Channel) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $channel->getKey() => ChannelSearch::label($channel),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    $set('channel_id', $state !== null && $state !== '' ? (int) $state : null);
+                                }),
+                            SearchableInput::make('partner_id')
+                                ->label(__('orders.fields.partner'))
+                                ->placeholder(__('orders.lookups.partner_placeholder'))
+                                ->searchUsing(fn (string $value): array => PartnerSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    if ($state === null) {
+                                        return;
+                                    }
+
+                                    $partner = Partner::query()
+                                        ->select(['id', 'name', 'code', 'contact_email'])
+                                        ->find($state);
+
+                                    if (! $partner instanceof Partner) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $partner->getKey() => PartnerSearch::label($partner),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    $set('partner_id', $state !== null && $state !== '' ? (int) $state : null);
+                                }),
                         ]),
                 ])
                 ->collapsible(),
@@ -394,8 +493,8 @@ final class OrderResource extends Resource
 
                                 return [
                                     'label' => __('Order (:locale)', ['locale' => strtoupper($locale)]),
-                                    'url' => $url,
-                                    'icon' => 'heroicon-o-arrow-top-right-on-square',
+                                    'url'   => $url,
+                                    'icon'  => 'heroicon-o-arrow-top-right-on-square',
                                     'color' => 'primary',
                                 ];
                             })
@@ -405,8 +504,8 @@ final class OrderResource extends Resource
                         if (Route::has('api.orders.show')) {
                             $items->push([
                                 'label' => __('Order API (:number)', ['number' => $record->number]),
-                                'url' => route('api.orders.show', ['order' => $record->number]),
-                                'icon' => 'heroicon-o-code-bracket',
+                                'url'   => route('api.orders.show', ['order' => $record->number]),
+                                'icon'  => 'heroicon-o-code-bracket',
                                 'color' => 'info',
                             ]);
                         }
@@ -540,25 +639,25 @@ final class OrderResource extends Resource
                     ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
-                        Forms\Components\DatePicker::make('created_from')
-                            ->label(__('orders.created_from')),
-                        Forms\Components\DatePicker::make('created_until')
-                            ->label(__('orders.created_until')),
+                        Flatpickr::makeRange('range')
+                            ->label(__('orders.created_at'))
+
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'] ?? null,
-                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'] ?? null,
-                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date),
-                            );
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
                 TrashedFilter::make(),
             ])
             ->filtersFormWidth(MaxWidth::Large)
+            ->headerActions([
+                ExportAction::make('export')
+                    ->label(__('Export'))
+                    ->exports(self::getExportPresets()),
+            ])
             ->actions([
                 ViewAction::make()
                     ->color('info')
@@ -647,48 +746,11 @@ final class OrderResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    BulkAction::make('export_selected')
+                    ExportBulkAction::make('export_selected')
                         ->label(__('Export selected'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
-                        ->form([
-                            Select::make('format')
-                                ->label(__('Format'))
-                                ->options([
-                                    'csv'  => 'CSV',
-                                    'xlsx' => 'XLSX',
-                                    'pdf'  => 'PDF',
-                                ])
-                                ->default('csv')
-                                ->required(),
-                            CheckboxList::make('columns')
-                                ->label(__('Columns'))
-                                ->options(fn () => collect(app(OrderExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
-                                ->default(fn () => app(OrderExport::class)->defaultColumns())
-                                ->columns(2)
-                                ->required(),
-                        ])
-                        ->action(function (Collection $records, array $data): void {
-                            /** @var ExportService $service */
-                            $service = app(ExportService::class);
-                            $columns = $data['columns'] ?? app(OrderExport::class)->defaultColumns();
-                            $request = new ExportRequestData(
-                                name: __('Orders Export'),
-                                exportable: OrderExport::class,
-                                format: $data['format'],
-                                columns: $columns,
-                                recordIds: $records->pluck('id')->all(),
-                                userId: auth()->id(),
-                            );
-
-                            $service->queue($request);
-
-                            Notification::make()
-                                ->title(__('Export queued'))
-                                ->body(__('You will receive a notification once the export has finished.'))
-                                ->success()
-                                ->send();
-                        })
+                        ->exports(self::getExportPresets())
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
                     DeleteBulkAction::make()
@@ -769,6 +831,70 @@ final class OrderResource extends Resource
             ->poll('30s')
             ->striped()
             ->paginated([10, 25, 50, 100]);
+    }
+
+    /**
+     * @return array<int, ExcelExport>
+     */
+    protected static function getExportPresets(): array
+    {
+        return [
+            ExcelExport::make('visible_orders')
+                ->label(__('orders.exports.visible_orders'))
+                ->fromTable()
+                ->queue()
+                ->withChunkSize(500),
+            ExcelExport::make('exportable_orders')
+                ->label(__('orders.exports.exportable_orders'))
+                ->fromTable()
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('exportable', true))
+                ->queue()
+                ->withColumns(self::getExportableOrderColumns()),
+        ];
+    }
+
+    /**
+     * Columns used for export presets.
+     *
+     * @return array<int, Column>
+     */
+    protected static function getExportableOrderColumns(): array
+    {
+        return [
+            Column::make('number')
+                ->heading(__('orders.fields.order_number')),
+            Column::make('customer_email')
+                ->heading(__('orders.fields.customer_email'))
+                ->getStateUsing(fn (Order $record): ?string => $record->user?->email),
+            Column::make('subtotal')
+                ->heading(__('orders.fields.subtotal'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->subtotal),
+            Column::make('tax_amount')
+                ->heading(__('orders.fields.tax_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->tax_amount),
+            Column::make('shipping_amount')
+                ->heading(__('orders.fields.shipping_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->shipping_amount),
+            Column::make('discount_amount')
+                ->heading(__('orders.fields.discount_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->discount_amount),
+            Column::make('total')
+                ->heading(__('orders.fields.total'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->total),
+            Column::make('status')
+                ->heading(__('orders.fields.status'))
+                ->getStateUsing(fn (Order $record): ?string => $record->status)
+                ->formatStateUsing(fn (?string $state): string => $state ? __("orders.status.{$state}") : ''),
+            Column::make('payment_status')
+                ->heading(__('orders.fields.payment_status'))
+                ->getStateUsing(fn (Order $record): ?string => $record->payment_status)
+                ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_status.{$state}") : ''),
+        ];
     }
 
     /**

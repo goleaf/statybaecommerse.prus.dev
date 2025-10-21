@@ -13,12 +13,17 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'items';
 
-    protected static ?string $title = 'Price List Items';
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('price_lists.relation_managers.items.title');
+    }
 
     public function form(Form $form): Form
     {
@@ -67,11 +72,11 @@ final class ItemsRelationManager extends BaseRelationManager
                     ->numeric()
                     ->minValue(1),
 
-                Forms\Components\DateTimePicker::make('valid_from')
+                Flatpickr::makeDateTime('valid_from')
                     ->label(__('price_list_items.valid_from'))
                     ->default(now()),
 
-                Forms\Components\DateTimePicker::make('valid_until')
+                Flatpickr::makeDateTime('valid_until')
                     ->label(__('price_list_items.valid_until'))
                     ->after('valid_from'),
 

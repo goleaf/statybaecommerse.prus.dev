@@ -11,7 +11,6 @@ use App\Models\Post;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -51,6 +50,7 @@ use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use RuntimeException;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * PostResource
@@ -186,7 +186,7 @@ final class PostResource extends Resource
                                     ->required()
                                     ->disableOptionWhen(fn (string $value): bool => $value === 'published')
                                     ->helperText(__('posts.status_managed_by_workflow')),
-                                DateTimePicker::make('published_at')
+                                Flatpickr::makeDateTime('published_at')
                                     ->label(__('posts.fields.published_at'))
                                     ->default(now()),
                             ]),
@@ -384,9 +384,9 @@ final class PostResource extends Resource
                     ->falseLabel(__('posts.filters.not_pinned')),
                 Filter::make('published_at')
                     ->form([
-                        DateTimePicker::make('published_from')
+                        Flatpickr::makeDateTime('published_from')
                             ->label(__('posts.filters.published_from')),
-                        DateTimePicker::make('published_until')
+                        Flatpickr::makeDateTime('published_until')
                             ->label(__('posts.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

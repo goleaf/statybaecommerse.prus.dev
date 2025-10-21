@@ -53,7 +53,30 @@ trait HasTranslations
             }
         }
 
-        return $this->{$field} ?? null;
+        return $this->getAttributes()[$field] ?? null;
+    }
+
+    public function getTranslation(string $field, ?string $locale = null, bool $useFallbackLocale = true): mixed
+    {
+        $locale ??= app()->getLocale();
+
+        $value = $this->translations()
+            ->where('locale', $locale)
+            ->value($field);
+
+        if ($value !== null) {
+            return $value;
+        }
+
+        if ($useFallbackLocale) {
+            $fallback = config('app.fallback_locale', 'en');
+
+            if ($fallback !== $locale) {
+                return $this->getTranslation($field, $fallback, false);
+            }
+        }
+
+        return $this->getAttributes()[$field] ?? null;
     }
 
     protected function translationModelClass(): string

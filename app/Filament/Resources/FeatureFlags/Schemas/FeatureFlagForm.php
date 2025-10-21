@@ -3,12 +3,12 @@
 namespace App\Filament\Resources\FeatureFlags\Schemas;
 
 use App\Models\FeatureFlag;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 class FeatureFlagForm
 {
@@ -32,14 +32,14 @@ class FeatureFlagForm
                 Textarea::make('rollout_percentage')
                     ->columnSpanFull(),
                 TextInput::make('environment'),
-                DateTimePicker::make('starts_at'),
-                DateTimePicker::make('ends_at'),
+                Flatpickr::makeDateTime('starts_at'),
+                Flatpickr::makeDateTime('ends_at'),
                 Toggle::make('is_enabled')
                     ->required(),
                 Toggle::make('is_global')
                     ->required(),
-                DateTimePicker::make('start_date'),
-                DateTimePicker::make('end_date'),
+                Flatpickr::makeDateTime('start_date'),
+                Flatpickr::makeDateTime('end_date'),
                 Textarea::make('metadata')
                     ->columnSpanFull(),
                 TextInput::make('priority'),
@@ -63,8 +63,8 @@ class FeatureFlagForm
                     ->content(fn (?FeatureFlag $record): string => $record === null ? '—' : ($record->updated_by_display ?? '—'))
                     ->visible(fn (?FeatureFlag $record): bool => $record !== null)
                     ->columnSpanFull(),
-                DateTimePicker::make('last_activated'),
-                DateTimePicker::make('last_deactivated'),
+                Flatpickr::makeDateTime('last_activated'),
+                Flatpickr::makeDateTime('last_deactivated'),
             ]);
     }
 }

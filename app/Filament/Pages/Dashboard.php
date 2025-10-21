@@ -12,6 +12,9 @@ class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
 
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';
@@ -35,6 +38,7 @@ class Dashboard extends BaseDashboard
             \App\Filament\Widgets\DashboardLowStockTable::class,
             \App\Filament\Widgets\DashboardRecentErrorsTable::class,
             \App\Filament\Widgets\DashboardQuickActionsWidget::class,
+            \App\Filament\Widgets\CalendarWidget::class,
         ];
     }
 

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationCaches\Schemas;
 
 use App\Models\RecommendationCache;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 final class RecommendationCacheForm
 {
@@ -58,7 +58,7 @@ final class RecommendationCacheForm
                             ->label(__('admin.recommendation_caches.recommendations'))
                             ->columnSpanFull()
                             ->default([]),
-                        DateTimePicker::make('expires_at')
+                        Flatpickr::makeDateTime('expires_at')
                             ->label(__('admin.recommendation_caches.expires_at'))
                             ->required()
                             ->seconds(false)

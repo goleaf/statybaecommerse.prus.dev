@@ -88,8 +88,10 @@ final class ActivityLogResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(ListActivityLogs::class)
             ->filterTable('created_at', [
-                'created_from' => now()->subDays(5)->format('Y-m-d'),
-                'created_until' => now()->format('Y-m-d'),
+                'range' => [
+                    'start' => now()->subDays(5)->format('Y-m-d'),
+                    'end' => now()->format('Y-m-d'),
+                ],
             ])
             ->assertCanSeeTableRecords([$recentLog])
             ->assertCanNotSeeTableRecords([$oldLog]);

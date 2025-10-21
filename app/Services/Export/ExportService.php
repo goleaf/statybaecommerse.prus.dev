@@ -15,6 +15,7 @@ use App\Services\Export\Contracts\ExportWriter;
 use App\Services\Export\Writers\CsvExportWriter;
 use App\Services\Export\Writers\PdfExportWriter;
 use App\Services\Export\Writers\XlsxExportWriter;
+use App\Support\Exports\ExportUrlGenerator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -22,7 +23,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -107,7 +107,10 @@ final class ExportService
             ])->save();
 
             if ($export->requestedBy) {
-                $export->requestedBy->notify(new ExportReadyNotification($export, $this->downloadUrl($export)));
+                $export->requestedBy->notify(new ExportReadyNotification(
+                    $export,
+                    ExportUrlGenerator::temporarySignedDownloadUrl($export),
+                ));
             }
         } catch (Throwable $exception) {
             Log::error('Export failed', [
@@ -129,15 +132,6 @@ final class ExportService
                 Storage::disk($export->artifact_disk ?? $this->disk)->delete($path);
             }
         }
-    }
-
-    public function downloadUrl(Export $export, ?int $minutes = null): string
-    {
-        $expires = now()->addMinutes($minutes ?? 60);
-
-        return URL::temporarySignedRoute('exports.signed-download', $expires, [
-            'export' => $export,
-        ]);
     }
 
     /**

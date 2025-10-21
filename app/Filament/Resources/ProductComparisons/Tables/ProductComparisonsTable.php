@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductComparisons\Tables;
 
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -12,6 +13,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use App\Support\Filament\Components\Flatpickr;
 
 class ProductComparisonsTable
 {
@@ -51,16 +54,17 @@ class ProductComparisonsTable
                     ->relationship('product', 'name'),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')
-                            ->label(__('product_comparisons.created_from')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')
-                            ->label(__('product_comparisons.created_until')),
+                        Flatpickr::makeRange('range')
+                            ->label(__('product_comparisons.created_at'))
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function ($query, array $data) {
-                        return $query
-                            ->when($data['created_from'] ?? null, fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'] ?? null, fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
             ])
             ->actions([
                 ViewAction::make(),

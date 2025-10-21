@@ -8,12 +8,15 @@ use App\Data\SearchQueryData;
 use App\Services\SearchService;
 use BackedEnum;
 use Filament\Pages\Page;
-use UnitEnum;
+
 final class SearchExplorer extends Page
 {
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Search';
     }

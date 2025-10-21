@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -14,7 +15,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -31,11 +31,10 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class ReferralStatisticsResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Referral';
     }
@@ -81,7 +80,7 @@ final class ReferralStatisticsResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        DatePicker::make('date')
+                        Flatpickr::makeDate('date')
                             ->label(__('referral_statistics.fields.date'))
                             ->required()
                             ->default(now()),
@@ -215,9 +214,9 @@ final class ReferralStatisticsResource extends Resource
                 Filter::make('date_range')
                     ->label(__('referral_statistics.filters.date_range'))
                     ->form([
-                        DatePicker::make('from')
+                        Flatpickr::makeDate('from')
                             ->label(__('referral_statistics.filters.from_date')),
-                        DatePicker::make('until')
+                        Flatpickr::makeDate('until')
                             ->label(__('referral_statistics.filters.until_date')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -358,10 +357,10 @@ final class ReferralStatisticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralStatistics::route('/'),
+            'index'  => Pages\ListReferralStatistics::route('/'),
             'create' => Pages\CreateReferralStatistics::route('/create'),
-            'view' => Pages\ViewReferralStatistics::route('/{record}'),
-            'edit' => Pages\EditReferralStatistics::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralStatistics::route('/{record}'),
+            'edit'   => Pages\EditReferralStatistics::route('/{record}/edit'),
         ];
     }
 

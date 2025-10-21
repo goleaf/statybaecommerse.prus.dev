@@ -55,6 +55,9 @@ return [
     'variant' => 'Variant',
     'variant_name' => 'Variant Name',
     'location' => 'Location',
+    'locations' => [
+        'unknown' => 'Unknown location',
+    ],
     'current_stock' => 'Current Stock',
 
     // New fields for StockResource

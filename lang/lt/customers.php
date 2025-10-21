@@ -6,6 +6,12 @@ return [
     'title'  => 'Klientai',
     'plural' => 'Klientai',
     'single' => 'Klientas',
+    'orders' => 'Užsakymai',
+    'order_number_label' => 'Užsakymas Nr. :number',
+    'order_placed_on' => 'Pateiktas :date',
+    'reviews' => 'Atsiliepimai',
+    'review_for_product' => 'Atsiliepimas apie :product',
+    'review_rating_tooltip' => 'Įvertinimas :rating/5 — :title',
 
     'basic_information'    => 'Pagrindinė informacija',
     'account_settings'     => 'Paskyros nustatymai',

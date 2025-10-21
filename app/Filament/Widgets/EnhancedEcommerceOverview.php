@@ -11,10 +11,14 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Carbon;
 use UnitEnum;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     protected static $navigationLabel = 'Enh. E-commerce Overview';
@@ -31,10 +35,10 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
 
         return [
             Stat::make($translations['total_revenue'], $this->getTotalRevenue())->description(
-                $translations['change_since_last_month'].': '.$this->formatDelta($this->getRevenueDelta())
+                $translations['change_since_last_month'] . ': ' . $this->formatDelta($this->getRevenueDelta())
             ),
             Stat::make($translations['total_orders'], $this->getTotalOrders())->description(
-                $translations['change_since_last_month'].': '.$this->formatDelta($this->getOrderDelta())
+                $translations['change_since_last_month'] . ': ' . $this->formatDelta($this->getOrderDelta())
             ),
             Stat::make($translations['total_customers'], $this->getTotalCustomers()),
             Stat::make($translations['average_order_value'], $this->getAverageOrderValue()),
@@ -82,19 +86,22 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     {
         $average = (float) Review::query()->avg('rating');
 
-        return number_format($average, 1).'/5';
+        return number_format($average, 1) . '/5';
     }
 
     private function getRevenueDelta(): float
     {
+        $now = Carbon::now();
+        $previousMonth = $now->copy()->subMonth();
+
         $current = Order::query()
             ->where('status', '!=', 'cancelled')
-            ->whereBetween('created_at', [now()->startOfMonth(), now()])
+            ->createdBetween($now->copy()->startOfMonth(), $now)
             ->sum('total');
 
         $previous = Order::query()
             ->where('status', '!=', 'cancelled')
-            ->whereBetween('created_at', [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()])
+            ->createdBetween($previousMonth->copy()->startOfMonth(), $previousMonth->copy()->endOfMonth())
             ->sum('total');
 
         return $this->calculateDelta($current, $previous);
@@ -102,10 +109,13 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
 
     private function getOrderDelta(): float
     {
-        $current = Order::query()->whereBetween('created_at', [now()->startOfMonth(), now()])->count();
+        $now = Carbon::now();
+        $previousMonth = $now->copy()->subMonth();
+
+        $current = Order::query()->createdBetween($now->copy()->startOfMonth(), $now)->count();
 
         $previous = Order::query()
-            ->whereBetween('created_at', [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()])
+            ->createdBetween($previousMonth->copy()->startOfMonth(), $previousMonth->copy()->endOfMonth())
             ->count();
 
         return $this->calculateDelta($current, $previous);

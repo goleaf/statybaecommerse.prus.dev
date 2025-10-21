@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard\Actions\FilterAction;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -37,6 +37,9 @@ final class SliderAnalytics extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Slider Analytics';
 
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
@@ -52,12 +55,12 @@ final class SliderAnalytics extends BaseDashboard
                 ->label('Filter Analytics')
                 ->icon('heroicon-o-funnel')
                 ->components([
-                    DatePicker::make('startDate')
+                    Flatpickr::makeDate('startDate')
                         ->label('Start Date')
                         ->default(now()->subDays(30))
                         ->displayFormat('Y-m-d')
                         ->helperText('Select the start date for analytics'),
-                    DatePicker::make('endDate')
+                    Flatpickr::makeDate('endDate')
                         ->label('End Date')
                         ->default(now())
                         ->displayFormat('Y-m-d')

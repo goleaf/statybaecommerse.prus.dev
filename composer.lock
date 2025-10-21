@@ -5,6 +5,7 @@
         "This file is @generated automatically"
     ],
     "content-hash": "aab0400c32da7b00b861e3fda7a047d9",
+    "content-hash": "878ed00a8e22608486d5f7ea2826346d",
     "packages": [
         {
             "name": "andreia/filament-nord-theme",
@@ -151,6 +152,53 @@
                 "source": "https://github.com/AnourValar/eloquent-serialize/tree/1.3.4"
             },
             "time": "2025-07-30T15:45:57+00:00"
+        },
+        {
+            "name": "asmit/resized-column",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/AsmitNepali/resized-column.git",
+                "reference": "a40a270cf77a7a2048051dbeb7b7168b17b58b49"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/AsmitNepali/resized-column/zipball/a40a270cf77a7a2048051dbeb7b7168b17b58b49",
+                "reference": "a40a270cf77a7a2048051dbeb7b7168b17b58b49",
+                "shasum": ""
+            },
+            "require": {
+                "filament/support": "^3.2|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Asmit\\ResizedColumn\\ResizedColumnServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Asmit\\ResizedColumn\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "AsmitNepali",
+                    "email": "mail2asmitnepali@gmail.com"
+                }
+            ],
+            "description": "Resizeable column for filament",
+            "support": {
+                "issues": "https://github.com/AsmitNepali/resized-column/issues",
+                "source": "https://github.com/AsmitNepali/resized-column/tree/v1.1.0"
+            },
+            "time": "2025-08-13T14:21:50+00:00"
         },
         {
             "name": "awcodes/overlook",
@@ -1534,6 +1582,82 @@
                 }
             ],
             "time": "2024-05-06T16:37:16+00:00"
+        },
+        {
+            "name": "coolsam/flatpickr",
+            "version": "v5.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coolsam726/flatpickr.git",
+                "reference": "9606656c9c657a68f4308a62555a0c6f6be1c788"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coolsam726/flatpickr/zipball/9606656c9c657a68f4308a62555a0c6f6be1c788",
+                "reference": "9606656c9c657a68f4308a62555a0c6f6be1c788",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "barryvdh/laravel-ide-helper": "^3.5",
+                "laravel/pint": "^1.0",
+                "nunomaduro/larastan": "^3.1.0",
+                "orchestra/testbench": "^9.12",
+                "pestphp/pest-plugin-laravel": "^3.1",
+                "pestphp/pest-plugin-livewire": "^3.0",
+                "phpstan/extension-installer": "^1.4.3",
+                "spatie/laravel-ray": "^1.39"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Flatpickr": "FilamentFlatpickr"
+                    },
+                    "providers": [
+                        "Coolsam\\Flatpickr\\FlatpickrServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Coolsam\\Flatpickr\\": "src/",
+                    "Coolsam\\Flatpickr\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sam Maosa",
+                    "email": "maosa.sam@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Flatpickr input for Filamentphp",
+            "homepage": "https://github.com/coolsam/flatpickr",
+            "keywords": [
+                "coolsam",
+                "flatpickr",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/coolsam/flatpickr/issues",
+                "source": "https://github.com/coolsam/flatpickr"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/coolsam",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-28T02:48:54+00:00"
         },
         {
             "name": "danharrin/date-format-converter",
@@ -4814,6 +4938,91 @@
                 }
             ],
             "time": "2025-06-11T19:19:30+00:00"
+        },
+        {
+            "name": "lara-zeus/matrix-choice",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lara-zeus/matrix-choice.git",
+                "reference": "f202c129f86744739ce748f84d7f4ec2a3ed8036"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lara-zeus/matrix-choice/zipball/f202c129f86744739ce748f84d7f4ec2a3ed8036",
+                "reference": "f202c129f86744739ce748f84d7f4ec2a3ed8036",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.2",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.0",
+                "orchestra/testbench": "^8.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaraZeus\\MatrixChoice\\MatrixChoiceServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaraZeus\\MatrixChoice\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lara Zeus (Ash)",
+                    "email": "info@larazeus.com"
+                }
+            ],
+            "description": "Zeus Matrix Choice multiple choice grid component form for filamentPHP",
+            "homepage": "https://larazeus.com/matrix-choice",
+            "keywords": [
+                "Forms",
+                "builder",
+                "choice",
+                "feilds",
+                "filamentphp",
+                "form",
+                "generator",
+                "grid",
+                "lara-zeus",
+                "laravel",
+                "maker",
+                "matrix",
+                "self hosted"
+            ],
+            "support": {
+                "issues": "https://github.com/lara-zeus/matrix-choice/issues",
+                "source": "https://github.com/lara-zeus/matrix-choice"
+            },
+            "funding": [
+                {
+                    "url": "https://www.buymeacoffee.com/larazeus",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/atmonshi",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-06-11T19:20:42+00:00"
         },
         {
             "name": "lara-zeus/spatie-translatable",
@@ -14206,82 +14415,6 @@
             "time": "2025-09-11T10:12:26+00:00"
         },
         {
-            "name": "symfony/yaml",
-            "version": "v7.3.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "d4f4a66866fe2451f61296924767280ab5732d9d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/d4f4a66866fe2451f61296924767280ab5732d9d",
-                "reference": "d4f4a66866fe2451f61296924767280ab5732d9d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2",
-                "symfony/deprecation-contracts": "^2.5|^3.0",
-                "symfony/polyfill-ctype": "^1.8"
-            },
-            "conflict": {
-                "symfony/console": "<6.4"
-            },
-            "require-dev": {
-                "symfony/console": "^6.4|^7.0"
-            },
-            "bin": [
-                "Resources/bin/yaml-lint"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Loads and dumps YAML files",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/yaml/tree/v7.3.3"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-08-27T11:34:33+00:00"
-        },
-        {
             "name": "tapp/filament-value-range-filter",
             "version": "v2.0.3",
             "source": {
@@ -14703,87 +14836,6 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.12.0"
             },
             "time": "2025-10-20T12:43:39+00:00"
-        },
-        {
-            "name": "zircote/swagger-php",
-            "version": "4.11.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "7df10e8ec47db07c031db317a25bef962b4e5de1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/7df10e8ec47db07c031db317a25bef962b4e5de1",
-                "reference": "7df10e8ec47db07c031db317a25bef962b4e5de1",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "php": ">=7.2",
-                "psr/log": "^1.1 || ^2.0 || ^3.0",
-                "symfony/deprecation-contracts": "^2 || ^3",
-                "symfony/finder": ">=2.2",
-                "symfony/yaml": ">=3.3"
-            },
-            "require-dev": {
-                "composer/package-versions-deprecated": "^1.11",
-                "doctrine/annotations": "^1.7 || ^2.0",
-                "friendsofphp/php-cs-fixer": "^2.17 || 3.62.0",
-                "phpstan/phpstan": "^1.6",
-                "phpunit/phpunit": ">=8",
-                "vimeo/psalm": "^4.23"
-            },
-            "suggest": {
-                "doctrine/annotations": "^1.7 || ^2.0"
-            },
-            "bin": [
-                "bin/openapi"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "OpenApi\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Robert Allen",
-                    "email": "zircote@gmail.com"
-                },
-                {
-                    "name": "Bob Fanger",
-                    "email": "bfanger@gmail.com",
-                    "homepage": "https://bfanger.nl"
-                },
-                {
-                    "name": "Martin Rademacher",
-                    "email": "mano@radebatz.net",
-                    "homepage": "https://radebatz.net"
-                }
-            ],
-            "description": "swagger-php - Generate interactive documentation for your RESTful API using phpdoc annotations",
-            "homepage": "https://github.com/zircote/swagger-php/",
-            "keywords": [
-                "api",
-                "json",
-                "rest",
-                "service discovery"
-            ],
-            "support": {
-                "issues": "https://github.com/zircote/swagger-php/issues",
-                "source": "https://github.com/zircote/swagger-php/tree/4.11.1"
-            },
-            "time": "2024-10-15T19:20:02+00:00"
         },
         {
             "name": "zvizvi/relation-manager-repeater",
@@ -18606,6 +18658,82 @@
             "time": "2024-10-20T05:08:20+00:00"
         },
         {
+            "name": "symfony/yaml",
+            "version": "v7.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "d4f4a66866fe2451f61296924767280ab5732d9d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/d4f4a66866fe2451f61296924767280ab5732d9d",
+                "reference": "d4f4a66866fe2451f61296924767280ab5732d9d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "symfony/deprecation-contracts": "^2.5|^3.0",
+                "symfony/polyfill-ctype": "^1.8"
+            },
+            "conflict": {
+                "symfony/console": "<6.4"
+            },
+            "require-dev": {
+                "symfony/console": "^6.4|^7.0"
+            },
+            "bin": [
+                "Resources/bin/yaml-lint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Loads and dumps YAML files",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/yaml/tree/v7.3.3"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2025-08-27T11:34:33+00:00"
+        },
+        {
             "name": "ta-tikoma/phpunit-architecture-test",
             "version": "0.8.5",
             "source": {
@@ -18713,6 +18841,87 @@
                 }
             ],
             "time": "2024-03-03T12:36:25+00:00"
+        },
+        {
+            "name": "zircote/swagger-php",
+            "version": "4.11.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zircote/swagger-php.git",
+                "reference": "7df10e8ec47db07c031db317a25bef962b4e5de1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/7df10e8ec47db07c031db317a25bef962b4e5de1",
+                "reference": "7df10e8ec47db07c031db317a25bef962b4e5de1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.2",
+                "psr/log": "^1.1 || ^2.0 || ^3.0",
+                "symfony/deprecation-contracts": "^2 || ^3",
+                "symfony/finder": ">=2.2",
+                "symfony/yaml": ">=3.3"
+            },
+            "require-dev": {
+                "composer/package-versions-deprecated": "^1.11",
+                "doctrine/annotations": "^1.7 || ^2.0",
+                "friendsofphp/php-cs-fixer": "^2.17 || 3.62.0",
+                "phpstan/phpstan": "^1.6",
+                "phpunit/phpunit": ">=8",
+                "vimeo/psalm": "^4.23"
+            },
+            "suggest": {
+                "doctrine/annotations": "^1.7 || ^2.0"
+            },
+            "bin": [
+                "bin/openapi"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OpenApi\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Robert Allen",
+                    "email": "zircote@gmail.com"
+                },
+                {
+                    "name": "Bob Fanger",
+                    "email": "bfanger@gmail.com",
+                    "homepage": "https://bfanger.nl"
+                },
+                {
+                    "name": "Martin Rademacher",
+                    "email": "mano@radebatz.net",
+                    "homepage": "https://radebatz.net"
+                }
+            ],
+            "description": "swagger-php - Generate interactive documentation for your RESTful API using phpdoc annotations",
+            "homepage": "https://github.com/zircote/swagger-php/",
+            "keywords": [
+                "api",
+                "json",
+                "rest",
+                "service discovery"
+            ],
+            "support": {
+                "issues": "https://github.com/zircote/swagger-php/issues",
+                "source": "https://github.com/zircote/swagger-php/tree/4.11.1"
+            },
+            "time": "2024-10-15T19:20:02+00:00"
         }
     ],
     "aliases": [],

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\ExportReadyNotification;
 use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;
+use App\Support\Exports\ExportUrlGenerator;
 use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
@@ -77,7 +78,7 @@ test('it returns signed download responses', function (): void {
     (new ProcessExportJob($export->getKey()))->handle($service);
     $export->refresh();
 
-    $url = $service->downloadUrl($export, 5);
+    $url = ExportUrlGenerator::temporarySignedDownloadUrl($export, 5);
 
     $response = $this->get($url);
 

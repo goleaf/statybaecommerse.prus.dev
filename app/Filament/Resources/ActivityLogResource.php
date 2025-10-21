@@ -10,11 +10,14 @@ use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ActivityLogResource extends Resource
 {
@@ -109,14 +112,17 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')->label(__('From')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')->label(__('Until')),
+                        Flatpickr::makeRange('range')
+                            ->label(__('Created At'))
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function ($query, array $data) {
-                        return $query
-                            ->when($data['created_from'] ?? null, fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'] ?? null, fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
             ])
             ->actions([
                 Action::make('view_details')

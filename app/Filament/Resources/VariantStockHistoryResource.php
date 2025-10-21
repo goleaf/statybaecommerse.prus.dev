@@ -6,7 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
-use Filament\Forms\Components\DatePicker;
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -23,7 +23,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class VariantStockHistoryResource extends Resource
 {
@@ -219,22 +221,17 @@ final class VariantStockHistoryResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.variant_stock_histories.filters.created_at'))
                     ->form([
-                        DatePicker::make('created_from')
-                            ->label(__('admin.variant_stock_histories.filters.created_from')),
-                        DatePicker::make('created_until')
-                            ->label(__('admin.variant_stock_histories.filters.created_until')),
+                        Flatpickr::makeRange('range')
+                            ->label(__('admin.variant_stock_histories.filters.created_at'))
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function ($query, array $data) {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn ($query, $date) => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn ($query, $date) => $query->whereDate('created_at', '<=', $date),
-                            );
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
             ])
             ->actions([
                 ViewAction::make(),

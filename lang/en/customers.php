@@ -6,6 +6,12 @@ return [
     'title'  => 'Customers',
     'plural' => 'Customers',
     'single' => 'Customer',
+    'orders' => 'Orders',
+    'order_number_label' => 'Order #:number',
+    'order_placed_on' => 'Placed on :date',
+    'reviews' => 'Reviews',
+    'review_for_product' => 'Review for :product',
+    'review_rating_tooltip' => 'Rated :rating/5 — :title',
 
     'basic_information'    => 'Basic Information',
     'account_settings'     => 'Account Settings',

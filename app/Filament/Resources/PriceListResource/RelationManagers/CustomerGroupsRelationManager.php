@@ -9,12 +9,16 @@ use Filament\Actions\DetachAction;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 final class CustomerGroupsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'customerGroups';
 
-    protected static ?string $title = 'Customer Groups';
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('price_lists.relation_managers.customer_groups.title');
+    }
 
     public function table(Table $table): Table
     {
