@@ -66,8 +66,10 @@ it('can filter orders by date range', function () {
 
     livewire(AnalyticsResource\Pages\AnalyticsDashboard::class)
         ->filterTable('created_at', [
-            'created_from' => now()->subDays(10)->format('Y-m-d'),
-            'created_until' => now()->format('Y-m-d'),
+            'range' => [
+                'start' => now()->subDays(10)->format('Y-m-d'),
+                'end' => now()->format('Y-m-d'),
+            ],
         ])
         ->assertCanSeeTableRecords([$recentOrder])
         ->assertCanNotSeeTableRecords([$oldOrder]);
