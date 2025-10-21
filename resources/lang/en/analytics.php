@@ -86,6 +86,7 @@ return [
     'data_refreshed_successfully' => 'Data refreshed successfully',
     'enhanced_overview' => [
         'title' => 'Enhanced E-commerce Overview',
+        'navigation_label' => 'Enhanced E-commerce Overview',
         'total_revenue' => 'Total Revenue',
         'total_orders' => 'Total Orders',
         'total_customers' => 'Total Customers',

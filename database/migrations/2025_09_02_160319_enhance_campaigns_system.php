@@ -185,12 +185,25 @@ return new class extends Migration
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
                 $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
                 $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+                $table->foreignId('brand_id')->nullable()->constrained('brands')->nullOnDelete();
+                $table->foreignId('collection_id')->nullable()->constrained('collections')->nullOnDelete();
                 $table->string('target_type');  // product, category, brand, collection
+                $table->unsignedSmallInteger('priority')->default(0);
+                $table->unsignedSmallInteger('weight')->default(0);
+                $table->unsignedInteger('sort_order')->default(0);
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_featured')->default(false);
+                $table->json('conditions')->nullable();
+                $table->text('notes')->nullable();
                 $table->timestamps();
 
                 $table->index(['campaign_id', 'target_type']);
+                $table->index(['is_active', 'is_featured']);
+                $table->index(['priority', 'weight']);
                 $table->unique(['campaign_id', 'product_id']);
                 $table->unique(['campaign_id', 'category_id']);
+                $table->unique(['campaign_id', 'brand_id']);
+                $table->unique(['campaign_id', 'collection_id']);
             });
         }
 

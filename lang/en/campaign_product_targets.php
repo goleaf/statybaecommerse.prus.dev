@@ -4,8 +4,16 @@ return [
     'single' => 'Campaign Product Target',
     'plural' => 'Campaign Product Targets',
     'navigation' => 'Product Targets',
+    'tab_label' => 'Tabs',
+    'tabs' => [
+        'all' => 'All Targets',
+        'product' => 'Product Targets',
+        'category' => 'Category Targets',
+        'brand' => 'Brand Targets',
+        'collection' => 'Collection Targets',
+        'active' => 'Active Targets',
+    ],
     // Form fields
-    'tabs' => 'Tabs',
     'basic_information' => 'Basic Information',
     'advanced_settings' => 'Advanced Settings',
     'campaign_selection' => 'Campaign Selection',
@@ -26,8 +34,12 @@ return [
     'conditions' => 'Conditions',
     'conditions_description' => 'Additional conditions and rules',
     'conditions_help' => 'Additional conditions in JSON format',
+    'conditions_key' => 'Condition Key',
+    'conditions_value' => 'Condition Value',
+    'no_conditions' => 'No conditions configured',
     'notes' => 'Notes',
     'notes_help' => 'Additional notes about the target',
+    'no_notes' => 'No notes provided',
     // Target types
     'types' => [
         'product' => 'Product',
@@ -43,7 +55,7 @@ return [
     // Table columns
     'id' => 'ID',
     'target_name' => 'Target Name',
-    'target_sku' => 'Target SKU',
+    'target_sku' => 'Target Identifier',
     'campaign_status' => 'Campaign Status',
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
@@ -66,6 +78,7 @@ return [
     'deactivate' => 'Deactivate',
     'feature' => 'Feature',
     'unfeature' => 'Unfeature',
+    'delete_bulk' => 'Delete Selected',
     // Search
     'search_placeholder' => 'Search by campaign, product, category...',
     // Messages
@@ -76,4 +89,11 @@ return [
     'deactivated_successfully' => 'Target deactivated successfully',
     'featured_successfully' => 'Target featured successfully',
     'unfeatured_successfully' => 'Target unfeatured successfully',
+    // View page sections
+    'view' => [
+        'sections' => [
+            'overview' => 'Target Overview',
+            'status' => 'Status & Ranking',
+        ],
+    ],
 ];

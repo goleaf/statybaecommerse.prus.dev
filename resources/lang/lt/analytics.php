@@ -86,6 +86,7 @@ return [
     'data_refreshed_successfully' => 'Duomenys sėkmingai atnaujinti',
     'enhanced_overview' => [
         'title' => 'Išplėstinė el. prekybos apžvalga',
+        'navigation_label' => 'Išplėstinė el. prekybos apžvalga',
         'total_revenue' => 'Visos pajamos',
         'total_orders' => 'Visi užsakymai',
         'total_customers' => 'Visi klientai',
