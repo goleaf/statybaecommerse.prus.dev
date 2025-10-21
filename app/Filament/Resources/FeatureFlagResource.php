@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -63,6 +65,18 @@ final class FeatureFlagResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('feature_flags.plural');
+    }
+
+    /**
+     * Extend the base query to include inactive or disabled feature flags for administrative visibility.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        // Removing the active/enabled scopes ensures administrators can review every feature flag status.
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
     }
 
     /**
