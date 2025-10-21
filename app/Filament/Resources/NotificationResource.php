@@ -11,8 +11,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -34,6 +32,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class NotificationResource extends Resource
 {
@@ -97,7 +96,7 @@ final class NotificationResource extends Resource
                                 ->label(__('admin.notifications.form.fields.is_read'))
                                 ->default(false)
                                 ->columnSpan(1),
-                            DateTimePicker::make('read_at')
+                            Flatpickr::makeDateTime('read_at')
                                 ->label(__('admin.notifications.form.fields.read_at'))
                                 ->columnSpan(1),
                         ]),

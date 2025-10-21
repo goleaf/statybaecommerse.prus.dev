@@ -12,8 +12,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -32,6 +30,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignResource extends Resource
 {
@@ -110,10 +109,10 @@ final class CampaignResource extends Resource
                 ->schema([
                     SchemaGrid::make(2)
                         ->schema([
-                            DateTimePicker::make('starts_at')
+                            Flatpickr::makeDateTime('starts_at')
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
                                 ->seconds(false),
-                            DateTimePicker::make('ends_at')
+                            Flatpickr::makeDateTime('ends_at')
                                 ->label(self::label('campaigns.fields.end_date', 'End date'))
                                 ->seconds(false),
                             TextInput::make('max_uses')
@@ -299,9 +298,9 @@ final class CampaignResource extends Resource
                     ->relationship('channel', 'name'),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
+                        Flatpickr::makeRange('range')
                             ->label(self::label('campaigns.fields.created_at', 'Created at'))
-                            ->rangePicker()
+                            
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

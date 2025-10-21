@@ -11,12 +11,12 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class AnalyticsResource extends Resource
 {
@@ -90,9 +90,9 @@ final class AnalyticsResource extends Resource
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
+                        Flatpickr::makeRange('range')
                             ->label(__('analytics.from_date'))
-                            ->rangePicker()
+                            
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

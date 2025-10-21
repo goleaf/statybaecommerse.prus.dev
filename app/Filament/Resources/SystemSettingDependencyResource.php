@@ -14,7 +14,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -35,6 +34,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class SystemSettingDependencyResource extends Resource
 {
@@ -102,7 +102,7 @@ final class SystemSettingDependencyResource extends Resource
                                 ->label(__('admin.system_setting_dependencies.is_active'))
                                 ->default(true)
                                 ->helperText(__('admin.system_setting_dependencies.is_active_help')),
-                            DateTimePicker::make('created_at')
+                            Flatpickr::makeDateTime('created_at')
                                 ->label(__('admin.common.created_at'))
                                 ->disabled()
                                 ->dehydrated(false)
@@ -208,9 +208,9 @@ final class SystemSettingDependencyResource extends Resource
                     ->label(__('admin.system_setting_dependencies.is_active')),
                 Filter::make('created_at')
                     ->form([
-                        DateTimePicker::make('created_from')
+                        Flatpickr::makeDateTime('created_from')
                             ->label(__('admin.common.created_from')),
-                        DateTimePicker::make('created_until')
+                        Flatpickr::makeDateTime('created_until')
                             ->label(__('admin.common.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -226,9 +226,9 @@ final class SystemSettingDependencyResource extends Resource
                     }),
                 Filter::make('updated_at')
                     ->form([
-                        DateTimePicker::make('updated_from')
+                        Flatpickr::makeDateTime('updated_from')
                             ->label(__('admin.common.updated_from')),
-                        DateTimePicker::make('updated_until')
+                        Flatpickr::makeDateTime('updated_until')
                             ->label(__('admin.common.updated_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

@@ -19,7 +19,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -34,6 +33,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use App\Support\Filament\Components\Flatpickr;
 
 final class LocationResource extends Resource
 {
@@ -205,10 +205,10 @@ final class LocationResource extends Resource
                             Toggle::make('is_closed')
                                 ->label(__('locations.fields.is_closed'))
                                 ->live(),
-                            TimePicker::make('open_time')
+                            Flatpickr::makeTime('open_time')
                                 ->label(__('locations.fields.open_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
-                            TimePicker::make('close_time')
+                            Flatpickr::makeTime('close_time')
                                 ->label(__('locations.fields.close_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
                         ])
