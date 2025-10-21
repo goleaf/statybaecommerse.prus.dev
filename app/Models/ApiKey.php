@@ -116,7 +116,7 @@ final class ApiKey extends Model
      */
     public function hasScope(string $scope): bool
     {
-        $scopes = $this->scopes ?? [];
+        $scopes = $this->resolvedScopes();
 
         if ($scope === '*') {
             return true;
@@ -136,13 +136,27 @@ final class ApiKey extends Model
             return true;
         }
 
-        $assignedScopes = $this->scopes ?? [];
+        $assignedScopes = $this->resolvedScopes();
 
         if (in_array('*', $assignedScopes, true)) {
             return true;
         }
 
         return array_intersect($assignedScopes, $scopes) !== [];
+    }
+
+    /**
+     * Retrieve the sanitised scopes assigned to the API key.
+     *
+     * @return array<int, string>
+     */
+    public function resolvedScopes(): array
+    {
+        return Collection::make(Arr::wrap($this->scopes))
+            ->filter(static fn ($scope): bool => is_string($scope) && $scope !== '')
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
