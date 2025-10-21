@@ -38,7 +38,7 @@ class DiscountRedemptionStatsWidget extends BaseWidget
                 ->description('Successfully redeemed')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make('Total Amount Saved', '€'.number_format($totalAmountSaved, 2))
+            Stat::make('Total Amount Saved', '€' . number_format($totalAmountSaved, 2))
                 ->description('Customer savings')
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),
@@ -46,14 +46,14 @@ class DiscountRedemptionStatsWidget extends BaseWidget
                 ->description('Last 7 days')
                 ->descriptionIcon('heroicon-m-calendar')
                 ->color('info'),
-            Stat::make('Average Amount', '€'.number_format($averageAmountSaved, 2))
+            Stat::make('Average Amount', '€' . number_format($averageAmountSaved, 2))
                 ->description('Per redemption')
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
         ];
     }
 
-    protected function getColumns(): int
+    protected function getColumns(): int|array|null
     {
         return 3;
     }
