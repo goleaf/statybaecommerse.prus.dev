@@ -1,6 +1,6 @@
 # Searchable input helper usage
 
-The `App\\Support\\Filament\\SearchableComponentHelper` centralises the repetitive wiring required to keep [DefStudio's `SearchableInput`](https://github.com/defstudio/filament-searchable-input) fields hydrated with the correct state, options, and payload metadata inside our Filament forms. Use it whenever a Filament form component needs to look up a record, expose a human-readable label, and share structured payload data with sibling inputs.
+The `App\\Support\\Filament\\SearchableComponentHelper` centralises the repetitive wiring required to keep [DefStudio's `SearchableInput`](https://github.com/defstudio/filament-searchable-input) fields hydrated with the correct state, options, and payload metadata inside our Filament forms. The helper normalises every payload into the canonical `{ id, label, ... }` structure produced by the search services, ensuring Livewire, Alpine, and downstream automation share the same tuple. Use it whenever a Filament form component needs to look up a record, expose a human-readable label, and share structured payload data with sibling inputs.
 
 ## Hydrating a component
 
@@ -37,11 +37,48 @@ Hidden::make('user_lookup_payload')
    - `label`: the display text shown inside the dropdown.
    - `payload` (optional): any associative array that dependent fields can consume.
 
-The helper converts the `value` to a string, registers it as the component state, and feeds the label through `options()` alongside the payload so downstream closures all read the same structure. When the normaliser returns an `Arrayable` payload (for example, a DTO implementing `toArray()`), the helper coerces it into an array before handing it over to Livewire. Empty or falsy identifiers short-circuit into `clear()` so the UI cannot surface stale metadata.
+The helper converts the `value` to a string, registers it as the component state, and feeds the label through `options()` alongside the payload so downstream closures all read the same structure. When the normaliser returns an `Arrayable` payload (for example, a DTO implementing `toArray()`), the helper coerces it into an array before handing it over to Livewire. Empty or falsy identifiers short-circuit into `clear()` so the UI cannot surface stale metadata. Regardless of the original payload, the helper injects `id` and `label` keys so the stored metadata mirrors the search result DTOs.
+
+## Syncing a lookup selection
+
+When a user changes the lookup value, call `SearchableComponentHelper::syncSelectedRecord()` to persist the foreign key and keep cached payload metadata aligned with the UI.
+
+```php
+use App\Support\Filament\SearchableComponentHelper;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Set;
+
+SearchableInput::make('user_lookup')
+    ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+        SearchableComponentHelper::syncSelectedRecord(
+            $component,
+            $state,
+            $set,
+            'user_id',
+            static fn (string $identifier): ?User => User::query()->find((int) $identifier),
+            static fn (User $user): array => [
+                'value'   => $user->getKey(),
+                'label'   => sprintf('%s <%s>', $user->name, $user->email),
+                'payload' => [
+                    'email' => $user->email,
+                ],
+            ],
+            'user_lookup_payload',
+            ['id' => null, 'label' => '', 'email' => null],
+        );
+    });
+
+Hidden::make('user_lookup_payload')
+    ->default(['id' => null, 'label' => '', 'email' => null])
+    ->dehydrated(false);
+```
+
+The helper stores the identifier using an integer when possible, updates the component state/options/payload, and falls back to the provided empty payload when the lookup clears.
 
 ## Clearing a component
 
-When a lookup is wiped out (for example, in an `afterStateUpdated` hook that receives a blank value), call the `clear()` helper to reset the state, options, and payload. Optional callbacks let you synchronise related form fields at the same time.
+When a lookup is wiped out (for example, in an `afterStateUpdated` hook that receives a blank value), call the `clear()` helper to reset the state, options, and payload. Optional callbacks let you synchronise related form fields at the same time. `syncSelectedRecord()` already delegates to `clear()` when the lookup fails, so only call it directly when you need bespoke clean-up logic.
 
 ```php
 use App\Support\Filament\SearchableComponentHelper;
@@ -75,7 +112,7 @@ Hidden payload fields (paired with `->dehydrated(false)`) keep the normalised me
 ## Resource integration checklist
 
 - Register `afterStateHydrated` closures on your Filament form components to call `SearchableComponentHelper::hydrate()` with a finder closure and normaliser that return the `[value, label, payload]` tuple described above. This keeps edit forms and relation managers aligned when records are re-opened.
-- Pair `afterStateUpdated` hooks with `SearchableComponentHelper::clear()` so clearing the lookup also wipes any dependent state (`Set` helpers for foreign keys, cached payload fields, and related dropdowns).
+- Use `SearchableComponentHelper::syncSelectedRecord()` inside `afterStateUpdated` hooks to persist foreign keys, refresh component options/payloads, and reset cached metadata when the lookup clears.
 - Prefer returning a payload array that is already shaped for the downstream Livewire data structure you need. The helper simply forwards the normalised payload, making the component the single source of truth for metadata.
 
 ## Related guidelines
