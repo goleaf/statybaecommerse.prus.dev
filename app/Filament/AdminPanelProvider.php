@@ -76,7 +76,12 @@ class AdminPanelProvider extends PanelProvider
                 ->authMiddleware([
                     \Illuminate\Auth\Middleware\Authenticate::class,
                 ])
-                ->viteTheme('resources/css/filament/admin/theme.css');
+                // Register the admin theme and companion JavaScript so plugin assets (including the combobox)
+                // are built for local testing environments.
+                ->viteTheme([
+                    'resources/css/filament/admin/theme.css',
+                    'resources/js/filament/admin/theme.js',
+                ]);
         }
 
         return $panel
@@ -110,7 +115,12 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 \Illuminate\Auth\Middleware\Authenticate::class,
             ])
-            ->viteTheme('resources/css/filament/admin/theme.css');
+            // Register the admin theme and companion JavaScript so plugin assets (including the combobox)
+            // are available throughout the production panel.
+            ->viteTheme([
+                'resources/css/filament/admin/theme.css',
+                'resources/js/filament/admin/theme.js',
+            ]);
     }
 
     private function isTestingEnvironment(): bool

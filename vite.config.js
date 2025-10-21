@@ -15,8 +15,12 @@ export default defineConfig({
       input: [
         'resources/css/app.scss',
         'resources/css/filament-enhancements.css',
+        // Compile the Filament admin theme so vendor combobox assets remain in sync with CSS imports.
+        'resources/css/filament/admin/theme.css',
         'resources/js/app.js',
         'resources/js/live-notifications.js',
+        // Bundle the Filament admin JavaScript entry to expose combobox behaviour during builds.
+        'resources/js/filament/admin/theme.js',
         'resources/images/hero.png',
         'vendor/andreia/filament-nord-theme/resources/css/theme.css',
       ],
