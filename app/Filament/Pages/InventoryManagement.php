@@ -28,9 +28,9 @@ final class InventoryManagement extends Page implements HasTable
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Products';
+        return 'Products'; // Keep stock controls grouped with the rest of the product catalog tools.
     }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
@@ -43,7 +43,7 @@ final class InventoryManagement extends Page implements HasTable
         return 'Inventory Management';
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         $table = $table
             ->query(Product::query())
@@ -84,6 +84,6 @@ final class InventoryManagement extends Page implements HasTable
                     }),
             ]);
 
-        return $this->applyToggleableTableLayout($table);
+        return $this->applyToggleableTableLayout($table); // Reuse the helper to apply saved column visibility.
     }
 }

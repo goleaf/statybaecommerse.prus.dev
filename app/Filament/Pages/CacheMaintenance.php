@@ -24,9 +24,9 @@ final class CacheMaintenance extends Page
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'System';
+        return 'System'; // Keep cache tooling aligned with the broader system utilities group.
     }
 
     protected static ?string $title = 'Cache Maintenance';
@@ -81,7 +81,7 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
