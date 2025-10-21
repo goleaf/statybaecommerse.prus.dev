@@ -17,6 +17,11 @@ class FixFilamentV4Command extends Command
 
     private array $errors = [];
 
+    /**
+     * Shared literal for the UnitEnum import so repeated strings are avoided.
+     */
+    private const UNIT_ENUM_IMPORT = 'use UnitEnum;';
+
     public function handle(): int
     {
         $this->info('🚀 Starting Filament v4 migration...');
@@ -172,7 +177,7 @@ class FixFilamentV4Command extends Command
     private function updateNavigationProperties(string $content): string
     {
         // Add UnitEnum import if needed
-        if (str_contains($content, 'NavigationGroup') && ! str_contains($content, 'use UnitEnum;')) {
+        if (str_contains($content, 'NavigationGroup') && ! str_contains($content, self::UNIT_ENUM_IMPORT)) {
             $lines = explode("\n", $content);
             $insertIndex = 0;
             foreach ($lines as $index => $line) {
@@ -180,7 +185,7 @@ class FixFilamentV4Command extends Command
                     $insertIndex = $index + 1;
                 }
             }
-            array_splice($lines, $insertIndex, 0, ['use UnitEnum;']);
+            array_splice($lines, $insertIndex, 0, [self::UNIT_ENUM_IMPORT]);
             $content = implode("\n", $lines);
         }
 
