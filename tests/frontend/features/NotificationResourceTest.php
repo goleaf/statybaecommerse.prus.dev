@@ -118,8 +118,7 @@ describe('NotificationResource', function () {
 
             livewire(NotificationResource\Pages\ListNotifications::class)
                 ->filterTable('created_at', [
-                    'created_from' => $yesterday->format('Y-m-d'),
-                    'created_until' => $tomorrow->format('Y-m-d'),
+                    'value' => $yesterday->format('Y-m-d'),
                 ])
                 ->assertCanSeeTableRecords($this->notifications);
         });
