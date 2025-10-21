@@ -187,4 +187,20 @@ trait InteractsWithTranslationTabs
 
         $record->saveQuietly();
     }
+
+    /**
+     * @param  array<string, array<string, mixed>> $translations
+     * @return array<string, array<string, mixed>>
+     */
+    protected function filterEmptyTranslations(array $translations): array
+    {
+        return Collection::make($translations)
+            ->map(
+                static fn (array $payload): array => Collection::make($payload)
+                    ->filter(static fn ($value) => filled($value))
+                    ->all()
+            )
+            ->filter(static fn (array $payload): bool => $payload !== [])
+            ->all();
+    }
 }
