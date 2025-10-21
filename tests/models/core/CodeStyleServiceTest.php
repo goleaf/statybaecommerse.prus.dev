@@ -38,7 +38,7 @@ final class CodeStyleServiceTest extends TestCase
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Spatie\Permission\Models\Role;
 
 class TestClass
@@ -228,7 +228,7 @@ final class TestClass
         $content = '<?php
 
 use Illuminate\Support\Facades\Hash;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 

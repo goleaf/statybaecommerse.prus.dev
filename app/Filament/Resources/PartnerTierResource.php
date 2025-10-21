@@ -8,12 +8,12 @@ use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class PartnerTierResource extends Resource
 {
@@ -25,9 +25,9 @@ final class PartnerTierResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('admin.partner_tiers.sections.basic_information'))
                     ->schema([
@@ -83,7 +83,7 @@ final class PartnerTierResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

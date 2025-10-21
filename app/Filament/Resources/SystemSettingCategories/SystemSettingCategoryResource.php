@@ -11,12 +11,12 @@ use App\Filament\Resources\SystemSettingCategories\Schemas\SystemSettingCategory
 use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
 class SystemSettingCategoryResource extends Resource
 {
@@ -24,12 +24,12 @@ class SystemSettingCategoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return SystemSettingCategoryForm::configure($form);
+        return SystemSettingCategoryForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return SystemSettingCategoriesTable::configure($table);
     }

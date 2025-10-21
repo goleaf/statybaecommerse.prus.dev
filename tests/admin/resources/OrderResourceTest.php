@@ -12,8 +12,6 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Zone;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

@@ -32,6 +32,7 @@ use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use BackedEnum;
 
 class SliderManagement extends Page implements HasActions, HasForms
 {
@@ -40,7 +41,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     /**
      * @var string|\BackedEnum|null Navigation icon override documented to support enums without extra imports.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 

@@ -29,7 +29,6 @@ use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -47,6 +46,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 /**
  * ProductVariantResource
@@ -91,9 +91,9 @@ final class ProductVariantResource extends Resource
         return 'Products';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('Variant Information')
                     ->tabs([
@@ -359,7 +359,7 @@ final class ProductVariantResource extends Resource
             ->every(fn ($item): bool => is_array($item) && array_key_exists('attribute_id', $item) && array_key_exists('attribute_value_id', $item));
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
