@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Schema;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
@@ -43,7 +44,7 @@ final class Order extends Model
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
 
-    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'payment_status', 'payment_method', 'payment_reference'];
+    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'coupon_id', 'payment_status', 'payment_method', 'payment_reference'];
 
     /**
      * Handle casts functionality with proper error handling.
@@ -74,6 +75,11 @@ final class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
     }
 
     /**
@@ -207,7 +213,7 @@ final class Order extends Model
     /**
      * Handle scopeByStatus functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByStatus($query, string $status)
     {
@@ -217,7 +223,7 @@ final class Order extends Model
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query)
     {
@@ -227,7 +233,7 @@ final class Order extends Model
     /**
      * Handle scopeCompleted functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeCompleted($query)
     {
@@ -239,12 +245,12 @@ final class Order extends Model
     /**
      * Handle scopePaid functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePaid($query)
     {
         // Prefer explicit payment status when present and non-null
-        if (\Schema::hasColumn($this->getTable(), 'payment_status')) {
+        if (Schema::hasColumn($this->getTable(), 'payment_status')) {
             $query = $query->where(function ($q) {
                 $q->whereNotNull('payment_status')->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']);
             });
@@ -299,6 +305,6 @@ final class Order extends Model
      */
     public function getFormattedTotalAttribute(): string
     {
-        return number_format((float) $this->total, 2).' '.$this->currency;
+        return number_format((float) $this->total, 2) . ' ' . $this->currency;
     }
 }
