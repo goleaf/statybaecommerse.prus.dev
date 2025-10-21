@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +19,7 @@ return new class extends Migration
             $channelIdExists = Schema::hasColumn('discount_campaigns', 'channel_id');
             $zoneIdExists = Schema::hasColumn('discount_campaigns', 'zone_id');
 
-            Schema::table('discount_campaigns', function (Blueprint $table) use ($statusExists, $startsAtExists, $endsAtExists, $isFeaturedExists, $channelIdExists, $zoneIdExists) {
+            Schema::table('discount_campaigns', function (Blueprint $table) use ($statusExists, $startsAtExists, $endsAtExists, $isFeaturedExists, $channelIdExists, $zoneIdExists): void {
                 // Campaign performance metrics
                 if (! Schema::hasColumn('discount_campaigns', 'total_views')) {
                     $table->unsignedBigInteger('total_views')->default(0);
@@ -105,7 +107,7 @@ return new class extends Migration
 
         // Create campaign views tracking table
         if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_views')) {
-            Schema::create('campaign_views', function (Blueprint $table) {
+            Schema::create('campaign_views', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
                 $table->string('session_id')->nullable();
@@ -123,7 +125,7 @@ return new class extends Migration
 
         // Create campaign clicks tracking table
         if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_clicks')) {
-            Schema::create('campaign_clicks', function (Blueprint $table) {
+            Schema::create('campaign_clicks', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
                 $table->string('session_id')->nullable();
@@ -143,7 +145,7 @@ return new class extends Migration
 
         // Create campaign conversions tracking table
         if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_conversions')) {
-            Schema::create('campaign_conversions', function (Blueprint $table) {
+            Schema::create('campaign_conversions', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
                 $table->foreignId('click_id')->nullable()->constrained('campaign_clicks')->nullOnDelete();
@@ -165,7 +167,7 @@ return new class extends Migration
 
         // Create campaign customer segments table
         if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_customer_segments')) {
-            Schema::create('campaign_customer_segments', function (Blueprint $table) {
+            Schema::create('campaign_customer_segments', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
                 $table->foreignId('customer_group_id')->nullable()->constrained('customer_groups')->nullOnDelete();
@@ -180,23 +182,36 @@ return new class extends Migration
 
         // Create campaign product targets table
         if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_product_targets')) {
-            Schema::create('campaign_product_targets', function (Blueprint $table) {
+            Schema::create('campaign_product_targets', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
                 $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
                 $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+                $table->foreignId('brand_id')->nullable()->constrained('brands')->nullOnDelete();
+                $table->foreignId('collection_id')->nullable()->constrained('collections')->nullOnDelete();
                 $table->string('target_type');  // product, category, brand, collection
+                $table->unsignedSmallInteger('priority')->default(0);
+                $table->unsignedSmallInteger('weight')->default(0);
+                $table->unsignedInteger('sort_order')->default(0);
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_featured')->default(false);
+                $table->json('conditions')->nullable();
+                $table->text('notes')->nullable();
                 $table->timestamps();
 
                 $table->index(['campaign_id', 'target_type']);
+                $table->index(['is_active', 'is_featured']);
+                $table->index(['priority', 'weight']);
                 $table->unique(['campaign_id', 'product_id']);
                 $table->unique(['campaign_id', 'category_id']);
+                $table->unique(['campaign_id', 'brand_id']);
+                $table->unique(['campaign_id', 'collection_id']);
             });
         }
 
         // Create campaign schedule table for recurring campaigns
         if (Schema::hasTable('discount_campaigns') && ! Schema::hasTable('campaign_schedules')) {
-            Schema::create('campaign_schedules', function (Blueprint $table) {
+            Schema::create('campaign_schedules', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('discount_campaigns')->cascadeOnDelete();
                 $table->string('schedule_type');  // daily, weekly, monthly, custom
@@ -222,7 +237,7 @@ return new class extends Migration
         Schema::dropIfExists('campaign_views');
 
         if (Schema::hasTable('discount_campaigns')) {
-            Schema::table('discount_campaigns', function (Blueprint $table) {
+            Schema::table('discount_campaigns', function (Blueprint $table): void {
                 $columns = [
                     'total_views', 'total_clicks', 'total_conversions', 'total_revenue', 'conversion_rate',
                     'target_audience', 'target_categories', 'target_products', 'target_customer_groups',
