@@ -2,6 +2,8 @@
 
 The admin panel now leans on the `novadaemon/filament-combobox` plugin for relationship pickers that benefit from a two-column, searchable layout. The package ships with Filament and is available to every resource through `Filament\Forms\Components\Combobox`.【F:composer.json†L11-L46】
 
+> **Build note:** The combobox styles and scripts are imported through `resources/css/filament/admin/theme.css` and `resources/js/filament/admin/theme.js` so the Vite build can bundle the vendor assets alongside the rest of the Filament theme.【F:resources/css/filament/admin/theme.css†L5-L8】【F:resources/js/filament/admin/theme.js†L1-L2】【F:vite.config.js†L17-L24】
+
 ## Where it is used today
 
 | Resource | Field(s) | Notes |
