@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -219,9 +219,9 @@ final class VariantStockHistoryResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.variant_stock_histories.filters.created_at'))
                     ->form([
-                        DatePicker::make('created_from')
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('admin.variant_stock_histories.filters.created_from')),
-                        DatePicker::make('created_until')
+                        Flatpickr::make('created_until')->datePicker()
                             ->label(__('admin.variant_stock_histories.filters.created_until')),
                     ])
                     ->query(function ($query, array $data) {

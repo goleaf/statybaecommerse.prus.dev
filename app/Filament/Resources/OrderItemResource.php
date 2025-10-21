@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -288,9 +289,9 @@ final class OrderItemResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Forms\Components\DatePicker::make('created_from')
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('order_items.created_from')),
-                        Forms\Components\DatePicker::make('created_until')
+                        Flatpickr::make('created_until')->datePicker()
                             ->label(__('order_items.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

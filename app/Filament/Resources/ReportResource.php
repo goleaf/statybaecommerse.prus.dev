@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
 use Filament\Actions\Action;
@@ -13,8 +14,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -171,14 +170,14 @@ final class ReportResource extends Resource
                     ->description(__('reports.sections.date_range_description'))
                     ->columns(2)
                     ->schema([
-                        DatePicker::make('start_date')
+                        Flatpickr::make('start_date')->datePicker()
                             ->label(__('reports.fields.start_date'))
                             ->nullable(),
-                        DatePicker::make('end_date')
+                        Flatpickr::make('end_date')->datePicker()
                             ->label(__('reports.fields.end_date'))
                             ->nullable()
                             ->after('start_date'),
-                        DateTimePicker::make('last_generated_at')
+                        Flatpickr::make('last_generated_at')->dateTimePicker()
                             ->label(__('reports.fields.last_generated_at'))
                             ->nullable()
                             ->disabled(),

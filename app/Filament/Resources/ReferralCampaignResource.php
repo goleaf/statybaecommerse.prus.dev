@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReferralCampaignResource\Pages;
 use App\Models\ReferralCampaign;
 use BackedEnum;
@@ -11,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -80,10 +80,10 @@ final class ReferralCampaignResource extends Resource
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
                                     ->default(true),
-                                DatePicker::make('start_date')
+                                Flatpickr::make('start_date')->datePicker()
                                     ->label(__('admin.referral_campaigns.start_date'))
                                     ->nullable(),
-                                DatePicker::make('end_date')
+                                Flatpickr::make('end_date')->datePicker()
                                     ->label(__('admin.referral_campaigns.end_date'))
                                     ->nullable(),
                             ]),

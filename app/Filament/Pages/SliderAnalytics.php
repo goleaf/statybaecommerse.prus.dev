@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Forms\Components\Flatpickr;
+use App\Support\DateRange;
 use App\Models\Slider;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard\Actions\FilterAction;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 /**
  * Slider Analytics Dashboard
@@ -52,16 +54,14 @@ final class SliderAnalytics extends BaseDashboard
                 ->label('Filter Analytics')
                 ->icon('heroicon-o-funnel')
                 ->components([
-                    DatePicker::make('startDate')
-                        ->label('Start Date')
-                        ->default(now()->subDays(30))
+                    Flatpickr::make('date_range')->dateRangePicker()
+                        ->label('Analytics Date Range')
+                        ->default([
+                            now()->subDays(30),
+                            now(),
+                        ])
                         ->displayFormat('Y-m-d')
-                        ->helperText('Select the start date for analytics'),
-                    DatePicker::make('endDate')
-                        ->label('End Date')
-                        ->default(now())
-                        ->displayFormat('Y-m-d')
-                        ->helperText('Select the end date for analytics'),
+                        ->helperText('Select the date range for analytics'),
                     Select::make('sliderId')
                         ->label('Specific Slider')
                         ->options(Slider::all()->pluck('title', 'id'))
@@ -125,8 +125,9 @@ final class SliderAnalytics extends BaseDashboard
 
     protected function exportAnalytics(): void
     {
-        $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
-        $endDate = $this->pageFilters['endDate'] ?? now();
+        [$startDate, $endDate] = DateRange::extract($this->pageFilters, 'date_range');
+        $startDate = $startDate ? Carbon::parse($startDate) : now()->subDays(30);
+        $endDate = $endDate ? Carbon::parse($endDate) : now();
         $sliderId = $this->pageFilters['sliderId'] ?? null;
         $status = $this->pageFilters['status'] ?? 'all';
 
@@ -180,8 +181,9 @@ final class SliderAnalytics extends BaseDashboard
 
     public function getSubheading(): string
     {
-        $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
-        $endDate = $this->pageFilters['endDate'] ?? now();
+        [$startDate, $endDate] = DateRange::extract($this->pageFilters, 'date_range');
+        $startDate = $startDate ? Carbon::parse($startDate) : now()->subDays(30);
+        $endDate = $endDate ? Carbon::parse($endDate) : now();
 
         return "Analytics for period: {$startDate->format('M d, Y')} - {$endDate->format('M d, Y')}";
     }

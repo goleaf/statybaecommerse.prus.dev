@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\UserProductInteractions\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
+use App\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -27,9 +27,9 @@ class UserProductInteractionForm
                     ->required()
                     ->numeric()
                     ->default(1),
-                DateTimePicker::make('first_interaction')
+                Flatpickr::make('first_interaction')->dateTimePicker()
                     ->required(),
-                DateTimePicker::make('last_interaction')
+                Flatpickr::make('last_interaction')->dateTimePicker()
                     ->required(),
             ]);
     }

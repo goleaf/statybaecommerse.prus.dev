@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -119,10 +119,10 @@ final class FeatureFlagResource extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            DateTimePicker::make('starts_at')
+                            Flatpickr::make('starts_at')->dateTimePicker()
                                 ->label(__('feature_flags.starts_at'))
                                 ->nullable(),
-                            DateTimePicker::make('ends_at')
+                            Flatpickr::make('ends_at')->dateTimePicker()
                                 ->label(__('feature_flags.ends_at'))
                                 ->nullable(),
                         ]),

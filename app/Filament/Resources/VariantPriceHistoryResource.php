@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
+use App\Support\DateRange;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use BackedEnum;
@@ -74,10 +76,10 @@ final class VariantPriceHistoryResource extends Resource
                     ->relationship('changedBy', 'name')
                     ->searchable()
                     ->preload(),
-                Forms\Components\DateTimePicker::make('effective_from')
+                Flatpickr::make('effective_from')->dateTimePicker()
                     ->label('Effective From')
                     ->required(),
-                Forms\Components\DateTimePicker::make('effective_until')
+                Flatpickr::make('effective_until')->dateTimePicker()
                     ->label('Effective Until')
                     ->after('effective_from'),
             ]);
@@ -198,19 +200,19 @@ final class VariantPriceHistoryResource extends Resource
                     ->preload(),
                 Tables\Filters\Filter::make('effective_date_range')
                     ->form([
-                        Forms\Components\DatePicker::make('effective_from')
-                            ->label('Effective From'),
-                        Forms\Components\DatePicker::make('effective_until')
-                            ->label('Effective Until'),
+                        Flatpickr::make('effective_from')->dateRangePicker()
+                            ->label('Effective Date Range'),
                     ])
                     ->query(function ($query, array $data) {
+                        [$effectiveFrom, $effectiveUntil] = DateRange::extract($data, 'effective_from', 'effective_until');
+
                         return $query
                             ->when(
-                                $data['effective_from'],
+                                $effectiveFrom,
                                 fn ($query, $date) => $query->whereDate('effective_from', '>=', $date),
                             )
                             ->when(
-                                $data['effective_until'],
+                                $effectiveUntil,
                                 fn ($query, $date) => $query->whereDate('effective_until', '<=', $date),
                             );
                     }),

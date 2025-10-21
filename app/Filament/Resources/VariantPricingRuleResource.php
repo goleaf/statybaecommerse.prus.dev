@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
 use Filament\Actions\Action;
@@ -11,7 +12,6 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -162,9 +162,9 @@ final class VariantPricingRuleResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('valid_from')
+                                Flatpickr::make('valid_from')->dateTimePicker()
                                     ->label(__('variant_pricing_rules.valid_from')),
-                                DateTimePicker::make('valid_until')
+                                Flatpickr::make('valid_until')->dateTimePicker()
                                     ->label(__('variant_pricing_rules.valid_until')),
                             ]),
                     ]),

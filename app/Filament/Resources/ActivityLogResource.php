@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use BackedEnum;
@@ -109,8 +110,8 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')->label(__('From')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')->label(__('Until')),
+                        Flatpickr::make('created_from')->datePicker()->label(__('From')),
+                        Flatpickr::make('created_until')->datePicker()->label(__('Until')),
                     ])
                     ->query(function ($query, array $data) {
                         return $query

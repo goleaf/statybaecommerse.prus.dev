@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
@@ -15,7 +16,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -157,12 +157,12 @@ final class UserProductInteractionResource extends Resource
                                     ->minValue(1)
                                     ->default(1)
                                     ->helperText(__('admin.user_product_interactions.count_help')),
-                                DateTimePicker::make('first_interaction')
+                                Flatpickr::make('first_interaction')->dateTimePicker()
                                     ->label(__('admin.user_product_interactions.first_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')
                                     ->seconds(false),
-                                DateTimePicker::make('last_interaction')
+                                Flatpickr::make('last_interaction')->dateTimePicker()
                                     ->label(__('admin.user_product_interactions.last_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductComparisonResource\Pages;
 use App\Models\ProductComparison;
@@ -145,9 +146,9 @@ final class ProductComparisonResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('product_comparisons.created_from')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')
+                        Flatpickr::make('created_until')->datePicker()
                             ->label(__('product_comparisons.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\LegalResource\Pages;
 use App\Filament\Resources\LegalResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Legal;
@@ -89,7 +90,7 @@ final class LegalResource extends Resource
                                     ->label(__('legal.sort_order'))
                                     ->numeric()
                                     ->default(0),
-                                Forms\Components\DateTimePicker::make('published_at')
+                                Flatpickr::make('published_at')->dateTimePicker()
                                     ->label(__('legal.published_at'))
                                     ->seconds(false)
                                     ->timezone(config('app.timezone')),

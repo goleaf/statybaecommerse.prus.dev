@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
@@ -18,7 +19,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
@@ -231,9 +231,9 @@ final class ProductVariantResource extends Resource
                                             ]),
                                         Grid::make(2)
                                             ->schema([
-                                                DateTimePicker::make('sale_start_date')
+                                                Flatpickr::make('sale_start_date')->dateTimePicker()
                                                     ->label(__('product_variants.fields.sale_start_date')),
-                                                DateTimePicker::make('sale_end_date')
+                                                Flatpickr::make('sale_end_date')->dateTimePicker()
                                                     ->label(__('product_variants.fields.sale_end_date')),
                                             ]),
                                     ]),

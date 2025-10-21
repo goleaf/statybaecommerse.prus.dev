@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\SubscriberResource\Pages;
 use App\Models\Subscriber;
 use Filament\Actions\Action;
@@ -13,7 +14,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -158,7 +158,7 @@ final class SubscriberResource extends Resource
                                     ->label(__('subscribers.newsletter_subscription'))
                                     ->default(true),
                             ]),
-                        DateTimePicker::make('subscribed_at')
+                        Flatpickr::make('subscribed_at')->dateTimePicker()
                             ->label(__('subscribers.subscribed_at'))
                             ->default(now()),
                     ]),
@@ -265,9 +265,9 @@ final class SubscriberResource extends Resource
                     ->native(false),
                 Filter::make('subscribed_at')
                     ->form([
-                        Forms\Components\DatePicker::make('subscribed_from')
+                        Flatpickr::make('subscribed_from')->datePicker()
                             ->label(__('subscribers.subscribed_from')),
-                        Forms\Components\DatePicker::make('subscribed_until')
+                        Flatpickr::make('subscribed_until')->datePicker()
                             ->label(__('subscribers.subscribed_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

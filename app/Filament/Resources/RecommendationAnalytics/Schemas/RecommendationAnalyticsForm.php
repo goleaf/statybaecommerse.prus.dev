@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationAnalytics\Schemas;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\Product;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationConfig;
 use App\Models\User;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -56,7 +56,7 @@ final class RecommendationAnalyticsForm
                                     ])
                                     ->required()
                                     ->default('view'),
-                                DatePicker::make('date')
+                                Flatpickr::make('date')->datePicker()
                                     ->label(__('recommendation_analytics.date'))
                                     ->required()
                                     ->default(now()),
