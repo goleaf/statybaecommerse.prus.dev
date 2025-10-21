@@ -6,6 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -28,7 +31,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * FeatureFlagResource
@@ -55,6 +57,17 @@ final class FeatureFlagResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('feature_flags.title');
+    }
+
+    /**
+     * Extend the base query so administrators can audit inactive and disabled flags.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
     }
 
     /**
