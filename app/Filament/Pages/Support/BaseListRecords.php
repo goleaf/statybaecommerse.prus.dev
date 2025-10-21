@@ -16,7 +16,10 @@ abstract class BaseListRecords extends ListRecords
     use HasResizableColumn;
     use HasToggleableTable;
 
-    public function table(Table $table): Table|array
+    /**
+     * Configure the shared table instance for list pages before applying layout helpers.
+     */
+    public function table(Table $table): Table
     {
         $table = parent::table($table);
 

@@ -8,6 +8,7 @@
 - Documented consistent JSON problem responses for the profile and checkout flows, falling back to user-owned carts when sessions rotate.
 
 ### Dependencies
+- Added `awcodes/filament-badgeable-column` (^3.0) to power reusable badge styling in Filament table columns while integrating the vendor Blade templates into our Tailwind build pipeline.
 - Replaced wildcard constraints with caret ranges for `dutchcodingcompany/filament-socialite` (`^3.0`), `lara-zeus/bolt` (`^4.0.5`), and `pxlrbt/filament-excel` (`^3.1`) to resolve `composer validate` warnings.
 - Upgraded `novadaemon/filament-combobox` to the `^2.0.1` constraint as part of the scheduled Filament maintenance sweep so we can consume the upstream dropdown focus bugfix ahead of the next admin UI release.
 - `composer why-not phpunit/phpunit 12.4.1` → `pestphp/pest` v4.1.2 conflicts with versions greater than 12.4.0; remains blocked.
