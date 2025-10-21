@@ -10,9 +10,12 @@ use App\Models\OrderItem;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
+use Illuminate\Support\Number;
+use LaraZeus\ListGroup\Entries\ListItem;
+use LaraZeus\ListGroup\Infolists\ListEntry;
 
 final class ViewOrder extends ViewRecord
 {
@@ -25,9 +28,67 @@ final class ViewOrder extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Infolist $infolist): Infolist
     {
-        return $schema->components([
+        return $infolist->schema([
+            ListEntry::make('orderQuickLinks')
+                ->heading(__('Quick links'))
+                ->state(function (Order $record): array {
+                    $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
+
+                    return [
+                        ListItem::make()
+                            ->id('order-customer-view-' . $record->getKey())
+                            ->label(__('View customer order page'))
+                            ->icon('heroicon-m-shopping-bag')
+                            ->color('primary')
+                            ->url(route('account.orders.detail', ['number' => $record->number]))
+                            ->tooltip(__('Open the customer-facing order detail for :number', ['number' => $record->number]))
+                            ->toArray(),
+                        ListItem::make()
+                            ->id('order-invoice-' . $record->getKey())
+                            ->label(__('Download invoice'))
+                            ->icon('heroicon-m-document-arrow-down')
+                            ->color('info')
+                            ->url(route('account.orders.invoice', ['number' => $record->number]))
+                            ->tooltip(__('Download the invoice for :number (:total)', [
+                                'number' => $record->number,
+                                'total'  => Number::currency($record->total, $currency),
+                            ]))
+                            ->toArray(),
+                    ];
+                }),
+            ListEntry::make('orderItemsSummary')
+                ->heading(__('orders.order_items'))
+                ->list()
+                ->state(function (Order $record): array {
+                    $record->loadMissing(['items.product']);
+                    $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
+
+                    return $record->items
+                        ->map(function (OrderItem $item) use ($currency): array {
+                            $product = $item->product;
+                            $productName = $product?->getTranslation('name') ?? $item->name;
+                            $productUrl = $product !== null
+                                ? route('frontend.products.show', $product)
+                                : route('frontend.products.index');
+
+                            return ListItem::make()
+                                ->id('order-item-' . $item->getKey())
+                                ->label(__('x:quantity — :product', [
+                                    'quantity' => $item->quantity,
+                                    'product'  => $productName,
+                                ]))
+                                ->icon('heroicon-m-rectangle-stack')
+                                ->color('success')
+                                ->url($productUrl)
+                                ->tooltip(__('Line total: :total', [
+                                    'total' => Number::currency($item->total, $currency),
+                                ]))
+                                ->toArray();
+                        })
+                        ->all();
+                }),
             Section::make(__('orders.order_items'))
                 ->schema([
                     TableRepeatableEntry::make('items')
@@ -38,11 +99,11 @@ final class ViewOrder extends ViewRecord
 
                             return $record->items
                                 ->map(fn (OrderItem $item): array => [
-                                    'product' => $item->product?->name ?? $item->name,
-                                    'sku' => $item->sku,
+                                    'product'  => $item->product?->name ?? $item->name,
+                                    'sku'      => $item->sku,
                                     'quantity' => $item->quantity,
-                                    'price' => $item->unit_price ?? $item->price,
-                                    'total' => $item->total,
+                                    'price'    => $item->unit_price ?? $item->price,
+                                    'total'    => $item->total,
                                 ])
                                 ->values()
                                 ->all();
