@@ -9,7 +9,7 @@ use App\Models\Partner;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -32,7 +32,7 @@ final class PartnerResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         // Build the Partner form using the Section helper to keep layouts consistent.
         return $form
@@ -102,7 +102,7 @@ final class PartnerResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
