@@ -40,7 +40,6 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\MaxWidth;
@@ -56,6 +55,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -213,11 +213,7 @@ final class OrderResource extends Resource
                                     );
                                 })
                                 ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
-                                    if (SearchableComponentHelper::normaliseIdentifier($state) === null) {
-                                        SearchableComponentHelper::clearComponent($component);
-                                    }
-
-                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'user_id');
+                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'user_id', $component);
                                 }),
                             Select::make('status')
                                 ->label(__('orders.fields.status'))
@@ -430,11 +426,7 @@ final class OrderResource extends Resource
                                     );
                                 })
                                 ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
-                                    if (SearchableComponentHelper::normaliseIdentifier($state) === null) {
-                                        SearchableComponentHelper::clearComponent($component);
-                                    }
-
-                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'channel_id');
+                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'channel_id', $component);
                                 }),
                             SearchableInput::make('partner_id')
                                 ->label(__('orders.fields.partner'))
@@ -455,11 +447,7 @@ final class OrderResource extends Resource
                                     );
                                 })
                                 ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
-                                    if (SearchableComponentHelper::normaliseIdentifier($state) === null) {
-                                        SearchableComponentHelper::clearComponent($component);
-                                    }
-
-                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'partner_id');
+                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'partner_id', $component);
                                 }),
                         ]),
                 ])
