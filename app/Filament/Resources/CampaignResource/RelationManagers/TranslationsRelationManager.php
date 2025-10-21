@@ -23,7 +23,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Translations';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form->schema([
             Forms\Components\Select::make('locale')
@@ -62,7 +62,7 @@ final class TranslationsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([

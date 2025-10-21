@@ -47,7 +47,7 @@ final class ReferralRewardResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -160,7 +160,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([
@@ -267,7 +267,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Infolist $infolist): Infolist|array
     {
         return $infolist
             ->schema([

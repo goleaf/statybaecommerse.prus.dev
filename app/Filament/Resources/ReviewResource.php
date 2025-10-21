@@ -65,7 +65,7 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -138,7 +138,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([
@@ -379,7 +379,7 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema|array
     {
         return $schema
             ->components([

@@ -30,7 +30,7 @@ class StockMovementsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Stock Movements';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->components([
@@ -69,7 +69,7 @@ class StockMovementsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('quantity')

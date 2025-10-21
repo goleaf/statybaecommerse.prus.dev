@@ -28,7 +28,7 @@ final class ViewUserProductInteraction extends ViewRecord implements HasTable
         $this->isTableLoaded = true;
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         $table = $table
             ->deferLoading(false)

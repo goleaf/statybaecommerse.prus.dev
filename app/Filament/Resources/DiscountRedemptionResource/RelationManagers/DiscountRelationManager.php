@@ -21,7 +21,7 @@ class DiscountRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Discounts';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -54,7 +54,7 @@ class DiscountRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('name')
