@@ -6,7 +6,7 @@ namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
 use App\Models\News;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -24,9 +24,9 @@ final class NewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'News';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('News Information')
                     ->schema([
@@ -55,7 +55,7 @@ final class NewsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')

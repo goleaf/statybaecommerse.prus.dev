@@ -12,10 +12,9 @@ use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\TextEntry;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -23,9 +22,9 @@ class AddressesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'addresses';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 TextInput::make('id')
                     ->required()
@@ -33,7 +32,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema|array
+    public function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -41,7 +40,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('id')

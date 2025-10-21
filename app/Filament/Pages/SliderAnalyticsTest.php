@@ -16,7 +16,7 @@ final class SliderAnalyticsTest extends BaseDashboard
     /**
      * Navigation icon override (string|\BackedEnum|null).
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 

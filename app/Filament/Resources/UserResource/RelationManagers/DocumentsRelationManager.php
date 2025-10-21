@@ -8,7 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Storage\SecureStorage;
 use Filament\Tables;
@@ -20,9 +20,9 @@ final class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin.sections.documents';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 Forms\Components\TextInput::make('title')
                     ->required()
@@ -50,7 +50,7 @@ final class DocumentsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')

@@ -19,14 +19,13 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Section as InfolistSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -44,16 +43,16 @@ final class ReviewResource extends Resource
     /**
      * @var string|\BackedEnum|null Normalize Filament icon typing for consistency.
      */
-    protected static $navigationIcon = 'heroicon-o-star';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
-     * @var string|\BackedEnum|null Allow enum-backed navigation grouping.
+     * @var string|\UnitEnum|null Allow enum-backed navigation grouping.
      */
-    protected static $navigationGroup = NavigationGroup::ContentManagement;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {
@@ -78,9 +77,9 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('reviews.sections.basic_info'))
                     ->description(__('reviews.sections.basic_info_description'))
@@ -151,7 +150,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -393,7 +392,7 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([

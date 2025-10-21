@@ -12,7 +12,7 @@ use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyti
 use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalyticsTable;
 use App\Models\RecommendationAnalytics;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 
@@ -23,7 +23,7 @@ final class RecommendationAnalyticsResource extends Resource
     /**
      * Navigation icon override (string|\BackedEnum|null).
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 8;
 
@@ -49,12 +49,12 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
         return RecommendationAnalyticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return RecommendationAnalyticsTable::configure($table);
     }

@@ -11,7 +11,7 @@ use App\Filament\Resources\Settings\Schemas\SettingForm;
 use App\Filament\Resources\Settings\Tables\SettingsTable;
 use App\Models\Setting;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -20,14 +20,14 @@ class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
         return SettingForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return SettingsTable::configure($table);
     }

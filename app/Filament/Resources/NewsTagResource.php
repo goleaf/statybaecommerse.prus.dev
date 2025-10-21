@@ -13,15 +13,15 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section as FormSection;
+use Filament\Schemas\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -63,9 +63,9 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
                 ->schema([
                     TextInput::make('name')
@@ -146,7 +146,7 @@ final class NewsTagResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

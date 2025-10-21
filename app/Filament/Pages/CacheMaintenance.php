@@ -8,8 +8,8 @@ use App\Services\Shared\ComponentPerformanceService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Arr;
@@ -22,7 +22,7 @@ final class CacheMaintenance extends Page
     /**
      * Navigation icon override (string|\BackedEnum|null).
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): ?string
     {
@@ -81,10 +81,10 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.
-        return $form
+        return $schema
             ->schema([
                 Section::make('Targeted Cache Operations')
                     ->description('Use scoped operations before clearing broad cache areas to follow CachePolicy guidance.')

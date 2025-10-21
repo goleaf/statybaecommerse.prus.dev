@@ -17,7 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -42,7 +42,7 @@ final class UserWishlistResource extends Resource
         return 'heroicon-o-heart';
     }
 
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    protected static string|\UnitEnum|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 8;
 
@@ -61,9 +61,9 @@ final class UserWishlistResource extends Resource
         return __('admin.user_wishlists.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 Select::make('user_id')
                     ->label(__('admin.user_wishlists.user'))
@@ -88,7 +88,7 @@ final class UserWishlistResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

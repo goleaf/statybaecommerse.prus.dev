@@ -19,7 +19,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
@@ -57,9 +57,9 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order items.
      */
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('orders.item_information'))
                     ->description(__('orders.item_information_description'))
@@ -181,7 +181,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order items.
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

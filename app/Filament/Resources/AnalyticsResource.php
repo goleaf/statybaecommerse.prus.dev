@@ -10,7 +10,7 @@ use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\Summarizers\Average;
@@ -30,7 +30,7 @@ final class AnalyticsResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {
@@ -65,12 +65,12 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.

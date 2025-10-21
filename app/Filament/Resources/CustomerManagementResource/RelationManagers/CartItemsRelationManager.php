@@ -15,9 +15,8 @@ use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -25,9 +24,9 @@ class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 // Keep the identifier locked because the relationship is read-only in this manager.
                 TextInput::make('id')
@@ -38,7 +37,7 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
         return $infolist
             ->schema([
