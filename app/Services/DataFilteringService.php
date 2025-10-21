@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use ArrayAccess;
 use Illuminate\Support\Collection;
 
 /**
@@ -80,7 +81,7 @@ final class DataFilteringService
                     return false;
                 }
 
-                return ! in_array($productId, $userInteractions);
+                return ! in_array($productId, $userInteractions, true);
             })
             ->values();
     }
@@ -144,18 +145,23 @@ final class DataFilteringService
      */
     public function filterProductsByPriceRange(Collection $products, float $minPrice = 0, ?float $maxPrice = null): Collection
     {
-        return $products->filter(function ($product) use ($minPrice, $maxPrice) {
-            $price = $product->price ?? $product['price'] ?? 0;
-            // Include products within price range
-            if ($price < $minPrice) {
-                return false;
-            }
-            if ($maxPrice !== null && $price > $maxPrice) {
-                return false;
-            }
+        return $products
+            ->filter(function ($product) use ($minPrice, $maxPrice) {
+                // Normalise the price regardless of whether we receive arrays, objects, or ArrayAccess instances.
+                $price = (float) ($this->extractValue($product, 'price') ?? 0.0);
 
-            return true;
-        });
+                // Include only products that fit within the defined price range.
+                if ($price < $minPrice) {
+                    return false;
+                }
+
+                if ($maxPrice !== null && $price > $maxPrice) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->values();
     }
 
     /**
@@ -224,7 +230,19 @@ final class DataFilteringService
 
     private function extractValue(mixed $item, string $key): mixed
     {
-        // Gracefully support both object-like and array-like payloads that surface throughout the service test suite.
-        return is_array($item) ? ($item[$key] ?? null) : ($item->{$key} ?? null);
+        // Gracefully support array-like, ArrayAccess, and object payloads that surface throughout the service test suite.
+        if (is_array($item)) {
+            return $item[$key] ?? null;
+        }
+
+        if ($item instanceof ArrayAccess) {
+            return $item->offsetExists($key) ? $item[$key] : null;
+        }
+
+        if (is_object($item)) {
+            return $item->{$key} ?? null;
+        }
+
+        return null;
     }
 }
