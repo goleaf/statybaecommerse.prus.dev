@@ -34,6 +34,7 @@ Tagging ensures that refreshing a product or category can invalidate related hom
 - Category structure changes must clear navigation trees (`CacheKeys::categoryNavigationTree()`) and home catalogue lookups.
 - Dashboard metrics rely on short TTLs but still respect `CacheKeys::dashboardTag()` for forced refreshes during deployments.
 - Product, user, and order observers flush the aggregate tags above on `created`, `updated`, `deleted`, `restored`, and `forceDeleted` so repository counts and dashboard snapshots never drift. When cache tags are unavailable (e.g. array store), the observers fall back to forgetting `CacheKeys::productTotalCount()`, `CacheKeys::userTotalCount()`, and the locale-aware dashboard metric keys.
+- The `CacheInvalidationService` coordinates fallback invalidation when drivers do not support tags by clearing home shelves, collection showcases, navigation menus, and dashboard metrics via `Cache::forget()` calls that leverage the helper builders. This prevents us from flushing the entire cache store when using the array/file driver while still keeping storefront widgets in sync.
 
 Where Redis tags are unavailable, fall back to targeted `Cache::forget()` calls that leverage the centralized builders.
 
