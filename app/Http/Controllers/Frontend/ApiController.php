@@ -19,12 +19,37 @@ final class ApiController extends Controller
 
     public function searchProducts(Request $request): JsonResponse
     {
-        $query = $request->get('q', '');
+        $query = trim((string) $request->get('q', ''));
 
-        $products = Product::where('name', 'like', "%{$query}%")
-            ->orWhere('description', 'like', "%{$query}%")
-            ->limit(10)
-            ->get(['id', 'name', 'price', 'image']);
+        // Keep the API predictable by clamping the requested limit to a safe range.
+        $limit = (int) $request->integer('limit', 10);
+        $limit = max(1, min($limit, 25));
+
+        $products = Product::query()
+            ->when($query !== '', static function ($productQuery) use ($query): void {
+                // Apply a scoped LIKE search across both name and description columns.
+                $productQuery->where(static function ($nestedQuery) use ($query): void {
+                    $likeQuery = "%{$query}%";
+
+                    $nestedQuery
+                        ->where('name', 'like', $likeQuery)
+                        ->orWhere('description', 'like', $likeQuery);
+                });
+            })
+            ->limit($limit)
+            ->get(['id', 'name', 'slug', 'price'])
+            ->map(static function (Product $product): array {
+                // Normalize the payload so every consumer receives consistent media keys.
+                return [
+                    'id'         => $product->getKey(),
+                    'name'       => $product->name,
+                    'slug'       => $product->slug,
+                    'price'      => $product->price,
+                    'main_image' => $product->main_image,
+                    'thumbnail'  => $product->thumbnail,
+                ];
+            })
+            ->values();
 
         return response()->json($products);
     }
@@ -97,7 +122,7 @@ final class ApiController extends Controller
             $wishlist->items()->create([
                 'product_id' => $productId,
                 'variant_id' => $variantId,
-                'quantity' => 1,
+                'quantity'   => 1,
             ]);
             $added = true;
         }
@@ -118,13 +143,29 @@ final class ApiController extends Controller
             return response()->json([]);
         }
 
-        $recentlyViewed = array_slice($recentlyViewed, 0, 10);
+        // Preserve the visit order while trimming to the most recent entries only.
+        $orderedIds = array_values(array_slice($recentlyViewed, 0, 10));
 
         $products = Product::query()
-            ->whereIn('id', $recentlyViewed)
-            ->get(['id', 'name', 'price', 'image'])
-            ->sortBy(fn (Product $product) => array_search($product->getKey(), $recentlyViewed, true))
-            ->values();
+            ->whereIn('id', $orderedIds)
+            ->get(['id', 'name', 'slug', 'price'])
+            ->sortBy(static function (Product $product) use ($orderedIds): int {
+                $position = array_search($product->getKey(), $orderedIds, true);
+
+                return $position === false ? PHP_INT_MAX : $position;
+            })
+            ->values()
+            ->map(static function (Product $product): array {
+                // Mirror the search payload structure so widgets can reuse adapters.
+                return [
+                    'id'         => $product->getKey(),
+                    'name'       => $product->name,
+                    'slug'       => $product->slug,
+                    'price'      => $product->price,
+                    'main_image' => $product->main_image,
+                    'thumbnail'  => $product->thumbnail,
+                ];
+            });
 
         return response()->json($products);
     }

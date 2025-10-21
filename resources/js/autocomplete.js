@@ -255,10 +255,13 @@ class AutocompleteComponent {
         item.setAttribute('data-index', index);
         item.setAttribute('role', 'option');
 
+        // Prefer modern media keys while staying backwards compatible with legacy payloads.
+        const imageUrl = result.main_image ?? result.thumbnail ?? result.image;
+
         item.innerHTML = `
             <div class="flex items-center space-x-3 p-3 hover:bg-gray-50 cursor-pointer">
                 <div class="flex-shrink-0">
-                    ${result.image ? `<img src="${result.image}" alt="${result.title}" class="w-8 h-8 object-cover rounded">` : ''}
+                    ${imageUrl ? `<img src="${imageUrl}" alt="${result.title}" class="w-8 h-8 object-cover rounded">` : ''}
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
