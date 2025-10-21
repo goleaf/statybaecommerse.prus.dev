@@ -7,8 +7,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -36,6 +38,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -454,11 +457,37 @@ final class ProductVariantResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('product_id')
+                Filter::make('product_lookup')
                     ->label(__('product_variants.filters.product'))
-                    ->relationship('product', 'name')
-                    ->searchable()
-                    ->preload(),
+                    ->form([
+                        SearchableInput::make('product_name')
+                            ->label(__('product_variants.filters.product'))
+                            ->placeholder(__('product_variants.filters.product_placeholder'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::searchProductOptions($search)),
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
+                            return [];
+                        }
+
+                        return [__('product_variants.filters.product') . ': ' . $value];
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
+                            return $query;
+                        }
+
+                        return $query->whereHas('product', function (Builder $relationQuery) use ($value): void {
+                            $relationQuery
+                                ->where('name', 'like', "%{$value}%")
+                                ->orWhere('sku', 'like', "%{$value}%");
+                        });
+                    }),
                 SelectFilter::make('variant_type')
                     ->label(__('product_variants.fields.variant_type'))
                     ->options([
@@ -573,5 +602,36 @@ final class ProductVariantResource extends Resource
             'view'   => Pages\ViewProductVariant::route('/{record}'),
             'edit'   => Pages\EditProductVariant::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function searchProductOptions(string $search): array
+    {
+        $term = trim($search);
+
+        if ($term === '') {
+            return [];
+        }
+
+        return Product::query()
+            ->select(['name', 'sku'])
+            ->where(function (Builder $query) use ($term): void {
+                $query
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('sku', 'like', "%{$term}%");
+            })
+            ->orderBy('name')
+            ->limit(15)
+            ->get()
+            ->map(static function (Product $product): string {
+                $sku = $product->sku;
+
+                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
+            })
+            ->unique()
+            ->values()
+            ->all();
     }
 }
