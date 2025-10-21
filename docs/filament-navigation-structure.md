@@ -145,6 +145,12 @@ Resources are ordered by priority within each group, with core functionality app
 
 ## Implementation Details
 
+### Centralised registry
+The navigation tree is now composed through the `App\Support\Nav` helper. The class discovers first-party resources,
+normalises group labels/icons, and exposes helpers that the admin panel provider consumes when registering navigation groups.
+Resources can opt into `App\Support\Concerns\HasNav` to proxy their `getNavigationGroup`, `getNavigationIcon`, and
+`getNavigationSort` methods to the shared registry, removing duplicated boilerplate while keeping backwards compatibility.
+
 ### Navigation Group Method
 ```php
 public static function getNavigationGroup(): ?string
