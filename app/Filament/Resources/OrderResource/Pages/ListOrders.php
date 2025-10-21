@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\OrderResource\Widgets\OrderResourceStats;
+use App\Filament\Resources\OrderResource\Widgets\OrderRevenueTrend;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -18,6 +20,20 @@ final class ListOrders extends ListRecords
         return [
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('orders', 'create')),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            OrderResourceStats::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            OrderRevenueTrend::class,
         ];
     }
 }
