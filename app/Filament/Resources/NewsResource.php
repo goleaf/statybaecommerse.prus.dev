@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\ModerationState;
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
@@ -22,7 +23,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use Novadaemon\FilamentCombobox\Combobox;
 use RuntimeException;
 use App\Support\Filament\Components\Flatpickr;
 
@@ -137,17 +137,19 @@ class NewsResource extends Resource
                     Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->boxSearchs()
                         ->height('320px')
-                        ->optionsLabel(__('news.combobox.categories.available'))
-                        ->selectedLabel(__('news.combobox.categories.selected')),
+                        ->translatedLabels(
+                            'news.combobox.categories.available',
+                            'news.combobox.categories.selected',
+                        ),
                     Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->boxSearchs()
                         ->height('320px')
-                        ->optionsLabel(__('news.combobox.tags.available'))
-                        ->selectedLabel(__('news.combobox.tags.selected')),
+                        ->translatedLabels(
+                            'news.combobox.tags.available',
+                            'news.combobox.tags.selected',
+                        ),
                 ])
                 ->columns(2),
         ]);
