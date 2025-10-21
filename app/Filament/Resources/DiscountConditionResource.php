@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\DiscountConditionResource\Pages;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionChartWidget;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionStatsWidget;
@@ -143,19 +144,15 @@ final class DiscountConditionResource extends Resource
                                 Section::make()
                                     ->columns(2)
                                     ->schema([
-                                        Select::make('products')
+                                        Combobox::make('products')
                                             ->label(__('discount_conditions.products'))
                                             ->relationship('products', 'name')
                                             ->preload()
-                                            ->searchable()
-                                            ->multiple()
                                             ->columnSpanFull(),
-                                        Select::make('categories')
+                                        Combobox::make('categories')
                                             ->label(__('discount_conditions.categories'))
                                             ->relationship('categories', 'name')
                                             ->preload()
-                                            ->searchable()
-                                            ->multiple()
                                             ->columnSpanFull(),
                                     ]),
                             ]),

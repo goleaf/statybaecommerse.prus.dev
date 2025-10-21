@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
@@ -114,22 +115,17 @@ final class RecommendationConfigResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Select::make('products')
+                            Combobox::make('products')
                                 ->label(__('recommendation_config.fields.products'))
                                 ->relationship('products', 'name')
-                                ->multiple()
                                 ->preload()
-                                ->searchable()
-                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
-                                ->native(false),
-                            Select::make('categories')
+                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state),
+                            Combobox::make('categories')
                                 ->label(__('recommendation_config.fields.categories'))
                                 ->relationship('categories', 'name')
-                                ->multiple()
                                 ->preload()
-                                ->searchable()
-                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
-                                ->native(false),
+                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state),
+
                         ]),
                 ]),
         ]);
