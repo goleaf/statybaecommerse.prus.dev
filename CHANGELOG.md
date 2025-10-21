@@ -11,6 +11,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
 
+### Bug Fixes
+* Ensured the price list discount filter only surfaces items where the compare price actually exceeds the net price and added coverage to guard the behaviour going forward.
+
 ## [0.1.0] - 2025-10-20
 
 ### Features & Enhancements
