@@ -18,6 +18,8 @@ use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
@@ -44,7 +46,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -354,11 +356,61 @@ final class ProductResource extends Resource
                     ->label(__('products.fields.image'))
                     ->circular()
                     ->size(50),
-                TextColumn::make('name')
+                BadgeableColumn::make('name')
                     ->label(__('products.fields.name'))
                     ->searchable()
                     ->sortable()
-                    ->limit(50),
+                    ->prefixBadges([
+                        Badge::make('status')
+                            ->label(fn (Product $record): string => __('products.status.' . $record->status))
+                            ->color(fn (Product $record): string => match ($record->status) {
+                                'published' => 'success',
+                                'draft'     => 'gray',
+                                'archived'  => 'warning',
+                                default     => 'primary',
+                            }),
+                    ])
+                    ->suffixBadges(function (Product $record): array {
+                        $badges = [];
+                        $locale = app()->getLocale();
+
+                        $categoryBadges = $record->categories->map(function ($category) use ($locale): Badge {
+                            $label = method_exists($category, 'getTranslation')
+                                ? (string) $category->getTranslation('name', $locale)
+                                : (string) $category->name;
+
+                            return Badge::make('category-' . $category->getKey())
+                                ->label($label)
+                                ->color('primary');
+                        })->all();
+
+                        if ($categoryBadges !== []) {
+                            $badges = array_merge($badges, $categoryBadges);
+                        }
+
+                        if ($record->is_featured) {
+                            $badges[] = Badge::make('featured')
+                                ->label(__('products.fields.is_featured'))
+                                ->color('warning');
+                        }
+
+                        if ($record->manage_stock) {
+                            if ($record->stock_quantity <= 0) {
+                                $badges[] = Badge::make('out-of-stock')
+                                    ->label(__('products.filters.out_of_stock'))
+                                    ->color('danger');
+                            } elseif ($record->low_stock_threshold !== null && $record->stock_quantity <= $record->low_stock_threshold) {
+                                $badges[] = Badge::make('low-stock')
+                                    ->label(__('products.filters.low_stock'))
+                                    ->color('warning');
+                            }
+                        }
+
+                        return $badges;
+                    })
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('sku')
                     ->label(__('products.fields.sku'))
                     ->searchable()
@@ -381,13 +433,6 @@ final class ProductResource extends Resource
                         $state <= 10 => 'warning',
                         default      => 'success',
                     }),
-                BadgeColumn::make('status')
-                    ->label(__('products.fields.status'))
-                    ->colors([
-                        'draft'     => 'gray',
-                        'published' => 'success',
-                        'archived'  => 'warning',
-                    ]),
                 IconColumn::make('is_visible')
                     ->label(__('products.fields.is_visible'))
                     ->boolean(),
@@ -723,6 +768,7 @@ final class ProductResource extends Resource
             ->with([
                 'brand:id,name',
                 'primaryImage',
+                'categories.translations',
             ])
             ->withCount([
                 'reviews as approved_reviews_count' => fn (Builder $query): Builder => $query->where('is_approved', true),

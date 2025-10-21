@@ -8,14 +8,16 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -23,15 +25,15 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Size;
 use Filament\Tables;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -40,11 +42,13 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use UnitEnum;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Excel;
 use pxlrbt\FilamentExcel\Actions\ExportBulkAction as ExcelExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use RuntimeException;
+use UnitEnum;
 
 /**
  * PostResource
@@ -65,7 +69,7 @@ final class PostResource extends Resource
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
-     * @var string|\BackedEnum|null
+     * @var string|BackedEnum|null
      */
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -114,7 +118,7 @@ final class PostResource extends Resource
                                     ->live()
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
                                         if (! $get('slug') && filled($state)) {
-                                            $set('slug', \Str::slug($state));
+                                            $set('slug', Str::slug($state));
                                         }
                                     }),
                                 TextInput::make('slug')
@@ -162,9 +166,9 @@ final class PostResource extends Resource
                                 Select::make('status')
                                     ->label(__('posts.fields.status'))
                                     ->options([
-                                        'draft' => __('posts.status.draft'),
+                                        'draft'     => __('posts.status.draft'),
                                         'published' => __('posts.status.published'),
-                                        'archived' => __('posts.status.archived'),
+                                        'archived'  => __('posts.status.archived'),
                                     ])
                                     ->default('draft')
                                     ->required()
@@ -252,31 +256,64 @@ final class PostResource extends Resource
                     ->conversion('thumb')
                     ->circular()
                     ->size(50),
-                TextColumn::make('title')
+                BadgeableColumn::make('title')
                     ->label(__('posts.fields.title'))
                     ->searchable()
                     ->sortable()
-                    ->limit(50),
+                    ->prefixBadges([
+                        Badge::make('status')
+                            ->label(fn (Post $record): string => __('posts.status.' . ($record->status ?? 'draft')))
+                            ->color(fn (Post $record): string => match ($record->status) {
+                                'published' => 'success',
+                                'review'    => 'info',
+                                'archived'  => 'gray',
+                                default     => 'warning',
+                            }),
+                        Badge::make('moderation')
+                            ->label(fn (Post $record): string => $record->moderation_state?->label() ?? __('posts.status.draft'))
+                            ->color(fn (Post $record): string => match ($record->moderation_state) {
+                                ModerationState::Published => 'success',
+                                ModerationState::Review    => 'info',
+                                ModerationState::Draft     => 'warning',
+                                default                    => 'gray',
+                            }),
+                    ])
+                    ->suffixBadges(function (Post $record): array {
+                        $badges = [];
+                        $locale = app()->getLocale();
+
+                        if ($record->featured) {
+                            $badges[] = Badge::make('featured')
+                                ->label(__('posts.fields.featured'))
+                                ->color('warning');
+                        }
+
+                        if ($record->is_pinned) {
+                            $badges[] = Badge::make('pinned')
+                                ->label(__('posts.fields.is_pinned'))
+                                ->color('primary');
+                        }
+
+                        $tags = (string) ($record->getTranslatedTags($locale) ?? $record->tags);
+                        $tagItems = collect(preg_split('/[,;]+/', $tags))
+                            ->map(static fn (?string $tag): string => trim((string) $tag))
+                            ->filter(fn (string $tag): bool => $tag !== '');
+
+                        foreach ($tagItems as $index => $tag) {
+                            $badges[] = Badge::make('tag-' . $index)
+                                ->label($tag)
+                                ->color('secondary');
+                        }
+
+                        return $badges;
+                    })
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('user.name')
                     ->label(__('posts.fields.user_id'))
                     ->sortable()
                     ->searchable(),
-                BadgeColumn::make('moderation_state')
-                    ->label(__('posts.fields.moderation_state'))
-                    ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
-                    ->colors([
-                        'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
-                        'info' => fn (?ModerationState $state): bool => $state === ModerationState::Review,
-                        'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
-                    ])
-                    ->sortable(),
-                BadgeColumn::make('status')
-                    ->label(__('posts.fields.status'))
-                    ->colors([
-                        'warning' => 'draft',
-                        'success' => 'published',
-                        'danger' => 'archived',
-                    ]),
                 IconColumn::make('featured')
                     ->label(__('posts.fields.featured'))
                     ->boolean()
@@ -308,9 +345,9 @@ final class PostResource extends Resource
                 SelectFilter::make('status')
                     ->label(__('posts.fields.status'))
                     ->options([
-                        'draft' => __('posts.status.draft'),
+                        'draft'     => __('posts.status.draft'),
                         'published' => __('posts.status.published'),
-                        'archived' => __('posts.status.archived'),
+                        'archived'  => __('posts.status.archived'),
                     ]),
                 SelectFilter::make('user_id')
                     ->label(__('posts.fields.user_id'))
@@ -357,9 +394,9 @@ final class PostResource extends Resource
                     ->visible(fn (Post $record): bool => $record->moderation_state === ModerationState::Draft)
                     ->action(function (Post $record): void {
                         $record->update([
-                            'moderation_state' => ModerationState::Review,
+                            'moderation_state'        => ModerationState::Review,
                             'submitted_for_review_at' => now(),
-                            'status' => 'draft',
+                            'status'                  => 'draft',
                         ]);
 
                         activity()
@@ -390,23 +427,23 @@ final class PostResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new \RuntimeException('Approvals require an authenticated user.');
+                            throw new RuntimeException('Approvals require an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $data, $userId): void {
                             $record->approvals()->create([
-                                'user_id' => $userId,
-                                'decision' => 'approved',
-                                'notes' => $data['notes'] ?? null,
+                                'user_id'    => $userId,
+                                'decision'   => 'approved',
+                                'notes'      => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
                                 'moderation_state' => ModerationState::Published,
-                                'approved_at' => now(),
-                                'approved_by_id' => $userId,
-                                'status' => 'published',
-                                'published_at' => $record->published_at ?? now(),
+                                'approved_at'      => now(),
+                                'approved_by_id'   => $userId,
+                                'status'           => 'published',
+                                'published_at'     => $record->published_at ?? now(),
                             ]);
                         });
 
@@ -438,23 +475,23 @@ final class PostResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new \RuntimeException('Return to draft requires an authenticated user.');
+                            throw new RuntimeException('Return to draft requires an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $data, $userId): void {
                             $record->approvals()->create([
-                                'user_id' => $userId,
-                                'decision' => 'returned',
-                                'notes' => $data['notes'] ?? null,
+                                'user_id'    => $userId,
+                                'decision'   => 'returned',
+                                'notes'      => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
-                                'moderation_state' => ModerationState::Draft,
+                                'moderation_state'        => ModerationState::Draft,
                                 'submitted_for_review_at' => null,
-                                'approved_at' => null,
-                                'approved_by_id' => null,
-                                'status' => 'draft',
+                                'approved_at'             => null,
+                                'approved_by_id'          => null,
+                                'status'                  => 'draft',
                             ]);
                         });
 
@@ -492,6 +529,11 @@ final class PostResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['user:id,name']);
+    }
+
     /**
      * Get the relations for this resource.
      */
@@ -508,10 +550,10 @@ final class PostResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPosts::route('/'),
+            'index'  => Pages\ListPosts::route('/'),
             'create' => Pages\CreatePost::route('/create'),
-            'view' => Pages\ViewPost::route('/{record}'),
-            'edit' => Pages\EditPost::route('/{record}/edit'),
+            'view'   => Pages\ViewPost::route('/{record}'),
+            'edit'   => Pages\EditPost::route('/{record}/edit'),
         ];
     }
 }

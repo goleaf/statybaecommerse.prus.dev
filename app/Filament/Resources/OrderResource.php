@@ -14,6 +14,8 @@ use App\Services\Export\ExportService;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Search\CustomerSearch;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
@@ -38,7 +40,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -358,12 +360,57 @@ final class OrderResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('number')
+                BadgeableColumn::make('number')
                     ->label(__('orders.fields.order_number'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->weight('bold'),
+                    ->prefixBadges([
+                        Badge::make('order-status')
+                            ->label(fn (Order $record): string => __('orders.statuses.' . ($record->status ?? 'pending')))
+                            ->color(fn (Order $record): string => match ($record->status) {
+                                'delivered', 'completed' => 'success',
+                                'processing', 'confirmed' => 'primary',
+                                'shipped' => 'info',
+                                'cancelled', 'returned' => 'danger',
+                                default => 'warning',
+                            }),
+                        Badge::make('payment-status')
+                            ->label(fn (Order $record): string => __('orders.payment_statuses.' . ($record->payment_status ?? 'pending')))
+                            ->color(fn (Order $record): string => match ($record->payment_status) {
+                                'paid' => 'success',
+                                'refunded', 'partially_refunded' => 'gray',
+                                'failed' => 'danger',
+                                default  => 'warning',
+                            }),
+                    ])
+                    ->suffixBadges(function (Order $record): array {
+                        $badges = [];
+
+                        $shippingStatus = $record->shipping?->status;
+
+                        if ($shippingStatus) {
+                            $badges[] = Badge::make('shipping-status')
+                                ->label(__('admin.enums.shipping_statuses.' . $shippingStatus))
+                                ->color(match ($shippingStatus) {
+                                    'delivered' => 'success',
+                                    'returned'  => 'danger',
+                                    'in_transit', 'shipped' => 'info',
+                                    default => 'primary',
+                                });
+                        }
+
+                        if (in_array($record->payment_status, ['paid', 'captured', 'settled', 'authorized'], true)) {
+                            $badges[] = Badge::make('paid')
+                                ->label(__('orders.payment_statuses.paid'))
+                                ->color('success');
+                        }
+
+                        return $badges;
+                    })
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('user.name')
                     ->label(__('orders.fields.customer'))
                     ->limit(30)
@@ -373,28 +420,6 @@ final class OrderResource extends Resource
                         return strlen($state) > 30 ? $state : null;
                     })
                     ->searchable()
-                    ->sortable(),
-                BadgeColumn::make('status')
-                    ->label(__('orders.fields.status'))
-                    ->colors([
-                        'warning'   => 'pending',
-                        'primary'   => 'processing',
-                        'info'      => 'shipped',
-                        'success'   => 'delivered',
-                        'danger'    => 'cancelled',
-                        'secondary' => 'refunded',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => __("orders.status.{$state}"))
-                    ->sortable(),
-                BadgeColumn::make('payment_status')
-                    ->label(__('orders.fields.payment_status'))
-                    ->colors([
-                        'warning'   => 'pending',
-                        'success'   => 'paid',
-                        'danger'    => 'failed',
-                        'secondary' => 'refunded',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => __("orders.payment_status.{$state}"))
                     ->sortable(),
                 TextColumn::make('total')
                     ->label(__('orders.fields.total'))
@@ -739,6 +764,15 @@ final class OrderResource extends Resource
             'view'   => Pages\ViewOrder::route('/{record}'),
             'edit'   => Pages\EditOrder::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with([
+            'user:id,name,email',
+            'shipping:id,order_id,status',
+            'channel:id,name',
+        ]);
     }
 
     /**

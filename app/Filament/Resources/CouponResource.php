@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -16,6 +18,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -23,12 +26,12 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 final class CouponResource extends Resource
@@ -85,8 +88,8 @@ final class CouponResource extends Resource
                             Select::make('type')
                                 ->label(__('coupons.type'))
                                 ->options([
-                                    'percentage' => __('coupons.types.percentage'),
-                                    'fixed' => __('coupons.types.fixed'),
+                                    'percentage'    => __('coupons.types.percentage'),
+                                    'fixed'         => __('coupons.types.fixed'),
                                     'free_shipping' => __('coupons.types.free_shipping'),
                                 ])
                                 ->default('percentage')
@@ -200,14 +203,64 @@ final class CouponResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('code')
+                BadgeableColumn::make('code')
                     ->label(__('coupons.code'))
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
                     ->copyable()
-                    ->badge()
-                    ->color('blue'),
+                    ->prefixBadges([
+                        Badge::make('status')
+                            ->label(fn (Coupon $record): string => $record->is_active ? __('discount_codes.active') : __('discount_codes.inactive'))
+                            ->color(fn (Coupon $record): string => $record->is_active ? 'success' : 'danger'),
+                    ])
+                    ->suffixBadges(function (Coupon $record): array {
+                        $badges = [];
+
+                        if ($record->type) {
+                            $badges[] = Badge::make('type-' . $record->type)
+                                ->label(__('discount_codes.types.' . $record->type))
+                                ->color('primary');
+                        }
+
+                        if ($record->is_public) {
+                            $badges[] = Badge::make('visibility-public')
+                                ->label(__('discount_codes.is_public'))
+                                ->color('success');
+                        } else {
+                            $badges[] = Badge::make('visibility-private')
+                                ->label(__('discount_codes.private_only'))
+                                ->color('gray');
+                        }
+
+                        if ($record->is_auto_apply) {
+                            $badges[] = Badge::make('auto-apply')
+                                ->label(__('discount_codes.is_auto_apply'))
+                                ->color('info');
+                        }
+
+                        if ($record->is_stackable) {
+                            $badges[] = Badge::make('stackable')
+                                ->label(__('discount_codes.is_stackable'))
+                                ->color('warning');
+                        }
+
+                        if ($record->valid_from) {
+                            $badges[] = Badge::make('valid-from')
+                                ->label(__('discount_codes.valid_from') . ': ' . $record->valid_from->format('Y-m-d'))
+                                ->color('secondary');
+                        }
+
+                        if ($record->valid_until) {
+                            $badges[] = Badge::make('valid-until')
+                                ->label(__('discount_codes.valid_until') . ': ' . $record->valid_until->format('Y-m-d'))
+                                ->color('secondary');
+                        }
+
+                        return $badges;
+                    })
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('name')
                     ->label(__('coupons.name'))
                     ->limit(50),
@@ -215,16 +268,16 @@ final class CouponResource extends Resource
                     ->label(__('coupons.type'))
                     ->formatStateUsing(fn (?string $state): string => $state ? __("coupons.types.{$state}") : '—')
                     ->color(fn (?string $state): string => match ($state) {
-                        'percentage' => 'green',
-                        'fixed' => 'blue',
+                        'percentage'    => 'green',
+                        'fixed'         => 'blue',
                         'free_shipping' => 'purple',
-                        default => 'gray',
+                        default         => 'gray',
                     }),
                 TextColumn::make('value')
                     ->label(__('coupons.value'))
                     ->formatStateUsing(function ($state, Coupon $record): string {
                         if ($record->type === 'percentage') {
-                            return is_null($state) ? '—' : $state.'%';
+                            return is_null($state) ? '—' : $state . '%';
                         }
 
                         if ($record->type === 'free_shipping') {
@@ -235,7 +288,7 @@ final class CouponResource extends Resource
                             return '—';
                         }
 
-                        return '€'.number_format((float) $state, 2);
+                        return '€' . number_format((float) $state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -252,13 +305,6 @@ final class CouponResource extends Resource
                 TextColumn::make('customerGroup.name')
                     ->label(__('coupons.customer_group'))
                     ->color('gray'),
-                BadgeColumn::make('is_active')
-                    ->label(__('coupons.status'))
-                    ->formatStateUsing(fn (bool $state): string => $state ? __('coupons.active') : __('coupons.inactive'))
-                    ->colors([
-                        'success' => true,
-                        'danger' => false,
-                    ]),
                 IconColumn::make('is_public')
                     ->label(__('coupons.is_public'))
                     ->boolean(),
@@ -290,8 +336,8 @@ final class CouponResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'percentage' => __('coupons.types.percentage'),
-                        'fixed' => __('coupons.types.fixed'),
+                        'percentage'    => __('coupons.types.percentage'),
+                        'fixed'         => __('coupons.types.fixed'),
                         'free_shipping' => __('coupons.types.free_shipping'),
                     ]),
                 SelectFilter::make('customer_group_id')
@@ -334,8 +380,8 @@ final class CouponResource extends Resource
                     ->color('info')
                     ->action(function (Coupon $record): void {
                         $newCoupon = $record->replicate();
-                        $newCoupon->code = $record->code.'_copy_'.time();
-                        $newCoupon->name = $record->name.' (Copy)';
+                        $newCoupon->code = $record->code . '_copy_' . time();
+                        $newCoupon->name = $record->name . ' (Copy)';
                         $newCoupon->used_count = 0;
                         $newCoupon->save();
 
@@ -379,6 +425,11 @@ final class CouponResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['customerGroup:id,name']);
+    }
+
     /**
      * Get the relations for this resource.
      */
@@ -395,10 +446,10 @@ final class CouponResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCoupons::route('/'),
+            'index'  => Pages\ListCoupons::route('/'),
             'create' => Pages\CreateCoupon::route('/create'),
-            'view' => Pages\ViewCoupon::route('/{record}'),
-            'edit' => Pages\EditCoupon::route('/{record}/edit'),
+            'view'   => Pages\ViewCoupon::route('/{record}'),
+            'edit'   => Pages\EditCoupon::route('/{record}/edit'),
         ];
     }
 }
