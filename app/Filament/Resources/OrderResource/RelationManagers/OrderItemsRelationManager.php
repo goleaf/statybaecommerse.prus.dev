@@ -7,6 +7,7 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -74,28 +75,37 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
+                                        // Hydrate using shared helper per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static function (int $value): ?array {
+                                                $variant = ProductVariant::query()
+                                                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                                    ->with(['product:id,sku,name'])
+                                                    ->find($value);
 
-                                        $variant = ProductVariant::query()
-                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                            ->with(['product:id,sku,name'])
-                                            ->find($state);
+                                                if (! $variant instanceof ProductVariant) {
+                                                    return null;
+                                                }
 
-                                        if (! $variant instanceof ProductVariant) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
-                                            ]);
+                                                return [
+                                                    'value' => $variant->getKey(),
+                                                    'label' => ProductVariantSearch::label($variant),
+                                                ];
+                                            },
+                                        );
                                     })
                                     ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
                                         if ($state === null || $state === '') {
-                                            $set('product_variant_id', null);
+                                            SearchableInputHelper::clear($set, [
+                                                'product_variant_id' => null,
+                                                'product_id'         => null,
+                                                'name'               => null,
+                                                'sku'                => null,
+                                                'unit_price'         => null,
+                                                'total'              => 0,
+                                            ]);
 
                                             return;
                                         }

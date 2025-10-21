@@ -10,10 +10,12 @@ use App\Models\Address;
 use App\Models\Channel;
 use App\Models\Order;
 use App\Models\Partner;
+use App\Models\User;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
@@ -189,20 +191,37 @@ final class OrderResource extends Resource
                                 ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
-                                    if ($state === null || ! $record?->user) {
-                                        return;
-                                    }
+                                    // Hydrate via helper to honour docs/forms/SEARCHABLE_INPUT_METADATA.md expectations.
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static function (int $value) use ($record): ?array {
+                                            $user = $record?->user;
 
-                                    $label = trim(sprintf('%s <%s>', (string) ($record->user->name ?? ''), (string) ($record->user->email ?? '')));
+                                            if (! $user instanceof User || $user->getKey() !== $value) {
+                                                $user = User::query()
+                                                    ->select(['id', 'name', 'email'])
+                                                    ->find($value);
+                                            }
 
-                                    $component
-                                        ->state((string) $state)
-                                        ->options([
-                                            (string) $record->user_id => $label,
-                                        ]);
+                                            if (! $user instanceof User) {
+                                                return null;
+                                            }
+
+                                            $label = trim(sprintf('%s <%s>', (string) ($user->name ?? ''), (string) ($user->email ?? '')));
+
+                                            return [
+                                                'value' => $user->getKey(),
+                                                'label' => $label,
+                                            ];
+                                        },
+                                    );
                                 })
                                 ->afterStateUpdated(function (?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
+                                        // Reset the relationship when cleared (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                        SearchableInputHelper::clear($set, ['user_id' => null]);
+
                                         return;
                                     }
 
@@ -312,10 +331,19 @@ final class OrderResource extends Resource
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    // Hydrate inline per docs/forms/SEARCHABLE_INPUT_METADATA.md helper guidance.
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static fn (int $value): ?array => ['value' => $value, 'label' => (string) $value],
+                                    );
+                                })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?int $state, Set $set): void {
                                     if ($state === null) {
-                                        $set('billing_address', []);
+                                        // Reset the cached billing payload when cleared.
+                                        SearchableInputHelper::clear($set, ['billing_address' => []]);
 
                                         return;
                                     }
@@ -336,10 +364,18 @@ final class OrderResource extends Resource
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    // Maintain parity with helper docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static fn (int $value): ?array => ['value' => $value, 'label' => (string) $value],
+                                    );
+                                })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?int $state, Set $set): void {
                                     if ($state === null) {
-                                        $set('shipping_address', []);
+                                        SearchableInputHelper::clear($set, ['shipping_address' => []]);
 
                                         return;
                                     }
@@ -406,26 +442,34 @@ final class OrderResource extends Resource
                                 ->searchUsing(fn (string $value): array => ChannelSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    if ($state === null) {
-                                        return;
-                                    }
+                                    // Hydrate via helper to keep channel labels consistent (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static function (int $value): ?array {
+                                            $channel = Channel::query()
+                                                ->select(['id', 'name', 'code', 'type'])
+                                                ->find($value);
 
-                                    $channel = Channel::query()
-                                        ->select(['id', 'name', 'code', 'type'])
-                                        ->find($state);
+                                            if (! $channel instanceof Channel) {
+                                                return null;
+                                            }
 
-                                    if (! $channel instanceof Channel) {
-                                        return;
-                                    }
-
-                                    $component
-                                        ->state((string) $state)
-                                        ->options([
-                                            (string) $channel->getKey() => ChannelSearch::label($channel),
-                                        ]);
+                                            return [
+                                                'value' => $channel->getKey(),
+                                                'label' => ChannelSearch::label($channel),
+                                            ];
+                                        },
+                                    );
                                 })
                                 ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    $set('channel_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    if ($state === null || $state === '') {
+                                        SearchableInputHelper::clear($set, ['channel_id' => null]);
+
+                                        return;
+                                    }
+
+                                    $set('channel_id', (int) $state);
                                 }),
                             SearchableInput::make('partner_id')
                                 ->label(__('orders.fields.partner'))
@@ -433,26 +477,34 @@ final class OrderResource extends Resource
                                 ->searchUsing(fn (string $value): array => PartnerSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    if ($state === null) {
-                                        return;
-                                    }
+                                    // Helper aligns hydration with docs/forms/SEARCHABLE_INPUT_METADATA.md expectations.
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static function (int $value): ?array {
+                                            $partner = Partner::query()
+                                                ->select(['id', 'name', 'code', 'contact_email'])
+                                                ->find($value);
 
-                                    $partner = Partner::query()
-                                        ->select(['id', 'name', 'code', 'contact_email'])
-                                        ->find($state);
+                                            if (! $partner instanceof Partner) {
+                                                return null;
+                                            }
 
-                                    if (! $partner instanceof Partner) {
-                                        return;
-                                    }
-
-                                    $component
-                                        ->state((string) $state)
-                                        ->options([
-                                            (string) $partner->getKey() => PartnerSearch::label($partner),
-                                        ]);
+                                            return [
+                                                'value' => $partner->getKey(),
+                                                'label' => PartnerSearch::label($partner),
+                                            ];
+                                        },
+                                    );
                                 })
                                 ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    $set('partner_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    if ($state === null || $state === '') {
+                                        SearchableInputHelper::clear($set, ['partner_id' => null]);
+
+                                        return;
+                                    }
+
+                                    $set('partner_id', (int) $state);
                                 }),
                         ]),
                 ])

@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
@@ -97,21 +98,45 @@ final class OrderItemResource extends Resource
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?OrderItem $record): void {
-                                    if ($state === null || ! $record?->product) {
-                                        return;
-                                    }
+                                    // Helper keeps hydration in sync with docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static function (int $value) use ($record): ?array {
+                                            $product = $record?->product;
 
-                                    $label = sprintf('[%s] %s', $record->product->sku ?? '—', $record->product->name ?? '');
+                                            if (! $product instanceof Product || $product->getKey() !== $value) {
+                                                $product = Product::query()
+                                                    ->select(['id', 'sku', 'name'])
+                                                    ->find($value);
+                                            }
 
-                                    $component
-                                        ->state((string) $state)
-                                        ->options([
-                                            (string) $record->product_id => $label,
-                                        ]);
+                                            if (! $product instanceof Product) {
+                                                return null;
+                                            }
+
+                                            $sku = $product->sku ?? '—';
+                                            $name = $product->name ?? '';
+
+                                            return [
+                                                'value' => $product->getKey(),
+                                                'label' => sprintf('[%s] %s', is_string($sku) ? $sku : '—', is_string($name) ? $name : ''),
+                                            ];
+                                        },
+                                    );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
+                                        // Clear product metadata when the lookup resets (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                        SearchableInputHelper::clear($set, [
+                                            'product_id'         => null,
+                                            'name'               => null,
+                                            'sku'                => null,
+                                            'unit_price'         => null,
+                                            'product_variant_id' => null,
+                                        ]);
+
                                         return;
                                     }
 
