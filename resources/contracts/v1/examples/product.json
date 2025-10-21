@@ -1,62 +1,62 @@
 {
-  "contract": "product",
-  "version": "v1",
-  "data": {
-    "item": {
-      "id": 1,
-      "slug": "demo-product",
-      "name": "Demo Product",
-      "sku": "SKU-001",
-      "description": "A contract example product for schema validation.",
-      "short_description": "Contract demo product",
-      "pricing": {
-        "amount": 129.99,
-        "sale_amount": 99.99,
-        "currency": "EUR"
-      },
-      "brand": {
-        "id": 5,
-        "name": "Demo Brand",
-        "slug": "demo-brand"
-      },
-      "category": {
-        "id": 9,
-        "name": "Demo Category",
-        "slug": "demo-category"
-      },
-      "media": {
-        "images": [
-          {
-            "url": "https://example.com/storage/products/demo-product.jpg",
-            "thumbnail": "https://example.com/storage/products/demo-product-thumb.jpg",
-            "alt": "Demo product image"
-          }
-        ]
-      },
-      "variants": [
-        {
-          "id": 101,
-          "name": "Default",
-          "sku": "SKU-001",
-          "price": 129.99,
-          "stock_quantity": 42
+    "contract": "product",
+    "version": "v1",
+    "data": {
+        "item": {
+            "id": 1,
+            "slug": "demo-product",
+            "name": "Demo Product",
+            "sku": "SKU-001",
+            "description": "A contract example product for schema validation.",
+            "short_description": "Contract demo product",
+            "pricing": {
+                "amount": 129.99,
+                "sale_amount": 99.99,
+                "currency": "EUR"
+            },
+            "brand": {
+                "id": 5,
+                "name": "Demo Brand",
+                "slug": "demo-brand"
+            },
+            "category": {
+                "id": 9,
+                "name": "Demo Category",
+                "slug": "demo-category"
+            },
+            "media": {
+                "images": [
+                    {
+                        "url": "https://example.com/storage/products/demo-product.jpg",
+                        "thumbnail": "https://example.com/storage/products/demo-product-thumb.jpg",
+                        "alt": "Demo product image"
+                    }
+                ]
+            },
+            "variants": [
+                {
+                    "id": 101,
+                    "name": "Default",
+                    "sku": "SKU-001",
+                    "price": 129.99,
+                    "stock_quantity": 42
+                }
+            ],
+            "inventory": {
+                "manage_stock": true,
+                "stock_quantity": 42,
+                "is_in_stock": true
+            },
+            "status": {
+                "is_visible": true,
+                "is_featured": false
+            },
+            "links": {
+                "self": "https://example.com/products/demo-product"
+            }
         }
-      ],
-      "inventory": {
-        "manage_stock": true,
-        "stock_quantity": 42,
-        "is_in_stock": true
-      },
-      "status": {
-        "is_visible": true,
-        "is_featured": false
-      },
-      "links": {
-        "self": "https://example.com/products/demo-product"
-      }
+    },
+    "meta": {
+        "generated_at": "2024-01-01T00:00:00+00:00"
     }
-  },
-  "meta": {
-    "generated_at": "2024-01-01T00:00:00+00:00"
-  }
 }

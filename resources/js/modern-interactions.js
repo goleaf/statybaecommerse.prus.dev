@@ -1,14 +1,13 @@
 // Modern Frontend Interactions and Animations
-document.addEventListener('DOMContentLoaded', function() {
-    
+document.addEventListener('DOMContentLoaded', function () {
     // Enhanced scroll animations with Intersection Observer
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px 0px -50px 0px',
     };
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
             }
@@ -16,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, observerOptions);
 
     // Observe all elements with animate-on-scroll class
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+    document.querySelectorAll('.animate-on-scroll').forEach((el) => {
         observer.observe(el);
     });
 
@@ -54,16 +53,16 @@ document.addEventListener('DOMContentLoaded', function() {
         backToTopButton.addEventListener('click', () => {
             window.scrollTo({
                 top: 0,
-                behavior: 'smooth'
+                behavior: 'smooth',
             });
         });
     }
 
     // Enhanced search functionality with modern UX
     const searchInputs = document.querySelectorAll('input[type="search"]');
-    searchInputs.forEach(input => {
+    searchInputs.forEach((input) => {
         let searchTimeout;
-        
+
         input.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
@@ -87,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modern card hover effects
     const cards = document.querySelectorAll('.card-hover, .product-card');
-    cards.forEach(card => {
+    cards.forEach((card) => {
         card.addEventListener('mouseenter', () => {
             card.style.transform = 'translateY(-8px) scale(1.02)';
         });
@@ -99,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Enhanced button interactions
     const buttons = document.querySelectorAll('.btn-gradient, .btn-glass, .btn-floating');
-    buttons.forEach(button => {
+    buttons.forEach((button) => {
         button.addEventListener('mouseenter', () => {
             button.style.transform = 'scale(1.05)';
         });
@@ -123,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('scroll', () => {
             const scrolled = window.pageYOffset;
             const rate = scrolled * -0.5;
-            
-            parallaxElements.forEach(element => {
+
+            parallaxElements.forEach((element) => {
                 element.style.transform = `translateY(${rate}px)`;
             });
         });
@@ -132,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Enhanced form interactions
     const formInputs = document.querySelectorAll('input, textarea, select');
-    formInputs.forEach(input => {
+    formInputs.forEach((input) => {
         input.addEventListener('focus', () => {
             input.parentElement.classList.add('ring-2', 'ring-blue-500/20');
         });
@@ -146,14 +145,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `fixed top-4 right-4 z-50 p-4 rounded-2xl shadow-large backdrop-blur-xl transition-all duration-300 transform translate-x-full`;
-        
+
         const colors = {
             success: 'bg-green-500/90 text-white',
             error: 'bg-red-500/90 text-white',
             warning: 'bg-yellow-500/90 text-white',
-            info: 'bg-blue-500/90 text-white'
+            info: 'bg-blue-500/90 text-white',
         };
-        
+
         notification.className += ` ${colors[type]}`;
         notification.innerHTML = `
             <div class="flex items-center gap-3">
@@ -165,14 +164,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             </div>
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         // Animate in
         setTimeout(() => {
             notification.classList.remove('translate-x-full');
         }, 100);
-        
+
         // Auto remove after 5 seconds
         setTimeout(() => {
             notification.classList.add('translate-x-full');
@@ -187,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Enhanced mobile menu interactions
     const mobileMenuButtons = document.querySelectorAll('[wire\\:click="toggleMobileMenu"]');
-    mobileMenuButtons.forEach(button => {
+    mobileMenuButtons.forEach((button) => {
         button.addEventListener('click', () => {
             button.classList.add('animate-pulse');
             setTimeout(() => {
@@ -199,28 +198,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modern image lazy loading with fade-in effect
     const images = document.querySelectorAll('img[loading="lazy"]');
     const imageObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 const img = entry.target;
                 img.style.opacity = '0';
                 img.style.transition = 'opacity 0.5s ease-in-out';
-                
+
                 img.onload = () => {
                     img.style.opacity = '1';
                 };
-                
+
                 imageObserver.unobserve(img);
             }
         });
     });
 
-    images.forEach(img => {
+    images.forEach((img) => {
         imageObserver.observe(img);
     });
 
     // Enhanced scroll progress indicator
     const progressBar = document.createElement('div');
-    progressBar.className = 'fixed top-0 left-0 w-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-50 transition-all duration-300';
+    progressBar.className =
+        'fixed top-0 left-0 w-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-50 transition-all duration-300';
     document.body.appendChild(progressBar);
 
     window.addEventListener('scroll', () => {
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modern cursor effects for interactive elements
     const interactiveElements = document.querySelectorAll('a, button, [role="button"]');
-    interactiveElements.forEach(element => {
+    interactiveElements.forEach((element) => {
         element.addEventListener('mouseenter', () => {
             document.body.style.cursor = 'pointer';
         });
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape') {
             // Close any open modals or dropdowns
             const openModals = document.querySelectorAll('.modal-open');
-            openModals.forEach(modal => {
+            openModals.forEach((modal) => {
                 modal.classList.remove('modal-open');
             });
         }
@@ -255,18 +255,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modern page transitions
     const links = document.querySelectorAll('a[href^="/"], a[href^="./"]');
-    links.forEach(link => {
+    links.forEach((link) => {
         link.addEventListener('click', (e) => {
             if (!e.ctrlKey && !e.metaKey) {
                 e.preventDefault();
                 const href = link.getAttribute('href');
-                
+
                 // Show loading overlay
                 if (loadingOverlay) {
                     loadingOverlay.classList.remove('opacity-0', 'pointer-events-none');
                     loadingOverlay.classList.add('opacity-100');
                 }
-                
+
                 // Navigate after a short delay for smooth transition
                 setTimeout(() => {
                     window.location.href = href;
@@ -288,11 +288,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modern error handling for failed image loads
     const allImages = document.querySelectorAll('img');
-    allImages.forEach(img => {
+    allImages.forEach((img) => {
         img.addEventListener('error', () => {
             img.style.display = 'none';
             const placeholder = document.createElement('div');
-            placeholder.className = 'w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center';
+            placeholder.className =
+                'w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center';
             placeholder.innerHTML = `
                 <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -321,7 +322,7 @@ window.ModernUI = {
             const targetPosition = target.offsetTop - offset;
             window.scrollTo({
                 top: targetPosition,
-                behavior: 'smooth'
+                behavior: 'smooth',
             });
         }
     },
@@ -350,5 +351,5 @@ window.ModernUI = {
         setTimeout(() => {
             element.style.animation = '';
         }, duration);
-    }
+    },
 };
