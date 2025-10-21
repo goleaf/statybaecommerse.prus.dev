@@ -9,15 +9,16 @@ use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Section as InfolistSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -46,28 +47,40 @@ final class ReferralRewardResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
                     ->schema([
                         Select::make('referral_id')
                             ->label(__('referral_rewards.fields.referral'))
-                            ->relationship('referral', 'referral_code', fn (Builder $query) => $query->withoutGlobalScopes())
+                            ->relationship(
+                                name: 'referral',
+                                titleAttribute: 'referral_code',
+                                modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes(),
+                            )
                             ->searchable()
                             ->preload()
                             ->nullable(),
                         Select::make('user_id')
                             ->label(__('referral_rewards.fields.user'))
-                            ->relationship('user', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
+                            ->relationship(
+                                name: 'user',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes(),
+                            )
                             ->searchable()
                             ->preload()
                             ->required(),
                         Select::make('order_id')
                             ->label(__('referral_rewards.fields.order'))
-                            ->relationship('order', 'id', fn (Builder $query) => $query->withoutGlobalScopes())
+                            ->relationship(
+                                name: 'order',
+                                titleAttribute: 'id',
+                                modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes(),
+                            )
                             ->searchable()
                             ->preload()
                             ->nullable(),
@@ -254,9 +267,9 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return $schema
+        return $infolist
             ->schema([
                 InfolistSection::make(__('referral_rewards.sections.reward_details'))
                     ->schema([
@@ -271,6 +284,20 @@ final class ReferralRewardResource extends Resource
                     ])
                     ->columns(1),
             ]);
+    }
+
+    public static function getNavigationIcon(): ?string
+    {
+        $icon = self::$navigationIcon;
+
+        return $icon instanceof BackedEnum ? $icon->value : $icon;
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        $group = self::$navigationGroup;
+
+        return $group instanceof UnitEnum ? $group->value : $group;
     }
 
     public static function getRelations(): array
