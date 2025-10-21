@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserProductInteraction;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -38,7 +38,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class UserProductInteractionResource extends Resource
 {
@@ -61,7 +60,7 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -131,14 +130,14 @@ final class UserProductInteractionResource extends Resource
                                 Select::make('interaction_type')
                                     ->label(__('admin.user_product_interactions.interaction_type'))
                                     ->options([
-                                        'view' => __('admin.user_product_interactions.interaction_types.view'),
-                                        'click' => __('admin.user_product_interactions.interaction_types.click'),
+                                        'view'        => __('admin.user_product_interactions.interaction_types.view'),
+                                        'click'       => __('admin.user_product_interactions.interaction_types.click'),
                                         'add_to_cart' => __('admin.user_product_interactions.interaction_types.add_to_cart'),
-                                        'purchase' => __('admin.user_product_interactions.interaction_types.purchase'),
-                                        'review' => __('admin.user_product_interactions.interaction_types.review'),
-                                        'share' => __('admin.user_product_interactions.interaction_types.share'),
-                                        'favorite' => __('admin.user_product_interactions.interaction_types.favorite'),
-                                        'compare' => __('admin.user_product_interactions.interaction_types.compare'),
+                                        'purchase'    => __('admin.user_product_interactions.interaction_types.purchase'),
+                                        'review'      => __('admin.user_product_interactions.interaction_types.review'),
+                                        'share'       => __('admin.user_product_interactions.interaction_types.share'),
+                                        'favorite'    => __('admin.user_product_interactions.interaction_types.favorite'),
+                                        'compare'     => __('admin.user_product_interactions.interaction_types.compare'),
                                     ])
                                     ->required()
                                     ->default('view')
@@ -189,7 +188,7 @@ final class UserProductInteractionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->deferLoading(false)
@@ -226,14 +225,14 @@ final class UserProductInteractionResource extends Resource
                 BadgeColumn::make('interaction_type')
                     ->label(__('admin.user_product_interactions.interaction_type'))
                     ->colors([
-                        'info' => 'view',
-                        'success' => 'click',
-                        'warning' => 'add_to_cart',
-                        'danger' => 'purchase',
-                        'primary' => 'review',
+                        'info'      => 'view',
+                        'success'   => 'click',
+                        'warning'   => 'add_to_cart',
+                        'danger'    => 'purchase',
+                        'primary'   => 'review',
                         'secondary' => 'share',
-                        'gray' => 'favorite',
-                        'slate' => 'compare',
+                        'gray'      => 'favorite',
+                        'slate'     => 'compare',
                     ])
                     ->sortable()
                     ->searchable(),
@@ -247,9 +246,9 @@ final class UserProductInteractionResource extends Resource
                         $state >= 4.5 => 'success',
                         $state >= 3.5 => 'warning',
                         $state >= 2.5 => 'info',
-                        default => 'danger',
+                        default       => 'danger',
                     })
-                    ->formatStateUsing(fn ($state) => $state ? $state.'/5' : __('admin.user_product_interactions.no_rating')),
+                    ->formatStateUsing(fn ($state) => $state ? $state . '/5' : __('admin.user_product_interactions.no_rating')),
                 TextColumn::make('count')
                     ->label(__('admin.user_product_interactions.count'))
                     ->numeric()
@@ -258,9 +257,9 @@ final class UserProductInteractionResource extends Resource
                     ->badge()
                     ->color(fn ($state) => match (true) {
                         $state >= 10 => 'success',
-                        $state >= 5 => 'warning',
-                        $state >= 2 => 'info',
-                        default => 'gray',
+                        $state >= 5  => 'warning',
+                        $state >= 2  => 'info',
+                        default      => 'gray',
                     }),
                 IconColumn::make('is_anonymous')
                     ->label(__('admin.user_product_interactions.is_anonymous'))
@@ -312,14 +311,14 @@ final class UserProductInteractionResource extends Resource
                 SelectFilter::make('interaction_type')
                     ->label(__('admin.user_product_interactions.interaction_type'))
                     ->options([
-                        'view' => __('admin.user_product_interactions.interaction_types.view'),
-                        'click' => __('admin.user_product_interactions.interaction_types.click'),
+                        'view'        => __('admin.user_product_interactions.interaction_types.view'),
+                        'click'       => __('admin.user_product_interactions.interaction_types.click'),
                         'add_to_cart' => __('admin.user_product_interactions.interaction_types.add_to_cart'),
-                        'purchase' => __('admin.user_product_interactions.interaction_types.purchase'),
-                        'review' => __('admin.user_product_interactions.interaction_types.review'),
-                        'share' => __('admin.user_product_interactions.interaction_types.share'),
-                        'favorite' => __('admin.user_product_interactions.interaction_types.favorite'),
-                        'compare' => __('admin.user_product_interactions.interaction_types.compare'),
+                        'purchase'    => __('admin.user_product_interactions.interaction_types.purchase'),
+                        'review'      => __('admin.user_product_interactions.interaction_types.review'),
+                        'share'       => __('admin.user_product_interactions.interaction_types.share'),
+                        'favorite'    => __('admin.user_product_interactions.interaction_types.favorite'),
+                        'compare'     => __('admin.user_product_interactions.interaction_types.compare'),
                     ])
                     ->multiple(),
                 TernaryFilter::make('is_anonymous')
@@ -510,10 +509,10 @@ final class UserProductInteractionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserProductInteractions::route('/'),
+            'index'  => Pages\ListUserProductInteractions::route('/'),
             'create' => Pages\CreateUserProductInteraction::route('/create'),
-            'view' => Pages\ViewUserProductInteraction::route('/{record}'),
-            'edit' => Pages\EditUserProductInteraction::route('/{record}/edit'),
+            'view'   => Pages\ViewUserProductInteraction::route('/{record}'),
+            'edit'   => Pages\EditUserProductInteraction::route('/{record}/edit'),
         ];
     }
 }
