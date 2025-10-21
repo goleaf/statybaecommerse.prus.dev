@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // use Illuminate\Database\Eloquent\SoftDeletes;
@@ -43,23 +44,25 @@ final class ShippingOption extends Model
         'estimated_days_max',
         'metadata',
         'shipping_matrix',
+        'zone_id',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_enabled' => 'boolean',
-            'is_default' => 'boolean',
-            'price' => 'decimal:2',
-            'min_weight' => 'integer',
-            'max_weight' => 'integer',
-            'min_order_amount' => 'decimal:2',
-            'max_order_amount' => 'decimal:2',
+            'is_enabled'         => 'boolean',
+            'is_default'         => 'boolean',
+            'price'              => 'decimal:2',
+            'min_weight'         => 'integer',
+            'max_weight'         => 'integer',
+            'min_order_amount'   => 'decimal:2',
+            'max_order_amount'   => 'decimal:2',
             'estimated_days_min' => 'integer',
             'estimated_days_max' => 'integer',
-            'sort_order' => 'integer',
-            'metadata' => 'array',
-            'shipping_matrix' => 'array',
+            'sort_order'         => 'integer',
+            'metadata'           => 'array',
+            'shipping_matrix'    => 'array',
+            'zone_id'            => 'integer',
         ];
     }
 
@@ -71,6 +74,14 @@ final class ShippingOption extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'shipping_option_id');
+    }
+
+    /**
+     * Shipping options belong to a geographic zone for localization logic.
+     */
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
     }
 
     /**
@@ -98,6 +109,18 @@ final class ShippingOption extends Model
     }
 
     /**
+     * Scope shipping options by zone while tolerating null filters.
+     */
+    public function scopeByZone(Builder $query, null|int|string $zoneId): Builder
+    {
+        if ($zoneId === null || $zoneId === '') {
+            return $query;
+        }
+
+        return $query->where('zone_id', $zoneId);
+    }
+
+    /**
      * Handle scopeOrdered functionality with proper error handling.
      */
     public function scopeOrdered(Builder $query): Builder
@@ -110,7 +133,7 @@ final class ShippingOption extends Model
      */
     public function getFormattedPriceAttribute(): string
     {
-        return number_format((float) $this->price, 2).' '.$this->currency_code;
+        return number_format((float) $this->price, 2) . ' ' . $this->currency_code;
     }
 
     /**
@@ -120,10 +143,10 @@ final class ShippingOption extends Model
     {
         if ($this->estimated_days_min && $this->estimated_days_max) {
             if ($this->estimated_days_min === $this->estimated_days_max) {
-                return $this->estimated_days_min.' '.__('days');
+                return $this->estimated_days_min . ' ' . __('days');
             }
 
-            return $this->estimated_days_min.'-'.$this->estimated_days_max.' '.__('days');
+            return $this->estimated_days_min . '-' . $this->estimated_days_max . ' ' . __('days');
         }
 
         return __('Standard delivery');
