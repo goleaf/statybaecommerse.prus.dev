@@ -34,5 +34,5 @@ Replicate these patterns for any new searchable inputs so metadata remains autho
 
 ## Follow-up checklist
 
-- [ ] Replace bespoke hydration closures with `SearchableComponentHelper::hydrate()`/`clear()` so every resource stays aligned.
+- [ ] Replace bespoke hydration closures with `SearchableComponentHelper::hydrate()`/`syncSelectedRecord()` so every resource stays aligned (use `clear()` directly only for bespoke cascading resets).
 - [ ] Request a team review of this document whenever the helper contract changes to keep the documentation accurate.

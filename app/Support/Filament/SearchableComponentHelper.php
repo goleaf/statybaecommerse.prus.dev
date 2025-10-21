@@ -6,6 +6,7 @@ namespace App\Support\Filament;
 
 use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms\Set;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
@@ -51,43 +52,15 @@ final class SearchableComponentHelper
             return;
         }
 
-        /** @var NormalisedPayload $normalized */
-        $normalized = $normalizePayload($record);
+        $normalised = self::normaliseResolvedRecord($record, $state, $normalizePayload);
 
-        $value = $normalized['value'] ?? $state;
-
-        // Treat a missing or empty value as a signal to clear the component entirely.
-        if (self::stateIsEmpty($value)) {
+        if ($normalised === null) {
             self::clear($component);
 
             return;
         }
 
-        $label = $normalized['label'] ?? '';
-
-        if ($label instanceof Stringable) {
-            $label = (string) $label;
-        } elseif (! is_string($label)) {
-            // Fallback to a simple cast so the dropdown always receives a string label.
-            $label = (string) $label;
-        }
-
-        $payload = $normalized['payload'] ?? [];
-
-        if ($payload instanceof Arrayable) {
-            $payload = $payload->toArray();
-        } elseif (! is_array($payload)) {
-            // Casting keeps loosely-typed payloads (for example, DTOs) compatible with Livewire serialisation.
-            $payload = (array) $payload;
-        }
-
-        // Guarantee string state/options to match the SearchableInput expectation.
-        $stringValue = (string) $value;
-
-        $component
-            ->state($stringValue)
-            ->options([$stringValue => $label])
-            ->payload($payload);
+        self::applyComponentState($component, $normalised);
     }
 
     /**
@@ -108,6 +81,62 @@ final class SearchableComponentHelper
     }
 
     /**
+     * Synchronise related state when a SearchableInput selection changes.
+     *
+     * @param Closure(string|int): (object|array|null)                                                    $resolveRecord    Locate the record backing the provided state.
+     * @param Closure(object|array): NormalisedPayload                                                    $normalizePayload Convert the record into the helper payload tuple.
+     * @param (Closure(array{value:int|string,label:string,payload:array<string|int, mixed>}): void)|null $onSync
+     *                                                                                                                      Optional callback invoked when the record successfully resolves.
+     * @param (Closure(): void)|null                                                                      $onClear          Optional callback invoked whenever the component is cleared.
+     */
+    public static function syncSelectedRecord(
+        SearchableInput $component,
+        ?string $state,
+        Set $set,
+        string $attribute,
+        Closure $resolveRecord,
+        Closure $normalizePayload,
+        ?Closure $onSync = null,
+        ?Closure $onClear = null,
+    ): void {
+        // Treat empty strings and null values as clear actions.
+        if (self::stateIsEmpty($state)) {
+            $set($attribute, null);
+            self::clear($component, ...self::wrapOptionalCallback($onClear));
+
+            return;
+        }
+
+        $record = $resolveRecord($state);
+
+        if ($record === null) {
+            $set($attribute, null);
+            self::clear($component, ...self::wrapOptionalCallback($onClear));
+
+            return;
+        }
+
+        $normalised = self::normaliseResolvedRecord($record, $state, $normalizePayload);
+
+        if ($normalised === null) {
+            $set($attribute, null);
+            self::clear($component, ...self::wrapOptionalCallback($onClear));
+
+            return;
+        }
+
+        self::applyComponentState($component, $normalised);
+
+        $identifier = $normalised['value'];
+        $set($attribute, is_numeric($identifier) ? (int) $identifier : $identifier);
+
+        if ($onSync !== null) {
+            // Surface the fully normalised payload so callers can hydrate dependent form data.
+            $onSync($normalised);
+        }
+    }
+
+    /**
      * Determine whether the provided state should be considered empty and therefore cleared.
      */
     private static function stateIsEmpty(mixed $state): bool
@@ -121,5 +150,75 @@ final class SearchableComponentHelper
         }
 
         return false;
+    }
+
+    /**
+     * Convert the resolved record into the tuple consumed by SearchableInput state helpers.
+     *
+     * @return array{value:int|string, label:string, payload: array<array-key, mixed>}|null
+     */
+    private static function normaliseResolvedRecord(
+        object|array $record,
+        mixed $state,
+        Closure $normalizePayload,
+    ): ?array {
+        /** @var NormalisedPayload $normalised */
+        $normalised = $normalizePayload($record);
+
+        $value = $normalised['value'] ?? $state;
+
+        // Bail out when the normaliser cannot determine a usable identifier.
+        if (self::stateIsEmpty($value)) {
+            return null;
+        }
+
+        $label = $normalised['label'] ?? '';
+
+        if ($label instanceof Stringable) {
+            $label = (string) $label;
+        } elseif (! is_string($label)) {
+            // Fallback to a simple cast so the dropdown always receives a string label.
+            $label = (string) $label;
+        }
+
+        $payload = $normalised['payload'] ?? [];
+
+        if ($payload instanceof Arrayable) {
+            $payload = $payload->toArray();
+        } elseif (! is_array($payload)) {
+            // Casting keeps loosely-typed payloads (for example, DTOs) compatible with Livewire serialisation.
+            $payload = (array) $payload;
+        }
+
+        return [
+            'value'   => $value,
+            'label'   => $label,
+            'payload' => $payload,
+        ];
+    }
+
+    /**
+     * Apply the normalised value, label, and payload to the SearchableInput component.
+     *
+     * @param array{value:int|string, label:string, payload: array<array-key, mixed>} $normalised
+     */
+    private static function applyComponentState(SearchableInput $component, array $normalised): void
+    {
+        $stringValue = (string) $normalised['value'];
+
+        $component
+            ->state($stringValue)
+            ->options([$stringValue => $normalised['label']])
+            ->payload($normalised['payload']);
+    }
+
+    /**
+     * Wrap an optional callback in an array so it can be unpacked into variadic parameters.
+     *
+     * @return array<int, Closure>
+     */
+    private static function wrapOptionalCallback(?Closure $callback): array
+    {
+        return $callback !== null ? [$callback] : [];
     }
 }

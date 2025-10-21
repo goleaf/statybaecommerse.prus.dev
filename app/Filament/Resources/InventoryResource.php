@@ -7,14 +7,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\ProductSearch;
-use App\Support\Search\SearchableComponentHelper;
 use App\Support\Search\SearchResultPayload;
-use DefStudio\SearchableInput\DTO\SearchResult;
 use BackedEnum;
-use Closure;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -86,21 +86,17 @@ final class InventoryResource extends Resource
                                     SearchableComponentHelper::hydrate(
                                         $component,
                                         $state,
-                                        function (int|string $productId) use ($record): ?\DefStudio\SearchableInput\DTO\SearchResult {
+                                        function (int|string $productId) use ($record): ?Product {
+                                            // Prefer the already-loaded relation when editing records to avoid duplicate queries.
                                             $product = $record?->product;
 
-                                            if (! $product instanceof Product || (int) $product->getKey() !== (int) $productId) {
-                                                $product = Product::query()
-                                                    ->select(['id', 'sku', 'name'])
-                                                    ->find((int) $productId);
+                                            if ($product instanceof Product && (int) $product->getKey() === (int) $productId) {
+                                                return $product;
                                             }
 
-                                            if (! $product instanceof Product) {
-                                                return null;
-                                            }
-
-                                            return self::buildProductSearchResult($product);
+                                            return self::resolveInventoryProduct((int) $productId);
                                         },
+                                        static fn (Product $product): array => self::normaliseProductComponentPayload($product),
                                     );
 
                                     // Reference the searchable input helper docs for behaviour overview.
@@ -112,19 +108,22 @@ final class InventoryResource extends Resource
                                         state: $state,
                                         set: $set,
                                         attribute: 'product_id',
-                                        resolver: static function (string $productId): ?\DefStudio\SearchableInput\DTO\SearchResult {
-                                            $product = Product::query()
-                                                ->select(['id', 'sku', 'name'])
-                                                ->find((int) $productId);
-
-                                            if (! $product instanceof Product) {
-                                                return null;
-                                            }
-
-                                            return self::buildProductSearchResult($product);
+                                        resolveRecord: static fn (string $productId): ?Product => self::resolveInventoryProduct((int) $productId),
+                                        normalizePayload: static fn (Product $product): array => self::normaliseProductComponentPayload($product),
+                                        onSync: static function (array $normalised) use ($set): void {
+                                            // Cache the latest payload metadata for Livewire interactions.
+                                            $set('product_payload', $normalised['payload']);
+                                        },
+                                        onClear: static function () use ($set): void {
+                                            // Keep dependant fields tidy when the selection is cleared.
+                                            $set('product_payload', []);
                                         },
                                     );
                                 }),
+                            Hidden::make('product_payload')
+                                ->default([])
+                                ->dehydrated(false)
+                                ->columnSpanFull(), // Preserve the enriched payload for downstream Livewire interactions without persisting it.
                             Select::make('location_id')
                                 ->label(__('Location'))
                                 ->relationship('location', 'name')
@@ -511,13 +510,45 @@ final class InventoryResource extends Resource
         /** @var string|null $rawSku */
         $rawSku = $product->getAttribute('sku');
         $translatedName = $product->getTranslatedName();
+        /** @var float|int|string|null $rawPrice */
+        $rawPrice = $product->getAttribute('price');
+        $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
 
         // Normalise payload so Livewire and PHP callbacks always receive consistent metadata.
         return SearchResultPayload::normalise($result, [
             'product_id' => $product->getKey(),
             'sku'        => is_string($rawSku) ? $rawSku : '',
             'name'       => is_string($translatedName) ? $translatedName : '',
+            'price'      => $price,
         ]);
+    }
+
+    /**
+     * Resolve the product used by the inventory form with the required metadata columns.
+     */
+    private static function resolveInventoryProduct(int $productId): ?Product
+    {
+        return Product::query()
+            ->select(['id', 'sku', 'name', 'price'])
+            ->find($productId);
+    }
+
+    /**
+     * Convert the product instance into the helper tuple consumed by SearchableComponentHelper.
+     *
+     * @return array{value:int|string, label:string, payload: array<string, mixed>}
+     */
+    private static function normaliseProductComponentPayload(Product $product): array
+    {
+        $normalised = SearchResultPayload::hydrate(self::buildProductSearchResult($product));
+
+        $identifier = $normalised['id'];
+
+        return [
+            'value'   => is_numeric($identifier) ? (int) $identifier : $identifier,
+            'label'   => $normalised['label'],
+            'payload' => $normalised['payload'],
+        ];
     }
 
     public static function getRelations(): array
