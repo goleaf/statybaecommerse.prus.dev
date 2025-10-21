@@ -9,22 +9,22 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
+use Filament\Schemas\Schema;
 final class CustomerSegmentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'customerSegments';
 
     protected static ?string $title = 'Customer Segments';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Select::make('customer_group_id')
                 ->label('Customer Group')
                 ->relationship('customerGroup', 'name')
@@ -40,7 +40,7 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

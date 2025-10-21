@@ -8,13 +8,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 
 class ChannelForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Form $schema): Form
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.channels.basic_information'))
                     ->schema([

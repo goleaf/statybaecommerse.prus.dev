@@ -18,7 +18,6 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\ActionGroup;
@@ -40,6 +39,7 @@ use Illuminate\Database\Eloquent\Model;
 use Throwable;
 use App\Support\Filament\Components\Flatpickr;
 
+use Filament\Schemas\Schema;
 final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
@@ -69,9 +69,9 @@ final class CountryResource extends Resource
         return __('countries.models.countries');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('countries.sections.basic_info'))
                     ->schema([
@@ -234,7 +234,7 @@ final class CountryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

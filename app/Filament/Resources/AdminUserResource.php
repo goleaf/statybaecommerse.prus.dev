@@ -17,7 +17,6 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -31,6 +30,7 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 
+use Filament\Schemas\Schema;
 final class AdminUserResource extends Resource
 {
     protected static ?string $model = AdminUser::class;
@@ -66,9 +66,9 @@ final class AdminUserResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -124,7 +124,7 @@ final class AdminUserResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -9,7 +9,6 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Arr;
@@ -17,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Throwable;
 
+use Filament\Schemas\Schema;
 final class CacheMaintenance extends Page
 {
     /**
@@ -81,10 +81,10 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.
-        return $form
+        return $schema
             ->schema([
                 Section::make('Targeted Cache Operations')
                     ->description('Use scoped operations before clearing broad cache areas to follow CachePolicy guidance.')

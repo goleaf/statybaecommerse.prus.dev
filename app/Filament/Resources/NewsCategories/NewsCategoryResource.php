@@ -11,11 +11,11 @@ use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;
 use App\Filament\Resources\NewsCategories\Tables\NewsCategoriesTable;
 use App\Models\NewsCategory;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class NewsCategoryResource extends Resource
 {
     protected static ?string $model = NewsCategory::class;
@@ -27,12 +27,12 @@ final class NewsCategoryResource extends Resource
         return 'News';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return NewsCategoryForm::configure($form);
+        return NewsCategoryForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return NewsCategoriesTable::configure($table);
     }

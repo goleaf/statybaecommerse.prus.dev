@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -35,6 +34,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class NewsCommentResource extends Resource
 {
     protected static ?string $model = NewsComment::class;
@@ -63,9 +63,9 @@ final class NewsCommentResource extends Resource
         return __('admin.news_comments.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.news_comments.basic_information'))
                 ->description(__('admin.news_comments.basic_information_description'))
                 ->schema([
@@ -144,7 +144,7 @@ final class NewsCommentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

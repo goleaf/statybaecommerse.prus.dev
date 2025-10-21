@@ -11,12 +11,12 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
+use Filament\Schemas\Schema;
 class CategoriesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'categories';
@@ -27,9 +27,9 @@ class CategoriesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Categories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 TextInput::make('name')
                     ->label(__('categories.fields.name'))
@@ -48,7 +48,7 @@ class CategoriesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

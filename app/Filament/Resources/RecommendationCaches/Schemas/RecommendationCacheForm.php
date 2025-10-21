@@ -10,14 +10,13 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use App\Support\Filament\Components\Flatpickr;
 
 final class RecommendationCacheForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Form $schema): Form
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.recommendation_caches.basic_information'))
                     ->schema([

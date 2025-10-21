@@ -10,7 +10,6 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\CreateAction;
@@ -23,6 +22,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
+use Filament\Schemas\Schema;
 final class ChildrenRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'children';
@@ -33,9 +33,9 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Subcategories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('categories.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -107,7 +107,7 @@ final class ChildrenRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

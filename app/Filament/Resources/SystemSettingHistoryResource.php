@@ -16,7 +16,6 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
@@ -28,6 +27,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class SystemSettingHistoryResource extends Resource
 {
     protected static ?string $model = SystemSettingHistory::class;
@@ -61,9 +61,9 @@ final class SystemSettingHistoryResource extends Resource
         return __('admin.system_setting_histories.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.system_setting_histories.basic_information'))
                     ->schema([
@@ -108,7 +108,7 @@ final class SystemSettingHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->deferFilters(false)

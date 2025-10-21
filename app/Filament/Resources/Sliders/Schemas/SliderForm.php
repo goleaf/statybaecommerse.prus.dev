@@ -13,13 +13,12 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 
 final class SliderForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Form $schema): Form
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.sliders.basic_information'))
                     ->description(__('admin.sliders.basic_information_description'))

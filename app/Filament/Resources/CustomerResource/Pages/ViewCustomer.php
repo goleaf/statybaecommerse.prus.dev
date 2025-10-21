@@ -13,13 +13,13 @@ use App\Models\Review;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 use Illuminate\Support\Str;
 
+use Filament\Schemas\Schema;
 final class ViewCustomer extends ViewRecord
 {
     protected static string $resource = CustomerResource::class;
@@ -31,9 +31,9 @@ final class ViewCustomer extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        return $schema->schema([
             ListEntry::make('customerQuickLinks')
                 ->heading(__('Quick links'))
                 ->list()

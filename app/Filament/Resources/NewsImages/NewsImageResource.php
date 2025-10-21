@@ -17,7 +17,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
@@ -37,6 +36,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
+use Filament\Schemas\Schema;
 class NewsImageResource extends Resource
 {
     protected static ?string $model = NewsImage::class;
@@ -48,9 +48,9 @@ class NewsImageResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Grid::make(2)
                     ->schema([
@@ -106,7 +106,7 @@ class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

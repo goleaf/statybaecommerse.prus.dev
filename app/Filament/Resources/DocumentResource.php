@@ -17,7 +17,6 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -25,6 +24,7 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class DocumentResource extends Resource
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
@@ -55,9 +55,9 @@ final class DocumentResource extends Resource
         return __('admin.documents.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.documents.form.sections.basic_information'))
                     ->schema([
@@ -121,7 +121,7 @@ final class DocumentResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -8,11 +8,11 @@ use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogForm as ReferralCodeUsageLogFormSchema;
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable as ReferralCodeUsageLogsTableSchema;
 use App\Models\ReferralCodeUsageLog;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 /**
  * ReferralCodeUsageLogResource
  *
@@ -43,12 +43,12 @@ final class ReferralCodeUsageLogResource extends Resource
         return __('admin.referral_code_usage_logs.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return ReferralCodeUsageLogFormSchema::configure($form);
+        return ReferralCodeUsageLogFormSchema::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ReferralCodeUsageLogsTableSchema::configure($table);
     }
