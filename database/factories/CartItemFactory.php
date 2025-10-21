@@ -31,6 +31,8 @@ final class CartItemFactory extends Factory
             'quantity' => $quantity,
             'minimum_quantity' => 1,
             'unit_price' => $unitPrice,
+            // Seed a nominal discount so calculations that rely on the column remain realistic.
+            'discount_amount' => 0.0,
             'price' => $unitPrice,  // Add the missing price field
             'total_price' => $totalPrice,
             'product_snapshot' => [
