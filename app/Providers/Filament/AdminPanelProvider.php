@@ -27,7 +27,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentExcel\FilamentExport;
-use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use function class_exists;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -128,13 +128,7 @@ final class AdminPanelProvider extends PanelProvider
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins(array_values(array_filter([
                     FilamentShieldPlugin::make(),
-                    class_exists(FilamentFullCalendarPlugin::class)
-                        ? FilamentFullCalendarPlugin::make()
-                            ->selectable(true)
-                            ->editable(true)
-                            ->timezone('Europe/Vilnius')
-                            ->locale('lt')
-                        : null,
+                    $this->makeFullCalendarPlugin(),
                     TableLayoutTogglePlugin::make()
                         ->setDefaultLayout('grid')
                         ->persistLayoutUsing(
@@ -186,5 +180,23 @@ final class AdminPanelProvider extends PanelProvider
                 return $navigationGroup;
             })
             ->all();
+    }
+
+    /**
+     * @return \Filament\Contracts\Plugin|null
+     */
+    private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
+    {
+        $pluginClass = 'Saade\\FilamentFullCalendar\\FilamentFullCalendarPlugin';
+
+        if (! class_exists($pluginClass)) {
+            return null;
+        }
+
+        return $pluginClass::make()
+            ->selectable(true)
+            ->editable(true)
+            ->timezone('Europe/Vilnius')
+            ->locale('lt');
     }
 }
