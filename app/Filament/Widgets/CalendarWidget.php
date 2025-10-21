@@ -16,7 +16,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
@@ -175,7 +175,7 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\CreateAction::make()
-                ->mountUsing(function (?Form $form, array $arguments = []): void {
+                ->mountUsing(function (?Schema $form, array $arguments = []): void {
                     if (! $form) {
                         return;
                     }
@@ -204,7 +204,7 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\EditAction::make()
-                ->mountUsing(function (?Form $form, array $arguments = []): void {
+                ->mountUsing(function (?Schema $form, array $arguments = []): void {
                     if (! $form) {
                         return;
                     }
@@ -305,7 +305,7 @@ final class CalendarWidget extends FullCalendarWidget
     /**
      * @return array<string, mixed>
      */
-    private function normaliseFormState(Form $form): array
+    private function normaliseFormState(Schema $form): array
     {
         $state = $form->getRawState();
 
