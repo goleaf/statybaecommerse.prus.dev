@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Repositories\ProductRepository;
-use App\Repositories\UserRepository;
+use App\Support\Repositories\ProductRepository;
+use App\Support\Repositories\UserRepository;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -46,14 +46,14 @@ final class BackupVerifyCommand extends Command
 
             $metadata = $this->readMetadata($latestBackup);
 
-            $databaseArtifact = $latestBackup.'/'.$metadata['artifacts']['database']['filename'];
-            $mediaArtifact = $latestBackup.'/'.$metadata['artifacts']['media']['filename'];
+            $databaseArtifact = $latestBackup . '/' . $metadata['artifacts']['database']['filename'];
+            $mediaArtifact = $latestBackup . '/' . $metadata['artifacts']['media']['filename'];
 
             $this->assertChecksum($databaseArtifact, $metadata['artifacts']['database']['checksum'] ?? null, 'database');
             $this->assertChecksum($mediaArtifact, $metadata['artifacts']['media']['checksum'] ?? null, 'media');
 
             $this->components->info('Extracting media archive...');
-            $mediaExtractionPath = $workingPath.'/media';
+            $mediaExtractionPath = $workingPath . '/media';
             $this->prepareWorkingDirectory($workingPath, $mediaExtractionPath);
             $this->extractArchive($mediaArtifact, $mediaExtractionPath);
 
@@ -126,7 +126,12 @@ final class BackupVerifyCommand extends Command
             return null;
         }
 
-        $directories = array_values(array_filter(File::directories($storageRoot), static fn (string $path): bool => File::isDirectory($path)));
+        $directories = array_values(array_filter(
+            File::directories($storageRoot),
+            static function ($path): bool {
+                return is_string($path) && File::isDirectory($path);
+            },
+        ));
 
         if ($directories === []) {
             return null;
@@ -134,7 +139,10 @@ final class BackupVerifyCommand extends Command
 
         rsort($directories);
 
-        return $directories[0];
+        /** @var string $latest */
+        $latest = $directories[0];
+
+        return $latest;
     }
 
     /**
@@ -149,7 +157,7 @@ final class BackupVerifyCommand extends Command
      */
     private function readMetadata(string $backupPath): array
     {
-        $metadataPath = $backupPath.'/metadata.json';
+        $metadataPath = $backupPath . '/metadata.json';
 
         if (! File::exists($metadataPath)) {
             throw new RuntimeException('Backup metadata file is missing.');
@@ -159,7 +167,7 @@ final class BackupVerifyCommand extends Command
             /** @var array<string, mixed> $decoded */
             $decoded = json_decode(File::get($metadataPath), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new RuntimeException('Failed to parse backup metadata: '.$exception->getMessage(), 0, $exception);
+            throw new RuntimeException('Failed to parse backup metadata: ' . $exception->getMessage(), 0, $exception);
         }
 
         if (! isset($decoded['artifacts']) || ! is_array($decoded['artifacts'])) {
@@ -227,7 +235,7 @@ final class BackupVerifyCommand extends Command
         $result = [
             'artifacts' => [
                 'database' => $databaseInfo,
-                'media' => $mediaInfo,
+                'media'    => $mediaInfo,
             ],
         ];
 
@@ -363,7 +371,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $connectionConfig
+     * @param array<string, mixed> $connectionConfig
      */
     private function restoreDatabase(string $driver, array $connectionConfig, string $artifactPath): void
     {
@@ -376,7 +384,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $connectionConfig
+     * @param array<string, mixed> $connectionConfig
      */
     private function restoreSqliteDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -402,7 +410,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $connectionConfig
+     * @param array<string, mixed> $connectionConfig
      */
     private function restoreMysqlDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -449,7 +457,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $connectionConfig
+     * @param array<string, mixed> $connectionConfig
      */
     private function restorePostgresDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -508,7 +516,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $config
+     * @param array<string, mixed> $config
      */
     private function connectionValue(array $config, string $key, ?string $default = null): ?string
     {

@@ -6,12 +6,11 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Log;
 
 final class Kernel extends ConsoleKernel
 {
-    /**
-     * @var array<int, class-string<\Illuminate\Console\Command>>
-     */
+    /** @phpstan-ignore-next-line */
     protected $commands = [
         \App\Console\Commands\AuditDatabaseIndexesCommand::class,
         \App\Console\Commands\FixCodeStyleCommand::class,
@@ -37,7 +36,7 @@ final class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->runInBackground()
             ->onFailure(function () {
-                \Log::error('Daily code style validation failed');
+                Log::error('Daily code style validation failed');
             });
 
         // Run code style fix weekly on Sundays at 3 AM
@@ -47,7 +46,7 @@ final class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->runInBackground()
             ->onSuccess(function () {
-                \Log::info('Weekly code style fix completed successfully');
+                Log::info('Weekly code style fix completed successfully');
             });
 
         $prepareSchedule = (array) config('backup.schedule.prepare', []);
@@ -55,10 +54,13 @@ final class Kernel extends ConsoleKernel
         if (($prepareSchedule['enabled'] ?? true) === true) {
             $event = $schedule->command('backup:prepare');
 
-            if (! empty($prepareSchedule['cron'])) {
-                $event->cron((string) $prepareSchedule['cron']);
-            } elseif (! empty($prepareSchedule['at'])) {
-                $event->dailyAt((string) $prepareSchedule['at']);
+            $cronExpression = $prepareSchedule['cron'] ?? null;
+            $scheduledAt = $prepareSchedule['at'] ?? null;
+
+            if (is_string($cronExpression) && $cronExpression !== '') {
+                $event->cron($cronExpression);
+            } elseif (is_string($scheduledAt) && $scheduledAt !== '') {
+                $event->dailyAt($scheduledAt);
             } else {
                 $event->daily();
             }
@@ -68,7 +70,7 @@ final class Kernel extends ConsoleKernel
                 ->runInBackground()
                 ->onOneServer()
                 ->onFailure(static function () {
-                    \Log::error('Scheduled backup:prepare command failed');
+                    Log::error('Scheduled backup:prepare command failed');
                 });
         }
 
@@ -77,10 +79,13 @@ final class Kernel extends ConsoleKernel
         if (($verifySchedule['enabled'] ?? true) === true) {
             $event = $schedule->command('backup:verify');
 
-            if (! empty($verifySchedule['cron'])) {
-                $event->cron((string) $verifySchedule['cron']);
-            } elseif (! empty($verifySchedule['at'])) {
-                $event->dailyAt((string) $verifySchedule['at']);
+            $cronExpression = $verifySchedule['cron'] ?? null;
+            $scheduledAt = $verifySchedule['at'] ?? null;
+
+            if (is_string($cronExpression) && $cronExpression !== '') {
+                $event->cron($cronExpression);
+            } elseif (is_string($scheduledAt) && $scheduledAt !== '') {
+                $event->dailyAt($scheduledAt);
             } else {
                 $event->daily();
             }
@@ -90,7 +95,7 @@ final class Kernel extends ConsoleKernel
                 ->runInBackground()
                 ->onOneServer()
                 ->onFailure(static function () {
-                    \Log::error('Scheduled backup:verify command failed');
+                    Log::error('Scheduled backup:verify command failed');
                 });
         }
 
@@ -104,7 +109,7 @@ final class Kernel extends ConsoleKernel
 
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

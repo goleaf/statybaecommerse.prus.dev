@@ -66,6 +66,8 @@ namespace Asmit\ResizedColumn {
     }
 }
 
-if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
-    class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+namespace {
+    if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
+        class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+    }
 }
