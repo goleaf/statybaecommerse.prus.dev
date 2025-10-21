@@ -6,6 +6,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ## [Unreleased]
 
+### Features & Enhancements
+* Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
+
 ### Maintenance
 * Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.

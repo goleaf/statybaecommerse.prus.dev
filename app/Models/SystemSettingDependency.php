@@ -27,9 +27,19 @@ final class SystemSettingDependency extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['setting_id', 'depends_on_setting_id', 'condition', 'is_active'];
+    protected $fillable = [
+        'setting_id',
+        'depends_on_setting_id',
+        'condition',
+        'condition_value',
+        'is_active',
+    ];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = [
+        'condition' => 'string',
+        'condition_value' => 'string',
+        'is_active' => 'boolean',
+    ];
 
     /**
      * Handle setting functionality with proper error handling.
@@ -105,31 +115,24 @@ final class SystemSettingDependency extends Model
      */
     public function scopeWithCondition($query, $condition)
     {
-        return $query->where('condition', 'like', "%{$condition}%");
+        return $query->where(function ($q) use ($condition): void {
+            $q
+                ->where('condition', 'like', "%{$condition}%")
+                ->orWhere('condition_value', 'like', "%{$condition}%");
+        });
     }
 
     /**
      * Scope the query to dependencies matching the given condition operator.
-     *
-     * Supports case-insensitive matches on both the JSON `condition->operator`
-     * key and the legacy string `condition` column representation for operators
-     * such as `equals_to`, `greater_than`, and `contains`.
      */
     public function scopeByCondition(Builder $query, string $operator): Builder
     {
-        // Normalize the operator and account for legacy uppercase values.
         $normalizedOperator = strtolower($operator);
 
-        $acceptedOperators = array_unique([
-            $operator,
-            $normalizedOperator,
-            strtoupper($normalizedOperator),
-        ]);
-
-        return $query->where(function (Builder $builder) use ($acceptedOperators): void {
+        return $query->where(function (Builder $builder) use ($operator, $normalizedOperator): void {
             $builder
-                ->whereIn('condition->operator', $acceptedOperators)
-                ->orWhereIn('condition', $acceptedOperators);
+                ->where('condition', $operator)
+                ->orWhere('condition', $normalizedOperator);
         });
     }
 
@@ -168,6 +171,7 @@ final class SystemSettingDependency extends Model
         return $query->where(function ($q) use ($search): void {
             $q
                 ->where('condition', 'like', "%{$search}%")
+                ->orWhere('condition_value', 'like', "%{$search}%")
                 ->orWhereHas('setting', function ($q) use ($search): void {
                     $q
                         ->where('key', 'like', "%{$search}%")
@@ -230,18 +234,112 @@ final class SystemSettingDependency extends Model
             return false;
         }
         $dependencyValue = $this->dependsOn->value;
-        $condition = $this->condition;
+        $operator = strtolower(trim((string) ($this->condition ?? '')));
+        $expectedValue = $this->condition_value;
 
-        return match ($condition['operator'] ?? 'equals') {
-            'equals'       => $dependencyValue == $condition['value'],
-            'not_equals'   => $dependencyValue != $condition['value'],
-            'greater_than' => $dependencyValue > $condition['value'],
-            'less_than'    => $dependencyValue < $condition['value'],
-            'contains'     => str_contains($dependencyValue, $condition['value']),
-            'not_contains' => ! str_contains($dependencyValue, $condition['value']),
-            'in'           => in_array($dependencyValue, $condition['value'] ?? []),
-            'not_in'       => ! in_array($dependencyValue, $condition['value'] ?? []),
-            default        => false,
+        if ($operator === '') {
+            return false;
+        }
+
+        // Operators that require an explicit comparison value.
+        $operatorsRequiringValue = [
+            'equals',
+            'not_equals',
+            'greater_than',
+            'greater_or_equals',
+            'less_than',
+            'less_or_equals',
+            'contains',
+            'not_contains',
+            'starts_with',
+            'ends_with',
+            'in',
+            'not_in',
+        ];
+
+        if (in_array($operator, $operatorsRequiringValue, true) && ($expectedValue === null || (is_string($expectedValue) && trim($expectedValue) === ''))) {
+            return false;
+        }
+
+        $normalizedValue = is_string($dependencyValue) ? trim($dependencyValue) : $dependencyValue;
+        $normalizedExpected = is_string($expectedValue) ? trim($expectedValue) : $expectedValue;
+
+        return match ($operator) {
+            'equals' => $this->compareValues($normalizedValue, $normalizedExpected) === 0,
+            'not_equals' => $this->compareValues($normalizedValue, $normalizedExpected) !== 0,
+            'greater_than' => $this->compareValues($normalizedValue, $normalizedExpected) === 1,
+            'greater_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) >= 0,
+            'less_than' => $this->compareValues($normalizedValue, $normalizedExpected) === -1,
+            'less_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) <= 0,
+            'contains' => is_string($normalizedValue) && is_string($normalizedExpected) && str_contains($normalizedValue, $normalizedExpected),
+            'not_contains' => is_string($normalizedValue) && is_string($normalizedExpected) && ! str_contains($normalizedValue, $normalizedExpected),
+            'starts_with' => is_string($normalizedValue) && is_string($normalizedExpected) && str_starts_with($normalizedValue, $normalizedExpected),
+            'ends_with' => is_string($normalizedValue) && is_string($normalizedExpected) && str_ends_with($normalizedValue, $normalizedExpected),
+            'in' => $this->isInList($normalizedValue, $normalizedExpected),
+            'not_in' => ! $this->isInList($normalizedValue, $normalizedExpected),
+            'is_empty' => blank($normalizedValue),
+            'is_not_empty' => filled($normalizedValue),
+            'is_true' => $this->toBoolean($normalizedValue) === true,
+            'is_false' => $this->toBoolean($normalizedValue) === false,
+            default => false,
         };
+    }
+
+    /**
+     * Compare actual and expected values with support for numeric and string data.
+     */
+    private function compareValues(mixed $actual, mixed $expected): int
+    {
+        if ($actual === null || $expected === null) {
+            return $actual === $expected ? 0 : ($actual === null ? -1 : 1);
+        }
+
+        if (is_numeric($actual) && is_numeric($expected)) {
+            return $actual <=> $expected;
+        }
+
+        return strcmp((string) $actual, (string) $expected);
+    }
+
+    /**
+     * Determine if a value exists in a comma separated or JSON encoded list.
+     */
+    private function isInList(mixed $actual, mixed $expected): bool
+    {
+        if ($expected === null) {
+            return false;
+        }
+
+        if (is_string($expected)) {
+            $decoded = json_decode($expected, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $expected = $decoded;
+            } else {
+                $expected = array_map('trim', array_filter(explode(',', $expected), static fn ($item): bool => $item !== ''));
+            }
+        }
+
+        if (! is_array($expected)) {
+            return false;
+        }
+
+        return in_array($actual, $expected, ! is_string($actual));
+    }
+
+    /**
+     * Convert supported textual values to booleans for consistent comparisons.
+     */
+    private function toBoolean(mixed $value): ?bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 }
