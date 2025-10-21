@@ -27,7 +27,8 @@ use UnitEnum;
 
 final class DocumentResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $model = Document::class;
 
@@ -55,7 +56,7 @@ final class DocumentResource extends Resource
         return __('admin.documents.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -121,7 +122,7 @@ final class DocumentResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

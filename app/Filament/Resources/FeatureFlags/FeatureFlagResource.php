@@ -19,14 +19,15 @@ class FeatureFlagResource extends Resource
 {
     protected static ?string $model = FeatureFlag::class;
 
+    /** @var string|\BackedEnum|null */
     protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return FeatureFlagForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return FeatureFlagsTable::configure($table);
     }

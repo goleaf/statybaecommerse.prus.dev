@@ -20,10 +20,8 @@ final class RecommendationAnalyticsResource extends Resource
 {
     protected static ?string $model = RecommendationAnalytics::class;
 
-    /**
-     * Navigation icon override (string|\BackedEnum|null).
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 8;
 
@@ -49,12 +47,12 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return RecommendationAnalyticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return RecommendationAnalyticsTable::configure($table);
     }

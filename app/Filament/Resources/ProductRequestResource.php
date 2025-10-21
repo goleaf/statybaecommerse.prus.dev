@@ -34,7 +34,8 @@ final class ProductRequestResource extends Resource
         return 'heroicon-o-clipboard-document-list';
     }
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 16;
 
@@ -53,7 +54,7 @@ final class ProductRequestResource extends Resource
         return __('product_requests.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -146,7 +147,7 @@ final class ProductRequestResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

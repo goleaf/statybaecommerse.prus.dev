@@ -38,9 +38,11 @@ final class UserPreferenceResource extends Resource
 {
     protected static ?string $model = UserPreference::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 6;
 
@@ -59,7 +61,7 @@ final class UserPreferenceResource extends Resource
         return __('admin.user_preferences.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -103,7 +105,7 @@ final class UserPreferenceResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -40,9 +40,11 @@ final class ApiKeyResource extends Resource
 
     protected static ?string $navigationLabel = 'api_keys.navigation.label';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-key';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-key';
 
-    protected static UnitEnum|string|null $navigationGroup = null;
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;
 
@@ -66,7 +68,7 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.plural');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('api_keys.sections.details'))
@@ -141,7 +143,7 @@ final class ApiKeyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

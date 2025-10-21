@@ -11,10 +11,8 @@ use Filament\Pages\Page;
 
 final class SearchExplorer extends Page
 {
-    /**
-     * Navigation icon override (string|\BackedEnum|null).
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     public static function getNavigationGroup(): ?string
     {

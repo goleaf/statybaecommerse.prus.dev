@@ -12,10 +12,8 @@ class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
 
-    /**
-     * Navigation icon override (string|\BackedEnum|null).
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';
 

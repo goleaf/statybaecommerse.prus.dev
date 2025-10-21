@@ -14,7 +14,10 @@ abstract class BaseRelationManager extends RelationManager
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
 
-    public function table(Table $table): Table|array
+    /**
+     * Apply the shared toggleable table layout configuration before returning the table instance.
+     */
+    public function table(Table $table): Table
     {
         $table = parent::table($table);
 

@@ -28,9 +28,11 @@ final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;
 
+    /** @var string|\BackedEnum|null */
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {
@@ -65,12 +67,12 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form;
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.

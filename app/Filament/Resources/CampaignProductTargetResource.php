@@ -44,10 +44,8 @@ final class CampaignProductTargetResource extends Resource
 {
     protected static ?string $model = CampaignProductTarget::class;
 
-    /**
-     * @var string|BackedEnum|null Keep Filament navigation metadata flexible between enums and plain strings.
-     */
-    protected static $navigationIcon = 'heroicon-o-bullseye-arrow';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-bullseye-arrow';
 
     protected static ?string $recordTitleAttribute = 'target_type';
 

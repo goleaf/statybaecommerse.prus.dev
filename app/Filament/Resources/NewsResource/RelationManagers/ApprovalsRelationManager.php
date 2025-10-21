@@ -15,7 +15,7 @@ final class ApprovalsRelationManager extends BaseRelationManager
 
     protected static ?string $recordTitleAttribute = 'decision';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -22,10 +22,8 @@ final class InventoryManagement extends Page implements HasTable
     use HasToggleableTable;
     use InteractsWithTable;
 
-    /**
-     * @var string|\BackedEnum|null Navigation icon override documented to avoid redundant enum imports.
-     */
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     public static function getNavigationGroup(): ?string
     {

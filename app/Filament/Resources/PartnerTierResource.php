@@ -17,15 +17,17 @@ use UnitEnum;
 
 final class PartnerTierResource extends Resource
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?string $model = PartnerTier::class;
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -83,7 +85,7 @@ final class PartnerTierResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

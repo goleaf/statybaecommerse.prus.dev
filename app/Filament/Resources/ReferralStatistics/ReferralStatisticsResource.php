@@ -20,17 +20,15 @@ class ReferralStatisticsResource extends Resource
 {
     protected static ?string $model = ReferralStatistics::class;
 
-    /**
-     * Navigation icon override (string|\BackedEnum|null).
-     */
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return ReferralStatisticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ReferralStatisticsTable::configure($table);
     }

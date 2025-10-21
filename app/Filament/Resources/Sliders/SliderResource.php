@@ -22,9 +22,11 @@ final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     /**
      * @var UnitEnum|string|null
@@ -33,12 +35,12 @@ final class SliderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return SliderForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return SlidersTable::configure($table);
     }

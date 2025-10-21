@@ -16,7 +16,7 @@ final class DiscountsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'customer_groups.relation_discounts';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -28,7 +28,7 @@ final class DiscountsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
