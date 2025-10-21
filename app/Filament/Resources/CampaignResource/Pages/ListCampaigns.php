@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CampaignResource\Pages;
 
 use App\Filament\Resources\CampaignResource;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListCampaigns extends ListRecords
 {
+    use HasWidgetTabs;
+
     protected static string $resource = CampaignResource::class;
 
     protected function getHeaderActions(): array
@@ -21,28 +24,29 @@ final class ListCampaigns extends ListRecords
         ];
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all' => Tab::make($this->label('campaigns.tabs.all', 'All')),
-            'active' => Tab::make($this->label('campaigns.tabs.active', 'Active'))
+            'all' => WidgetTab::make($this->label('campaigns.tabs.all', 'All'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'active' => WidgetTab::make($this->label('campaigns.tabs.active', 'Active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'active'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'active')->count()),
-            'scheduled' => Tab::make($this->label('campaigns.tabs.scheduled', 'Scheduled'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('status', 'active')->count()),
+            'scheduled' => WidgetTab::make($this->label('campaigns.tabs.scheduled', 'Scheduled'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'scheduled'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'scheduled')->count()),
-            'draft' => Tab::make($this->label('campaigns.tabs.draft', 'Draft'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('status', 'scheduled')->count()),
+            'draft' => WidgetTab::make($this->label('campaigns.tabs.draft', 'Draft'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'draft'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'draft')->count()),
-            'paused' => Tab::make($this->label('campaigns.tabs.paused', 'Paused'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('status', 'draft')->count()),
+            'paused' => WidgetTab::make($this->label('campaigns.tabs.paused', 'Paused'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'paused'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('status', 'paused')->count()),
-            'inactive' => Tab::make($this->label('campaigns.tabs.inactive', 'Inactive'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('status', 'paused')->count()),
+            'inactive' => WidgetTab::make($this->label('campaigns.tabs.inactive', 'Inactive'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', false))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_active', false)->count()),
-            'featured' => Tab::make($this->label('campaigns.tabs.featured', 'Featured'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', false)->count()),
+            'featured' => WidgetTab::make($this->label('campaigns.tabs.featured', 'Featured'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_featured', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),
         ];
     }
 

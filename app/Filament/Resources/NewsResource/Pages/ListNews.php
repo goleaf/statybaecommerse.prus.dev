@@ -8,11 +8,14 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\NewsResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListNews extends ListRecords
 {
+    use HasWidgetTabs;
+
     protected static string $resource = NewsResource::class;
 
     protected function getHeaderActions(): array
@@ -22,34 +25,35 @@ final class ListNews extends ListRecords
         ];
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all' => Tab::make(__('news.tabs.all')),
-            'draft' => Tab::make(__('news.tabs.draft'))
+            'all' => WidgetTab::make(__('news.tabs.all'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'draft' => WidgetTab::make(__('news.tabs.draft'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Draft->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Draft->value)->count()),
-            'review' => Tab::make(__('news.tabs.review'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Draft->value)->count()),
+            'review' => WidgetTab::make(__('news.tabs.review'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Review->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Review->value)->count()),
-            'published' => Tab::make(__('news.tabs.published'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Review->value)->count()),
+            'published' => WidgetTab::make(__('news.tabs.published'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Published->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Published->value)->count()),
-            'featured' => Tab::make(__('news.tabs.featured'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Published->value)->count()),
+            'featured' => WidgetTab::make(__('news.tabs.featured'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_featured', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),
-            'breaking' => Tab::make(__('news.tabs.breaking'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),
+            'breaking' => WidgetTab::make(__('news.tabs.breaking'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_breaking', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_breaking', true)->count()),
-            'today' => Tab::make(__('news.tabs.today'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_breaking', true)->count()),
+            'today' => WidgetTab::make(__('news.tabs.today'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereDate('created_at', today()))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereDate('created_at', today())->count()),
-            'this_week' => Tab::make(__('news.tabs.this_week'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereDate('created_at', today())->count()),
+            'this_week' => WidgetTab::make(__('news.tabs.this_week'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count()),
-            'this_month' => Tab::make(__('news.tabs.this_month'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count()),
+            'this_month' => WidgetTab::make(__('news.tabs.this_month'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count()),
         ];
     }
 }
