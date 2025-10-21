@@ -9,7 +9,7 @@ use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
-use BackedEnum;
+use App\Support\Filament\Components\Flatpickr;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
@@ -24,16 +24,20 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
-use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+    /**
+     * @var string|\BackedEnum|null
+     *
+     * @phpstan-var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-clock';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    // Keep the resource grouped via the shared navigation enum for consistency across the admin UI.
+    protected static NavigationGroup|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 11;
 
