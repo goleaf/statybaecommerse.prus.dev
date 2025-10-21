@@ -35,12 +35,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class CartItemResource extends Resource
 {
-    /**
-     * Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
-     *
-     * @var string|\BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 

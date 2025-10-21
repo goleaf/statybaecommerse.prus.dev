@@ -25,12 +25,12 @@ class ChannelResource extends Resource
         return 'heroicon-o-rectangle-stack';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return ChannelForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ChannelsTable::configure($table);
     }

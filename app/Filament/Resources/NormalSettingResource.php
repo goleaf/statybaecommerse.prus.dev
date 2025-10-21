@@ -25,7 +25,8 @@ final class NormalSettingResource extends Resource
 {
     protected static ?string $model = NormalSetting::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 8;
 
@@ -46,7 +47,7 @@ final class NormalSettingResource extends Resource
         return __('normal_settings.navigation');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Tabs::make(__('normal_settings.tabs.label'))
@@ -97,7 +98,7 @@ final class NormalSettingResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

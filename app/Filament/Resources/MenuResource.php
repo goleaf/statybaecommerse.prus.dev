@@ -37,11 +37,10 @@ final class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
-    /**
-     * Navigation icon override (string|\BackedEnum|null) kept typed for Filament discovery.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
@@ -63,7 +62,7 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         $locationOptions = [
             'header'  => __('menus.locations.header'),
@@ -111,7 +110,7 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

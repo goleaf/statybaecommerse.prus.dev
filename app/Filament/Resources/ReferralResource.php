@@ -30,21 +30,17 @@ final class ReferralResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = Referral::class;
 
-    /**
-     * Navigation icon for the resource.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
 
-    /**
-     * Navigation group for organizing the resource in the admin panel.
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 17;
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->components([
@@ -133,7 +129,7 @@ final class ReferralResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

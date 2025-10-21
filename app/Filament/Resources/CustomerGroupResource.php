@@ -35,7 +35,8 @@ final class CustomerGroupResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = CustomerGroup::class;
 
-    protected static UnitEnum|string|null $navigationGroup = null;
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -61,7 +62,7 @@ final class CustomerGroupResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('customer_groups.basic_information'))
@@ -165,7 +166,7 @@ final class CustomerGroupResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
