@@ -35,6 +35,7 @@ class Dashboard extends BaseDashboard
             \App\Filament\Widgets\DashboardLowStockTable::class,
             \App\Filament\Widgets\DashboardRecentErrorsTable::class,
             \App\Filament\Widgets\DashboardQuickActionsWidget::class,
+            \App\Filament\Widgets\CalendarWidget::class,
         ];
     }
 
