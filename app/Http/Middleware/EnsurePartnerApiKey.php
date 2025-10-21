@@ -46,7 +46,8 @@ final class EnsurePartnerApiKey
 
     private function resolveProvidedKey(Request $request): ?string
     {
-        $header = $request->headers->get('X-Api-Key');
+        $headerName = (string) config('services.partner_api.header', 'X-Api-Key');
+        $header = $request->headers->get($headerName);
 
         if (! is_string($header)) {
             return null;
