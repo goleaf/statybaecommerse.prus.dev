@@ -8,6 +8,7 @@ use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -16,13 +17,13 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -30,10 +31,16 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr;
 
 final class CartItemResource extends Resource
 {
+    /**
+     * Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
+     *
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+
     protected static ?string $model = CartItem::class;
 
     protected static ?int $navigationSort = 3;
@@ -59,13 +66,13 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('cart_items.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('user_id')
                                 ->label(__('cart_items.user'))
                                 ->relationship('user', 'name')
@@ -137,14 +144,20 @@ final class CartItemResource extends Resource
                                 }
                             }
                         }),
+                    // The product name is derived from the related product, therefore we never dehydrate the value.
                     TextInput::make('product_name')
                         ->label(__('cart_items.product_name'))
+                        ->readOnly()
+                        ->dehydrated(false)
                         ->maxLength(255),
+                    // The product SKU behaves like the name above and remains display-only.
                     TextInput::make('product_sku')
                         ->label(__('cart_items.product_sku'))
+                        ->readOnly()
+                        ->dehydrated(false)
                         ->maxLength(255),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('quantity')
                                 ->label(__('cart_items.quantity'))
                                 ->numeric()
@@ -173,9 +186,9 @@ final class CartItemResource extends Resource
                         ->maxLength(1000),
                 ]),
             Section::make(__('cart_items.pricing'))
-                ->components([
+                ->schema([
                     Grid::make(3)
-                        ->components([
+                        ->schema([
                             TextInput::make('unit_price')
                                 ->label(__('cart_items.unit_price'))
                                 ->prefix('€')
@@ -201,14 +214,16 @@ final class CartItemResource extends Resource
                                     $total = ($unitPrice * $quantity) - $discount;
                                     $set('total_price', number_format($total, 2, '.', ''));
                                 }),
+                            // Persist the calculated total even though the field is disabled for manual edits.
                             TextInput::make('total_price')
                                 ->label(__('cart_items.total'))
                                 ->prefix('€')
-                                ->disabled(),
+                                ->disabled()
+                                ->dehydrated(),
                         ]),
                 ]),
             Section::make(__('cart_items.additional_info'))
-                ->components([
+                ->schema([
                     Forms\Components\KeyValue::make('attributes')
                         ->label(__('cart_items.attributes'))
                         ->keyLabel(__('cart_items.attribute_name'))
@@ -228,7 +243,7 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

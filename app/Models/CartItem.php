@@ -31,16 +31,16 @@ final class CartItem extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['session_id', 'user_id', 'product_id', 'variant_id', 'product_variant_id', 'quantity', 'minimum_quantity', 'unit_price', 'total_price', 'price', 'product_snapshot', 'notes', 'attributes'];
+    protected $fillable = ['session_id', 'user_id', 'product_id', 'variant_id', 'product_variant_id', 'quantity', 'minimum_quantity', 'unit_price', 'discount_amount', 'total_price', 'price', 'product_snapshot', 'notes', 'attributes'];
 
-    protected $casts = ['quantity' => 'integer', 'minimum_quantity' => 'integer', 'unit_price' => 'decimal:2', 'total_price' => 'decimal:2', 'price' => 'decimal:2', 'product_snapshot' => 'array', 'attributes' => 'array'];
+    protected $casts = ['quantity' => 'integer', 'minimum_quantity' => 'integer', 'unit_price' => 'decimal:2', 'discount_amount' => 'decimal:2', 'total_price' => 'decimal:2', 'price' => 'decimal:2', 'product_snapshot' => 'array', 'attributes' => 'array'];
 
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
-    protected $appends = ['formatted_total_price', 'formatted_unit_price', 'subtotal'];
+    protected $appends = ['formatted_total_price', 'formatted_unit_price', 'subtotal', 'product_name', 'product_sku'];
 
     /**
      * Handle user functionality with proper error handling.
@@ -192,5 +192,23 @@ final class CartItem extends Model
         $price = $this->price ?? $this->unit_price;
 
         return $price * $this->quantity;
+    }
+
+    /**
+     * Provide a convenient accessor for the product name using the relation or snapshot cache.
+     */
+    public function getProductNameAttribute(): ?string
+    {
+        // Attempt to read the live relationship first, falling back to the stored snapshot for resiliency.
+        return $this->product?->name ?? ($this->product_snapshot['name'] ?? null);
+    }
+
+    /**
+     * Provide a convenient accessor for the product SKU using the relation or snapshot cache.
+     */
+    public function getProductSkuAttribute(): ?string
+    {
+        // Attempt to read the live relationship first, falling back to the stored snapshot for resiliency.
+        return $this->product?->sku ?? ($this->product_snapshot['sku'] ?? null);
     }
 }
