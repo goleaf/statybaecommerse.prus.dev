@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
-use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -119,24 +119,20 @@ final class RecommendationConfigResource extends Resource
                                 ->label(__('recommendation_config.fields.products'))
                                 ->relationship('products', 'name')
                                 ->multiple()
-                                ->preload()
-                                ->searchable()
-                                ->boxSearchs()
+                                ->relationshipDefaults()
+                                // Shared Combobox defaults cover preload, search, and JS behaviour.
                                 ->height('360px')
                                 ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
-                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
-                                ->native(false),
+                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state),
                             Combobox::make('categories')
                                 ->label(__('recommendation_config.fields.categories'))
                                 ->relationship('categories', 'name')
                                 ->multiple()
-                                ->preload()
-                                ->searchable()
-                                ->boxSearchs()
+                                ->relationshipDefaults()
+                                // Shared Combobox defaults cover preload, search, and JS behaviour.
                                 ->height('360px')
                                 ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
-                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
-                                ->native(false),
+                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state),
                         ]),
                 ]),
         ]);
