@@ -18,6 +18,7 @@
 
 ### Changed
 - Swapped Campaign resource schemas to Filament v4 `Section`/`Grid` components, refreshed table action imports, and synced the related translation manager plus Variant Analytics navigation icon docblock with v4 conventions.
+- Documented the Variant Inventory resource's Select form component import so dropdown dependencies stay transparent for reviewers.
 - Restored typed navigation icons for the Menu, Enum Management, and Variant Analytics resources while cleaning up redundant `UnitEnum` imports in favor of fully qualified annotations.
 - Routed the Menu activation toggle through Filament's success notification system to standardize feedback messaging.
 - Added localized LaraZeus list group quick links to the product, order, customer, and post view record pages so relationship collections surface with consistent icons, tooltips, and storefront URLs.
