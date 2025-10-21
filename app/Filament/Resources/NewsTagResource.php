@@ -35,7 +35,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class NewsTagResource extends Resource
 {
@@ -46,8 +45,9 @@ final class NewsTagResource extends Resource
         return 'heroicon-o-tag';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
+        // Returning the enum directly keeps Filament aware of the localization metadata without redundant UnitEnum imports.
         return NavigationGroup::News;
     }
 
