@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
+use App\Support\Nav;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 
@@ -50,12 +51,6 @@ final class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        $resourceClasses = array_values(array_filter(
-            (array) config('filament.navigation.resources', []),
-            static fn (mixed $resource): bool => is_string($resource),
-        ));
-
-        /** @var array<class-string> $resourceClasses */
         $pageClasses = array_values(array_filter(
             (array) config('filament.navigation.pages', []),
             static fn (mixed $page): bool => is_string($page),
@@ -86,7 +81,8 @@ final class AdminPanelProvider extends PanelProvider
                 'info'    => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->resources($resourceClasses)
+            // Register ordered resources to guarantee deterministic navigation rendering.
+            ->resources(Nav::orderedResources())
             ->pages($pageClasses)
             ->widgets([
                 AccountWidget::class,
@@ -118,6 +114,8 @@ final class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts()
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
+            // Feed navigation groups generated from the shared helper so the sidebar uses
+            // consistent icons, order, and collapse behaviour across the application.
             ->navigationGroups($this->configuredNavigationGroups())
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->userMenuItems([
@@ -205,23 +203,16 @@ final class AdminPanelProvider extends PanelProvider
      */
     private function configuredNavigationGroups(): array
     {
-        $groupConfigurations = array_values(array_filter(
-            (array) config('filament.navigation.groups', []),
-            static fn (mixed $group): bool => is_array($group),
-        ));
-
-        /** @var array<int, array{label?: string, icon?: string|null, collapsed?: bool|null}> $groupConfigurations */
-
-        return collect($groupConfigurations)
-            ->map(static function (array $group, int|string $unused): NavigationGroup {
+        return collect(Nav::navigationGroups())
+            ->map(static function (array $group): NavigationGroup {
                 $navigationGroup = NavigationGroup::make()
-                    ->label(__($group['label'] ?? ''));
+                    ->label($group['label']);
 
                 if (! empty($group['icon'])) {
                     $navigationGroup->icon($group['icon']);
                 }
 
-                if (($group['collapsed'] ?? false) === true) {
+                if ($group['collapsed']) {
                     $navigationGroup->collapsed();
                 }
 

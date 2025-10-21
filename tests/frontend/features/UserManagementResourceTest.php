@@ -6,6 +6,7 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\UserResource as UserManagementResource;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -189,7 +190,7 @@ class UserManagementResourceTest extends TestCase
     {
         $navigationGroup = UserManagementResource::getNavigationGroup();
 
-        $this->assertIsString($navigationGroup);
+        $this->assertSame(Nav::groupForResource(UserManagementResource::class), $navigationGroup);
     }
 
     public function test_user_management_resource_has_correct_navigation_icon(): void

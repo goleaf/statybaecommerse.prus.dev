@@ -7,6 +7,7 @@ namespace Tests\Admin\Resources;
 use App\Filament\Resources\UserPreferenceResource;
 use App\Models\User;
 use App\Models\UserPreference;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -298,7 +299,10 @@ final class UserPreferenceResourceTest extends TestCase
 
     public function test_user_preference_resource_navigation_group(): void
     {
-        $this->assertEquals('Users', UserPreferenceResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(UserPreferenceResource::class),
+            UserPreferenceResource::getNavigationGroup()
+        );
         $this->assertEquals(6, UserPreferenceResource::getNavigationSort());
     }
 

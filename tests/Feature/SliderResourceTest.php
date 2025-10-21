@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\Slider;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -333,7 +334,10 @@ final class SliderResourceTest extends TestCase
     public function test_slider_resource_has_correct_navigation_properties(): void
     {
         $this->assertEquals('heroicon-o-rectangle-stack', \App\Filament\Resources\Sliders\SliderResource::getNavigationIcon());
-        $this->assertEquals('Content', \App\Filament\Resources\Sliders\SliderResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(\App\Filament\Resources\Sliders\SliderResource::class),
+            \App\Filament\Resources\Sliders\SliderResource::getNavigationGroup()
+        );
     }
 
     public function test_slider_resource_can_export_sliders(): void

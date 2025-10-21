@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Enums\NavigationGroup;
 use App\Models\Notification;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
@@ -346,16 +346,25 @@ final class NotificationResourceTest extends TestCase
 
     public function test_navigation_group_is_system(): void
     {
-        $this->assertEquals(NavigationGroup::System, \App\Filament\Resources\NotificationResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(\App\Filament\Resources\NotificationResource::class),
+            \App\Filament\Resources\NotificationResource::getNavigationGroup()
+        );
     }
 
     public function test_has_correct_navigation_sort(): void
     {
-        $this->assertEquals(3, \App\Filament\Resources\NotificationResource::getNavigationSort());
+        $this->assertEquals(
+            Nav::sortForResource(\App\Filament\Resources\NotificationResource::class),
+            \App\Filament\Resources\NotificationResource::getNavigationSort()
+        );
     }
 
     public function test_has_correct_navigation_icon(): void
     {
-        $this->assertEquals('heroicon-o-bell', \App\Filament\Resources\NotificationResource::getNavigationIcon());
+        $this->assertEquals(
+            Nav::iconForResource(\App\Filament\Resources\NotificationResource::class),
+            \App\Filament\Resources\NotificationResource::getNavigationIcon()
+        );
     }
 }
