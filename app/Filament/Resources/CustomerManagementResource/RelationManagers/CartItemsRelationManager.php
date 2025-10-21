@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -14,8 +17,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Schemas\Schema;
+use Filament\Infolists\Infolist;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -23,25 +25,28 @@ class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
+                // Keep the identifier locked because the relationship is read-only in this manager.
                 TextInput::make('id')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled()
+                    ->dehydrated(false),
             ]);
     }
 
-    public function infolist(Schema $schema): Schema|array
+    public function infolist(Infolist $infolist): Infolist
     {
-        return $schema
-            ->components([
+        return $infolist
+            ->schema([
                 TextEntry::make('id'),
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('id')
