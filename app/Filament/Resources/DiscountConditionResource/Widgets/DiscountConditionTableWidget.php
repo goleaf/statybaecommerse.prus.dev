@@ -16,7 +16,7 @@ final class DiscountConditionTableWidget extends BaseWidget
 
     protected static ?string $heading = 'Recent Discount Conditions';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->query(

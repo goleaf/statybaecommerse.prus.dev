@@ -21,7 +21,7 @@ final class ReviewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Reviews';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->components([
@@ -45,7 +45,7 @@ final class ReviewsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('title')

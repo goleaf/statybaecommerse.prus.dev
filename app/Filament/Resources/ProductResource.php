@@ -143,7 +143,7 @@ final class ProductResource extends Resource
         return __('products.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form
             ->components([
@@ -349,7 +349,7 @@ final class ProductResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->defaultPaginationPageOption(25)

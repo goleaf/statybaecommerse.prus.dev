@@ -31,7 +31,7 @@ final class VariantPriceHistoryResource extends Resource
         return 'System';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -84,7 +84,7 @@ final class VariantPriceHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([

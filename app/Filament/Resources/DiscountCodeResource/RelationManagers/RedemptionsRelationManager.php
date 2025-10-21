@@ -20,7 +20,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'redemptions';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -46,7 +46,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('id')

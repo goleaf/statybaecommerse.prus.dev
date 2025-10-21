@@ -69,7 +69,7 @@ final class CampaignClickResource extends Resource
      * @param  Forms\Form  $schema
      * @return Forms\Form
      */
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form->schema([
             Section::make(__('campaign_clicks.basic_information'))
@@ -192,7 +192,7 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([
