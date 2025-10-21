@@ -42,6 +42,7 @@ final class ShippingOption extends Model
         'estimated_days_min',
         'estimated_days_max',
         'metadata',
+        'shipping_matrix',
     ];
 
     protected function casts(): array
@@ -58,6 +59,7 @@ final class ShippingOption extends Model
             'estimated_days_max' => 'integer',
             'sort_order' => 'integer',
             'metadata' => 'array',
+            'shipping_matrix' => 'array',
         ];
     }
 
