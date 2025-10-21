@@ -37,7 +37,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * VariantImageResource
@@ -48,9 +47,12 @@ final class VariantImageResource extends Resource
 {
     protected static ?string $model = VariantImage::class;
 
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Inventory';
     }
@@ -251,7 +253,7 @@ final class VariantImageResource extends Resource
                     ->label(__('admin.variant_images.file_size'))
                     ->formatStateUsing(function ($state) {
                         if ($state) {
-                            return number_format($state / 1024, 2).' KB';
+                            return number_format($state / 1024, 2) . ' KB';
                         }
 
                         return '-';
@@ -446,10 +448,10 @@ final class VariantImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantImages::route('/'),
+            'index'  => Pages\ListVariantImages::route('/'),
             'create' => Pages\CreateVariantImage::route('/create'),
-            'view' => Pages\ViewVariantImage::route('/{record}'),
-            'edit' => Pages\EditVariantImage::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantImage::route('/{record}'),
+            'edit'   => Pages\EditVariantImage::route('/{record}/edit'),
         ];
     }
 }

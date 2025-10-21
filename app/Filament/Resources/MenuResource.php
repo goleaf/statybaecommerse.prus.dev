@@ -38,6 +38,9 @@ final class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';
@@ -183,9 +186,13 @@ final class MenuResource extends Resource
                     ->action(function (Menu $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
 
+                        $message = $record->is_active
+                            ? __('menus.activated_successfully')
+                            : __('menus.deactivated_successfully');
+
                         Notification::make()
-                            ->title($record->is_active ? __('menus.activated_successfully') : __('menus.deactivated_successfully'))
                             ->success()
+                            ->title((string) $message)
                             ->send();
                     }),
                 Action::make('duplicate')
