@@ -312,6 +312,7 @@ final class OrderResource extends Resource
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?int $state, Set $set): void {
                                     if ($state === null) {
                                         $set('billing_address', []);
@@ -335,6 +336,7 @@ final class OrderResource extends Resource
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?int $state, Set $set): void {
                                     if ($state === null) {
                                         $set('shipping_address', []);

@@ -109,6 +109,7 @@ final class OrderItemResource extends Resource
                                             (string) $record->product_id => $label,
                                         ]);
                                 })
+                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
                                         return;
