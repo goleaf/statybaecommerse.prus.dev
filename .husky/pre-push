@@ -1,7 +1,8 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+# Use Husky's helper to keep PATH enriched before running Composer's CI suite.
+. "$(dirname -- "$0")/_/h"
 
-set -e
+set -eu
 
 echo "Running Composer CI suite before push..."
 composer ci

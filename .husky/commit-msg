@@ -1,4 +1,7 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+# Bootstrap Husky's maintained helper so PATH and environment tweaks remain consistent.
+. "$(dirname -- "$0")/_/h"
+
+set -eu
 
 npx --no -- commitlint --edit "$1"
