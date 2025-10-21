@@ -9,6 +9,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Support\Filament\ProductVariantFieldHelper;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -41,7 +43,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component->assertSuccessful();
@@ -56,25 +58,25 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
             ->callTableAction('create', null, [
                 'product_variant_id' => $this->productVariant->id,
-                'quantity' => 2,
-                'unit_price' => 25.5,
-                'discount_amount' => 5.0,
-                'notes' => 'Test order item',
+                'quantity'           => 2,
+                'unit_price'         => 25.5,
+                'discount_amount'    => 5.0,
+                'notes'              => 'Test order item',
             ])
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_items', [
-            'order_id' => $this->order->id,
+            'order_id'           => $this->order->id,
             'product_variant_id' => $this->productVariant->id,
-            'quantity' => 2,
-            'unit_price' => 25.5,
-            'discount_amount' => 5.0,
+            'quantity'           => 2,
+            'unit_price'         => 25.5,
+            'discount_amount'    => 5.0,
         ]);
     }
 
@@ -86,25 +88,25 @@ final class OrderItemsRelationManagerTest extends TestCase
         $this->actingAs($this->user);
 
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'           => $this->order->id,
             'product_variant_id' => $this->productVariant->id,
         ]);
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
             ->callTableAction('edit', $orderItem, [
-                'quantity' => 5,
+                'quantity'   => 5,
                 'unit_price' => 30.0,
             ])
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_items', [
-            'id' => $orderItem->id,
-            'quantity' => 5,
+            'id'         => $orderItem->id,
+            'quantity'   => 5,
             'unit_price' => 30.0,
         ]);
     }
@@ -122,7 +124,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -142,13 +144,13 @@ final class OrderItemsRelationManagerTest extends TestCase
         $this->actingAs($this->user);
 
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'           => $this->order->id,
             'product_variant_id' => $this->productVariant->id,
         ]);
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -167,17 +169,17 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         OrderItem::factory()->create([
             'order_id' => $this->order->id,
-            'status' => 'pending',
+            'status'   => 'pending',
         ]);
 
         OrderItem::factory()->create([
             'order_id' => $this->order->id,
-            'status' => 'completed',
+            'status'   => 'completed',
         ]);
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -195,18 +197,18 @@ final class OrderItemsRelationManagerTest extends TestCase
         $this->actingAs($this->user);
 
         OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'        => $this->order->id,
             'discount_amount' => 10.0,
         ]);
 
         OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'        => $this->order->id,
             'discount_amount' => 0.0,
         ]);
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -225,12 +227,12 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $orderItems = OrderItem::factory()->count(3)->create([
             'order_id' => $this->order->id,
-            'status' => 'pending',
+            'status'   => 'pending',
         ]);
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -239,7 +241,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         foreach ($orderItems as $item) {
             $this->assertDatabaseHas('order_items', [
-                'id' => $item->id,
+                'id'     => $item->id,
                 'status' => 'completed',
             ]);
         }
@@ -258,7 +260,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -269,7 +271,7 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         foreach ($orderItems as $item) {
             $this->assertDatabaseHas('order_items', [
-                'id' => $item->id,
+                'id'              => $item->id,
                 'discount_amount' => 15.0,
             ]);
         }
@@ -284,15 +286,15 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
             ->callTableAction('create', null, [
                 'product_variant_id' => $this->productVariant->id,
-                'quantity' => 3,
-                'unit_price' => 20.0,
-                'discount_amount' => 10.0,
+                'quantity'           => 3,
+                'unit_price'         => 20.0,
+                'discount_amount'    => 10.0,
             ])
             ->assertHasNoFormErrors();
 
@@ -311,14 +313,14 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
             ->callTableAction('create', null, [
                 'product_variant_id' => null,
-                'quantity' => null,
-                'unit_price' => null,
+                'quantity'           => null,
+                'unit_price'         => null,
             ])
             ->assertHasFormErrors(['product_variant_id', 'quantity', 'unit_price']);
     }
@@ -332,15 +334,61 @@ final class OrderItemsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderItemsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
             ->callTableAction('create', null, [
                 'product_variant_id' => $this->productVariant->id,
-                'quantity' => 0,
-                'unit_price' => 20.0,
+                'quantity'           => 0,
+                'unit_price'         => 20.0,
             ])
             ->assertHasFormErrors(['quantity']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_clears_variant_lookup_and_snapshot_fields_when_selection_is_removed(): void
+    {
+        $this->actingAs($this->user);
+
+        $component = SearchableInput::make('product_variant_id');
+
+        // Hydrate the component to simulate a previously selected variant in the action form.
+        ProductVariantFieldHelper::hydrateSearchableVariant($component, $this->productVariant->getKey());
+
+        $fields = [
+            'product_variant_id' => $this->productVariant->getKey(),
+            'product_id'         => $this->productVariant->getAttribute('product_id'),
+            'name'               => 'Persisted variant name',
+            'sku'                => 'PERSISTED-SKU',
+            'unit_price'         => 45.0,
+            'quantity'           => 2,
+            'discount_amount'    => 5.0,
+            'total'              => 85.0,
+        ];
+
+        $set = static function (string $field, mixed $value) use (&$fields): void {
+            $fields[$field] = $value;
+        };
+
+        $get = static function (string $field) use (&$fields): mixed {
+            return $fields[$field] ?? null;
+        };
+
+        // Invoke the helper with an empty state to mirror the lookup being cleared in the UI.
+        ProductVariantFieldHelper::handleVariantSelection('', $set, $get, $component);
+
+        $this->assertNull($component->getState());
+        $this->assertSame([], $component->getOptions());
+        $this->assertSame([], $component->getPayload());
+
+        $this->assertNull($fields['product_variant_id']);
+        $this->assertNull($fields['product_id']);
+        $this->assertSame('', $fields['name']);
+        $this->assertSame('', $fields['sku']);
+        $this->assertSame(0.0, $fields['unit_price']);
+        $this->assertSame(0.0, $fields['total']);
     }
 }
