@@ -6,12 +6,15 @@ namespace App\Filament\Resources\PriceListResource\Pages;
 
 use App\Filament\Resources\PriceListResource;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListPriceLists extends ListRecords
 {
+    use HasWidgetTabs;
+
     protected static string $resource = PriceListResource::class;
 
     protected function getHeaderActions(): array
@@ -21,22 +24,22 @@ final class ListPriceLists extends ListRecords
         ];
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all' => Tab::make(__('price_lists.tabs.all')),
-
-            'active' => Tab::make(__('price_lists.tabs.active'))
+            'all' => WidgetTab::make(__('price_lists.tabs.all'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'active' => WidgetTab::make(__('price_lists.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->active())
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->active()->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->active()->count()),
 
-            'default' => Tab::make(__('price_lists.tabs.default'))
+            'default' => WidgetTab::make(__('price_lists.tabs.default'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_default', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_default', true)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_default', true)->count()),
 
-            'auto_apply' => Tab::make(__('price_lists.tabs.auto_apply'))
+            'auto_apply' => WidgetTab::make(__('price_lists.tabs.auto_apply'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('auto_apply', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('auto_apply', true)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('auto_apply', true)->count()),
         ];
     }
 }

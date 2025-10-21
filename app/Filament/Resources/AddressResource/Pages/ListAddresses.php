@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AddressResource\Pages;
 
+use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListAddresses extends ListRecords
 {
+    use HasWidgetTabs;
+
     protected static string $resource = AddressResource::class;
 
     protected function getHeaderActions(): array
@@ -21,31 +25,32 @@ final class ListAddresses extends ListRecords
         ];
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all'      => Tab::make(__('translations.all_addresses')),
-            'shipping' => Tab::make(__('translations.shipping_addresses'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', \App\Enums\AddressType::SHIPPING))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', \App\Enums\AddressType::SHIPPING)->count()),
-            'billing' => Tab::make(__('translations.billing_addresses'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', \App\Enums\AddressType::BILLING))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', \App\Enums\AddressType::BILLING)->count()),
-            'home' => Tab::make(__('translations.home_addresses'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', \App\Enums\AddressType::HOME))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', \App\Enums\AddressType::HOME)->count()),
-            'work' => Tab::make(__('translations.work_addresses'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', \App\Enums\AddressType::WORK))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', \App\Enums\AddressType::WORK)->count()),
-            'default' => Tab::make(__('translations.default_addresses'))
+            'all' => WidgetTab::make(__('translations.all_addresses'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'shipping' => WidgetTab::make(__('translations.shipping_addresses'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::SHIPPING))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::SHIPPING)->count()),
+            'billing' => WidgetTab::make(__('translations.billing_addresses'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::BILLING))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::BILLING)->count()),
+            'home' => WidgetTab::make(__('translations.home_addresses'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::HOME))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::HOME)->count()),
+            'work' => WidgetTab::make(__('translations.work_addresses'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::WORK))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::WORK)->count()),
+            'default' => WidgetTab::make(__('translations.default_addresses'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_default', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_default', true)->count()),
-            'active' => Tab::make(__('translations.active_addresses'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_default', true)->count()),
+            'active' => WidgetTab::make(__('translations.active_addresses'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
-            'recent' => Tab::make(__('translations.recent_addresses'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
+            'recent' => WidgetTab::make(__('translations.recent_addresses'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('created_at', '>=', now()->subDays(7)))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('created_at', '>=', now()->subDays(7))->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('created_at', '>=', now()->subDays(7))->count()),
         ];
     }
 }
