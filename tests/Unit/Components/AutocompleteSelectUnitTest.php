@@ -69,29 +69,40 @@ it('can set model class', function (): void {
     expect($component->getModelClass())->toBe(Product::class);
 });
 
+it('clears search state when empty queries are provided', function (): void {
+    $component = AutocompleteSelect::make('test_field')
+        ->model(Product::class)
+        ->setSearchQuery('Initial');
+
+    expect($component->getSearchQuery())->toBe('Initial');
+
+    $component->setSearchQuery('   ');
+
+    expect($component->getSearchQuery())->toBeNull();
+    expect(count($component->getViewData()['searchResults']))->toBe(0);
+});
+
 it('can set search query', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
-        ->setSearchQuery('test');
+        ->setSearchQuery(' test ');
 
     expect($component->getSearchQuery())->toBe('test');
 });
 
 it('returns empty results for invalid model class', function (): void {
-    $component = AutocompleteSelect::make('test_field')
-        ->setSearchQuery('test');
+    $component = AutocompleteSelect::make('test_field');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('test');
 
     expect($searchResults)->toHaveCount(0);
 });
 
 it('returns empty results for empty search query', function (): void {
     $component = AutocompleteSelect::make('test_field')
-        ->model(Product::class)
-        ->setSearchQuery('');
+        ->model(Product::class);
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('');
 
     expect($searchResults)->toHaveCount(0);
 });
