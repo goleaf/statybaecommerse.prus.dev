@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserProductInteraction;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -38,7 +38,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class UserProductInteractionResource extends Resource
 {
@@ -61,7 +60,10 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    /**
+     * Ensure Filament v4 receives a concrete Form instance for schema binding.
+     */
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -128,6 +130,7 @@ final class UserProductInteractionResource extends Resource
 
                                         return Product::create($data)->getKey();
                                     }),
+                                // Map each interaction type to its localized label for admins.
                                 Select::make('interaction_type')
                                     ->label(__('admin.user_product_interactions.interaction_type'))
                                     ->options([
@@ -189,7 +192,10 @@ final class UserProductInteractionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    /**
+     * Return a Table instance to satisfy Filament v4 table expectations.
+     */
+    public static function table(Table $table): Table
     {
         return $table
             ->deferLoading(false)
