@@ -341,17 +341,19 @@ final class OrderResource extends Resource
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if ($state === null) {
+                                ->afterStateUpdated(function (string|int|null $state, Set $set): void {
+                                    if ($state === null || $state === '') {
                                         // Reset the cached billing payload when cleared.
                                         SearchableInputHelper::clear($set, ['billing_address' => []]);
 
                                         return;
                                     }
 
+                                    $addressId = (int) $state;
+
                                     $address = Address::query()
                                         ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
-                                        ->find($state);
+                                        ->find($addressId);
 
                                     if (! $address instanceof Address) {
                                         return;
@@ -374,16 +376,18 @@ final class OrderResource extends Resource
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if ($state === null) {
+                                ->afterStateUpdated(function (string|int|null $state, Set $set): void {
+                                    if ($state === null || $state === '') {
                                         SearchableInputHelper::clear($set, ['shipping_address' => []]);
 
                                         return;
                                     }
 
+                                    $addressId = (int) $state;
+
                                     $address = Address::query()
                                         ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
-                                        ->find($state);
+                                        ->find($addressId);
 
                                     if (! $address instanceof Address) {
                                         return;
