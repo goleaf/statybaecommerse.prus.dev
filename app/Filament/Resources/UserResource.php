@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use UnitEnum;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 /**
  * UserResource
@@ -46,6 +47,8 @@ use UnitEnum;
  */
 final class UserResource extends Resource
 {
+    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+
     protected static ?string $model = User::class;
 
     protected static ?int $navigationSort = 1;

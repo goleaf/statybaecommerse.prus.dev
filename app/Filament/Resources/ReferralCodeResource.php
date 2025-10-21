@@ -30,9 +30,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 final class ReferralCodeResource extends Resource
 {
+    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = ReferralCode::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';

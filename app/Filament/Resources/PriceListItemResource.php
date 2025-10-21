@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 /**
  * PriceListItemResource
@@ -43,6 +44,8 @@ use App\Support\Filament\Components\Flatpickr;
  */
 final class PriceListItemResource extends Resource
 {
+    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+
     protected static ?string $model = PriceListItem::class;
 
     protected static ?int $navigationSort = 16;

@@ -23,9 +23,11 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 final class ReferralResource extends Resource
 {
+    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = Referral::class;
 
     /**
