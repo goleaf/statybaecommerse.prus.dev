@@ -43,7 +43,10 @@ final class CompanyResource extends Resource
         return __('companies.single');
     }
 
-    public static function form(Form $form): Form|array
+    /**
+     * Build the form schema for creating and editing companies.
+     */
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Forms\Components\Section::make(__('companies.basic_information'))
@@ -96,9 +99,9 @@ final class CompanyResource extends Resource
     }
 
     /**
-     * Configure the Filament table with columns, filters, and actions.
+     * Configure the table for listing company records in the admin panel.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
