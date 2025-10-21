@@ -174,6 +174,16 @@ return [
         'sort_order' => 'Rikiavimo tvarka',
         'color' => 'Spalva',
     ],
+    'combobox' => [
+        'categories' => [
+            'available' => 'Galimos kategorijos',
+            'selected' => 'Pasirinktos kategorijos',
+        ],
+        'tags' => [
+            'available' => 'Galimos žymos',
+            'selected' => 'Pasirinktos žymos',
+        ],
+    ],
     // Filter translations
     'filters' => [
         'published_from' => 'Paskelbta nuo',
