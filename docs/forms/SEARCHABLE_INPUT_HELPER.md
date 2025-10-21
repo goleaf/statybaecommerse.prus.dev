@@ -1,6 +1,6 @@
 # Searchable Input Helper
 
-The `App\Support\Filament\SearchableComponentHelper` centralises the repetitive work required to keep [`DefStudio\SearchableInput`](https://github.com/defstudio/searchable-input) fields hydrated with the correct state, option list, and metadata payload. By funnelling hydration and update hooks through the helper, resources inherit consistent behaviour while reusing the canonical `{ value, label, payload }` tuple produced by our search services.
+The `App\Support\Filament\Components\SearchableComponentHelper` centralises the repetitive work required to keep [`DefStudio\SearchableInput`](https://github.com/defstudio/searchable-input) fields hydrated with the correct state, option list, and metadata payload. By funnelling hydration and update hooks through the helper, resources inherit consistent behaviour while reusing the canonical `{ value, label, payload }` tuple produced by our search services.
 
 ## Core scenarios
 

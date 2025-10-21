@@ -1,11 +1,11 @@
 # Searchable input helper usage
 
-The `App\\Support\\Filament\\SearchableComponentHelper` centralises the repetitive wiring required to keep [DefStudio's `SearchableInput`](https://github.com/defstudio/filament-searchable-input) fields hydrated with the correct state, options, and payload metadata inside our Filament forms. Use it whenever a Filament form component needs to look up a record, expose a human-readable label, and share structured payload data with sibling inputs.
+The `App\\Support\\Filament\\Components\\SearchableComponentHelper` centralises the repetitive wiring required to keep [DefStudio's `SearchableInput`](https://github.com/defstudio/filament-searchable-input) fields hydrated with the correct state, options, and payload metadata inside our Filament forms. Use it whenever a Filament form component needs to look up a record, expose a human-readable label, and share structured payload data with sibling inputs.
 
 ## Hydrating a component
 
 ```php
-use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filament\Components\SearchableComponentHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Hidden;
 
@@ -44,7 +44,7 @@ The helper converts the `value` to a string, registers it as the component state
 When a lookup is wiped out (for example, in an `afterStateUpdated` hook that receives a blank value), call the `clear()` helper to reset the state, options, and payload. Optional callbacks let you synchronise related form fields at the same time. `syncSelectedRecord()` already delegates to `clear()` when the lookup fails or the state is empty, but the standalone helper remains handy for bespoke flows (such as cascading dropdowns that need to wipe multiple fields).
 
 ```php
-use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filament\Components\SearchableComponentHelper;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 
