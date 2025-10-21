@@ -6,6 +6,7 @@
 ## Admin panel resilience
 - Filament navigation icons once again use docblock overrides so enum-aware navigation metadata loads without typed property collisions introduced in PR #1098.
 - Variant stock history tables consolidate destructive change reasons under the `danger` badge, keeping badge colors predictable for both `damage` and `theft` events.
+- User Product Interaction analytics pages restore Filament v4-friendly spacing for interaction filters and rating badges, silencing the concatenation notices flagged while QAing PR #1097.
 
 ## Tooling polish
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
