@@ -81,6 +81,32 @@ final class AddressSearch
     }
 
     /**
+     * @return array<int, SearchResult>
+     */
+    public static function addressResults(string $term, int $limit = 15): array
+    {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Address> $addresses */
+        $addresses = self::addressQuery($term)
+            ->limit($limit)
+            ->get();
+
+        return $addresses
+            ->map(function (Address $address): SearchResult {
+                $label = self::formatAddress($address);
+                /** @var int|string|null $identifier */
+                $identifier = $address->getKey();
+                $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+                $result
+                    ->withData('address', self::addressPayload($address))
+                    ->withData('address_id', $address->getKey());
+
+                return $result;
+            })
+            ->all();
+    }
+
+    /**
      * @return Builder<Address>
      */
     private static function addressQuery(string $term): Builder
@@ -141,5 +167,31 @@ final class AddressSearch
         ], fn (string $value): bool => $value !== '');
 
         return implode(', ', $parts);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function addressPayload(Address $address): array
+    {
+        $payload = [
+            'name' => trim(implode(' ', array_filter([
+                $address->getAttribute('first_name'),
+                $address->getAttribute('last_name'),
+            ]))),
+            'company'        => (string) ($address->getAttribute('company') ?? ''),
+            'address_line_1' => (string) ($address->getAttribute('address_line_1') ?? ''),
+            'address_line_2' => (string) ($address->getAttribute('address_line_2') ?? ''),
+            'city'           => (string) ($address->getAttribute('city') ?? ''),
+            'state'          => (string) ($address->getAttribute('state') ?? ''),
+            'postal_code'    => (string) ($address->getAttribute('postal_code') ?? ''),
+            'country_code'   => (string) ($address->getAttribute('country_code') ?? ''),
+            'phone'          => (string) ($address->getAttribute('phone') ?? ''),
+            'email'          => (string) ($address->getAttribute('email') ?? ''),
+        ];
+
+        return collect($payload)
+            ->filter(fn (string $value): bool => trim($value) !== '')
+            ->all();
     }
 }

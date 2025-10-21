@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantInventoryResource\Pages;
+use App\Models\Location;
+use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -22,6 +26,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
@@ -76,18 +81,54 @@ final class VariantInventoryResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Select::make('variant_id')
+                                SearchableInput::make('variant_id')
                                     ->label(__('admin.variant_inventory.variant'))
-                                    ->relationship('variant', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
-                                Select::make('location_id')
+                                    ->placeholder(__('admin.variant_inventory.placeholders.variant'))
+                                    ->searchUsing(fn (string $search): array => self::searchVariants($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
+                                        if ($state === null || ! $record?->variant) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->variant_id => self::formatVariantLabel($record->variant),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $set('variant_id', (int) $state);
+                                    })
+                                    ->required(),
+                                SearchableInput::make('location_id')
                                     ->label(__('admin.variant_inventory.location'))
-                                    ->relationship('location', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
+                                    ->placeholder(__('admin.variant_inventory.placeholders.location'))
+                                    ->searchUsing(fn (string $search): array => self::searchLocations($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
+                                        if ($state === null || ! $record?->location) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->location_id => self::formatLocationLabel($record->location),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $set('location_id', (int) $state);
+                                    })
+                                    ->required(),
                             ]),
                         Grid::make(2)
                             ->schema([
@@ -209,6 +250,90 @@ final class VariantInventoryResource extends Resource
                     ])
                     ->visible(fn (?VariantInventory $record): bool => $record !== null),
             ]);
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function searchVariants(string $term, int $limit = 15): array
+    {
+        /** @var Collection<int, ProductVariant> $variants */
+        $variants = ProductVariant::query()
+            ->select(['id', 'name', 'sku', 'product_id'])
+            ->with(['product:id,name,sku'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('sku', 'like', "%{$term}%")
+                        ->orWhere('name', 'like', "%{$term}%")
+                        ->orWhereHas('product', static function (Builder $productQuery) use ($term): void {
+                            $productQuery
+                                ->where('name', 'like', "%{$term}%")
+                                ->orWhere('sku', 'like', "%{$term}%");
+                        });
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
+
+        return $variants
+            ->map(static function (ProductVariant $variant): SearchResult {
+                return SearchResult::make((string) $variant->getKey(), self::formatVariantLabel($variant));
+            })
+            ->all();
+    }
+
+    private static function formatVariantLabel(ProductVariant $variant): string
+    {
+        $sku = $variant->getAttribute('sku');
+        $variantName = $variant->getAttribute('name');
+        $productName = $variant->product?->getAttribute('name');
+
+        $parts = [
+            sprintf('[%s]', $sku !== null && $sku !== '' ? $sku : '—'),
+            (string) ($variantName ?? ''),
+        ];
+
+        if ($productName) {
+            $parts[] = sprintf('• %s', $productName);
+        }
+
+        return trim(implode(' ', array_filter($parts)));
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function searchLocations(string $term, int $limit = 15): array
+    {
+        /** @var Collection<int, Location> $locations */
+        $locations = Location::query()
+            ->select(['id', 'name', 'code'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
+
+        return $locations
+            ->map(static function (Location $location): SearchResult {
+                return SearchResult::make((string) $location->getKey(), self::formatLocationLabel($location));
+            })
+            ->all();
+    }
+
+    private static function formatLocationLabel(Location $location): string
+    {
+        $code = $location->getAttribute('code');
+        $name = $location->getAttribute('name');
+
+        return trim(sprintf('[%s] %s', $code !== null && $code !== '' ? $code : '—', (string) ($name ?? '')));
     }
 
     public static function table(Table $table): Table

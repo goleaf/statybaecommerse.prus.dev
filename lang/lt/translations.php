@@ -38,6 +38,8 @@ return [
     'filters' => 'Filtrai',
     'categories' => 'Kategorijos',
     'products' => 'Produktai',
+    'button_link_lookup' => 'Pasirinkti mygtuko nuorodą',
+    'button_link_lookup_placeholder' => 'Ieškokite produktų, kategorijų, kolekcijų, naujienų arba įklijuokite URL',
     'newest' => 'Naujausi',
     'oldest' => 'Seniausi',
     'ascending' => 'Didėjimo tvarka',

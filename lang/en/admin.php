@@ -73,6 +73,10 @@ return [
         'description' => 'Description',
         'button_text' => 'Button Text',
     ],
+    'sliders' => [
+        'button_link_lookup' => 'Select Button Link',
+        'button_link_lookup_placeholder' => 'Search products, categories, collections, news, or paste a URL',
+    ],
     'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'product_history' => require __DIR__ . '/admin/product_history.php',
     'variant_combinations' => [
@@ -239,6 +243,11 @@ return [
         'location' => 'Location',
         'warehouse_code' => 'Warehouse Code',
         'batch_number' => 'Batch Number',
+
+        'placeholders' => [
+            'variant' => 'Search for a variant...',
+            'location' => 'Search for a location...',
+        ],
 
         // Stock Levels
         'stock_levels' => 'Stock Levels',
