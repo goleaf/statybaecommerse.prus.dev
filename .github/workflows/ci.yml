@@ -369,6 +369,7 @@ jobs:
         with:
           name: lighthouse-reports
           path: storage/lighthouse
+          retention-days: 14
 
       - name: Stop Laravel server
         if: always()
