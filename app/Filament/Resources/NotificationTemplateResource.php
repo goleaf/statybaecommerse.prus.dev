@@ -26,6 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 /**
  * NotificationTemplateResource
@@ -40,7 +41,7 @@ final class NotificationTemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationGroup = NavigationGroup::Content->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {
@@ -98,9 +99,9 @@ final class NotificationTemplateResource extends Resource
                                 Select::make('type')
                                     ->label(__('admin.notification_templates.type'))
                                     ->options([
-                                        'email' => __('admin.notification_templates.types.email'),
-                                        'sms' => __('admin.notification_templates.types.sms'),
-                                        'push' => __('admin.notification_templates.types.push'),
+                                        'email'  => __('admin.notification_templates.types.email'),
+                                        'sms'    => __('admin.notification_templates.types.sms'),
+                                        'push'   => __('admin.notification_templates.types.push'),
                                         'in_app' => __('admin.notification_templates.types.in_app'),
                                     ])
                                     ->required()
@@ -159,11 +160,11 @@ final class NotificationTemplateResource extends Resource
                     ->label(__('admin.notification_templates.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'email' => 'success',
-                        'sms' => 'info',
-                        'push' => 'warning',
+                        'email'  => 'success',
+                        'sms'    => 'info',
+                        'push'   => 'warning',
                         'in_app' => 'danger',
-                        default => 'gray',
+                        default  => 'gray',
                     }),
                 TextColumn::make('event')
                     ->label(__('admin.notification_templates.event'))
@@ -194,9 +195,9 @@ final class NotificationTemplateResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('admin.notification_templates.type'))
                     ->options([
-                        'email' => __('admin.notification_templates.types.email'),
-                        'sms' => __('admin.notification_templates.types.sms'),
-                        'push' => __('admin.notification_templates.types.push'),
+                        'email'  => __('admin.notification_templates.types.email'),
+                        'sms'    => __('admin.notification_templates.types.sms'),
+                        'push'   => __('admin.notification_templates.types.push'),
                         'in_app' => __('admin.notification_templates.types.in_app'),
                     ]),
                 TernaryFilter::make('is_active')
@@ -225,10 +226,10 @@ final class NotificationTemplateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNotificationTemplates::route('/'),
+            'index'  => Pages\ListNotificationTemplates::route('/'),
             'create' => Pages\CreateNotificationTemplate::route('/create'),
-            'view' => Pages\ViewNotificationTemplate::route('/{record}'),
-            'edit' => Pages\EditNotificationTemplate::route('/{record}/edit'),
+            'view'   => Pages\ViewNotificationTemplate::route('/{record}'),
+            'edit'   => Pages\EditNotificationTemplate::route('/{record}/edit'),
         ];
     }
 }
