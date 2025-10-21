@@ -123,6 +123,7 @@ return $dt->format(config('datetime.formats.date', 'Y-m-d'));
 - Updated `NewsResource.php` DateTimePicker formats
 - Updated `CustomerManagementResource.php` date formats
 - All Filament forms now use `Y-m-d` format
+- Refreshed `App\\Support\\Filament\\Components\\Flatpickr` to delegate to core `DatePicker`, `DateTimePicker`, and `TimePicker` widgets while keeping range selectors compatible with existing filters
 
 ### 5. Blade Templates
 Updated templates to use consistent year-month-day format:
