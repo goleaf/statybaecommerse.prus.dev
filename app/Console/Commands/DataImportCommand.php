@@ -11,9 +11,15 @@ use Throwable;
 
 final class DataImportCommand extends Command
 {
-    protected $signature = 'data:import';
+    /**
+     * Artisan signature for triggering the consolidated data import pipeline.
+     */
+    protected string $signature = 'data:import';
 
-    protected $description = 'Import data into the application.';
+    /**
+     * Human readable description surfaced in `php artisan list` for discoverability.
+     */
+    protected string $description = 'Import data into the application.';
 
     public function handle(): int
     {
