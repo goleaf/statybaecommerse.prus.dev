@@ -25,10 +25,18 @@ return [
 
     // @translators: Rodoma, kai pasirinktos prekės SKU atsargų neužtenka užsakymui įvykdyti.
     ErrorCodes::INVENTORY_INSUFFICIENT => 'SKU :sku atsargų nepakanka.',
+    // @translators: Rodoma, kai nepavyksta įkelti prisijungusio vartotojo profilio duomenų.
+    ErrorCodes::PROFILE_UNAVAILABLE => 'Profilis nepasiekiamas',
+    // @translators: Rodoma, kai atsiskaitymo procesas negali tęstis dėl tuščio krepšelio.
+    ErrorCodes::CHECKOUT_CART_EMPTY => 'Krepšelis tuščias',
 
     'messages' => [
         // @translators: Bendrinė žinutė API atsakymams, kai įvyksta nenumatyta serverio klaida.
         'server_error' => 'Įvyko klaida. Bandykite dar kartą vėliau.',
+        // @translators: API žinutė, kai nepavyksta sugeneruoti vartotojo profilio atsakymo.
+        'profile_unavailable' => 'Nepavyko įkelti jūsų profilio. Atnaujinkite puslapį ir bandykite dar kartą.',
+        // @translators: API žinutė, kai atsiskaitymo procesas sustabdomas dėl tuščio krepšelio.
+        'checkout_empty' => 'Jūsų krepšelis tuščias. Pridėkite prekių prieš tęsdami apmokėjimą.',
     ],
 
     'pages' => [
