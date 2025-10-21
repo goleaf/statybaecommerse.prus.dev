@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use ArrayObject;
 use App\Services\DataFilteringService;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
@@ -116,5 +117,47 @@ final class DataFilteringServiceTest extends TestCase
         $filtered = $this->service->filterWithMultipleCriteria($items, $criteria);
 
         $this->assertSame([14], $filtered->pluck('id')->all());
+    }
+
+    public function test_filter_products_by_price_range_handles_mixed_payload_shapes(): void
+    {
+        $products = Collection::make([
+            // Object payload should be considered within range.
+            (object) [
+                'id' => 101,
+                'price' => 24.99,
+            ],
+            // ArrayAccess payload demonstrates support for offset-based lookups.
+            new ArrayObject([
+                'id' => 102,
+                'price' => 30.01,
+            ]),
+            // Array payload verifies upper bound handling.
+            [
+                'id' => 103,
+                'price' => 18.50,
+            ],
+        ]);
+
+        $filtered = $this->service->filterProductsByPriceRange($products, 20.00, 30.00);
+
+        $this->assertSame([101], $filtered->pluck('id')->all());
+        $this->assertSame([0], array_values($filtered->keys()->all()));
+    }
+
+    public function test_filter_new_recommendations_uses_strict_comparisons(): void
+    {
+        $recommendations = Collection::make([
+            // Integer identifier should be filtered out when the user interacted with the same integer.
+            ['id' => 1],
+            // String identifier should remain when only integer interactions are recorded.
+            ['id' => '1'],
+            // Null identifier should be discarded by guard clause.
+            ['foo' => 'bar'],
+        ]);
+
+        $filtered = $this->service->filterNewRecommendations($recommendations, [1]);
+
+        $this->assertSame(['1'], $filtered->pluck('id')->all());
     }
 }
