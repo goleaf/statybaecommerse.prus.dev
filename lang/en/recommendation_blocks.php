@@ -7,7 +7,7 @@ return [
 
     'basic_information' => 'Basic Information',
     'name' => 'Name',
-    'title' => 'Title',
+    'block_title' => 'Title',
     'description' => 'Description',
     'type' => 'Type',
     'position' => 'Position',
@@ -56,5 +56,15 @@ return [
         'bulk_deactivated_success' => 'Selected items deactivated successfully',
         'activate_selected' => 'Activate Selected',
         'deactivate_selected' => 'Deactivate Selected',
+    ],
+
+    'tabs' => [
+        'all' => 'All Blocks',
+        'active' => 'Active Blocks',
+        'featured' => 'Featured',
+        'related' => 'Related',
+        'similar' => 'Similar',
+        'trending' => 'Trending',
+        'recent' => 'Recent',
     ],
 ];
