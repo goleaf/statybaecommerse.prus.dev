@@ -58,12 +58,12 @@ final class ActivityLogResource extends Resource
         return __('activity_logs.plural');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

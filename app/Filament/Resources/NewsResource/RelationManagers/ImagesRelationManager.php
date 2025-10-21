@@ -20,7 +20,7 @@ final class ImagesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Images';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->components([
@@ -59,7 +59,7 @@ final class ImagesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('alt_text')

@@ -17,7 +17,7 @@ use App\Support\Filament\Components\Flatpickr;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->components([

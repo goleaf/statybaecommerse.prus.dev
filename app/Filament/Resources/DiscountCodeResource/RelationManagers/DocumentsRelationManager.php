@@ -19,7 +19,7 @@ final class DocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->components([
@@ -51,7 +51,7 @@ final class DocumentsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')

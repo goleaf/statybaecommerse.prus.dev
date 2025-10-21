@@ -24,12 +24,12 @@ class SystemSettingCategoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return SystemSettingCategoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return SystemSettingCategoriesTable::configure($table);
     }
