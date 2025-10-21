@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+# This shim bootstraps Husky Git hooks so that repository scripts run consistently across environments.
 [ "$HUSKY" = "2" ] && set -x
 n=$(basename "$0")
 s=$(dirname "$(dirname "$0")")/$n
