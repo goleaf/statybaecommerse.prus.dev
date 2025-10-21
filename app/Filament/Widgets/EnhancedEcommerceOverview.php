@@ -8,22 +8,23 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
-use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
-use UnitEnum;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * @var string|\BackedEnum|null Navigation icon override documented for consistency.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     protected static $navigationLabel = 'Enh. E-commerce Overview';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
+    /**
+     * @var string|\BackedEnum|null Keep dashboard grouping flexible for enums and raw strings.
+     */
+    protected static $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
 

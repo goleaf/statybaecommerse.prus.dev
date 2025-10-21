@@ -95,6 +95,8 @@ return [
     'confirm_feature_reviews_description' => 'Tai pažymės pasirinktus atsiliepimus kaip išskirtus, padarydama juos labiau pastebimus.',
     'confirm_unfeature_reviews' => 'Nepažymėti atsiliepimų kaip išskirtų',
     'confirm_unfeature_reviews_description' => 'Tai pašalins išskirtų atsiliepimų statusą iš pasirinktų atsiliepimų.',
+    // Review placeholders
+    'reviews.placeholders.no_rating' => 'Įvertinimas dar nepateiktas',
     'confirm_delete_category' => 'Ar tikrai norite ištrinti šią kategoriją? Šis veiksmas negali būti atšauktas.',
     'confirm_remove_coupon' => 'Ar tikrai norite pašalinti šį kuponą?',
     'confirm_feature_products' => 'Išskirti produktus',
