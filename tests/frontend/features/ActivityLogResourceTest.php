@@ -129,8 +129,10 @@ it('can filter activities by date range', function () {
 
     livewire(ActivityLogResource\Pages\ListActivityLogs::class)
         ->filterTable('created_at', [
-            'created_from' => now()->subDays(5)->format('Y-m-d'),
-            'created_until' => now()->format('Y-m-d'),
+            'range' => [
+                'start' => now()->subDays(5)->format('Y-m-d'),
+                'end' => now()->format('Y-m-d'),
+            ],
         ])
         ->assertCanSeeTableRecords([$recentActivityRecord])
         ->assertCanNotSeeTableRecords([$oldActivityRecord]);

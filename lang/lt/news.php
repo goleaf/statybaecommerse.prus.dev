@@ -64,6 +64,7 @@ return [
     'add_tag' => 'Pridėti žymę',
     'is_published' => 'Paskelbta',
     'is_featured' => 'Išskirtinė',
+    'visibility_managed' => 'Matomumą kontroliuoja moderavimo procesas.',
     'published_at' => 'Paskelbta',
     'expires_at' => 'Galioja iki',
     'seo_title' => 'SEO pavadinimas',
@@ -78,6 +79,7 @@ return [
     'status' => 'Būsena',
     'published' => 'Paskelbta',
     'draft' => 'Juodraštis',
+    'review' => 'Peržiūroje',
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
     // Filters
@@ -96,6 +98,17 @@ return [
     'unpublished_successfully' => 'Sėkmingai nepaskelbta',
     'bulk_published_success' => 'Masinis paskelbimas sėkmingas',
     'bulk_unpublished_success' => 'Masinis nepaskelbimas sėkmingas',
+    'tabs' => [
+        'all' => 'Visi',
+        'draft' => 'Juodraščiai',
+        'review' => 'Peržiūroje',
+        'published' => 'Paskelbti',
+        'featured' => 'Išskirti',
+        'breaking' => 'Skubios naujienos',
+        'today' => 'Šiandien',
+        'this_week' => 'Šią savaitę',
+        'this_month' => 'Šį mėnesį',
+    ],
     // Category specific translations
     'category_name' => 'Kategorijos pavadinimas',
     'parent_category' => 'Tėvinė kategorija',
@@ -129,6 +142,7 @@ return [
         'author_email' => 'Autoriaus el. paštas',
         'is_visible' => 'Matoma',
         'is_featured' => 'Išskirtinė',
+        'is_breaking' => 'Skubios naujienos',
         'meta_title' => 'Meta pavadinimas',
         'meta_description' => 'Meta aprašymas',
         'meta_keywords' => 'Meta raktažodžiai',
@@ -138,6 +152,10 @@ return [
         'view_count' => 'Peržiūrų skaičius',
         'created_at' => 'Sukurta',
         'updated_at' => 'Atnaujinta',
+        'moderation_state' => 'Moderavimo būsena',
+        'submitted_for_review_at' => 'Pateikta peržiūrai',
+        'approved_at' => 'Patvirtinta',
+        'approved_by' => 'Patvirtino',
         'featured_image' => 'Pagrindinis paveikslėlis',
         'file_path' => 'Failo kelias',
         'alt_text' => 'Alt tekstas',
@@ -156,6 +174,16 @@ return [
         'sort_order' => 'Rikiavimo tvarka',
         'color' => 'Spalva',
     ],
+    'combobox' => [
+        'categories' => [
+            'available' => 'Galimos kategorijos',
+            'selected' => 'Pasirinktos kategorijos',
+        ],
+        'tags' => [
+            'available' => 'Galimos žymos',
+            'selected' => 'Pasirinktos žymos',
+        ],
+    ],
     // Filter translations
     'filters' => [
         'published_from' => 'Paskelbta nuo',
@@ -168,4 +196,17 @@ return [
     'non_featured_only' => 'Tik neišskirtinės',
     'primary_only' => 'Tik pagrindinės',
     'secondary_only' => 'Tik antrinės',
+    'approvals' => [
+        'notes' => 'Pastabos',
+        'notes_help' => 'Pasidalykite sprendimo kontekstu (neprivaloma).',
+        'decided_at' => 'Sprendimo data',
+        'reviewer' => 'Peržiūrėtojas',
+        'decision' => 'Sprendimas',
+        'decisions' => [
+            'approved' => 'Patvirtinta',
+            'returned' => 'Grąžinta į juodraštį',
+        ],
+        'empty_heading' => 'Dar nėra patvirtinimų',
+        'empty_description' => 'Peržiūros istorija bus rodoma čia, kai tik bus priimtas sprendimas.',
+    ],
 ];

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Settings\Pages;
 
 use App\Filament\Resources\Settings\SettingResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListSettings extends ListRecords
+class ListSettings extends BaseListRecords
 {
     protected static string $resource = SettingResource::class;
 

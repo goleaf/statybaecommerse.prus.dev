@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
 use BackedEnum;
 use Filament\Actions\BulkAction;
@@ -14,16 +15,23 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use UnitEnum;
+use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 
 final class InventoryManagement extends Page implements HasTable
 {
+    use ConfiguresToggleableTableLayout;
+    use HasToggleableTable;
     use InteractsWithTable;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Products';
+    }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
     {
@@ -37,7 +45,7 @@ final class InventoryManagement extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        return $table
+        $table = $table
             ->query(Product::query())
             ->columns([
                 TextColumn::make('name')->label('Name')->searchable(),
@@ -63,14 +71,19 @@ final class InventoryManagement extends Page implements HasTable
                             if (! $product instanceof Product) {
                                 continue;
                             }
+
                             $delta = (int) ($data['quantity'] ?? 0);
+
                             if (($data['operation'] ?? 'increase') === 'decrease') {
                                 $delta = -$delta;
                             }
+
                             $product->stock_quantity = max(0, (int) $product->stock_quantity + $delta);
                             $product->save();
                         }
                     }),
             ]);
+
+        return $this->applyToggleableTableLayout($table);
     }
 }

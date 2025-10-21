@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Widgets\LowStockAlertsWidget;
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\AdminAuthorizationSeeder;
 use Filament\Actions\Testing\TestAction;
 
 use function Pest\Laravel\actingAs;
@@ -14,23 +15,12 @@ beforeEach(function () {
     $this->adminUser = User::factory()->create([
         'email' => 'admin@admin.com',
         'name' => 'Admin User',
+        'is_admin' => true,
     ]);
 
-    // Create role and permissions if they don't exist
-    $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'super_admin']);
+    $this->seed(AdminAuthorizationSeeder::class);
 
-    // Create all necessary permissions
-    $permissions = [
-        'view_product',
-        'edit_product',
-        'create_product',
-        'delete_product',
-    ];
-
-    foreach ($permissions as $permission) {
-        $perm = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permission]);
-        $role->givePermissionTo($perm);
-    }
+    $role = \Spatie\Permission\Models\Role::findByName('super_admin', 'web');
 
     $this->adminUser->assignRole($role);
 

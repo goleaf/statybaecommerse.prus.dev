@@ -7,22 +7,22 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -77,9 +77,9 @@ final class CollectionRuleResource extends Resource
                     Tab::make(__('admin.collection_rules.form.tabs.basic_information'))
                         ->icon('heroicon-o-information-circle')
                         ->schema([
-                            SchemaSection::make(__('admin.collection_rules.form.sections.basic_information'))
+                            Section::make(__('admin.collection_rules.form.sections.basic_information'))
                                 ->schema([
-                                    SchemaGrid::make(2)
+                                    Grid::make(2)
                                         ->schema([
                                             Select::make('collection_id')
                                                 ->label(__('admin.collection_rules.form.fields.collection'))
@@ -95,7 +95,7 @@ final class CollectionRuleResource extends Resource
                                                 ->maxLength(255)
                                                 ->columnSpan(1),
                                         ]),
-                                    SchemaGrid::make(3)
+                                    Grid::make(3)
                                         ->schema([
                                             Select::make('operator')
                                                 ->label(__('admin.collection_rules.form.fields.operator'))
@@ -130,7 +130,7 @@ final class CollectionRuleResource extends Resource
                     Tab::make(__('admin.collection_rules.form.tabs.rule_details'))
                         ->icon('heroicon-o-cog-6-tooth')
                         ->schema([
-                            SchemaSection::make(__('admin.collection_rules.form.sections.rule_details'))
+                            Section::make(__('admin.collection_rules.form.sections.rule_details'))
                                 ->schema([
                                     Placeholder::make('collection_name')
                                         ->label(__('admin.collection_rules.form.fields.collection_name'))
@@ -225,7 +225,7 @@ final class CollectionRuleResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('reorder')
+                Action::make('reorder')
                     ->label(__('admin.collection_rules.actions.reorder'))
                     ->icon('heroicon-o-arrows-up-down')
                     ->color('info')
@@ -246,7 +246,7 @@ final class CollectionRuleResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    TableBulkAction::make('reorder_bulk')
+                    BulkAction::make('reorder_bulk')
                         ->label(__('admin.collection_rules.actions.reorder_bulk'))
                         ->icon('heroicon-o-arrows-up-down')
                         ->color('info')

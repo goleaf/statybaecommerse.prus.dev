@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -72,7 +74,7 @@ class WishlistItemSeeder extends Seeder
                     'wishlist_id' => $powerUserWishlist->id,
                     'product_id' => $product->id,
                     'quantity' => rand(1, 5),
-                    'notes' => 'Priority: ' . rand(1, 5),
+                    'notes' => 'Priority: '.rand(1, 5),
                 ]);
         }
 

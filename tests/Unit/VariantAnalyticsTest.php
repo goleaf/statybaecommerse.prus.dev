@@ -237,37 +237,72 @@ final class VariantAnalyticsTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(VariantAnalytics::class, $analytics);
+        $this->assertEquals($variant->product_id, $analytics->product_id);
         $this->assertEquals($variant->id, $analytics->variant_id);
         $this->assertEquals($date, $analytics->date->toDateString());
+        $this->assertEquals('daily:'.$date, $analytics->date_bucket);
         $this->assertEquals(100, $analytics->views);
         $this->assertEquals(50, $analytics->clicks);
         $this->assertEquals(500.00, $analytics->revenue);
     }
 
-    // TODO: Fix this test - there's a unique constraint issue
-    // public function test_record_analytics_updates_existing_record(): void
-    // {
-    //     // Arrange
-    //     $variant = ProductVariant::factory()->create();
-    //     $date = '2025-12-25'; // Use a fixed unique date
-    //     $existingAnalytics = VariantAnalytics::factory()
-    //         ->withVariant($variant)
-    //         ->forDate($date)
-    //         ->create(['views' => 50]);
+    public function test_record_analytics_updates_existing_record(): void
+    {
+        // Arrange
+        $variant = ProductVariant::factory()->create();
+        $date = '2025-12-25'; // Use a fixed unique date
+        $existingAnalytics = VariantAnalytics::factory()
+            ->withVariant($variant)
+            ->forDate($date)
+            ->create(['views' => 50]);
 
-    //     $data = ['views' => 150];
+        $data = ['views' => 150];
 
-    //     // Act - Use the same variant and date to test update functionality
-    //     $analytics = VariantAnalytics::recordAnalytics($variant->id, $date, $data);
+        // Act - Use the same variant and date to test update functionality
+        $analytics = VariantAnalytics::recordAnalytics($variant->id, $date, $data);
 
-    //     // Assert
-    //     $this->assertEquals($existingAnalytics->id, $analytics->id);
-    //     $this->assertEquals(150, $analytics->views);
-    //     $this->assertEquals($variant->id, $analytics->variant_id);
+        // Assert
+        $this->assertEquals($existingAnalytics->id, $analytics->id);
+        $this->assertEquals(200, $analytics->views);
+        $this->assertEquals($variant->id, $analytics->variant_id);
+        $this->assertEquals('daily:'.$date, $analytics->date_bucket);
 
-    //     // Verify the record was actually updated, not created new
-    //     $this->assertDatabaseCount('variant_analytics', 1);
-    // }
+        // Verify the record was actually updated, not created new
+        $this->assertDatabaseCount('variant_analytics', 1);
+    }
+
+    public function test_record_analytics_tracks_weekly_bucket(): void
+    {
+        // Arrange
+        $variant = ProductVariant::factory()->create();
+        $today = now();
+        $date = $today->toDateString();
+        $startOfWeek = $today->copy()->startOfWeek()->toDateString();
+
+        // Act
+        $analytics = VariantAnalytics::recordAnalytics(
+            $variant->id,
+            $date,
+            ['views' => 10],
+            VariantAnalytics::BUCKET_WEEKLY
+        );
+
+        // Assert
+        $this->assertEquals($variant->product_id, $analytics->product_id);
+        $this->assertEquals('weekly:'.$startOfWeek, $analytics->date_bucket);
+        $this->assertEquals(10, $analytics->views);
+
+        // Calling again should increment rather than create a new row
+        $analytics = VariantAnalytics::recordAnalytics(
+            $variant->id,
+            $date,
+            ['views' => 5],
+            VariantAnalytics::BUCKET_WEEKLY
+        );
+
+        $this->assertEquals(15, $analytics->views);
+        $this->assertDatabaseCount('variant_analytics', 1);
+    }
 
     public function test_increment_metric_updates_correctly(): void
     {
@@ -323,8 +358,10 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $fillable = [
+            'product_id',
             'variant_id',
             'date',
+            'date_bucket',
             'views',
             'clicks',
             'add_to_cart',
@@ -348,8 +385,10 @@ final class VariantAnalyticsTest extends TestCase
         ]);
 
         // Act & Assert
+        $this->assertIsInt($analytics->product_id);
         $this->assertIsInt($analytics->views);
         $this->assertIsInt($analytics->clicks);
+        $this->assertIsString($analytics->date_bucket);
         $this->assertIsString($analytics->revenue); // Laravel decimal cast returns string
         $this->assertIsString($analytics->conversion_rate); // Laravel decimal cast returns string
         $this->assertInstanceOf(\DateTime::class, $analytics->date);

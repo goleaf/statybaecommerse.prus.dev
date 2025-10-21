@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use App\Models\NewsCategory;
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class ChildrenRelationManager extends RelationManager
+final class ChildrenRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'children';
 

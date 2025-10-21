@@ -5,25 +5,48 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationCaches;
 
 use App\Filament\Resources\RecommendationCaches\Pages\CreateRecommendationCache;
-use UnitEnum;
-use BackedEnum;
 use App\Filament\Resources\RecommendationCaches\Pages\EditRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\ListRecommendationCaches;
+use App\Filament\Resources\RecommendationCaches\Pages\ViewRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;
 use App\Filament\Resources\RecommendationCaches\Tables\RecommendationCachesTable;
 use App\Models\RecommendationCache;
+use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
-use Filament\Forms\Form;
-
-class RecommendationCacheResource extends Resource
+final class RecommendationCacheResource extends Resource
 {
     protected static ?string $model = RecommendationCache::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $recordTitleAttribute = 'cache_key';
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Analytics';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.recommendation_caches.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.recommendation_caches.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.recommendation_caches.model_label');
+    }
 
     public static function form(Form $form): Form
     {
@@ -37,9 +60,7 @@ class RecommendationCacheResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -47,6 +68,7 @@ class RecommendationCacheResource extends Resource
         return [
             'index' => ListRecommendationCaches::route('/'),
             'create' => CreateRecommendationCache::route('/create'),
+            'view' => ViewRecommendationCache::route('/{record}'),
             'edit' => EditRecommendationCache::route('/{record}/edit'),
         ];
     }

@@ -51,8 +51,8 @@ title(__('users.profile'));
                     <!-- Avatar Section -->
                     <div class="text-center">
                         <div class="relative inline-block">
-                            <img 
-                                src="{{ $user->avatar_url ? Storage::disk('public')->url($user->avatar_url) : $user->generateGravatarUrl() }}" 
+                            <img
+                                src="{{ $user->avatar_url }}"
                                 alt="{{ $user->name }}"
                                 class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-white shadow-lg"
                                 id="avatar-preview"
@@ -148,7 +148,7 @@ title(__('users.profile'));
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('users.wishlist') }}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                                <a href="{{ route('frontend.wishlist.index') }}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                     </svg>

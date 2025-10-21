@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantImageResource\Pages;
-use BackedEnum;
 use App\Models\ProductVariant;
 use App\Models\VariantImage;
+use App\Support\Storage\SecureStorage;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -23,6 +24,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -35,9 +37,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * VariantImageResource
@@ -48,10 +47,12 @@ final class VariantImageResource extends Resource
 {
     protected static ?string $model = VariantImage::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-photo';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Inventory';
     }
@@ -107,7 +108,7 @@ final class VariantImageResource extends Resource
 
                                     return '';
                                 })
-                                ->visible(fn($get) => !empty($get('variant_id'))),
+                                ->visible(fn ($get) => ! empty($get('variant_id'))),
                         ]),
                 ]),
             Section::make(__('admin.variant_images.image_details'))
@@ -118,7 +119,7 @@ final class VariantImageResource extends Resource
                                 ->label(__('admin.variant_images.image'))
                                 ->image()
                                 ->directory('variant-images')
-                                ->visibility('public')
+                                ->visibility('private')
                                 ->required()
                                 ->imageEditor()
                                 ->imageEditorAspectRatios([
@@ -191,7 +192,12 @@ final class VariantImageResource extends Resource
                     ->size(80)
                     ->circular(false)
                     ->square()
-                    ->grow(false),
+                    ->grow(false)
+                    ->getStateUsing(
+                        fn ($record) => $record->image_path
+                            ? SecureStorage::temporarySignedUrl($record->image_path)
+                            : null
+                    ),
                 TextColumn::make('variant.name')
                     ->label(__('admin.variant_images.variant'))
                     ->sortable()
@@ -294,11 +300,11 @@ final class VariantImageResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -324,19 +330,19 @@ final class VariantImageResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn(VariantImage $record): bool => !$record->is_primary),
+                    ->visible(fn (VariantImage $record): bool => ! $record->is_primary),
                 Action::make('toggle_active')
-                    ->label(fn(VariantImage $record): string => $record->is_active
+                    ->label(fn (VariantImage $record): string => $record->is_active
                         ? __('admin.variant_images.deactivate')
                         : __('admin.variant_images.activate'))
-                    ->icon(fn(VariantImage $record): string => $record->is_active
+                    ->icon(fn (VariantImage $record): string => $record->is_active
                         ? 'heroicon-o-x-circle'
                         : 'heroicon-o-check-circle')
-                    ->color(fn(VariantImage $record): string => $record->is_active
+                    ->color(fn (VariantImage $record): string => $record->is_active
                         ? 'danger'
                         : 'success')
                     ->action(function (VariantImage $record): void {
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active
@@ -442,10 +448,10 @@ final class VariantImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantImages::route('/'),
+            'index'  => Pages\ListVariantImages::route('/'),
             'create' => Pages\CreateVariantImage::route('/create'),
-            'view' => Pages\ViewVariantImage::route('/{record}'),
-            'edit' => Pages\EditVariantImage::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantImage::route('/{record}'),
+            'edit'   => Pages\EditVariantImage::route('/{record}/edit'),
         ];
     }
 }

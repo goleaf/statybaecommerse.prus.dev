@@ -50,6 +50,7 @@ return [
         'delivered' => 'Pristatytas',
         'completed' => 'Užbaigtas',
         'cancelled' => 'Atšauktas',
+        'returned' => 'Grąžintas',
     ],
 
     // Payment statuses
@@ -103,6 +104,7 @@ return [
     'mime_type' => 'MIME tipas',
     'download' => 'Atsisiųsti',
     'description' => 'Aprašymas',
+    'document_version_tooltip' => 'Atidaryti sugeneruotą dokumento versiją :version',
 
     // Document types
     'document_types' => [
@@ -119,6 +121,22 @@ return [
     'address_field' => 'Lauko pavadinimas',
     'address_value' => 'Lauko reikšmė',
     'add_address_field' => 'Pridėti adreso lauką',
+
+    'lookups' => [
+        'billing_address' => 'Ieškoti sąskaitos adreso',
+        'shipping_address' => 'Ieškoti pristatymo adreso',
+        'address_placeholder' => 'Pradėkite rašyti adresą, miestą ar pašto kodą…',
+        'address_field' => 'Laukelis',
+        'address_value' => 'Reikšmė',
+        'channel_placeholder' => 'Ieškokite kanalų pagal pavadinimą ar kodą…',
+        'channel_unknown' => 'Neįvardintas kanalas',
+        'partner_placeholder' => 'Ieškokite partnerių pagal pavadinimą, kodą ar el. paštą…',
+        'partner_unknown' => 'Neįvardintas partneris',
+        'status_placeholder' => 'Ieškokite užsakymų būsenų…',
+        'variant_placeholder' => 'Ieškokite variantų pagal SKU ar pavadinimą…',
+        'variant_product' => 'Produktas: :product',
+        'variant_unknown' => 'Variantas',
+    ],
 
     // Actions
     'actions' => [
@@ -219,5 +237,7 @@ return [
         'cannot_delete' => 'Negalite ištrinti šio užsakymo',
         'cannot_cancel' => 'Negalite atšaukti šio užsakymo',
         'cancelled_successfully' => 'Užsakymas sėkmingai atšauktas',
+        'cannot_request_return' => 'Negalite pateikti grąžinimo užklausos šiam užsakymui',
+        'return_requested_successfully' => 'Grąžinimo užklausa sėkmingai pateikta',
     ],
 ];

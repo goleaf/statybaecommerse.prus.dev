@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralRewardLogResource\Pages;
-use BackedEnum;
 use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
 use App\Models\User;
@@ -13,18 +12,17 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * ReferralRewardLogResource
@@ -60,9 +58,9 @@ final class ReferralRewardLogResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.referral_reward_logs.basic_information'))
+                Section::make(__('admin.referral_reward_logs.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Select::make('referral_reward_id')
                                     ->label(__('admin.referral_reward_logs.referral_reward'))
@@ -79,9 +77,9 @@ final class ReferralRewardLogResource extends Resource
                                 Select::make('action')
                                     ->label(__('admin.referral_reward_logs.action'))
                                     ->options([
-                                        'earned' => __('admin.referral_reward_logs.actions.earned'),
-                                        'redeemed' => __('admin.referral_reward_logs.actions.redeemed'),
-                                        'expired' => __('admin.referral_reward_logs.actions.expired'),
+                                        'earned'    => __('admin.referral_reward_logs.actions.earned'),
+                                        'redeemed'  => __('admin.referral_reward_logs.actions.redeemed'),
+                                        'expired'   => __('admin.referral_reward_logs.actions.expired'),
                                         'cancelled' => __('admin.referral_reward_logs.actions.cancelled'),
                                     ])
                                     ->required()
@@ -123,11 +121,11 @@ final class ReferralRewardLogResource extends Resource
                     ->label(__('admin.referral_reward_logs.action'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'earned' => 'success',
-                        'redeemed' => 'info',
-                        'expired' => 'warning',
+                        'earned'    => 'success',
+                        'redeemed'  => 'info',
+                        'expired'   => 'warning',
                         'cancelled' => 'danger',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
 
                 TextColumn::make('ip_address')
@@ -141,7 +139,11 @@ final class ReferralRewardLogResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return mb_strlen($state) > 50 ? $state : null;
                     }),
 
                 TextColumn::make('created_at')
@@ -164,9 +166,9 @@ final class ReferralRewardLogResource extends Resource
                 SelectFilter::make('action')
                     ->label(__('admin.referral_reward_logs.action'))
                     ->options([
-                        'earned' => __('admin.referral_reward_logs.actions.earned'),
-                        'redeemed' => __('admin.referral_reward_logs.actions.redeemed'),
-                        'expired' => __('admin.referral_reward_logs.actions.expired'),
+                        'earned'    => __('admin.referral_reward_logs.actions.earned'),
+                        'redeemed'  => __('admin.referral_reward_logs.actions.redeemed'),
+                        'expired'   => __('admin.referral_reward_logs.actions.expired'),
                         'cancelled' => __('admin.referral_reward_logs.actions.cancelled'),
                     ]),
             ])
@@ -192,10 +194,10 @@ final class ReferralRewardLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralRewardLogs::route('/'),
+            'index'  => Pages\ListReferralRewardLogs::route('/'),
             'create' => Pages\CreateReferralRewardLog::route('/create'),
-            'view' => Pages\ViewReferralRewardLog::route('/{record}'),
-            'edit' => Pages\EditReferralRewardLog::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralRewardLog::route('/{record}'),
+            'edit'   => Pages\EditReferralRewardLog::route('/{record}/edit'),
         ];
     }
 }

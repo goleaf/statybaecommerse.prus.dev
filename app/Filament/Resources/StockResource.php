@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockResource\Pages;
-use BackedEnum;
 use App\Models\Inventory;
 use App\Models\Product;
 use Filament\Actions\Action;
@@ -19,18 +18,18 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * StockResource
@@ -94,6 +93,7 @@ final class StockResource extends Resource
                     TextInput::make('product_name')
                         ->label(__('inventory.product_name'))
                         ->maxLength(255)
+                        ->dehydrated(false)
                         ->disabled(),
                 ]),
             Section::make(__('inventory.stock_information'))
@@ -151,7 +151,7 @@ final class StockResource extends Resource
                     ->label(__('inventory.quantity'))
                     ->numeric()
                     ->sortable()
-                    ->color(fn($state, $record) => $record->isLowStock() ? 'danger' : 'success'),
+                    ->color(fn ($state, $record) => $record->isLowStock() ? 'danger' : 'success'),
                 TextColumn::make('reserved')
                     ->label(__('inventory.reserved'))
                     ->numeric()
@@ -162,9 +162,9 @@ final class StockResource extends Resource
                     ->sortable(),
                 TextColumn::make('available_quantity')
                     ->label(__('inventory.available'))
-                    ->getStateUsing(fn($record) => $record->available_quantity)
+                    ->getStateUsing(fn ($record) => $record->available_quantity)
                     ->numeric()
-                    ->color(fn($state) => $state > 0 ? 'success' : 'danger'),
+                    ->color(fn ($state) => $state > 0 ? 'success' : 'danger'),
                 TextColumn::make('threshold')
                     ->label(__('inventory.threshold'))
                     ->numeric()
@@ -190,9 +190,20 @@ final class StockResource extends Resource
                 TernaryFilter::make('is_tracked')
                     ->label(__('inventory.tracked_only'))
                     ->native(false),
-                SelectFilter::make('low_stock')
+                Filter::make('low_stock')
                     ->label(__('inventory.low_stock'))
-                    ->query(fn(Builder $query): Builder => $query->whereRaw('quantity <= threshold')),
+                    ->form([
+                        Toggle::make('is_low_stock')
+                            ->label(__('inventory.low_stock_only')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (! ($data['is_low_stock'] ?? false)) {
+                            return $query;
+                        }
+
+                        return $query->whereColumn('quantity', '<=', 'threshold');
+                    })
+                    ->indicateUsing(fn (array $data): ?string => ($data['is_low_stock'] ?? false) ? __('inventory.low_stock_only') : null),
             ])
             ->actions([
                 ViewAction::make(),

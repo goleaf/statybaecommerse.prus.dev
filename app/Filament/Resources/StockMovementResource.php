@@ -5,26 +5,26 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockMovementResource\Pages;
-use BackedEnum;
 use App\Models\StockMovement;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * StockMovementResource
@@ -33,12 +33,8 @@ use Filament\Forms\Form;
  */
 final class StockMovementResource extends Resource
 {
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    /**
-     * @var UnitEnum|string|null
-     */
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 3;
@@ -116,7 +112,7 @@ final class StockMovementResource extends Resource
                         ->label(__('stock_movement.fields.notes'))
                         ->maxLength(1000)
                         ->rows(3),
-                    DateTimePicker::make('moved_at')
+                    Flatpickr::makeDateTime('moved_at')
                         ->label(__('stock_movement.fields.moved_at'))
                         ->required()
                         ->default(now()),
@@ -146,7 +142,7 @@ final class StockMovementResource extends Resource
                 TextColumn::make('type')
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'in' => 'success',
                         'out' => 'danger',
                         'adjustment' => 'warning',
@@ -175,22 +171,23 @@ final class StockMovementResource extends Resource
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
                     ->preload(),
-                \Filament\Tables\Filters\Filter::make('moved_at')
+                Filter::make('moved_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('moved_from')
+                        Flatpickr::makeDate('moved_from')
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.from')),
-                        \Filament\Forms\Components\DatePicker::make('moved_to')
+                        Flatpickr::makeDate('moved_to')
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.to')),
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
                         return $query
-                            ->when($data['moved_from'] ?? null, fn($q, $date) => $q->whereDate('moved_at', '>=', $date))
-                            ->when($data['moved_to'] ?? null, fn($q, $date) => $q->whereDate('moved_at', '<=', $date));
+                            ->when($data['moved_from'] ?? null, fn ($q, $date) => $q->whereDate('moved_at', '>=', $date))
+                            ->when($data['moved_to'] ?? null, fn ($q, $date) => $q->whereDate('moved_at', '<=', $date));
                     }),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -207,6 +204,7 @@ final class StockMovementResource extends Resource
         return [
             'index' => Pages\ListStockMovements::route('/'),
             'create' => Pages\CreateStockMovement::route('/create'),
+            'view' => Pages\ViewStockMovement::route('/{record}'),
             'edit' => Pages\EditStockMovement::route('/{record}/edit'),
         ];
     }

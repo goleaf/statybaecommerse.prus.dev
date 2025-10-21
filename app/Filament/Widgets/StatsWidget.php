@@ -30,10 +30,10 @@ final class StatsWidget extends BaseStatsOverviewWidget
         $approvedReviews = (int) Review::where('is_approved', true)->count();
         $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0.0;
-        $monthOrders = (int) Order::whereMonth('created_at', Carbon::now()->month)->count();
+        $monthOrders = (int) Order::createdThisMonth()->count();
 
         return [
-            Stat::make(__('analytics.total_revenue'), '€'.number_format($totalRevenue, 2))->color('success'),
+            Stat::make(__('analytics.total_revenue'), '€' . number_format($totalRevenue, 2))->color('success'),
             Stat::make(__('analytics.total_orders'), $totalOrders)->color('primary'),
             Stat::make(__('analytics.products'), $totalProducts)->color('primary'),
             Stat::make(__('analytics.customers'), $totalCustomers)->color('primary'),
@@ -42,15 +42,17 @@ final class StatsWidget extends BaseStatsOverviewWidget
             Stat::make(__('analytics.brands'), $enabledBrands)->color('info'),
             Stat::make(__('analytics.content'), $visibleCategories + $enabledBrands)->color('info'),
             Stat::make(__('analytics.reviews'), $approvedReviews)->color('warning'),
-            Stat::make(__('analytics.average_rating'), number_format($avgRating, 1).'/5')->color('warning'),
-            Stat::make(__('analytics.average_order_value'), '€'.number_format($avgOrderValue, 2))->color('info'),
+            Stat::make(__('analytics.average_rating'), number_format($avgRating, 1) . '/5')->color('warning'),
+            Stat::make(__('analytics.average_order_value'), '€' . number_format($avgOrderValue, 2))->color('info'),
             Stat::make(__('analytics.month_orders'), $monthOrders)->color('primary'),
         ];
     }
 
     public function getRevenueChart(): array
     {
-        return Order::whereDate('created_at', '>=', Carbon::now()->subDays(30))
+        $since = Carbon::now()->subDays(30);
+
+        return Order::createdSince($since)
             ->selectRaw('DATE(created_at) as date, SUM(total) as revenue')
             ->groupBy('date')
             ->orderBy('date')
@@ -60,7 +62,9 @@ final class StatsWidget extends BaseStatsOverviewWidget
 
     public function getOrdersChart(): array
     {
-        return Order::whereDate('created_at', '>=', Carbon::now()->subDays(30))
+        $since = Carbon::now()->subDays(30);
+
+        return Order::createdSince($since)
             ->selectRaw('DATE(created_at) as date, COUNT(*) as orders')
             ->groupBy('date')
             ->orderBy('date')

@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\ContentLinkSearch;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
@@ -23,24 +28,19 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
+use Illuminate\Support\Str;
 
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
     /**
-     * @var string|\BackedEnum|null
+     * Navigation icon override (string|\BackedEnum|null).
      */
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-rectangle-stack';
-    }
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 
@@ -50,10 +50,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Content';
     }
@@ -88,7 +85,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state))),
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                             TextInput::make('slug')
                                 ->label(__('translations.slug'))
                                 ->required()
@@ -115,17 +112,28 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->textColors([
                                 'primary' => '#1d4ed8',
                                 'emerald' => '#047857',
-                                'amber' => '#f59e0b',
-                                'slate' => '#475569',
+                                'amber'   => '#f59e0b',
+                                'slate'   => '#475569',
                             ]),
                         Grid::make(2)->components([
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
-                            TextInput::make('button_url')
+                            SearchableInput::make('button_url')
                                 ->label(__('translations.button_url'))
-                                ->url()
-                                ->maxLength(255),
+                                ->placeholder(__('translations.slider_link_placeholder'))
+                                ->maxLength(255)
+                                ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state($state)
+                                        ->options([$state => $state]);
+                                }),
                         ]),
                     ])
                     ->collapsible(),
@@ -135,7 +143,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->label(__('translations.slider_image'))
                             ->image()
                             ->directory('sliders/images')
-                            ->visibility('public')
+                            ->visibility('private')
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 '16:9',
@@ -147,7 +155,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                             ->label(__('translations.mobile_image'))
                             ->image()
                             ->directory('sliders/mobile')
-                            ->visibility('public')
+                            ->visibility('private')
                             ->imageEditor()
                             ->maxSize(2048),  // 2MB
                     ])
@@ -169,23 +177,23 @@ class SliderManagement extends Page implements HasActions, HasForms
                             Select::make('text_alignment')
                                 ->label(__('translations.text_alignment'))
                                 ->options([
-                                    'left' => __('translations.left'),
+                                    'left'   => __('translations.left'),
                                     'center' => __('translations.center'),
-                                    'right' => __('translations.right'),
+                                    'right'  => __('translations.right'),
                                 ])
                                 ->default('center'),
                             Select::make('content_position')
                                 ->label(__('translations.content_position'))
                                 ->options([
-                                    'top-left' => __('translations.top_left'),
-                                    'top-center' => __('translations.top_center'),
-                                    'top-right' => __('translations.top_right'),
-                                    'center-left' => __('translations.center_left'),
-                                    'center' => __('translations.center'),
-                                    'center-right' => __('translations.center_right'),
-                                    'bottom-left' => __('translations.bottom_left'),
+                                    'top-left'      => __('translations.top_left'),
+                                    'top-center'    => __('translations.top_center'),
+                                    'top-right'     => __('translations.top_right'),
+                                    'center-left'   => __('translations.center_left'),
+                                    'center'        => __('translations.center'),
+                                    'center-right'  => __('translations.center_right'),
+                                    'bottom-left'   => __('translations.bottom_left'),
                                     'bottom-center' => __('translations.bottom_center'),
-                                    'bottom-right' => __('translations.bottom_right'),
+                                    'bottom-right'  => __('translations.bottom_right'),
                                 ])
                                 ->default('center'),
                         ]),
@@ -197,12 +205,12 @@ class SliderManagement extends Page implements HasActions, HasForms
                             Select::make('animation_type')
                                 ->label(__('translations.animation_type'))
                                 ->options([
-                                    'fade' => __('translations.fade'),
-                                    'slide' => __('translations.slide'),
-                                    'zoom' => __('translations.zoom'),
-                                    'flip' => __('translations.flip'),
+                                    'fade'   => __('translations.fade'),
+                                    'slide'  => __('translations.slide'),
+                                    'zoom'   => __('translations.zoom'),
+                                    'flip'   => __('translations.flip'),
                                     'bounce' => __('translations.bounce'),
-                                    'pulse' => __('translations.pulse'),
+                                    'pulse'  => __('translations.pulse'),
                                 ])
                                 ->default('fade')
                                 ->live(),
@@ -227,9 +235,9 @@ class SliderManagement extends Page implements HasActions, HasForms
                         Select::make('transition_speed')
                             ->label(__('translations.transition_speed'))
                             ->options([
-                                'slow' => __('translations.slow'),
+                                'slow'   => __('translations.slow'),
                                 'normal' => __('translations.normal'),
-                                'fast' => __('translations.fast'),
+                                'fast'   => __('translations.fast'),
                             ])
                             ->default('normal'),
                     ])
@@ -237,10 +245,10 @@ class SliderManagement extends Page implements HasActions, HasForms
                 Section::make(__('translations.scheduling'))
                     ->components([
                         Grid::make(2)->components([
-                            DateTimePicker::make('start_date')
+                            Flatpickr::makeDateTime('start_date')
                                 ->label(__('translations.start_date'))
                                 ->default(now()),
-                            DateTimePicker::make('end_date')
+                            Flatpickr::makeDateTime('end_date')
                                 ->label(__('translations.end_date'))
                                 ->after('start_date'),
                         ]),
@@ -261,9 +269,9 @@ class SliderManagement extends Page implements HasActions, HasForms
                             Select::make('priority')
                                 ->label(__('translations.priority'))
                                 ->options([
-                                    'low' => __('translations.low'),
+                                    'low'    => __('translations.low'),
                                     'normal' => __('translations.normal'),
-                                    'high' => __('translations.high'),
+                                    'high'   => __('translations.high'),
                                     'urgent' => __('translations.urgent'),
                                 ])
                                 ->default('normal'),
@@ -285,9 +293,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->label(__('translations.slide_image'))
                                     ->image()
                                     ->directory('sliders/slides'),
-                                TextInput::make('link')
+                                SearchableInput::make('link')
                                     ->label(__('translations.slide_link'))
-                                    ->url(),
+                                    ->placeholder(__('translations.slider_link_placeholder'))
+                                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state($state)
+                                            ->options([$state => $state]);
+                                    }),
                             ])
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
@@ -306,10 +325,10 @@ class SliderManagement extends Page implements HasActions, HasForms
                         CheckboxList::make('target_audience')
                             ->label(__('translations.target_audience'))
                             ->options([
-                                'all' => __('translations.all_users'),
-                                'new' => __('translations.new_users'),
+                                'all'       => __('translations.all_users'),
+                                'new'       => __('translations.new_users'),
                                 'returning' => __('translations.returning_users'),
-                                'premium' => __('translations.premium_users'),
+                                'premium'   => __('translations.premium_users'),
                             ])
                             ->default(['all']),
                     ])
@@ -317,31 +336,31 @@ class SliderManagement extends Page implements HasActions, HasForms
             ])
             ->action(function (array $data): void {
                 $slider = Slider::create([
-                    'title' => $data['title'],
-                    'slug' => $data['slug'],
-                    'description' => $data['description'],
-                    'button_text' => $data['button_text'] ?? null,
-                    'button_url' => $data['button_url'] ?? null,
-                    'background_color' => $data['background_color'] ?? '#ffffff',
-                    'text_color' => $data['text_color'] ?? '#000000',
-                    'button_color' => $data['button_color'] ?? '#007bff',
-                    'text_alignment' => $data['text_alignment'] ?? 'center',
-                    'content_position' => $data['content_position'] ?? 'center',
-                    'sort_order' => $data['sort_order'] ?? 0,
-                    'priority' => $data['priority'] ?? 'normal',
-                    'tags' => $data['tags'] ?? [],
+                    'title'             => $data['title'],
+                    'slug'              => $data['slug'],
+                    'description'       => $data['description'],
+                    'button_text'       => $data['button_text'] ?? null,
+                    'button_url'        => $data['button_url'] ?? null,
+                    'background_color'  => $data['background_color'] ?? '#ffffff',
+                    'text_color'        => $data['text_color'] ?? '#000000',
+                    'button_color'      => $data['button_color'] ?? '#007bff',
+                    'text_alignment'    => $data['text_alignment'] ?? 'center',
+                    'content_position'  => $data['content_position'] ?? 'center',
+                    'sort_order'        => $data['sort_order'] ?? 0,
+                    'priority'          => $data['priority'] ?? 'normal',
+                    'tags'              => $data['tags'] ?? [],
                     'custom_attributes' => $data['custom_attributes'] ?? [],
-                    'target_audience' => $data['target_audience'] ?? ['all'],
-                    'is_active' => $data['is_active'] ?? true,
-                    'is_featured' => $data['is_featured'] ?? false,
-                    'is_scheduled' => $data['is_scheduled'] ?? false,
-                    'start_date' => $data['start_date'] ?? null,
-                    'end_date' => $data['end_date'] ?? null,
-                    'settings' => [
-                        'animation' => $data['animation_type'] ?? 'fade',
-                        'duration' => $data['duration'] ?? 5000,
-                        'autoplay' => $data['autoplay'] ?? true,
-                        'pause_on_hover' => $data['pause_on_hover'] ?? true,
+                    'target_audience'   => $data['target_audience'] ?? ['all'],
+                    'is_active'         => $data['is_active'] ?? true,
+                    'is_featured'       => $data['is_featured'] ?? false,
+                    'is_scheduled'      => $data['is_scheduled'] ?? false,
+                    'start_date'        => $data['start_date'] ?? null,
+                    'end_date'          => $data['end_date'] ?? null,
+                    'settings'          => [
+                        'animation'        => $data['animation_type'] ?? 'fade',
+                        'duration'         => $data['duration'] ?? 5000,
+                        'autoplay'         => $data['autoplay'] ?? true,
+                        'pause_on_hover'   => $data['pause_on_hover'] ?? true,
                         'transition_speed' => $data['transition_speed'] ?? 'normal',
                     ],
                     'slides' => $data['slides'] ?? [],
@@ -428,7 +447,7 @@ class SliderManagement extends Page implements HasActions, HasForms
             ->color('info')
             ->action(function () use ($slider): void {
                 $newSlider = $slider->replicate();
-                $newSlider->title = $slider->title.' (Copy)';
+                $newSlider->title = $slider->title . ' (Copy)';
                 $newSlider->sort_order = Slider::max('sort_order') + 1;
                 $newSlider->save();
 
@@ -526,8 +545,8 @@ class SliderManagement extends Page implements HasActions, HasForms
                     ->label(__('translations.export_format'))
                     ->options([
                         'excel' => __('translations.excel'),
-                        'csv' => __('translations.csv'),
-                        'json' => __('translations.json'),
+                        'csv'   => __('translations.csv'),
+                        'json'  => __('translations.json'),
                     ])
                     ->default('excel'),
                 Toggle::make('include_images')
@@ -568,9 +587,9 @@ class SliderManagement extends Page implements HasActions, HasForms
                         Select::make('default_animation')
                             ->label(__('translations.default_animation'))
                             ->options([
-                                'fade' => __('translations.fade'),
+                                'fade'  => __('translations.fade'),
                                 'slide' => __('translations.slide'),
-                                'zoom' => __('translations.zoom'),
+                                'zoom'  => __('translations.zoom'),
                             ])
                             ->default('fade'),
                         TextInput::make('default_duration')

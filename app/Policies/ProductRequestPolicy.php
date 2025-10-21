@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Policies;
 
@@ -41,7 +43,7 @@ final class ProductRequestPolicy
                 }
             }
 
-            return ($user->is_admin || $hasPermission || $productRequest->user_id === $user->id);
+            return $user->is_admin || $hasPermission || $productRequest->user_id === $user->id;
         }
 
         return $this->canAdminister($user, 'view_product_requests');
@@ -70,7 +72,7 @@ final class ProductRequestPolicy
                 }
             }
 
-            return ($user->is_admin || $hasPermission || $productRequest->user_id === $user->id);
+            return $user->is_admin || $hasPermission || $productRequest->user_id === $user->id;
         }
 
         return $this->canAdminister($user, 'update_product_requests');
@@ -94,7 +96,7 @@ final class ProductRequestPolicy
 
     private function canAdminister(?AuthenticatableContract $user, string $permission): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 

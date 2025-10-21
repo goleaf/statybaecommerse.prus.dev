@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-final class TranslationsRelationManager extends RelationManager
+final class TranslationsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'translations';
 

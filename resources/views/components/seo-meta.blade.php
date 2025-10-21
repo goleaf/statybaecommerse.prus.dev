@@ -13,7 +13,7 @@
     $title = $title ?? config('app.name');
     $description = $description ?? __('meta_description_home');
     $keywords = $keywords ?? __('meta_keywords');
-    $image = $image ?? asset('images/og-image.jpg');
+    $image = $image ?? og_placeholder_url();
     $canonical = $canonical ?? url()->current();
     $currentLocale = app()->getLocale();
 @endphp

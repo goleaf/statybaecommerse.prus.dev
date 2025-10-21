@@ -8,19 +8,21 @@ use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -29,24 +31,22 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 final class VariantStockResource extends Resource
 {
     protected static ?string $model = VariantInventory::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            SchemaSection::make('Stock Details')
+            Section::make('Stock Details')
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Select::make('variant_id')
                                 ->label('Variant')
@@ -62,22 +62,22 @@ final class VariantStockResource extends Resource
                                 ->searchable()
                                 ->preload(),
                         ]),
-                    SchemaGrid::make(3)
+                    Grid::make(3)
                         ->schema([
                             TextInput::make('stock')->numeric()->required(),
                             TextInput::make('reserved')->numeric()->default(0),
                             TextInput::make('incoming')->numeric()->default(0),
                         ]),
-                    SchemaGrid::make(3)
+                    Grid::make(3)
                         ->schema([
                             TextInput::make('threshold')->numeric()->default(0),
                             TextInput::make('reorder_point')->numeric()->default(0),
                             TextInput::make('max_stock_level')->numeric()->default(0),
                         ]),
                 ]),
-            SchemaSection::make('Procurement')
+            Section::make('Procurement')
                 ->schema([
-                    SchemaGrid::make(3)
+                    Grid::make(3)
                         ->schema([
                             TextInput::make('cost_per_unit')->numeric()->step(0.01),
                             Select::make('supplier_id')
@@ -87,19 +87,19 @@ final class VariantStockResource extends Resource
                                 ->preload(),
                             TextInput::make('batch_number'),
                         ]),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
-                            DatePicker::make('expiry_date'),
+                            Flatpickr::makeDate('expiry_date'),
                             Select::make('status')
                                 ->options([
-                                    'active' => 'active',
-                                    'inactive' => 'inactive',
+                                    'active'       => 'active',
+                                    'inactive'     => 'inactive',
                                     'discontinued' => 'discontinued',
-                                    'quarantine' => 'quarantine',
+                                    'quarantine'   => 'quarantine',
                                 ])
                                 ->default('active'),
                         ]),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Toggle::make('is_tracked')->default(true),
                         ]),
@@ -108,6 +108,9 @@ final class VariantStockResource extends Resource
         ]);
     }
 
+    /**
+     * @return Builder<VariantInventory>
+     */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScopes();
@@ -128,8 +131,8 @@ final class VariantStockResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('status')->colors([
                     'success' => 'active',
-                    'gray' => 'inactive',
-                    'danger' => 'discontinued',
+                    'gray'    => 'inactive',
+                    'danger'  => 'discontinued',
                 ]),
             ])
             ->deferLoading(false)
@@ -144,7 +147,7 @@ final class VariantStockResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
-                \Filament\Actions\Action::make('reserve_stock')
+                Action::make('reserve_stock')
                     ->label('Reserve stock')
                     ->form([
                         TextInput::make('quantity')->numeric()->required()->minValue(1),
@@ -153,7 +156,11 @@ final class VariantStockResource extends Resource
                         if (! $record) {
                             return;
                         }
-                        $quantity = (int) ($data['quantity'] ?? 0);
+                        $rawQuantity = $data['quantity'] ?? null;
+                        if (! is_numeric($rawQuantity)) {
+                            return;
+                        }
+                        $quantity = (int) $rawQuantity;
                         if ($quantity <= 0) {
                             return;
                         }
@@ -161,10 +168,10 @@ final class VariantStockResource extends Resource
                             return;  // insufficient available
                         }
                         $record->reserved += $quantity;
-                        $record->available = max(0, $record->stock - $record->reserved);
+                        $record->setAttribute('available', max(0, $record->stock - $record->reserved));
                         $record->save();
                     }),
-                \Filament\Actions\Action::make('unreserve_stock')
+                Action::make('unreserve_stock')
                     ->label('Unreserve stock')
                     ->form([
                         TextInput::make('quantity')->numeric()->required()->minValue(1),
@@ -173,12 +180,16 @@ final class VariantStockResource extends Resource
                         if (! $record) {
                             return;
                         }
-                        $quantity = (int) ($data['quantity'] ?? 0);
+                        $rawQuantity = $data['quantity'] ?? null;
+                        if (! is_numeric($rawQuantity)) {
+                            return;
+                        }
+                        $quantity = (int) $rawQuantity;
                         if ($quantity <= 0) {
                             return;
                         }
                         $record->reserved = max(0, $record->reserved - $quantity);
-                        $record->available = max(0, $record->stock - $record->reserved);
+                        $record->setAttribute('available', max(0, $record->stock - $record->reserved));
                         $record->save();
                     }),
             ])
@@ -190,22 +201,26 @@ final class VariantStockResource extends Resource
                             TextInput::make('quantity')->numeric()->required()->minValue(1),
                             Select::make('reason')->options([
                                 'bulk_restock' => 'bulk_restock',
-                                'adjustment' => 'adjustment',
+                                'adjustment'   => 'adjustment',
                             ])->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
-                            $qty = (int) ($data['quantity'] ?? 0);
+                            $rawQuantity = $data['quantity'] ?? null;
+                            if (! is_numeric($rawQuantity)) {
+                                return;
+                            }
+                            $qty = (int) $rawQuantity;
                             if ($qty <= 0) {
                                 return;
                             }
                             /** @var VariantInventory $record */
                             foreach ($records as $record) {
                                 $record->stock += $qty;
-                                $record->available = max(0, $record->stock - $record->reserved);
+                                $record->setAttribute('available', max(0, $record->stock - $record->reserved));
                                 $record->save();
                             }
                         }),
-                    \Filament\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -218,9 +233,9 @@ final class VariantStockResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantStocks::route('/'),
+            'index'  => Pages\ListVariantStocks::route('/'),
             'create' => Pages\CreateVariantStock::route('/create'),
-            'edit' => Pages\EditVariantStock::route('/{record}/edit'),
+            'edit'   => Pages\EditVariantStock::route('/{record}/edit'),
         ];
     }
 
@@ -245,6 +260,6 @@ final class VariantStockResource extends Resource
             return 'warning';
         }
 
-        return 'success';
+        return null;
     }
 }

@@ -6,19 +6,21 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
+use App\Models\Product;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -32,8 +34,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * PriceListItemResource
@@ -152,11 +153,11 @@ final class PriceListItemResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('valid_from')
+                                Flatpickr::makeDateTime('valid_from')
                                     ->label(__('price_list_items.valid_from'))
                                     ->default(now())
                                     ->helperText(__('price_list_items.valid_from_help')),
-                                DateTimePicker::make('valid_until')
+                                Flatpickr::makeDateTime('valid_until')
                                     ->label(__('price_list_items.valid_until'))
                                     ->after('valid_from')
                                     ->helperText(__('price_list_items.valid_until_help')),
@@ -264,10 +265,37 @@ final class PriceListItemResource extends Resource
                 SelectFilter::make('price_list_id')
                     ->relationship('priceList', 'name')
                     ->preload(),
-                SelectFilter::make('product_id')
-                    ->relationship('product', 'name')
-                    ->searchable()
-                    ->preload(),
+                Filter::make('product_lookup')
+                    ->label(__('price_list_items.product'))
+                    ->form([
+                        SearchableInput::make('product_name')
+                            ->label(__('price_list_items.product'))
+                            ->placeholder(__('products.filters.product_placeholder'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::searchProductOptions($search)),
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
+                            return [];
+                        }
+
+                        return [__('price_list_items.product') . ': ' . $value];
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
+                            return $query;
+                        }
+
+                        return $query->whereHas('product', function (Builder $relationQuery) use ($value): void {
+                            $relationQuery
+                                ->where('name', 'like', "%{$value}%")
+                                ->orWhere('sku', 'like', "%{$value}%");
+                        });
+                    }),
                 TernaryFilter::make('is_active')
                     ->label(__('price_list_items.is_active'))
                     ->trueLabel(__('price_list_items.active_only'))
@@ -280,9 +308,13 @@ final class PriceListItemResource extends Resource
                     ->native(false),
                 Filter::make('valid_now')
                     ->label(__('price_list_items.valid_now'))
-                    ->query(fn (Builder $query): Builder => $query->where('valid_from', '<=', now())->where(function (Builder $query): void {
-                        $query->whereNull('valid_until')->orWhere('valid_until', '>=', now());
-                    }))
+                    ->query(fn (Builder $query): Builder => $query
+                        ->where(function (Builder $query): void {
+                            $query->whereNull('valid_from')->orWhere('valid_from', '<=', now());
+                        })
+                        ->where(function (Builder $query): void {
+                            $query->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+                        }))
                     ->toggle(),
                 Filter::make('expired')
                     ->label(__('price_list_items.expired'))
@@ -397,10 +429,41 @@ final class PriceListItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPriceListItems::route('/'),
+            'index'  => Pages\ListPriceListItems::route('/'),
             'create' => Pages\CreatePriceListItem::route('/create'),
-            'view' => Pages\ViewPriceListItem::route('/{record}'),
-            'edit' => Pages\EditPriceListItem::route('/{record}/edit'),
+            'view'   => Pages\ViewPriceListItem::route('/{record}'),
+            'edit'   => Pages\EditPriceListItem::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function searchProductOptions(string $search): array
+    {
+        $term = trim($search);
+
+        if ($term === '') {
+            return [];
+        }
+
+        return Product::query()
+            ->select(['name', 'sku'])
+            ->where(function (Builder $query) use ($term): void {
+                $query
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('sku', 'like', "%{$term}%");
+            })
+            ->orderBy('name')
+            ->limit(15)
+            ->get()
+            ->map(static function (Product $product): string {
+                $sku = $product->sku;
+
+                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
+            })
+            ->unique()
+            ->values()
+            ->all();
     }
 }

@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -14,12 +12,14 @@ use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class AddressesRelationManager extends RelationManager
+class AddressesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'addresses';
 
@@ -33,9 +33,9 @@ class AddressesRelationManager extends RelationManager
             ]);
     }
 
-    public function infolist(Schema $form): Schema
+    public function infolist(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 TextEntry::make('id'),
             ]);

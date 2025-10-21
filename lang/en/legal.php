@@ -50,6 +50,13 @@ return [
     'required_only' => 'Required Only',
     'optional_only' => 'Optional Only',
     // Actions
+    'actions' => [
+        'create' => 'Create Legal Document',
+        'preview' => 'Preview',
+        'publish' => 'Publish',
+        'unpublish' => 'Unpublish',
+        'duplicate' => 'Duplicate',
+    ],
     'enable' => 'Enable',
     'disable' => 'Disable',
     'publish' => 'Publish',
@@ -59,7 +66,20 @@ return [
     'disable_selected' => 'Disable Selected',
     'publish_selected' => 'Publish Selected',
     'unpublish_selected' => 'Unpublish Selected',
+    'tabs' => [
+        'all' => 'All Documents',
+        'enabled' => 'Enabled',
+        'disabled' => 'Disabled',
+        'required' => 'Required',
+        'published' => 'Published',
+        'draft' => 'Draft',
+    ],
     // Notifications
+    'notifications' => [
+        'published' => 'Document published successfully',
+        'unpublished' => 'Document unpublished successfully',
+        'duplicated' => 'Document duplicated successfully',
+    ],
     'enabled_successfully' => 'Document successfully enabled',
     'disabled_successfully' => 'Document successfully disabled',
     'published_successfully' => 'Document successfully published',

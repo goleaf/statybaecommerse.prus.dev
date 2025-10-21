@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderTranslationResource\Pages;
-use BackedEnum;
 use App\Models\Slider;
 use App\Models\SliderTranslation;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -15,6 +15,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -22,8 +23,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * SliderTranslationResource
@@ -34,8 +33,7 @@ final class SliderTranslationResource extends Resource
 {
     protected static ?string $model = SliderTranslation::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
 
@@ -109,7 +107,7 @@ final class SliderTranslationResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('admin.slider_translations.locale'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'en' => 'success',
                         'lt' => 'info',
                         'de' => 'warning',

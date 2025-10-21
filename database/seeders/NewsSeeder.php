@@ -36,6 +36,7 @@ final class NewsSeeder extends Seeder
             $news = News::factory()->create([
                 'is_visible' => fake()->boolean(80),  // 80% chance of being visible
                 'is_featured' => fake()->boolean(20),  // 20% chance of being featured
+                'is_breaking' => fake()->boolean(10),  // 10% chance of being breaking news
                 'published_at' => fake()->boolean(70) ? now()->subDays(fake()->numberBetween(0, 30)) : null,
                 'view_count' => fake()->numberBetween(0, 1000),
             ]);

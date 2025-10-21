@@ -29,9 +29,12 @@ final class CreateProductVariant extends CreateRecord
     {
         parent::afterCreate();
 
+        $state = $this->form->getState();
+
         ProductVariantResource::syncVariantAttributeRelations(
             $this->record,
-            data_get($this->form->getState(), 'attributeValueSelections', []),
+            data_get($state, 'variant_attribute_matrix', []),
+            data_get($state, 'attributeValueSelections', []),
         );
     }
 

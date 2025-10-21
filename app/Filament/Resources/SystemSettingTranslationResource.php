@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SystemSettingTranslationResource\Pages;
-use BackedEnum;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingTranslation;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -15,20 +15,20 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid as FormGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -38,9 +38,9 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Throwable;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * SystemSettingTranslationResource
@@ -55,8 +55,7 @@ final class SystemSettingTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
@@ -84,7 +83,7 @@ final class SystemSettingTranslationResource extends Resource
                         Tab::make(__('admin.system_setting_translations.basic_information'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
-                                SchemaGrid::make(2)
+                                FormGrid::make(2)
                                     ->schema([
                                         Select::make('system_setting_id')
                                             ->label(__('admin.system_setting_translations.system_setting'))
@@ -132,7 +131,7 @@ final class SystemSettingTranslationResource extends Resource
                         Tab::make(__('admin.system_setting_translations.advanced_settings'))
                             ->icon('heroicon-o-cog-6-tooth')
                             ->schema([
-                                SchemaGrid::make(2)
+                                FormGrid::make(2)
                                     ->schema([
                                         Toggle::make('is_active')
                                             ->label(__('admin.system_setting_translations.is_active'))
@@ -178,8 +177,8 @@ final class SystemSettingTranslationResource extends Resource
                                     ->textColors([
                                         'primary' => '#1d4ed8',
                                         'emerald' => '#047857',
-                                        'amber' => '#f59e0b',
-                                        'slate' => '#475569',
+                                        'amber'   => '#f59e0b',
+                                        'slate'   => '#475569',
                                     ])
                                     ->helperText(__('admin.system_setting_translations.rich_description_help'))
                                     ->columnSpanFull(),
@@ -213,23 +212,23 @@ final class SystemSettingTranslationResource extends Resource
                     ->label(__('admin.system_setting_translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'en' => 'success',
-                        'lt' => 'info',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
-                        'pl' => 'secondary',
-                        'ru' => 'gray',
+                        'en'    => 'success',
+                        'lt'    => 'info',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
+                        'pl'    => 'secondary',
+                        'ru'    => 'gray',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'en' => '🇺🇸 English',
-                        'lt' => '🇱🇹 Lithuanian',
-                        'de' => '🇩🇪 German',
-                        'fr' => '🇫🇷 French',
-                        'es' => '🇪🇸 Spanish',
-                        'pl' => '🇵🇱 Polish',
-                        'ru' => '🇷🇺 Russian',
+                        'en'    => '🇺🇸 English',
+                        'lt'    => '🇱🇹 Lithuanian',
+                        'de'    => '🇩🇪 German',
+                        'fr'    => '🇫🇷 French',
+                        'es'    => '🇪🇸 Spanish',
+                        'pl'    => '🇵🇱 Polish',
+                        'ru'    => '🇷🇺 Russian',
                         default => $state,
                     }),
                 TextColumn::make('name')
@@ -290,7 +289,7 @@ final class SystemSettingTranslationResource extends Resource
                         'array', 'json' => 'purple',
                         'file', 'image' => 'orange',
                         'select' => 'indigo',
-                        'color' => 'pink',
+                        'color'  => 'pink',
                         'date', 'datetime' => 'yellow',
                         default => 'gray',
                     })
@@ -345,16 +344,16 @@ final class SystemSettingTranslationResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->form([
-                        DatePicker::make('from')->label(__('admin.common.from')),
-                        DatePicker::make('until')->label(__('admin.common.until')),
+                        Flatpickr::makeDate('from')->label(__('admin.common.from')),
+                        Flatpickr::makeDate('until')->label(__('admin.common.until')),
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from'] ?? null) {
-                            $indicators[] = __('admin.common.from').': '.$data['from'];
+                            $indicators[] = __('admin.common.from') . ': ' . $data['from'];
                         }
                         if ($data['until'] ?? null) {
-                            $indicators[] = __('admin.common.until').': '.$data['until'];
+                            $indicators[] = __('admin.common.until') . ': ' . $data['until'];
                         }
 
                         return $indicators;
@@ -389,11 +388,11 @@ final class SystemSettingTranslationResource extends Resource
                     ->action(function (SystemSettingTranslation $record): void {
                         try {
                             $newRecord = $record->replicate();
-                            $newRecord->name = $record->name.' (Copy)';
+                            $newRecord->name = $record->name . ' (Copy)';
                             $newRecord->save();
-                        } catch (\Throwable $e) {
+                        } catch (Throwable $e) {
                             // Fallback for schemas enforcing unique (system_setting_id, locale)
-                            $record->update(['name' => $record->name.' (Copy)']);
+                            $record->update(['name' => $record->name . ' (Copy)']);
                         }
 
                         Notification::make()
@@ -509,7 +508,7 @@ final class SystemSettingTranslationResource extends Resource
     {
         return [
             __('admin.system_setting_translations.system_setting') => $record->systemSetting->key,
-            __('admin.system_setting_translations.locale') => $record->locale,
+            __('admin.system_setting_translations.locale')         => $record->locale,
         ];
     }
 
@@ -521,10 +520,10 @@ final class SystemSettingTranslationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettingTranslations::route('/'),
+            'index'  => Pages\ListSystemSettingTranslations::route('/'),
             'create' => Pages\CreateSystemSettingTranslation::route('/create'),
-            'view' => Pages\ViewSystemSettingTranslation::route('/{record}'),
-            'edit' => Pages\EditSystemSettingTranslation::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingTranslation::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingTranslation::route('/{record}/edit'),
         ];
     }
 }

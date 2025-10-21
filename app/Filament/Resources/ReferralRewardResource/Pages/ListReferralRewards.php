@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ReferralRewardResource\Pages;
 
 use App\Filament\Resources\ReferralRewardResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListReferralRewards extends ListRecords
+final class ListReferralRewards extends BaseListRecords
 {
     protected static string $resource = ReferralRewardResource::class;
 

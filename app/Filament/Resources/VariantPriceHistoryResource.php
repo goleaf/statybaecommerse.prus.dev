@@ -1,30 +1,35 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
-use BackedEnum;
 use App\Models\VariantPriceHistory;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
+use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Tables;
-use UnitEnum;
-
 use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
 {
     protected static ?string $model = VariantPriceHistory::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-currency-euro';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 20;
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): ?string
     {
         return 'System';
     }
@@ -51,21 +56,21 @@ final class VariantPriceHistoryResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('price_type')
                     ->options([
-                        'regular' => 'Regular Price',
-                        'sale' => 'Sale Price',
+                        'regular'   => 'Regular Price',
+                        'sale'      => 'Sale Price',
                         'wholesale' => 'Wholesale Price',
-                        'bulk' => 'Bulk Price',
+                        'bulk'      => 'Bulk Price',
                     ])
                     ->default('regular')
                     ->required(),
                 Forms\Components\Select::make('change_reason')
                     ->options([
-                        'manual' => 'Manual Change',
-                        'automatic' => 'Automatic Update',
-                        'promotion' => 'Promotion',
-                        'cost_change' => 'Cost Change',
+                        'manual'            => 'Manual Change',
+                        'automatic'         => 'Automatic Update',
+                        'promotion'         => 'Promotion',
+                        'cost_change'       => 'Cost Change',
                         'market_adjustment' => 'Market Adjustment',
-                        'seasonal' => 'Seasonal Change',
+                        'seasonal'          => 'Seasonal Change',
                     ])
                     ->default('manual')
                     ->required(),
@@ -73,10 +78,10 @@ final class VariantPriceHistoryResource extends Resource
                     ->relationship('changedBy', 'name')
                     ->searchable()
                     ->preload(),
-                Forms\Components\DateTimePicker::make('effective_from')
+                Flatpickr::makeDateTime('effective_from')
                     ->label('Effective From')
                     ->required(),
-                Forms\Components\DateTimePicker::make('effective_until')
+                Flatpickr::makeDateTime('effective_until')
                     ->label('Effective Until')
                     ->after('effective_from'),
             ]);
@@ -100,39 +105,60 @@ final class VariantPriceHistoryResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price_change')
                     ->label('Change')
-                    ->formatStateUsing(function ($record) {
-                        if ($record->old_price && $record->new_price) {
-                            $change = $record->new_price - $record->old_price;
-                            $percentage = $record->old_price > 0 ? ($change / $record->old_price) * 100 : 0;
-                            $sign = $change >= 0 ? '+' : '';
-
-                            return $sign . '€' . number_format($change, 2) . ' (' . $sign . number_format($percentage, 1) . '%)';
+                    ->state(function (VariantPriceHistory $record): ?float {
+                        if ($record->old_price === null || $record->new_price === null) {
+                            return null;
                         }
 
-                        return '-';
+                        return (float) ($record->new_price - $record->old_price);
                     })
-                    ->sortable()
-                    ->color(fn($record) => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
+                    ->formatStateUsing(function (?float $state, VariantPriceHistory $record): string {
+                        if ($state === null) {
+                            return '-';
+                        }
+
+                        $percentage = $record->old_price > 0
+                            ? ($state / $record->old_price) * 100
+                            : 0.0;
+
+                        $sign = $state >= 0 ? '+' : '';
+
+                        return sprintf(
+                            '%s€%s (%s%s%%)',
+                            $sign,
+                            number_format($state, 2),
+                            $sign,
+                            number_format($percentage, 1)
+                        );
+                    })
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        $direction = $direction === 'asc' ? 'asc' : 'desc';
+
+                        return $query->orderByRaw(
+                            '(COALESCE(new_price, 0) - COALESCE(old_price, 0)) ' . $direction
+                        );
+                    })
+                    ->color(fn ($record) => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
                 Tables\Columns\TextColumn::make('price_type')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'regular' => 'primary',
-                        'sale' => 'success',
+                    ->color(fn (string $state): string => match ($state) {
+                        'regular'   => 'primary',
+                        'sale'      => 'success',
                         'wholesale' => 'warning',
-                        'bulk' => 'info',
-                        default => 'gray',
+                        'bulk'      => 'info',
+                        default     => 'gray',
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('change_reason')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'manual' => 'primary',
-                        'automatic' => 'success',
-                        'promotion' => 'warning',
-                        'cost_change' => 'info',
+                    ->color(fn (string $state): string => match ($state) {
+                        'manual'            => 'primary',
+                        'automatic'         => 'success',
+                        'promotion'         => 'warning',
+                        'cost_change'       => 'info',
                         'market_adjustment' => 'danger',
-                        'seasonal' => 'secondary',
-                        default => 'gray',
+                        'seasonal'          => 'secondary',
+                        default             => 'gray',
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('changedBy.name')
@@ -156,19 +182,19 @@ final class VariantPriceHistoryResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('price_type')
                     ->options([
-                        'regular' => 'Regular Price',
-                        'sale' => 'Sale Price',
+                        'regular'   => 'Regular Price',
+                        'sale'      => 'Sale Price',
                         'wholesale' => 'Wholesale Price',
-                        'bulk' => 'Bulk Price',
+                        'bulk'      => 'Bulk Price',
                     ]),
                 Tables\Filters\SelectFilter::make('change_reason')
                     ->options([
-                        'manual' => 'Manual Change',
-                        'automatic' => 'Automatic Update',
-                        'promotion' => 'Promotion',
-                        'cost_change' => 'Cost Change',
+                        'manual'            => 'Manual Change',
+                        'automatic'         => 'Automatic Update',
+                        'promotion'         => 'Promotion',
+                        'cost_change'       => 'Cost Change',
                         'market_adjustment' => 'Market Adjustment',
-                        'seasonal' => 'Seasonal Change',
+                        'seasonal'          => 'Seasonal Change',
                     ]),
                 Tables\Filters\SelectFilter::make('variant_id')
                     ->relationship('variant', 'name')
@@ -176,20 +202,20 @@ final class VariantPriceHistoryResource extends Resource
                     ->preload(),
                 Tables\Filters\Filter::make('effective_date_range')
                     ->form([
-                        Forms\Components\DatePicker::make('effective_from')
+                        Flatpickr::makeDate('effective_from')
                             ->label('Effective From'),
-                        Forms\Components\DatePicker::make('effective_until')
+                        Flatpickr::makeDate('effective_until')
                             ->label('Effective Until'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
                             ->when(
                                 $data['effective_from'],
-                                fn($query, $date) => $query->whereDate('effective_from', '>=', $date),
+                                fn ($query, $date) => $query->whereDate('effective_from', '>=', $date),
                             )
                             ->when(
                                 $data['effective_until'],
-                                fn($query, $date) => $query->whereDate('effective_until', '<=', $date),
+                                fn ($query, $date) => $query->whereDate('effective_until', '<=', $date),
                             );
                     }),
                 Tables\Filters\TernaryFilter::make('price_change')
@@ -198,8 +224,8 @@ final class VariantPriceHistoryResource extends Resource
                     ->trueLabel('Increases only')
                     ->falseLabel('Decreases only')
                     ->queries(
-                        true: fn($query) => $query->increases(),
-                        false: fn($query) => $query->decreases(),
+                        true: fn ($query) => $query->increases(),
+                        false: fn ($query) => $query->decreases(),
                     ),
             ])
             ->actions([
@@ -227,10 +253,10 @@ final class VariantPriceHistoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantPriceHistories::route('/'),
+            'index'  => Pages\ListVariantPriceHistories::route('/'),
             'create' => Pages\CreateVariantPriceHistory::route('/create'),
-            'view' => Pages\ViewVariantPriceHistory::route('/{record}'),
-            'edit' => Pages\EditVariantPriceHistory::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantPriceHistory::route('/{record}'),
+            'edit'   => Pages\EditVariantPriceHistory::route('/{record}/edit'),
         ];
     }
 }

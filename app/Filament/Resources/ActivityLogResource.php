@@ -1,29 +1,34 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
-use Filament\Actions\Action;
+use App\Models\ActivityLog;
+use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
-use Spatie\Activitylog\Models\Activity;
-use BackedEnum;
-use UnitEnum;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ActivityLogResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    protected static ?string $model = ActivityLog::class;
 
-    protected static ?string $model = Activity::class;
+    /**
+     * Icon used in the navigation menu. Type: string|BackedEnum|null.
+     */
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 9;
 
     protected static ?string $navigationLabel = null;
 
@@ -31,24 +36,31 @@ final class ActivityLogResource extends Resource
 
     protected static ?string $pluralModelLabel = null;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    protected static ?string $recordTitleAttribute = 'description';
+
+    public static function getNavigationGroup(): string
     {
-        return 'heroicon-o-document-text';
+        return __('navigation.groups.system');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Veiklos žurnalai');
+        return __('activity_logs.plural');
     }
 
     public static function getModelLabel(): string
     {
-        return __('admin.activity_logs.title');
+        return __('activity_logs.single');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('admin.activity_logs.title');
+        return __('activity_logs.plural');
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([]);
     }
 
     public static function table(Table $table): Table
@@ -71,7 +83,7 @@ final class ActivityLogResource extends Resource
                     ->sortable(),
                 TextColumn::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->formatStateUsing(fn($state) => class_basename((string) $state))
+                    ->formatStateUsing(fn ($state) => class_basename((string) $state))
                     ->sortable(),
                 TextColumn::make('event')
                     ->label(__('Event'))
@@ -84,7 +96,7 @@ final class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_name')
                     ->label(__('Log Name'))
-                    ->options(fn(): array => \Spatie\Activitylog\Models\Activity::query()
+                    ->options(fn (): array => ActivityLog::query()
                         ->select('log_name')
                         ->whereNotNull('log_name')
                         ->distinct()
@@ -92,7 +104,7 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 SelectFilter::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->options(fn(): array => \Spatie\Activitylog\Models\Activity::query()
+                    ->options(fn (): array => ActivityLog::query()
                         ->select('subject_type')
                         ->whereNotNull('subject_type')
                         ->distinct()
@@ -100,27 +112,54 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')->label(__('From')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')->label(__('Until')),
+                        Flatpickr::makeRange('range')
+                            ->label(__('Created At'))
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function ($query, array $data) {
-                        return $query
-                            ->when($data['created_from'] ?? null, fn($q, $date) => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'] ?? null, fn($q, $date) => $q->whereDate('created_at', '<=', $date));
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
             ])
             ->actions([
                 Action::make('view_details')
                     ->label(__('View details'))
-                    ->modalHeading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) ($record->description ?? __('Activity details')))
-                    ->modalSubheading(fn(\Spatie\Activitylog\Models\Activity $record) => (string) ($record->causer?->name ?? __('System')))
-                    ->modalContent(fn(\Spatie\Activitylog\Models\Activity $record) => view(
+                    ->modalHeading(fn (ActivityLog $record) => (string) ($record->description ?? __('Activity details')))
+                    ->modalSubheading(fn (ActivityLog $record) => (string) ($record->causer?->name ?? __('System')))
+                    ->modalContent(fn (ActivityLog $record) => view(
                         'filament.resources.activity-log-resource.components.activity-details',
                         ['activity' => $record->loadMissing('causer', 'subject')]
                     ))
                     ->modalSubmitActionLabel(__('Close')),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getRecordTitle(?Model $record): string
+    {
+        if ($record instanceof ActivityLog) {
+            $title = (string) ($record->description ?? '');
+
+            if ($title !== '') {
+                return $title;
+            }
+
+            $key = $record->getKey();
+
+            if ($key !== null) {
+                return __('activity_logs.single') . ' #' . $key;
+            }
+        }
+
+        return __('activity_logs.single');
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
     }
 
     public static function getPages(): array

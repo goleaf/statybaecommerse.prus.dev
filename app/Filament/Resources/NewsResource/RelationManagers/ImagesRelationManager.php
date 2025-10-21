@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
-use Filament\Forms\Form;
-
+use App\Support\Storage\SecureStorage;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class ImagesRelationManager extends RelationManager
+final class ImagesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'images';
 
@@ -68,7 +68,7 @@ final class ImagesRelationManager extends RelationManager
                     ->label(__('news.fields.image'))
                     ->size(60)
                     ->square()
-                    ->disk('public'),
+                    ->getStateUsing(fn ($record) => $record->file_path ? SecureStorage::temporarySignedUrl($record->file_path) : null),
                 Tables\Columns\TextColumn::make('alt_text')
                     ->label(__('news.fields.alt_text'))
                     ->searchable()

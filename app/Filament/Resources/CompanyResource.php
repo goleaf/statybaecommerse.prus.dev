@@ -6,19 +6,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
-use Filament\Actions\BulkActionGroup;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-
-use Filament\Forms\Form;
 
 final class CompanyResource extends Resource
 {
@@ -40,15 +43,9 @@ final class CompanyResource extends Resource
         return __('companies.single');
     }
 
-    /**
-     * Configure the Filament form schema with fields and validation.
-     *
-     * @param  Form  $schema
-     * @return Form
-     */
     public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Forms\Components\Section::make(__('companies.basic_information'))
                 ->schema([
                     Forms\Components\Grid::make(2)
@@ -84,9 +81,9 @@ final class CompanyResource extends Resource
                     Forms\Components\Select::make('size')
                         ->label(__('companies.size'))
                         ->options([
-                            'small' => __('companies.sizes.small'),
+                            'small'  => __('companies.sizes.small'),
                             'medium' => __('companies.sizes.medium'),
-                            'large' => __('companies.sizes.large'),
+                            'large'  => __('companies.sizes.large'),
                         ]),
                 ]),
             Forms\Components\Section::make(__('companies.settings'))
@@ -129,13 +126,21 @@ final class CompanyResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('size')
                     ->label(__('companies.size'))
-                    ->formatStateUsing(fn (string $state): string => __("companies.sizes.{$state}"))
+                    ->formatStateUsing(static function (?string $state): string {
+                        if ($state === null || $state === '') {
+                            return __('filament::common.none');
+                        }
+
+                        return __("companies.sizes.{$state}");
+                    })
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'small' => 'green',
-                        'medium' => 'blue',
-                        'large' => 'purple',
-                        default => 'gray',
+                    ->color(static function (?string $state): string {
+                        return match ($state) {
+                            'small'  => 'green',
+                            'medium' => 'blue',
+                            'large'  => 'purple',
+                            default  => 'gray',
+                        };
                     }),
                 IconColumn::make('is_active')
                     ->label(__('companies.is_active'))
@@ -155,9 +160,9 @@ final class CompanyResource extends Resource
             ->filters([
                 SelectFilter::make('size')
                     ->options([
-                        'small' => __('companies.sizes.small'),
+                        'small'  => __('companies.sizes.small'),
                         'medium' => __('companies.sizes.medium'),
-                        'large' => __('companies.sizes.large'),
+                        'large'  => __('companies.sizes.large'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->trueLabel(__('companies.active_only'))
@@ -165,9 +170,9 @@ final class CompanyResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('toggle_active')
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('toggle_active')
                     ->label(fn (Company $record): string => $record->is_active ? __('companies.deactivate') : __('companies.activate'))
                     ->icon(fn (Company $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Company $record): string => $record->is_active ? 'warning' : 'success')
@@ -183,8 +188,8 @@ final class CompanyResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('activate')
+                    DeleteBulkAction::make(),
+                    BulkAction::make('activate')
                         ->label(__('companies.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -196,7 +201,7 @@ final class CompanyResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label(__('companies.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
@@ -229,10 +234,10 @@ final class CompanyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCompanies::route('/'),
+            'index'  => Pages\ListCompanies::route('/'),
             'create' => Pages\CreateCompany::route('/create'),
-            'view' => Pages\ViewCompany::route('/{record}'),
-            'edit' => Pages\EditCompany::route('/{record}/edit'),
+            'view'   => Pages\ViewCompany::route('/{record}'),
+            'edit'   => Pages\EditCompany::route('/{record}/edit'),
         ];
     }
 }

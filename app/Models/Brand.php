@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Traits\HasTranslations;
+use DB;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,11 +26,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * Eloquent model representing the Brand entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $fillable
- * @property mixed $appends
- * @property mixed $table
+ * @property mixed  $fillable
+ * @property mixed  $appends
+ * @property mixed  $table
  * @property string $translationModel
- * @property mixed $translatable
+ * @property mixed  $translatable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Brand newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Brand newQuery()
@@ -37,7 +39,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
-final class Brand extends Model implements HasMedia
+final class Brand extends Model implements HasMedia, TranslatableRecord
 {
     use HasFactory, SoftDeletes;
     use HasTranslations;
@@ -52,9 +54,9 @@ final class Brand extends Model implements HasMedia
     protected function casts(): array
     {
         return [
-            'is_enabled' => 'boolean',
-            'is_active' => 'boolean',
-            'is_visible' => 'boolean',
+            'is_enabled'  => 'boolean',
+            'is_active'   => 'boolean',
+            'is_visible'  => 'boolean',
             'is_featured' => 'boolean',
         ];
     }
@@ -123,7 +125,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -133,7 +135,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeVisible functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeVisible($query)
     {
@@ -143,7 +145,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeWithProducts functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithProducts($query)
     {
@@ -251,13 +253,13 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -375,7 +377,7 @@ final class Brand extends Model implements HasMedia
      */
     public function getTotalRevenue(): float
     {
-        return $this->products()->join('order_items', 'products.id', '=', 'order_items.product_id')->join('orders', 'order_items.order_id', '=', 'orders.id')->where('orders.status', 'completed')->sum(\DB::raw('order_items.quantity * order_items.price'));
+        return $this->products()->join('order_items', 'products.id', '=', 'order_items.product_id')->join('orders', 'order_items.order_id', '=', 'orders.id')->where('orders.status', 'completed')->sum(DB::raw('order_items.quantity * order_items.price'));
     }
 
     /**
@@ -473,7 +475,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -483,7 +485,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeInactive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInactive($query)
     {
@@ -493,7 +495,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeWithWebsite functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithWebsite($query)
     {
@@ -503,11 +505,11 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeWithoutWebsite functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithoutWebsite($query)
     {
-        return $query->where(function ($q) {
+        return $query->where(function ($q): void {
             $q->whereNull('website')->orWhere('website', '');
         });
     }
@@ -515,7 +517,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeWithMedia functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithMedia($query)
     {
@@ -525,7 +527,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeWithoutMedia functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithoutMedia($query)
     {
@@ -535,7 +537,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopePopular functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePopular($query, int $minProducts = 5)
     {
@@ -545,7 +547,7 @@ final class Brand extends Model implements HasMedia
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query, int $days = 30)
     {

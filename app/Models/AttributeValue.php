@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,14 +37,14 @@ final class AttributeValue extends Model
 
     protected $table = 'attribute_values';
 
-    protected $fillable = ['attribute_id', 'value', 'slug', 'color_code', 'sort_order', 'is_enabled', 'description', 'hex_color', 'image', 'metadata', 'display_value', 'is_active'];
+    protected $fillable = ['attribute_id', 'value', 'slug', 'color_code', 'sort_order', 'is_enabled', 'description', 'hex_color', 'image', 'metadata', 'display_value', 'is_active', 'is_default'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['sort_order' => 'integer', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'metadata' => 'array'];
+        return ['sort_order' => 'integer', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_default' => 'boolean'];
     }
 
     protected string $translationModel = \App\Models\Translations\AttributeValueTranslation::class;
@@ -160,5 +161,49 @@ final class AttributeValue extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    protected function metadata(): EloquentAttribute
+    {
+        return EloquentAttribute::make(
+            get: static function ($value): array {
+                if (is_array($value)) {
+                    return $value;
+                }
+
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+
+                    return is_array($decoded) ? $decoded : [];
+                }
+
+                if ($value instanceof \JsonSerializable) {
+                    $encoded = $value->jsonSerialize();
+
+                    return is_array($encoded) ? $encoded : [];
+                }
+
+                return $value ? (array) $value : [];
+            },
+            set: static function ($value): ?array {
+                if ($value === null) {
+                    return null;
+                }
+
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+
+                    return is_array($decoded) ? $decoded : null;
+                }
+
+                if ($value instanceof \JsonSerializable) {
+                    $encoded = $value->jsonSerialize();
+
+                    return is_array($encoded) ? $encoded : null;
+                }
+
+                return is_array($value) ? $value : (array) $value;
+            }
+        );
     }
 }

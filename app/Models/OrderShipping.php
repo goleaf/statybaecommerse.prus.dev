@@ -42,7 +42,9 @@ final class OrderShipping extends Model
         'delivered_at',
         'weight',
         'dimensions',
-        'cost',
+        'base_cost',
+        'insurance_cost',
+        'total_cost',
         'metadata',
     ];
 
@@ -52,16 +54,16 @@ final class OrderShipping extends Model
     protected function casts(): array
     {
         return [
-            'shipped_at' => 'datetime',
+            'shipped_at'         => 'datetime',
             'estimated_delivery' => 'datetime',
-            'delivered_at' => 'datetime',
-            'weight' => 'decimal:3',
-            'base_cost' => 'decimal:2',
-            'insurance_cost' => 'decimal:2',
-            'total_cost' => 'decimal:2',
-            'dimensions' => 'array',
-            'metadata' => 'array',
-            'is_delivered' => 'boolean',
+            'delivered_at'       => 'datetime',
+            'weight'             => 'decimal:3',
+            'base_cost'          => 'decimal:2',
+            'insurance_cost'     => 'decimal:2',
+            'total_cost'         => 'decimal:2',
+            'dimensions'         => 'array',
+            'metadata'           => 'array',
+            'is_delivered'       => 'boolean',
         ];
     }
 
@@ -76,7 +78,7 @@ final class OrderShipping extends Model
     /**
      * Handle scopeShipped functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeShipped($query)
     {
@@ -86,7 +88,7 @@ final class OrderShipping extends Model
     /**
      * Handle scopeDelivered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeDelivered($query)
     {
@@ -96,7 +98,7 @@ final class OrderShipping extends Model
     /**
      * Handle scopeByCarrier functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCarrier($query, string $carrier)
     {
@@ -134,8 +136,8 @@ final class OrderShipping extends Model
     {
         return match (true) {
             $this->isDelivered() => 'delivered',
-            $this->isShipped() => 'in_transit',
-            default => 'pending',
+            $this->isShipped()   => 'in_transit',
+            default              => 'pending',
         };
     }
 }

@@ -4,12 +4,24 @@ return [
     // Basic fields
     'title' => 'Posts',
     'post' => 'Post',
+    'single' => 'Post',
+    'plural' => 'Posts',
+    'sections' => [
+        'basic_information' => 'Basic Information',
+        'media' => 'Media',
+        'seo' => 'SEO',
+        'settings' => 'Settings',
+    ],
     'fields' => [
         'title' => 'Title',
         'slug' => 'Slug',
         'content' => 'Content',
         'excerpt' => 'Excerpt',
         'status' => 'Status',
+        'moderation_state' => 'Moderation State',
+        'submitted_for_review_at' => 'Submitted For Review',
+        'approved_at' => 'Approved At',
+        'approved_by' => 'Approved By',
         'published_at' => 'Published At',
         'featured' => 'Featured',
         'is_pinned' => 'Pinned',
@@ -30,11 +42,16 @@ return [
     // Status
     'status' => [
         'draft' => 'Draft',
+        'review' => 'In Review',
         'published' => 'Published',
         'archived' => 'Archived',
     ],
 
+    'status_managed_by_workflow' => 'Status is managed by the moderation workflow.',
+
     // Actions
+    'add_tag' => 'Add tag',
+
     'actions' => [
         'publish' => 'Publish',
         'unpublish' => 'Unpublish',
@@ -43,6 +60,20 @@ return [
         'unfeature' => 'Unfeature',
         'pin' => 'Pin',
         'unpin' => 'Unpin',
+    ],
+
+    'approvals' => [
+        'notes' => 'Approval Notes',
+        'notes_help' => 'Share any context around this decision (optional).',
+        'decided_at' => 'Decided At',
+        'reviewer' => 'Reviewer',
+        'decision' => 'Decision',
+        'decisions' => [
+            'approved' => 'Approved',
+            'returned' => 'Returned to Draft',
+        ],
+        'empty_heading' => 'No approvals yet',
+        'empty_description' => 'Approval history will appear here once reviewers make a decision.',
     ],
 
     // Filters
@@ -55,6 +86,8 @@ return [
         'author' => 'Author',
         'published_from' => 'Published From',
         'published_until' => 'Published Until',
+        'pinned_only' => 'Pinned Only',
+        'not_pinned' => 'Not Pinned',
     ],
 
     // SEO

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use App\Models\News;
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Support\Filament\Components\Flatpickr;
 
-final class NewsRelationManager extends RelationManager
+final class NewsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'news';
 
@@ -48,7 +48,7 @@ final class NewsRelationManager extends RelationManager
                             ->default(true),
                         Forms\Components\Toggle::make('is_featured')
                             ->default(false),
-                        Forms\Components\DateTimePicker::make('published_at')
+                        Flatpickr::makeDateTime('published_at')
                             ->default(now()),
                     ])
                     ->columns(2),
@@ -102,8 +102,8 @@ final class NewsRelationManager extends RelationManager
                 Tables\Filters\TernaryFilter::make('is_featured'),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Forms\Components\DatePicker::make('published_from'),
-                        Forms\Components\DatePicker::make('published_until'),
+                        Flatpickr::makeDate('published_from'),
+                        Flatpickr::makeDate('published_until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\UserProductInteractionResource\Pages;
-use BackedEnum;
+use App\Models\Product;
+use App\Models\User;
 use App\Models\UserProductInteraction;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
@@ -13,12 +15,12 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -32,12 +34,16 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 final class UserProductInteractionResource extends Resource
 {
+    protected static ?string $model = UserProductInteraction::class;
+
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string
@@ -78,8 +84,25 @@ final class UserProductInteractionResource extends Resource
                                             ->label(__('admin.users.email'))
                                             ->email()
                                             ->required()
-                                            ->maxLength(255),
-                                    ]),
+                                            ->maxLength(255)
+                                            ->unique(User::class, 'email', ignoreRecord: true),
+                                        TextInput::make('password')
+                                            ->label(__('filament-panels::password_reset.reset.form.password.label'))
+                                            ->password()
+                                            ->required()
+                                            ->minLength(8)
+                                            ->rule(Password::defaults())
+                                            ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
+                                        TextInput::make('password_confirmation')
+                                            ->label(__('filament-panels::password_reset.reset.form.password_confirmation.label'))
+                                            ->password()
+                                            ->required()
+                                            ->same('password')
+                                            ->dehydrated(false),
+                                    ])
+                                    ->createOptionUsing(function (array $data): int {
+                                        return User::create($data)->getKey();
+                                    }),
                                 Select::make('product_id')
                                     ->label(__('admin.user_product_interactions.product'))
                                     ->relationship('product', 'name')
@@ -91,10 +114,20 @@ final class UserProductInteractionResource extends Resource
                                             ->label(__('admin.products.name'))
                                             ->required()
                                             ->maxLength(255),
+                                        TextInput::make('slug')
+                                            ->label(__('products.fields.slug'))
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->unique(Product::class, 'slug', ignoreRecord: true),
                                         TextInput::make('sku')
                                             ->label(__('admin.products.sku'))
                                             ->maxLength(100),
-                                    ]),
+                                    ])
+                                    ->createOptionUsing(function (array $data): int {
+                                        $data['slug'] = Str::slug($data['slug'] ?? $data['name'] ?? '');
+
+                                        return Product::create($data)->getKey();
+                                    }),
                                 Select::make('interaction_type')
                                     ->label(__('admin.user_product_interactions.interaction_type'))
                                     ->options([
@@ -124,12 +157,12 @@ final class UserProductInteractionResource extends Resource
                                     ->minValue(1)
                                     ->default(1)
                                     ->helperText(__('admin.user_product_interactions.count_help')),
-                                DateTimePicker::make('first_interaction')
+                                Flatpickr::makeDateTime('first_interaction')
                                     ->label(__('admin.user_product_interactions.first_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')
                                     ->seconds(false),
-                                DateTimePicker::make('last_interaction')
+                                Flatpickr::makeDateTime('last_interaction')
                                     ->label(__('admin.user_product_interactions.last_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')

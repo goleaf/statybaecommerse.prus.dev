@@ -95,6 +95,7 @@ return [
         'activate' => 'Aktyvuoti',
         'pause' => 'Pristabdyti',
         'complete' => 'Užbaigti',
+        'view_details' => 'Peržiūrėti detales',
     ],
     // Messages
     'messages' => [
@@ -107,6 +108,7 @@ return [
         'scheduled' => 'Kampanija suplanuota',
         'test_sent' => 'Bandomasis el. laiškas išsiųstas',
         'no_campaigns' => 'Kampanijų nerasta',
+        'no_campaigns_description' => 'Pabandykite pakoreguoti filtrus arba sugrįžkite vėliau – netrukus atsiras naujų kampanijų.',
         'campaign_not_found' => 'Kampanija nerasta',
         'insufficient_budget' => 'Nepakanka biudžeto',
         'campaign_expired' => 'Kampanijos galiojimas pasibaigęs',
@@ -186,6 +188,32 @@ return [
         'avg_conversion_rate_description' => 'Vidutinis konversijos procentas',
         'avg_ctr' => 'Vidutinis CTR',
         'avg_ctr_description' => 'Vidutinis paspaudimų per peržiūras procentas',
+    ],
+    'index' => [
+        'description' => 'Atraskite naujausias mūsų rinkodaros kampanijas ir pasiūlymus, pritaikytus jums.',
+    ],
+    'featured' => [
+        'title' => 'Išskirtinės kampanijos',
+        'description' => 'Peržiūrėkite atrinktas kampanijas su geriausiais pasiūlymais ir patirtimis.',
+        'empty_title' => 'Šiuo metu nėra išskirtinių kampanijų',
+        'empty_description' => 'Užsukite vėliau – netrukus pateiksime naujų išskirtinių kampanijų.',
+    ],
+    'by_type' => [
+        'title' => ':type kampanijos',
+        'heading' => ':type kampanijos',
+        'description' => 'Peržiūrėkite aktyvias :type kampanijas, pritaikytas šiam kanalui.',
+        'empty_title' => 'Nėra :type kampanijų',
+        'empty_description' => 'Pabandykite pasirinkti kitą kampanijos tipą, kad rastumėte daugiau pasiūlymų.',
+    ],
+    'search' => [
+        'title' => 'Paieškos rezultatai „:query“',
+        'title_default' => 'Ieškoti kampanijų',
+        'description' => 'Kampanijos, atitinkančios „:query“.',
+        'description_default' => 'Ieškokite tarp visų kampanijų ir raskite jums tinkamiausią pasiūlymą.',
+        'empty_title' => 'Nerasta kampanijų, atitinkančių „:query“',
+        'empty_description' => 'Pabandykite kitus raktinius žodžius arba pakoreguokite paieškos filtrus.',
+        'empty_title_default' => 'Pradėkite kampanijų paiešką',
+        'empty_description_default' => 'Naudokite paiešką ir raskite kampanijas pagal pavadinimą, aprašymą ar kanalą.',
     ],
     // Frontend
     'frontend' => [

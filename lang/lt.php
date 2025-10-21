@@ -2,6 +2,8 @@
 
 return [
     // Common
+    'exceptions_orders_not_found' => 'Užsakymas :order nerastas.',
+    'exceptions_inventory_insufficient' => 'Atsargų SKU :sku nepakanka.',
     'common' => [
         'back_to_list' => 'Grįžti į sąrašą',
         'back_to_list_tooltip' => 'Grįžti į sąrašo rodinį',
@@ -77,6 +79,7 @@ return [
                     'campaign_name' => 'Kampanijos pavadinimas',
                     'campaign_status' => 'Kampanijos būsena',
                     'campaign_type' => 'Kampanijos tipas',
+                    'status' => 'Būsena',
                     'schedule_type' => 'Grafiko tipas',
                     'schedule_status' => 'Grafiko būsena',
                     'schedule_config' => 'Grafiko konfigūracija',
@@ -1902,12 +1905,15 @@ return [
         'is_active' => 'Aktyvus',
         'targeting_tags' => 'Tikslinimo žymos',
         'add_targeting_tag' => 'Pridėti tikslinimo žymą',
+        'no_targeting_tags' => 'Nėra tikslinimo žymų',
         'custom_conditions' => 'Pritaikyti sąlygos',
         'custom_conditions_help' => 'Papildomos sąlygos segmento apibrėžimui',
         'targeting_options' => 'Tikslinimo parinktys',
         'performance_settings' => 'Veiklos nustatymai',
         'track_performance' => 'Sekti veiklą',
         'auto_optimize' => 'Automatinis optimizavimas',
+        'sort_order' => 'Rūšiavimo tvarka',
+        'sort_order_help' => 'Mažesni skaičiai rodomi pirmieji',
         'types' => [
             'demographic' => 'Demografinis',
             'behavioral' => 'Elgsenos',

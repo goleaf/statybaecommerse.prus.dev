@@ -4,9 +4,9 @@ namespace App\Filament\Resources\ProductSimilarities\Pages;
 
 use App\Filament\Resources\ProductSimilarities\ProductSimilarityResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListProductSimilarities extends ListRecords
+class ListProductSimilarities extends BaseListRecords
 {
     protected static string $resource = ProductSimilarityResource::class;
 

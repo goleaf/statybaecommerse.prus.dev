@@ -5,46 +5,45 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MenuResource\Pages;
+use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
+use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-rectangle-stack';
-    }
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -67,6 +66,13 @@ final class MenuResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        $locationOptions = [
+            'header'  => __('menus.locations.header'),
+            'footer'  => __('menus.locations.footer'),
+            'sidebar' => __('menus.locations.sidebar'),
+            'mobile'  => __('menus.locations.mobile'),
+        ];
+
         return $form->schema([
             Section::make(__('menus.basic_information'))
                 ->schema([
@@ -76,78 +82,29 @@ final class MenuResource extends Resource
                                 ->label(__('menus.name'))
                                 ->required()
                                 ->maxLength(255),
-                            TextInput::make('slug')
-                                ->label(__('menus.slug'))
+                            TextInput::make('key')
+                                ->label(__('menus.key'))
+                                ->helperText(__('menus.key_help'))
+                                ->required()
                                 ->maxLength(255)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
+                                ->rule('alpha_dash')
+                                ->unique(ignoreRecord: true),
                         ]),
+                    Select::make('location')
+                        ->label(__('menus.location'))
+                        ->required()
+                        ->options($locationOptions)
+                        ->searchable(),
                     Textarea::make('description')
                         ->label(__('menus.description'))
-                        ->rows(3)
-                        ->maxLength(500)
+                        ->maxLength(65535)
                         ->columnSpanFull(),
-                ]),
-            Section::make(__('menus.menu_items'))
-                ->schema([
-                    Repeater::make('items')
-                        ->label(__('menus.menu_items'))
-                        ->schema([
-                            TextInput::make('label')
-                                ->label(__('menus.item_label'))
-                                ->required(),
-                            TextInput::make('url')
-                                ->label(__('menus.item_url'))
-                                ->url(),
-                            Select::make('target')
-                                ->label(__('menus.item_target'))
-                                ->options([
-                                    '_self' => __('menus.targets.self'),
-                                    '_blank' => __('menus.targets.blank'),
-                                    '_parent' => __('menus.targets.parent'),
-                                    '_top' => __('menus.targets.top'),
-                                ])
-                                ->default('_self'),
-                            TextInput::make('icon')
-                                ->label(__('menus.item_icon'))
-                                ->maxLength(100)
-                                ->helperText(__('menus.item_icon_help')),
-                            TextInput::make('css_class')
-                                ->label(__('menus.item_css_class'))
-                                ->helperText(__('menus.item_css_class_help')),
-                            Toggle::make('is_active')
-                                ->label(__('menus.item_is_active'))
-                                ->default(true),
-                            TextInput::make('sort_order')
-                                ->label(__('menus.item_sort_order'))
-                                ->numeric()
-                                ->default(0)
-                                ->minValue(0),
-                        ])
-                        ->columns(3)
-                        ->addActionLabel(__('menus.add_menu_item')),
                 ]),
             Section::make(__('menus.settings'))
                 ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            Toggle::make('is_active')
-                                ->label(__('menus.is_active'))
-                                ->default(true),
-                            Toggle::make('is_mobile')
-                                ->label(__('menus.is_mobile'))
-                                ->default(false),
-                        ]),
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('css_class')
-                                ->label(__('menus.css_class'))
-                                ->helperText(__('menus.css_class_help')),
-                            TextInput::make('sort_order')
-                                ->label(__('menus.sort_order'))
-                                ->numeric()
-                                ->default(0),
-                        ]),
+                    Toggle::make('is_active')
+                        ->label(__('menus.is_active'))
+                        ->default(true),
                 ]),
         ]);
     }
@@ -164,11 +121,22 @@ final class MenuResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                TextColumn::make('slug')
-                    ->label(__('menus.slug'))
+                TextColumn::make('key')
+                    ->label(__('menus.key'))
                     ->copyable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('location')
+                    ->label(__('menus.location'))
                     ->badge()
-                    ->color('gray'),
+                    ->formatStateUsing(static fn (?string $state): ?string => match ($state) {
+                        'header'  => __('menus.locations.header'),
+                        'footer'  => __('menus.locations.footer'),
+                        'sidebar' => __('menus.locations.sidebar'),
+                        'mobile'  => __('menus.locations.mobile'),
+                        default   => $state,
+                    })
+                    ->sortable(),
                 TextColumn::make('description')
                     ->label(__('menus.description'))
                     ->limit(100)
@@ -180,18 +148,6 @@ final class MenuResource extends Resource
                 IconColumn::make('is_active')
                     ->label(__('menus.is_active'))
                     ->boolean()
-                    ->sortable(),
-                IconColumn::make('is_mobile')
-                    ->label(__('menus.is_mobile'))
-                    ->boolean()
-                    ->sortable(),
-                TextColumn::make('css_class')
-                    ->label(__('menus.css_class'))
-                    ->limit(50)
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('sort_order')
-                    ->label(__('menus.sort_order'))
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('menus.created_at'))
@@ -207,35 +163,61 @@ final class MenuResource extends Resource
             ->filters([
                 TernaryFilter::make('is_active')
                     ->trueLabel(__('menus.active_only'))
-                    ->falseLabel(__('menus.inactive_only'))
-                    ->native(false),
-                TernaryFilter::make('is_mobile')
-                    ->trueLabel(__('menus.mobile_only'))
-                    ->falseLabel(__('menus.desktop_only'))
-                    ->native(false),
+                    ->falseLabel(__('menus.inactive_only')),
+                SelectFilter::make('location')
+                    ->label(__('menus.location'))
+                    ->multiple()
+                    ->options([
+                        'header'  => __('menus.locations.header'),
+                        'footer'  => __('menus.locations.footer'),
+                        'sidebar' => __('menus.locations.sidebar'),
+                        'mobile'  => __('menus.locations.mobile'),
+                    ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (Menu $record): string => $record->is_active ? __('menus.deactivate') : __('menus.activate'))
                     ->icon(fn (Menu $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Menu $record): string => $record->is_active ? 'warning' : 'success')
+                    ->requiresConfirmation()
                     ->action(function (Menu $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
 
+                        $message = $record->is_active
+                            ? __('menus.activated_successfully')
+                            : __('menus.deactivated_successfully');
+
                         Notification::make()
-                            ->title($record->is_active ? __('menus.activated_successfully') : __('menus.deactivated_successfully'))
+                            ->success()
+                            ->title((string) $message)
+                            ->send();
+                    }),
+                Action::make('duplicate')
+                    ->label(__('menus.duplicate'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('secondary')
+                    ->requiresConfirmation()
+                    ->action(function (Menu $record): void {
+                        $timestamp = now()->timestamp;
+
+                        $duplicate = $record->replicate([
+                            'created_at',
+                            'updated_at',
+                        ]);
+
+                        $duplicate->name = sprintf('%s (Copy)', $record->name);
+                        $duplicate->key = sprintf('%s_copy_%s', $record->key, $timestamp);
+
+                        $duplicate->save();
+
+                        Notification::make()
+                            ->title(__('menus.duplicated_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('preview')
-                    ->label(__('menus.preview'))
-                    ->icon('heroicon-o-eye')
-                    ->color('info')
-                    ->url(fn (Menu $record): string => route('menu.preview', $record))
-                    ->openUrlInNewTab(),
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -266,7 +248,7 @@ final class MenuResource extends Resource
                         ->requiresConfirmation(),
                 ]),
             ])
-            ->defaultSort('sort_order');
+            ->defaultSort('name');
     }
 
     /**
@@ -275,7 +257,7 @@ final class MenuResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            MenuItemsRelationManager::class,
         ];
     }
 
@@ -285,10 +267,17 @@ final class MenuResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMenus::route('/'),
+            'index'  => Pages\ListMenus::route('/'),
             'create' => Pages\CreateMenu::route('/create'),
-            'view' => Pages\ViewMenu::route('/{record}'),
-            'edit' => Pages\EditMenu::route('/{record}/edit'),
+            'view'   => Pages\ViewMenu::route('/{record}'),
+            'edit'   => Pages\EditMenu::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+        ]);
     }
 }

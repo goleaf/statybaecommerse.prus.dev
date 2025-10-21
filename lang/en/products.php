@@ -4,6 +4,10 @@ return [
     'title' => 'Products',
     'plural' => 'Products',
     'single' => 'Product',
+    'related_categories' => 'Related categories',
+    'related_collections' => 'Related collections',
+    'view_category_tooltip' => 'View the :category category',
+    'explore_collection_tooltip' => 'Explore the :collection collection',
     'fields' => [
         'name' => 'Name',
         'slug' => 'Slug',
@@ -61,6 +65,8 @@ return [
         'weight_range' => 'Weight Range',
         'weight_from' => 'Weight From',
         'weight_to' => 'Weight To',
+        'product' => 'Product',
+        'product_placeholder' => 'Type to filter by product name or SKU',
     ],
     'actions' => [
         'publish' => 'Publish',

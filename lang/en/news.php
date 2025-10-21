@@ -64,6 +64,7 @@ return [
     'add_tag' => 'Add tag',
     'is_published' => 'Published',
     'is_featured' => 'Featured',
+    'visibility_managed' => 'Visibility is controlled by the moderation workflow.',
     'published_at' => 'Published At',
     'expires_at' => 'Expires At',
     'seo_title' => 'SEO Title',
@@ -78,6 +79,7 @@ return [
     'status' => 'Status',
     'published' => 'Published',
     'draft' => 'Draft',
+    'review' => 'In Review',
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
     // Filters
@@ -96,6 +98,17 @@ return [
     'unpublished_successfully' => 'Unpublished Successfully',
     'bulk_published_success' => 'Bulk Published Successfully',
     'bulk_unpublished_success' => 'Bulk Unpublished Successfully',
+    'tabs' => [
+        'all' => 'All',
+        'draft' => 'Draft',
+        'review' => 'In Review',
+        'published' => 'Published',
+        'featured' => 'Featured',
+        'breaking' => 'Breaking',
+        'today' => 'Published Today',
+        'this_week' => 'This Week',
+        'this_month' => 'This Month',
+    ],
     // Category specific translations
     'category_name' => 'Category Name',
     'parent_category' => 'Parent Category',
@@ -129,6 +142,7 @@ return [
         'author_email' => 'Author Email',
         'is_visible' => 'Visible',
         'is_featured' => 'Featured',
+        'is_breaking' => 'Breaking News',
         'meta_title' => 'Meta Title',
         'meta_description' => 'Meta Description',
         'meta_keywords' => 'Meta Keywords',
@@ -138,6 +152,10 @@ return [
         'view_count' => 'View Count',
         'created_at' => 'Created At',
         'updated_at' => 'Updated At',
+        'moderation_state' => 'Moderation State',
+        'submitted_for_review_at' => 'Submitted For Review',
+        'approved_at' => 'Approved At',
+        'approved_by' => 'Approved By',
         'featured_image' => 'Featured Image',
         'file_path' => 'File Path',
         'alt_text' => 'Alt Text',
@@ -156,6 +174,16 @@ return [
         'sort_order' => 'Sort Order',
         'color' => 'Color',
     ],
+    'combobox' => [
+        'categories' => [
+            'available' => 'Available categories',
+            'selected' => 'Selected categories',
+        ],
+        'tags' => [
+            'available' => 'Available tags',
+            'selected' => 'Selected tags',
+        ],
+    ],
     // Filter translations
     'filters' => [
         'published_from' => 'Published From',
@@ -168,4 +196,17 @@ return [
     'non_featured_only' => 'Non-Featured Only',
     'primary_only' => 'Primary Only',
     'secondary_only' => 'Secondary Only',
+    'approvals' => [
+        'notes' => 'Notes',
+        'notes_help' => 'Share any context around this decision (optional).',
+        'decided_at' => 'Decided At',
+        'reviewer' => 'Reviewer',
+        'decision' => 'Decision',
+        'decisions' => [
+            'approved' => 'Approved',
+            'returned' => 'Returned to Draft',
+        ],
+        'empty_heading' => 'No approvals yet',
+        'empty_description' => 'Approval history will appear here once reviewers make a decision.',
+    ],
 ];

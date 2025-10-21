@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\Country;
+use App\Services\PaginationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -21,7 +22,13 @@ final class CityController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = City::with(['country', 'parent'])->withTranslations()->enabled()->active();
+        $query = City::with([
+            'country.translations',
+            'region.translations',
+            'parent.translations',
+        ])->withTranslations()->enabled()->active()
+            ->whereNotNull('name')
+            ->whereNotNull('code');
         // Search
         if ($request->filled('search')) {
             $search = $request->get('search');
@@ -53,10 +60,8 @@ final class CityController extends Controller
         }
         // Sort by default
         $query->ordered()->orderBy('name');
-        $cities = $query->get()->skipWhile(function ($city) {
-            // Skip cities that are not properly configured for display
-            return empty($city->name) || ! $city->is_enabled || ! $city->is_active || empty($city->country_id) || empty($city->code);
-        })->paginate(24);
+        $cities = PaginationService::paginateWithContext($query, 'cities', 24);
+        $cities->appends($request->query());
         // Get countries for filter dropdown
         $countries = Country::withTranslations()->enabled()->active()->ordered()->orderBy('name')->get();
 

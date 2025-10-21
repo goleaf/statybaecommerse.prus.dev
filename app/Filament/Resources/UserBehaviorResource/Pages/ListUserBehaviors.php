@@ -6,9 +6,9 @@ namespace App\Filament\Resources\UserBehaviorResource\Pages;
 
 use App\Filament\Resources\UserBehaviorResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListUserBehaviors extends ListRecords
+final class ListUserBehaviors extends BaseListRecords
 {
     protected static string $resource = UserBehaviorResource::class;
 

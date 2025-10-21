@@ -6,9 +6,9 @@ namespace App\Filament\Resources\PartnerTierResource\Pages;
 
 use App\Filament\Resources\PartnerTierResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListPartnerTiers extends ListRecords
+final class ListPartnerTiers extends BaseListRecords
 {
     protected static string $resource = PartnerTierResource::class;
 

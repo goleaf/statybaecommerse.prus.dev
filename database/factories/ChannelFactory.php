@@ -30,4 +30,17 @@ class ChannelFactory extends Factory
             'metadata' => null,
         ];
     }
+
+    public function web(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'B2C Web',
+            'slug' => 'b2c-web',
+            'description' => 'Numatytasis viešas prekybos kanalas.',
+            'timezone' => 'Europe/Vilnius',
+            'url' => 'https://demo.statyba.test',
+            'is_default' => true,
+            'is_enabled' => true,
+        ]);
+    }
 }

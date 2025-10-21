@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'domain' => env('HORIZON_DOMAIN'),
+    'domain' => value(env('HORIZON_DOMAIN')) ?: null,
 
     /*
     |--------------------------------------------------------------------------

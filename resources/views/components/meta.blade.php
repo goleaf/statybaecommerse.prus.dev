@@ -5,13 +5,16 @@
     'ogDescription' => null,
     'ogImage' => null,
     'ogType' => 'website',
+    'ogUrl' => null,
     'twitterCard' => 'summary_large_image',
     'twitterTitle' => null,
     'twitterDescription' => null,
+    'twitterUrl' => null,
     'robots' => null,
     'prev' => null,
     'next' => null,
     'canonical' => null,
+    'keywords' => null,
     'preloadImage' => null,
     'preloadSrcset' => null,
     'preloadSizes' => null,
@@ -26,9 +29,27 @@
     $openGraphDescription = $ogDescription ?? $metaDescription;
     $twTitle = $twitterTitle ?? $openGraphTitle;
     $twDescription = $twitterDescription ?? $openGraphDescription;
-    $defaultImage = asset('og-image.jpg');
+    $defaultImage = og_placeholder_url();
     $effectiveOgImage = $ogImage ?: $defaultImage;
+    $jsonLdBlocks = collect(
+        is_array($jsonld)
+            ? (array_is_list($jsonld) ? $jsonld : [$jsonld])
+            : ($jsonld ? [$jsonld] : [])
+    )
+        ->map(function ($block) {
+            if (is_array($block)) {
+                return json_encode($block, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            }
+
+            return (string) $block;
+        })
+        ->filter(static fn ($block) => $block !== '')
+        ->values();
 @endphp
+
+@if ($title)
+    <meta property="og:site_name" content="{{ config('app.name') }}" />
+@endif
 
 @if ($metaDescription)
     <meta name="description" content="{{ $metaDescription }}" />
@@ -47,6 +68,9 @@
 @if ($ogType)
     <meta property="og:type" content="{{ $ogType }}" />
 @endif
+@if ($ogUrl ?? $canonical)
+    <meta property="og:url" content="{{ $ogUrl ?? $canonical }}" />
+@endif
 @if ($effectiveOgImage)
     <meta property="og:image" content="{{ $effectiveOgImage }}" />
 @endif
@@ -63,6 +87,9 @@
 @if ($effectiveOgImage)
     <meta name="twitter:image" content="{{ $effectiveOgImage }}" />
 @endif
+@if ($twitterUrl ?? $canonical)
+    <meta name="twitter:url" content="{{ $twitterUrl ?? $canonical }}" />
+@endif
 
 @if ($prev)
     <link rel="prev" href="{{ $prev }}" />
@@ -72,6 +99,10 @@
 @endif
 @if ($canonical)
     <link rel="canonical" href="{{ $canonical }}" />
+@endif
+
+@if ($keywords)
+    <meta name="keywords" content="{{ is_array($keywords) ? implode(', ', $keywords) : $keywords }}" />
 @endif
 
 @if ($preloadImage || $preloadSrcset)
@@ -87,6 +118,8 @@
     @endforeach
 @endif
 
-@if (!empty($jsonld))
-    <script type="application/ld+json">{!! $jsonld !!}</script>
+@if ($jsonLdBlocks->isNotEmpty())
+    @foreach ($jsonLdBlocks as $block)
+        <script type="application/ld+json">{!! $block !!}</script>
+    @endforeach
 @endif

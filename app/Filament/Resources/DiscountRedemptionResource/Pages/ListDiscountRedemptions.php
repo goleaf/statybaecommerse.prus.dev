@@ -6,9 +6,9 @@ namespace App\Filament\Resources\DiscountRedemptionResource\Pages;
 
 use App\Filament\Resources\DiscountRedemptionResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListDiscountRedemptions extends ListRecords
+final class ListDiscountRedemptions extends BaseListRecords
 {
     protected static string $resource = DiscountRedemptionResource::class;
 

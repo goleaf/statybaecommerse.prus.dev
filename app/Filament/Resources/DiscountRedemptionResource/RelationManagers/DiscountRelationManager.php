@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class DiscountRelationManager extends RelationManager
+class DiscountRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'discount';
 

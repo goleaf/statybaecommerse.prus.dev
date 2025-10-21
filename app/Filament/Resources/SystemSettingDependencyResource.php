@@ -14,15 +14,15 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -34,11 +34,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 final class SystemSettingDependencyResource extends Resource
 {
+    protected static ?string $model = SystemSettingDependency::class;
+
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-link';
@@ -101,7 +102,7 @@ final class SystemSettingDependencyResource extends Resource
                                 ->label(__('admin.system_setting_dependencies.is_active'))
                                 ->default(true)
                                 ->helperText(__('admin.system_setting_dependencies.is_active_help')),
-                            DateTimePicker::make('created_at')
+                            Flatpickr::makeDateTime('created_at')
                                 ->label(__('admin.common.created_at'))
                                 ->disabled()
                                 ->dehydrated(false)
@@ -158,6 +159,10 @@ final class SystemSettingDependencyResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
                         return strlen($state) > 50 ? $state : null;
                     })
                     ->searchable()
@@ -203,9 +208,9 @@ final class SystemSettingDependencyResource extends Resource
                     ->label(__('admin.system_setting_dependencies.is_active')),
                 Filter::make('created_at')
                     ->form([
-                        DateTimePicker::make('created_from')
+                        Flatpickr::makeDateTime('created_from')
                             ->label(__('admin.common.created_from')),
-                        DateTimePicker::make('created_until')
+                        Flatpickr::makeDateTime('created_until')
                             ->label(__('admin.common.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -221,9 +226,9 @@ final class SystemSettingDependencyResource extends Resource
                     }),
                 Filter::make('updated_at')
                     ->form([
-                        DateTimePicker::make('updated_from')
+                        Flatpickr::makeDateTime('updated_from')
                             ->label(__('admin.common.updated_from')),
-                        DateTimePicker::make('updated_until')
+                        Flatpickr::makeDateTime('updated_until')
                             ->label(__('admin.common.updated_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -266,7 +271,7 @@ final class SystemSettingDependencyResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingDependency $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->condition = $record->condition.' (Copy)';
+                        $newRecord->condition = $record->condition . ' (Copy)';
                         $newRecord->is_active = false;
                         $newRecord->save();
 
@@ -321,9 +326,9 @@ final class SystemSettingDependencyResource extends Resource
                         ->icon('heroicon-o-document-duplicate')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            $records->each(function (SystemSettingDependency $record) {
+                            $records->each(function (SystemSettingDependency $record): void {
                                 $newRecord = $record->replicate();
-                                $newRecord->condition = $record->condition.' (Copy)';
+                                $newRecord->condition = $record->condition . ' (Copy)';
                                 $newRecord->is_active = false;
                                 $newRecord->save();
                             });
@@ -351,10 +356,10 @@ final class SystemSettingDependencyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettingDependencies::route('/'),
+            'index'  => Pages\ListSystemSettingDependencies::route('/'),
             'create' => Pages\CreateSystemSettingDependency::route('/create'),
-            'view' => Pages\ViewSystemSettingDependency::route('/{record}'),
-            'edit' => Pages\EditSystemSettingDependency::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingDependency::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingDependency::route('/{record}/edit'),
         ];
     }
 }

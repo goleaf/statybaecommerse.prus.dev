@@ -21,12 +21,7 @@ final class ViewDiscount extends ViewRecord
                 ->label('Duplicate')
                 ->icon('heroicon-o-document-duplicate')
                 ->action(function () {
-                    $newDiscount = $this->record->replicate();
-                    $newDiscount->name = $this->record->name.' (Copy)';
-                    $newDiscount->slug = $this->record->slug.'-copy';
-                    $newDiscount->status = 'draft';
-                    $newDiscount->usage_count = 0;
-                    $newDiscount->save();
+                    $newDiscount = DiscountResource::duplicateDiscount($this->record);
 
                     $this->redirect($this->getResource()::getUrl('edit', ['record' => $newDiscount]));
                 })

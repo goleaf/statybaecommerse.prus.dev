@@ -17,13 +17,13 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -32,8 +32,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class CampaignClickResource extends Resource
 {
@@ -97,7 +95,8 @@ final class CampaignClickResource extends Resource
                             TextInput::make('campaign_name')
                                 ->label(__('campaign_clicks.campaign_name'))
                                 ->maxLength(255)
-                                ->disabled(),
+                                ->disabled()
+                                ->dehydrated(false),
                         ]),
                     Select::make('customer_id')
                         ->label(__('campaign_clicks.customer'))
@@ -117,7 +116,8 @@ final class CampaignClickResource extends Resource
                     TextInput::make('customer_name')
                         ->label(__('campaign_clicks.customer_name'))
                         ->maxLength(255)
-                        ->disabled(),
+                        ->disabled()
+                        ->dehydrated(false),
                 ]),
             Section::make(__('campaign_clicks.click_information'))
                 ->schema([
@@ -185,16 +185,6 @@ final class CampaignClickResource extends Resource
                         ->step(0.01)
                         ->minValue(0)
                         ->helperText(__('campaign_clicks.conversion_value_help')),
-                    TextInput::make('conversion_currency')
-                        ->label(__('campaign_clicks.conversion_currency'))
-                        ->maxLength(3)
-                        ->default('EUR')
-                        ->rules(['alpha']),
-                    Textarea::make('notes')
-                        ->label(__('campaign_clicks.notes'))
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
                 ]),
         ]);
     }
@@ -206,13 +196,12 @@ final class CampaignClickResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('campaign_name')
+                TextColumn::make('campaign.name')
                     ->label(__('campaign_clicks.campaign_name'))
                     ->searchable()
-                    ->sortable()
                     ->weight('bold')
                     ->limit(50),
-                TextColumn::make('campaign_code')
+                TextColumn::make('campaign.code')
                     ->label(__('campaign_clicks.campaign_code'))
                     ->copyable()
                     ->badge()
@@ -255,8 +244,6 @@ final class CampaignClickResource extends Resource
                     ->label(__('campaign_clicks.conversion_value'))
                     ->money('EUR')
                     ->alignCenter(),
-                TextColumn::make('conversion_currency')
-                    ->label(__('campaign_clicks.conversion_currency')),
                 TextColumn::make('session_id')
                     ->label(__('campaign_clicks.session_id'))
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -264,16 +251,6 @@ final class CampaignClickResource extends Resource
                     ->label(__('campaign_clicks.clicked_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->label(__('campaign_clicks.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->label(__('campaign_clicks.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('campaign_id')
@@ -350,7 +327,7 @@ final class CampaignClickResource extends Resource
                         ->requiresConfirmation(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('clicked_at', 'desc');
     }
 
     /**

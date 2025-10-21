@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
@@ -110,7 +112,7 @@ class UserManagementResourceTest extends TestCase
 
         $this
             ->actingAs($this->user)
-            ->get(UserManagementResource::getUrl('index') . '?search=Unique')
+            ->get(UserManagementResource::getUrl('index').'?search=Unique')
             ->assertSee('Unique User Name')
             ->assertDontSee('Another User');
     }

@@ -2,22 +2,27 @@
 
 namespace App\Filament\Resources\FeatureFlags\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
+use App\Models\FeatureFlag;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 class FeatureFlagForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 TextInput::make('name')
                     ->required(),
                 TextInput::make('key')
-                    ->required(),
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true)
+                    ->rules(['alpha_dash']),
                 Textarea::make('description')
                     ->columnSpanFull(),
                 Toggle::make('is_active')
@@ -27,14 +32,14 @@ class FeatureFlagForm
                 Textarea::make('rollout_percentage')
                     ->columnSpanFull(),
                 TextInput::make('environment'),
-                DateTimePicker::make('starts_at'),
-                DateTimePicker::make('ends_at'),
+                Flatpickr::makeDateTime('starts_at'),
+                Flatpickr::makeDateTime('ends_at'),
                 Toggle::make('is_enabled')
                     ->required(),
                 Toggle::make('is_global')
                     ->required(),
-                DateTimePicker::make('start_date'),
-                DateTimePicker::make('end_date'),
+                Flatpickr::makeDateTime('start_date'),
+                Flatpickr::makeDateTime('end_date'),
                 Textarea::make('metadata')
                     ->columnSpanFull(),
                 TextInput::make('priority'),
@@ -48,10 +53,18 @@ class FeatureFlagForm
                 TextInput::make('approval_status'),
                 Textarea::make('approval_notes')
                     ->columnSpanFull(),
-                TextInput::make('created_by'),
-                TextInput::make('updated_by'),
-                DateTimePicker::make('last_activated'),
-                DateTimePicker::make('last_deactivated'),
+                Placeholder::make('created_by_display')
+                    ->label(__('system.created_by'))
+                    ->content(fn (?FeatureFlag $record): string => $record === null ? '—' : ($record->created_by_display ?? '—'))
+                    ->visible(fn (?FeatureFlag $record): bool => $record !== null)
+                    ->columnSpanFull(),
+                Placeholder::make('updated_by_display')
+                    ->label(__('system.updated_by'))
+                    ->content(fn (?FeatureFlag $record): string => $record === null ? '—' : ($record->updated_by_display ?? '—'))
+                    ->visible(fn (?FeatureFlag $record): bool => $record !== null)
+                    ->columnSpanFull(),
+                Flatpickr::makeDateTime('last_activated'),
+                Flatpickr::makeDateTime('last_deactivated'),
             ]);
     }
 }

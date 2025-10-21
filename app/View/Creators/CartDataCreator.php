@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\View\Creators;
 
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Session;
 
@@ -77,26 +78,17 @@ final class CartDataCreator
             ];
         }
 
-        // Calculate tax (simplified - in real app this would be more complex)
-        $taxRate = config('shared.tax.default_rate', 0.21); // 21% VAT
-        $tax = $subtotal * $taxRate;
-
-        // Calculate shipping (simplified)
-        $shipping = $subtotal > 50 ? 0 : 5.99; // Free shipping over €50
-
-        // Get discount from session
-        $discount = Session::get('cart_discount', 0);
-
-        $total = $subtotal + $tax + $shipping - $discount;
+        $discount = (float) Session::get('cart_discount', 0);
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discount);
 
         return [
             'items' => $items,
             'count' => $count,
-            'subtotal' => round($subtotal, 2),
-            'tax' => round($tax, 2),
-            'shipping' => round($shipping, 2),
-            'discount' => round($discount, 2),
-            'total' => round($total, 2),
+            'subtotal' => $breakdown->subtotal,
+            'tax' => $breakdown->tax,
+            'shipping' => $breakdown->shipping,
+            'discount' => $breakdown->discount,
+            'total' => $breakdown->total,
         ];
     }
 }

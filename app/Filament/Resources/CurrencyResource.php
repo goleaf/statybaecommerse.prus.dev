@@ -11,22 +11,21 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-
-use Filament\Forms\Form;
 
 final class CurrencyResource extends Resource
 {
@@ -115,7 +114,7 @@ final class CurrencyResource extends Resource
                                 ->label(__('currencies.symbol_position'))
                                 ->options([
                                     'before' => __('currencies.positions.before'),
-                                    'after' => __('currencies.positions.after'),
+                                    'after'  => __('currencies.positions.after'),
                                 ])
                                 ->default('after'),
                         ]),
@@ -338,10 +337,10 @@ final class CurrencyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCurrencies::route('/'),
+            'index'  => Pages\ListCurrencies::route('/'),
             'create' => Pages\CreateCurrency::route('/create'),
-            'view' => Pages\ViewCurrency::route('/{record}'),
-            'edit' => Pages\EditCurrency::route('/{record}/edit'),
+            'view'   => Pages\ViewCurrency::route('/{record}'),
+            'edit'   => Pages\EditCurrency::route('/{record}/edit'),
         ];
     }
 }

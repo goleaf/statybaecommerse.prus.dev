@@ -6,7 +6,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Support\Contracts\Entities\CategoryContract;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use App\Traits\HandlesContentNegotiation;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -33,7 +38,9 @@ final class CategoryController extends Controller
             return empty($category->name) || ! $category->is_visible || empty($category->slug);
         });
 
-        return $this->handleCategoryContentNegotiation($request, $categories);
+        $payload = CategoryContract::forCollection($categories, ['context' => 'tree']);
+
+        return $this->respondWithContract($request, $payload);
     }
 
     /**
@@ -41,17 +48,47 @@ final class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse|View|Response
     {
-        $perPage = min((int) $request->get('per_page', 20), 100);
-        $search = $request->get('search');
-        $query = Category::query()->where('is_visible', true)->withCount('products');
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-        $categories = $query->orderBy('sort_order')->orderBy('name')->paginate($perPage);
+        $definition = new ListQueryDefinition(
+            filters: [
+                'search' => [
+                    'type' => 'string',
+                    'callback' => static function (Builder $builder, string $term): void {
+                        $builder->where(function (Builder $query) use ($term): void {
+                            $query->where('name', 'like', "%{$term}%")
+                                ->orWhere('description', 'like', "%{$term}%");
+                        });
+                    },
+                ],
+            ],
+            sortable: [
+                'name' => ['column' => 'categories.name'],
+                'sort_order' => ['column' => 'categories.sort_order'],
+            ],
+            defaultSort: 'sort_order',
+            defaultDirection: 'asc',
+            defaultPerPage: 20,
+            maxPerPage: 100,
+        );
 
-        return $this->handleCategoryContentNegotiation($request, $categories);
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
+        $query = Category::query()->where('is_visible', true)->withCount('products');
+        $listQuery->applyFilters($query);
+        $listQuery->applySorts($query);
+
+        if (! $listQuery->hasSort('sort_order')) {
+            $query->orderBy('sort_order');
+        }
+
+        if (! $listQuery->hasSort('name')) {
+            $query->orderBy('name');
+        }
+
+        $categories = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
+
+        $payload = CategoryContract::forCollection($categories, ListResponse::meta($listQuery, $categories));
+
+        return $this->respondWithContract($request, $payload);
     }
 
     /**
@@ -60,10 +97,8 @@ final class CategoryController extends Controller
     public function show(Request $request, Category $category): JsonResponse|View|Response
     {
         $category->load(['children', 'parent']);
-        $data = ['category' => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'parent' => $category->parent ? ['id' => $category->parent->id, 'name' => $category->parent->name, 'slug' => $category->parent->slug] : null, 'children' => $category->children->map(function ($child) {
-            return ['id' => $child->id, 'name' => $child->name, 'slug' => $child->slug, 'description' => $child->description];
-        })->toArray(), 'url' => route('category.show', $category->slug), 'product_count' => $category->products_count ?? 0]];
+        $payload = CategoryContract::forCategory($category);
 
-        return $this->handleContentNegotiation($request, $data);
+        return $this->respondWithContract($request, $payload);
     }
 }

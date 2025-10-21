@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -11,19 +13,18 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * RecommendationCacheResource
@@ -62,9 +63,9 @@ final class RecommendationCacheResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.recommendation_caches.basic_information'))
+                Section::make(__('admin.recommendation_caches.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('cache_key')
                                     ->label(__('admin.recommendation_caches.cache_key'))
@@ -98,7 +99,7 @@ final class RecommendationCacheResource extends Resource
                                     ->default([])
                                     ->columnSpanFull(),
                             ]),
-                        DateTimePicker::make('expires_at')
+                        Flatpickr::makeDateTime('expires_at')
                             ->label(__('admin.recommendation_caches.expires_at'))
                             ->required()
                             ->default(now()->addHours(24)),
@@ -119,6 +120,10 @@ final class RecommendationCacheResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('block.name')
@@ -136,6 +141,10 @@ final class RecommendationCacheResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 30 ? $state : null;
                     }),
@@ -174,9 +183,9 @@ final class RecommendationCacheResource extends Resource
                     ->label(__('admin.recommendation_caches.context_type'))
                     ->options([
                         'homepage' => 'Homepage',
-                        'product' => 'Product',
+                        'product'  => 'Product',
                         'category' => 'Category',
-                        'cart' => 'Cart',
+                        'cart'     => 'Cart',
                         'checkout' => 'Checkout',
                     ]),
             ])
@@ -202,10 +211,10 @@ final class RecommendationCacheResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationCaches::route('/'),
+            'index'  => Pages\ListRecommendationCaches::route('/'),
             'create' => Pages\CreateRecommendationCache::route('/create'),
-            'view' => Pages\ViewRecommendationCache::route('/{record}'),
-            'edit' => Pages\EditRecommendationCache::route('/{record}/edit'),
+            'view'   => Pages\ViewRecommendationCache::route('/{record}'),
+            'edit'   => Pages\EditRecommendationCache::route('/{record}/edit'),
         ];
     }
 }

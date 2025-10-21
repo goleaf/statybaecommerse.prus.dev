@@ -21,7 +21,7 @@ class OrderShippingResourceTest extends TestCase
 
         // Create test user with admin role
         $this->user = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -48,16 +48,16 @@ class OrderShippingResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $orderShippingData = [
-            'order_id' => $this->order->id,
-            'carrier_name' => 'DHL',
-            'service' => 'Express',
-            'tracking_number' => 'TRK123456789',
-            'tracking_url' => 'https://www.dhl.com/track/TRK123456789',
-            'shipped_at' => now(),
+            'order_id'           => $this->order->id,
+            'carrier_name'       => 'DHL',
+            'service'            => 'Express',
+            'tracking_number'    => 'TRK123456789',
+            'tracking_url'       => 'https://www.dhl.com/track/TRK123456789',
+            'shipped_at'         => now(),
             'estimated_delivery' => now()->addDays(3),
-            'weight' => 1.5,
-            'cost' => 15.99,
-            'dimensions' => '30x20x10',
+            'weight'             => 1.5,
+            'total_cost'         => 15.99,
+            'dimensions'         => '30x20x10',
         ];
 
         Livewire::test(\App\Filament\Resources\OrderShippingResource\Pages\CreateOrderShipping::class)
@@ -66,9 +66,9 @@ class OrderShippingResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_shippings', [
-            'order_id' => $this->order->id,
-            'carrier_name' => 'DHL',
-            'service' => 'Express',
+            'order_id'        => $this->order->id,
+            'carrier_name'    => 'DHL',
+            'service'         => 'Express',
             'tracking_number' => 'TRK123456789',
         ]);
     }
@@ -88,26 +88,26 @@ class OrderShippingResourceTest extends TestCase
     public function test_can_edit_order_shipping(): void
     {
         $orderShipping = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'     => $this->order->id,
             'carrier_name' => 'DHL',
-            'service' => 'Express',
+            'service'      => 'Express',
         ]);
 
         $this->actingAs($this->user);
 
         Livewire::test(\App\Filament\Resources\OrderShippingResource\Pages\EditOrderShipping::class, ['record' => $orderShipping->id])
             ->fillForm([
-                'carrier_name' => 'FedEx',
-                'service' => 'Standard',
+                'carrier_name'    => 'FedEx',
+                'service'         => 'Standard',
                 'tracking_number' => 'TRK987654321',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_shippings', [
-            'id' => $orderShipping->id,
-            'carrier_name' => 'FedEx',
-            'service' => 'Standard',
+            'id'              => $orderShipping->id,
+            'carrier_name'    => 'FedEx',
+            'service'         => 'Standard',
             'tracking_number' => 'TRK987654321',
         ]);
     }
@@ -146,12 +146,12 @@ class OrderShippingResourceTest extends TestCase
     public function test_can_filter_order_shippings_by_carrier(): void
     {
         $orderShipping1 = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'     => $this->order->id,
             'carrier_name' => 'DHL',
         ]);
 
         $orderShipping2 = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'     => $this->order->id,
             'carrier_name' => 'FedEx',
         ]);
 
@@ -166,12 +166,12 @@ class OrderShippingResourceTest extends TestCase
     public function test_can_search_order_shippings_by_tracking_number(): void
     {
         $orderShipping1 = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'        => $this->order->id,
             'tracking_number' => 'TRK123456789',
         ]);
 
         $orderShipping2 = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'        => $this->order->id,
             'tracking_number' => 'TRK987654321',
         ]);
 
@@ -203,7 +203,7 @@ class OrderShippingResourceTest extends TestCase
     public function test_can_bulk_mark_order_shippings_as_shipped(): void
     {
         $orderShippings = OrderShipping::factory()->count(3)->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'shipped_at' => null,
         ]);
 
@@ -227,7 +227,7 @@ class OrderShippingResourceTest extends TestCase
     public function test_can_bulk_mark_order_shippings_as_delivered(): void
     {
         $orderShippings = OrderShipping::factory()->count(3)->create([
-            'order_id' => $this->order->id,
+            'order_id'     => $this->order->id,
             'delivered_at' => null,
         ]);
 
@@ -251,12 +251,12 @@ class OrderShippingResourceTest extends TestCase
     public function test_can_filter_order_shippings_by_shipped_date(): void
     {
         $shippedShipping = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'shipped_at' => now()->subDays(5),
         ]);
 
         $notShippedShipping = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'shipped_at' => null,
         ]);
 
@@ -264,7 +264,7 @@ class OrderShippingResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderShippingResource\Pages\ListOrderShippings::class)
             ->filterTable('shipped_at', [
-                'shipped_from' => now()->subDays(10)->format('Y-m-d H:i:s'),
+                'shipped_from'  => now()->subDays(10)->format('Y-m-d H:i:s'),
                 'shipped_until' => now()->subDays(1)->format('Y-m-d H:i:s'),
             ])
             ->assertCanSeeTableRecords([$shippedShipping])
@@ -274,12 +274,12 @@ class OrderShippingResourceTest extends TestCase
     public function test_can_sort_order_shippings_by_created_at(): void
     {
         $orderShipping1 = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'created_at' => now()->subDays(2),
         ]);
 
         $orderShipping2 = OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -304,7 +304,7 @@ class OrderShippingResourceTest extends TestCase
             ->assertTableColumnExists('shipped_at')
             ->assertTableColumnExists('estimated_delivery')
             ->assertTableColumnExists('delivered_at')
-            ->assertTableColumnExists('cost')
+            ->assertTableColumnExists('total_cost')
             ->assertTableColumnExists('created_at');
     }
 }

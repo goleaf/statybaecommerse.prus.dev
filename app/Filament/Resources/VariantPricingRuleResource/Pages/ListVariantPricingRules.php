@@ -6,9 +6,9 @@ namespace App\Filament\Resources\VariantPricingRuleResource\Pages;
 
 use App\Filament\Resources\VariantPricingRuleResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListVariantPricingRules extends ListRecords
+final class ListVariantPricingRules extends BaseListRecords
 {
     protected static string $resource = VariantPricingRuleResource::class;
 
