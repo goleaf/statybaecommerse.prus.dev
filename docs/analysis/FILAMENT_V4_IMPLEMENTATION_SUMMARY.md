@@ -90,6 +90,12 @@
 - ✅ **Navigation Groups**: Organized admin menu structure
 - ✅ **Resource Management**: Comprehensive admin interface
 
+### Spatie Translatable
+
+- **Plugin registration**: The `lara-zeus/spatie-translatable` plugin is registered inside `App\Providers\Filament\AdminPanelProvider`. When the class exists, the provider pulls locale codes from `config('shared.localization.supported_locales')`, feeds them into `SpatieTranslatablePlugin::make()`, and calls `->persist()` so every administrator returns to their last active editing language.
+- **Persisted locale behaviour**: Persistence keeps the selected locale alive across Livewire requests, page changes, and future sign-ins. Preferences are stored per Filament user; clearing browser storage or removing the plugin simply falls back to the configured default locale.
+- **Resource & page integration**: Resources exposing translated attributes should `use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable` (aliased to `SpatieTranslatableResource` in resource classes) and pair their page classes with the corresponding concerns (`SpatieTranslatableCreateRecord`, `SpatieTranslatableEditRecord`, `SpatieTranslatableListRecords`, `SpatieTranslatableViewRecord`). Layer these on top of the project-specific `InteractsWithTranslationTabs` or `ManagesNewsTranslationTabs` traits so locale switchers, translation tabs, and persistence hooks stay in sync.
+
 #### **Planned Enhancements**
 - 🔄 **Relation Managers**: Advanced relationship management
 - 🔄 **Dashboard Widgets**: Analytics and statistics widgets
