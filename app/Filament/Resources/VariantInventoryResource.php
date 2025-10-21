@@ -11,7 +11,6 @@ use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\ProductVariantSearch;
-use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -19,9 +18,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -54,7 +53,10 @@ final class VariantInventoryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'variant_id';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    /**
+     * @var string|\BackedEnum|null Explicit navigation icon definition for inventory context.
+     */
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
@@ -73,195 +75,171 @@ final class VariantInventoryResource extends Resource
         return __('admin.variant_inventory.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make(__('admin.variant_inventory.basic_information'))
+                    ->columns(2)
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                SearchableInput::make('variant_id')
-                                    ->label(__('admin.variant_inventory.variant'))
-                                    ->placeholder(__('admin.variant_inventory.variant_placeholder'))
-                                    ->required()
-                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
+                        SearchableInput::make('variant_id')
+                            ->label(__('admin.variant_inventory.variant'))
+                            ->placeholder(__('admin.variant_inventory.variant_placeholder'))
+                            ->required()
+                            ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                            ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                            ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                if ($state === null) {
+                                    return;
+                                }
 
-                                        $variant = ProductVariant::query()
-                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                            ->with(['product:id,sku,name'])
-                                            ->find($state);
+                                $variant = ProductVariant::query()
+                                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                    ->with(['product:id,sku,name'])
+                                    ->find($state);
 
-                                        if (! $variant instanceof ProductVariant) {
-                                            return;
-                                        }
+                                if (! $variant instanceof ProductVariant) {
+                                    return;
+                                }
 
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
-                                            ]);
-                                    })
-                                    ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
-                                    }),
-                                SearchableInput::make('location_id')
-                                    ->label(__('admin.variant_inventory.location'))
-                                    ->placeholder(__('admin.variant_inventory.location_placeholder'))
-                                    ->required()
-                                    ->searchUsing(fn (string $value): array => LocationSearch::results($value))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
+                                $component
+                                    ->state((string) $state)
+                                    ->options([
+                                        (string) $variant->getKey() => ProductVariantSearch::label($variant),
+                                    ]);
+                            })
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
+                            }),
+                        SearchableInput::make('location_id')
+                            ->label(__('admin.variant_inventory.location'))
+                            ->placeholder(__('admin.variant_inventory.location_placeholder'))
+                            ->required()
+                            ->searchUsing(fn (string $value): array => LocationSearch::results($value))
+                            ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                            ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                if ($state === null) {
+                                    return;
+                                }
 
-                                        $location = Location::query()
-                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                            ->find($state);
+                                $location = Location::query()
+                                    ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                    ->find($state);
 
-                                        if (! $location instanceof Location) {
-                                            return;
-                                        }
+                                if (! $location instanceof Location) {
+                                    return;
+                                }
 
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $location->getKey() => LocationSearch::label($location),
-                                            ]);
-                                    })
-                                    ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
-                                    }),
-                            ]),
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('warehouse_code')
-                                    ->label(__('admin.variant_inventory.warehouse_code'))
-                                    ->maxLength(50),
-                                TextInput::make('batch_number')
-                                    ->label(__('admin.variant_inventory.batch_number'))
-                                    ->maxLength(100),
-                            ]),
+                                $component
+                                    ->state((string) $state)
+                                    ->options([
+                                        (string) $location->getKey() => LocationSearch::label($location),
+                                    ]);
+                            })
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
+                            }),
+                        TextInput::make('warehouse_code')
+                            ->label(__('admin.variant_inventory.warehouse_code'))
+                            ->maxLength(50),
+                        TextInput::make('batch_number')
+                            ->label(__('admin.variant_inventory.batch_number'))
+                            ->maxLength(100),
                     ]),
                 Section::make(__('admin.variant_inventory.stock_levels'))
+                    ->columns(3)
                     ->schema([
-                        Grid::make(3)
-                            ->schema([
-                                TextInput::make('stock')
-                                    ->label(__('admin.variant_inventory.stock'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0),
-                                TextInput::make('reserved')
-                                    ->label(__('admin.variant_inventory.reserved'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0),
-                                TextInput::make('available')
-                                    ->label(__('admin.variant_inventory.available'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0),
-                            ]),
-                        Grid::make(3)
-                            ->schema([
-                                TextInput::make('incoming')
-                                    ->label(__('admin.variant_inventory.incoming'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0),
-                                TextInput::make('threshold')
-                                    ->label(__('admin.variant_inventory.threshold'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0),
-                                TextInput::make('reorder_point')
-                                    ->label(__('admin.variant_inventory.reorder_point'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0),
-                            ]),
+                        TextInput::make('stock')
+                            ->label(__('admin.variant_inventory.stock'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
+                        TextInput::make('reserved')
+                            ->label(__('admin.variant_inventory.reserved'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
+                        TextInput::make('available')
+                            ->label(__('admin.variant_inventory.available'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
+                        TextInput::make('incoming')
+                            ->label(__('admin.variant_inventory.incoming'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
+                        TextInput::make('threshold')
+                            ->label(__('admin.variant_inventory.threshold'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
+                        TextInput::make('reorder_point')
+                            ->label(__('admin.variant_inventory.reorder_point'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
                     ]),
                 Section::make(__('admin.variant_inventory.pricing'))
+                    ->columns(2)
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('cost_per_unit')
-                                    ->label(__('admin.variant_inventory.cost_per_unit'))
-                                    ->numeric()
-                                    ->step(0.01)
-                                    ->prefix('€'),
-                                TextInput::make('reorder_quantity')
-                                    ->label(__('admin.variant_inventory.reorder_quantity'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0),
-                            ]),
-                        Grid::make(2)
-                            ->schema([
-                                Flatpickr::makeDate('expiry_date')
-                                    ->label(__('admin.variant_inventory.expiry_date')),
-                                TextInput::make('supplier_id')
-                                    ->label(__('admin.variant_inventory.supplier_id'))
-                                    ->numeric(),
-                            ]),
+                        TextInput::make('cost_per_unit')
+                            ->label(__('admin.variant_inventory.cost_per_unit'))
+                            ->numeric()
+                            ->step(0.01)
+                            ->prefix('€'),
+                        TextInput::make('reorder_quantity')
+                            ->label(__('admin.variant_inventory.reorder_quantity'))
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0),
+                        Flatpickr::makeDate('expiry_date')
+                            ->label(__('admin.variant_inventory.expiry_date')),
+                        TextInput::make('supplier_id')
+                            ->label(__('admin.variant_inventory.supplier_id'))
+                            ->numeric(),
                     ]),
                 Section::make(__('admin.variant_inventory.additional_info'))
+                    ->columns(2)
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Toggle::make('is_tracked')
-                                    ->label(__('admin.variant_inventory.is_tracked'))
-                                    ->default(true),
-                                Select::make('status')
-                                    ->label(__('admin.variant_inventory.status'))
-                                    ->options([
-                                        'active'       => __('admin.variant_inventory.status_active'),
-                                        'inactive'     => __('admin.variant_inventory.status_inactive'),
-                                        'discontinued' => __('admin.variant_inventory.status_discontinued'),
-                                    ])
-                                    ->default('active'),
-                            ]),
-                        Grid::make(1)
-                            ->schema([
-                                Textarea::make('notes')
-                                    ->label(__('admin.variant_inventory.notes'))
-                                    ->rows(3),
-                            ]),
-                        Grid::make(2)
-                            ->schema([
-                                Flatpickr::makeDate('last_restocked_at')
-                                    ->label(__('admin.variant_inventory.last_restocked_at')),
-                                Flatpickr::makeDate('last_sold_at')
-                                    ->label(__('admin.variant_inventory.last_sold_at')),
-                            ]),
+                        Toggle::make('is_tracked')
+                            ->label(__('admin.variant_inventory.is_tracked'))
+                            ->default(true),
+                        Select::make('status')
+                            ->label(__('admin.variant_inventory.status'))
+                            ->options([
+                                'active'       => __('admin.variant_inventory.status_active'),
+                                'inactive'     => __('admin.variant_inventory.status_inactive'),
+                                'discontinued' => __('admin.variant_inventory.status_discontinued'),
+                            ])
+                            ->default('active'),
+                        Textarea::make('notes')
+                            ->label(__('admin.variant_inventory.notes'))
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        Flatpickr::makeDate('last_restocked_at')
+                            ->label(__('admin.variant_inventory.last_restocked_at')),
+                        Flatpickr::makeDate('last_sold_at')
+                            ->label(__('admin.variant_inventory.last_sold_at')),
                     ]),
                 Section::make(__('admin.variant_inventory.calculated_fields'))
+                    ->columns(3)
                     ->schema([
-                        Grid::make(3)
-                            ->schema([
-                                Placeholder::make('is_low_stock')
-                                    ->label(__('admin.variant_inventory.is_low_stock'))
-                                    ->content(fn (?VariantInventory $record): string => $record ? ($record->is_low_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
-                                Placeholder::make('is_out_of_stock')
-                                    ->label(__('admin.variant_inventory.is_out_of_stock'))
-                                    ->content(fn (?VariantInventory $record): string => $record ? ($record->is_out_of_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
-                                Placeholder::make('stock_status')
-                                    ->label(__('admin.variant_inventory.stock_status'))
-                                    ->content(fn (?VariantInventory $record): string => $record ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
-                            ]),
+                        Placeholder::make('is_low_stock')
+                            ->label(__('admin.variant_inventory.is_low_stock'))
+                            ->content(fn (?VariantInventory $record): string => $record ? ($record->is_low_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
+                        Placeholder::make('is_out_of_stock')
+                            ->label(__('admin.variant_inventory.is_out_of_stock'))
+                            ->content(fn (?VariantInventory $record): string => $record ? ($record->is_out_of_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
+                        Placeholder::make('stock_status')
+                            ->label(__('admin.variant_inventory.stock_status'))
+                            ->content(fn (?VariantInventory $record): string => $record ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
                     ])
-                    ->visible(fn (?VariantInventory $record): bool => $record !== null),
+                    ->hidden(fn (?VariantInventory $record): bool => $record === null),
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -338,7 +316,7 @@ final class VariantInventoryResource extends Resource
                     ->toggleable(),
                 TextColumn::make('utilization_percentage')
                     ->label(__('admin.variant_inventory.utilization_percentage'))
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->formatStateUsing(fn (float|int|null $state): string => self::formatPercentage($state))
                     ->color(fn ($state) => $state > 80 ? 'warning' : 'success')
                     ->toggleable(),
                 TextColumn::make('last_restocked_at')
@@ -573,6 +551,15 @@ final class VariantInventoryResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * Provide a reusable percentage formatter for table output to keep display consistent.
+     */
+    protected static function formatPercentage(float|int|null $value): string
+    {
+        // Guard against null while preserving decimal precision for inventory metrics.
+        return number_format((float) $value, 2) . '%';
     }
 
     public static function getRelations(): array
