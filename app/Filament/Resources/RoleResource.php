@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RoleResource\MatrixFactory;
+use App\Support\Forms\MatrixFactory;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Role;
 use App\Support\Authorization\AuthorizationMatrix;
@@ -110,7 +110,12 @@ final class RoleResource extends Resource
                             ->native(false),
                     ])
                     ->columns(2),
-                MatrixFactory::permissions(),
+                MatrixFactory::permissions(
+                    definition: self::matrixDefinition(),
+                    moduleLabelResolver: fn (string $module): string => self::moduleLabel($module),
+                    abilityLabelResolver: fn (string $ability): string => self::abilityLabel($ability),
+                    sectionLabel: __('roles.sections.permissions'),
+                ),
             ]);
     }
 
