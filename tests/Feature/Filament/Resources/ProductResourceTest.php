@@ -59,6 +59,16 @@ final class ProductResourceTest extends TestCase
             ->assertSee('Alpha Product');
     }
 
+    /**
+     * Ensure the new inline chart column is registered on the product list table.
+     */
+    public function test_list_page_includes_sales_sparkline_column(): void
+    {
+        Livewire::test(ListProducts::class)
+            ->call('loadTable')
+            ->assertTableColumnExists('sales_sparkline');
+    }
+
     public function test_can_create_product_via_filament_form(): void
     {
         Livewire::test(CreateProduct::class)

@@ -50,6 +50,7 @@ return [
     'verified'     => 'Patvirtintas',
     'unverified'   => 'Nepatvirtintas',
     'orders_count' => 'Užsakymų skaičius',
+    'orders_trend' => 'Užsakymų dinamika',
     'total_spent'  => 'Išleista iš viso',
     'created_at'   => 'Sukurta',
     'updated_at'   => 'Atnaujinta',
@@ -86,4 +87,7 @@ return [
     'bulk_verified_success'    => 'Sėkmingai patvirtinti pasirinkti įrašai',
     'bulk_activated_success'   => 'Sėkmingai aktyvuoti pasirinkti įrašai',
     'bulk_deactivated_success' => 'Sėkmingai deaktyvuoti pasirinkti įrašai',
+    'sparkline' => [
+        'orders_label' => 'Užsakymai per paskutines :days dienas',
+    ],
 ];

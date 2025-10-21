@@ -50,6 +50,7 @@ return [
     'verified'     => 'Verifiziert',
     'unverified'   => 'Nicht verifiziert',
     'orders_count' => 'Bestellanzahl',
+    'orders_trend' => 'Bestelltrend',
     'total_spent'  => 'Insgesamt ausgegeben',
     'created_at'   => 'Erstellt am',
     'updated_at'   => 'Aktualisiert am',
@@ -86,4 +87,7 @@ return [
     'bulk_verified_success'    => 'Ausgewählte Einträge erfolgreich verifiziert',
     'bulk_activated_success'   => 'Ausgewählte Einträge erfolgreich aktiviert',
     'bulk_deactivated_success' => 'Ausgewählte Einträge erfolgreich deaktiviert',
+    'sparkline' => [
+        'orders_label' => 'Bestellungen der letzten :days Tage',
+    ],
 ];
