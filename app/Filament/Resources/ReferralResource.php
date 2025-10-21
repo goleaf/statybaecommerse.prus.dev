@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
 use BackedEnum;
@@ -11,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -67,9 +67,9 @@ final class ReferralResource extends Resource
                                 'cancelled' => 'Cancelled',
                             ])
                             ->required(),
-                        DatePicker::make('completed_at')
+                        Flatpickr::make('completed_at')->datePicker()
                             ->nullable(),
-                        DatePicker::make('expires_at')
+                        Flatpickr::make('expires_at')->datePicker()
                             ->nullable(),
                         TextInput::make('source')
                             ->maxLength(255)

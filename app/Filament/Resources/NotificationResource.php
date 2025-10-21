@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use BackedEnum;
@@ -11,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -96,7 +96,7 @@ final class NotificationResource extends Resource
                                 ->label(__('admin.notifications.form.fields.is_read'))
                                 ->default(false)
                                 ->columnSpan(1),
-                            DateTimePicker::make('read_at')
+                            Flatpickr::make('read_at')->dateTimePicker()
                                 ->label(__('admin.notifications.form.fields.read_at'))
                                 ->columnSpan(1),
                         ]),

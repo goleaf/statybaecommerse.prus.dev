@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\CouponUsage;
 use App\Support\Search\CouponSearch;
@@ -13,7 +14,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -128,7 +128,7 @@ final class CouponUsageResource extends Resource
                                                 ->prefix('€')
                                                 ->required(),
                                         ]),
-                                    DateTimePicker::make('used_at')
+                                    Flatpickr::make('used_at')->dateTimePicker()
                                         ->label(__('admin.coupon_usages.form.fields.used_at'))
                                         ->required()
                                         ->default(now())
@@ -214,8 +214,8 @@ final class CouponUsageResource extends Resource
                 Filter::make('used_at_range')
                     ->label(__('admin.coupon_usages.filters.used_at'))
                     ->form([
-                        DateTimePicker::make('from')->label(__('admin.coupon_usages.filters.used_at_from')),
-                        DateTimePicker::make('until')->label(__('admin.coupon_usages.filters.used_at_until')),
+                        Flatpickr::make('from')->dateTimePicker()->label(__('admin.coupon_usages.filters.used_at_from')),
+                        Flatpickr::make('until')->dateTimePicker()->label(__('admin.coupon_usages.filters.used_at_until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))

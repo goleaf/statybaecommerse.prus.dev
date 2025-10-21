@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -89,10 +89,10 @@ final class AnalyticsResource extends Resource
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        DatePicker::make('created_from')
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('analytics.from_date'))
                             ->placeholder(__('analytics.from_date')),
-                        DatePicker::make('created_until')
+                        Flatpickr::make('created_until')->datePicker()
                             ->label(__('analytics.until_date'))
                             ->placeholder(__('analytics.until_date')),
                     ])

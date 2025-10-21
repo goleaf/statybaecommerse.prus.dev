@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers\AddressesRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManager;
@@ -11,7 +12,6 @@ use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationMan
 use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
 use Filament\Actions\Action;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
@@ -343,9 +343,9 @@ final class CountryResource extends Resource
                     ->searchable(),
                 Filter::make('created_at')
                     ->form([
-                        DatePicker::make('created_from')
+                        Flatpickr::make('created_from')->datePicker()
                             ->label('Created from'),
-                        DatePicker::make('created_until')
+                        Flatpickr::make('created_until')->datePicker()
                             ->label('Created until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

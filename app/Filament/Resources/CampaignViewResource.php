@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CampaignViewResource\Pages;
 use App\Models\CampaignView;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -80,7 +80,7 @@ final class CampaignViewResource extends Resource
                                 TextInput::make('session_id')
                                     ->label(__('campaign_views.session_id'))
                                     ->maxLength(255),
-                                DateTimePicker::make('viewed_at')
+                                Flatpickr::make('viewed_at')->dateTimePicker()
                                     ->label(__('campaign_views.viewed_at'))
                                     ->seconds(false)
                                     ->required(),

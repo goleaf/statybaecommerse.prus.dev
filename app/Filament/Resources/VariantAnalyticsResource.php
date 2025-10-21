@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
+use App\Support\DateRange;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use BackedEnum;
@@ -13,7 +15,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -95,7 +96,7 @@ final class VariantAnalyticsResource extends Resource
                                                             }
                                                         }
                                                     }),
-                                                DatePicker::make('date')
+                                                Flatpickr::make('date')->datePicker()
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
                                                     ->default(now())
@@ -383,14 +384,11 @@ final class VariantAnalyticsResource extends Resource
                     ->label(__('admin.variant_analytics.date')),
                 Filter::make('date_range')
                     ->form([
-                        DatePicker::make('date_from')
-                            ->label(__('admin.variant_analytics.date_from')),
-                        DatePicker::make('date_until')
-                            ->label(__('admin.variant_analytics.date_until')),
+                        Flatpickr::make('date_from')->dateRangePicker()
+                            ->label(sprintf('%s / %s', __('admin.variant_analytics.date_from'), __('admin.variant_analytics.date_until'))),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        $dateFrom = $data['date_from'] ?? null;
-                        $dateUntil = $data['date_until'] ?? null;
+                        [$dateFrom, $dateUntil] = DateRange::extract($data, 'date_from', 'date_until');
 
                         return $query
                             ->when(

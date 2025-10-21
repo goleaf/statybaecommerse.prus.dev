@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
@@ -11,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -67,7 +67,7 @@ final class ReferralCodeStatisticsResource extends Resource
                                     ->options(ReferralCode::pluck('code', 'id'))
                                     ->required()
                                     ->searchable(),
-                                DatePicker::make('date')
+                                Flatpickr::make('date')->datePicker()
                                     ->label(__('admin.referral_code_statistics.date'))
                                     ->required()
                                     ->default(now()),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Forms;
 use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
@@ -37,7 +38,7 @@ class UserRelationManager extends BaseRelationManager
                         Forms\Components\TextInput::make('phone')
                             ->tel()
                             ->maxLength(255),
-                        Forms\Components\DateTimePicker::make('email_verified_at')
+                        Flatpickr::make('email_verified_at')->dateTimePicker()
                             ->label('Email Verified At'),
                         Forms\Components\Select::make('status')
                             ->options([

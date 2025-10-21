@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductComparisons\Tables;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -51,9 +52,9 @@ class ProductComparisonsTable
                     ->relationship('product', 'name'),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('product_comparisons.created_from')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')
+                        Flatpickr::make('created_until')->datePicker()
                             ->label(__('product_comparisons.created_until')),
                     ])
                     ->query(function ($query, array $data) {

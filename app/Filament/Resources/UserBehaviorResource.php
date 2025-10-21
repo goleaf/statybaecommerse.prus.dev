@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\UserBehaviorResource\Pages;
 use App\Models\User;
 use App\Models\UserBehavior;
@@ -14,7 +15,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -121,7 +121,7 @@ final class UserBehaviorResource extends Resource
                             ->options(self::behaviorTypeOptions())
                             ->required()
                             ->searchable(),
-                        DateTimePicker::make('created_at')
+                        Flatpickr::make('created_at')->dateTimePicker()
                             ->label(__('admin.user_behaviors.created_at'))
                             ->default(now())
                             ->displayFormat('d/m/Y H:i:s'),
@@ -270,9 +270,9 @@ final class UserBehaviorResource extends Resource
                     ),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('admin.user_behaviors.created_from')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')
+                        Flatpickr::make('created_until')->datePicker()
                             ->label(__('admin.user_behaviors.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

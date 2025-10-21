@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\OrderShipping;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -117,14 +117,14 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('shipped_at')
+                                Flatpickr::make('shipped_at')->dateTimePicker()
                                     ->label(__('orders.shipped_at')),
-                                DateTimePicker::make('estimated_delivery')
+                                Flatpickr::make('estimated_delivery')->dateTimePicker()
                                     ->label(__('orders.estimated_delivery')),
                             ]),
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('delivered_at')
+                                Flatpickr::make('delivered_at')->dateTimePicker()
                                     ->label(__('orders.delivered_at')),
                                 TextInput::make('delivery_notes')
                                     ->label(__('orders.delivery_notes'))

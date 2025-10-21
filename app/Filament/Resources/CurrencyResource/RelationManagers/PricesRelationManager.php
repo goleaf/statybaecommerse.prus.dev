@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -55,8 +56,8 @@ final class PricesRelationManager extends BaseRelationManager
                         'wholesale' => 'Wholesale',
                     ])
                     ->default('regular'),
-                Forms\Components\DateTimePicker::make('starts_at'),
-                Forms\Components\DateTimePicker::make('ends_at'),
+                Flatpickr::make('starts_at')->dateTimePicker(),
+                Flatpickr::make('ends_at')->dateTimePicker(),
                 Forms\Components\Toggle::make('is_enabled')
                     ->default(true),
                 Forms\Components\KeyValue::make('metadata')

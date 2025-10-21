@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
 use BackedEnum;
@@ -13,7 +14,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -100,10 +100,10 @@ final class ReferralRewardResource extends Resource
                                 'cancelled' => __('referral_rewards.status.cancelled'),
                             ])
                             ->required(),
-                        DatePicker::make('applied_at')
+                        Flatpickr::make('applied_at')->datePicker()
                             ->label(__('referral_rewards.fields.applied_at'))
                             ->nullable(),
-                        DatePicker::make('expires_at')
+                        Flatpickr::make('expires_at')->datePicker()
                             ->label(__('referral_rewards.fields.expires_at'))
                             ->nullable(),
                         TextInput::make('title')

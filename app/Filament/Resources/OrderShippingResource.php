@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
@@ -14,7 +15,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -115,11 +115,11 @@ final class OrderShippingResource extends Resource
                         ]),
                     Grid::make(3)
                         ->schema([
-                            DateTimePicker::make('shipped_at')
+                            Flatpickr::make('shipped_at')->dateTimePicker()
                                 ->label(__('admin.order_shippings.shipped_at')),
-                            DateTimePicker::make('estimated_delivery')
+                            Flatpickr::make('estimated_delivery')->dateTimePicker()
                                 ->label(__('admin.order_shippings.estimated_delivery')),
-                            DateTimePicker::make('delivered_at')
+                            Flatpickr::make('delivered_at')->dateTimePicker()
                                 ->label(__('admin.order_shippings.delivered_at')),
                         ]),
                     Grid::make(3)
@@ -242,9 +242,9 @@ final class OrderShippingResource extends Resource
                 Filter::make('shipped_at')
                     ->label(__('admin.order_shippings.shipped_at'))
                     ->form([
-                        DateTimePicker::make('shipped_from')
+                        Flatpickr::make('shipped_from')->dateTimePicker()
                             ->label(__('admin.order_shippings.shipped_from')),
-                        DateTimePicker::make('shipped_until')
+                        Flatpickr::make('shipped_until')->dateTimePicker()
                             ->label(__('admin.order_shippings.shipped_until')),
                     ])
                     ->query(function ($query, array $data) {

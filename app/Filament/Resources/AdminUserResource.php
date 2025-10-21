@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\AdminUserResource\Pages;
 use App\Models\AdminUser;
 use BackedEnum;
@@ -13,7 +14,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
@@ -171,9 +171,9 @@ final class AdminUserResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.admin_users.filters.created_at'))
                     ->form([
-                        DatePicker::make('from')
+                        Flatpickr::make('from')->datePicker()
                             ->label(__('admin.admin_users.filters.created_from')),
-                        DatePicker::make('until')
+                        Flatpickr::make('until')->datePicker()
                             ->label(__('admin.admin_users.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

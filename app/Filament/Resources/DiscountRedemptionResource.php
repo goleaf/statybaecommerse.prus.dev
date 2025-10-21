@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\DiscountRedemptionResource\Pages;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\CodeRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\DiscountRelationManager;
@@ -12,7 +13,6 @@ use App\Models\DiscountRedemption;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -118,7 +118,7 @@ final class DiscountRedemptionResource extends Resource
                                 ->default('pending')
                                 ->required(),
                         ]),
-                    DateTimePicker::make('redeemed_at')
+                    Flatpickr::make('redeemed_at')->dateTimePicker()
                         ->label(__('discount_redemptions.fields.redeemed_at'))
                         ->seconds(false)
                         ->displayFormat('Y-m-d H:i')
@@ -218,9 +218,9 @@ final class DiscountRedemptionResource extends Resource
                     ]),
                 Filter::make('redeemed_range')
                     ->form([
-                        DateTimePicker::make('from')
+                        Flatpickr::make('from')->dateTimePicker()
                             ->label(__('discount_redemptions.filters.redeemed_from')),
-                        DateTimePicker::make('until')
+                        Flatpickr::make('until')->dateTimePicker()
                             ->label(__('discount_redemptions.filters.redeemed_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

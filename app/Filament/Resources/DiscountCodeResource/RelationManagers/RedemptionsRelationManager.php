@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -38,7 +39,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
                     ->numeric()
                     ->prefix('€')
                     ->required(),
-                Forms\Components\DateTimePicker::make('redeemed_at')
+                Flatpickr::make('redeemed_at')->dateTimePicker()
                     ->label(__('Redeemed At'))
                     ->default(now())
                     ->required(),
