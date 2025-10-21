@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages;
 use App\Models\RecommendationAnalytics;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -22,8 +23,6 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * RecommendationAnalyticsResource
@@ -43,7 +42,7 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Analytics';
     }
