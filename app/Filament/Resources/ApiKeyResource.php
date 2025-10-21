@@ -30,7 +30,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use UnitEnum;
 
 final class ApiKeyResource extends Resource
 {
@@ -42,7 +41,8 @@ final class ApiKeyResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-key';
 
-    protected static UnitEnum|string|null $navigationGroup = null;
+    /** @var string|BackedEnum|null Using BackedEnum removes the redundant UnitEnum import for navigation grouping. */
+    protected static $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;
 

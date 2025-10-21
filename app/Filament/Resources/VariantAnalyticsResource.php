@@ -8,6 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -19,12 +20,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -44,12 +40,10 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /**
-     * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
-     */
+    /** @var string|BackedEnum|null Typed via docblock to align with Filament v4 navigation expectations. */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    /** @var string|BackedEnum|null Keep analytics grouped without redundant UnitEnum imports. */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
@@ -558,9 +552,9 @@ final class VariantAnalyticsResource extends Resource
                     ),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                Action::make('regenerate_metrics')
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('regenerate_metrics')
                     ->label(__('admin.variant_analytics.regenerate_metrics'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
@@ -573,7 +567,7 @@ final class VariantAnalyticsResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation(),
-                Action::make('duplicate')
+                Tables\Actions\Action::make('duplicate')
                     ->label(__('admin.variant_analytics.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
@@ -586,7 +580,7 @@ final class VariantAnalyticsResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Action::make('export_single')
+                Tables\Actions\Action::make('export_single')
                     ->label(__('admin.variant_analytics.export_single'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
@@ -599,9 +593,9 @@ final class VariantAnalyticsResource extends Resource
                     }),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    BulkAction::make('export_analytics')
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('export_analytics')
                         ->label(__('admin.variant_analytics.export_analytics'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('info')
@@ -613,7 +607,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    BulkAction::make('regenerate_metrics_bulk')
+                    Tables\Actions\BulkAction::make('regenerate_metrics_bulk')
                         ->label(__('admin.variant_analytics.regenerate_metrics_bulk'))
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
@@ -630,7 +624,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    BulkAction::make('duplicate_records')
+                    Tables\Actions\BulkAction::make('duplicate_records')
                         ->label(__('admin.variant_analytics.duplicate_records'))
                         ->icon('heroicon-o-document-duplicate')
                         ->color('gray')
@@ -649,7 +643,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    BulkAction::make('reset_metrics')
+                    Tables\Actions\BulkAction::make('reset_metrics')
                         ->label(__('admin.variant_analytics.reset_metrics'))
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('danger')
