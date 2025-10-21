@@ -8,6 +8,7 @@ use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 use App\Models\Scopes\ActiveScope;
 use App\Models\SystemSettingCategory;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -16,16 +17,17 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -33,9 +35,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 /**
  * SystemSettingCategoryResource
@@ -46,7 +47,7 @@ final class SystemSettingCategoryResource extends Resource
 {
     protected static ?string $model = SystemSettingCategory::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
         return 'System';
     }
@@ -84,28 +85,40 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                SchemaSection::make(__('system_setting_categories.basic_information'))
+                Section::make(__('system_setting_categories.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('system_setting_categories.name'))
                                     ->required()
                                     ->maxLength(255)
                                     ->live()
-                                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state)))
+                                    ->afterStateUpdated(static function (?string $state, Set $set): void {
+                                        // Keep the slug synchronized when administrators edit the name.
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $set('slug', Str::slug($state));
+                                    })
                                     ->helperText(__('system_setting_categories.name_help')),
                                 TextInput::make('slug')
                                     ->label(__('system_setting_categories.slug'))
-                                    ->rules(fn (SchemaGet $get) => [empty($get('name')) ? 'required' : 'nullable'])
+                                    ->rules(static fn (Get $get): array => [empty($get('name')) ? 'required' : 'nullable'])
                                     ->unique(SystemSettingCategory::class, 'slug', ignoreRecord: true)
                                     // Allow empty slug; it will be generated from name on submit
                                     ->maxLength(255)
-                                    ->dehydrateStateUsing(fn ($state, callable $get) => $state ?: Str::slug((string) $get('name')))
+                                    ->dehydrateStateUsing(static function (?string $state, Get $get): string {
+                                        // Fall back to a generated slug whenever the administrator leaves it blank.
+                                        return $state !== null && $state !== ''
+                                            ? $state
+                                            : Str::slug((string) $get('name'));
+                                    })
                                     ->helperText(__('system_setting_categories.slug_help')),
                             ]),
                         Textarea::make('description')
@@ -113,9 +126,9 @@ final class SystemSettingCategoryResource extends Resource
                             ->rows(3)
                             ->helperText(__('system_setting_categories.description_help')),
                     ]),
-                SchemaSection::make(__('system_setting_categories.appearance'))
+                Section::make(__('system_setting_categories.appearance'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('icon')
                                     ->label(__('system_setting_categories.icon'))
@@ -127,19 +140,19 @@ final class SystemSettingCategoryResource extends Resource
                                     ->helperText(__('system_setting_categories.color_help')),
                             ]),
                     ]),
-                SchemaSection::make(__('system_setting_categories.hierarchy'))
+                Section::make(__('system_setting_categories.hierarchy'))
                     ->schema([
                         Select::make('parent_id')
                             ->label(__('system_setting_categories.parent'))
-                            ->relationship('parent', 'name', fn ($query) => $query->withoutGlobalScopes([\App\Models\Scopes\ActiveScope::class]))
+                            ->relationship('parent', 'name', static fn (Builder $query): Builder => $query->withoutGlobalScopes([ActiveScope::class]))
                             ->nullable()
                             ->searchable()
                             ->preload()
                             ->helperText(__('system_setting_categories.parent_help')),
                     ]),
-                SchemaSection::make(__('system_setting_categories.configuration'))
+                Section::make(__('system_setting_categories.configuration'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('sort_order')
                                     ->label(__('system_setting_categories.sort_order'))
@@ -158,10 +171,10 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([ActiveScope::class]))
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes([ActiveScope::class]))
             ->deferLoading(false)
             ->columns([
                 TextColumn::make('name')
@@ -178,15 +191,15 @@ final class SystemSettingCategoryResource extends Resource
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('icon')
                     ->label(__('system_setting_categories.icon'))
-                    ->formatStateUsing(fn ($state) => $state ?: 'heroicon-o-cog-6-tooth')
+                    ->formatStateUsing(static fn (?string $state): string => $state ?: 'heroicon-o-cog-6-tooth')
                     ->toggleable(isToggledHiddenByDefault: true),
                 ColorColumn::make('color')
                     ->label(__('system_setting_categories.color'))
@@ -234,10 +247,11 @@ final class SystemSettingCategoryResource extends Resource
                     ->label(__('system_setting_categories.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
-                    ->action(function (SystemSettingCategory $record): void {
+                    ->action(static function (SystemSettingCategory $record): void {
+                        // Duplicate the record with a predictable suffix to keep slugs unique during reviews.
                         $newRecord = $record->replicate();
-                        $newRecord->name = $record->name.' (Copy)';
-                        $newRecord->slug = $record->slug.'-copy';
+                        $newRecord->name = $record->name . ' (Copy)';
+                        $newRecord->slug = $record->slug . '-copy';
                         $newRecord->save();
 
                         Notification::make()
@@ -253,65 +267,59 @@ final class SystemSettingCategoryResource extends Resource
                         ->label(__('system_setting_categories.activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function (Collection $records): void {
-                            $ids = collect($records)
-                                ->map(function ($r) {
-                                    if ($r instanceof \App\Models\SystemSettingCategory) {
-                                        return $r->getKey();
-                                    }
-                                    if (is_array($r)) {
-                                        return $r['id'] ?? (array_values($r)[0] ?? null);
-                                    }
-
-                                    return $r;
-                                })
-                                ->filter()
-                                ->values()
-                                ->all();
-
-                            if (! empty($ids)) {
-                                \App\Models\SystemSettingCategory::withoutGlobalScopes([\App\Models\Scopes\ActiveScope::class])
-                                    ->whereIn('id', $ids)
-                                    ->update(['is_active' => true]);
-                            }
-                            Notification::make()
-                                ->title(__('system_setting_categories.activated_successfully'))
-                                ->success()
-                                ->send();
+                        ->action(static function (Collection $records): void {
+                            self::updateActivationState($records, true);
                         }),
                     BulkAction::make('deactivate')
                         ->label(__('system_setting_categories.deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('warning')
-                        ->action(function (Collection $records): void {
-                            $ids = collect($records)
-                                ->map(function ($r) {
-                                    if ($r instanceof \App\Models\SystemSettingCategory) {
-                                        return $r->getKey();
-                                    }
-                                    if (is_array($r)) {
-                                        return $r['id'] ?? (array_values($r)[0] ?? null);
-                                    }
-
-                                    return $r;
-                                })
-                                ->filter()
-                                ->values()
-                                ->all();
-
-                            if (! empty($ids)) {
-                                \App\Models\SystemSettingCategory::withoutGlobalScopes([\App\Models\Scopes\ActiveScope::class])
-                                    ->whereIn('id', $ids)
-                                    ->update(['is_active' => false]);
-                            }
-                            Notification::make()
-                                ->title(__('system_setting_categories.deactivated_successfully'))
-                                ->success()
-                                ->send();
+                        ->action(static function (Collection $records): void {
+                            self::updateActivationState($records, false);
                         }),
                 ]),
             ])
             ->defaultSort('sort_order');
+    }
+
+    /**
+     * Normalize incoming record collections and toggle their activation flag safely.
+     */
+    private static function updateActivationState(Collection $records, bool $activate): void
+    {
+        $ids = $records
+            ->map(static function ($record): ?int {
+                if ($record instanceof SystemSettingCategory) {
+                    return $record->getKey();
+                }
+
+                if (is_array($record)) {
+                    return isset($record['id']) ? (int) $record['id'] : (isset($record[0]) ? (int) $record[0] : null);
+                }
+
+                if (is_numeric($record)) {
+                    return (int) $record;
+                }
+
+                return null;
+            })
+            ->filter()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return;
+        }
+
+        SystemSettingCategory::withoutGlobalScopes([ActiveScope::class])
+            ->whereIn('id', $ids)
+            ->update(['is_active' => $activate]);
+
+        Notification::make()
+            ->title($activate
+                ? __('system_setting_categories.activated_successfully')
+                : __('system_setting_categories.deactivated_successfully'))
+            ->success()
+            ->send();
     }
 
     /**
@@ -332,10 +340,10 @@ final class SystemSettingCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettingCategories::route('/'),
+            'index'  => Pages\ListSystemSettingCategories::route('/'),
             'create' => Pages\CreateSystemSettingCategory::route('/create'),
-            'view' => Pages\ViewSystemSettingCategory::route('/{record}'),
-            'edit' => Pages\EditSystemSettingCategory::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingCategory::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingCategory::route('/{record}/edit'),
         ];
     }
 }

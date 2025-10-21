@@ -28,7 +28,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * SystemSettingCategoryTranslationResource
@@ -43,9 +42,12 @@ final class SystemSettingCategoryTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
+    /** @var string|BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-language';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Settings';
+    // Keep translation utilities alongside the broader settings area for discoverability.
+    /** @var string|BackedEnum|null */
+    protected static $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -64,7 +66,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
         return __('admin.system_setting_category_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.system_setting_category_translations.basic_information'))
@@ -108,7 +110,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

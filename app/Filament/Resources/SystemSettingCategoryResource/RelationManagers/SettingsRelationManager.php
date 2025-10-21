@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -11,17 +12,14 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Forms\Set;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 final class SettingsRelationManager extends BaseRelationManager
 {
@@ -33,7 +31,7 @@ final class SettingsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Settings';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('system_setting_categories.settings.basic_information'))
@@ -45,7 +43,14 @@ final class SettingsRelationManager extends BaseRelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state)))
+                                ->afterStateUpdated(static function (?string $state, Set $set): void {
+                                    // Synchronize the slug to avoid manual cleanup after typing mistakes.
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $set('slug', Str::slug($state));
+                                })
                                 ->helperText(__('system_setting_categories.settings.key_help')),
 
                             TextInput::make('slug')
@@ -74,15 +79,15 @@ final class SettingsRelationManager extends BaseRelationManager
                             Select::make('type')
                                 ->label(__('system_setting_categories.settings.type'))
                                 ->options([
-                                    'string' => 'String',
-                                    'integer' => 'Integer',
-                                    'boolean' => 'Boolean',
-                                    'array' => 'Array',
-                                    'json' => 'JSON',
-                                    'text' => 'Text',
-                                    'email' => 'Email',
-                                    'url' => 'URL',
-                                    'date' => 'Date',
+                                    'string'   => 'String',
+                                    'integer'  => 'Integer',
+                                    'boolean'  => 'Boolean',
+                                    'array'    => 'Array',
+                                    'json'     => 'JSON',
+                                    'text'     => 'Text',
+                                    'email'    => 'Email',
+                                    'url'      => 'URL',
+                                    'date'     => 'Date',
                                     'datetime' => 'DateTime',
                                 ])
                                 ->required()
@@ -125,7 +130,7 @@ final class SettingsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -140,47 +145,47 @@ final class SettingsRelationManager extends BaseRelationManager
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
                     }),
 
                 TextColumn::make('type')
                     ->label(__('system_setting_categories.settings.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'string' => 'primary',
-                        'integer' => 'info',
-                        'boolean' => 'warning',
-                        'array' => 'success',
-                        'json' => 'danger',
-                        'text' => 'secondary',
-                        'email' => 'info',
-                        'url' => 'primary',
-                        'date' => 'success',
+                        'string'   => 'primary',
+                        'integer'  => 'info',
+                        'boolean'  => 'warning',
+                        'array'    => 'success',
+                        'json'     => 'danger',
+                        'text'     => 'secondary',
+                        'email'    => 'info',
+                        'url'      => 'primary',
+                        'date'     => 'success',
                         'datetime' => 'warning',
-                        default => 'gray',
+                        default    => 'gray',
                     })
                     ->sortable(),
 
                 TextColumn::make('default_value')
                     ->label(__('system_setting_categories.settings.default_value'))
                     ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 30 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 30 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.settings.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -210,15 +215,15 @@ final class SettingsRelationManager extends BaseRelationManager
                 SelectFilter::make('type')
                     ->label(__('system_setting_categories.settings.type'))
                     ->options([
-                        'string' => 'String',
-                        'integer' => 'Integer',
-                        'boolean' => 'Boolean',
-                        'array' => 'Array',
-                        'json' => 'JSON',
-                        'text' => 'Text',
-                        'email' => 'Email',
-                        'url' => 'URL',
-                        'date' => 'Date',
+                        'string'   => 'String',
+                        'integer'  => 'Integer',
+                        'boolean'  => 'Boolean',
+                        'array'    => 'Array',
+                        'json'     => 'JSON',
+                        'text'     => 'Text',
+                        'email'    => 'Email',
+                        'url'      => 'URL',
+                        'date'     => 'Date',
                         'datetime' => 'DateTime',
                     ])
                     ->native(false),
@@ -229,15 +234,15 @@ final class SettingsRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
-                CreateAction::make(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('sort_order');
     }

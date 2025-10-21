@@ -8,6 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -44,18 +45,17 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /**
-     * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
-     */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    // Ensure inventory analytics stay grouped centrally for merchandising reviewers.
+    /** @var string|BackedEnum|null */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {
         // Centralize the NavigationGroup handling to leverage enum labels.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
