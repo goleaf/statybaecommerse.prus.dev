@@ -38,6 +38,8 @@ return [
     'filters' => 'Filters',
     'categories' => 'Categories',
     'products' => 'Products',
+    'button_link_lookup' => 'Select button link',
+    'button_link_lookup_placeholder' => 'Search products, categories, collections, news, or paste a URL',
     'newest' => 'Newest',
     'ascending' => 'Ascending',
     'descending' => 'Descending',

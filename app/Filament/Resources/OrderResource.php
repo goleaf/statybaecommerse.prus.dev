@@ -6,13 +6,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Models\Channel;
 use App\Models\Order;
+use App\Models\Partner;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\CustomerSearch;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -30,6 +33,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -341,16 +345,52 @@ final class OrderResource extends Resource
                         ->helperText(__('orders.fields.internal_notes')),
                     Grid::make(3)
                         ->schema([
-                            Select::make('channel_id')
-                                ->label(__('orders.fields.customer'))
-                                ->relationship('channel', 'name')
-                                ->searchable()
-                                ->preload(),
-                            Select::make('partner_id')
-                                ->label(__('orders.fields.customer'))
-                                ->relationship('partner', 'name')
-                                ->searchable()
-                                ->preload(),
+                            SearchableInput::make('channel_id')
+                                ->label(__('orders.fields.channel'))
+                                ->placeholder(__('orders.placeholders.channel'))
+                                ->searchUsing(fn (string $search): array => self::searchChannels($search))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                                    if ($state === null || ! $record?->channel) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $record->channel_id => self::formatChannelLabel($record->channel),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $set('channel_id', (int) $state);
+                                }),
+                            SearchableInput::make('partner_id')
+                                ->label(__('orders.fields.partner'))
+                                ->placeholder(__('orders.placeholders.partner'))
+                                ->searchUsing(fn (string $search): array => self::searchPartners($search))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                                    if ($state === null || ! $record?->partner) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $record->partner_id => self::formatPartnerLabel($record->partner),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $set('partner_id', (int) $state);
+                                }),
                         ]),
                 ])
                 ->collapsible(),
@@ -797,6 +837,86 @@ final class OrderResource extends Resource
                 ->getStateUsing(fn (Order $record): ?string => $record->payment_status)
                 ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_status.{$state}") : ''),
         ];
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function searchChannels(string $term, int $limit = 15): array
+    {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Channel> $channels */
+        $channels = Channel::query()
+            ->select(['id', 'name', 'code'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
+
+        return $channels
+            ->map(static function (Channel $channel): SearchResult {
+                $label = self::formatChannelLabel($channel);
+
+                return SearchResult::make((string) $channel->getKey(), $label);
+            })
+            ->all();
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function searchPartners(string $term, int $limit = 15): array
+    {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Partner> $partners */
+        $partners = Partner::query()
+            ->select(['id', 'name', 'code'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
+
+        return $partners
+            ->map(static function (Partner $partner): SearchResult {
+                $label = self::formatPartnerLabel($partner);
+
+                return SearchResult::make((string) $partner->getKey(), $label);
+            })
+            ->all();
+    }
+
+    private static function formatChannelLabel(?Channel $channel): string
+    {
+        if (! $channel instanceof Channel) {
+            return '';
+        }
+
+        $code = $channel->getAttribute('code');
+        $name = $channel->getAttribute('name');
+
+        return trim(sprintf('[%s] %s', $code !== null && $code !== '' ? $code : '—', (string) ($name ?? '')));
+    }
+
+    private static function formatPartnerLabel(?Partner $partner): string
+    {
+        if (! $partner instanceof Partner) {
+            return '';
+        }
+
+        $code = $partner->getAttribute('code');
+        $name = $partner->getAttribute('name');
+
+        return trim(sprintf('[%s] %s', $code !== null && $code !== '' ? $code : '—', (string) ($name ?? '')));
     }
 
     /**

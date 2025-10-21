@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -13,12 +16,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -63,25 +66,51 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ->components([
                         Grid::make(2)
                             ->components([
-                                Select::make('product_variant_id')
+                                SearchableInput::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
-                                    ->relationship('productVariant', 'name')
-                                    ->searchable()
-                                    ->preload()
+                                    ->placeholder(__('orders.placeholders.product_variant'))
+                                    ->searchUsing(fn (string $search): array => self::searchVariants($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?OrderItem $record): void {
+                                        if ($state === null || ! $record?->productVariant) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->product_variant_id => self::formatVariantLabel($record->productVariant),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'name', 'sku', 'price', 'product_id'])
+                                            ->with(['product:id,name,sku'])
+                                            ->find((int) $state);
+
+                                        if (! $variant instanceof ProductVariant) {
+                                            return;
+                                        }
+
+                                        $set('product_variant_id', $variant->getKey());
+                                        $set('product_id', $variant->product_id);
+
+                                        $name = $variant->name ?? $variant->product?->name ?? '';
+                                        $sku = $variant->sku ?? $variant->product?->sku ?? '';
+                                        $price = (float) ($variant->price ?? 0);
+                                        $quantity = (int) ($get('quantity') ?? 1);
+
+                                        $set('name', $name);
+                                        $set('sku', $sku);
+                                        $set('unit_price', number_format($price, 2, '.', ''));
+                                        $set('total', number_format($price * $quantity, 2, '.', ''));
+                                    })
                                     ->required()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
-                                        if ($state) {
-                                            $variant = ProductVariant::find($state);
-                                            if ($variant) {
-                                                $set('unit_price', $variant->price);
-                                                $set('total', $variant->price * ($get('quantity') ?? 1));
-                                                $set('product_id', $variant->product_id);
-                                                $set('name', $variant->name ?? ($variant->product->name ?? ''));
-                                                $set('sku', $variant->sku ?? ($variant->product->sku ?? ''));
-                                            }
-                                        }
-                                    })
                                     ->prefixIcon('heroicon-o-cube'),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
@@ -343,6 +372,56 @@ final class OrderItemsRelationManager extends BaseRelationManager
             ])
             ->defaultSort('created_at', 'desc')
             ->striped();
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function searchVariants(string $term, int $limit = 15): array
+    {
+        /** @var Collection<int, ProductVariant> $variants */
+        $variants = ProductVariant::query()
+            ->select(['id', 'name', 'sku', 'price', 'product_id'])
+            ->with(['product:id,name,sku'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('sku', 'like', "%{$term}%")
+                        ->orWhere('name', 'like', "%{$term}%")
+                        ->orWhereHas('product', static function (Builder $productQuery) use ($term): void {
+                            $productQuery
+                                ->where('name', 'like', "%{$term}%")
+                                ->orWhere('sku', 'like', "%{$term}%");
+                        });
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
+
+        return $variants
+            ->map(static function (ProductVariant $variant): SearchResult {
+                return SearchResult::make((string) $variant->getKey(), self::formatVariantLabel($variant));
+            })
+            ->all();
+    }
+
+    private static function formatVariantLabel(ProductVariant $variant): string
+    {
+        $sku = $variant->getAttribute('sku');
+        $variantName = $variant->getAttribute('name');
+        $productName = $variant->product?->getAttribute('name');
+
+        $parts = [
+            sprintf('[%s]', $sku !== null && $sku !== '' ? $sku : '—'),
+            (string) ($variantName ?? ''),
+        ];
+
+        if ($productName) {
+            $parts[] = sprintf('• %s', $productName);
+        }
+
+        return trim(implode(' ', array_filter($parts)));
     }
 
     public function isReadOnly(): bool

@@ -6,7 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
+use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -15,6 +17,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
@@ -88,6 +92,31 @@ final class SliderResource extends Resource
                         ->label(__('sliders.description'))
                         ->rows(3)
                         ->maxLength(500)
+                        ->columnSpanFull(),
+                    SearchableInput::make('button_url_lookup')
+                        ->label(__('sliders.button_link_lookup'))
+                        ->placeholder(__('sliders.button_link_lookup_placeholder'))
+                        ->searchUsing(fn (string $search): array => ContentLinkSearch::sliderLinks($search))
+                        ->dehydrated(false)
+                        ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                            if ($state === null || $state === '') {
+                                return;
+                            }
+
+                            $resolved = ContentLinkSearch::resolve($state);
+
+                            if ($resolved !== null) {
+                                $set('button_url', $resolved['url']);
+
+                                if (($get('button_text') ?? '') === '' && $resolved['title'] !== '') {
+                                    $set('button_text', $resolved['title']);
+                                }
+
+                                return;
+                            }
+
+                            $set('button_url', $state);
+                        })
                         ->columnSpanFull(),
                     TextInput::make('button_url')
                         ->label(__('sliders.button_url'))

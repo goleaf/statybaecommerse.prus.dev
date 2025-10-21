@@ -14,6 +14,8 @@ return [
     'description' => 'Description',
     'button_text' => 'Button Text',
     'button_url' => 'Button URL',
+    'button_link_lookup' => 'Select Button Link',
+    'button_link_lookup_placeholder' => 'Search products, categories, collections, news, or paste a URL',
     'image' => 'Image',
     'background_color' => 'Background Color',
     'text_color' => 'Text Color',
@@ -21,4 +23,22 @@ return [
     'is_active' => 'Active',
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
+
+    'static_links' => [
+        'home' => 'Home',
+        'products' => 'All Products',
+        'collections' => 'Collections',
+        'news' => 'News',
+        'contact' => 'Contact',
+    ],
+
+    'link_types' => [
+        'static' => 'Storefront Page',
+        'product' => 'Product',
+        'category' => 'Category',
+        'collection' => 'Collection',
+        'news' => 'News Article',
+    ],
+
+    'unknown_title' => 'Untitled Link',
 ];

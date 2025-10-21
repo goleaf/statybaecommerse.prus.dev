@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
+use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -24,6 +26,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Size;
@@ -31,6 +35,7 @@ use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
+
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
@@ -114,11 +119,36 @@ class SliderManagement extends Page implements HasActions, HasForms
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
-                            TextInput::make('button_url')
-                                ->label(__('translations.button_url'))
-                                ->url()
-                                ->maxLength(255),
+                            SearchableInput::make('button_url_lookup')
+                                ->label(__('translations.button_link_lookup'))
+                                ->placeholder(__('translations.button_link_lookup_placeholder'))
+                                ->searchUsing(fn (string $search): array => ContentLinkSearch::sliderLinks($search))
+                                ->dehydrated(false)
+                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $resolved = ContentLinkSearch::resolve($state);
+
+                                    if ($resolved !== null) {
+                                        $set('button_url', $resolved['url']);
+
+                                        if (($get('button_text') ?? '') === '' && $resolved['title'] !== '') {
+                                            $set('button_text', $resolved['title']);
+                                        }
+
+                                        return;
+                                    }
+
+                                    $set('button_url', $state);
+                                }),
                         ]),
+                        TextInput::make('button_url')
+                            ->label(__('translations.button_url'))
+                            ->url()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                     ])
                     ->collapsible(),
                 Section::make(__('translations.media'))
