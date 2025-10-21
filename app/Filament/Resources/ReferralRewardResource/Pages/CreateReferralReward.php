@@ -6,8 +6,19 @@ namespace App\Filament\Resources\ReferralRewardResource\Pages;
 
 use App\Filament\Resources\ReferralRewardResource;
 use Filament\Resources\Pages\CreateRecord;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as TranslatableCreateRecord;
 
 final class CreateReferralReward extends CreateRecord
 {
+    use TranslatableCreateRecord;
+
     protected static string $resource = ReferralRewardResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            LocaleSwitcher::make(),
+        ];
+    }
 }
