@@ -7,6 +7,7 @@ namespace App\Providers\Filament;
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Contracts\Plugin as FilamentPlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -33,13 +34,15 @@ final class AdminPanelProvider extends PanelProvider
 {
     public function boot(): void
     {
-        FilamentExport::createExportUrlUsing(
-            static fn ($export): string => URL::temporarySignedRoute(
-                'exports.signed-download',
-                now()->addMinutes(60),
-                ['export' => $export],
-            ),
-        );
+        if (class_exists(FilamentExport::class)) {
+            FilamentExport::createExportUrlUsing(
+                static fn ($export): string => URL::temporarySignedRoute(
+                    'exports.signed-download',
+                    now()->addMinutes(60),
+                    ['export' => $export],
+                ),
+            );
+        }
     }
 
     public function panel(Panel $panel): Panel
@@ -63,9 +66,11 @@ final class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile()
-            ->when(app()->environment('testing'),
+            ->when(
+                app()->environment('testing'),
                 fn (Panel $p) => $p->authGuard('web'),
-                fn (Panel $p) => $p->authGuard('admin'))
+                fn (Panel $p) => $p->authGuard('admin'),
+            )
             ->authPasswordBroker('admin_users')
             ->brandName(__('admin.brand_name'))
             ->brandLogo(asset('images/logo-admin.svg'))
@@ -124,26 +129,36 @@ final class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
                     ->icon('heroicon-o-language'),
             ])
-            ->when(app()->environment('testing'),
+            ->when(
+                app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins(array_values(array_filter([
-                    FilamentShieldPlugin::make(),
+                    $this->optionalPlugin(FilamentShieldPlugin::class),
                     $this->makeFullCalendarPlugin(),
-                    TableLayoutTogglePlugin::make()
-                        ->setDefaultLayout('grid')
-                        ->persistLayoutUsing(
-                            persister: LocalStoragePersister::class,
-                            cacheStore: 'redis',
-                            cacheTtl: 60 * 24,
-                        )
-                        ->shareLayoutBetweenPages(false)
-                        ->displayToggleAction()
-                        ->toggleActionHook('tables::toolbar.search.after')
-                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
-                    FilamentNordThemePlugin::make(),
-                    ResizedColumnPlugin::make()->preserveOnDB(),
-                ]))))
+                    $this->optionalPlugin(
+                        TableLayoutTogglePlugin::class,
+                        static function (TableLayoutTogglePlugin $plugin): TableLayoutTogglePlugin {
+                            return $plugin
+                                ->setDefaultLayout('grid')
+                                ->persistLayoutUsing(
+                                    persister: LocalStoragePersister::class,
+                                    cacheStore: 'redis',
+                                    cacheTtl: 60 * 24,
+                                )
+                                ->shareLayoutBetweenPages(false)
+                                ->displayToggleAction()
+                                ->toggleActionHook('tables::toolbar.search.after')
+                                ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                                ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
+                        },
+                    ),
+                    $this->optionalPlugin(FilamentNordThemePlugin::class),
+                    $this->optionalPlugin(
+                        ResizedColumnPlugin::class,
+                        static fn (ResizedColumnPlugin $plugin): ResizedColumnPlugin => $plugin->preserveOnDB(),
+                    ),
+                ]))),
+            )
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.css')
@@ -185,7 +200,7 @@ final class AdminPanelProvider extends PanelProvider
     /**
      * @return \Filament\Contracts\Plugin|null
      */
-    private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
+    private function makeFullCalendarPlugin(): ?FilamentPlugin
     {
         $pluginClass = 'Saade\\FilamentFullCalendar\\FilamentFullCalendarPlugin';
 
@@ -198,5 +213,29 @@ final class AdminPanelProvider extends PanelProvider
             ->editable(true)
             ->timezone('Europe/Vilnius')
             ->locale('lt');
+    }
+
+    /**
+     * @template T of FilamentPlugin
+     *
+     * @param class-string<T> $pluginClass
+     * @param (callable(T): T)|null $configure
+     *
+     * @return T|null
+     */
+    private function optionalPlugin(string $pluginClass, ?callable $configure = null): ?FilamentPlugin
+    {
+        if (! class_exists($pluginClass)) {
+            return null;
+        }
+
+        /** @var FilamentPlugin $plugin */
+        $plugin = $pluginClass::make();
+
+        if ($configure !== null) {
+            $plugin = $configure($plugin);
+        }
+
+        return $plugin;
     }
 }
