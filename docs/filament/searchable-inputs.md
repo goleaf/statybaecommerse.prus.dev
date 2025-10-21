@@ -5,64 +5,96 @@ The `App\\Support\\Filament\\SearchableComponentHelper` centralises the repetiti
 ## Hydrating a component
 
 ```php
-use App\Support\Filament\SearchableComponentHelper;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\\Models\\User;
+use App\\Support\\Filament\\SearchableComponentHelper;
+use App\\Support\\Search\\SearchResultPayload;
+use DefStudio\\SearchableInput\\DTO\\SearchResult;
+use DefStudio\\SearchableInput\\Forms\\Components\\SearchableInput;
 
 SearchableInput::make('user_lookup')
     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
         SearchableComponentHelper::hydrate(
-            $component,
-            $state,
-            fn (int $identifier): ?User => User::query()->with('profile')->find($identifier),
-            static fn (User $user): array => [
-                'value' => $user->getKey(),
-                'label' => sprintf('%s <%s>', $user->name, $user->email),
-                'payload' => [
-                    'phone' => $user->profile?->phone,
-                    'company' => $user->profile?->company,
-                ],
-            ],
+            component: $component,
+            state: $state,
+            resolveResult: function (int|string $identifier): ?SearchResult {
+                $user = User::query()->with('profile')->find((int) $identifier);
+
+                if (! $user instanceof User) {
+                    return null;
+                }
+
+                return SearchResultPayload::normalise(
+                    SearchResult::make(
+                        (string) $user->getKey(),
+                        sprintf('%s <%s>', $user->name, $user->email),
+                    ),
+                    [
+                        'phone'   => $user->profile?->phone,
+                        'company' => $user->profile?->company,
+                    ],
+                );
+            },
         );
     });
 ```
 
-1. **Lookup closure** – receives the persisted state and returns the matched record (or `null` when nothing should hydrate).
-2. **Payload normaliser** – receives the resolved record and must return an array with:
-   - `value`: the identifier that should be stored as component state.
-   - `label`: the display text shown inside the dropdown.
-   - `payload` (optional): any associative array that dependent fields can consume.
+1. **Resolver closure** – receives the persisted state and must return a `SearchResult` DTO (or `null` when nothing should hydrate).
+2. **Canonical payload** – construct the DTO with `SearchResultPayload::normalise()` so the helper reuses the same `{ id, label, payload }` shape that Livewire emits.
+3. **Automatic clearing** – when the resolver returns `null`, the helper resets the component state and options immediately, preventing stale metadata.
 
-The helper converts the `value` to a string, registers it as the component state, and feeds the label through `options()` alongside the payload so downstream closures all read the same structure.
-
-## Clearing a component
-
-When a lookup is wiped out (for example, in an `afterStateUpdated` hook that receives a blank value), call the `clear()` helper to reset the state, options, and payload. Optional callbacks let you synchronise related form fields at the same time.
+## Synchronising state after updates
 
 ```php
-use App\Support\Filament\SearchableComponentHelper;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use App\\Models\\User;
+use App\\Support\\Search\\SearchResultPayload;
+use DefStudio\\SearchableInput\\DTO\\SearchResult;
+use Filament\\Forms\\Set;
 
-SearchableInput::make('billing_address_lookup')
-    ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set, Get $get): void {
-        if ($state !== null && $state !== '') {
-            return;
-        }
+SearchableInput::make('user_lookup')
+    ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+        SearchableComponentHelper::sync(
+            component: $component,
+            state: $state,
+            set: $set,
+            targetField: 'user_id',
+            resolveResult: static function (int|string $identifier): ?SearchResult {
+                $user = User::query()->with('profile')->find((int) $identifier);
 
-        SearchableComponentHelper::clear(
-            $component,
-            fn (): bool => $set('billing_address_id', null),
-            fn (): bool => $set('billing_address_payload', []),
+                if (! $user instanceof User) {
+                    return null;
+                }
+
+                return SearchResultPayload::normalise(
+                    SearchResult::make(
+                        (string) $user->getKey(),
+                        sprintf('%s <%s>', $user->name, $user->email),
+                    ),
+                    [
+                        'phone'   => $user->profile?->phone,
+                        'company' => $user->profile?->company,
+                    ],
+                );
+            },
         );
+
+        if ($state === null || $state === '') {
+            $set('profile_payload', []);
+        }
     });
 ```
 
-Each callback receives no arguments, so close over the Filament `Set`/`Get` helpers you need. Returning a value is optional; the helper ignores it after invocation.
+- **Target field** – the helper writes the resolved identifier back to the provided `$targetField` using the Filament `Set` helper.
+- **Type normalisation** – numeric identifiers are converted to integers automatically so Eloquent relationships receive the expected type.
+- **Clearing dependants** – when the state is empty you can reset related fields immediately after `sync()` runs, as shown with the `profile_payload` field above.
+
+## Clearing a component manually
+
+Call `SearchableComponentHelper::clear($component);` whenever you need to wipe a lookup outside of the standard lifecycle hooks. The helper strips state and options so the user sees a blank input and no residual metadata.
 
 ## Normalisation tips
 
-- Keep the payload structure aligned with the search service that powers the component. For example, `AddressSearch::payload()` already exposes the exact fields expected by the order form, so return it directly from your normaliser.
-- When the component stores something other than the lookup identifier (for example, a composite key), make sure the `value` key reflects the final persisted state; the helper pushes that value back into the component before rendering.
+- Keep the payload structure aligned with the search service that powers the component. For example, `AddressSearch::payload()` already exposes the exact fields expected by the order form, so return it directly from the resolver.
+- When the component stores something other than the lookup identifier (for example, a composite key), make sure the `SearchResult` value mirrors the final persisted state; the helper pushes that value back into the component before rendering.
 - If a lookup fails or the state is empty, the helper automatically calls `clear()` so the UI stays in sync with the database.
 
 ## Related guidelines

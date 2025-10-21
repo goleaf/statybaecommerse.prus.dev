@@ -7,12 +7,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\ProductSearch;
-use App\Support\Search\SearchableComponentHelper;
 use App\Support\Search\SearchResultPayload;
-use DefStudio\SearchableInput\DTO\SearchResult;
 use BackedEnum;
 use Closure;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -84,15 +84,15 @@ final class InventoryResource extends Resource
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Inventory $record): void {
                                     SearchableComponentHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        function (int|string $productId) use ($record): ?\DefStudio\SearchableInput\DTO\SearchResult {
+                                        component: $component,
+                                        state: $state,
+                                        resolveResult: function (int|string $identifier) use ($record): ?SearchResult {
                                             $product = $record?->product;
 
-                                            if (! $product instanceof Product || (int) $product->getKey() !== (int) $productId) {
+                                            if (! $product instanceof Product || (int) $product->getKey() !== (int) $identifier) {
                                                 $product = Product::query()
-                                                    ->select(['id', 'sku', 'name'])
-                                                    ->find((int) $productId);
+                                                    ->select(['id', 'sku', 'name', 'price'])
+                                                    ->find((int) $identifier);
                                             }
 
                                             if (! $product instanceof Product) {
@@ -103,19 +103,18 @@ final class InventoryResource extends Resource
                                         },
                                     );
 
-                                    // Reference the searchable input helper docs for behaviour overview.
-                                    // See docs/i18n/SEARCHABLE_INPUT.md for expectations when hydrating/clearing selections.
+                                    // Behaviour documented at docs/forms/SEARCHABLE_INPUT_METADATA.md to keep helper usage aligned.
                                 })
                                 ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                    SearchableComponentHelper::syncSelectedRecord(
+                                    SearchableComponentHelper::sync(
                                         component: $component,
                                         state: $state,
                                         set: $set,
-                                        attribute: 'product_id',
-                                        resolver: static function (string $productId): ?\DefStudio\SearchableInput\DTO\SearchResult {
+                                        targetField: 'product_id',
+                                        resolveResult: static function (int|string $identifier): ?SearchResult {
                                             $product = Product::query()
-                                                ->select(['id', 'sku', 'name'])
-                                                ->find((int) $productId);
+                                                ->select(['id', 'sku', 'name', 'price'])
+                                                ->find((int) $identifier);
 
                                             if (! $product instanceof Product) {
                                                 return null;
@@ -510,13 +509,17 @@ final class InventoryResource extends Resource
 
         /** @var string|null $rawSku */
         $rawSku = $product->getAttribute('sku');
+        /** @var float|int|string|null $rawPrice */
+        $rawPrice = $product->getAttribute('price');
         $translatedName = $product->getTranslatedName();
+        $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
 
         // Normalise payload so Livewire and PHP callbacks always receive consistent metadata.
         return SearchResultPayload::normalise($result, [
             'product_id' => $product->getKey(),
             'sku'        => is_string($rawSku) ? $rawSku : '',
             'name'       => is_string($translatedName) ? $translatedName : '',
+            'price'      => $price,
         ]);
     }
 
