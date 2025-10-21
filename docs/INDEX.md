@@ -35,6 +35,7 @@ A curated map of the most useful documents for day-to-day development and operat
 - [CURRENT_SYSTEM_STATUS](CURRENT_SYSTEM_STATUS.md) – snapshot of live issues, mitigations, and follow-up owners.
 - [Dependency automation schedule](operations/RENOVATE_OVERVIEW.md) – explains the Renovate rollup cadence and CI expectations.
 - [PR Branch Cleanup Workflow](../.github/workflows/pr-branch-cleanup.yml) – documents the automation that deletes local branches when pull requests close without merging; the job now ignores already-removed branches after validating the reference.
+- **Testing shortcut** – run `composer test` to invoke the bundled Pest runner (`vendor/bin/pest`) without requiring a global installation.
 
 ## Explore Further
 - [Analysis & Summary Index](analysis/INDEX.md) – master index to deep-dive research, audits, and rollout recaps.

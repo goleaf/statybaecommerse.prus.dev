@@ -17,7 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -36,11 +36,11 @@ use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class CategoryResource extends Resource
 {
-    /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
-    protected static $navigationIcon = 'heroicon-o-tag';
+    /** @var string|\BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
-    protected static $navigationGroup = NavigationGroup::Products;
+    /** @var string|\UnitEnum|null Align the resource under the Products navigation section. */
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -98,7 +98,7 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('categories.basic_information'))

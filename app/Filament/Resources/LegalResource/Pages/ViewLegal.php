@@ -27,7 +27,7 @@ class ViewLegal extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema|array
+    public function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([
