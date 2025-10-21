@@ -56,6 +56,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permissions'        => Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'localize'           => App\Http\Middleware\SetLocale::class,
+            'partner.api'        => App\Http\Middleware\EnsurePartnerApiKey::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
