@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ConversionsRelationManager extends BaseRelationManager
 {
@@ -23,16 +23,19 @@ final class ConversionsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Conversions';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Select::make('conversion_type')
                 ->label('Conversion Type')
                 ->options([
                     'purchase' => 'Purchase',
-                    'signup' => 'Signup',
+                    'signup'   => 'Signup',
                     'download' => 'Download',
-                    'contact' => 'Contact',
+                    'contact'  => 'Contact',
                 ])
                 ->required(),
             TextInput::make('conversion_value')
@@ -51,7 +54,7 @@ final class ConversionsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -60,10 +63,10 @@ final class ConversionsRelationManager extends BaseRelationManager
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'purchase' => 'success',
-                        'signup' => 'info',
+                        'signup'   => 'info',
                         'download' => 'warning',
-                        'contact' => 'primary',
-                        default => 'gray',
+                        'contact'  => 'primary',
+                        default    => 'gray',
                     })
                     ->sortable(),
                 TextColumn::make('conversion_value')
@@ -86,9 +89,9 @@ final class ConversionsRelationManager extends BaseRelationManager
                     ->label('Type')
                     ->options([
                         'purchase' => 'Purchase',
-                        'signup' => 'Signup',
+                        'signup'   => 'Signup',
                         'download' => 'Download',
-                        'contact' => 'Contact',
+                        'contact'  => 'Contact',
                     ]),
                 SelectFilter::make('customer_id')
                     ->label('Has Customer')

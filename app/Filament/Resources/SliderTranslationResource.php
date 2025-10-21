@@ -15,10 +15,10 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -56,8 +56,11 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
                 ->components([
@@ -95,7 +98,7 @@ final class SliderTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -108,11 +111,11 @@ final class SliderTranslationResource extends Resource
                     ->label(__('admin.slider_translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'en' => 'success',
-                        'lt' => 'info',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
+                        'en'    => 'success',
+                        'lt'    => 'info',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
                         default => 'gray',
                     }),
                 TextColumn::make('title')
@@ -184,10 +187,10 @@ final class SliderTranslationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSliderTranslations::route('/'),
+            'index'  => Pages\ListSliderTranslations::route('/'),
             'create' => Pages\CreateSliderTranslation::route('/create'),
-            'view' => Pages\ViewSliderTranslation::route('/{record}'),
-            'edit' => Pages\EditSliderTranslation::route('/{record}/edit'),
+            'view'   => Pages\ViewSliderTranslation::route('/{record}'),
+            'edit'   => Pages\EditSliderTranslation::route('/{record}/edit'),
         ];
     }
 }

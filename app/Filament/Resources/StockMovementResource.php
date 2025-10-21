@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -17,14 +18,13 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * StockMovementResource
@@ -61,8 +61,11 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('stock_movement.sections.basic_information'))
                 ->components([
@@ -91,10 +94,10 @@ final class StockMovementResource extends Resource
                             Select::make('type')
                                 ->label(__('stock_movement.fields.type'))
                                 ->options([
-                                    'in' => __('stock_movement.types.in'),
-                                    'out' => __('stock_movement.types.out'),
+                                    'in'         => __('stock_movement.types.in'),
+                                    'out'        => __('stock_movement.types.out'),
                                     'adjustment' => __('stock_movement.types.adjustment'),
-                                    'transfer' => __('stock_movement.types.transfer'),
+                                    'transfer'   => __('stock_movement.types.transfer'),
                                 ])
                                 ->required(),
                         ]),
@@ -123,7 +126,7 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -143,11 +146,11 @@ final class StockMovementResource extends Resource
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'in' => 'success',
-                        'out' => 'danger',
+                        'in'         => 'success',
+                        'out'        => 'danger',
                         'adjustment' => 'warning',
-                        'transfer' => 'info',
-                        default => 'gray',
+                        'transfer'   => 'info',
+                        default      => 'gray',
                     }),
                 TextColumn::make('reason')
                     ->label(__('stock_movement.fields.reason'))
@@ -163,10 +166,10 @@ final class StockMovementResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'in' => __('stock_movement.types.in'),
-                        'out' => __('stock_movement.types.out'),
+                        'in'         => __('stock_movement.types.in'),
+                        'out'        => __('stock_movement.types.out'),
                         'adjustment' => __('stock_movement.types.adjustment'),
-                        'transfer' => __('stock_movement.types.transfer'),
+                        'transfer'   => __('stock_movement.types.transfer'),
                     ]),
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
@@ -202,10 +205,10 @@ final class StockMovementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStockMovements::route('/'),
+            'index'  => Pages\ListStockMovements::route('/'),
             'create' => Pages\CreateStockMovement::route('/create'),
-            'view' => Pages\ViewStockMovement::route('/{record}'),
-            'edit' => Pages\EditStockMovement::route('/{record}/edit'),
+            'view'   => Pages\ViewStockMovement::route('/{record}'),
+            'edit'   => Pages\EditStockMovement::route('/{record}/edit'),
         ];
     }
 }

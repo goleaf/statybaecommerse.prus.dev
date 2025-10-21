@@ -12,8 +12,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -34,8 +34,11 @@ final class ProductImageResource extends Resource
 
     protected static ?int $navigationSort = 14;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Select::make('product_id')
@@ -61,7 +64,7 @@ final class ProductImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -106,9 +109,9 @@ final class ProductImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductImages::route('/'),
+            'index'  => Pages\ListProductImages::route('/'),
             'create' => Pages\CreateProductImage::route('/create'),
-            'edit' => Pages\EditProductImage::route('/{record}/edit'),
+            'edit'   => Pages\EditProductImage::route('/{record}/edit'),
         ];
     }
 }

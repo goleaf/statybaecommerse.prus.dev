@@ -19,7 +19,7 @@ class CreateLegal extends CreateRecord
                 ->label(__('legal.actions.preview'))
                 ->icon('heroicon-o-eye')
                 ->color('gray')
-                ->action(function () {
+                ->action(function (): void {
                     // Preview logic here
                 }),
         ];

@@ -20,7 +20,7 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
 
     protected ?string $pollingInterval = '30s';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query(
@@ -50,9 +50,9 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->colors([
-                        'warning' => 'pending',
-                        'success' => 'redeemed',
-                        'danger' => 'expired',
+                        'warning'   => 'pending',
+                        'success'   => 'redeemed',
+                        'danger'    => 'expired',
                         'secondary' => 'cancelled',
                     ]),
                 Tables\Columns\TextColumn::make('redeemed_at')

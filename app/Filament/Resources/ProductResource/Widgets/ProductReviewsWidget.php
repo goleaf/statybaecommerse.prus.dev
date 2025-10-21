@@ -14,19 +14,19 @@ final class ProductReviewsWidget extends ChartWidget
     protected function getData(): array
     {
         $reviewRanges = [
-            '5 stars' => Product::whereHas('reviews', function ($query) {
+            '5 stars' => Product::whereHas('reviews', function ($query): void {
                 $query->where('rating', 5);
             })->count(),
-            '4 stars' => Product::whereHas('reviews', function ($query) {
+            '4 stars' => Product::whereHas('reviews', function ($query): void {
                 $query->where('rating', 4);
             })->count(),
-            '3 stars' => Product::whereHas('reviews', function ($query) {
+            '3 stars' => Product::whereHas('reviews', function ($query): void {
                 $query->where('rating', 3);
             })->count(),
-            '2 stars' => Product::whereHas('reviews', function ($query) {
+            '2 stars' => Product::whereHas('reviews', function ($query): void {
                 $query->where('rating', 2);
             })->count(),
-            '1 star' => Product::whereHas('reviews', function ($query) {
+            '1 star' => Product::whereHas('reviews', function ($query): void {
                 $query->where('rating', 1);
             })->count(),
         ];
@@ -34,8 +34,8 @@ final class ProductReviewsWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('products.charts.review_distribution'),
-                    'data' => array_values($reviewRanges),
+                    'label'           => __('products.charts.review_distribution'),
+                    'data'            => array_values($reviewRanges),
                     'backgroundColor' => [
                         '#10B981', // emerald (5 stars)
                         '#3B82F6', // blue (4 stars)

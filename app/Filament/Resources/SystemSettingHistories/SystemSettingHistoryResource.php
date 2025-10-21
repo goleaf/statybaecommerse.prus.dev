@@ -11,8 +11,8 @@ use App\Filament\Resources\SystemSettingHistories\Schemas\SystemSettingHistoryFo
 use App\Filament\Resources\SystemSettingHistories\Tables\SystemSettingHistoriesTable;
 use App\Models\SystemSettingHistory;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
@@ -22,12 +22,15 @@ class SystemSettingHistoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return SystemSettingHistoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return SystemSettingHistoriesTable::configure($table);
     }
@@ -42,9 +45,9 @@ class SystemSettingHistoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSystemSettingHistories::route('/'),
+            'index'  => ListSystemSettingHistories::route('/'),
             'create' => CreateSystemSettingHistory::route('/create'),
-            'edit' => EditSystemSettingHistory::route('/{record}/edit'),
+            'edit'   => EditSystemSettingHistory::route('/{record}/edit'),
         ];
     }
 }

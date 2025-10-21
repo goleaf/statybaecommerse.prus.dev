@@ -27,7 +27,7 @@ final class StockOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
 
-            Stat::make(__('stocks.stats.total_value'), '€'.number_format($totalValue, 2))
+            Stat::make(__('stocks.stats.total_value'), '€' . number_format($totalValue, 2))
                 ->description(__('stocks.stats.total_value_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('success'),

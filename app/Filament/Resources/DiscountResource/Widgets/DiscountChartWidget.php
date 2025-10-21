@@ -19,7 +19,7 @@ final class DiscountChartWidget extends ChartWidget
             'datasets' => [
                 [
                     'label' => __('discounts.usage'),
-                    'data' => [5, 10, 7, 14, 9, 12, 8],
+                    'data'  => [5, 10, 7, 14, 9, 12, 8],
                 ],
             ],
             'labels' => [
@@ -42,9 +42,9 @@ final class DiscountChartWidget extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'scales' => [
+            'scales'              => [
                 'y' => [
                     'beginAtZero' => true,
                 ],

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantStockResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -18,7 +19,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -30,8 +30,11 @@ class StockMovementsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Stock Movements';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 TextInput::make('quantity')
@@ -41,21 +44,21 @@ class StockMovementsRelationManager extends BaseRelationManager
                 Select::make('type')
                     ->label(__('inventory.type'))
                     ->options([
-                        'in' => __('inventory.stock_in'),
+                        'in'  => __('inventory.stock_in'),
                         'out' => __('inventory.stock_out'),
                     ])
                     ->required(),
                 Select::make('reason')
                     ->label(__('inventory.reason'))
                     ->options([
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
+                        'sale'              => __('inventory.reason_sale'),
+                        'return'            => __('inventory.reason_return'),
+                        'adjustment'        => __('inventory.reason_adjustment'),
                         'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
+                        'restock'           => __('inventory.reason_restock'),
+                        'damage'            => __('inventory.reason_damage'),
+                        'theft'             => __('inventory.reason_theft'),
+                        'transfer'          => __('inventory.reason_transfer'),
                     ])
                     ->required(),
                 TextInput::make('reference')
@@ -69,7 +72,7 @@ class StockMovementsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('quantity')
@@ -82,20 +85,20 @@ class StockMovementsRelationManager extends BaseRelationManager
                     ->label(__('inventory.type'))
                     ->colors([
                         'success' => 'in',
-                        'danger' => 'out',
+                        'danger'  => 'out',
                     ]),
                 TextColumn::make('reason')
                     ->label(__('inventory.reason'))
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
+                        'sale'              => __('inventory.reason_sale'),
+                        'return'            => __('inventory.reason_return'),
+                        'adjustment'        => __('inventory.reason_adjustment'),
                         'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
-                        default => $state,
+                        'restock'           => __('inventory.reason_restock'),
+                        'damage'            => __('inventory.reason_damage'),
+                        'theft'             => __('inventory.reason_theft'),
+                        'transfer'          => __('inventory.reason_transfer'),
+                        default             => $state,
                     }),
                 TextColumn::make('reference')
                     ->label(__('inventory.reference'))
@@ -117,20 +120,20 @@ class StockMovementsRelationManager extends BaseRelationManager
                 SelectFilter::make('type')
                     ->label(__('inventory.type'))
                     ->options([
-                        'in' => __('inventory.stock_in'),
+                        'in'  => __('inventory.stock_in'),
                         'out' => __('inventory.stock_out'),
                     ]),
                 SelectFilter::make('reason')
                     ->label(__('inventory.reason'))
                     ->options([
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
+                        'sale'              => __('inventory.reason_sale'),
+                        'return'            => __('inventory.reason_return'),
+                        'adjustment'        => __('inventory.reason_adjustment'),
                         'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
+                        'restock'           => __('inventory.reason_restock'),
+                        'damage'            => __('inventory.reason_damage'),
+                        'theft'             => __('inventory.reason_theft'),
+                        'transfer'          => __('inventory.reason_transfer'),
                     ]),
                 Filter::make('recent')
                     ->label(__('inventory.recent_movements'))

@@ -5,28 +5,27 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NewsImageResource\Pages;
-use App\Filament\Resources\NewsResource;
 use App\Models\News;
 use App\Models\NewsImage;
-use BackedEnum;
 use App\Support\Storage\SecureStorage;
+use BackedEnum;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
@@ -74,8 +73,11 @@ final class NewsImageResource extends Resource
         return __('admin.news_images.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Tabs::make(__('admin.news_images.tabs'))
@@ -93,7 +95,7 @@ final class NewsImageResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set) {
+                                            ->afterStateUpdated(function ($state, callable $set): void {
                                                 if ($state) {
                                                     $news = News::find($state);
                                                     if ($news) {
@@ -117,7 +119,7 @@ final class NewsImageResource extends Resource
                                                 '1:1',
                                             ])
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                                                 if (! $state) {
                                                     return;
                                                 }
@@ -159,7 +161,7 @@ final class NewsImageResource extends Resource
 
                                                 if ($imageInfo) {
                                                     $set('dimensions', [
-                                                        'width' => $imageInfo[0],
+                                                        'width'  => $imageInfo[0],
                                                         'height' => $imageInfo[1],
                                                     ]);
                                                 }
@@ -193,7 +195,7 @@ final class NewsImageResource extends Resource
                                                     ->label(__('admin.news_images.file_size'))
                                                     ->numeric()
                                                     ->disabled()
-                                                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : ''),
+                                                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
                                                 TextInput::make('mime_type')
                                                     ->label(__('admin.news_images.mime_type'))
                                                     ->disabled(),
@@ -228,13 +230,13 @@ final class NewsImageResource extends Resource
 
                                                 $info = [];
                                                 if ($fileSize) {
-                                                    $info[] = __('admin.news_images.file_size').': '.number_format($fileSize / 1024, 2).' KB';
+                                                    $info[] = __('admin.news_images.file_size') . ': ' . number_format($fileSize / 1024, 2) . ' KB';
                                                 }
                                                 if ($mimeType) {
-                                                    $info[] = __('admin.news_images.mime_type').': '.$mimeType;
+                                                    $info[] = __('admin.news_images.mime_type') . ': ' . $mimeType;
                                                 }
                                                 if ($dimensions && isset($dimensions['width']) && isset($dimensions['height'])) {
-                                                    $info[] = __('admin.news_images.dimensions').': '.$dimensions['width'].'x'.$dimensions['height'];
+                                                    $info[] = __('admin.news_images.dimensions') . ': ' . $dimensions['width'] . 'x' . $dimensions['height'];
                                                 }
 
                                                 return implode(' | ', $info);
@@ -263,7 +265,7 @@ final class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -313,7 +315,7 @@ final class NewsImageResource extends Resource
                     ->formatStateUsing(fn ($state) => $state ? __('admin.common.yes') : __('admin.common.no'))
                     ->colors([
                         'success' => true,
-                        'gray' => false,
+                        'gray'    => false,
                     ])
                     ->sortable(),
                 TextColumn::make('sort_order')
@@ -324,7 +326,7 @@ final class NewsImageResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('file_size')
                     ->label(__('admin.news_images.file_size'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : '')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge()
@@ -333,14 +335,14 @@ final class NewsImageResource extends Resource
                     ->label(__('admin.news_images.mime_type'))
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'image/jpeg' => 'JPEG',
-                        'image/png' => 'PNG',
-                        'image/gif' => 'GIF',
+                        'image/png'  => 'PNG',
+                        'image/gif'  => 'GIF',
                         'image/webp' => 'WebP',
-                        default => $state,
+                        default      => $state,
                     })
                     ->colors([
                         'success' => 'image/jpeg',
-                        'info' => 'image/png',
+                        'info'    => 'image/png',
                         'warning' => 'image/gif',
                         'primary' => 'image/webp',
                     ])
@@ -348,7 +350,7 @@ final class NewsImageResource extends Resource
                 TextColumn::make('dimensions')
                     ->label(__('admin.news_images.dimensions'))
                     ->formatStateUsing(fn ($state) => $state && isset($state['width'], $state['height'])
-                        ? $state['width'].'x'.$state['height']
+                        ? $state['width'] . 'x' . $state['height']
                         : '')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge()
@@ -379,8 +381,8 @@ final class NewsImageResource extends Resource
                     ->label(__('admin.news_images.mime_type'))
                     ->options([
                         'image/jpeg' => 'JPEG',
-                        'image/png' => 'PNG',
-                        'image/gif' => 'GIF',
+                        'image/png'  => 'PNG',
+                        'image/gif'  => 'GIF',
                         'image/webp' => 'WebP',
                     ])
                     ->multiple(),
@@ -412,7 +414,7 @@ final class NewsImageResource extends Resource
                     Action::make('duplicate')
                         ->label(__('admin.news_images.duplicate'))
                         ->icon('heroicon-o-document-duplicate')
-                        ->action(function (NewsImage $record) {
+                        ->action(function (NewsImage $record): void {
                             $newRecord = $record->replicate();
                             $newRecord->sort_order = $record->news->images()->max('sort_order') + 1;
                             $newRecord->save();
@@ -444,7 +446,7 @@ final class NewsImageResource extends Resource
                     BulkAction::make('set_featured')
                         ->label(__('admin.news_images.set_featured'))
                         ->icon('heroicon-o-star')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_featured' => true]);
                         })
                         ->requiresConfirmation()
@@ -452,7 +454,7 @@ final class NewsImageResource extends Resource
                     BulkAction::make('unset_featured')
                         ->label(__('admin.news_images.unset_featured'))
                         ->icon('heroicon-o-star')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_featured' => false]);
                         })
                         ->requiresConfirmation()
@@ -460,8 +462,8 @@ final class NewsImageResource extends Resource
                     BulkAction::make('reorder')
                         ->label(__('admin.news_images.reorder'))
                         ->icon('heroicon-o-arrows-up-down')
-                        ->action(function (Collection $records) {
-                            $records->each(function ($record, $index) {
+                        ->action(function (Collection $records): void {
+                            $records->each(function ($record, $index): void {
                                 $record->update(['sort_order' => $index + 1]);
                             });
                         })
@@ -488,10 +490,10 @@ final class NewsImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNewsImages::route('/'),
+            'index'  => Pages\ListNewsImages::route('/'),
             'create' => Pages\CreateNewsImage::route('/create'),
-            'view' => Pages\ViewNewsImage::route('/{record}'),
-            'edit' => Pages\EditNewsImage::route('/{record}/edit'),
+            'view'   => Pages\ViewNewsImage::route('/{record}'),
+            'edit'   => Pages\EditNewsImage::route('/{record}/edit'),
         ];
     }
 }

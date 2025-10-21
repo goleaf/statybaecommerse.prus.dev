@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Storage\SecureStorage;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\AttachAction;
 use Filament\Tables\Actions\DetachAction;
 use Filament\Tables\Actions\EditAction;
@@ -21,6 +21,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Str;
 
 final class ProductsRelationManager extends BaseRelationManager
 {
@@ -32,15 +33,18 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Products';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             TextInput::make('name')
                 ->label(__('products.name'))
                 ->required()
                 ->maxLength(255)
                 ->live(onBlur: true)
-                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
             TextInput::make('slug')
                 ->label(__('products.slug'))
                 ->unique(ignoreRecord: true)
@@ -71,7 +75,7 @@ final class ProductsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -138,16 +142,16 @@ final class ProductsRelationManager extends BaseRelationManager
                 SelectFilter::make('stock_status')
                     ->label(__('products.stock_status'))
                     ->options([
-                        'in_stock' => __('products.in_stock'),
-                        'low_stock' => __('products.low_stock'),
+                        'in_stock'     => __('products.in_stock'),
+                        'low_stock'    => __('products.low_stock'),
                         'out_of_stock' => __('products.out_of_stock'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value'] ?? null) {
-                            'in_stock' => $query->where('stock_quantity', '>', 10),
-                            'low_stock' => $query->whereBetween('stock_quantity', [1, 10]),
+                            'in_stock'     => $query->where('stock_quantity', '>', 10),
+                            'low_stock'    => $query->whereBetween('stock_quantity', [1, 10]),
                             'out_of_stock' => $query->where('stock_quantity', 0),
-                            default => $query,
+                            default        => $query,
                         };
                     }),
             ])

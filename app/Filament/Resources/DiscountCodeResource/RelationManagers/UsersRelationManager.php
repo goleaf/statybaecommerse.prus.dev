@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,8 +16,11 @@ final class UsersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'users';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Forms\Components\TextInput::make('name')
@@ -33,13 +36,13 @@ final class UsersRelationManager extends BaseRelationManager
                     ->label(__('Type'))
                     ->options([
                         'customer' => __('Customer'),
-                        'admin' => __('Admin'),
+                        'admin'    => __('Admin'),
                     ])
                     ->required(),
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -58,8 +61,8 @@ final class UsersRelationManager extends BaseRelationManager
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'customer' => 'success',
-                        'admin' => 'primary',
-                        default => 'gray',
+                        'admin'    => 'primary',
+                        default    => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Created At'))
@@ -71,7 +74,7 @@ final class UsersRelationManager extends BaseRelationManager
                     ->label(__('Type'))
                     ->options([
                         'customer' => __('Customer'),
-                        'admin' => __('Admin'),
+                        'admin'    => __('Admin'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])

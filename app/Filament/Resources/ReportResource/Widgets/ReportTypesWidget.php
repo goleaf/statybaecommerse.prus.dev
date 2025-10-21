@@ -22,8 +22,8 @@ final class ReportTypesWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('reports.charts.reports_by_type'),
-                    'data' => $data->pluck('count')->toArray(),
+                    'label'           => __('reports.charts.reports_by_type'),
+                    'data'            => $data->pluck('count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // blue
                         '#10B981', // emerald

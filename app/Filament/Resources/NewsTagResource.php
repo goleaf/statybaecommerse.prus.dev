@@ -21,9 +21,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
@@ -35,6 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Str;
 use UnitEnum;
 
 final class NewsTagResource extends Resource
@@ -63,8 +64,11 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
                 ->schema([
@@ -73,7 +77,7 @@ final class NewsTagResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->live()
-                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state))),
+                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                     TextInput::make('slug')
                         ->label(__('admin.news_tags.form.fields.slug'))
                         ->required()
@@ -146,7 +150,7 @@ final class NewsTagResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -180,7 +184,7 @@ final class NewsTagResource extends Resource
                         'primary' => fn ($state): bool => $state === '#3B82F6',
                         'success' => fn ($state): bool => $state === '#10B981',
                         'warning' => fn ($state): bool => $state === '#F59E0B',
-                        'danger' => fn ($state): bool => $state === '#EF4444',
+                        'danger'  => fn ($state): bool => $state === '#EF4444',
                     ])
                     ->formatStateUsing(fn ($state): string => $state ?? '#3B82F6')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -263,8 +267,8 @@ final class NewsTagResource extends Resource
                     ->color('info')
                     ->action(function (NewsTag $record): void {
                         $newTag = $record->replicate();
-                        $newTag->name = $record->name.' (Copy)';
-                        $newTag->slug = $record->slug.'-copy';
+                        $newTag->name = $record->name . ' (Copy)';
+                        $newTag->slug = $record->slug . '-copy';
                         $newTag->save();
 
                         Notification::make()
@@ -309,8 +313,8 @@ final class NewsTagResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each(function (NewsTag $record): void {
                                 $newTag = $record->replicate();
-                                $newTag->name = $record->name.' (Copy)';
-                                $newTag->slug = $record->slug.'-copy';
+                                $newTag->name = $record->name . ' (Copy)';
+                                $newTag->slug = $record->slug . '-copy';
                                 $newTag->save();
                             });
                             Notification::make()
@@ -333,10 +337,10 @@ final class NewsTagResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNewsTags::route('/'),
+            'index'  => Pages\ListNewsTags::route('/'),
             'create' => Pages\CreateNewsTag::route('/create'),
-            'view' => Pages\ViewNewsTag::route('/{record}'),
-            'edit' => Pages\EditNewsTag::route('/{record}/edit'),
+            'view'   => Pages\ViewNewsTag::route('/{record}'),
+            'edit'   => Pages\EditNewsTag::route('/{record}/edit'),
         ];
     }
 }

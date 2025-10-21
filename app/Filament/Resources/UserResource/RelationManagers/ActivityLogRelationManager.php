@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -16,8 +16,11 @@ final class ActivityLogRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin.sections.activity_log';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Forms\Components\TextInput::make('log_name')
@@ -31,7 +34,7 @@ final class ActivityLogRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('description')
@@ -51,7 +54,7 @@ final class ActivityLogRelationManager extends BaseRelationManager
                         'created' => 'success',
                         'updated' => 'warning',
                         'deleted' => 'danger',
-                        default => 'gray',
+                        default   => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))
@@ -61,8 +64,8 @@ final class ActivityLogRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('log_name')
                     ->options([
-                        'user' => 'User',
-                        'order' => 'Order',
+                        'user'    => 'User',
+                        'order'   => 'Order',
                         'product' => 'Product',
                     ]),
                 Tables\Filters\SelectFilter::make('event')

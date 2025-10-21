@@ -11,6 +11,7 @@ use App\Models\PostApproval;
 use Filament\Actions;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Schema;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 
@@ -25,8 +26,11 @@ final class ViewPost extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Preserve legacy infolist variable naming for clarity.
+
         return $infolist->schema([
             ListEntry::make('postQuickLinks')
                 ->heading(__('Quick links'))

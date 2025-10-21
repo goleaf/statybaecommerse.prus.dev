@@ -49,7 +49,7 @@ final class SliderEngagementMetrics extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'Engagement Features',
-                    'data' => [
+                    'data'  => [
                         $withImages,
                         $withBackgrounds,
                         $withButtons,
@@ -95,15 +95,15 @@ final class SliderEngagementMetrics extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'plugins' => [
+            'plugins'             => [
                 'legend' => [
                     'position' => 'bottom',
                 ],
                 'title' => [
                     'display' => true,
-                    'text' => 'Slider Feature Usage',
+                    'text'    => 'Slider Feature Usage',
                 ],
             ],
         ];

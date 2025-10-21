@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,8 +21,11 @@ final class ReviewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Reviews';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Forms\Components\Select::make('product_id')
@@ -45,7 +48,7 @@ final class ReviewsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')
@@ -57,7 +60,7 @@ final class ReviewsRelationManager extends BaseRelationManager
                     ->color(fn (int $state): string => match (true) {
                         $state >= 4 => 'success',
                         $state >= 3 => 'warning',
-                        default => 'danger',
+                        default     => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('title')
                     ->limit(50),

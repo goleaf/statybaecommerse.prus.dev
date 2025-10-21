@@ -8,6 +8,7 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use Filament\Forms;
@@ -20,9 +21,9 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -50,7 +51,6 @@ use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use RuntimeException;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * PostResource
@@ -105,8 +105,11 @@ final class PostResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Section::make(__('posts.sections.basic_information'))
@@ -252,7 +255,7 @@ final class PostResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -300,10 +303,10 @@ final class PostResource extends Resource
                                 return [
                                     'label' => __('View (:locale): :title', [
                                         'locale' => strtoupper($locale),
-                                        'title' => $title,
+                                        'title'  => $title,
                                     ]),
-                                    'url' => $url,
-                                    'icon' => 'heroicon-o-document-text',
+                                    'url'   => $url,
+                                    'icon'  => 'heroicon-o-document-text',
                                     'color' => 'primary',
                                 ];
                             })

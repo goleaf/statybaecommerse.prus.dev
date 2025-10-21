@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,8 +19,11 @@ final class DocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Forms\Components\Select::make('template_id')
@@ -36,22 +39,22 @@ final class DocumentsRelationManager extends BaseRelationManager
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'draft' => __('Draft'),
+                        'draft'     => __('Draft'),
                         'generated' => __('Generated'),
-                        'sent' => __('Sent'),
+                        'sent'      => __('Sent'),
                     ])
                     ->required(),
                 Forms\Components\Select::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ])
                     ->required(),
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')
@@ -69,17 +72,17 @@ final class DocumentsRelationManager extends BaseRelationManager
                     ->label(__('Status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'draft' => 'warning',
+                        'draft'     => 'warning',
                         'generated' => 'success',
-                        'sent' => 'info',
-                        default => 'gray',
+                        'sent'      => 'info',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('format')
                     ->label(__('Format'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'html' => 'primary',
-                        'pdf' => 'danger',
+                        'html'  => 'primary',
+                        'pdf'   => 'danger',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('generated_at')
@@ -91,15 +94,15 @@ final class DocumentsRelationManager extends BaseRelationManager
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'draft' => __('Draft'),
+                        'draft'     => __('Draft'),
                         'generated' => __('Generated'),
-                        'sent' => __('Sent'),
+                        'sent'      => __('Sent'),
                     ]),
                 Tables\Filters\SelectFilter::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])

@@ -23,7 +23,7 @@ class RecentActivityWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query($this->getTableQuery())
@@ -32,15 +32,15 @@ class RecentActivityWidget extends BaseWidget
                     ->label(__('translations.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Order' => 'success',
-                        'Product' => 'primary',
-                        'User' => 'info',
-                        'Review' => 'warning',
-                        'Campaign' => 'danger',
-                        'News' => 'secondary',
-                        'Slider' => 'gray',
+                        'Order'          => 'success',
+                        'Product'        => 'primary',
+                        'User'           => 'info',
+                        'Review'         => 'warning',
+                        'Campaign'       => 'danger',
+                        'News'           => 'secondary',
+                        'Slider'         => 'gray',
                         'System Setting' => 'slate',
-                        default => 'gray',
+                        default          => 'gray',
                     })
                     ->searchable()
                     ->sortable(),

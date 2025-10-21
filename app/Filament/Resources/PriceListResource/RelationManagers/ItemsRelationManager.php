@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
@@ -25,8 +25,11 @@ final class ItemsRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.items.title');
     }
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Forms\Components\Select::make('product_id')
@@ -92,7 +95,7 @@ final class ItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('product.name')
@@ -172,9 +175,9 @@ final class ItemsRelationManager extends BaseRelationManager
 
                 Tables\Filters\Filter::make('valid_now')
                     ->label(__('price_list_items.valid_now'))
-                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $query) {
+                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $query): void {
                         $query->where('valid_from', '<=', now())
-                            ->where(function (Builder $query) {
+                            ->where(function (Builder $query): void {
                                 $query->whereNull('valid_until')
                                     ->orWhere('valid_until', '>=', now());
                             });

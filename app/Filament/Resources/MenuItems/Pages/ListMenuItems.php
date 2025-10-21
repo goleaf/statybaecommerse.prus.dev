@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\MenuItems\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\MenuItems\MenuItemResource;
 use Filament\Actions\CreateAction;
-use App\Filament\Pages\Support\BaseListRecords;
 
 class ListMenuItems extends BaseListRecords
 {

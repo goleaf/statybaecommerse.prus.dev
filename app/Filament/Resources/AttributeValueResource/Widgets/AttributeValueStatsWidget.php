@@ -14,10 +14,10 @@ final class AttributeValueStatsWidget extends BaseWidget
     {
         $totalAttributeValues = AttributeValue::count();
         $activeAttributeValues = AttributeValue::where('is_active', true)->count();
-        $colorValues = AttributeValue::whereHas('attribute', function ($query) {
+        $colorValues = AttributeValue::whereHas('attribute', function ($query): void {
             $query->where('type', 'color');
         })->count();
-        $sizeValues = AttributeValue::whereHas('attribute', function ($query) {
+        $sizeValues = AttributeValue::whereHas('attribute', function ($query): void {
             $query->where('type', 'size');
         })->count();
 

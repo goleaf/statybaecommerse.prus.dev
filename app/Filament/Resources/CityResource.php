@@ -9,14 +9,14 @@ use App\Models\City;
 use App\Models\Country;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
@@ -64,8 +64,11 @@ final class CityResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('cities.basic_information'))
                 ->schema([
@@ -76,7 +79,7 @@ final class CityResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function ($state, Forms\Set $set, $operation) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set, $operation): void {
                                     if ($operation === 'create' && $state) {
                                         $set('slug', Str::slug($state));
                                     }
@@ -95,7 +98,7 @@ final class CityResource extends Resource
                         ->preload()
                         ->required()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
                             if ($state) {
                                 $country = Country::find($state);
                                 if ($country) {
@@ -244,11 +247,11 @@ final class CityResource extends Resource
                                 ->label(__('cities.type'))
                                 ->options([
                                     'metropolitan' => __('cities.types.metropolitan'),
-                                    'urban' => __('cities.types.urban'),
-                                    'rural' => __('cities.types.rural'),
-                                    'suburban' => __('cities.types.suburban'),
-                                    'industrial' => __('cities.types.industrial'),
-                                    'tourist' => __('cities.types.tourist'),
+                                    'urban'        => __('cities.types.urban'),
+                                    'rural'        => __('cities.types.rural'),
+                                    'suburban'     => __('cities.types.suburban'),
+                                    'industrial'   => __('cities.types.industrial'),
+                                    'tourist'      => __('cities.types.tourist'),
                                 ])
                                 ->searchable()
                                 ->helperText(__('cities.type_help')),
@@ -260,7 +263,7 @@ final class CityResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -299,13 +302,13 @@ final class CityResource extends Resource
                 TextColumn::make('area')
                     ->label(__('cities.area'))
                     ->numeric()
-                    ->formatStateUsing(fn ($state): string => $state ? number_format($state, 2).' km²' : '-')
+                    ->formatStateUsing(fn ($state): string => $state ? number_format($state, 2) . ' km²' : '-')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 TextColumn::make('density')
                     ->label(__('cities.density'))
                     ->numeric()
-                    ->formatStateUsing(fn ($state): string => $state ? number_format($state, 2).'/km²' : '-')
+                    ->formatStateUsing(fn ($state): string => $state ? number_format($state, 2) . '/km²' : '-')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 IconColumn::make('is_active')
@@ -326,12 +329,12 @@ final class CityResource extends Resource
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'metropolitan' => 'purple',
-                        'urban' => 'blue',
-                        'rural' => 'green',
-                        'suburban' => 'orange',
-                        'industrial' => 'red',
-                        'tourist' => 'pink',
-                        default => 'gray',
+                        'urban'        => 'blue',
+                        'rural'        => 'green',
+                        'suburban'     => 'orange',
+                        'industrial'   => 'red',
+                        'tourist'      => 'pink',
+                        default        => 'gray',
                     })
                     ->formatStateUsing(fn (?string $state): string => $state ? __("cities.types.{$state}") : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -339,10 +342,10 @@ final class CityResource extends Resource
                     ->label(__('cities.level'))
                     ->badge()
                     ->color(fn (?int $state): string => match ($state) {
-                        0 => 'blue',
-                        1 => 'green',
-                        2 => 'yellow',
-                        3 => 'orange',
+                        0       => 'blue',
+                        1       => 'green',
+                        2       => 'yellow',
+                        3       => 'orange',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (?int $state): string => $state !== null ? __("cities.levels.{$state}") : '-')
@@ -404,11 +407,11 @@ final class CityResource extends Resource
                 SelectFilter::make('type')
                     ->options([
                         'metropolitan' => __('cities.types.metropolitan'),
-                        'urban' => __('cities.types.urban'),
-                        'rural' => __('cities.types.rural'),
-                        'suburban' => __('cities.types.suburban'),
-                        'industrial' => __('cities.types.industrial'),
-                        'tourist' => __('cities.types.tourist'),
+                        'urban'        => __('cities.types.urban'),
+                        'rural'        => __('cities.types.rural'),
+                        'suburban'     => __('cities.types.suburban'),
+                        'industrial'   => __('cities.types.industrial'),
+                        'tourist'      => __('cities.types.tourist'),
                     ]),
                 SelectFilter::make('level')
                     ->options([
@@ -547,10 +550,10 @@ final class CityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCities::route('/'),
+            'index'  => Pages\ListCities::route('/'),
             'create' => Pages\CreateCity::route('/create'),
-            'view' => Pages\ViewCity::route('/{record}'),
-            'edit' => Pages\EditCity::route('/{record}/edit'),
+            'view'   => Pages\ViewCity::route('/{record}'),
+            'edit'   => Pages\EditCity::route('/{record}/edit'),
         ];
     }
 }

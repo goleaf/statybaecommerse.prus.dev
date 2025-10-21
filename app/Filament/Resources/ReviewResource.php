@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
+use BackedEnum;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\NumericScale;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
@@ -19,7 +20,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -36,29 +36,30 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class ReviewResource extends Resource
 {
     protected static ?string $model = Review::class;
 
     /**
-     * @var string|\BackedEnum|null Normalize Filament icon typing for consistency.
+     * @var string|BackedEnum|null Normalize Filament icon typing for consistency.
      */
-    protected static $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
-     * @var string|\BackedEnum|null Allow enum-backed navigation grouping.
+     * @var string|BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static $navigationGroup = NavigationGroup::ContentManagement;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {
         // Convert enum-backed navigation groups into translated labels automatically.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
@@ -78,8 +79,11 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Section::make(__('reviews.sections.basic_info'))
@@ -151,7 +155,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -393,8 +397,11 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->components([
                 InfolistSection::make(__('reviews.sections.basic_info'))

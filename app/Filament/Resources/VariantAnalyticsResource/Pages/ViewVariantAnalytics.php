@@ -25,8 +25,11 @@ final class ViewVariantAnalytics extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema|array
+    public function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->components([
                 Section::make(__('admin.variant_analytics.basic_info'))
@@ -78,7 +81,7 @@ final class ViewVariantAnalytics extends ViewRecord
 
                                 TextEntry::make('conversion_rate')
                                     ->label(__('admin.variant_analytics.conversion_rate'))
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
+                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                                     ->columnSpan(1),
                             ]),
                     ]),
@@ -90,19 +93,19 @@ final class ViewVariantAnalytics extends ViewRecord
                                 TextEntry::make('click_through_rate')
                                     ->label(__('admin.variant_analytics.ctr'))
                                     ->getStateUsing(fn ($record) => $record->click_through_rate)
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
+                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('add_to_cart_rate')
                                     ->label(__('admin.variant_analytics.atc_rate'))
                                     ->getStateUsing(fn ($record) => $record->add_to_cart_rate)
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
+                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('purchase_rate')
                                     ->label(__('admin.variant_analytics.purchase_rate'))
                                     ->getStateUsing(fn ($record) => $record->purchase_rate)
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
+                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('average_revenue_per_purchase')

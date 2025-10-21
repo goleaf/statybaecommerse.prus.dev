@@ -12,8 +12,8 @@ use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;
 use App\Filament\Resources\RecommendationCaches\Tables\RecommendationCachesTable;
 use App\Models\RecommendationCache;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -48,12 +48,15 @@ final class RecommendationCacheResource extends Resource
         return __('admin.recommendation_caches.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return RecommendationCacheForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return RecommendationCachesTable::configure($table);
     }
@@ -66,10 +69,10 @@ final class RecommendationCacheResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListRecommendationCaches::route('/'),
+            'index'  => ListRecommendationCaches::route('/'),
             'create' => CreateRecommendationCache::route('/create'),
-            'view' => ViewRecommendationCache::route('/{record}'),
-            'edit' => EditRecommendationCache::route('/{record}/edit'),
+            'view'   => ViewRecommendationCache::route('/{record}'),
+            'edit'   => EditRecommendationCache::route('/{record}/edit'),
         ];
     }
 }

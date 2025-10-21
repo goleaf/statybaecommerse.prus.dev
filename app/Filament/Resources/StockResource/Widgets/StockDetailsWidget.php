@@ -27,18 +27,18 @@ final class StockDetailsWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('stocks.charts.total_quantity'),
-                    'data' => $data->pluck('total_quantity')->toArray(),
+                    'label'           => __('stocks.charts.total_quantity'),
+                    'data'            => $data->pluck('total_quantity')->toArray(),
                     'backgroundColor' => 'rgba(59, 130, 246, 0.8)',
-                    'borderColor' => '#3B82F6',
-                    'borderWidth' => 1,
+                    'borderColor'     => '#3B82F6',
+                    'borderWidth'     => 1,
                 ],
                 [
-                    'label' => __('stocks.charts.reserved_quantity'),
-                    'data' => $data->pluck('total_reserved')->toArray(),
+                    'label'           => __('stocks.charts.reserved_quantity'),
+                    'data'            => $data->pluck('total_reserved')->toArray(),
                     'backgroundColor' => 'rgba(245, 158, 11, 0.8)',
-                    'borderColor' => '#F59E0B',
-                    'borderWidth' => 1,
+                    'borderColor'     => '#F59E0B',
+                    'borderWidth'     => 1,
                 ],
             ],
             'labels' => $data->pluck('location')->toArray(),
@@ -56,7 +56,7 @@ final class StockDetailsWidget extends ChartWidget
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'stepSize' => 1,
                     ],
                 ],

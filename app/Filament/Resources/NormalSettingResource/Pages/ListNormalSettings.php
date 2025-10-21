@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NormalSettingResource\Pages;
 
-use App\Filament\Resources\NormalSettingResource;
-use Filament\Actions;
 use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Resources\NormalSettingResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListNormalSettings extends BaseListRecords

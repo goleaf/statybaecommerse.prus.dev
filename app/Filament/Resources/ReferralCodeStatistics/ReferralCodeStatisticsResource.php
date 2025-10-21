@@ -11,8 +11,8 @@ use App\Filament\Resources\ReferralCodeStatistics\Schemas\ReferralCodeStatistics
 use App\Filament\Resources\ReferralCodeStatistics\Tables\ReferralCodeStatisticsTable;
 use App\Models\ReferralCodeStatistics;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
@@ -22,12 +22,15 @@ class ReferralCodeStatisticsResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return ReferralCodeStatisticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ReferralCodeStatisticsTable::configure($table);
     }
@@ -42,9 +45,9 @@ class ReferralCodeStatisticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralCodeStatistics::route('/'),
+            'index'  => ListReferralCodeStatistics::route('/'),
             'create' => CreateReferralCodeStatistics::route('/create'),
-            'edit' => EditReferralCodeStatistics::route('/{record}/edit'),
+            'edit'   => EditReferralCodeStatistics::route('/{record}/edit'),
         ];
     }
 }

@@ -26,12 +26,12 @@ final class StockMovementsWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('stocks.charts.stock_movements'),
-                    'data' => $data->pluck('movements')->toArray(),
-                    'borderColor' => '#10B981',
+                    'label'           => __('stocks.charts.stock_movements'),
+                    'data'            => $data->pluck('movements')->toArray(),
+                    'borderColor'     => '#10B981',
                     'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
             ],
             'labels' => $data->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
@@ -49,7 +49,7 @@ final class StockMovementsWidget extends ChartWidget
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'stepSize' => 1,
                     ],
                 ],

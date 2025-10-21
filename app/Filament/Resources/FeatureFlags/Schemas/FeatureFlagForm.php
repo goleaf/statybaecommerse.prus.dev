@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\FeatureFlags\Schemas;
 
 use App\Models\FeatureFlag;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use App\Support\Filament\Components\Flatpickr;
 
 class FeatureFlagForm
 {

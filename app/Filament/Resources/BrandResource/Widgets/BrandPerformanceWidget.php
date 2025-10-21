@@ -21,8 +21,8 @@ final class BrandPerformanceWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('brands.charts.products_per_brand'),
-                    'data' => $data->pluck('products_count')->toArray(),
+                    'label'           => __('brands.charts.products_per_brand'),
+                    'data'            => $data->pluck('products_count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // blue
                         '#10B981', // emerald

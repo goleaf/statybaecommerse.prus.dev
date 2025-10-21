@@ -6,6 +6,7 @@ namespace App\Filament\Resources\SystemResource\Widgets;
 
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
+use Exception;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
@@ -49,7 +50,7 @@ final class SystemSettingStatsWidget extends BaseWidget
                 ->description('Security protected settings')
                 ->descriptionIcon('heroicon-m-shield-check')
                 ->color('danger'),
-            Stat::make('Cache Hit Rate', $cacheHitRate.'%')
+            Stat::make('Cache Hit Rate', $cacheHitRate . '%')
                 ->description('Cache performance')
                 ->descriptionIcon('heroicon-m-bolt')
                 ->color($cacheHitRate > 80 ? 'success' : ($cacheHitRate > 60 ? 'warning' : 'danger')),
@@ -73,7 +74,7 @@ final class SystemSettingStatsWidget extends BaseWidget
             }
 
             return 85;  // Default optimistic value
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0;
         }
     }

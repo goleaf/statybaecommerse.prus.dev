@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ReferralRewardLogs\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ReferralRewardLogs\ReferralRewardLogResource;
 use Filament\Actions\CreateAction;
-use App\Filament\Pages\Support\BaseListRecords;
 
 class ListReferralRewardLogs extends BaseListRecords
 {

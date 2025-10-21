@@ -31,18 +31,18 @@ final class AddressChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('translations.addresses_created'),
-                    'data' => $data['addresses'],
+                    'label'           => __('translations.addresses_created'),
+                    'data'            => $data['addresses'],
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'borderColor' => 'rgba(59, 130, 246, 1)',
-                    'borderWidth' => 2,
+                    'borderColor'     => 'rgba(59, 130, 246, 1)',
+                    'borderWidth'     => 2,
                 ],
                 [
-                    'label' => __('translations.active_addresses'),
-                    'data' => $data['active_addresses'],
+                    'label'           => __('translations.active_addresses'),
+                    'data'            => $data['active_addresses'],
                     'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
-                    'borderColor' => 'rgba(34, 197, 94, 1)',
-                    'borderWidth' => 2,
+                    'borderColor'     => 'rgba(34, 197, 94, 1)',
+                    'borderWidth'     => 2,
                 ],
             ],
             'labels' => $data['labels'],
@@ -81,8 +81,8 @@ final class AddressChartWidget extends ChartWidget
         }
 
         return [
-            'labels' => $months,
-            'addresses' => $addresses,
+            'labels'           => $months,
+            'addresses'        => $addresses,
             'active_addresses' => $activeAddresses,
         ];
     }

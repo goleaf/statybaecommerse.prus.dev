@@ -9,6 +9,7 @@ use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\CodeRelat
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\DiscountRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\UserRelationManager;
 use App\Models\DiscountRedemption;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -18,8 +19,8 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
@@ -32,7 +33,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class DiscountRedemptionResource extends Resource
 {
@@ -58,8 +58,11 @@ final class DiscountRedemptionResource extends Resource
         return __('discount_redemptions.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('discount_redemptions.sections.associations'))
                 ->schema([
@@ -152,7 +155,7 @@ final class DiscountRedemptionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

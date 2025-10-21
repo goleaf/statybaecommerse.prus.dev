@@ -21,8 +21,8 @@ final class AttributePerformanceWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('attributes.charts.attribute_performance'),
-                    'data' => [$filterable, $nonFilterable, $required, $optional],
+                    'label'           => __('attributes.charts.attribute_performance'),
+                    'data'            => [$filterable, $nonFilterable, $required, $optional],
                     'backgroundColor' => [
                         '#10B981', // emerald (filterable)
                         '#6B7280', // gray (non-filterable)

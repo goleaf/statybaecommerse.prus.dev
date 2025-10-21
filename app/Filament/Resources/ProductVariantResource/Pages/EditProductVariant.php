@@ -20,7 +20,7 @@ final class EditProductVariant extends EditRecord
             Actions\Action::make('set_default')
                 ->label(__('product_variants.actions.set_default'))
                 ->icon('heroicon-o-star')
-                ->action(function () {
+                ->action(function (): void {
                     $this->record->setAsDefault();
                     Notification::make()
                         ->title(__('product_variants.messages.set_as_default_success'))
@@ -76,17 +76,17 @@ final class EditProductVariant extends EditRecord
 
         $sku = $baseSku;
         if ($size) {
-            $sku .= '-'.strtoupper($size);
+            $sku .= '-' . strtoupper($size);
         }
         if ($suffix) {
-            $sku .= '-'.strtoupper($suffix);
+            $sku .= '-' . strtoupper($suffix);
         }
 
         // Ensure uniqueness (excluding current record)
         $originalSku = $sku;
         $counter = 1;
         while (\App\Models\ProductVariant::where('sku', $sku)->where('id', '!=', $this->record->id)->exists()) {
-            $sku = $originalSku.'-'.$counter;
+            $sku = $originalSku . '-' . $counter;
             $counter++;
         }
 

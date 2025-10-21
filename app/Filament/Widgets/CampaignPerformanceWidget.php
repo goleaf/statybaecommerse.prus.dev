@@ -10,6 +10,7 @@ use App\Models\CampaignConversion;
 use App\Models\CampaignView;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
+use Str;
 
 class CampaignPerformanceWidget extends ChartWidget
 {
@@ -40,7 +41,7 @@ class CampaignPerformanceWidget extends ChartWidget
 
         foreach ($topCampaigns as $item) {
             if ($item->campaign) {
-                $campaignNames[] = \Str::limit($item->campaign->name, 20);
+                $campaignNames[] = Str::limit($item->campaign->name, 20);
                 $viewsData[] = $item->total_views;
 
                 // Get clicks for this campaign
@@ -66,39 +67,39 @@ class CampaignPerformanceWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Views',
-                    'data' => $viewsData,
-                    'borderColor' => 'rgb(59, 130, 246)',
+                    'label'           => 'Views',
+                    'data'            => $viewsData,
+                    'borderColor'     => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.2)',
-                    'yAxisID' => 'y',
+                    'yAxisID'         => 'y',
                 ],
                 [
-                    'label' => 'Clicks',
-                    'data' => $clicksData,
-                    'borderColor' => 'rgb(34, 197, 94)',
+                    'label'           => 'Clicks',
+                    'data'            => $clicksData,
+                    'borderColor'     => 'rgb(34, 197, 94)',
                     'backgroundColor' => 'rgba(34, 197, 94, 0.2)',
-                    'yAxisID' => 'y',
+                    'yAxisID'         => 'y',
                 ],
                 [
-                    'label' => 'Conversions',
-                    'data' => $conversionsData,
-                    'borderColor' => 'rgb(239, 68, 68)',
+                    'label'           => 'Conversions',
+                    'data'            => $conversionsData,
+                    'borderColor'     => 'rgb(239, 68, 68)',
                     'backgroundColor' => 'rgba(239, 68, 68, 0.2)',
-                    'yAxisID' => 'y',
+                    'yAxisID'         => 'y',
                 ],
                 [
-                    'label' => 'CTR (%)',
-                    'data' => $ctrData,
-                    'borderColor' => 'rgb(245, 158, 11)',
+                    'label'           => 'CTR (%)',
+                    'data'            => $ctrData,
+                    'borderColor'     => 'rgb(245, 158, 11)',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.2)',
-                    'yAxisID' => 'y1',
+                    'yAxisID'         => 'y1',
                 ],
                 [
-                    'label' => 'Conversion Rate (%)',
-                    'data' => $conversionRateData,
-                    'borderColor' => 'rgb(168, 85, 247)',
+                    'label'           => 'Conversion Rate (%)',
+                    'data'            => $conversionRateData,
+                    'borderColor'     => 'rgb(168, 85, 247)',
                     'backgroundColor' => 'rgba(168, 85, 247, 0.2)',
-                    'yAxisID' => 'y1',
+                    'yAxisID'         => 'y1',
                 ],
             ],
             'labels' => $campaignNames,
@@ -113,37 +114,37 @@ class CampaignPerformanceWidget extends ChartWidget
     public function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'plugins' => [
+            'plugins'             => [
                 'legend' => [
                     'position' => 'top',
                 ],
                 'title' => [
                     'display' => true,
-                    'text' => 'Top 10 Campaigns Performance',
+                    'text'    => 'Top 10 Campaigns Performance',
                 ],
             ],
             'scales' => [
                 'y' => [
-                    'type' => 'linear',
-                    'display' => true,
-                    'position' => 'left',
+                    'type'        => 'linear',
+                    'display'     => true,
+                    'position'    => 'left',
                     'beginAtZero' => true,
-                    'title' => [
+                    'title'       => [
                         'display' => true,
-                        'text' => 'Count',
+                        'text'    => 'Count',
                     ],
                 ],
                 'y1' => [
-                    'type' => 'linear',
-                    'display' => true,
-                    'position' => 'right',
+                    'type'        => 'linear',
+                    'display'     => true,
+                    'position'    => 'right',
                     'beginAtZero' => true,
-                    'max' => 100,
-                    'title' => [
+                    'max'         => 100,
+                    'title'       => [
                         'display' => true,
-                        'text' => 'Rate (%)',
+                        'text'    => 'Rate (%)',
                     ],
                     'grid' => [
                         'drawOnChartArea' => false,

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\NewsCategory;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -20,8 +20,11 @@ final class CategoriesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Categories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Forms\Components\Select::make('id')
@@ -69,7 +72,7 @@ final class CategoriesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -107,10 +110,10 @@ final class CategoriesRelationManager extends BaseRelationManager
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state >= 100 => 'danger',
-                        $state >= 50 => 'warning',
-                        $state >= 20 => 'info',
-                        $state >= 10 => 'success',
-                        default => 'gray',
+                        $state >= 50  => 'warning',
+                        $state >= 20  => 'info',
+                        $state >= 10  => 'success',
+                        default       => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('color')
                     ->label(__('news.fields.color'))

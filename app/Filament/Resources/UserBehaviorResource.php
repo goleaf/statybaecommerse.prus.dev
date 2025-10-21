@@ -7,6 +7,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserBehaviorResource\Pages;
 use App\Models\User;
 use App\Models\UserBehavior;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -20,10 +22,9 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use App\Support\Filament\Filters\DateRangeFilter;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -33,7 +34,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * UserBehaviorResource
@@ -53,16 +53,16 @@ final class UserBehaviorResource extends Resource
     private static function behaviorTypeOptions(): array
     {
         return [
-            'view' => __('admin.user_behaviors.behavior_types.view'),
-            'click' => __('admin.user_behaviors.behavior_types.click'),
-            'add_to_cart' => __('admin.user_behaviors.behavior_types.add_to_cart'),
+            'view'             => __('admin.user_behaviors.behavior_types.view'),
+            'click'            => __('admin.user_behaviors.behavior_types.click'),
+            'add_to_cart'      => __('admin.user_behaviors.behavior_types.add_to_cart'),
             'remove_from_cart' => __('admin.user_behaviors.behavior_types.remove_from_cart'),
-            'purchase' => __('admin.user_behaviors.behavior_types.purchase'),
-            'search' => __('admin.user_behaviors.behavior_types.search'),
-            'filter' => __('admin.user_behaviors.behavior_types.filter'),
-            'sort' => __('admin.user_behaviors.behavior_types.sort'),
-            'wishlist' => __('admin.user_behaviors.behavior_types.wishlist'),
-            'share' => __('admin.user_behaviors.behavior_types.share'),
+            'purchase'         => __('admin.user_behaviors.behavior_types.purchase'),
+            'search'           => __('admin.user_behaviors.behavior_types.search'),
+            'filter'           => __('admin.user_behaviors.behavior_types.filter'),
+            'sort'             => __('admin.user_behaviors.behavior_types.sort'),
+            'wishlist'         => __('admin.user_behaviors.behavior_types.wishlist'),
+            'share'            => __('admin.user_behaviors.behavior_types.share'),
         ];
     }
 
@@ -81,8 +81,11 @@ final class UserBehaviorResource extends Resource
         return __('admin.user_behaviors.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Section::make(__('admin.user_behaviors.basic_information'))
@@ -162,7 +165,7 @@ final class UserBehaviorResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -175,17 +178,17 @@ final class UserBehaviorResource extends Resource
                     ->label(__('admin.user_behaviors.behavior_type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'view' => 'info',
-                        'click' => 'success',
-                        'add_to_cart' => 'warning',
+                        'view'             => 'info',
+                        'click'            => 'success',
+                        'add_to_cart'      => 'warning',
                         'remove_from_cart' => 'danger',
-                        'purchase' => 'primary',
-                        'search' => 'secondary',
-                        'filter' => 'gray',
-                        'sort' => 'gray',
-                        'wishlist' => 'pink',
-                        'share' => 'blue',
-                        default => 'gray',
+                        'purchase'         => 'primary',
+                        'search'           => 'secondary',
+                        'filter'           => 'gray',
+                        'sort'             => 'gray',
+                        'wishlist'         => 'pink',
+                        'share'            => 'blue',
+                        default            => 'gray',
                     })
                     ->searchable(),
                 TextColumn::make('product.name')
@@ -273,7 +276,7 @@ final class UserBehaviorResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('admin.user_behaviors.created_at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
@@ -401,10 +404,10 @@ final class UserBehaviorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserBehaviors::route('/'),
-            'create' => Pages\CreateUserBehavior::route('/create'),
-            'view' => Pages\ViewUserBehavior::route('/{record}'),
-            'edit' => Pages\EditUserBehavior::route('/{record}/edit'),
+            'index'     => Pages\ListUserBehaviors::route('/'),
+            'create'    => Pages\CreateUserBehavior::route('/create'),
+            'view'      => Pages\ViewUserBehavior::route('/{record}'),
+            'edit'      => Pages\EditUserBehavior::route('/{record}/edit'),
             'analytics' => Pages\Analytics::route('/analytics'),
         ];
     }

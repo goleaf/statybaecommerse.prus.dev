@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -19,8 +19,11 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Translations';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Select::make('locale')
@@ -55,7 +58,7 @@ final class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -64,17 +67,17 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('admin.collections.fields.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'success',
-                        'en' => 'primary',
-                        'de' => 'warning',
-                        'ru' => 'danger',
+                        'lt'    => 'success',
+                        'en'    => 'primary',
+                        'de'    => 'warning',
+                        'ru'    => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'lt' => '🇱🇹 Lithuanian',
-                        'en' => '🇬🇧 English',
-                        'de' => '🇩🇪 German',
-                        'ru' => '🇷🇺 Russian',
+                        'lt'    => '🇱🇹 Lithuanian',
+                        'en'    => '🇬🇧 English',
+                        'de'    => '🇩🇪 German',
+                        'ru'    => '🇷🇺 Russian',
                         default => $state,
                     })
                     ->sortable(),

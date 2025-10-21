@@ -28,8 +28,8 @@ final class StockValueWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('stocks.charts.stock_value'),
-                    'data' => $data->pluck('total_value')->toArray(),
+                    'label'           => __('stocks.charts.stock_value'),
+                    'data'            => $data->pluck('total_value')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // blue
                         '#10B981', // emerald
