@@ -28,6 +28,11 @@ return new class extends Migration
             return;
         }
 
+        if (! Schema::hasColumn($tableName, 'created_at')) {
+            // Skip tables that opt out of timestamps to keep the migration idempotent.
+            return;
+        }
+
         Schema::table($tableName, function (Blueprint $table) use ($tableName, $indexName): void {
             if ($this->indexExists($tableName, $indexName)) {
                 return;
@@ -50,8 +55,16 @@ return new class extends Migration
 
     private function indexExists(string $tableName, string $indexName): bool
     {
-        $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($tableName);
+        $connection = Schema::getConnection();
+
+        if (! method_exists($connection, 'getDoctrineSchemaManager')) {
+            return false;
+        }
+
+        $schemaManager = $connection->getDoctrineSchemaManager();
+        $prefixedTable = $connection->getTablePrefix() . $tableName;
+
+        $indexes = $schemaManager->listTableIndexes($prefixedTable);
 
         return array_key_exists($indexName, $indexes);
     }
