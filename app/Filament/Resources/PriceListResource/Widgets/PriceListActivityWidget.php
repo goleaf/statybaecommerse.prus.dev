@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 final class PriceListActivityWidget extends ChartWidget
 {
-    protected function getHeading(): ?string
+    public function getHeading(): string
     {
         return __('price_lists.charts.activity_over_time');
     }
@@ -29,12 +29,12 @@ final class PriceListActivityWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('price_lists.charts.price_lists_created'),
-                    'data' => $data->pluck('count')->toArray(),
-                    'borderColor' => '#3B82F6',
+                    'label'           => __('price_lists.charts.price_lists_created'),
+                    'data'            => $data->pluck('count')->toArray(),
+                    'borderColor'     => '#3B82F6',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
             ],
             'labels' => $data->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
@@ -52,7 +52,7 @@ final class PriceListActivityWidget extends ChartWidget
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'stepSize' => 1,
                     ],
                 ],
