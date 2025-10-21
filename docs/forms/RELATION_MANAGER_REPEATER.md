@@ -33,3 +33,7 @@ Opt out of the action when a relation manager:
 - Performs side effects during save that assume single-record edits.
 
 When new relation managers are introduced, evaluate them against the criteria above and document the outcome here so the global rollout stays consistent.
+
+## Related docs
+
+- [Searchable input metadata lifecycle](SEARCHABLE_INPUT_METADATA.md) – guidance for hydrating searchable field metadata alongside relation manager repeaters.

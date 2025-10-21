@@ -183,6 +183,7 @@ final class WishlistItemResource extends Resource
                                                 (string) $product->getKey() => ProductSearch::label($product),
                                             ]);
                                     })
+                                    // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                     ->afterStateUpdated(function (?string $state, callable $set): void {
                                         if ($state === null || $state === '') {
                                             return;

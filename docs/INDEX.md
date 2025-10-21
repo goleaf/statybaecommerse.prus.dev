@@ -23,6 +23,7 @@ A curated map of the most useful documents for day-to-day development and operat
 - [FILAMENT_V4_IMPLEMENTATION_SUMMARY](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md) – component patterns and conventions for building admin UI.
 - [NEWS_RESOURCE_IMPLEMENTATION_SUMMARY](analysis/NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md) & [COMPANY_RESOURCE_ANALYSIS](analysis/COMPANY_RESOURCE_ANALYSIS.md) – worked examples of resources and permissions in action.
 - [Combobox field reference](forms/COMBOBOX.md) – where the dual-list picker is enabled, configuration knobs, and localisation tips.
+- [Searchable input metadata lifecycle](forms/SEARCHABLE_INPUT_METADATA.md) – the canonical `SearchResult` payload, helper APIs, and how forms hydrate dependent fields.
 - [Matrix choice permission grids](forms/MATRIX_CHOICE.md) – which Filament resources consult the permission matrix, how rows/columns are mapped, and how to extend the config safely.
 - [REFERRAL_SYSTEM_IMPLEMENTATION](REFERRAL_SYSTEM_IMPLEMENTATION.md) – loyalty and referral programme operations for support teams.
 - [Table Column Resizing](ui/RESIZED_COLUMNS.md) – how column width adjustments are saved, reset, and recovered when troubleshooting.

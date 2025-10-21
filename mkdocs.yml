@@ -23,3 +23,8 @@ nav:
       - Test Organisation Summary: TEST_ORGANIZATION_SUMMARY.md
       - Widget Testing Summary: WIDGET_TESTING_SUMMARY.md
       - Implementation Status: IMPLEMENTATION_STATUS.md
+  - Filament Forms:
+      - Combobox field reference: forms/COMBOBOX.md
+      - Searchable input metadata lifecycle: forms/SEARCHABLE_INPUT_METADATA.md
+      - Relation Manager Repeater quick-edit actions: forms/RELATION_MANAGER_REPEATER.md
+      - Matrix choice permission grids: forms/MATRIX_CHOICE.md
