@@ -52,6 +52,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
@@ -69,6 +70,8 @@ use UnitEnum;
  */
 final class OrderResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = Order::class;
 
     protected static ?int $navigationSort = 1;
@@ -394,8 +397,8 @@ final class OrderResource extends Resource
 
                                 return [
                                     'label' => __('Order (:locale)', ['locale' => strtoupper($locale)]),
-                                    'url' => $url,
-                                    'icon' => 'heroicon-o-arrow-top-right-on-square',
+                                    'url'   => $url,
+                                    'icon'  => 'heroicon-o-arrow-top-right-on-square',
                                     'color' => 'primary',
                                 ];
                             })
@@ -405,8 +408,8 @@ final class OrderResource extends Resource
                         if (Route::has('api.orders.show')) {
                             $items->push([
                                 'label' => __('Order API (:number)', ['number' => $record->number]),
-                                'url' => route('api.orders.show', ['order' => $record->number]),
-                                'icon' => 'heroicon-o-code-bracket',
+                                'url'   => route('api.orders.show', ['order' => $record->number]),
+                                'icon'  => 'heroicon-o-code-bracket',
                                 'color' => 'info',
                             ]);
                         }

@@ -27,10 +27,13 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 final class CustomerGroupResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = CustomerGroup::class;
 
     protected static UnitEnum|string|null $navigationGroup = null;
