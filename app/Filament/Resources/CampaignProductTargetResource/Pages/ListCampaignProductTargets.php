@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignProductTargetResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CampaignProductTargetResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCampaignProductTargets extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CampaignProductTargetResource::class;
 
     protected function getHeaderActions(): array
@@ -24,7 +27,7 @@ class ListCampaignProductTargets extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('campaign_product_targets.tabs.all')),
+            'all'     => Tab::make(__('campaign_product_targets.tabs.all')),
             'product' => Tab::make(__('campaign_product_targets.tabs.product'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('target_type', 'product'))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('target_type', 'product')->count()),

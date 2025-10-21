@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NormalSettingResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NormalSettingResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListNormalSettings extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = NormalSettingResource::class;
 
     protected function getHeaderActions(): array
@@ -24,7 +27,7 @@ class ListNormalSettings extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('normal_settings.tabs.all')),
+            'all'    => Tab::make(__('normal_settings.tabs.all')),
             'string' => Tab::make(__('normal_settings.tabs.string'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'string'))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'string')->count()),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\SystemSettingResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListSystemSettings extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = SystemSettingResource::class;
 
     protected function getHeaderActions(): array

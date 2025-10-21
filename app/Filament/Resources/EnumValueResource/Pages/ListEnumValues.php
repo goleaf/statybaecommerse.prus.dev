@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\EnumValueResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\EnumValueResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListEnumValues extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = EnumValueResource::class;
 
     protected function getHeaderActions(): array
@@ -24,7 +27,7 @@ class ListEnumValues extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make('All Enum Values'),
+            'all'            => Tab::make('All Enum Values'),
             'product_status' => Tab::make('Product Status')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product_status'))
                 ->badge(fn () => $this->getResource()::getModel()::where('type', 'product_status')->count()),

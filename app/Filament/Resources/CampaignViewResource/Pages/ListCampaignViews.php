@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignViewResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CampaignViewResource;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCampaignViews extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CampaignViewResource::class;
 
     public function getTabs(): array

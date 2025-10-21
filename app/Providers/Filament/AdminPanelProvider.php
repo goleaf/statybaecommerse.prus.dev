@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
@@ -55,11 +56,11 @@ final class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
-                'gray' => Color::Slate,
+                'gray'    => Color::Slate,
                 'success' => Color::Green,
                 'warning' => Color::Amber,
-                'danger' => Color::Red,
-                'info' => Color::Sky,
+                'danger'  => Color::Red,
+                'info'    => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources($resourceClasses)
@@ -110,6 +111,8 @@ final class AdminPanelProvider extends PanelProvider
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
+                    ResizedColumnPlugin::make()
+                        ->preserveOnDB(),
                 ]))
             // Remove custom Vite theme to ensure default Filament styles load
             // ->viteTheme('resources/css/filament-enhancements.css')

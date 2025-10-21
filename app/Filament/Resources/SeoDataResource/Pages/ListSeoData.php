@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SeoDataResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\SeoDataResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListSeoData extends ListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = SeoDataResource::class;
 
     protected function getHeaderActions(): array
