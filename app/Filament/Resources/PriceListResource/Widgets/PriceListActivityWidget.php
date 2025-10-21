@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 final class PriceListActivityWidget extends ChartWidget
 {
-    protected ?string $heading = 'Price List Activity Over Time';
+    protected function getHeading(): ?string
+    {
+        return __('price_lists.charts.activity_over_time');
+    }
 
     protected function getData(): array
     {
