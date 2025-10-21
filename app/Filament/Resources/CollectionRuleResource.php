@@ -7,10 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
@@ -23,6 +19,10 @@ use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -40,11 +40,13 @@ final class CollectionRuleResource extends Resource
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
+        // Document the navigation icon choice so Filament adopters know where to adjust it.
         return 'heroicon-o-cog-6-tooth';
     }
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
+        // Keep the resource grouped with other product tooling links.
         return 'Products';
     }
 
@@ -69,8 +71,9 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Define the Filament form schema using the v4 `Form` contract exclusively.
         return $form->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
@@ -100,16 +103,16 @@ final class CollectionRuleResource extends Resource
                                             Select::make('operator')
                                                 ->label(__('admin.collection_rules.form.fields.operator'))
                                                 ->options([
-                                                    'equals' => __('admin.collection_rules.operators.equals'),
-                                                    'not_equals' => __('admin.collection_rules.operators.not_equals'),
-                                                    'contains' => __('admin.collection_rules.operators.contains'),
-                                                    'not_contains' => __('admin.collection_rules.operators.not_contains'),
-                                                    'starts_with' => __('admin.collection_rules.operators.starts_with'),
-                                                    'ends_with' => __('admin.collection_rules.operators.ends_with'),
-                                                    'greater_than' => __('admin.collection_rules.operators.greater_than'),
-                                                    'less_than' => __('admin.collection_rules.operators.less_than'),
+                                                    'equals'                => __('admin.collection_rules.operators.equals'),
+                                                    'not_equals'            => __('admin.collection_rules.operators.not_equals'),
+                                                    'contains'              => __('admin.collection_rules.operators.contains'),
+                                                    'not_contains'          => __('admin.collection_rules.operators.not_contains'),
+                                                    'starts_with'           => __('admin.collection_rules.operators.starts_with'),
+                                                    'ends_with'             => __('admin.collection_rules.operators.ends_with'),
+                                                    'greater_than'          => __('admin.collection_rules.operators.greater_than'),
+                                                    'less_than'             => __('admin.collection_rules.operators.less_than'),
                                                     'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
-                                                    'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
+                                                    'less_than_or_equal'    => __('admin.collection_rules.operators.less_than_or_equal'),
                                                 ])
                                                 ->required()
                                                 ->columnSpan(1),
@@ -151,8 +154,9 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition following the v4 `Table` signature.
         return $table
             ->columns([
                 TextColumn::make('collection.name')
@@ -166,23 +170,23 @@ final class CollectionRuleResource extends Resource
                 BadgeColumn::make('operator')
                     ->label(__('admin.collection_rules.form.fields.operator'))
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'equals' => __('admin.collection_rules.operators.equals'),
-                        'not_equals' => __('admin.collection_rules.operators.not_equals'),
-                        'contains' => __('admin.collection_rules.operators.contains'),
-                        'not_contains' => __('admin.collection_rules.operators.not_contains'),
-                        'starts_with' => __('admin.collection_rules.operators.starts_with'),
-                        'ends_with' => __('admin.collection_rules.operators.ends_with'),
-                        'greater_than' => __('admin.collection_rules.operators.greater_than'),
-                        'less_than' => __('admin.collection_rules.operators.less_than'),
+                        'equals'                => __('admin.collection_rules.operators.equals'),
+                        'not_equals'            => __('admin.collection_rules.operators.not_equals'),
+                        'contains'              => __('admin.collection_rules.operators.contains'),
+                        'not_contains'          => __('admin.collection_rules.operators.not_contains'),
+                        'starts_with'           => __('admin.collection_rules.operators.starts_with'),
+                        'ends_with'             => __('admin.collection_rules.operators.ends_with'),
+                        'greater_than'          => __('admin.collection_rules.operators.greater_than'),
+                        'less_than'             => __('admin.collection_rules.operators.less_than'),
                         'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
-                        'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
-                        default => $state,
+                        'less_than_or_equal'    => __('admin.collection_rules.operators.less_than_or_equal'),
+                        default                 => $state,
                     })
                     ->colors([
                         'primary' => 'equals',
                         'success' => 'contains',
                         'warning' => 'starts_with',
-                        'danger' => 'not_equals',
+                        'danger'  => 'not_equals',
                     ]),
                 TextColumn::make('value')
                     ->label(__('admin.collection_rules.form.fields.value'))
@@ -205,16 +209,16 @@ final class CollectionRuleResource extends Resource
                 SelectFilter::make('operator')
                     ->label(__('admin.collection_rules.filters.operator'))
                     ->options([
-                        'equals' => __('admin.collection_rules.operators.equals'),
-                        'not_equals' => __('admin.collection_rules.operators.not_equals'),
-                        'contains' => __('admin.collection_rules.operators.contains'),
-                        'not_contains' => __('admin.collection_rules.operators.not_contains'),
-                        'starts_with' => __('admin.collection_rules.operators.starts_with'),
-                        'ends_with' => __('admin.collection_rules.operators.ends_with'),
-                        'greater_than' => __('admin.collection_rules.operators.greater_than'),
-                        'less_than' => __('admin.collection_rules.operators.less_than'),
+                        'equals'                => __('admin.collection_rules.operators.equals'),
+                        'not_equals'            => __('admin.collection_rules.operators.not_equals'),
+                        'contains'              => __('admin.collection_rules.operators.contains'),
+                        'not_contains'          => __('admin.collection_rules.operators.not_contains'),
+                        'starts_with'           => __('admin.collection_rules.operators.starts_with'),
+                        'ends_with'             => __('admin.collection_rules.operators.ends_with'),
+                        'greater_than'          => __('admin.collection_rules.operators.greater_than'),
+                        'less_than'             => __('admin.collection_rules.operators.less_than'),
                         'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
-                        'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
+                        'less_than_or_equal'    => __('admin.collection_rules.operators.less_than_or_equal'),
                     ]),
                 DateFilter::make('created_at')
                     ->label(__('admin.collection_rules.filters.created_at')),
@@ -229,19 +233,26 @@ final class CollectionRuleResource extends Resource
                     ->label(__('admin.collection_rules.actions.reorder'))
                     ->icon('heroicon-o-arrows-up-down')
                     ->color('info')
-                    ->action(function (CollectionRule $record, array $data): void {
-                        $record->update(['position' => $data['position'] ?? 0]);
-                        FilamentNotification::make()
-                            ->title(__('admin.collection_rules.reordered_successfully'))
-                            ->success()
-                            ->send();
-                    })
+                    ->modalIcon('heroicon-o-arrows-up-down')
+                    ->modalHeading(__('admin.collection_rules.actions.reorder'))
+                    ->modalSubmitActionLabel(__('admin.collection_rules.actions.reorder'))
+                    ->fillForm(fn (CollectionRule $record): array => [
+                        'position' => $record->position,
+                    ])
                     ->form([
                         TextInput::make('position')
                             ->label(__('admin.collection_rules.form.fields.position'))
                             ->numeric()
                             ->required(),
-                    ]),
+                    ])
+                    ->action(function (CollectionRule $record, array $data): void {
+                        // Persist the reordered position once the modal-backed action is confirmed.
+                        $record->update(['position' => $data['position'] ?? 0]);
+                        FilamentNotification::make()
+                            ->title(__('admin.collection_rules.reordered_successfully'))
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -281,10 +292,10 @@ final class CollectionRuleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCollectionRules::route('/'),
+            'index'  => Pages\ListCollectionRules::route('/'),
             'create' => Pages\CreateCollectionRule::route('/create'),
-            'view' => Pages\ViewCollectionRule::route('/{record}'),
-            'edit' => Pages\EditCollectionRule::route('/{record}/edit'),
+            'view'   => Pages\ViewCollectionRule::route('/{record}'),
+            'edit'   => Pages\EditCollectionRule::route('/{record}/edit'),
         ];
     }
 }
