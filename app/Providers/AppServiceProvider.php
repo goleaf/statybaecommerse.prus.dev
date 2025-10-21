@@ -15,7 +15,6 @@ use App\Models\EmailCampaign;
 use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
-use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
 use App\Support\Health\HealthReporter;
 use App\Support\Storage\SecureStorage;
@@ -174,12 +173,10 @@ class AppServiceProvider extends ServiceProvider
         // Legacy Shopper components removed - using native Filament resources
 
         Model::saved(function ($model): void {
-            app(CacheInvalidationService::class)->flushForModel($model);
             $this->flushSitemapIfCatalog($model);
             $this->flushDiscountsIfNeeded($model);
         });
         Model::deleted(function ($model): void {
-            app(CacheInvalidationService::class)->flushForModel($model);
             $this->flushSitemapIfCatalog($model);
             $this->flushDiscountsIfNeeded($model);
         });
