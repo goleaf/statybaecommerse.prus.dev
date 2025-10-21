@@ -36,6 +36,7 @@
 - Migrated the Activity Log resource to the Filament v4 `Form` API and normalized its navigation icon annotation to keep admin resources consistent.
 
 ### Fixed
+- Restored the executable Husky shim after PR #687 overwrote it with the warning stub so Git hooks keep running during local workflows.
 - Eliminated redundant null coalescing in the Variant Stock widget aggregation logic to resolve phpstan nullability reports.
 - Reinstated the Husky shared bootstrap script so Git hooks run without deprecation notices or missing PATH exports during repository installs.
 - Captured the `sh -n .husky/_/husky.sh` smoke check that verifies the restored script syntax before publishing commits.
