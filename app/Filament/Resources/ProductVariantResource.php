@@ -20,7 +20,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -47,6 +46,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * ProductVariantResource
@@ -237,9 +237,9 @@ final class ProductVariantResource extends Resource
                                             ]),
                                         Grid::make(2)
                                             ->schema([
-                                                DateTimePicker::make('sale_start_date')
+                                                Flatpickr::makeDateTime('sale_start_date')
                                                     ->label(__('product_variants.fields.sale_start_date')),
-                                                DateTimePicker::make('sale_end_date')
+                                                Flatpickr::makeDateTime('sale_end_date')
                                                     ->label(__('product_variants.fields.sale_end_date')),
                                             ]),
                                     ]),

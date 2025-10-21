@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Models\CampaignSchedule;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -34,6 +33,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignScheduleResource extends Resource
 {
@@ -92,11 +92,11 @@ final class CampaignScheduleResource extends Resource
                                         ]),
                                     Grid::make(2)
                                         ->schema([
-                                            DateTimePicker::make('next_run_at')
+                                            Flatpickr::makeDateTime('next_run_at')
                                                 ->label(__('admin.campaign_schedules.form.fields.next_run_at'))
                                                 ->required()
                                                 ->columnSpan(1),
-                                            DateTimePicker::make('last_run_at')
+                                            Flatpickr::makeDateTime('last_run_at')
                                                 ->label(__('admin.campaign_schedules.form.fields.last_run_at'))
                                                 ->columnSpan(1),
                                         ]),
