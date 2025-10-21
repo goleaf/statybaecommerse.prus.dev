@@ -35,11 +35,25 @@ final class ApiServiceProvider extends ServiceProvider
             );
         });
 
+        RateLimiter::for('api.profile', function (Request $request): Limit|array {
+            return $this->resolveLimit(
+                config('security.rate_limiting.api.profile', 60),
+                $this->rateLimitKey($request, 'profile')
+            );
+        });
+
+        RateLimiter::for('frontend.checkout', function (Request $request): Limit|array {
+            return $this->resolveLimit(
+                config('security.rate_limiting.frontend.checkout', 10),
+                $this->rateLimitKey($request, 'checkout')
+            );
+        });
+
         RateLimiter::for('partner.api', function (Request $request): Limit|array {
             $apiKey = $this->resolvePartnerApiKey($request);
 
             if ($apiKey === null) {
-                return Limit::perMinute(60)->by('partner_api:anonymous:'.$request->ip());
+                return Limit::perMinute(60)->by('partner_api:anonymous:' . $request->ip());
             }
 
             $key = $apiKey->rateLimiterKey();
@@ -56,13 +70,13 @@ final class ApiServiceProvider extends ServiceProvider
     private function rateLimitKey(Request $request, string $suffix = ''): string
     {
         $userId = $request->user()?->getAuthIdentifier();
-        $key = $userId !== null ? 'user:'.$userId : 'ip:'.$request->ip();
+        $key = $userId !== null ? 'user:' . $userId : 'ip:' . $request->ip();
 
-        return $suffix === '' ? $key : $key.'|'.$suffix;
+        return $suffix === '' ? $key : $key . '|' . $suffix;
     }
 
     /**
-     * @param array<int|string, int>|int $limit
+     * @param  array<int|string, int>|int $limit
      * @return Limit|array<int, Limit>
      */
     private function resolveLimit(array|int $limit, string $key): Limit|array
