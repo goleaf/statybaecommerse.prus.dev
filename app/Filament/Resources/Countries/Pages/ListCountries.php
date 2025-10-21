@@ -4,9 +4,9 @@ namespace App\Filament\Resources\Countries\Pages;
 
 use App\Filament\Resources\Countries\CountryResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListCountries extends ListRecords
+class ListCountries extends BaseListRecords
 {
     protected static string $resource = CountryResource::class;
 

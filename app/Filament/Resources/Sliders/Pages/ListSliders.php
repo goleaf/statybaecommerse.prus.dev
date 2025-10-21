@@ -4,9 +4,9 @@ namespace App\Filament\Resources\Sliders\Pages;
 
 use App\Filament\Resources\Sliders\SliderResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListSliders extends ListRecords
+class ListSliders extends BaseListRecords
 {
     protected static string $resource = SliderResource::class;
 

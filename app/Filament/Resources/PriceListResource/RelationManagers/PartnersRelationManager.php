@@ -6,11 +6,11 @@ namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class PartnersRelationManager extends RelationManager
+final class PartnersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'partners';
 

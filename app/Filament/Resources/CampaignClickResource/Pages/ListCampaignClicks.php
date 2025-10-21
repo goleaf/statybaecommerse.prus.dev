@@ -6,9 +6,9 @@ namespace App\Filament\Resources\CampaignClickResource\Pages;
 
 use App\Filament\Resources\CampaignClickResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListCampaignClicks extends ListRecords
+final class ListCampaignClicks extends BaseListRecords
 {
     protected static string $resource = CampaignClickResource::class;
 

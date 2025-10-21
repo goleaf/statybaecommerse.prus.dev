@@ -7,10 +7,10 @@ namespace App\Filament\Resources\CampaignViewResource\Pages;
 use App\Filament\Resources\CampaignViewResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListCampaignViews extends ListRecords
+class ListCampaignViews extends BaseListRecords
 {
     use HasWidgetTabs;
 

@@ -6,9 +6,9 @@ namespace App\Filament\Resources\NewsCommentResource\Pages;
 
 use App\Filament\Resources\NewsCommentResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListNewsComments extends ListRecords
+class ListNewsComments extends BaseListRecords
 {
     protected static string $resource = NewsCommentResource::class;
 

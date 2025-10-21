@@ -9,9 +9,9 @@ use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeStatsWidget;
 use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeUsageChartWidget;
 use App\Filament\Resources\ReferralCodeResource\Widgets\TopReferralCodesWidget;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListReferralCodes extends ListRecords
+final class ListReferralCodes extends BaseListRecords
 {
     protected static string $resource = ReferralCodeResource::class;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -13,9 +14,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use UnitEnum;
 final class UserImpersonation extends Page implements HasTable
 {
+    use ConfiguresToggleableTableLayout;
+    use HasToggleableTable;
     use InteractsWithTable;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
@@ -33,7 +37,7 @@ final class UserImpersonation extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        return $table
+        $table = $table
             ->query(User::query()->where('is_admin', false))
             ->columns([
                 TextColumn::make('name')->label('Name')->searchable(),
@@ -65,5 +69,7 @@ final class UserImpersonation extends Page implements HasTable
                         ]));
                     }),
             ]);
+
+        return $this->applyToggleableTableLayout($table);
     }
 }

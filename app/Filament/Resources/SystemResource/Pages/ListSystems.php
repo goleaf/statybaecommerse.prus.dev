@@ -6,9 +6,9 @@ namespace App\Filament\Resources\SystemResource\Pages;
 
 use App\Filament\Resources\SystemResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListSystems extends ListRecords
+class ListSystems extends BaseListRecords
 {
     protected static string $resource = SystemResource::class;
 

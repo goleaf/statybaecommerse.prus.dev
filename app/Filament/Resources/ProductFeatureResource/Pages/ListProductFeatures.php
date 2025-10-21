@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ProductFeatureResource\Pages;
 
 use App\Filament\Resources\ProductFeatureResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListProductFeatures extends ListRecords
+final class ListProductFeatures extends BaseListRecords
 {
     protected static string $resource = ProductFeatureResource::class;
 

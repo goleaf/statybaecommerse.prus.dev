@@ -6,9 +6,9 @@ namespace App\Filament\Resources\CompanyResource\Pages;
 
 use App\Filament\Resources\CompanyResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListCompanies extends ListRecords
+final class ListCompanies extends BaseListRecords
 {
     protected static string $resource = CompanyResource::class;
 

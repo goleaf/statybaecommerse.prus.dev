@@ -11,10 +11,10 @@ use App\Filament\Resources\NewsResource\Widgets\NewsResourceStats;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListNews extends ListRecords
+final class ListNews extends BaseListRecords
 {
     use HasWidgetTabs;
 

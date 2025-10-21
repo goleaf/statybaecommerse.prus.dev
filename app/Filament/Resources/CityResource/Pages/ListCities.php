@@ -6,9 +6,9 @@ namespace App\Filament\Resources\CityResource\Pages;
 
 use App\Filament\Resources\CityResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListCities extends ListRecords
+final class ListCities extends BaseListRecords
 {
     protected static string $resource = CityResource::class;
 

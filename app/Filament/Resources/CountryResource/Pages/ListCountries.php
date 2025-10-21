@@ -15,10 +15,10 @@ use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use App\Filament\WidgetTabs\Enums\WidgetTabTheme;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListCountries extends ListRecords
+class ListCountries extends BaseListRecords
 {
     use HasWidgetTabs;
 

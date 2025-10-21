@@ -6,9 +6,9 @@ namespace App\Filament\Resources\RecommendationConfigResource\Pages;
 
 use App\Filament\Resources\RecommendationConfigResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListRecommendationConfigs extends ListRecords
+final class ListRecommendationConfigs extends BaseListRecords
 {
     protected static string $resource = RecommendationConfigResource::class;
 

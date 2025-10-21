@@ -6,12 +6,12 @@ namespace App\Filament\Resources\CampaignCustomerSegmentResource\Pages;
 
 use App\Filament\Resources\CampaignCustomerSegmentResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListCampaignCustomerSegments extends ListRecords
+class ListCampaignCustomerSegments extends BaseListRecords
 {
     use HasWidgetTabs;
 

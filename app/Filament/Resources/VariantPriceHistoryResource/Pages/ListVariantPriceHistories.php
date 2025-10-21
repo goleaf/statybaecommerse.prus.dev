@@ -6,9 +6,9 @@ namespace App\Filament\Resources\VariantPriceHistoryResource\Pages;
 
 use App\Filament\Resources\VariantPriceHistoryResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListVariantPriceHistories extends ListRecords
+final class ListVariantPriceHistories extends BaseListRecords
 {
     protected static string $resource = VariantPriceHistoryResource::class;
 

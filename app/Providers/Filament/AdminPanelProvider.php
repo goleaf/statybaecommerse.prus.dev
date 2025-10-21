@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
+use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -110,6 +112,18 @@ final class AdminPanelProvider extends PanelProvider
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
+                    TableLayoutTogglePlugin::make()
+                        ->setDefaultLayout('grid')
+                        ->persistLayoutUsing(
+                            persister: LocalStoragePersister::class,
+                            cacheStore: 'redis',
+                            cacheTtl: 60 * 24,
+                        )
+                        ->shareLayoutBetweenPages(false)
+                        ->displayToggleAction()
+                        ->toggleActionHook('tables::toolbar.search.after')
+                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
                 ]))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.

@@ -10,12 +10,12 @@ use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
-final class ImagesRelationManager extends RelationManager
+final class ImagesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'images';
 

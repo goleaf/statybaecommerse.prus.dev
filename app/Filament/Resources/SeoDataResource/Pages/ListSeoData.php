@@ -8,10 +8,10 @@ use App\Filament\Resources\SeoDataResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListSeoData extends ListRecords
+final class ListSeoData extends BaseListRecords
 {
     use HasWidgetTabs;
 
