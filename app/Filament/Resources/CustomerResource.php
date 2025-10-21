@@ -27,7 +27,7 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -224,6 +224,22 @@ final class CustomerResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
+                // Badge to show whether the customer confirmed their email address.
+                BadgeColumn::make('email_verified_at')
+                    ->label(__('customers.email_verified_at'))
+                    ->getStateUsing(static fn (Customer $record): string => filled($record->email_verified_at) ? 'verified' : 'unverified')
+                    ->formatStateUsing(static fn (string $state): string => __('customers.badges.' . $state))
+                    ->color(static fn (string $state): string => match ($state) {
+                        'verified'   => 'success',
+                        'unverified' => 'warning',
+                        default      => 'gray',
+                    })
+                    ->icon(static fn (string $state): ?string => match ($state) {
+                        'verified'   => 'heroicon-o-check-circle',
+                        'unverified' => 'heroicon-o-exclamation-triangle',
+                        default      => null,
+                    })
+                    ->toggleable(),
                 TextColumn::make('phone')
                     ->label(__('customers.phone'))
                     ->searchable()
@@ -248,9 +264,21 @@ final class CustomerResource extends Resource
                 TextColumn::make('postal_code')
                     ->label(__('customers.postal_code'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('is_active')
+                // Badge that surfaces the active or inactive status for quick scanning.
+                BadgeColumn::make('is_active')
                     ->label(__('customers.is_active'))
-                    ->boolean()
+                    ->getStateUsing(static fn (Customer $record): string => $record->is_active ? 'active' : 'inactive')
+                    ->formatStateUsing(static fn (string $state): string => __('customers.badges.' . $state))
+                    ->color(static fn (string $state): string => match ($state) {
+                        'active'   => 'success',
+                        'inactive' => 'gray',
+                        default    => 'gray',
+                    })
+                    ->icon(static fn (string $state): ?string => match ($state) {
+                        'active'   => 'heroicon-o-check',
+                        'inactive' => 'heroicon-o-x-mark',
+                        default    => null,
+                    })
                     ->sortable(),
                 TextColumn::make('orders_count')
                     ->label(__('customers.orders_count'))
