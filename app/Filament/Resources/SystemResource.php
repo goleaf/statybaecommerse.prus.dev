@@ -10,7 +10,7 @@ use App\Models\SystemSettingCategory;
 use BackedEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -43,6 +43,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * System Resource - Comprehensive System Management
@@ -297,11 +298,19 @@ final class SystemResource extends Resource
                                             ->label(__('system.color_value'))
                                             ->visible(fn (callable $get) => $get('type') === 'color')
                                             ->helperText(__('system.color_value_help')),
-                                        DateTimePicker::make('value')
+                                        Flatpickr::make('value')
+                                            ->time(true)
+                                            ->time24hr(true)
+                                            ->seconds(false)
+                                            ->format('Y-m-d H:i')
                                             ->label(__('system.date_time'))
                                             ->visible(fn (callable $get) => $get('type') === 'datetime')
                                             ->helperText(__('system.date_time_help')),
-                                        DateTimePicker::make('value')
+                                        Flatpickr::make('value')
+                                            ->time(true)
+                                            ->time24hr(true)
+                                            ->seconds(false)
+                                            ->format('Y-m-d H:i')
                                             ->label(__('system.date'))
                                             ->displayFormat('Y-m-d')
                                             ->visible(fn (callable $get) => $get('type') === 'date')

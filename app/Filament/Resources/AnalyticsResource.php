@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
-use Filament\Forms\Components\DatePicker;
+
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -16,6 +16,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class AnalyticsResource extends Resource
 {
@@ -89,10 +90,16 @@ final class AnalyticsResource extends Resource
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        DatePicker::make('created_from')
+                        Flatpickr::make('created_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('analytics.from_date'))
                             ->placeholder(__('analytics.from_date')),
-                        DatePicker::make('created_until')
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('analytics.until_date'))
                             ->placeholder(__('analytics.until_date')),
                     ])

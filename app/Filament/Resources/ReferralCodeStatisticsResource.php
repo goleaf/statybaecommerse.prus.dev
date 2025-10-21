@@ -11,7 +11,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -23,6 +23,7 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * ReferralCodeStatisticsResource
@@ -67,7 +68,9 @@ final class ReferralCodeStatisticsResource extends Resource
                                     ->options(ReferralCode::pluck('code', 'id'))
                                     ->required()
                                     ->searchable(),
-                                DatePicker::make('date')
+                                Flatpickr::make('date')
+                                    ->time(false)
+                                    ->format('Y-m-d')
                                     ->label(__('admin.referral_code_statistics.date'))
                                     ->required()
                                     ->default(now()),

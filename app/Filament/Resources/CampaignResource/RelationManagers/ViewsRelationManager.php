@@ -7,7 +7,7 @@ namespace App\Filament\Resources\CampaignResource\RelationManagers;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ViewsRelationManager extends BaseRelationManager
 {
@@ -40,7 +41,11 @@ final class ViewsRelationManager extends BaseRelationManager
             TextInput::make('customer_id')
                 ->label('Customer ID')
                 ->numeric(),
-            DateTimePicker::make('viewed_at')
+            Flatpickr::make('viewed_at')
+                ->time(true)
+                ->time24hr(true)
+                ->seconds(false)
+                ->format('Y-m-d H:i')
                 ->label('Viewed At')
                 ->required(),
         ]);

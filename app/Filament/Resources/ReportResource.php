@@ -13,8 +13,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -39,6 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ReportResource extends Resource
 {
@@ -171,14 +171,24 @@ final class ReportResource extends Resource
                     ->description(__('reports.sections.date_range_description'))
                     ->columns(2)
                     ->schema([
-                        DatePicker::make('start_date')
+                        Flatpickr::make('start_date')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('reports.fields.start_date'))
                             ->nullable(),
-                        DatePicker::make('end_date')
+                        Flatpickr::make('end_date')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('reports.fields.end_date'))
                             ->nullable()
                             ->after('start_date'),
-                        DateTimePicker::make('last_generated_at')
+                        Flatpickr::make('last_generated_at')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
                             ->label(__('reports.fields.last_generated_at'))
                             ->nullable()
                             ->disabled(),

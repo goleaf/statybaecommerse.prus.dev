@@ -11,7 +11,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -29,6 +29,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class CampaignResource extends Resource
 {
@@ -107,10 +108,20 @@ final class CampaignResource extends Resource
                 ->schema([
                     SchemaGrid::make(2)
                         ->schema([
-                            DateTimePicker::make('starts_at')
+                            Flatpickr::make('starts_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
                                 ->seconds(false),
-                            DateTimePicker::make('ends_at')
+                            Flatpickr::make('ends_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
                                 ->label(self::label('campaigns.fields.end_date', 'End date'))
                                 ->seconds(false),
                             TextInput::make('max_uses')

@@ -8,7 +8,7 @@ use App\Models\ProductVariant;
 use App\Models\VariantPriceHistory;
 use Carbon\Carbon;
 use DateTimeInterface;
-use EncoreDigitalGroup\Filament\Helpers\InputTypes\DateTime\DateTimePicker as DateTimePickerInput;
+
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Actions\Action;
@@ -17,6 +17,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class VariantBulkPriceUpdate extends Action
 {
@@ -72,11 +73,21 @@ final class VariantBulkPriceUpdate extends Action
                 Toggle::make('set_sale_period')
                     ->label(__('product_variants.fields.set_sale_period'))
                     ->default(false),
-                DateTimePickerInput::make('sale_start_date', false)
+                Flatpickr::make('sale_start_date')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
+                    ->rangePicker()
                     ->label(__('product_variants.fields.sale_start_date'))
                     ->visible(fn (callable $get) => $get('set_sale_period'))
                     ->default(now()),
-                DateTimePickerInput::make('sale_end_date', false)
+                Flatpickr::make('sale_end_date')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
+                    ->rangePicker()
                     ->label(__('product_variants.fields.sale_end_date'))
                     ->visible(fn (callable $get) => $get('set_sale_period'))
                     ->default(now()->addDays(30)),
