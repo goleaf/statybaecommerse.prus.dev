@@ -54,3 +54,4 @@ Use this page to discover the project's internal documentation. The content is o
 ## Contribution checklist
 - Review the [Documentation Style Guide](CONTRIBUTING_DOCS.md) before adding or updating any files in this directory.
 - After publishing a new document, update this index and, if applicable, the [analysis index](analysis/INDEX.md) or relevant sub-index so other contributors can discover the content quickly.
+- Keep each committed file under 2MB so the automated documentation size check succeeds.
