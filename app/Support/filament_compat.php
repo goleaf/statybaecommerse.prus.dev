@@ -13,7 +13,6 @@ namespace {
 }
 
 namespace Filament\Forms\Components {
-    use Filament\Forms\Components\Select;
 
     if (! class_exists(Combobox::class) && class_exists(Select::class)) {
         class Combobox extends Select
@@ -38,9 +37,6 @@ namespace Filament\Forms\Components {
                 return $this;
             }
 
-            /**
-             * @param  string|int  $value
-             */
             public function height(string|int $value): static
             {
                 return $this;
@@ -66,6 +62,8 @@ namespace Asmit\ResizedColumn {
     }
 }
 
-if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
-    class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+namespace {
+    if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
+        class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+    }
 }
