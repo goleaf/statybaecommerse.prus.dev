@@ -12,6 +12,7 @@
 - `composer why-not phpunit/phpunit 12.4.1` → `pestphp/pest` v4.1.2 conflicts with versions greater than 12.4.0; remains blocked.
 - `composer why-not zircote/swagger-php 5.5.1` → the application requires `^4.9` and cannot adopt the 5.x breaking change.
 - Verified production install flow with `composer install --no-dev --prefer-dist`.
+- Relaxed the `novadaemon/filament-combobox` constraint to `^2.0.1` to capture the latest bugfix release and updated the lock file accordingly.
 
 ### Changed
 - Restored typed navigation icons for the Menu, Enum Management, and Variant Analytics resources while cleaning up redundant `UnitEnum` imports in favor of fully qualified annotations.
