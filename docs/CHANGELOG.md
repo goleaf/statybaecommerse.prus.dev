@@ -32,8 +32,10 @@
 - Modernized the CartItem administration surface by adopting Filament v4 form components, preventing non-persisted field dehydration, and wiring the model/migration updates that expose product metadata accessors alongside discount tracking.
 - Updated the Variant Inventory resource to use the Filament v4 `Form` return type and refreshed the navigation icon annotations for consistency across admin resources.
 - Recorded the shared Filament Number percentage helper adoption for Variant Inventory and Analytics resources so reviewers notice the locale-aware formatting upgrade.
+- Migrated all Filament resources, relation managers, pages, and widgets to the v4 `Schema` APIs, refreshed `Get`/`Set` utilities, and realigned navigation icon/group property types to match the core typed unions.
 
 ### Fixed
+- Eliminated redundant null coalescing in the Variant Stock widget aggregation logic to resolve phpstan nullability reports.
 - Reinstated the Husky shared bootstrap script so Git hooks run without deprecation notices or missing PATH exports during repository installs.
 - Captured the `sh -n .husky/_/husky.sh` smoke check that verifies the restored script syntax before publishing commits.
 - Removed the deprecated Husky v10 warning stub that overwrote the shim so local Git hooks keep executing through the repository toolchain instead of exiting early.

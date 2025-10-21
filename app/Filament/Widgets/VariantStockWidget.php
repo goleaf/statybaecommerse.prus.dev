@@ -15,10 +15,12 @@ final class VariantStockWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalStock = (int) (ProductVariant::sum('stock_quantity') ?? 0);
-        $availableStock = (int) (ProductVariant::sum('available_quantity') ?? 0);
-        $reservedStock = (int) (ProductVariant::sum('reserved_quantity') ?? 0);
-        $soldStock = (int) (ProductVariant::sum('sold_quantity') ?? 0);
+        // The Eloquent sum helper already guarantees an integer return value, so we can
+        // safely cast without an additional null coalesce that triggered phpstan errors.
+        $totalStock = (int) ProductVariant::sum('stock_quantity');
+        $availableStock = (int) ProductVariant::sum('available_quantity');
+        $reservedStock = (int) ProductVariant::sum('reserved_quantity');
+        $soldStock = (int) ProductVariant::sum('sold_quantity');
 
         $lowStockCount = ProductVariant::whereColumn('available_quantity', '<=', 'low_stock_threshold')
             ->where('track_inventory', true)
@@ -28,7 +30,8 @@ final class VariantStockWidget extends BaseWidget
             ->where('track_inventory', true)
             ->count();
 
-        $stockValue = (float) (ProductVariant::sum(DB::raw('available_quantity * cost_price')) ?? 0);
+        // DB::raw aggregates also default to zero, so we avoid redundant null coalescing here.
+        $stockValue = (float) ProductVariant::sum(DB::raw('available_quantity * cost_price'));
 
         return [
             Stat::make(__('product_variants.stats.total_stock'), number_format($totalStock))
@@ -55,7 +58,7 @@ final class VariantStockWidget extends BaseWidget
                 ->description(__('product_variants.stats.unavailable_variants'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            Stat::make(__('product_variants.stats.stock_value'), '€'.number_format($stockValue, 2))
+            Stat::make(__('product_variants.stats.stock_value'), '€' . number_format($stockValue, 2))
                 ->description(__('product_variants.stats.total_inventory_value'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('primary'),
