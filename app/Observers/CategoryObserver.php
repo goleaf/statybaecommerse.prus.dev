@@ -15,26 +15,27 @@ final class CategoryObserver
 
     public function created(Category $category): void
     {
-        ($this->invalidateCategoryCache)($category->id);
+        // Trigger the centralized cache invalidation pipeline for this category instance.
+        ($this->invalidateCategoryCache)($category);
     }
 
     public function updated(Category $category): void
     {
-        ($this->invalidateCategoryCache)($category->id);
+        ($this->invalidateCategoryCache)($category);
     }
 
     public function deleted(Category $category): void
     {
-        ($this->invalidateCategoryCache)($category->id);
+        ($this->invalidateCategoryCache)($category);
     }
 
     public function restored(Category $category): void
     {
-        ($this->invalidateCategoryCache)($category->id);
+        ($this->invalidateCategoryCache)($category);
     }
 
     public function forceDeleted(Category $category): void
     {
-        ($this->invalidateCategoryCache)($category->id);
+        ($this->invalidateCategoryCache)($category);
     }
 }

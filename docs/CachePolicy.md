@@ -33,7 +33,7 @@ Legacy helpers (`CacheKeys::productTag($id)`, `CacheKeys::homeTag()`, and simila
 - The `App\Services\CacheInvalidationService` is the single entry point for cache flushing. Observers and service hooks call `flushForModel()` so changing a `Product`, `Category`, `Brand`, or `Collection` automatically clears the correct tag groups.
 - Product mutations therefore clear featured, trending, navigation, and dashboard caches through the shared product tag group. Category mutations flush category and related product caches, and so on.
 - Dashboard metrics rely on short TTLs but still receive `CacheTagHelper::dashboards()` so forced refreshes happen instantly during deployments or data imports.
-- When cache tags are unavailable (for example, while using the array driver) the invalidation service logs the issue and falls back to `Cache::flush()`. This matches the legacy behaviour that enumerated keys manually.
+- When cache tags are unavailable (for example, while using the array driver) the invalidation service logs the issue and falls back to targeted key resets. Product events clear the `home:*` shelves, featured lists, and related product entries per locale and currency, while categories, brands, and collections drop their respective navigation trees and showcase caches.
 
 Where Redis tags are unavailable, fall back to targeted `Cache::forget()` calls that leverage the centralized builders.
 

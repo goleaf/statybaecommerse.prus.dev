@@ -4,37 +4,17 @@ declare(strict_types=1);
 
 namespace App\UseCases\Cache;
 
-use App\Observers\Concerns\ResolvesSupportedLocales;
-use App\Support\Cache\CacheKeys;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use App\Models\Category;
+use App\Services\CacheInvalidationService;
 
 final class InvalidateCategoryCache
 {
-    use ResolvesSupportedLocales;
+    public function __construct(private readonly CacheInvalidationService $cacheInvalidationService) {}
 
-    public function __invoke(?int $categoryId = null): void
+    public function __invoke(?Category $category = null): void
     {
-        if (Cache::supportsTags()) {
-            $tags = [CacheKeys::navigationTag(), CacheKeys::homeTag()];
+        $categoryId = $category?->getKey();
 
-            if ($categoryId !== null) {
-                $tags[] = CacheKeys::categoryTag($categoryId);
-            }
-
-            Cache::tags($tags)->flush();
-
-            return;
-        }
-
-        foreach ($this->supportedLocales() as $locale) {
-            Cache::forget(CacheKeys::homeCategoryTree($locale));
-            Cache::forget(CacheKeys::homeCatalogueCategories($locale));
-            Cache::forget(CacheKeys::navigationCategories(8, $locale));
-        }
-
-        Log::debug('Category caches invalidated via fallback path.', [
-            'category_id' => $categoryId,
-        ]);
+        $this->cacheInvalidationService->flushCategories(is_numeric($categoryId) ? (int) $categoryId : null);
     }
 }
