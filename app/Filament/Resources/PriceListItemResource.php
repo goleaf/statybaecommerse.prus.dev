@@ -6,7 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
+use App\Models\Product;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -267,6 +269,31 @@ final class PriceListItemResource extends Resource
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload(),
+                Filter::make('product_search')
+                    ->label(__('price_list_items.product'))
+                    ->form([
+                        SearchableInput::make('product_search')
+                            ->label(__('price_list_items.product'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::productLookupSuggestions($search))
+                            ->options(fn (): array => self::productLookupSuggestions()),
+                    ])
+                    ->indicateUsing(fn (array $data): array => filled($data['product_search'] ?? null)
+                        ? [__('price_list_items.product') . ': ' . $data['product_search']]
+                        : [])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $term = $data['product_search'] ?? null;
+
+                        if (! filled($term)) {
+                            return $query;
+                        }
+
+                        return $query->whereHas('product', function (Builder $productQuery) use ($term): void {
+                            $productQuery
+                                ->where('name', 'like', "%{$term}%")
+                                ->orWhere('sku', 'like', "%{$term}%");
+                        });
+                    }),
                 TernaryFilter::make('is_active')
                     ->label(__('price_list_items.is_active'))
                     ->trueLabel(__('price_list_items.active_only'))
@@ -400,10 +427,38 @@ final class PriceListItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPriceListItems::route('/'),
+            'index'  => Pages\ListPriceListItems::route('/'),
             'create' => Pages\CreatePriceListItem::route('/create'),
-            'view' => Pages\ViewPriceListItem::route('/{record}'),
-            'edit' => Pages\EditPriceListItem::route('/{record}/edit'),
+            'view'   => Pages\ViewPriceListItem::route('/{record}'),
+            'edit'   => Pages\EditPriceListItem::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function productLookupSuggestions(?string $search = null): array
+    {
+        return Product::query()
+            ->select(['name', 'sku'])
+            ->when($search !== null, function (Builder $query) use ($search): Builder {
+                return $query->where(function (Builder $query) use ($search): void {
+                    $query
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit(25)
+            ->get()
+            ->map(static function (Product $product): string {
+                $sku = $product->sku ? ' (' . $product->sku . ')' : '';
+
+                return $product->name . $sku;
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

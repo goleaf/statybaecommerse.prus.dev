@@ -9,6 +9,7 @@ use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\ProductVariant;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -36,6 +37,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -501,6 +503,27 @@ final class ProductVariantResource extends Resource
                             default       => $query,
                         };
                     }),
+                Filter::make('sku')
+                    ->label(__('product_variants.fields.sku'))
+                    ->form([
+                        SearchableInput::make('sku')
+                            ->label(__('product_variants.fields.sku'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::variantSkuSuggestions($search))
+                            ->options(fn (): array => self::variantSkuSuggestions()),
+                    ])
+                    ->indicateUsing(fn (array $data): array => filled($data['sku'] ?? null)
+                        ? [__('product_variants.fields.sku') . ': ' . $data['sku']]
+                        : [])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $sku = $data['sku'] ?? null;
+
+                        if (! filled($sku)) {
+                            return $query;
+                        }
+
+                        return $query->where('sku', 'like', "%{$sku}%");
+                    }),
                 TernaryFilter::make('is_enabled')
                     ->label(__('product_variants.fields.is_enabled')),
                 TernaryFilter::make('is_default_variant')
@@ -573,5 +596,23 @@ final class ProductVariantResource extends Resource
             'view'   => Pages\ViewProductVariant::route('/{record}'),
             'edit'   => Pages\EditProductVariant::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function variantSkuSuggestions(?string $search = null): array
+    {
+        return ProductVariant::query()
+            ->select('sku')
+            ->whereNotNull('sku')
+            ->when($search !== null, fn (Builder $query): Builder => $query->where('sku', 'like', "%{$search}%"))
+            ->orderBy('sku')
+            ->limit(25)
+            ->pluck('sku')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }
