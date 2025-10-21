@@ -7,6 +7,9 @@ namespace App\Providers\Filament;
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+
+use function class_exists;
+
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -27,7 +30,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentExcel\FilamentExport;
-use function class_exists;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -127,22 +129,11 @@ final class AdminPanelProvider extends PanelProvider
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins(array_values(array_filter([
-                    FilamentShieldPlugin::make(),
+                    $this->makeFilamentShieldPlugin(),
                     $this->makeFullCalendarPlugin(),
-                    TableLayoutTogglePlugin::make()
-                        ->setDefaultLayout('grid')
-                        ->persistLayoutUsing(
-                            persister: LocalStoragePersister::class,
-                            cacheStore: 'redis',
-                            cacheTtl: 60 * 24,
-                        )
-                        ->shareLayoutBetweenPages(false)
-                        ->displayToggleAction()
-                        ->toggleActionHook('tables::toolbar.search.after')
-                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
-                    FilamentNordThemePlugin::make(),
-                    ResizedColumnPlugin::make()->preserveOnDB(),
+                    $this->makeTableLayoutTogglePlugin(),
+                    $this->makeFilamentNordThemePlugin(),
+                    $this->makeResizedColumnPlugin(),
                 ]))))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
@@ -182,9 +173,58 @@ final class AdminPanelProvider extends PanelProvider
             ->all();
     }
 
-    /**
-     * @return \Filament\Contracts\Plugin|null
-     */
+    private function makeFilamentShieldPlugin(): ?\Filament\Contracts\Plugin
+    {
+        if (! class_exists(FilamentShieldPlugin::class)) {
+            return null;
+        }
+
+        return FilamentShieldPlugin::make();
+    }
+
+    private function makeFilamentNordThemePlugin(): ?\Filament\Contracts\Plugin
+    {
+        if (! class_exists(FilamentNordThemePlugin::class)) {
+            return null;
+        }
+
+        return FilamentNordThemePlugin::make();
+    }
+
+    private function makeResizedColumnPlugin(): ?\Filament\Contracts\Plugin
+    {
+        if (! class_exists(ResizedColumnPlugin::class)) {
+            return null;
+        }
+
+        return ResizedColumnPlugin::make()->preserveOnDB();
+    }
+
+    private function makeTableLayoutTogglePlugin(): ?\Filament\Contracts\Plugin
+    {
+        if (! class_exists(TableLayoutTogglePlugin::class)) {
+            return null;
+        }
+
+        $plugin = TableLayoutTogglePlugin::make()
+            ->setDefaultLayout('grid')
+            ->shareLayoutBetweenPages(false)
+            ->displayToggleAction()
+            ->toggleActionHook('tables::toolbar.search.after')
+            ->listLayoutButtonIcon('heroicon-o-list-bullet')
+            ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
+
+        if (class_exists(LocalStoragePersister::class)) {
+            $plugin->persistLayoutUsing(
+                persister: LocalStoragePersister::class,
+                cacheStore: 'redis',
+                cacheTtl: 60 * 24,
+            );
+        }
+
+        return $plugin;
+    }
+
     private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
     {
         $pluginClass = 'Saade\\FilamentFullCalendar\\FilamentFullCalendarPlugin';
