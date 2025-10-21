@@ -21,7 +21,7 @@ final class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Orders';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->components([
@@ -45,7 +45,7 @@ final class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('order_number')

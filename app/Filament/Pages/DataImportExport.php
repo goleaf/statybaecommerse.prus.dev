@@ -35,7 +35,7 @@ final class DataImportExport extends Page
 
     public array|string|null $file = null;
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->schema([

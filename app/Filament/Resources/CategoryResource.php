@@ -37,10 +37,10 @@ use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 final class CategoryResource extends Resource
 {
     /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
-    protected static $navigationIcon = 'heroicon-o-tag';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
 
     /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
-    protected static $navigationGroup = NavigationGroup::Products;
+    protected static string | \UnitEnum | null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 

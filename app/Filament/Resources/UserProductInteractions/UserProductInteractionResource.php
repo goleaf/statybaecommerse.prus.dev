@@ -26,12 +26,12 @@ class UserProductInteractionResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return UserProductInteractionForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return UserProductInteractionsTable::configure($table);
     }

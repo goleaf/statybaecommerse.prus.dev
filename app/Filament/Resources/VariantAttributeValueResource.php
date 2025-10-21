@@ -68,7 +68,7 @@ final class VariantAttributeValueResource extends Resource
         return __('admin.variant_attribute_values.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.variant_attribute_values.basic_information'))
@@ -188,7 +188,7 @@ final class VariantAttributeValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

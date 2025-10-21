@@ -27,12 +27,12 @@ final class NewsCategoryResource extends Resource
         return 'News';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return NewsCategoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return NewsCategoriesTable::configure($table);
     }

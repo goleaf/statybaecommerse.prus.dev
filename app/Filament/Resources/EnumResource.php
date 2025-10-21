@@ -41,10 +41,10 @@ final class EnumResource extends Resource
     protected static ?string $model = EnumValue::class;
 
     /** @var string|\BackedEnum|null Align navigation metadata with BackedEnum compatibility. */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Anchor the resource to the System navigation area. */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static string | \UnitEnum | null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 

@@ -25,7 +25,7 @@ final class AddressTableWidget extends BaseWidget
     /**
      * Get table
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query(

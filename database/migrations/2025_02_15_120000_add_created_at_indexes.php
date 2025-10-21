@@ -67,7 +67,17 @@ return new class extends Migration
         $connection = Schema::getConnection();
 
         if (! method_exists($connection, 'getDoctrineSchemaManager')) {
-            // When Doctrine DBAL is missing (such as in lightweight testing setups), we skip the check.
+            if ($connection->getDriverName() === 'sqlite') {
+                // Fall back to a lightweight PRAGMA lookup so in-memory SQLite runs remain deterministic during testing.
+                $result = $connection->select(
+                    "SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?",
+                    [$indexName]
+                );
+
+                return count($result) > 0;
+            }
+
+            // Without Doctrine (and outside SQLite) we assume the index does not exist so the migration can add it.
             return false;
         }
 

@@ -22,7 +22,7 @@ class UserRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Users';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -55,7 +55,7 @@ class UserRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
