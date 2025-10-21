@@ -41,7 +41,7 @@ The helper converts the `value` to a string, registers it as the component state
 
 ## Clearing a component
 
-When a lookup is wiped out (for example, in an `afterStateUpdated` hook that receives a blank value), call the `clear()` helper to reset the state, options, and payload. Optional callbacks let you synchronise related form fields at the same time.
+When a lookup is wiped out (for example, in an `afterStateUpdated` hook that receives a blank value), call the `clear()` helper to reset the state, options, and payload. Optional callbacks let you synchronise related form fields at the same time. `syncSelectedRecord()` already delegates to `clear()` when the lookup fails or the state is empty, but the standalone helper remains handy for bespoke flows (such as cascading dropdowns that need to wipe multiple fields).
 
 ```php
 use App\Support\Filament\SearchableComponentHelper;
@@ -75,7 +75,7 @@ Hidden payload fields (paired with `->dehydrated(false)`) keep the normalised me
 ## Resource integration checklist
 
 - Register `afterStateHydrated` closures on your Filament form components to call `SearchableComponentHelper::hydrate()` with a finder closure and normaliser that return the `[value, label, payload]` tuple described above. This keeps edit forms and relation managers aligned when records are re-opened.
-- Pair `afterStateUpdated` hooks with `SearchableComponentHelper::clear()` so clearing the lookup also wipes any dependent state (`Set` helpers for foreign keys, cached payload fields, and related dropdowns).
+- Pair `afterStateUpdated` hooks with `SearchableComponentHelper::syncSelectedRecord()` so related attributes update automatically and dependent payloads can be cached or cleared through the optional callbacks.
 - Prefer returning a payload array that is already shaped for the downstream Livewire data structure you need. The helper simply forwards the normalised payload, making the component the single source of truth for metadata.
 
 ## Related guidelines
