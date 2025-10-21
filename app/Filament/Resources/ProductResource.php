@@ -56,6 +56,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
 
 /**
@@ -139,64 +140,63 @@ final class ProductResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
+            ->components([
                 Tabs::make('Product Information')
                     ->tabs([
                         Tab::make('Basic Information')
-                            ->schema([
+                            ->components([
                                 Section::make('Product Details')
-                                    ->schema([
+                                    ->components([
+                                        LanguageTabs::make([
+                                            TextInput::make('name')
+                                                ->label(__('products.fields.name'))
+                                                ->required()
+                                                ->maxLength(255),
+                                            TextInput::make('slug')
+                                                ->label(__('products.fields.slug'))
+                                                ->required()
+                                                ->maxLength(255),
+                                            RichEditor::make('description')
+                                                ->label(__('products.fields.description'))
+                                                ->toolbarButtons([
+                                                    'bold',
+                                                    'italic',
+                                                    'underline',
+                                                    'strike',
+                                                    'link',
+                                                    'bulletList',
+                                                    'orderedList',
+                                                    'grid',
+                                                    'gridDelete',
+                                                    'textColor',
+                                                ])
+                                                ->textColors([
+                                                    'primary' => '#1d4ed8',
+                                                    'emerald' => '#047857',
+                                                    'amber'   => '#f59e0b',
+                                                    'slate'   => '#475569',
+                                                ]),
+                                            Textarea::make('short_description')
+                                                ->label(__('products.fields.short_description'))
+                                                ->rows(3)
+                                                ->maxLength(500),
+                                        ]),
                                         Grid::make(2)
-                                            ->schema([
-                                                TextInput::make('name')
-                                                    ->label(__('products.fields.name'))
-                                                    ->required()
-                                                    ->maxLength(255)
-                                                    ->live()
-                                                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state))),
-                                                TextInput::make('slug')
-                                                    ->label(__('products.fields.slug'))
+                                            ->components([
+                                                TextInput::make('sku')
+                                                    ->label(__('products.fields.sku'))
                                                     ->required()
                                                     ->unique(ignoreRecord: true)
                                                     ->maxLength(255),
+                                                TextInput::make('barcode')
+                                                    ->label(__('products.fields.barcode'))
+                                                    ->maxLength(255),
                                             ]),
-                                        TextInput::make('sku')
-                                            ->label(__('products.fields.sku'))
-                                            ->required()
-                                            ->unique(ignoreRecord: true)
-                                            ->maxLength(255),
-                                        TextInput::make('barcode')
-                                            ->label(__('products.fields.barcode'))
-                                            ->maxLength(255),
-                                        RichEditor::make('description')
-                                            ->label(__('products.fields.description'))
-                                            ->toolbarButtons([
-                                                'bold',
-                                                'italic',
-                                                'underline',
-                                                'strike',
-                                                'link',
-                                                'bulletList',
-                                                'orderedList',
-                                                'grid',
-                                                'gridDelete',
-                                                'textColor',
-                                            ])
-                                            ->textColors([
-                                                'primary' => '#1d4ed8',
-                                                'emerald' => '#047857',
-                                                'amber' => '#f59e0b',
-                                                'slate' => '#475569',
-                                            ]),
-                                        Textarea::make('short_description')
-                                            ->label(__('products.fields.short_description'))
-                                            ->rows(3)
-                                            ->maxLength(500),
                                     ]),
                                 Section::make('Pricing & Inventory')
-                                    ->schema([
+                                    ->components([
                                         Grid::make(3)
-                                            ->schema([
+                                            ->components([
                                                 TextInput::make('price')
                                                     ->label(__('products.fields.price'))
                                                     ->required()
@@ -215,7 +215,7 @@ final class ProductResource extends Resource
                                                     ->step(0.01),
                                             ]),
                                         Grid::make(2)
-                                            ->schema([
+                                            ->components([
                                                 Toggle::make('manage_stock')
                                                     ->label(__('products.fields.manage_stock'))
                                                     ->default(true),
@@ -224,7 +224,7 @@ final class ProductResource extends Resource
                                                     ->default(true),
                                             ]),
                                         Grid::make(2)
-                                            ->schema([
+                                            ->components([
                                                 TextInput::make('stock_quantity')
                                                     ->label(__('products.fields.stock_quantity'))
                                                     ->numeric()
@@ -237,9 +237,9 @@ final class ProductResource extends Resource
                                     ]),
                             ]),
                         Tab::make('Media & SEO')
-                            ->schema([
+                            ->components([
                                 Section::make('Product Images')
-                                    ->schema([
+                                    ->components([
                                         FileUpload::make('images')
                                             ->label(__('products.fields.images'))
                                             ->image()
@@ -252,22 +252,24 @@ final class ProductResource extends Resource
                                             ->appendFiles(),
                                     ]),
                                 Section::make('SEO Settings')
-                                    ->schema([
-                                        TextInput::make('seo_title')
-                                            ->label(__('products.fields.seo_title'))
-                                            ->maxLength(255),
-                                        Textarea::make('seo_description')
-                                            ->label(__('products.fields.seo_description'))
-                                            ->rows(3)
-                                            ->maxLength(160),
+                                    ->components([
+                                        LanguageTabs::make([
+                                            TextInput::make('seo_title')
+                                                ->label(__('products.fields.seo_title'))
+                                                ->maxLength(255),
+                                            Textarea::make('seo_description')
+                                                ->label(__('products.fields.seo_description'))
+                                                ->rows(3)
+                                                ->maxLength(160),
+                                        ]),
                                     ]),
                             ]),
                         Tab::make('Settings & Options')
-                            ->schema([
+                            ->components([
                                 Section::make('Product Settings')
-                                    ->schema([
+                                    ->components([
                                         Grid::make(2)
-                                            ->schema([
+                                            ->components([
                                                 Select::make('brand_id')
                                                     ->label(__('products.fields.brand'))
                                                     ->relationship('brand', 'name')
@@ -276,14 +278,14 @@ final class ProductResource extends Resource
                                                 Select::make('status')
                                                     ->label(__('products.fields.status'))
                                                     ->options([
-                                                        'draft' => __('products.status.draft'),
+                                                        'draft'     => __('products.status.draft'),
                                                         'published' => __('products.status.published'),
-                                                        'archived' => __('products.status.archived'),
+                                                        'archived'  => __('products.status.archived'),
                                                     ])
                                                     ->default('draft'),
                                             ]),
                                         Grid::make(3)
-                                            ->schema([
+                                            ->components([
                                                 Toggle::make('is_visible')
                                                     ->label(__('products.fields.is_visible'))
                                                     ->default(true),
@@ -297,9 +299,9 @@ final class ProductResource extends Resource
                                             ->default(now()),
                                     ]),
                                 Section::make('Physical Properties')
-                                    ->schema([
+                                    ->components([
                                         Grid::make(4)
-                                            ->schema([
+                                            ->components([
                                                 TextInput::make('weight')
                                                     ->label(__('products.fields.weight'))
                                                     ->numeric()
@@ -324,9 +326,9 @@ final class ProductResource extends Resource
                                     ]),
                             ]),
                         Tab::make('Advanced')
-                            ->schema([
+                            ->components([
                                 Section::make('Additional Data')
-                                    ->schema([
+                                    ->components([
                                         KeyValue::make('metadata')
                                             ->label(__('products.fields.metadata'))
                                             ->keyLabel(__('products.fields.metadata_key'))
@@ -374,16 +376,16 @@ final class ProductResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
-                        $state <= 0 => 'danger',
+                        $state <= 0  => 'danger',
                         $state <= 10 => 'warning',
-                        default => 'success',
+                        default      => 'success',
                     }),
                 BadgeColumn::make('status')
                     ->label(__('products.fields.status'))
                     ->colors([
-                        'draft' => 'gray',
+                        'draft'     => 'gray',
                         'published' => 'success',
-                        'archived' => 'warning',
+                        'archived'  => 'warning',
                     ]),
                 IconColumn::make('is_visible')
                     ->label(__('products.fields.is_visible'))
@@ -412,7 +414,7 @@ final class ProductResource extends Resource
                     ->toggleable(),
                 TextColumn::make('average_rating')
                     ->label(__('products.fields.average_rating'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1).' ⭐' : 'No ratings')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1) . ' ⭐' : 'No ratings')
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('published_at')
@@ -435,9 +437,9 @@ final class ProductResource extends Resource
                 SelectFilter::make('status')
                     ->label(__('products.filters.status'))
                     ->options([
-                        'draft' => __('products.status.draft'),
+                        'draft'     => __('products.status.draft'),
                         'published' => __('products.status.published'),
-                        'archived' => __('products.status.archived'),
+                        'archived'  => __('products.status.archived'),
                     ]),
                 TernaryFilter::make('is_visible')
                     ->label(__('products.fields.is_visible')),
@@ -541,9 +543,9 @@ final class ProductResource extends Resource
                             Select::make('format')
                                 ->label(__('Format'))
                                 ->options([
-                                    'csv' => 'CSV',
+                                    'csv'  => 'CSV',
                                     'xlsx' => 'XLSX',
-                                    'pdf' => 'PDF',
+                                    'pdf'  => 'PDF',
                                 ])
                                 ->default('csv')
                                 ->required(),
@@ -636,7 +638,7 @@ final class ProductResource extends Resource
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $records->each->update([
-                                'stock_quantity' => $data['stock_quantity'],
+                                'stock_quantity'      => $data['stock_quantity'],
                                 'low_stock_threshold' => $data['low_stock_threshold'],
                             ]);
                             Notification::make()
@@ -661,9 +663,9 @@ final class ProductResource extends Resource
 
                             $records->each(function ($product) use ($multiplier): void {
                                 $product->update([
-                                    'price' => round($product->price * $multiplier, 2),
+                                    'price'         => round($product->price * $multiplier, 2),
                                     'compare_price' => $product->compare_price ? round($product->compare_price * $multiplier, 2) : null,
-                                    'cost_price' => $product->cost_price ? round($product->cost_price * $multiplier, 2) : null,
+                                    'cost_price'    => $product->cost_price ? round($product->cost_price * $multiplier, 2) : null,
                                 ]);
                             });
 
@@ -722,10 +724,10 @@ final class ProductResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
+            'index'  => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
-            'view' => Pages\ViewProduct::route('/{record}'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'view'   => Pages\ViewProduct::route('/{record}'),
+            'edit'   => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
 }

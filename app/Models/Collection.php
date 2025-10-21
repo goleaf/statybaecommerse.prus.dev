@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
@@ -23,10 +24,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * Eloquent model representing the Collection entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
- * @property mixed $translatable
- * @property mixed $appends
+ * @property mixed  $table
+ * @property mixed  $fillable
+ * @property mixed  $translatable
+ * @property mixed  $appends
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Collection newModelQuery()
@@ -36,7 +37,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, VisibleScope::class])]
-final class Collection extends Model implements HasMedia
+final class Collection extends Model implements HasMedia, TranslatableRecord
 {
     use HasFactory, SoftDeletes;
     use HasTranslations;
@@ -116,7 +117,7 @@ final class Collection extends Model implements HasMedia
     /**
      * Handle scopeVisible functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeVisible($query)
     {
@@ -126,7 +127,7 @@ final class Collection extends Model implements HasMedia
     /**
      * Handle scopeManual functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeManual($query)
     {
@@ -136,7 +137,7 @@ final class Collection extends Model implements HasMedia
     /**
      * Handle scopeAutomatic functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeAutomatic($query)
     {
@@ -146,7 +147,7 @@ final class Collection extends Model implements HasMedia
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOrdered($query)
     {
@@ -156,7 +157,7 @@ final class Collection extends Model implements HasMedia
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -301,7 +302,7 @@ final class Collection extends Model implements HasMedia
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
