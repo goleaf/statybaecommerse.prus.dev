@@ -44,9 +44,7 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /**
-     * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
-     */
+    /** @var string|\BackedEnum|null Icon that represents variant analytics within the Filament menu. */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
