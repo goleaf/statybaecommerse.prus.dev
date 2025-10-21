@@ -38,6 +38,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -48,6 +49,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
 /**
@@ -462,6 +464,32 @@ final class OrderResource extends Resource
                         true: fn (Builder $query) => $query->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
                         false: fn (Builder $query) => $query->whereNotIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
                     ),
+                ValueRangeFilter::make('subtotal')
+                    ->label(__('orders.fields.subtotal'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('discount_amount')
+                    ->label(__('orders.fields.discount_amount'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('shipping_amount')
+                    ->label(__('orders.fields.shipping_amount'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('total')
+                    ->label(__('orders.fields.total'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('items_count')
+                    ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
@@ -480,30 +508,9 @@ final class OrderResource extends Resource
                                 fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date),
                             );
                     }),
-                Filter::make('total_range')
-                    ->form([
-                        TextInput::make('total_from')
-                            ->label(__('orders.total_from'))
-                            ->numeric()
-                            ->prefix('€'),
-                        TextInput::make('total_until')
-                            ->label(__('orders.total_until'))
-                            ->numeric()
-                            ->prefix('€'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['total_from'],
-                                fn (Builder $query, $amount): Builder => $query->where('total', '>=', $amount),
-                            )
-                            ->when(
-                                $data['total_until'],
-                                fn (Builder $query, $amount): Builder => $query->where('total', '<=', $amount),
-                            );
-                    }),
                 TrashedFilter::make(),
             ])
+            ->filtersFormWidth(MaxWidth::Large)
             ->actions([
                 ViewAction::make()
                     ->color('info')
