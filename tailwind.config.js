@@ -13,6 +13,7 @@ export default {
     './resources/**/*.vue',
     './app/Livewire/**/*.php',
     './vendor/filament/**/resources/**/*.blade.php',
+    './vendor/defstudio/filament-searchable-input/resources/**/*.blade.php',
     './vendor/laravelcm/livewire-slide-overs/resources/views/*.blade.php',
     './vendor/wire-elements/modal/resources/views/*.blade.php',
     './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
