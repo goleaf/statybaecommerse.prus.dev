@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Resources\ProductResource;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Html\HtmlSanitizer;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -91,13 +92,13 @@ final class EditProduct extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         [$data, $translations] = $this->extractTranslationsFromForm($data);
-        $this->languageTabsPayload = $translations;
+        $this->languageTabsPayload = $this->sanitizeTranslatablePayload($translations);
 
-        $data = $this->mutateMainDataWithDefaultLocale($data, $translations);
+        $data = $this->mutateMainDataWithDefaultLocale($data, $this->languageTabsPayload);
 
         $defaultLocale = $this->getDefaultLocale();
-        $defaultName = $translations[$defaultLocale]['name'] ?? $data['name'] ?? $this->record->name;
-        $slugFromTranslations = $translations[$defaultLocale]['slug'] ?? null;
+        $defaultName = $this->languageTabsPayload[$defaultLocale]['name'] ?? $data['name'] ?? $this->record->name;
+        $slugFromTranslations = $this->languageTabsPayload[$defaultLocale]['slug'] ?? null;
 
         if (filled($slugFromTranslations)) {
             $data['slug'] = $slugFromTranslations;
@@ -119,5 +120,30 @@ final class EditProduct extends EditRecord
         $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
 
         parent::afterSave();
+    }
+
+    /**
+     * @param  array<string, array<string, mixed>>  $translations
+     * @return array<string, array<string, mixed>>
+     */
+    private function sanitizeTranslatablePayload(array $translations): array
+    {
+        /** @var HtmlSanitizer $sanitizer */
+        $sanitizer = app(HtmlSanitizer::class);
+
+        foreach ($translations as $locale => $payload) {
+            foreach (['description', 'short_description'] as $field) {
+                $value = $payload[$field] ?? null;
+
+                if (! is_string($value) || trim($value) === '') {
+                    continue;
+                }
+
+                // Keep editor input aligned with the sanitizer before persisting updates.
+                $translations[$locale][$field] = $sanitizer->sanitize($value);
+            }
+        }
+
+        return $translations;
     }
 }

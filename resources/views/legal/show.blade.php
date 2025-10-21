@@ -142,9 +142,7 @@
 
             <!-- Document Content -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-                <div class="prose prose-lg max-w-none">
-                    {!! $translation->content !!}
-                </div>
+                <x-sanitized-html class="prose prose-lg max-w-none" :content="$translation->content" />
             </div>
 
             <!-- Related Documents -->
