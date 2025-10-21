@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderResource\Pages;
-use BackedEnum;
 use App\Models\Slider;
-use Filament\Actions\DeleteAction;
+use App\Support\Search\ContentLinkSearch;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -15,8 +16,10 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TableEditAction;
 use Filament\Tables\Actions\ViewAction as TableViewAction;
@@ -27,8 +30,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 /**
  * SliderResource
  *
@@ -38,13 +39,9 @@ final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
 
@@ -55,7 +52,7 @@ final class SliderResource extends Resource
      */
     public static function getNavigationLabel(): string
     {
-        return __('sliders.title');
+        return __('sliders.navigation_label');
     }
 
     /**
@@ -94,10 +91,21 @@ final class SliderResource extends Resource
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
-                    TextInput::make('button_url')
+                    SearchableInput::make('button_url')
                         ->label(__('sliders.button_url'))
-                        ->url()
+                        ->placeholder(__('sliders.link_search.placeholder'))
                         ->maxLength(255)
+                        ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                        ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                        ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                            if ($state === null || $state === '') {
+                                return;
+                            }
+
+                            $component
+                                ->state($state)
+                                ->options([$state => $state]);
+                        })
                         ->columnSpanFull(),
                 ]),
             Section::make(__('sliders.media'))
@@ -106,7 +114,7 @@ final class SliderResource extends Resource
                         ->label(__('sliders.image'))
                         ->image()
                         ->directory('sliders')
-                        ->visibility('public')
+                        ->disk('public')
                         ->columnSpanFull(),
                 ]),
             Section::make(__('sliders.appearance'))
@@ -145,6 +153,7 @@ final class SliderResource extends Resource
                 ImageColumn::make('image')
                     ->label(__('sliders.image'))
                     ->circular()
+                    ->disk('public')
                     ->size(50),
                 TextColumn::make('title')
                     ->label(__('sliders.title'))
@@ -178,7 +187,7 @@ final class SliderResource extends Resource
             ->actions([
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make(),
+                TableDeleteAction::make(),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
@@ -204,10 +213,10 @@ final class SliderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSliders::route('/'),
+            'index'  => Pages\ListSliders::route('/'),
             'create' => Pages\CreateSlider::route('/create'),
-            'view' => Pages\ViewSlider::route('/{record}'),
-            'edit' => Pages\EditSlider::route('/{record}/edit'),
+            'view'   => Pages\ViewSlider::route('/{record}'),
+            'edit'   => Pages\EditSlider::route('/{record}/edit'),
         ];
     }
 }

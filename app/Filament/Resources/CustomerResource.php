@@ -5,33 +5,42 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
+use App\Models\City;
 use App\Models\Customer;
+use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Tables;
+use Filament\Schemas\Components\Utilities\Get as SchemaGet;
+use Filament\Schemas\Components\Utilities\Set as SchemaSet;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
 final class CustomerResource extends Resource
@@ -121,23 +130,35 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set|SchemaSet $set): void {
                                     if ($state) {
                                         $set('city_id', null);
                                     }
                                 }),
                             Select::make('city_id')
                                 ->label(__('customers.city'))
-                                ->relationship('city', 'name')
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->modifyOptionsQueryUsing(function (Builder $query, Forms\Get $get) {
-                                    $countryId = $get('country_id');
-                                    if ($countryId) {
+                                ->options(function (Forms\Get|SchemaGet $get): array {
+                                    $query = City::query()->orderBy('name');
+
+                                    if ($countryId = $get('country_id')) {
                                         $query->where('country_id', $countryId);
                                     }
-                                }),
+
+                                    return $query->pluck('name', 'id')->all();
+                                })
+                                ->getSearchResultsUsing(function (Forms\Get|SchemaGet $get, string $search): array {
+                                    return City::query()
+                                        ->where('name', 'like', "%{$search}%")
+                                        ->when($get('country_id'), fn (Builder $query, $countryId): Builder => $query->where('country_id', $countryId))
+                                        ->orderBy('name')
+                                        ->limit(50)
+                                        ->pluck('name', 'id')
+                                        ->all();
+                                })
+                                ->getOptionLabelUsing(fn ($value): ?string => City::query()->find($value)?->name),
                             TextInput::make('postal_code')
                                 ->label(__('customers.postal_code'))
                                 ->maxLength(20),
@@ -173,6 +194,29 @@ final class CustomerResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Customer $record): array {
+                        return collect([
+                            filled($record->email) ? [
+                                'label' => __('Email :email', ['email' => $record->email]),
+                                'url' => 'mailto:'.$record->email,
+                                'icon' => 'heroicon-o-envelope',
+                                'color' => 'info',
+                            ] : null,
+                            filled($record->phone) ? [
+                                'label' => __('Call :phone', ['phone' => $record->phone]),
+                                'url' => 'tel:'.preg_replace('/[^0-9+]/', '', (string) $record->phone),
+                                'icon' => 'heroicon-o-phone',
+                                'color' => 'success',
+                            ] : null,
+                        ])
+                            ->filter()
+                            ->values()
+                            ->all();
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('email')
                     ->label(__('customers.email'))
                     ->searchable()
@@ -234,13 +278,19 @@ final class CustomerResource extends Resource
                     ->relationship('company', 'name')
                     ->preload()
                     ->searchable(),
+                ValueRangeFilter::make('orders_count')
+                    ->label(__('customers.orders_count')),
                 TernaryFilter::make('is_active')
                     ->trueLabel(__('customers.active_only'))
                     ->falseLabel(__('customers.inactive_only'))
                     ->native(false),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export'))
+                    ->exports(self::getCustomerExportPresets()),
+            ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (Customer $record): string => $record->is_active ? __('customers.deactivate') : __('customers.activate'))
@@ -282,9 +332,41 @@ final class CustomerResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
+                    ExportBulkAction::make()
+                        ->label(__('Export selected'))
+                        ->exports(self::getCustomerExportPresets()),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * @return array<int, ExcelExport>
+     */
+    private static function getCustomerExportPresets(): array
+    {
+        return [
+            ExcelExport::make('visible_columns')
+                ->fromTable()
+                ->queue()
+                ->withChunkSize(500),
+            ExcelExport::make('ltv_snapshot')
+                ->fromTable()
+                ->withColumns([
+                    Column::make('name')
+                        ->heading(__('customers.name')),
+                    Column::make('email')
+                        ->heading(__('customers.email')),
+                    Column::make('orders_count')
+                        ->heading(__('customers.orders_count')),
+                    Column::make('ltv')
+                        ->heading(__('customers.ltv'))
+                        ->formatStateUsing(fn ($state, Customer $record): float => (float) $record->orders()->sum('total'))
+                        ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
+                ])
+                ->queue()
+                ->withChunkSize(500),
+        ];
     }
 
     /**
@@ -303,10 +385,17 @@ final class CustomerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomers::route('/'),
+            'index'  => Pages\ListCustomers::route('/'),
             'create' => Pages\CreateCustomer::route('/create'),
-            'view' => Pages\ViewCustomer::route('/{record}'),
-            'edit' => Pages\EditCustomer::route('/{record}/edit'),
+            'view'   => Pages\ViewCustomer::route('/{record}'),
+            'edit'   => Pages\EditCustomer::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+        ]);
     }
 }

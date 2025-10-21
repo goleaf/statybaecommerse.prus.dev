@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Actions;
 
+use App\Contracts\DocumentServiceContract;
 use App\Filament\Actions\DiscountCodeDocumentAction;
 use App\Models\Discount;
 use App\Models\DiscountCode;
+use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\User;
-use App\Services\DocumentService;
 use Filament\Actions\Action;
+use Filament\Schemas\Schema;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use LogicException;
 use Tests\TestCase;
 
 final class DiscountCodeDocumentActionTest extends TestCase
@@ -51,7 +55,7 @@ final class DiscountCodeDocumentActionTest extends TestCase
             'status' => 'active',
         ]);
 
-        $this->template = DocumentTemplate::factory()->create([
+        $this->template = DocumentTemplate::factory()->active()->create([
             'name' => 'Discount Code Template',
             'content' => 'Discount Code: {{DISCOUNT_CODE}} - Value: {{DISCOUNT_VALUE}}',
         ]);
@@ -82,17 +86,20 @@ final class DiscountCodeDocumentActionTest extends TestCase
     public function test_action_form_has_required_fields(): void
     {
         $action = DiscountCodeDocumentAction::make();
-        $form = $action->getForm();
+        $schema = $action->getSchema(Schema::make());
 
-        expect($form->getComponents())
+        expect($schema)
+            ->not->toBeNull()
+            ->and($schema?->getComponents())
             ->toHaveCount(3);
     }
 
-    public function test_can_generate_document_successfully(): void
+    public function test_generates_html_document_with_expected_variables(): void
     {
-        Storage::fake('local');
-
         $action = DiscountCodeDocumentAction::make();
+        $handler = $action->getActionFunction();
+
+        $this->assertNotNull($handler);
 
         $data = [
             'template_id' => $this->template->id,
@@ -100,21 +107,37 @@ final class DiscountCodeDocumentActionTest extends TestCase
             'title' => 'Test Document',
         ];
 
-        $action->action($this->discountCode, $data, app(DocumentService::class));
-
-        $this->assertDatabaseHas('documents', [
-            'document_template_id' => $this->template->id,
-            'title' => 'Test Document',
-            'documentable_type' => DiscountCode::class,
-            'documentable_id' => $this->discountCode->id,
+        $document = Document::make([
+            'title' => $data['title'],
+            'content' => '<p>Generated</p>',
         ]);
+
+        $service = $this->makeDocumentServiceFake(
+            $document,
+            function (DocumentTemplate $template, DiscountCode $code, array $variables, ?string $title) use ($data): void {
+                expect($template->is($this->template))->toBeTrue();
+                expect($code->is($this->discountCode))->toBeTrue();
+                expect($variables['DISCOUNT_CODE'])->toBe($this->discountCode->code);
+                expect($variables['DISCOUNT_NAME'])->toBe($this->discount->name);
+                expect($variables['DISCOUNT_VALUE'])->toBe($this->discount->value);
+                expect($title)->toBe($data['title']);
+            }
+        );
+
+        $response = $handler($this->discountCode, $data, $service);
+
+        expect($response)
+            ->toBeInstanceOf(Response::class)
+            ->and($response->getContent())
+            ->toBe($document->content);
     }
 
-    public function test_generates_pdf_download_when_format_is_pdf(): void
+    public function test_generates_pdf_redirect_when_requested(): void
     {
-        Storage::fake('local');
-
         $action = DiscountCodeDocumentAction::make();
+        $handler = $action->getActionFunction();
+
+        $this->assertNotNull($handler);
 
         $data = [
             'template_id' => $this->template->id,
@@ -122,51 +145,84 @@ final class DiscountCodeDocumentActionTest extends TestCase
             'title' => 'Test PDF Document',
         ];
 
-        $response = $action->action($this->discountCode, $data, app(DocumentService::class));
+        $document = Document::make([
+            'title' => $data['title'],
+            'content' => '<p>Generated</p>',
+        ]);
+
+        $service = $this->makeDocumentServiceFake(
+            $document,
+            function (): void {
+                // Invocation indicates success.
+            },
+            function (Document $document): string {
+                return 'https://example.test/discount.pdf';
+            }
+        );
+
+        $response = $handler($this->discountCode, $data, $service);
 
         expect($response)
-            ->toBeInstanceOf(\Illuminate\Http\Response::class);
+            ->toBeInstanceOf(RedirectResponse::class)
+            ->and($response->getTargetUrl())
+            ->toBe('https://example.test/discount.pdf');
     }
 
-    public function test_handles_document_generation_errors_gracefully(): void
+    public function test_throws_exception_when_template_is_missing(): void
     {
         $action = DiscountCodeDocumentAction::make();
+        $handler = $action->getActionFunction();
 
-        // Test with invalid template ID
+        $this->assertNotNull($handler);
+
         $data = [
-            'template_id' => 99999,  // Non-existent template
+            'template_id' => 999999,
             'format' => 'html',
-            'title' => 'Test Document',
+            'title' => 'Missing Template',
         ];
 
-        $this->expectException(\Exception::class);
+        $service = $this->makeDocumentServiceFake(
+            Document::make(),
+            function (): void {
+                // Should not be invoked due to missing template.
+            }
+        );
 
-        $action->action($this->discountCode, $data, app(DocumentService::class));
+        expect(fn () => $handler($this->discountCode, $data, $service))
+            ->toThrow(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
     }
 
-    public function test_action_variables_are_correctly_passed(): void
+    private function makeDocumentServiceFake(Document $document, callable $assertion, ?callable $pdfHandler = null): DocumentServiceContract
     {
-        Storage::fake('local');
+        return new class($document, $assertion, $pdfHandler) implements DocumentServiceContract
+        {
+            /** @var callable */
+            private $assertion;
 
-        $action = DiscountCodeDocumentAction::make();
+            /** @var callable|null */
+            private $pdfHandler;
 
-        $data = [
-            'template_id' => $this->template->id,
-            'format' => 'html',
-            'title' => 'Test Document',
-        ];
+            public function __construct(private Document $document, callable $assertion, ?callable $pdfHandler)
+            {
+                $this->assertion = $assertion;
+                $this->pdfHandler = $pdfHandler;
+            }
 
-        $action->action($this->discountCode, $data, app(DocumentService::class));
+            public function generateDocument(DocumentTemplate $template, \Illuminate\Database\Eloquent\Model $relatedModel, array $variables = [], ?string $title = null, bool $sendNotification = false): Document
+            {
+                ($this->assertion)($template, $relatedModel, $variables, $title);
 
-        $document = \App\Models\Document::where('documentable_id', $this->discountCode->id)->first();
+                return $this->document;
+            }
 
-        expect($document->variables)
-            ->toHaveKey('DISCOUNT_CODE')
-            ->and($document->variables['DISCOUNT_CODE'])
-            ->toBe('TEST10')
-            ->and($document->variables)
-            ->toHaveKey('DISCOUNT_NAME')
-            ->and($document->variables['DISCOUNT_NAME'])
-            ->toBe('Test Discount');
+            public function generatePdf(Document $document): string
+            {
+                if ($this->pdfHandler === null) {
+                    throw new LogicException('generatePdf should not be called.');
+                }
+
+                return ($this->pdfHandler)($document);
+            }
+        };
     }
 }

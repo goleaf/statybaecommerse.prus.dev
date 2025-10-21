@@ -28,6 +28,8 @@ return [
         'verified' => 'Patvirtintas',
         'unverified' => 'Nepatvirtintas',
         'created_at' => 'Sukurta',
+        'created_from' => 'Sukurta nuo',
+        'created_until' => 'Sukurta iki',
         'recent' => 'Nauji (30 dienų)',
     ],
     'actions' => [

@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 final class RecentProductChangesWidget extends ChartWidget
 {
-    protected ?string $heading = 'Recent Product Changes';
+    public function getHeading(): ?string
+    {
+        return __('product_histories.charts.recent_changes_heading');
+    }
 
     protected function getData(): array
     {

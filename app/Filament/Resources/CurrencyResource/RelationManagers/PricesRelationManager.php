@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Support\Filament\Components\Flatpickr;
 
-final class PricesRelationManager extends RelationManager
+final class PricesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'prices';
 
@@ -56,8 +56,8 @@ final class PricesRelationManager extends RelationManager
                         'wholesale' => 'Wholesale',
                     ])
                     ->default('regular'),
-                Forms\Components\DateTimePicker::make('starts_at'),
-                Forms\Components\DateTimePicker::make('ends_at'),
+                Flatpickr::makeDateTime('starts_at'),
+                Flatpickr::makeDateTime('ends_at'),
                 Forms\Components\Toggle::make('is_enabled')
                     ->default(true),
                 Forms\Components\KeyValue::make('metadata')

@@ -2,6 +2,8 @@
 
 return [
     // Basic fields
+    'basic_information' => 'Basic information',
+    'media' => 'Media',
     'name' => 'Name',
     'slug' => 'Slug',
     'description' => 'Description',
@@ -21,6 +23,17 @@ return [
     'show_filters' => 'Show Filters',
     'image' => 'Image',
     'banner' => 'Banner',
+    'products' => 'Products',
+    'activate' => 'Activate',
+    'deactivate' => 'Deactivate',
+    'activate_selected' => 'Activate selected',
+    'deactivate_selected' => 'Deactivate selected',
+    'activated_successfully' => 'Collection activated successfully',
+    'deactivated_successfully' => 'Collection deactivated successfully',
+    'bulk_activated_success' => 'Selected collections activated successfully',
+    'bulk_deactivated_success' => 'Selected collections deactivated successfully',
+    'created_at' => 'Created at',
+    'updated_at' => 'Updated at',
 
     // Helpers
     'full_display_name' => 'Full Display Name',

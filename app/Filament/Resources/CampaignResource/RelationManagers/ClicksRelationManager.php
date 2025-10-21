@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use App\Support\Filament\Components\Flatpickr;
 
-final class ClicksRelationManager extends RelationManager
+final class ClicksRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'clicks';
 
@@ -52,7 +51,7 @@ final class ClicksRelationManager extends RelationManager
             TextInput::make('customer_id')
                 ->label('Customer ID')
                 ->numeric(),
-            DateTimePicker::make('clicked_at')
+            Flatpickr::makeDateTime('clicked_at')
                 ->label('Clicked At')
                 ->required(),
         ]);

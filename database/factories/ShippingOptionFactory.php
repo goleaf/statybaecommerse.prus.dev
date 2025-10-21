@@ -40,6 +40,7 @@ class ShippingOptionFactory extends Factory
             'estimated_days_min' => fake()->numberBetween(1, 3),
             'estimated_days_max' => fake()->numberBetween(3, 7),
             'metadata' => null,
+            'shipping_matrix' => [],
         ];
     }
 

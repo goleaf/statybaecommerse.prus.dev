@@ -2,7 +2,6 @@
 
 return [
     // General translations
-    'home' => 'Pradžia',
     'breadcrumb' => 'Navigacijos kelias',
     'catalogue_overview' => 'Katalogo apžvalga',
     'discover_departments' => 'Atraskite kiekvieną StatyBae Commerce skyrių',
@@ -44,7 +43,6 @@ return [
     'grid' => 'Tinklelis',
     'list' => 'Sąrašas',
     'view_category' => 'Peržiūrėti kategoriją',
-    'products' => 'produktai',
     'all_rights_reserved' => 'Visos teisės saugomos',
     'created_with' => 'Sukurta su',
     'working_hours' => 'Darbo laikas',
@@ -57,6 +55,7 @@ return [
     'Secure payments & 30-day returns' => 'Saugūs mokėjimai ir 30 dienų grąžinimas',
     'Store locator' => 'Parduotuvių paieška',
     'navigation' => [
+        'home' => 'Pradžia',
         'products' => 'Produktai',
         'campaigns' => 'Kampanijos',
         'orders' => 'Užsakymai',
@@ -589,8 +588,6 @@ return [
     'login' => 'Prisijungti',
     'items_in_cart' => 'prekių krepšelyje',
     'view_cart' => 'peržiūrėti krepšelį',
-    'home' => 'Pradžia',
-    'products' => 'Produktai',
     'months_ago' => 'prieš :count mėnesius',
     'months_ago_alt' => 'prieš :count mėnesių',
     'catalog_manager' => 'Katalogo vadovas',
@@ -678,5 +675,10 @@ return [
         'interests_technical' => 'Techninė informacija',
         'subscribe_button' => 'Prenumeruoti',
         'privacy_notice' => 'Privatumo pranešimas',
+    ],
+    'legal' => [
+        'required' => 'Privalomas',
+        'last_updated' => 'Paskutinį kartą atnaujinta',
+        'document_unavailable' => 'Šis dokumentas šiuo metu nepasiekiamas. Dėl pagalbos susisiekite su mumis.',
     ],
 ];

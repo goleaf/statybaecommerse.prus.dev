@@ -64,57 +64,57 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
 
     private function getTotalViews(): string
     {
-        $total = VariantAnalytics::sum('views');
+        $total = VariantAnalytics::daily()->sum('views');
 
         return number_format($total);
     }
 
     private function getTotalClicks(): string
     {
-        $total = VariantAnalytics::sum('clicks');
+        $total = VariantAnalytics::daily()->sum('clicks');
 
         return number_format($total);
     }
 
     private function getTotalPurchases(): string
     {
-        $total = VariantAnalytics::sum('purchases');
+        $total = VariantAnalytics::daily()->sum('purchases');
 
         return number_format($total);
     }
 
     private function getTotalRevenue(): string
     {
-        $total = VariantAnalytics::sum('revenue');
+        $total = VariantAnalytics::daily()->sum('revenue');
 
         return '€'.number_format($total, 2);
     }
 
     private function getAverageConversionRate(): string
     {
-        $avg = VariantAnalytics::avg('conversion_rate');
+        $avg = VariantAnalytics::daily()->avg('conversion_rate');
 
         return number_format($avg ?? 0, 2).'%';
     }
 
     private function getTopPerformingVariantsCount(): string
     {
-        $count = VariantAnalytics::where('conversion_rate', '>=', 5.0)->count();
+        $count = VariantAnalytics::daily()->where('conversion_rate', '>=', 5.0)->count();
 
         return number_format($count);
     }
 
     private function getTodayViews(): string
     {
-        $today = VariantAnalytics::whereDate('date', now())->sum('views');
+        $today = VariantAnalytics::daily()->whereDate('date', now())->sum('views');
 
         return number_format($today);
     }
 
     private function getViewsChangeDescription(): string
     {
-        $today = VariantAnalytics::whereDate('date', now())->sum('views');
-        $yesterday = VariantAnalytics::whereDate('date', now()->subDay())->sum('views');
+        $today = VariantAnalytics::daily()->whereDate('date', now())->sum('views');
+        $yesterday = VariantAnalytics::daily()->whereDate('date', now()->subDay())->sum('views');
 
         if ($yesterday == 0) {
             return __('filament::variant_analytics.no_previous_data');
@@ -131,8 +131,8 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
 
     private function getViewsChangeIcon(): string
     {
-        $today = VariantAnalytics::whereDate('date', now())->sum('views');
-        $yesterday = VariantAnalytics::whereDate('date', now()->subDay())->sum('views');
+        $today = VariantAnalytics::daily()->whereDate('date', now())->sum('views');
+        $yesterday = VariantAnalytics::daily()->whereDate('date', now()->subDay())->sum('views');
 
         if ($today >= $yesterday) {
             return 'heroicon-m-arrow-trending-up';
@@ -143,8 +143,8 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
 
     private function getViewsChangeColor(): string
     {
-        $today = VariantAnalytics::whereDate('date', now())->sum('views');
-        $yesterday = VariantAnalytics::whereDate('date', now()->subDay())->sum('views');
+        $today = VariantAnalytics::daily()->whereDate('date', now())->sum('views');
+        $yesterday = VariantAnalytics::daily()->whereDate('date', now()->subDay())->sum('views');
 
         if ($today >= $yesterday) {
             return 'success';
@@ -158,15 +158,15 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
         $weekStart = now()->startOfWeek();
         $weekEnd = now()->endOfWeek();
 
-        $revenue = VariantAnalytics::whereBetween('date', [$weekStart, $weekEnd])->sum('revenue');
+        $revenue = VariantAnalytics::daily()->whereBetween('date', [$weekStart, $weekEnd])->sum('revenue');
 
         return '€'.number_format($revenue, 2);
     }
 
     private function getRevenueChangeDescription(): string
     {
-        $thisWeek = VariantAnalytics::whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])->sum('revenue');
-        $lastWeek = VariantAnalytics::whereBetween('date', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('revenue');
+        $thisWeek = VariantAnalytics::daily()->whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])->sum('revenue');
+        $lastWeek = VariantAnalytics::daily()->whereBetween('date', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('revenue');
 
         if ($lastWeek == 0) {
             return __('filament::variant_analytics.no_previous_data');
@@ -183,8 +183,8 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
 
     private function getRevenueChangeIcon(): string
     {
-        $thisWeek = VariantAnalytics::whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])->sum('revenue');
-        $lastWeek = VariantAnalytics::whereBetween('date', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('revenue');
+        $thisWeek = VariantAnalytics::daily()->whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])->sum('revenue');
+        $lastWeek = VariantAnalytics::daily()->whereBetween('date', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('revenue');
 
         if ($thisWeek >= $lastWeek) {
             return 'heroicon-m-arrow-trending-up';
@@ -195,8 +195,8 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
 
     private function getRevenueChangeColor(): string
     {
-        $thisWeek = VariantAnalytics::whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])->sum('revenue');
-        $lastWeek = VariantAnalytics::whereBetween('date', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('revenue');
+        $thisWeek = VariantAnalytics::daily()->whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()])->sum('revenue');
+        $lastWeek = VariantAnalytics::daily()->whereBetween('date', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->sum('revenue');
 
         if ($thisWeek >= $lastWeek) {
             return 'success';

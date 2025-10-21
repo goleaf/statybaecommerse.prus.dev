@@ -1,9 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Logging\CustomizeFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
+
+$sentryDsn = (string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN', ''));
+$sentryAvailable = $sentryDsn !== '' && class_exists(\Sentry\Laravel\Integration::class);
+
+$configuredStackChannels = array_filter(array_map(
+    static fn (string $channel): ?string => $channel !== '' ? $channel : null,
+    explode(',', (string) env('LOG_STACK', 'daily'))
+));
+
+$stackChannels = $configuredStackChannels === []
+    ? ['daily']
+    : array_values(array_unique($configuredStackChannels));
+
+$productionStackChannels = array_values(array_unique(array_merge(['daily'], $stackChannels)));
+
+if ($sentryAvailable) {
+    $stackChannels = array_values(array_unique(array_merge($stackChannels, ['sentry'])));
+    $productionStackChannels = array_values(array_unique(array_merge($productionStackChannels, ['sentry'])));
+}
+$isProductionEnvironment = env('APP_ENV', 'production') === 'production';
 
 return [
 
@@ -18,7 +41,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LOG_CHANNEL', $isProductionEnvironment ? 'production' : 'stack'),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,7 +56,7 @@ return [
 
     'deprecations' => [
         'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
-        'trace' => env('LOG_DEPRECATIONS_TRACE', false),
+        'trace'   => env('LOG_DEPRECATIONS_TRACE', false),
     ],
 
     /*
@@ -53,73 +76,98 @@ return [
     'channels' => [
 
         'stack' => [
-            'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'driver'            => 'stack',
+            'channels'          => $stackChannels,
+            'ignore_exceptions' => false,
+        ],
+
+        'production' => [
+            'driver'            => 'stack',
+            'channels'          => $productionStackChannels,
             'ignore_exceptions' => false,
         ],
 
         'single' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/laravel.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
+            'driver'               => 'single',
+            'path'                 => storage_path('logs/laravel.log'),
+            'level'                => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
 
         'daily' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => env('LOG_DAILY_DAYS', 14),
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/laravel.log'),
+            'level'                => env('LOG_LEVEL', 'debug'),
+            'days'                 => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
+            'tap'                  => [
+                CustomizeFormatter::class,
+            ],
+        ],
+
+        'security' => [
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/security.log'),
+            'level'                => env('LOG_SECURITY_LEVEL', 'notice'),
+            'days'                 => env('LOG_SECURITY_DAYS', 30),
+            'replace_placeholders' => true,
+            'tap'                  => [
+                CustomizeFormatter::class,
+            ],
         ],
 
         'slack' => [
-            'driver' => 'slack',
-            'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
-            'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
-            'level' => env('LOG_LEVEL', 'critical'),
+            'driver'               => 'slack',
+            'url'                  => env('LOG_SLACK_WEBHOOK_URL'),
+            'username'             => env('LOG_SLACK_USERNAME', 'Laravel Log'),
+            'emoji'                => env('LOG_SLACK_EMOJI', ':boom:'),
+            'level'                => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
         ],
 
         'papertrail' => [
-            'driver' => 'monolog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'handler' => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
+            'driver'       => 'monolog',
+            'level'        => env('LOG_LEVEL', 'debug'),
+            'handler'      => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
             'handler_with' => [
-                'host' => env('PAPERTRAIL_URL'),
-                'port' => env('PAPERTRAIL_PORT'),
-                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
+                'host'             => env('PAPERTRAIL_URL'),
+                'port'             => env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
         'stderr' => [
-            'driver' => 'monolog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'handler' => StreamHandler::class,
+            'driver'       => 'monolog',
+            'level'        => env('LOG_LEVEL', 'debug'),
+            'handler'      => StreamHandler::class,
             'handler_with' => [
                 'stream' => 'php://stderr',
             ],
-            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'formatter'  => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
+        'sentry' => [
+            'driver' => 'sentry',
+            'level'  => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
+        ],
+
         'syslog' => [
-            'driver' => 'syslog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'facility' => env('LOG_SYSLOG_FACILITY', LOG_USER),
+            'driver'               => 'syslog',
+            'level'                => env('LOG_LEVEL', 'debug'),
+            'facility'             => env('LOG_SYSLOG_FACILITY', LOG_USER),
             'replace_placeholders' => true,
         ],
 
         'errorlog' => [
-            'driver' => 'errorlog',
-            'level' => env('LOG_LEVEL', 'debug'),
+            'driver'               => 'errorlog',
+            'level'                => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
 
         'null' => [
-            'driver' => 'monolog',
+            'driver'  => 'monolog',
             'handler' => NullHandler::class,
         ],
 

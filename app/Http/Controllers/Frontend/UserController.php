@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Frontend\DeactivateAccountRequest;
+use App\Http\Requests\Frontend\DeleteAccountRequest;
+use App\Http\Requests\Frontend\UpdateUserAvatarRequest;
+use App\Http\Requests\Frontend\UpdateUserNotificationPreferencesRequest;
+use App\Http\Requests\Frontend\UpdateUserPasswordRequest;
+use App\Http\Requests\Frontend\UpdateUserPrivacySettingsRequest;
+use App\Http\Requests\Frontend\UpdateUserProfileRequest;
+use App\Http\Requests\Frontend\UpdateUserSocialLinksRequest;
 use App\Models\Document;
 use App\Models\User;
-use App\Rules\UrlRule;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
@@ -59,11 +65,10 @@ final class UserController extends Controller
     /**
      * Handle updateProfile functionality with proper error handling.
      */
-    public function updateProfile(Request $request): RedirectResponse
+    public function updateProfile(UpdateUserProfileRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        $request->validate(['name' => 'required|string|max:255', 'first_name' => 'nullable|string|max:255', 'last_name' => 'nullable|string|max:255', 'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)], 'phone_number' => 'nullable|string|max:255', 'gender' => 'nullable|in:male,female,other', 'birth_date' => 'nullable|date', 'bio' => 'nullable|string|max:1000', 'company' => 'nullable|string|max:255', 'position' => 'nullable|string|max:255', 'website' => ['nullable', new UrlRule, 'max:255'], 'preferred_locale' => 'required|in:en,lt', 'timezone' => 'nullable|string|max:255']);
-        $user->update($request->only(['name', 'first_name', 'last_name', 'email', 'phone_number', 'gender', 'birth_date', 'bio', 'company', 'position', 'website', 'preferred_locale', 'timezone']));
+        $user->update($request->validated());
 
         return redirect()->route('users.profile')->with('success', __('users.profile_updated_successfully'));
     }
@@ -71,9 +76,8 @@ final class UserController extends Controller
     /**
      * Handle updatePassword functionality with proper error handling.
      */
-    public function updatePassword(Request $request): RedirectResponse
+    public function updatePassword(UpdateUserPasswordRequest $request): RedirectResponse
     {
-        $request->validate(['current_password' => 'required|current_password', 'password' => 'required|string|min:8|confirmed']);
         Auth::user()->update(['password' => Hash::make($request->password)]);
 
         return redirect()->route('users.profile')->with('success', __('users.password_updated_successfully'));
@@ -82,28 +86,31 @@ final class UserController extends Controller
     /**
      * Handle updateAvatar functionality with proper error handling.
      */
-    public function updateAvatar(Request $request): JsonResponse
+    public function updateAvatar(UpdateUserAvatarRequest $request): JsonResponse
     {
-        $request->validate(['avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048']);
         $user = Auth::user();
         // Delete old avatar if exists
-        if ($user->avatar_url && Storage::disk('public')->exists($user->avatar_url)) {
-            Storage::disk('public')->delete($user->avatar_url);
+        $disk = SecureStorage::disk();
+        if ($user->avatar_url && Storage::disk($disk)->exists($user->avatar_url)) {
+            Storage::disk($disk)->delete($user->avatar_url);
         }
         // Store new avatar
-        $avatarPath = $request->file('avatar')->store('avatars', 'public');
+        $avatarPath = $request->file('avatar')->store('avatars', $disk);
         $user->update(['avatar_url' => $avatarPath]);
 
-        return response()->json(['success' => true, 'avatar_url' => Storage::disk('public')->url($avatarPath), 'message' => __('users.avatar_updated_successfully')]);
+        return response()->json([
+            'success' => true,
+            'avatar_url' => SecureStorage::temporarySignedUrl($avatarPath),
+            'message' => __('users.avatar_updated_successfully'),
+        ]);
     }
 
     /**
      * Handle updateSocialLinks functionality with proper error handling.
      */
-    public function updateSocialLinks(Request $request): RedirectResponse
+    public function updateSocialLinks(UpdateUserSocialLinksRequest $request): RedirectResponse
     {
-        $request->validate(['social_links' => 'nullable|array', 'social_links.*.platform' => 'required|string|in:facebook,twitter,instagram,linkedin,youtube,tiktok,github,website', 'social_links.*.url' => ['required', new UrlRule]]);
-        Auth::user()->update(['social_links' => $request->social_links ?? []]);
+        Auth::user()->update(['social_links' => $request->validated('social_links', [])]);
 
         return redirect()->route('users.profile')->with('success', __('users.social_links_updated_successfully'));
     }
@@ -111,10 +118,9 @@ final class UserController extends Controller
     /**
      * Handle updateNotificationPreferences functionality with proper error handling.
      */
-    public function updateNotificationPreferences(Request $request): RedirectResponse
+    public function updateNotificationPreferences(UpdateUserNotificationPreferencesRequest $request): RedirectResponse
     {
-        $request->validate(['notification_preferences' => 'nullable|array', 'notification_preferences.*' => 'boolean']);
-        Auth::user()->update(['notification_preferences' => $request->notification_preferences ?? []]);
+        Auth::user()->update(['notification_preferences' => $request->validated('notification_preferences', [])]);
 
         return redirect()->route('users.profile')->with('success', __('users.notification_preferences_updated_successfully'));
     }
@@ -122,10 +128,9 @@ final class UserController extends Controller
     /**
      * Handle updatePrivacySettings functionality with proper error handling.
      */
-    public function updatePrivacySettings(Request $request): RedirectResponse
+    public function updatePrivacySettings(UpdateUserPrivacySettingsRequest $request): RedirectResponse
     {
-        $request->validate(['privacy_settings' => 'nullable|array', 'privacy_settings.*' => 'boolean']);
-        Auth::user()->update(['privacy_settings' => $request->privacy_settings ?? []]);
+        Auth::user()->update(['privacy_settings' => $request->validated('privacy_settings', [])]);
 
         return redirect()->route('users.profile')->with('success', __('users.privacy_settings_updated_successfully'));
     }
@@ -199,11 +204,14 @@ final class UserController extends Controller
         if ($document->documentable_id !== $user->id || $document->documentable_type !== User::class) {
             abort(403, __('users.unauthorized_document_access'));
         }
-        if (! Storage::disk('public')->exists($document->file_path)) {
+        $disk = SecureStorage::disk();
+        if (! Storage::disk($disk)->exists($document->file_path)) {
             abort(404, __('users.document_not_found'));
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->filename ?? 'document.pdf');
+        $filename = $document->filename ?? SecureStorage::filename($document->file_path);
+
+        return Storage::disk($disk)->download($document->file_path, $filename);
     }
 
     /**
@@ -220,13 +228,14 @@ final class UserController extends Controller
     /**
      * Handle deactivateAccount functionality with proper error handling.
      */
-    public function deactivateAccount(Request $request): RedirectResponse
+    public function deactivateAccount(DeactivateAccountRequest $request): RedirectResponse
     {
-        $request->validate(['password' => 'required|current_password', 'reason' => 'nullable|string|max:500']);
         $user = Auth::user();
         // Log deactivation reason if provided
-        if ($request->reason) {
-            activity()->performedOn($user)->withProperties(['reason' => $request->reason])->log('Account deactivated by user');
+        $reason = $request->validated('reason');
+
+        if ($reason) {
+            activity()->performedOn($user)->withProperties(['reason' => $reason])->log('Account deactivated by user');
         }
         $user->update(['is_active' => false, 'deactivated_at' => now()]);
         Auth::logout();
@@ -237,9 +246,8 @@ final class UserController extends Controller
     /**
      * Handle deleteAccount functionality with proper error handling.
      */
-    public function deleteAccount(Request $request): RedirectResponse
+    public function deleteAccount(DeleteAccountRequest $request): RedirectResponse
     {
-        $request->validate(['password' => 'required|current_password', 'confirmation' => 'required|accepted']);
         $user = Auth::user();
         // Log account deletion
         activity()->performedOn($user)->log('Account deleted by user');

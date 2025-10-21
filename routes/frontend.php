@@ -46,16 +46,16 @@ Route::middleware(['web'])->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\OrderController::class, 'index'])->name('index');
         Route::get('/{order}', [App\Http\Controllers\Frontend\OrderController::class, 'show'])->name('show');
         Route::post('/{order}/cancel', [App\Http\Controllers\Frontend\OrderController::class, 'cancel'])->name('cancel');
-        Route::post('/{order}/return', [App\Http\Controllers\Frontend\OrderController::class, 'return'])->name('return');
+        Route::post('/{order}/return', [App\Http\Controllers\Frontend\OrderController::class, 'requestReturn'])->name('return');
     });
 
     // Cart
     Route::prefix('cart')->name('frontend.cart.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\CartController::class, 'index'])->name('index');
-        Route::post('/add', [App\Http\Controllers\Frontend\CartController::class, 'add'])->name('add');
-        Route::post('/update', [App\Http\Controllers\Frontend\CartController::class, 'update'])->name('update');
-        Route::post('/remove', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('remove');
-        Route::post('/clear', [App\Http\Controllers\Frontend\CartController::class, 'clear'])->name('clear');
+        Route::post('/items', [App\Http\Controllers\Frontend\CartController::class, 'add'])->name('add');
+        Route::patch('/items/{cartItem}', [App\Http\Controllers\Frontend\CartController::class, 'update'])->name('update');
+        Route::delete('/items/{cartItem}', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('remove');
+        Route::delete('/', [App\Http\Controllers\Frontend\CartController::class, 'clear'])->name('clear');
     });
 
     // Checkout
@@ -98,8 +98,8 @@ Route::middleware(['web'])->group(function () {
 
     // Collections
     Route::prefix('collections')->name('frontend.collections.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\CollectionController::class, 'index'])->name('index');
-        Route::get('/{collection}', [App\Http\Controllers\Frontend\CollectionController::class, 'show'])->name('show');
+        Route::get('/', [App\Http\Controllers\CollectionController::class, 'index'])->name('index');
+        Route::get('/{collection}', [App\Http\Controllers\CollectionController::class, 'show'])->name('show');
     });
 
     // News & Content
@@ -109,8 +109,8 @@ Route::middleware(['web'])->group(function () {
     });
 
     Route::prefix('posts')->name('frontend.posts.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\PostController::class, 'index'])->name('index');
-        Route::get('/{post}', [App\Http\Controllers\Frontend\PostController::class, 'show'])->name('show');
+        Route::get('/', [App\Http\Controllers\PostController::class, 'index'])->name('index');
+        Route::get('/{post}', [App\Http\Controllers\PostController::class, 'show'])->name('show');
     });
 
     // Legal Pages
@@ -149,11 +149,11 @@ Route::middleware(['web'])->group(function () {
 
     // Reviews
     Route::prefix('reviews')->name('frontend.reviews.')->group(function () {
-        Route::post('/{product}', [App\Http\Controllers\Frontend\ReviewController::class, 'store'])->name('store');
-        Route::put('/{review}', [App\Http\Controllers\Frontend\ReviewController::class, 'update'])->name('update');
-        Route::delete('/{review}', [App\Http\Controllers\Frontend\ReviewController::class, 'destroy'])->name('destroy');
-        Route::post('/{review}/like', [App\Http\Controllers\Frontend\ReviewController::class, 'like'])->name('like');
-        Route::post('/{review}/report', [App\Http\Controllers\Frontend\ReviewController::class, 'report'])->name('report');
+        Route::post('/{product}', [App\Http\Controllers\ReviewController::class, 'store'])->name('store');
+        Route::put('/{review}', [App\Http\Controllers\ReviewController::class, 'update'])->name('update');
+        Route::delete('/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('destroy');
+        Route::post('/{review}/like', [App\Http\Controllers\ReviewController::class, 'like'])->name('like');
+        Route::post('/{review}/report', [App\Http\Controllers\ReviewController::class, 'report'])->name('report');
     });
 
     // Contact
@@ -169,8 +169,8 @@ Route::middleware(['web'])->group(function () {
     });
 
     // Sitemap
-    Route::get('/sitemap.xml', [App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('sitemap');
+    Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
     // Robots
-    Route::get('/robots.txt', [App\Http\Controllers\Frontend\RobotsController::class, 'index'])->name('robots');
+    Route::get('/robots.txt', App\Http\Controllers\RobotsController::class)->name('robots');
 });

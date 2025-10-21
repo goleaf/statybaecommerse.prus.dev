@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use App\Models\OrderShipping;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -28,6 +26,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderShippingRelationManager
@@ -39,7 +38,7 @@ use Illuminate\Database\Eloquent\Collection;
  * - Cost calculation
  * - Bulk operations
  */
-final class OrderShippingRelationManager extends RelationManager
+final class OrderShippingRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'shipping';
 
@@ -118,14 +117,14 @@ final class OrderShippingRelationManager extends RelationManager
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('shipped_at')
+                                Flatpickr::makeDateTime('shipped_at')
                                     ->label(__('orders.shipped_at')),
-                                DateTimePicker::make('estimated_delivery')
+                                Flatpickr::makeDateTime('estimated_delivery')
                                     ->label(__('orders.estimated_delivery')),
                             ]),
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('delivered_at')
+                                Flatpickr::makeDateTime('delivered_at')
                                     ->label(__('orders.delivered_at')),
                                 TextInput::make('delivery_notes')
                                     ->label(__('orders.delivery_notes'))

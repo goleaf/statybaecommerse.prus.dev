@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -28,6 +29,11 @@ class CartTotal extends Component
     public float $shippingDiscount = 0.0;
 
     public float $total = 0.0;
+
+    /**
+     * @var array<string, mixed>
+     */
+    public array $summary = [];
 
     /**
      * Handle cartSubtotal functionality with proper error handling.
@@ -63,13 +69,7 @@ class CartTotal extends Component
     #[Computed]
     public function finalTotal(): float
     {
-        $subtotal = $this->cartSubtotal;
-        $result = $this->discountCalculation;
-        $discount = (float) ($result['discount_total_amount'] ?? 0.0);
-        $shippingDiscount = (float) data_get($result, 'shipping.discount_amount', 0.0);
-        $shipping = (float) data_get(session()->get('checkout'), 'shipping_option.0.price', 0.0);
-
-        return max(0, $subtotal - $discount + max(0, $shipping - $shippingDiscount));
+        return (float) ($this->summary['total'] ?? 0.0);
     }
 
     /**
@@ -109,8 +109,11 @@ class CartTotal extends Component
         $result = $this->calculateDiscountsAndShipping($this->subtotal);
         $this->discount = (float) ($result['discount_total_amount'] ?? 0.0);
         $this->shippingDiscount = (float) data_get($result, 'shipping.discount_amount', 0.0);
-        $shipping = (float) data_get(session()->get('checkout'), 'shipping_option.0.price', 0.0);
-        $this->total = max(0, $this->subtotal - $this->discount + max(0, $shipping - $this->shippingDiscount));
+        $shippingOption = data_get(session()->get('checkout'), 'shipping_option.0.price');
+        $shippingAmount = $shippingOption === null ? null : max(0.0, (float) $shippingOption - $this->shippingDiscount);
+        $breakdown = app(PriceCalculator::class)->breakdown($this->subtotal, $this->discount, $shippingAmount);
+        $this->total = $breakdown->total;
+        $this->summary = $breakdown->toSummary();
     }
 
     /**

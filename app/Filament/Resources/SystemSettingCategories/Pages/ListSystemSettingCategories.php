@@ -4,9 +4,9 @@ namespace App\Filament\Resources\SystemSettingCategories\Pages;
 
 use App\Filament\Resources\SystemSettingCategories\SystemSettingCategoryResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListSystemSettingCategories extends ListRecords
+class ListSystemSettingCategories extends BaseListRecords
 {
     protected static string $resource = SystemSettingCategoryResource::class;
 

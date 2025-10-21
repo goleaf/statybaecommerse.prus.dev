@@ -6,7 +6,12 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
+use App\Observers\OrderObserver;
+use Carbon\CarbonInterface;
+use DateTimeInterface;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +19,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use Schema;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
@@ -33,6 +40,7 @@ use Spatie\Translatable\HasTranslations;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([OrderObserver::class])]
 #[ScopedBy([ActiveScope::class, StatusScope::class])]
 final class Order extends Model
 {
@@ -204,7 +212,7 @@ final class Order extends Model
     /**
      * Handle scopeByStatus functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByStatus($query, string $status)
     {
@@ -214,7 +222,7 @@ final class Order extends Model
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query)
     {
@@ -224,11 +232,61 @@ final class Order extends Model
     /**
      * Handle scopeCompleted functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeCompleted($query)
     {
         return $query->whereIn('status', ['delivered', 'completed']);
+    }
+
+    public function scopeCreatedBetween(Builder $query, CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): Builder
+    {
+        [$startAt, $endAt] = self::normalizeRange($start, $end);
+
+        return $query->whereBetween($query->qualifyColumn('created_at'), [$startAt, $endAt]);
+    }
+
+    public function scopeCreatedSince(Builder $query, CarbonInterface|DateTimeInterface|string $start): Builder
+    {
+        return $query->where($query->qualifyColumn('created_at'), '>=', self::toImmutableCarbon($start));
+    }
+
+    public function scopeCreatedUntil(Builder $query, CarbonInterface|DateTimeInterface|string $end): Builder
+    {
+        return $query->where($query->qualifyColumn('created_at'), '<=', self::toImmutableCarbon($end));
+    }
+
+    public function scopeCreatedOn(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
+    {
+        $day = self::toImmutableCarbon($date);
+
+        return $query->whereBetween($query->qualifyColumn('created_at'), [$day->copy()->startOfDay(), $day->copy()->endOfDay()]);
+    }
+
+    public function scopeCreatedToday(Builder $query): Builder
+    {
+        return $this->scopeCreatedOn($query, Carbon::now());
+    }
+
+    public function scopeCreatedThisMonth(Builder $query): Builder
+    {
+        $now = Carbon::now();
+
+        return $this->scopeCreatedBetween($query, $now->copy()->startOfMonth(), $now);
+    }
+
+    public function scopeCreatedLastMonth(Builder $query): Builder
+    {
+        $lastMonth = Carbon::now()->subMonth();
+
+        return $this->scopeCreatedBetween($query, $lastMonth->copy()->startOfMonth(), $lastMonth->copy()->endOfMonth());
+    }
+
+    public function scopeCreatedInMonth(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
+    {
+        $month = self::toImmutableCarbon($date);
+
+        return $this->scopeCreatedBetween($query, $month->copy()->startOfMonth(), $month->copy()->endOfMonth());
     }
 
     // Consider orders that have been paid (preferred) or are in a paid-like lifecycle state
@@ -236,13 +294,13 @@ final class Order extends Model
     /**
      * Handle scopePaid functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePaid($query)
     {
         // Prefer explicit payment status when present and non-null
-        if (\Schema::hasColumn($this->getTable(), 'payment_status')) {
-            $query = $query->where(function ($q) {
+        if (Schema::hasColumn($this->getTable(), 'payment_status')) {
+            $query = $query->where(function ($q): void {
                 $q->whereNotNull('payment_status')->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']);
             });
         }
@@ -276,6 +334,14 @@ final class Order extends Model
     }
 
     /**
+     * Determine if the order can be returned.
+     */
+    public function canRequestReturn(): bool
+    {
+        return in_array($this->status, ['delivered', 'completed']);
+    }
+
+    /**
      * Handle getTotalItemsCountAttribute functionality with proper error handling.
      */
     public function getTotalItemsCountAttribute(): int
@@ -288,6 +354,34 @@ final class Order extends Model
      */
     public function getFormattedTotalAttribute(): string
     {
-        return number_format((float) $this->total, 2).' '.$this->currency;
+        return number_format((float) $this->total, 2) . ' ' . $this->currency;
+    }
+
+    private static function toImmutableCarbon(CarbonInterface|DateTimeInterface|string $value): Carbon
+    {
+        if ($value instanceof CarbonInterface) {
+            return $value->copy();
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::make($value)?->copy() ?? Carbon::parse($value->format('Y-m-d H:i:s.u'), $value->getTimezone());
+        }
+
+        return Carbon::parse((string) $value);
+    }
+
+    /**
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private static function normalizeRange(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): array
+    {
+        $startAt = self::toImmutableCarbon($start);
+        $endAt = self::toImmutableCarbon($end);
+
+        if ($startAt->greaterThan($endAt)) {
+            [$startAt, $endAt] = [$endAt, $startAt];
+        }
+
+        return [$startAt, $endAt];
     }
 }

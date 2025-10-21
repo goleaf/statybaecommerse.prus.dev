@@ -206,6 +206,21 @@ final class ReferralStatisticsResourceTest extends TestCase
             ])
             ->assertCanSeeTableRecords([$statistics1, $statistics2])
             ->assertCanNotSeeTableRecords([$statistics3]);
+
+        Livewire::actingAs($this->adminUser)
+            ->test(ListReferralStatistics::class)
+            ->filterTable('date_range', [
+                'from' => '2024-01-01',
+            ])
+            ->assertCanSeeTableRecords([$statistics1, $statistics2, $statistics3]);
+
+        Livewire::actingAs($this->adminUser)
+            ->test(ListReferralStatistics::class)
+            ->filterTable('date_range', [
+                'until' => '2024-01-31',
+            ])
+            ->assertCanSeeTableRecords([$statistics1, $statistics2])
+            ->assertCanNotSeeTableRecords([$statistics3]);
     }
 
     public function test_can_filter_by_has_referrals(): void

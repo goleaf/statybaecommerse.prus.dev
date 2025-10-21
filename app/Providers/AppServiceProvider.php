@@ -4,8 +4,22 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\DocumentServiceContract;
+use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Filament\Components\LiveNotificationFeed;
+use App\Models\DiscountCode;
+use App\Models\DiscountRedemption;
+use App\Models\Document;
+use App\Models\EmailCampaign;
+use App\Models\FeatureFlag;
+use App\Models\SystemSetting;
+use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
+use App\Support\Storage\SecureStorage;
+use App\Support\Uploads\SecureUploadHandler;
+use App\Support\Health\HealthReporter;
+use App\Support\Tracing\Trace;
+use App\Support\Tracing\TraceContext;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
@@ -19,16 +33,26 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
+        $this->app->bind(DocumentServiceContract::class, DocumentService::class);
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \App\Console\Commands\ImportProducts::class,
@@ -40,11 +64,75 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->registerModelObservers();
+
+        $this->registerQueueTracing();
+
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
+        if (! Testable::hasMacro('assertCanSeeFormData')) {
+            Testable::macro('assertCanSeeFormData', function (array $data): Testable {
+                foreach (Arr::dot($data) as $value) {
+                    if (is_scalar($value) && $value !== null) {
+                        $this->assertSee((string) $value, escape: false);
+                    }
+                }
+
+                return $this;
+            });
+        }
+
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Components\Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
+            class_alias(\Filament\Schemas\Components\Section::class, \Filament\Forms\Components\Section::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Components\Grid::class) && class_exists(\Filament\Schemas\Components\Grid::class)) {
+            class_alias(\Filament\Schemas\Components\Grid::class, \Filament\Forms\Components\Grid::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Get::class) && class_exists(\Filament\Schemas\Components\Utilities\Get::class)) {
+            class_alias(\Filament\Schemas\Components\Utilities\Get::class, \Filament\Forms\Get::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Set::class) && class_exists(\Filament\Schemas\Components\Utilities\Set::class)) {
+            class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
+        }
+
+        if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
+            \Filament\Forms\Components\FileUpload::configureUsing(
+                static function (\Filament\Forms\Components\FileUpload $component): void {
+                    SecureUploadHandler::configure($component);
+                }
+            );
+        }
+
+        if (class_exists(\Filament\Tables\Columns\ImageColumn::class)) {
+            \Filament\Tables\Columns\ImageColumn::configureUsing(
+                static function (\Filament\Tables\Columns\ImageColumn $column): void {
+                    if (! method_exists($column, 'formatStateUsing')) {
+                        return;
+                    }
+
+                    $column->formatStateUsing(
+                        static function ($state): ?string {
+                            if (! is_string($state) || $state === '') {
+                                return $state;
+                            }
+
+                            if (filter_var($state, FILTER_VALIDATE_URL)) {
+                                return $state;
+                            }
+
+                            return SecureStorage::temporarySignedUrl($state);
+                        }
+                    );
+                }
+            );
         }
 
         // Aliases for Filament resource Livewire components used in tests
@@ -96,7 +184,7 @@ class AppServiceProvider extends ServiceProvider
             $schedule->call(function (): void {
                 // Rotate exports older than 7 days with timeout protection
                 $timeout = now()->addMinutes(3);  // 3 minute timeout for export rotation
-                $disk = \Storage::disk('public');
+                $disk = \Storage::disk(SecureStorage::disk());
                 $dir = 'exports';
                 if ($disk->exists($dir)) {
                     $files = collect($disk->files($dir))
@@ -170,6 +258,66 @@ class AppServiceProvider extends ServiceProvider
                 // ignore macro registration failures
             }
         }
+    }
+
+    private function registerQueueTracing(): void
+    {
+        Queue::createPayloadUsing(function ($connection, $queue, array $payload): array {
+            $context = Trace::current();
+
+            return [
+                'trace' => [
+                    'trace_id' => $context->traceId(),
+                    'parent_span_id' => $context->spanId(),
+                    'correlation_id' => $context->correlationId(),
+                    'trace_flags' => $context->traceFlags(),
+                ],
+            ];
+        });
+
+        Queue::before(function (JobProcessing $event): void {
+            $payload = $event->job->payload();
+            $trace = $payload['trace'] ?? null;
+
+            if (\is_array($trace)) {
+                Trace::store(TraceContext::generate(
+                    traceId: (string) ($trace['trace_id'] ?? ''),
+                    parentSpanId: (string) ($trace['parent_span_id'] ?? ''),
+                    correlationId: (string) ($trace['correlation_id'] ?? ''),
+                    traceFlags: (string) ($trace['trace_flags'] ?? TraceContext::DEFAULT_TRACE_FLAGS),
+                ));
+            } else {
+                Trace::store(TraceContext::generate());
+            }
+        });
+
+        $cleanup = static function (): void {
+            Trace::forget();
+        };
+
+        Queue::after(function (JobProcessed $event) use ($cleanup): void {
+            $cleanup();
+        });
+
+        Queue::exceptionOccurred(function (JobExceptionOccurred $event) use ($cleanup): void {
+            $cleanup();
+        });
+
+        Queue::failing(function (JobFailed $event) use ($cleanup): void {
+            $cleanup();
+        });
+    }
+
+    private function registerModelObservers(): void
+    {
+        $observer = UserAttributionObserver::class;
+
+        DiscountCode::observe($observer);
+        DiscountRedemption::observe($observer);
+        Document::observe($observer);
+        EmailCampaign::observe($observer);
+        FeatureFlag::observe($observer);
+        SystemSetting::observe($observer);
     }
 
     /**

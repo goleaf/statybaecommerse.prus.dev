@@ -10,13 +10,13 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignViewResource extends Resource
 {
@@ -27,7 +27,6 @@ final class CampaignViewResource extends Resource
 
     protected static ?string $model = CampaignView::class;
 
-    // /** @var UnitEnum|string|null */
     protected static ?int $navigationSort = 7;
 
     protected static ?string $recordTitleAttribute = 'ip_address';
@@ -51,9 +50,9 @@ final class CampaignViewResource extends Resource
     {
         return $form
             ->schema([
-                Tabs::make(__('campaign_views.tabs'))
+                Tabs::make(__('campaign_views.section_title'))
                     ->tabs([
-                        Tab::make(__('campaign_views.basic_information'))
+                        Tab::make(__('campaign_views.tabs.basic_information'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
                                 Select::make('campaign_id')
@@ -62,9 +61,9 @@ final class CampaignViewResource extends Resource
                                     ->required()
                                     ->searchable()
                                     ->preload(),
-                                Select::make('user_id')
-                                    ->label(__('campaign_views.user'))
-                                    ->relationship('user', 'name')
+                                Select::make('customer_id')
+                                    ->label(__('campaign_views.customer'))
+                                    ->relationship('customer', 'name')
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('ip_address')
@@ -74,13 +73,17 @@ final class CampaignViewResource extends Resource
                                 TextInput::make('user_agent')
                                     ->label(__('campaign_views.user_agent'))
                                     ->maxLength(500),
-                                TextInput::make('referrer')
+                                TextInput::make('referer')
                                     ->label(__('campaign_views.referrer'))
                                     ->url()
                                     ->maxLength(255),
                                 TextInput::make('session_id')
                                     ->label(__('campaign_views.session_id'))
                                     ->maxLength(255),
+                                Flatpickr::makeDateTime('viewed_at')
+                                    ->label(__('campaign_views.viewed_at'))
+                                    ->seconds(false)
+                                    ->required(),
                             ]),
                     ])
                     ->columnSpanFull(),
@@ -95,8 +98,8 @@ final class CampaignViewResource extends Resource
                     ->label(__('campaign_views.campaign'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('user.name')
-                    ->label(__('campaign_views.user'))
+                TextColumn::make('customer.name')
+                    ->label(__('campaign_views.customer'))
                     ->searchable()
                     ->sortable()
                     ->placeholder(__('campaign_views.guest')),
@@ -116,7 +119,7 @@ final class CampaignViewResource extends Resource
                         return $state;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('referrer')
+                TextColumn::make('referer')
                     ->label(__('campaign_views.referrer'))
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
@@ -128,15 +131,10 @@ final class CampaignViewResource extends Resource
                         return $state;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                TextColumn::make('viewed_at')
                     ->label(__('campaign_views.viewed_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('updated_at')
-                    ->label(__('campaign_views.updated_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('campaign_id')
@@ -144,9 +142,9 @@ final class CampaignViewResource extends Resource
                     ->relationship('campaign', 'name')
                     ->searchable()
                     ->preload(),
-                SelectFilter::make('user_id')
-                    ->label(__('campaign_views.user'))
-                    ->relationship('user', 'name')
+                SelectFilter::make('customer_id')
+                    ->label(__('campaign_views.customer'))
+                    ->relationship('customer', 'name')
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('ip_address')
@@ -177,7 +175,7 @@ final class CampaignViewResource extends Resource
     {
         return [
             'index' => Pages\ListCampaignViews::route('/'),
-            'view' => Pages\ViewCampaignView::route('/{record}'),
+            'view'  => Pages\ViewCampaignView::route('/{record}'),
         ];
     }
 }

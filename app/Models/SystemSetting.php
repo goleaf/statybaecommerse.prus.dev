@@ -593,11 +593,7 @@ final class SystemSetting extends Model implements HasMedia
     protected static function boot(): void
     {
         parent::boot();
-        self::creating(function (SystemSetting $setting) {
-            $setting->updated_by = auth()->id();
-        });
         self::updating(function (SystemSetting $setting) {
-            $setting->updated_by = auth()->id();
             $setting->clearCache();
         });
         self::deleting(function (SystemSetting $setting) {

@@ -21,8 +21,10 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -34,8 +36,6 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class NewsTagResource extends Resource
 {
@@ -167,7 +167,11 @@ final class NewsTagResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
+                        return mb_strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
                 BadgeColumn::make('color')
@@ -231,7 +235,7 @@ final class NewsTagResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('activate')
+                Action::make('activate')
                     ->label(__('admin.news_tags.actions.activate'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -242,7 +246,7 @@ final class NewsTagResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableBulkAction::make('deactivate')
+                Action::make('deactivate')
                     ->label(__('admin.news_tags.actions.deactivate'))
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
@@ -253,7 +257,7 @@ final class NewsTagResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableBulkAction::make('duplicate')
+                Action::make('duplicate')
                     ->label(__('admin.news_tags.actions.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')

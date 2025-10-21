@@ -5,27 +5,25 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
-use BackedEnum;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use BackedEnum;
+use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
+use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 final class ProductFeatureResource extends Resource
 {
     protected static ?string $model = ProductFeature::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
@@ -35,30 +33,37 @@ final class ProductFeatureResource extends Resource
     {
         return $form->schema([
             Forms\Components\Select::make('product_id')
+                ->label('Product')
                 ->relationship('product', 'name')
                 ->required()
                 ->searchable()
                 ->preload(),
             Forms\Components\Select::make('feature_type')
-                ->options([
-                    'specification' => 'Specification',
-                    'benefit' => 'Benefit',
-                    'feature' => 'Feature',
-                    'technical' => 'Technical',
-                    'performance' => 'Performance',
-                ])
+                ->label('Feature Type')
+                ->options(self::getFeatureTypeOptions())
+                ->required()
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
                 ->label('Feature Key')
+                ->required()
                 ->maxLength(255),
             Forms\Components\Textarea::make('feature_value')
                 ->label('Feature Value')
+                ->required()
+                ->rows(3)
                 ->columnSpanFull(),
             Forms\Components\TextInput::make('weight')
+                ->label('Weight')
                 ->numeric()
                 ->step(0.0001)
                 ->default(0)
                 ->minValue(0),
+            Forms\Components\Toggle::make('is_active')
+                ->label('Active')
+                ->default(true)
+                ->inline(false)
+                ->helperText('Inactive features will be hidden from customer-facing experiences.')
+                ->columnSpanFull(),
         ]);
     }
 
@@ -68,8 +73,11 @@ final class ProductFeatureResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
                     ->label('Product')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\BadgeColumn::make('feature_type')
+                    ->label('Feature Type')
+                    ->enum(self::getFeatureTypeOptions())
                     ->colors([
                         'primary' => 'specification',
                         'success' => 'benefit',
@@ -77,27 +85,48 @@ final class ProductFeatureResource extends Resource
                         'info' => 'technical',
                         'danger' => 'performance',
                     ]),
-                Tables\Columns\TextColumn::make('feature_key'),
+                Tables\Columns\TextColumn::make('feature_key')
+                    ->label('Feature Key')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('feature_value')
-                    ->limit(50),
+                    ->label('Feature Value')
+                    ->limit(50)
+                    ->wrap()
+                    ->searchable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('weight')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at'),
+                    ->label('Created')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Updated')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('feature_type'),
-                Tables\Filters\SelectFilter::make('product_id'),
+                Tables\Filters\SelectFilter::make('feature_type')
+                    ->options(self::getFeatureTypeOptions()),
+                Tables\Filters\SelectFilter::make('product_id')
+                    ->relationship('product', 'name'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active')
+                    ->trueLabel('Active')
+                    ->falseLabel('Inactive'),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                TablesEditAction::make(),
+                TablesDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                TablesBulkActionGroup::make([
+                    TablesDeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('weight', 'desc');
@@ -116,6 +145,20 @@ final class ProductFeatureResource extends Resource
             'index' => Pages\ListProductFeatures::route('/'),
             'create' => Pages\CreateProductFeature::route('/create'),
             'edit' => Pages\EditProductFeature::route('/{record}/edit'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function getFeatureTypeOptions(): array
+    {
+        return [
+            'specification' => 'Specification',
+            'benefit' => 'Benefit',
+            'feature' => 'Feature',
+            'technical' => 'Technical',
+            'performance' => 'Performance',
         ];
     }
 }

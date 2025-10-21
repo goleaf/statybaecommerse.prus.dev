@@ -13,13 +13,13 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -29,8 +29,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 final class AdminUserResource extends Resource
 {
@@ -70,9 +69,9 @@ final class AdminUserResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            SchemaSection::make(__('admin.admin_users.form.sections.basic_information'))
+            Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('admin.admin_users.form.fields.name'))
@@ -87,7 +86,7 @@ final class AdminUserResource extends Resource
                                 ->maxLength(255)
                                 ->columnSpan(1),
                         ]),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('password')
                                 ->label(__('admin.admin_users.form.fields.password'))
@@ -106,7 +105,7 @@ final class AdminUserResource extends Resource
                         ]),
                 ])
                 ->columns(1),
-            SchemaSection::make(__('admin.admin_users.form.sections.account_details'))
+            Section::make(__('admin.admin_users.form.sections.account_details'))
                 ->schema([
                     Placeholder::make('email_verified_at')
                         ->label(__('admin.admin_users.form.fields.email_verified_at'))
@@ -154,17 +153,17 @@ final class AdminUserResource extends Resource
                 SelectFilter::make('email_verified')
                     ->label(__('admin.admin_users.filters.email_verified'))
                     ->options([
-                        'verified' => __('admin.admin_users.filters.verified'),
+                        'verified'   => __('admin.admin_users.filters.verified'),
                         'unverified' => __('admin.admin_users.filters.unverified'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
-                            $data['value'],
+                            $data['value'] ?? null,
                             function (Builder $query, $value): Builder {
                                 return match ($value) {
-                                    'verified' => $query->whereNotNull('email_verified_at'),
+                                    'verified'   => $query->whereNotNull('email_verified_at'),
                                     'unverified' => $query->whereNull('email_verified_at'),
-                                    default => $query,
+                                    default      => $query,
                                 };
                             }
                         );
@@ -172,15 +171,21 @@ final class AdminUserResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.admin_users.filters.created_at'))
                     ->form([
-                        DatePicker::make('from')
+                        Flatpickr::makeDate('from')
                             ->label(__('admin.admin_users.filters.created_from')),
-                        DatePicker::make('until')
+                        Flatpickr::makeDate('until')
                             ->label(__('admin.admin_users.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['until'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
+                            ->when(
+                                $data['from'] ?? null,
+                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date)
+                            )
+                            ->when(
+                                $data['until'] ?? null,
+                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date)
+                            );
                     }),
                 Filter::make('recent')
                     ->label(__('admin.admin_users.filters.recent'))
@@ -197,7 +202,7 @@ final class AdminUserResource extends Resource
                     ->action(function (AdminUser $record): void {
                         $record->update(['email_verified_at' => now()]);
                         FilamentNotification::make()
-                            ->title(__('admin.admin_users.email_verified_successfully'))
+                            ->title(__('admin.admin_users.notifications.email_verified_successfully'))
                             ->success()
                             ->send();
                     }),
@@ -208,7 +213,7 @@ final class AdminUserResource extends Resource
                     ->action(function (AdminUser $record): void {
                         // Send verification email logic here
                         FilamentNotification::make()
-                            ->title(__('admin.admin_users.verification_sent_successfully'))
+                            ->title(__('admin.admin_users.notifications.verification_sent_successfully'))
                             ->success()
                             ->send();
                     }),
@@ -225,7 +230,7 @@ final class AdminUserResource extends Resource
                                 $record->update(['email_verified_at' => now()]);
                             });
                             FilamentNotification::make()
-                                ->title(__('admin.admin_users.emails_verified_successfully'))
+                                ->title(__('admin.admin_users.notifications.emails_verified_successfully'))
                                 ->success()
                                 ->send();
                         }),
@@ -236,7 +241,7 @@ final class AdminUserResource extends Resource
                         ->action(function (Collection $records): void {
                             // Send verification emails logic here
                             FilamentNotification::make()
-                                ->title(__('admin.admin_users.verifications_sent_successfully'))
+                                ->title(__('admin.admin_users.notifications.verifications_sent_successfully'))
                                 ->success()
                                 ->send();
                         }),
@@ -255,10 +260,10 @@ final class AdminUserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAdminUsers::route('/'),
+            'index'  => Pages\ListAdminUsers::route('/'),
             'create' => Pages\CreateAdminUser::route('/create'),
-            'view' => Pages\ViewAdminUser::route('/{record}'),
-            'edit' => Pages\EditAdminUser::route('/{record}/edit'),
+            'view'   => Pages\ViewAdminUser::route('/{record}'),
+            'edit'   => Pages\EditAdminUser::route('/{record}/edit'),
         ];
     }
 }

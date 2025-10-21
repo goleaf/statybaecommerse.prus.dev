@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationBlockResource\Pages;
-use BackedEnum;
 use App\Models\RecommendationBlock;
 use App\Models\Scopes\ActiveScope;
 use Filament\Actions\BulkActionGroup;
@@ -15,8 +14,10 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -24,8 +25,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * RecommendationBlockResource
@@ -116,14 +115,13 @@ final class RecommendationBlockResource extends Resource
                 ]),
             Section::make(__('recommendation_blocks.products'))
                 ->schema([
-                    Select::make('product_ids')
+                    Combobox::make('products')
                         ->label(__('recommendation_blocks.products'))
-                        ->multiple()
                         ->relationship('products', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                        ->searchable()
-                        ->preload()
+                        ->boxSearchs()
+                        ->height('320px')
                         ->afterStateHydrated(function ($state, callable $set): void {
-                            $set('product_ids', collect($state)->sort()->values()->all());
+                            $set('products', collect($state)->sort()->values()->all());
                         })
                         ->createOptionForm([
                             TextInput::make('name')

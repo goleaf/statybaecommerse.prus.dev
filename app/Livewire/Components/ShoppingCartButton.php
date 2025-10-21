@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Services\Cart\CartService;
 use Livewire\Component;
 
 /**
@@ -49,14 +50,11 @@ final class ShoppingCartButton extends Component
             try {
                 return (int) \Darryldecode\Cart\Facades\CartFacade::session($this->sessionKey)->getTotalQuantity();
             } catch (\Throwable $e) {
-                // fall through to session-based fallback
+                // fall through to cart service fallback
             }
         }
-        $cart = (array) session('cart', []);
 
-        return array_sum(array_map(static function ($item) {
-            return (int) ($item['quantity'] ?? 0);
-        }, $cart));
+        return app(CartService::class)->getCount(auth()->id(), $this->sessionKey);
     }
 
     /**

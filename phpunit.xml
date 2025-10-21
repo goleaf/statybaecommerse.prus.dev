@@ -6,12 +6,21 @@
          beStrictAboutTestsThatDoNotTestAnything="false"
          beStrictAboutOutputDuringTests="false"
 >
+    <coverage cacheDirectory="storage/app/coverage/cache">
+        <report>
+            <clover outputFile="storage/app/coverage/clover.xml"/>
+        </report>
+    </coverage>
     <testsuites>
         <testsuite name="Unit">
             <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">tests/Feature</directory>
+            <directory suffix="Test.php">tests/Admin</directory>
+        </testsuite>
+        <testsuite name="Performance">
+            <directory suffix="Test.php">tests/Performance</directory>
         </testsuite>
     </testsuites>
     <source>

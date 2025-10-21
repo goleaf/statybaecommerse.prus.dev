@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use App\Services\PaginationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -23,7 +24,12 @@ final class ReportController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Report::query()->where('is_active', true)->where('is_public', true);
+        $query = Report::query()
+            ->where('is_active', true)
+            ->where('is_public', true)
+            ->whereNotNull('type')
+            ->whereNotNull('category')
+            ->whereNotNull('name->'.app()->getLocale());
         // Apply filters
         if ($request->filled('type')) {
             $query->where('type', $request->get('type'));
@@ -43,10 +49,8 @@ final class ReportController extends Controller
         if (in_array($sortBy, ['name', 'view_count', 'download_count', 'created_at'])) {
             $query->orderBy($sortBy, $sortDirection);
         }
-        $reports = $query->get()->skipWhile(function ($report) {
-            // Skip reports that are not properly configured for display
-            return empty($report->name) || ! $report->is_active || ! $report->is_public || empty($report->type) || empty($report->category);
-        })->paginate(12);
+        $reports = PaginationService::paginateWithOnEachSide($query, 12);
+        $reports->appends($request->query());
         // Get filter options
         $types = Report::select('type')->where('is_active', true)->where('is_public', true)->distinct()->pluck('type')->mapWithKeys(fn ($type) => [$type => __("admin.reports.types.{$type}")]);
         $categories = Report::select('category')->where('is_active', true)->where('is_public', true)->distinct()->pluck('category')->mapWithKeys(fn ($category) => [$category => __("admin.reports.categories.{$category}")]);

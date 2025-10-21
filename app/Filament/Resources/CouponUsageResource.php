@@ -6,11 +6,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\CouponUsage;
+use App\Support\Search\CouponSearch;
+use App\Support\Search\CustomerSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -20,9 +22,12 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -32,8 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CouponUsageResource extends Resource
 {
@@ -60,18 +64,58 @@ final class CouponUsageResource extends Resource
                                 ->schema([
                                     Grid::make(2)
                                         ->schema([
-                                            Select::make('coupon_id')
+                                            SearchableInput::make('coupon_id')
                                                 ->label(__('admin.coupon_usages.form.fields.coupon'))
-                                                ->relationship('coupon', 'code')
-                                                ->searchable()
-                                                ->preload()
-                                                ->required(),
-                                            Select::make('user_id')
+                                                ->placeholder(__('admin.coupon_usages.form.fields.coupon'))
+                                                ->required()
+                                                ->searchUsing(fn (string $search): array => CouponSearch::byCode($search))
+                                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CouponUsage $record): void {
+                                                    if ($state === null || ! $record?->coupon) {
+                                                        return;
+                                                    }
+
+                                                    $label = trim(sprintf('%s — %s', (string) ($record->coupon->code ?? ''), (string) ($record->coupon->name ?? '')));
+
+                                                    $component
+                                                        ->state((string) $state)
+                                                        ->options([
+                                                            (string) $record->coupon_id => $label,
+                                                        ]);
+                                                })
+                                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                                    if ($state === null || $state === '') {
+                                                        return;
+                                                    }
+
+                                                    $set('coupon_id', (int) $state);
+                                                }),
+                                            SearchableInput::make('user_id')
                                                 ->label(__('admin.coupon_usages.form.fields.user'))
-                                                ->relationship('user', 'name')
-                                                ->searchable()
-                                                ->preload()
-                                                ->required(),
+                                                ->placeholder('Name, email or phone')
+                                                ->required()
+                                                ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
+                                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CouponUsage $record): void {
+                                                    if ($state === null || ! $record?->user) {
+                                                        return;
+                                                    }
+
+                                                    $label = trim(sprintf('%s <%s>', (string) ($record->user->name ?? ''), (string) ($record->user->email ?? '')));
+
+                                                    $component
+                                                        ->state((string) $state)
+                                                        ->options([
+                                                            (string) $record->user_id => $label,
+                                                        ]);
+                                                })
+                                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                                    if ($state === null || $state === '') {
+                                                        return;
+                                                    }
+
+                                                    $set('user_id', (int) $state);
+                                                }),
                                             Select::make('order_id')
                                                 ->label(__('admin.coupon_usages.form.fields.order'))
                                                 ->relationship('order', 'id')
@@ -84,7 +128,7 @@ final class CouponUsageResource extends Resource
                                                 ->prefix('€')
                                                 ->required(),
                                         ]),
-                                    DateTimePicker::make('used_at')
+                                    Flatpickr::makeDateTime('used_at')
                                         ->label(__('admin.coupon_usages.form.fields.used_at'))
                                         ->required()
                                         ->default(now())
@@ -108,7 +152,7 @@ final class CouponUsageResource extends Resource
                                         ->content(fn (?Model $record) => $record?->user?->email ?? '-'),
                                     Placeholder::make('order_total')
                                         ->label(__('admin.coupon_usages.form.fields.order_total'))
-                                        ->content(fn (?Model $record) => $record?->order ? '€'.number_format($record->order->total_amount, 2) : '-'),
+                                        ->content(fn (?Model $record) => $record?->order ? '€' . number_format($record->order->total_amount, 2) : '-'),
                                     Textarea::make('notes')
                                         ->label(__('admin.coupon_usages.form.fields.notes'))
                                         ->rows(3),
@@ -144,11 +188,11 @@ final class CouponUsageResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('usage_period')
                     ->label(__('admin.coupon_usages.form.fields.usage_period'))
-                    ->formatStateUsing(fn (CouponUsage $record) => $record->usage_period)
+                    ->state(fn (CouponUsage $record): string => $record->usage_period)
                     ->colors([
                         'success' => fn ($state) => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')], true),
                         'warning' => fn ($state) => $state === __('admin.coupon_usages.periods.this_month'),
-                        'danger' => fn ($state) => $state === __('admin.coupon_usages.periods.older'),
+                        'danger'  => fn ($state) => $state === __('admin.coupon_usages.periods.older'),
                     ]),
             ])
             ->filters([
@@ -170,8 +214,8 @@ final class CouponUsageResource extends Resource
                 Filter::make('used_at_range')
                     ->label(__('admin.coupon_usages.filters.used_at'))
                     ->form([
-                        DateTimePicker::make('from')->label(__('admin.coupon_usages.filters.used_at_from')),
-                        DateTimePicker::make('until')->label(__('admin.coupon_usages.filters.used_at_until')),
+                        Flatpickr::makeDateTime('from')->label(__('admin.coupon_usages.filters.used_at_from')),
+                        Flatpickr::makeDateTime('until')->label(__('admin.coupon_usages.filters.used_at_until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))
@@ -179,45 +223,49 @@ final class CouponUsageResource extends Resource
                 TernaryFilter::make('used_today')
                     ->label(__('admin.coupon_usages.filters.used_today'))
                     ->queries(
-                        true: fn (Builder $query) => $query->usedToday(),
-                        false: fn (Builder $query) => $query->whereDate('used_at', '!=', today()),
+                        true: fn (Builder $query): Builder => $query->usedToday(),
+                        false: fn (Builder $query): Builder => $query->whereDate('used_at', '!=', today()),
                     ),
                 TernaryFilter::make('used_this_week')
                     ->label(__('admin.coupon_usages.filters.used_this_week'))
                     ->queries(
-                        true: fn (Builder $query) => $query->usedThisWeek(),
-                        false: fn (Builder $query) => $query->whereNotBetween('used_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                        true: fn (Builder $query): Builder => $query->usedThisWeek(),
+                        false: fn (Builder $query): Builder => $query->whereNotBetween('used_at', [now()->startOfWeek(), now()->endOfWeek()]),
                     ),
                 TernaryFilter::make('used_this_month')
                     ->label(__('admin.coupon_usages.filters.used_this_month'))
                     ->queries(
-                        true: fn (Builder $query) => $query->usedThisMonth(),
-                        false: fn (Builder $query) => $query->whereNotBetween('used_at', [now()->startOfMonth(), now()->endOfMonth()]),
+                        true: fn (Builder $query): Builder => $query->usedThisMonth(),
+                        false: fn (Builder $query): Builder => $query->whereNotBetween('used_at', [now()->startOfMonth(), now()->endOfMonth()]),
                     ),
             ])
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('export_usage_report')
+                Action::make('export_usage_report')
                     ->label(__('admin.coupon_usages.actions.export_usage_report'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('info')
-                    ->action(fn (CouponUsage $record) => FilamentNotification::make()
-                        ->title(__('admin.coupon_usages.usage_report_exported_successfully'))
-                        ->success()
-                        ->send()),
+                    ->action(function (CouponUsage $record): void {
+                        FilamentNotification::make()
+                            ->title(__('admin.coupon_usages.usage_report_exported_successfully'))
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    TableBulkAction::make('export_bulk_report')
+                    BulkAction::make('export_bulk_report')
                         ->label(__('admin.coupon_usages.actions.export_bulk_report'))
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('info')
-                        ->action(fn (EloquentCollection $records) => FilamentNotification::make()
-                            ->title(__('admin.coupon_usages.bulk_report_exported_successfully'))
-                            ->success()
-                            ->send()),
+                        ->action(function (EloquentCollection $records): void {
+                            FilamentNotification::make()
+                                ->title(__('admin.coupon_usages.bulk_report_exported_successfully'))
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ])
             ->defaultSort('used_at', 'desc');
@@ -231,10 +279,10 @@ final class CouponUsageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCouponUsages::route('/'),
+            'index'  => Pages\ListCouponUsages::route('/'),
             'create' => Pages\CreateCouponUsage::route('/create'),
-            'view' => Pages\ViewCouponUsage::route('/{record}'),
-            'edit' => Pages\EditCouponUsage::route('/{record}/edit'),
+            'view'   => Pages\ViewCouponUsage::route('/{record}'),
+            'edit'   => Pages\EditCouponUsage::route('/{record}/edit'),
         ];
     }
 }

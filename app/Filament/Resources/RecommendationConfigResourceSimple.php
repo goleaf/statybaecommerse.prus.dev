@@ -12,22 +12,22 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Novadaemon\FilamentCombobox\Combobox;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-
-use Filament\Forms\Form;
 
 final class RecommendationConfigResourceSimple extends Resource
 {
@@ -85,11 +85,11 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->options([
                                     'collaborative' => __('recommendation_configs_simple.algorithm_types.collaborative'),
                                     'content_based' => __('recommendation_configs_simple.algorithm_types.content_based'),
-                                    'hybrid' => __('recommendation_configs_simple.algorithm_types.hybrid'),
-                                    'popularity' => __('recommendation_configs_simple.algorithm_types.popularity'),
-                                    'trending' => __('recommendation_configs_simple.algorithm_types.trending'),
-                                    'similarity' => __('recommendation_configs_simple.algorithm_types.similarity'),
-                                    'custom' => __('recommendation_configs_simple.algorithm_types.custom'),
+                                    'hybrid'        => __('recommendation_configs_simple.algorithm_types.hybrid'),
+                                    'popularity'    => __('recommendation_configs_simple.algorithm_types.popularity'),
+                                    'trending'      => __('recommendation_configs_simple.algorithm_types.trending'),
+                                    'similarity'    => __('recommendation_configs_simple.algorithm_types.similarity'),
+                                    'custom'        => __('recommendation_configs_simple.algorithm_types.custom'),
                                 ])
                                 ->required()
                                 ->default('collaborative'),
@@ -125,13 +125,15 @@ final class RecommendationConfigResourceSimple extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            Select::make('products')
+                            Combobox::make('products')
                                 ->label(__('recommendation_configs_simple.products'))
                                 ->relationship('products', 'name')
                                 ->multiple()
                                 ->searchable()
+                                ->boxSearchs(true)
+                                ->height('360px')
                                 ->preload()
-                                ->afterStateHydrated(fn (Select $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
+                                ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
                                 ->createOptionForm([
                                     TextInput::make('name')
@@ -140,12 +142,16 @@ final class RecommendationConfigResourceSimple extends Resource
                                     Textarea::make('description')
                                         ->maxLength(500),
                                 ]),
-                            Select::make('categories')
+                            Combobox::make('categories')
                                 ->label(__('recommendation_configs_simple.categories'))
                                 ->relationship('categories', 'name')
                                 ->multiple()
                                 ->searchable()
+                                ->boxSearchs(true)
+                                ->height('360px')
                                 ->preload()
+                                ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
+                                ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
                                 ->createOptionForm([
                                     TextInput::make('name')
                                         ->required()
@@ -285,12 +291,12 @@ final class RecommendationConfigResourceSimple extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'collaborative' => 'blue',
                         'content_based' => 'green',
-                        'hybrid' => 'purple',
-                        'popularity' => 'orange',
-                        'trending' => 'pink',
-                        'similarity' => 'indigo',
-                        'custom' => 'gray',
-                        default => 'gray',
+                        'hybrid'        => 'purple',
+                        'popularity'    => 'orange',
+                        'trending'      => 'pink',
+                        'similarity'    => 'indigo',
+                        'custom'        => 'gray',
+                        default         => 'gray',
                     }),
                 TextColumn::make('min_score')
                     ->label(__('recommendation_configs_simple.min_score'))
@@ -404,11 +410,11 @@ final class RecommendationConfigResourceSimple extends Resource
                     ->options([
                         'collaborative' => __('recommendation_configs_simple.algorithm_types.collaborative'),
                         'content_based' => __('recommendation_configs_simple.algorithm_types.content_based'),
-                        'hybrid' => __('recommendation_configs_simple.algorithm_types.hybrid'),
-                        'popularity' => __('recommendation_configs_simple.algorithm_types.popularity'),
-                        'trending' => __('recommendation_configs_simple.algorithm_types.trending'),
-                        'similarity' => __('recommendation_configs_simple.algorithm_types.similarity'),
-                        'custom' => __('recommendation_configs_simple.algorithm_types.custom'),
+                        'hybrid'        => __('recommendation_configs_simple.algorithm_types.hybrid'),
+                        'popularity'    => __('recommendation_configs_simple.algorithm_types.popularity'),
+                        'trending'      => __('recommendation_configs_simple.algorithm_types.trending'),
+                        'similarity'    => __('recommendation_configs_simple.algorithm_types.similarity'),
+                        'custom'        => __('recommendation_configs_simple.algorithm_types.custom'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_configs_simple.is_active'))
@@ -520,10 +526,10 @@ final class RecommendationConfigResourceSimple extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationConfigSimples::route('/'),
+            'index'  => Pages\ListRecommendationConfigSimples::route('/'),
             'create' => Pages\CreateRecommendationConfigSimple::route('/create'),
-            'view' => Pages\ViewRecommendationConfigSimple::route('/{record}'),
-            'edit' => Pages\EditRecommendationConfigSimple::route('/{record}/edit'),
+            'view'   => Pages\ViewRecommendationConfigSimple::route('/{record}'),
+            'edit'   => Pages\EditRecommendationConfigSimple::route('/{record}/edit'),
         ];
     }
 }

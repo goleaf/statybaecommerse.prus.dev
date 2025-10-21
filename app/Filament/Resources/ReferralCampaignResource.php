@@ -1,44 +1,46 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralCampaignResource\Pages;
-use BackedEnum;
 use App\Models\ReferralCampaign;
+use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class ReferralCampaignResource extends Resource
 {
     protected static ?string $model = ReferralCampaign::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-megaphone';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 14;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): ?string
     {
         return 'System';
     }
@@ -80,10 +82,10 @@ final class ReferralCampaignResource extends Resource
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
                                     ->default(true),
-                                DatePicker::make('start_date')
+                                Flatpickr::makeDate('start_date')
                                     ->label(__('admin.referral_campaigns.start_date'))
                                     ->nullable(),
-                                DatePicker::make('end_date')
+                                Flatpickr::makeDate('end_date')
                                     ->label(__('admin.referral_campaigns.end_date'))
                                     ->nullable(),
                             ]),
@@ -101,9 +103,9 @@ final class ReferralCampaignResource extends Resource
                                     ->label(__('admin.referral_campaigns.reward_type'))
                                     ->options([
                                         'discount' => __('admin.referral_campaigns.reward_types.discount'),
-                                        'credit' => __('admin.referral_campaigns.reward_types.credit'),
-                                        'points' => __('admin.referral_campaigns.reward_types.points'),
-                                        'gift' => __('admin.referral_campaigns.reward_types.gift'),
+                                        'credit'   => __('admin.referral_campaigns.reward_types.credit'),
+                                        'points'   => __('admin.referral_campaigns.reward_types.points'),
+                                        'gift'     => __('admin.referral_campaigns.reward_types.gift'),
                                     ])
                                     ->nullable(),
                                 TextInput::make('max_referrals_per_user')
@@ -162,23 +164,23 @@ final class ReferralCampaignResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'discount' => 'success',
-                        'credit' => 'info',
-                        'points' => 'warning',
-                        'gift' => 'primary',
-                        default => 'gray',
+                        'credit'   => 'info',
+                        'points'   => 'warning',
+                        'gift'     => 'primary',
+                        default    => 'gray',
                     }),
                 TextColumn::make('max_referrals_per_user')
                     ->label(__('admin.referral_campaigns.max_referrals_per_user'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn($state) => $state ?: __('admin.common.unlimited')),
+                    ->formatStateUsing(fn ($state) => $state ?: __('admin.common.unlimited')),
                 TextColumn::make('max_total_referrals')
                     ->label(__('admin.referral_campaigns.max_total_referrals'))
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn($state) => $state ?: __('admin.common.unlimited')),
+                    ->formatStateUsing(fn ($state) => $state ?: __('admin.common.unlimited')),
                 IconColumn::make('is_active')
                     ->label(__('admin.referral_campaigns.is_active'))
                     ->boolean()
@@ -210,9 +212,9 @@ final class ReferralCampaignResource extends Resource
                     ->label(__('admin.referral_campaigns.reward_type'))
                     ->options([
                         'discount' => __('admin.referral_campaigns.reward_types.discount'),
-                        'credit' => __('admin.referral_campaigns.reward_types.credit'),
-                        'points' => __('admin.referral_campaigns.reward_types.points'),
-                        'gift' => __('admin.referral_campaigns.reward_types.gift'),
+                        'credit'   => __('admin.referral_campaigns.reward_types.credit'),
+                        'points'   => __('admin.referral_campaigns.reward_types.points'),
+                        'gift'     => __('admin.referral_campaigns.reward_types.gift'),
                     ]),
             ])
             ->recordActions([
@@ -237,10 +239,10 @@ final class ReferralCampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralCampaigns::route('/'),
+            'index'  => Pages\ListReferralCampaigns::route('/'),
             'create' => Pages\CreateReferralCampaign::route('/create'),
-            'view' => Pages\ViewReferralCampaign::route('/{record}'),
-            'edit' => Pages\EditReferralCampaign::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralCampaign::route('/{record}'),
+            'edit'   => Pages\EditReferralCampaign::route('/{record}/edit'),
         ];
     }
 

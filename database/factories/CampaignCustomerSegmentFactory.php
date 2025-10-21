@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
 use App\Models\Campaign;
 use App\Models\CampaignCustomerSegment;
-use App\Models\CustomerGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,6 +27,7 @@ final class CampaignCustomerSegmentFactory extends Factory
                 if ($existingGroups->isNotEmpty()) {
                     return $existingGroups->random()->id;
                 }
+
                 return \App\Models\CustomerGroup::factory();
             },
             'segment_type' => $segmentType,
@@ -41,7 +43,7 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function demographic(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'segment_type' => 'demographic',
             'segment_criteria' => $this->generateDemographicCriteria(),
             'targeting_tags' => ['age_group', 'gender', 'income_level', 'education'],
@@ -56,7 +58,7 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function behavioral(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'segment_type' => 'behavioral',
             'segment_criteria' => $this->generateBehavioralCriteria(),
             'targeting_tags' => ['purchase_frequency', 'loyalty_level', 'browsing_behavior'],
@@ -71,7 +73,7 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function geographic(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'segment_type' => 'geographic',
             'segment_criteria' => $this->generateGeographicCriteria(),
             'targeting_tags' => ['country', 'region', 'city', 'timezone'],
@@ -86,7 +88,7 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function psychographic(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'segment_type' => 'psychographic',
             'segment_criteria' => $this->generatePsychographicCriteria(),
             'targeting_tags' => ['lifestyle', 'interests', 'values', 'personality'],
@@ -101,21 +103,21 @@ final class CampaignCustomerSegmentFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => true,
         ]);
     }
 
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
         ]);
     }
 
     public function highPerformance(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'track_performance' => true,
             'auto_optimize' => true,
             'is_active' => true,

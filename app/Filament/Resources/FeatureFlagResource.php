@@ -6,19 +6,18 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use Filament\Actions\DeleteAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TableEditAction;
 use Filament\Tables\Actions\ViewAction as TableViewAction;
@@ -27,7 +26,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * FeatureFlagResource
@@ -118,10 +119,10 @@ final class FeatureFlagResource extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            DateTimePicker::make('starts_at')
+                            Flatpickr::makeDateTime('starts_at')
                                 ->label(__('feature_flags.starts_at'))
                                 ->nullable(),
-                            DateTimePicker::make('ends_at')
+                            Flatpickr::makeDateTime('ends_at')
                                 ->label(__('feature_flags.ends_at'))
                                 ->nullable(),
                         ]),
@@ -133,20 +134,20 @@ final class FeatureFlagResource extends Resource
                             Select::make('environment')
                                 ->label(__('feature_flags.environment'))
                                 ->options([
-                                    'local' => 'Local',
-                                    'staging' => 'Staging',
+                                    'local'      => 'Local',
+                                    'staging'    => 'Staging',
                                     'production' => 'Production',
                                 ])
                                 ->nullable(),
                             Select::make('category')
                                 ->label(__('feature_flags.category'))
                                 ->options([
-                                    'ui' => 'UI/UX',
+                                    'ui'          => 'UI/UX',
                                     'performance' => 'Performance',
-                                    'security' => 'Security',
-                                    'analytics' => 'Analytics',
-                                    'payment' => 'Payment',
-                                    'shipping' => 'Shipping',
+                                    'security'    => 'Security',
+                                    'analytics'   => 'Analytics',
+                                    'payment'     => 'Payment',
+                                    'shipping'    => 'Shipping',
                                 ])
                                 ->nullable(),
                         ]),
@@ -164,6 +165,19 @@ final class FeatureFlagResource extends Resource
                         ->keyLabel(__('feature_flags.condition_key'))
                         ->valueLabel(__('feature_flags.condition_value'))
                         ->columnSpanFull(),
+                ]),
+            Section::make('Attribution')
+                ->visible(fn (?FeatureFlag $record): bool => $record !== null)
+                ->components([
+                    Grid::make(2)
+                        ->components([
+                            Placeholder::make('created_by_display')
+                                ->label(__('system.created_by'))
+                                ->content(fn (?FeatureFlag $record): string => $record?->created_by_display ?? '—'),
+                            Placeholder::make('updated_by_display')
+                                ->label(__('system.updated_by'))
+                                ->content(fn (?FeatureFlag $record): string => $record?->updated_by_display ?? '—'),
+                        ]),
                 ]),
         ]);
     }
@@ -188,22 +202,22 @@ final class FeatureFlagResource extends Resource
                     ->label(__('feature_flags.category'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'ui' => 'info',
+                        'ui'          => 'info',
                         'performance' => 'success',
-                        'security' => 'danger',
-                        'analytics' => 'warning',
-                        'payment' => 'primary',
-                        'shipping' => 'secondary',
-                        default => 'gray',
+                        'security'    => 'danger',
+                        'analytics'   => 'warning',
+                        'payment'     => 'primary',
+                        'shipping'    => 'secondary',
+                        default       => 'gray',
                     }),
                 TextColumn::make('environment')
                     ->label(__('feature_flags.environment'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'local' => 'gray',
-                        'staging' => 'warning',
+                        'local'      => 'gray',
+                        'staging'    => 'warning',
                         'production' => 'success',
-                        default => 'gray',
+                        default      => 'gray',
                     }),
                 IconColumn::make('is_active')
                     ->label(__('feature_flags.is_active'))
@@ -229,23 +243,45 @@ final class FeatureFlagResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_by_display')
+                    ->label(__('system.created_by'))
+                    ->formatStateUsing(fn (FeatureFlag $record): string => $record->created_by_display ?? '—')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where(function (Builder $scopedQuery) use ($search): void {
+                            $scopedQuery
+                                ->whereHas('creator', fn (Builder $creatorQuery): Builder => $creatorQuery->where('name', 'like', "%{$search}%"))
+                                ->orWhere('created_by_name', 'like', "%{$search}%");
+                        });
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_by_display')
+                    ->label(__('system.updated_by'))
+                    ->formatStateUsing(fn (FeatureFlag $record): string => $record->updated_by_display ?? '—')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where(function (Builder $scopedQuery) use ($search): void {
+                            $scopedQuery
+                                ->whereHas('updater', fn (Builder $updaterQuery): Builder => $updaterQuery->where('name', 'like', "%{$search}%"))
+                                ->orWhere('updated_by_name', 'like', "%{$search}%");
+                        });
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('category')
                     ->label(__('feature_flags.category'))
                     ->options([
-                        'ui' => 'UI/UX',
+                        'ui'          => 'UI/UX',
                         'performance' => 'Performance',
-                        'security' => 'Security',
-                        'analytics' => 'Analytics',
-                        'payment' => 'Payment',
-                        'shipping' => 'Shipping',
+                        'security'    => 'Security',
+                        'analytics'   => 'Analytics',
+                        'payment'     => 'Payment',
+                        'shipping'    => 'Shipping',
                     ]),
                 SelectFilter::make('environment')
                     ->label(__('feature_flags.environment'))
                     ->options([
-                        'local' => 'Local',
-                        'staging' => 'Staging',
+                        'local'      => 'Local',
+                        'staging'    => 'Staging',
                         'production' => 'Production',
                     ]),
                 TernaryFilter::make('is_active')
@@ -258,7 +294,7 @@ final class FeatureFlagResource extends Resource
             ->actions([
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make(),
+                TableDeleteAction::make(),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
@@ -284,10 +320,10 @@ final class FeatureFlagResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFeatureFlags::route('/'),
+            'index'  => Pages\ListFeatureFlags::route('/'),
             'create' => Pages\CreateFeatureFlag::route('/create'),
-            'view' => Pages\ViewFeatureFlag::route('/{record}'),
-            'edit' => Pages\EditFeatureFlag::route('/{record}/edit'),
+            'view'   => Pages\ViewFeatureFlag::route('/{record}'),
+            'edit'   => Pages\EditFeatureFlag::route('/{record}/edit'),
         ];
     }
 }

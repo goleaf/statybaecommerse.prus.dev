@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
-use App\Services\DocumentService;
+use App\Contracts\DocumentServiceContract;
+use App\Models\DocumentTemplate;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 
 final class DocumentAction
 {
@@ -37,13 +41,14 @@ final class DocumentAction
                     ->label(__('admin.fields.title'))
                     ->required(),
             ])
-            ->action(function ($record, array $data, DocumentService $documentService) {
+            ->action(function (Model $record, array $data, DocumentServiceContract $documentService): RedirectResponse|Response {
                 try {
+                    $template = DocumentTemplate::query()->findOrFail($data['template_id']);
+
                     $document = $documentService->generateDocument(
-                        templateId: $data['template_id'],
-                        documentable: $record,
-                        variables: $this->getDefaultVariables($record),
-                        format: $data['format'],
+                        template: $template,
+                        relatedModel: $record,
+                        variables: self::getDefaultVariables($record),
                         title: $data['title']
                     );
 
@@ -54,29 +59,35 @@ final class DocumentAction
                         ->send();
 
                     if ($data['format'] === 'pdf') {
-                        return response()->download($document->file_path, $document->title.'.pdf');
+                        $downloadUrl = $documentService->generatePdf($document);
+
+                        return redirect()->away($downloadUrl);
                     }
 
-                    return response($document->content, 200, [
+                    return response($document->content ?? '', 200, [
                         'Content-Type' => 'text/html',
                     ]);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     Notification::make()
                         ->title(__('admin.notifications.document_generation_failed'))
                         ->body($e->getMessage())
                         ->danger()
                         ->send();
+
+                    throw $e;
                 }
             });
     }
 
-    private static function getDefaultVariables($record): array
+    private static function getDefaultVariables(Model $record): array
     {
+        $now = now();
+
         $variables = [
             'MODEL_ID' => $record->getKey(),
             'MODEL_TYPE' => $record->getMorphClass(),
-            'CREATED_AT' => now()->format('d/m/Y H:i'),
-            'UPDATED_AT' => now()->format('d/m/Y H:i'),
+            'CREATED_AT' => $now->format('d/m/Y H:i'),
+            'UPDATED_AT' => $now->format('d/m/Y H:i'),
         ];
 
         // Add model-specific variables if the model has common attributes
@@ -84,8 +95,10 @@ final class DocumentAction
             $commonAttributes = ['name', 'title', 'code', 'description', 'status'];
 
             foreach ($commonAttributes as $attribute) {
-                if ($record->getAttribute($attribute)) {
-                    $variables[strtoupper($attribute)] = $record->getAttribute($attribute);
+                $value = $record->getAttribute($attribute);
+
+                if ($value !== null) {
+                    $variables[strtoupper($attribute)] = $value;
                 }
             }
         }

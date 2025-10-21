@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
+use App\Support\Search\ContentLinkSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 
 final class SliderForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Section::make(__('admin.sliders.basic_information'))
                     ->description(__('admin.sliders.basic_information_description'))
                     ->components([
@@ -55,7 +57,7 @@ final class SliderForm
                                 '1:1',
                             ])
                             ->directory('sliders/images')
-                            ->visibility('public')
+                            ->visibility('private')
                             ->maxSize(5120)  // 5MB
                             ->columnSpanFull(),
                     ])
@@ -69,10 +71,21 @@ final class SliderForm
                                     ->label(__('admin.sliders.button_text'))
                                     ->maxLength(255)
                                     ->columnSpan(1),
-                                TextInput::make('button_url')
+                                SearchableInput::make('button_url')
                                     ->label(__('admin.sliders.button_url'))
-                                    ->url()
+                                    ->placeholder(__('admin.sliders.link_search.placeholder'))
                                     ->maxLength(255)
+                                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state($state)
+                                            ->options([$state => $state]);
+                                    })
                                     ->columnSpan(1),
                             ]),
                     ])
@@ -91,6 +104,30 @@ final class SliderForm
                                     ->label(__('admin.sliders.text_color'))
                                     ->required()
                                     ->default('#000000')
+                                    ->columnSpan(1),
+                            ]),
+                    ])
+                    ->collapsible(),
+                Section::make(__('admin.sliders.settings'))
+                    ->description(__('admin.sliders.settings_description'))
+                    ->components([
+                        Grid::make(3)
+                            ->components([
+                                Toggle::make('settings.autoplay')
+                                    ->label(__('admin.sliders.settings_autoplay'))
+                                    ->default(true)
+                                    ->columnSpan(1),
+                                TextInput::make('settings.interval')
+                                    ->label(__('admin.sliders.settings_interval'))
+                                    ->numeric()
+                                    ->default(5000)
+                                    ->minValue(1000)
+                                    ->step(500)
+                                    ->required()
+                                    ->columnSpan(1),
+                                Toggle::make('settings.show_indicators')
+                                    ->label(__('admin.sliders.settings_show_indicators'))
+                                    ->default(true)
                                     ->columnSpan(1),
                             ]),
                     ])

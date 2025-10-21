@@ -180,10 +180,14 @@ function createNotification({ type = 'info', title, message, duration = 3000 }) 
         info: 'bg-blue-500'
     };
 
-    notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-large z-50 transform translate-x-full transition-all duration-300 flex items-start gap-3 max-w-sm`;
+    const variant = icons[type] && colors[type] ? type : 'info';
+
+    notification.className = `fixed top-4 right-4 ${colors[variant]} text-white px-6 py-4 rounded-xl shadow-large z-50 transform translate-x-full transition-all duration-300 flex items-start gap-3 max-w-sm`;
+    notification.setAttribute('role', 'status');
+    notification.setAttribute('aria-live', 'polite');
     notification.innerHTML = `
         <div class="flex-shrink-0 mt-0.5">
-            ${icons[type]}
+            ${icons[variant]}
         </div>
         <div class="flex-1">
             <h4 class="font-semibold text-sm">${title}</h4>
@@ -215,13 +219,19 @@ function initializeSearchEnhancements() {
     const searchInputs = document.querySelectorAll('input[type="search"], input[placeholder*="search" i]');
 
     searchInputs.forEach(input => {
+        const inputParent = input.parentElement;
+
         // Add search icon animation
         input.addEventListener('focus', function () {
-            this.parentElement.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+            if (inputParent) {
+                inputParent.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+            }
         });
 
         input.addEventListener('blur', function () {
-            this.parentElement.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+            if (inputParent) {
+                inputParent.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+            }
         });
 
         // Add search suggestions (if needed)
@@ -277,18 +287,29 @@ function initializeThemeSystem() {
 // Image lazy loading
 function initializeImageLazyLoading() {
     if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
+        const imageObserver = new IntersectionObserver(entries => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.remove('lazy');
-                    imageObserver.unobserve(img);
+                if (!entry.isIntersecting) {
+                    return;
                 }
+
+                const img = entry.target;
+                const { src, srcset } = img.dataset;
+
+                if (src) {
+                    img.src = src;
+                }
+
+                if (srcset) {
+                    img.srcset = srcset;
+                }
+
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
             });
         });
 
-        document.querySelectorAll('img[data-src]').forEach(img => {
+        document.querySelectorAll('img[data-src], img[data-srcset]').forEach(img => {
             imageObserver.observe(img);
         });
     }

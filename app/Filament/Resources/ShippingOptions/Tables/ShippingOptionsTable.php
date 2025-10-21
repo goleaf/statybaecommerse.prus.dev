@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ShippingOptions\Tables;
 
+use App\Models\ShippingOption;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
 
 class ShippingOptionsTable
 {
@@ -24,7 +28,15 @@ class ShippingOptionsTable
                 TextColumn::make('service_type')
                     ->searchable(),
                 TextColumn::make('price')
-                    ->money()
+                    ->numeric()
+                    ->formatStateUsing(
+                        fn (?string $state, ShippingOption $record): string => $state === null
+                            ? ''
+                            : Number::currency(
+                                (float) $state,
+                                strtoupper($record->currency_code ?: 'EUR')
+                            )
+                    )
                     ->sortable(),
                 TextColumn::make('currency_code')
                     ->searchable(),

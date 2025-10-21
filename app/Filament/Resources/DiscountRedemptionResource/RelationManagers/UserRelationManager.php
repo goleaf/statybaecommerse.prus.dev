@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Support\Filament\Components\Flatpickr;
 
-class UserRelationManager extends RelationManager
+class UserRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'user';
 
@@ -38,7 +38,7 @@ class UserRelationManager extends RelationManager
                         Forms\Components\TextInput::make('phone')
                             ->tel()
                             ->maxLength(255),
-                        Forms\Components\DateTimePicker::make('email_verified_at')
+                        Flatpickr::makeDateTime('email_verified_at')
                             ->label('Email Verified At'),
                         Forms\Components\Select::make('status')
                             ->options([

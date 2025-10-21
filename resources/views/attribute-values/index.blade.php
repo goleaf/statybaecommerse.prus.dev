@@ -92,8 +92,8 @@
 
                             <!-- Stats -->
                             <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                <span>{{ $attributeValue->products()->count() }} {{ __('attributes.products') }}</span>
-                                <span>{{ $attributeValue->variants()->count() }} {{ __('attributes.variants') }}</span>
+                                <span>{{ $attributeValue->products_count }} {{ __('attributes.products') }}</span>
+                                <span>{{ $attributeValue->variants_count }} {{ __('attributes.variants') }}</span>
                             </div>
 
                             <!-- Actions -->

@@ -204,10 +204,27 @@ To update city data:
 php artisan migrate:fresh --seed --force
 php artisan db:seed --class=Database\\Seeders\\Cities\\AllCitiesSeeder
 
+# Warm Laravel caches (ensures config/routes/views are optimized)
+./scripts/deploy.sh
+
 # Verify deployment
 php artisan tinker
 >>> App\Models\City::count() // Should be 500+
 ```
+
+### PHP Opcache configuration
+
+Ensure production PHP instances run with Opcache tuned for long-running processes. Recommended settings:
+
+```
+opcache.enable=1
+opcache.enable_cli=1
+opcache.memory_consumption=256
+opcache.max_accelerated_files=20000
+opcache.validate_timestamps=0
+```
+
+After updating the ini on the server, restart PHP-FPM to apply the changes.
 
 ## 📞 Support
 

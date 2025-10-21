@@ -5,24 +5,25 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserBehaviorResource\Pages;
-use BackedEnum;
 use App\Models\User;
 use App\Models\UserBehavior;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -32,8 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-use Filament\Forms\Form;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * UserBehaviorResource
@@ -44,8 +44,7 @@ final class UserBehaviorResource extends Resource
 {
     protected static ?string $model = UserBehavior::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
@@ -123,7 +122,7 @@ final class UserBehaviorResource extends Resource
                             ->options(self::behaviorTypeOptions())
                             ->required()
                             ->searchable(),
-                        DateTimePicker::make('created_at')
+                        Flatpickr::makeDateTime('created_at')
                             ->label(__('admin.user_behaviors.created_at'))
                             ->default(now())
                             ->displayFormat('d/m/Y H:i:s'),
@@ -175,7 +174,7 @@ final class UserBehaviorResource extends Resource
                 TextColumn::make('behavior_type')
                     ->label(__('admin.user_behaviors.behavior_type'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'view' => 'info',
                         'click' => 'success',
                         'add_to_cart' => 'warning',
@@ -259,47 +258,42 @@ final class UserBehaviorResource extends Resource
                 TernaryFilter::make('has_product')
                     ->label(__('admin.user_behaviors.has_product'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('product_id'),
-                        false: fn(Builder $query) => $query->whereNull('product_id'),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->whereNotNull('product_id'),
+                        false: fn (Builder $query) => $query->whereNull('product_id'),
+                        blank: fn (Builder $query) => $query,
                     ),
                 TernaryFilter::make('has_category')
                     ->label(__('admin.user_behaviors.has_category'))
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('category_id'),
-                        false: fn(Builder $query) => $query->whereNull('category_id'),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->whereNotNull('category_id'),
+                        false: fn (Builder $query) => $query->whereNull('category_id'),
+                        blank: fn (Builder $query) => $query,
                     ),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')
-                            ->label(__('admin.user_behaviors.created_from')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')
-                            ->label(__('admin.user_behaviors.created_until')),
+                        Flatpickr::makeRange('range')
+                            ->label(__('admin.user_behaviors.created_at'))
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
                 Filter::make('recent_behaviors')
                     ->label(__('admin.user_behaviors.recent_behaviors'))
-                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
+                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
                 Filter::make('today')
                     ->label(__('admin.user_behaviors.today'))
-                    ->query(fn(Builder $query): Builder => $query->whereDate('created_at', today())),
+                    ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today())),
                 Filter::make('this_week')
                     ->label(__('admin.user_behaviors.this_week'))
-                    ->query(fn(Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])),
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])),
                 Filter::make('this_month')
                     ->label(__('admin.user_behaviors.this_month'))
-                    ->query(fn(Builder $query): Builder => $query->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)),
+                    ->query(fn (Builder $query): Builder => $query->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)),
             ])
             ->actions([
                 ViewAction::make(),
@@ -381,7 +375,7 @@ final class UserBehaviorResource extends Resource
                     ->label(__('admin.user_behaviors.analytics_dashboard'))
                     ->icon('heroicon-o-chart-pie')
                     ->color('primary')
-                    ->url(fn(): string => route('filament.admin.resources.user-behaviors.analytics')),
+                    ->url(fn (): string => route('filament.admin.resources.user-behaviors.analytics')),
                 Action::make('export_all')
                     ->label(__('admin.user_behaviors.export_all'))
                     ->icon('heroicon-o-arrow-down-tray')

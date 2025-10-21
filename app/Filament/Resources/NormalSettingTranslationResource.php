@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\NormalSettingTranslationResource\Pages;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -29,16 +33,23 @@ use UnitEnum;
  */
 final class NormalSettingTranslationResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
-
     protected static ?string $model = NormalSettingTranslation::class;
+
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 16;
 
     protected static ?string $recordTitleAttribute = 'display_name';
+
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-language';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return NavigationGroup::System;
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -55,9 +66,9 @@ final class NormalSettingTranslationResource extends Resource
         return __('admin.normal_setting_translations.model_label');
     }
 
-    public static function schema(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 SchemaSection::make(__('admin.normal_setting_translations.basic_information'))
                     ->schema([
@@ -65,7 +76,7 @@ final class NormalSettingTranslationResource extends Resource
                             ->schema([
                                 Select::make('enhanced_setting_id')
                                     ->label(__('admin.normal_setting_translations.enhanced_setting'))
-                                    ->options(NormalSetting::pluck('key', 'id'))
+                                    ->options(NormalSetting::query()->pluck('key', 'id')->all())
                                     ->required()
                                     ->searchable(),
 
@@ -79,7 +90,7 @@ final class NormalSettingTranslationResource extends Resource
                                         'es' => 'Spanish',
                                     ])
                                     ->required()
-                                    ->default('en'),
+                                    ->native(false),
                             ]),
 
                         TextInput::make('display_name')
@@ -115,11 +126,11 @@ final class NormalSettingTranslationResource extends Resource
                     ->label(__('admin.normal_setting_translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'en' => 'success',
-                        'lt' => 'info',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
+                        'en'    => 'success',
+                        'lt'    => 'info',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
                         default => 'gray',
                     }),
 
@@ -161,7 +172,7 @@ final class NormalSettingTranslationResource extends Resource
             ->filters([
                 SelectFilter::make('enhanced_setting_id')
                     ->label(__('admin.normal_setting_translations.enhanced_setting'))
-                    ->options(NormalSetting::pluck('key', 'id'))
+                    ->options(NormalSetting::query()->pluck('key', 'id')->all())
                     ->searchable(),
 
                 SelectFilter::make('locale')
@@ -174,9 +185,10 @@ final class NormalSettingTranslationResource extends Resource
                         'es' => 'Spanish',
                     ]),
             ])
-            ->recordActions([
+            ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -196,10 +208,10 @@ final class NormalSettingTranslationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNormalSettingTranslations::route('/'),
+            'index'  => Pages\ListNormalSettingTranslations::route('/'),
             'create' => Pages\CreateNormalSettingTranslation::route('/create'),
-            'view' => Pages\ViewNormalSettingTranslation::route('/{record}'),
-            'edit' => Pages\EditNormalSettingTranslation::route('/{record}/edit'),
+            'view'   => Pages\ViewNormalSettingTranslation::route('/{record}'),
+            'edit'   => Pages\EditNormalSettingTranslation::route('/{record}/edit'),
         ];
     }
 }

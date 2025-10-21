@@ -6,9 +6,9 @@ namespace App\Filament\Resources\LocationResource\Pages;
 
 use App\Filament\Resources\LocationResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListLocations extends ListRecords
+final class ListLocations extends BaseListRecords
 {
     protected static string $resource = LocationResource::class;
 

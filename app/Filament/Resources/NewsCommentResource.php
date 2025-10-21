@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NewsCommentResource\Pages;
-use App\Models\News;
 use App\Models\NewsComment;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\ApprovedScope;
+use App\Models\Scopes\VisibleScope;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -25,13 +31,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class NewsCommentResource extends Resource
 {
     protected static ?string $model = NewsComment::class;
+
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -65,15 +73,46 @@ final class NewsCommentResource extends Resource
                         ->schema([
                             Select::make('news_id')
                                 ->label(__('admin.news_comments.news'))
-                                ->options(News::pluck('title', 'id'))
+                                ->relationship(
+                                    name: 'news',
+                                    titleAttribute: 'title',
+                                    modifyQueryUsing: fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                                        ActiveScope::class,
+                                        ApprovedScope::class,
+                                        VisibleScope::class,
+                                    ])
+                                )
                                 ->required()
                                 ->searchable()
-                                ->preload(),
+                                ->preload()
+                                ->live(),
                             Select::make('parent_id')
                                 ->label(__('admin.news_comments.parent_comment'))
-                                ->options(NewsComment::pluck('author_name', 'id'))
+                                ->options(function (Get $get, ?NewsComment $record): array {
+                                    $newsId = $get('news_id') ?? $record?->news_id;
+
+                                    if (! $newsId) {
+                                        return [];
+                                    }
+
+                                    $query = NewsComment::query()
+                                        ->withoutGlobalScopes([
+                                            ActiveScope::class,
+                                            ApprovedScope::class,
+                                            VisibleScope::class,
+                                        ])
+                                        ->where('news_id', $newsId)
+                                        ->orderBy('created_at');
+
+                                    if ($record?->exists) {
+                                        $query->whereKeyNot($record->getKey());
+                                    }
+
+                                    return $query->pluck('author_name', 'id')->all();
+                                })
                                 ->searchable()
-                                ->preload(),
+                                ->preload()
+                                ->live(),
                         ]),
                     Grid::make(2)
                         ->schema([
@@ -117,6 +156,10 @@ final class NewsCommentResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('author_name')
@@ -133,6 +176,10 @@ final class NewsCommentResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
 
                         return strlen($state) > 50 ? $state : null;
                     }),
@@ -158,7 +205,15 @@ final class NewsCommentResource extends Resource
             ->filters([
                 SelectFilter::make('news_id')
                     ->label(__('admin.news_comments.news'))
-                    ->options(News::pluck('title', 'id'))
+                    ->relationship(
+                        'news',
+                        'title',
+                        modifyQueryUsing: fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                            ActiveScope::class,
+                            ApprovedScope::class,
+                            VisibleScope::class,
+                        ])
+                    )
                     ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_approved')
@@ -169,7 +224,15 @@ final class NewsCommentResource extends Resource
                     ->boolean(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.news_comments.parent_comment'))
-                    ->options(NewsComment::pluck('author_name', 'id'))
+                    ->options(fn (): array => NewsComment::query()
+                        ->withoutGlobalScopes([
+                            ActiveScope::class,
+                            ApprovedScope::class,
+                            VisibleScope::class,
+                        ])
+                        ->orderBy('author_name')
+                        ->pluck('author_name', 'id')
+                        ->all())
                     ->searchable()
                     ->preload(),
             ])
@@ -177,6 +240,25 @@ final class NewsCommentResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
+                Action::make('toggle_approval')
+                    ->label(fn (NewsComment $record): string => $record->is_approved
+                        ? __('admin.news_comments.disapprove')
+                        : __('admin.news_comments.approve'))
+                    ->icon(fn (NewsComment $record): string => $record->is_approved
+                        ? 'heroicon-o-x-mark'
+                        : 'heroicon-o-check')
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (NewsComment $record): string => $record->is_approved
+                        ? __('admin.news_comments.confirm_disapprove_heading')
+                        : __('admin.news_comments.confirm_approve_heading'))
+                    ->modalDescription(fn (NewsComment $record): string => $record->is_approved
+                        ? __('admin.news_comments.confirm_disapprove_description')
+                        : __('admin.news_comments.confirm_approve_description'))
+                    ->action(function (NewsComment $record): void {
+                        $record->forceFill([
+                            'is_approved' => ! $record->is_approved,
+                        ])->save();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -184,20 +266,29 @@ final class NewsCommentResource extends Resource
                     BulkAction::make('approve')
                         ->label(__('admin.news_comments.approve_selected'))
                         ->icon('heroicon-o-check')
-                        ->action(function ($records) {
+                        ->action(function (EloquentCollection $records): void {
                             $records->each->update(['is_approved' => true]);
                         })
                         ->requiresConfirmation(),
                     BulkAction::make('disapprove')
                         ->label(__('admin.news_comments.disapprove_selected'))
                         ->icon('heroicon-o-x-mark')
-                        ->action(function ($records) {
+                        ->action(function (EloquentCollection $records): void {
                             $records->each->update(['is_approved' => false]);
                         })
                         ->requiresConfirmation(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            ApprovedScope::class,
+            VisibleScope::class,
+        ]);
     }
 
     public static function getRelations(): array
@@ -210,10 +301,10 @@ final class NewsCommentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNewsComments::route('/'),
+            'index'  => Pages\ListNewsComments::route('/'),
             'create' => Pages\CreateNewsComment::route('/create'),
-            'view' => Pages\ViewNewsComment::route('/{record}'),
-            'edit' => Pages\EditNewsComment::route('/{record}/edit'),
+            'view'   => Pages\ViewNewsComment::route('/{record}'),
+            'edit'   => Pages\EditNewsComment::route('/{record}/edit'),
         ];
     }
 }

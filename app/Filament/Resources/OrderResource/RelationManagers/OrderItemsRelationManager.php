@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-use Filament\Forms\Form;
-
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Support\Search\ProductVariantSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -28,6 +31,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 /**
  * OrderItemsRelationManager
@@ -39,7 +43,7 @@ use Illuminate\Database\Eloquent\Collection;
  * - Bulk operations
  * - Advanced filtering
  */
-final class OrderItemsRelationManager extends RelationManager
+final class OrderItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'items';
 
@@ -62,26 +66,65 @@ final class OrderItemsRelationManager extends RelationManager
                     ->components([
                         Grid::make(2)
                             ->components([
-                                Select::make('product_variant_id')
+                                SearchableInput::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
-                                    ->relationship('productVariant', 'name')
-                                    ->searchable()
-                                    ->preload()
+                                    ->placeholder(__('orders.lookups.variant_placeholder'))
                                     ->required()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        if ($state) {
-                                            $variant = ProductVariant::find($state);
-                                            if ($variant) {
-                                                $set('unit_price', $variant->price);
-                                                $set('total', $variant->price * ($get('quantity') ?? 1));
-                                                $set('product_id', $variant->product_id);
-                                                $set('name', $variant->name ?? ($variant->product->name ?? ''));
-                                                $set('sku', $variant->sku ?? ($variant->product->sku ?? ''));
-                                            }
+                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
                                         }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find($state);
+
+                                        if (! $variant instanceof ProductVariant) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
+                                            ]);
                                     })
-                                    ->prefixIcon('heroicon-o-cube'),
+                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                        if ($state === null || $state === '') {
+                                            $set('product_variant_id', null);
+
+                                            return;
+                                        }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find((int) $state);
+
+                                        if (! $variant instanceof ProductVariant) {
+                                            return;
+                                        }
+
+                                        $set('product_variant_id', $variant->getKey());
+                                        $set('product_id', $variant->getAttribute('product_id'));
+
+                                        $name = $variant->getAttribute('name') ?? optional($variant->product)->name ?? '';
+                                        $sku = $variant->getAttribute('sku') ?? optional($variant->product)->sku ?? '';
+
+                                        $set('name', is_string($name) ? $name : '');
+                                        $set('sku', is_string($sku) ? $sku : '');
+
+                                        $price = (float) ($variant->getAttribute('price') ?? 0);
+                                        $set('unit_price', $price);
+
+                                        $quantity = (int) ($get('quantity') ?? 1);
+                                        $discount = (float) ($get('discount_amount') ?? 0);
+                                        $set('total', ($price * $quantity) - $discount);
+                                    }),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()
@@ -89,7 +132,7 @@ final class OrderItemsRelationManager extends RelationManager
                                     ->default(1)
                                     ->minValue(1)
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                                         $unitPrice = $get('unit_price') ?? 0;
                                         $set('total', $unitPrice * $state);
                                     })
@@ -104,7 +147,7 @@ final class OrderItemsRelationManager extends RelationManager
                                     ->prefix('€')
                                     ->step(0.01)
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                                         $quantity = $get('quantity') ?? 1;
                                         $set('total', $state * $quantity);
                                     })
@@ -116,7 +159,7 @@ final class OrderItemsRelationManager extends RelationManager
                                     ->prefix('€')
                                     ->step(0.01)
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                                         $unitPrice = $get('unit_price') ?? 0;
                                         $quantity = $get('quantity') ?? 1;
                                         $discount = $state ?? 0;
@@ -132,7 +175,7 @@ final class OrderItemsRelationManager extends RelationManager
 
                                         $total = ($unitPrice * $quantity) - $discount;
 
-                                        return '€'.number_format($total, 2);
+                                        return '€' . number_format($total, 2);
                                     }),
                             ]),
                         Hidden::make('product_id')
@@ -209,7 +252,7 @@ final class OrderItemsRelationManager extends RelationManager
                         'warning' => 'pending',
                         'primary' => 'processing',
                         'success' => 'completed',
-                        'danger' => 'cancelled',
+                        'danger'  => 'cancelled',
                     ])
                     ->formatStateUsing(fn (?string $state): string => $state ? __("orders.item_statuses.{$state}") : '-'),
                 TextColumn::make('created_at')
@@ -222,10 +265,10 @@ final class OrderItemsRelationManager extends RelationManager
                 SelectFilter::make('status')
                     ->label(__('orders.fields.status'))
                     ->options([
-                        'pending' => __('orders.item_statuses.pending'),
+                        'pending'    => __('orders.item_statuses.pending'),
                         'processing' => __('orders.item_statuses.processing'),
-                        'completed' => __('orders.item_statuses.completed'),
-                        'cancelled' => __('orders.item_statuses.cancelled'),
+                        'completed'  => __('orders.item_statuses.completed'),
+                        'cancelled'  => __('orders.item_statuses.cancelled'),
                     ])
                     ->multiple(),
                 TernaryFilter::make('has_discount')
@@ -236,6 +279,47 @@ final class OrderItemsRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit items')
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit order items')
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        return $repeater
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->schema([
+                                Hidden::make('id'),
+                                Hidden::make('product_variant_id'),
+                                TextInput::make('name')
+                                    ->label(__('orders.fields.product'))
+                                    ->readOnly()
+                                    ->dehydrated(false),
+                                TextInput::make('sku')
+                                    ->label(__('orders.fields.sku'))
+                                    ->readOnly()
+                                    ->dehydrated(false),
+                                TextInput::make('quantity')
+                                    ->label(__('orders.fields.quantity'))
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->required(),
+                                TextInput::make('unit_price')
+                                    ->label(__('orders.fields.unit_price'))
+                                    ->numeric()
+                                    ->prefix('€')
+                                    ->required(),
+                                TextInput::make('discount_amount')
+                                    ->label(__('orders.fields.discount_amount'))
+                                    ->numeric()
+                                    ->prefix('€')
+                                    ->default(0),
+                                Textarea::make('notes')
+                                    ->label(__('orders.item_notes'))
+                                    ->rows(2)
+                                    ->columnSpanFull(),
+                            ]);
+                    }),
                 \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_item'))
                     ->icon('heroicon-o-plus')

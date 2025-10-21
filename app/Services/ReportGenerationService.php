@@ -8,6 +8,7 @@ use App\Models\AnalyticsEvent;
 use App\Models\Product;
 use App\Models\Report;
 use App\Models\User;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -55,9 +56,18 @@ final class ReportGenerationService
             $day['unique_users'] = $day['users']->unique()->count();
             unset($day['users']);
         }
+        $calculator = app(PriceCalculator::class);
+        $totals = $calculator->breakdown($totalRevenue);
+        $summary = $totals->toSummary();
+
+        foreach ($salesData as &$day) {
+            $day['formatted_revenue'] = app_money_format($day['revenue'], $summary['currency']);
+        }
+        unset($day);
+
         Log::info('Sales report generated', ['processed_events' => $processedCount, 'total_revenue' => $totalRevenue, 'days_covered' => count($salesData), 'timeout_reached' => now()->greaterThan($timeout)]);
 
-        return ['summary' => ['total_revenue' => $totalRevenue, 'total_transactions' => $processedCount, 'days_covered' => count($salesData), 'processed_events' => $processedCount], 'daily_data' => array_values($salesData)];
+        return ['summary' => $summary + ['total_revenue' => $summary['total'], 'total_transactions' => $processedCount, 'days_covered' => count($salesData), 'processed_events' => $processedCount], 'daily_data' => array_values($salesData)];
     }
 
     /**

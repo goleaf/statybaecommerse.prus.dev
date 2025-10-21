@@ -8,7 +8,6 @@ use Closure;
 use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Livewire\Component;
 
 /**
  * AutocompleteSelect Component
@@ -40,21 +39,30 @@ final class AutocompleteSelect extends Select
 
     protected ?string $searchQuery = null;
 
+    /**
+     * @var array<string, array<int, array{value:mixed, label:string, data:array}>>
+     */
+    protected array $searchResultCache = [];
+
     public static function make(?string $name = null): static
     {
         return parent::make($name);
     }
 
-    public function searchable(bool|Closure|array $condition = true): static
+    public function searchable(Closure|array|bool $condition = true): static
     {
-        $this->searchable = is_bool($condition) ? $condition : true;
+        parent::searchable($condition);
+
+        $this->searchable = (bool) $this->evaluate($condition);
 
         return $this;
     }
 
     public function multiple(bool|Closure $condition = true): static
     {
-        $this->multiple = is_bool($condition) ? $condition : true;
+        parent::multiple($condition);
+
+        $this->multiple = (bool) $this->evaluate($condition);
 
         return $this;
     }
@@ -96,13 +104,23 @@ final class AutocompleteSelect extends Select
 
     public function model(Model|Closure|array|string|null $model = null): static
     {
-        parent::model($model);
+        $evaluatedModel = $this->evaluate($model);
 
-        if (is_string($model)) {
-            $this->modelClass = $model;
-        } elseif ($model instanceof Model) {
-            $this->modelClass = $model::class;
+        $modelClass = match (true) {
+            $evaluatedModel instanceof Model => $evaluatedModel::class,
+            is_string($evaluatedModel) => $evaluatedModel,
+            default => null,
+        };
+
+        if ($modelClass !== null) {
+            parent::model($modelClass);
         }
+
+        if ($modelClass !== $this->modelClass) {
+            $this->resetSearchState();
+        }
+
+        $this->modelClass = $modelClass;
 
         return $this;
     }
@@ -151,9 +169,7 @@ final class AutocompleteSelect extends Select
     {
         $this->setSearchQuery($search);
 
-        $results = $this->searchResults ?? collect();
-
-        return $results
+        return ($this->searchResults ?? collect())
             ->mapWithKeys(function (array $item): array {
                 $value = $item['value'] ?? null;
                 $label = $item['label'] ?? (is_array($item['data'] ?? null) ? ($item['data']['name'] ?? (string) $value) : (string) $value);
@@ -165,8 +181,12 @@ final class AutocompleteSelect extends Select
 
     public function setSearchQuery(?string $query): static
     {
-        $this->searchQuery = $query;
-        $this->performSearch();
+        $normalizedQuery = $this->normalizeSearchQuery($query);
+
+        $this->searchQuery = $normalizedQuery;
+        $this->searchResults = $normalizedQuery !== null
+            ? $this->performSearch($normalizedQuery)
+            : collect();
 
         return $this;
     }
@@ -176,12 +196,16 @@ final class AutocompleteSelect extends Select
         return $this->searchQuery;
     }
 
-    protected function performSearch(): void
+    protected function performSearch(string $search): Collection
     {
-        if (! $this->modelClass || ! $this->searchQuery || strlen($this->searchQuery) < $this->minSearchLength) {
-            $this->searchResults = collect();
+        if ($this->shouldSkipSearch($search)) {
+            return collect();
+        }
 
-            return;
+        $cacheKey = $this->cacheKey($search);
+
+        if (array_key_exists($cacheKey, $this->searchResultCache)) {
+            return collect($this->searchResultCache[$cacheKey]);
         }
 
         $model = app($this->modelClass);
@@ -189,18 +213,24 @@ final class AutocompleteSelect extends Select
         $valueField = $this->getValueField();
         $labelField = $this->getLabelField();
 
-        $query = $model
-            ->query()
-            ->where($searchField, 'like', '%'.$this->searchQuery.'%')
-            ->limit($this->maxSearchResults);
+        $results = $model
+            ->newQuery()
+            ->where($searchField, 'like', '%'.$search.'%')
+            ->limit($this->maxSearchResults)
+            ->get()
+            ->map(function (Model $item) use ($valueField, $labelField): array {
+                return [
+                    'value' => $item->{$valueField},
+                    'label' => $item->{$labelField},
+                    'data' => $item->toArray(),
+                ];
+            })
+            ->values()
+            ->all();
 
-        $this->searchResults = $query->get()->map(function (Model $item) use ($valueField, $labelField) {
-            return [
-                'value' => $item->{$valueField},
-                'label' => $item->{$labelField},
-                'data' => $item->toArray(),
-            ];
-        });
+        $this->searchResultCache[$cacheKey] = $results;
+
+        return collect($results);
     }
 
     public function getViewData(): array
@@ -217,5 +247,34 @@ final class AutocompleteSelect extends Select
             'searchResults' => $this->searchResults ?? collect(),
             'searchQuery' => $this->getSearchQuery(),
         ];
+    }
+
+    protected function shouldSkipSearch(string $search): bool
+    {
+        return $this->modelClass === null
+            || mb_strlen($search) < $this->minSearchLength;
+    }
+
+    protected function normalizeSearchQuery(?string $query): ?string
+    {
+        if ($query === null) {
+            return null;
+        }
+
+        $trimmed = trim($query);
+
+        return $trimmed === '' ? null : $trimmed;
+    }
+
+    protected function cacheKey(string $search): string
+    {
+        return mb_strtolower($search);
+    }
+
+    protected function resetSearchState(): void
+    {
+        $this->searchResults = collect();
+        $this->searchQuery = null;
+        $this->searchResultCache = [];
     }
 }

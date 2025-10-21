@@ -19,4 +19,5 @@ return [
     'verify_email_intro' => 'Spustelėkite žemiau esantį mygtuką, kad patvirtintumėte el. pašto adresą.',
     'verify_email_button' => 'Patvirtinti el. paštą',
     'verify_email_no_action' => 'Jei nekūrėte paskyros, jokio veiksmo nereikia.',
+    'contact_message_subject' => 'Nauja užklausa: :subject',
 ];

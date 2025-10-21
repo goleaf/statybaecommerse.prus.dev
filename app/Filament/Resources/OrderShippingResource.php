@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -14,10 +15,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -28,9 +29,8 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class OrderShippingResource extends Resource
 {
@@ -71,7 +71,24 @@ final class OrderShippingResource extends Resource
                 ->schema([
                     Select::make('order_id')
                         ->label(__('admin.order_shippings.order'))
-                        ->options(Order::pluck('number', 'id'))
+                        ->relationship(
+                            name: 'order',
+                            titleAttribute: 'number',
+                            modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+                        )
+                        ->getOptionLabelFromRecordUsing(
+                            static fn (Order $record): string => $record->number ?? __('Order #:id', ['id' => $record->getKey()]),
+                        )
+                        ->getOptionLabelUsing(
+                            static fn (int|string|null $value): ?string => match (true) {
+                                $value === null => null,
+                                default         => optional(
+                                    Order::query()
+                                        ->withoutGlobalScopes()
+                                        ->find($value),
+                                )->number ?? __('Order #:id', ['id' => $value]),
+                            },
+                        )
                         ->required()
                         ->searchable()
                         ->preload(),
@@ -98,11 +115,11 @@ final class OrderShippingResource extends Resource
                         ]),
                     Grid::make(3)
                         ->schema([
-                            DateTimePicker::make('shipped_at')
+                            Flatpickr::makeDateTime('shipped_at')
                                 ->label(__('admin.order_shippings.shipped_at')),
-                            DateTimePicker::make('estimated_delivery')
+                            Flatpickr::makeDateTime('estimated_delivery')
                                 ->label(__('admin.order_shippings.estimated_delivery')),
-                            DateTimePicker::make('delivered_at')
+                            Flatpickr::makeDateTime('delivered_at')
                                 ->label(__('admin.order_shippings.delivered_at')),
                         ]),
                     Grid::make(3)
@@ -112,7 +129,7 @@ final class OrderShippingResource extends Resource
                                 ->numeric()
                                 ->step(0.001)
                                 ->suffix('kg'),
-                            TextInput::make('cost')
+                            TextInput::make('total_cost')
                                 ->label(__('admin.order_shippings.cost'))
                                 ->numeric()
                                 ->step(0.01)
@@ -166,7 +183,7 @@ final class OrderShippingResource extends Resource
                     })
                     ->colors([
                         'warning' => 'pending',
-                        'info' => 'shipped',
+                        'info'    => 'shipped',
                         'success' => 'delivered',
                     ]),
                 TextColumn::make('shipped_at')
@@ -184,7 +201,7 @@ final class OrderShippingResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('cost')
+                TextColumn::make('total_cost')
                     ->label(__('admin.order_shippings.cost'))
                     ->money('EUR')
                     ->sortable()
@@ -198,19 +215,45 @@ final class OrderShippingResource extends Resource
             ->filters([
                 SelectFilter::make('order_id')
                     ->label(__('admin.order_shippings.order'))
-                    ->options(Order::pluck('number', 'id'))
+                    ->relationship(
+                        name: 'order',
+                        titleAttribute: 'number',
+                        modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+                    )
+                    ->getOptionLabelFromRecordUsing(
+                        static fn (Order $record): string => $record->number ?? __('Order #:id', ['id' => $record->getKey()]),
+                    )
+                    ->getOptionLabelUsing(
+                        static fn (int|string|null $value): ?string => match (true) {
+                            $value === null => null,
+                            default         => optional(
+                                Order::query()
+                                    ->withoutGlobalScopes()
+                                    ->find($value),
+                            )->number ?? __('Order #:id', ['id' => $value]),
+                        },
+                    )
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('carrier_name')
                     ->label(__('admin.order_shippings.carrier_name'))
-                    ->options(fn () => OrderShipping::distinct()->pluck('carrier_name', 'carrier_name'))
+                    ->options(
+                        fn () => OrderShipping::query()
+                            ->select('carrier_name')
+                            ->whereNotNull('carrier_name')
+                            ->distinct()
+                            ->orderBy('carrier_name')
+                            ->pluck('carrier_name', 'carrier_name')
+                            ->filter()
+                            ->all(),
+                    )
                     ->searchable(),
                 Filter::make('shipped_at')
                     ->label(__('admin.order_shippings.shipped_at'))
                     ->form([
-                        DateTimePicker::make('shipped_from')
+                        Flatpickr::makeDateTime('shipped_from')
                             ->label(__('admin.order_shippings.shipped_from')),
-                        DateTimePicker::make('shipped_until')
+                        Flatpickr::makeDateTime('shipped_until')
                             ->label(__('admin.order_shippings.shipped_until')),
                     ])
                     ->query(function ($query, array $data) {
@@ -236,14 +279,14 @@ final class OrderShippingResource extends Resource
                     BulkAction::make('mark_shipped')
                         ->label(__('admin.order_shippings.mark_shipped'))
                         ->icon('heroicon-o-truck')
-                        ->action(function ($records) {
+                        ->action(function ($records): void {
                             $records->each->update(['shipped_at' => now()]);
                         })
                         ->requiresConfirmation(),
                     BulkAction::make('mark_delivered')
                         ->label(__('admin.order_shippings.mark_delivered'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(function ($records) {
+                        ->action(function ($records): void {
                             $records->each->update(['delivered_at' => now()]);
                         })
                         ->requiresConfirmation(),
@@ -262,10 +305,10 @@ final class OrderShippingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrderShippings::route('/'),
+            'index'  => Pages\ListOrderShippings::route('/'),
             'create' => Pages\CreateOrderShipping::route('/create'),
-            'view' => Pages\ViewOrderShipping::route('/{record}'),
-            'edit' => Pages\EditOrderShipping::route('/{record}/edit'),
+            'view'   => Pages\ViewOrderShipping::route('/{record}'),
+            'edit'   => Pages\EditOrderShipping::route('/{record}/edit'),
         ];
     }
 }

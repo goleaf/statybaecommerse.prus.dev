@@ -5,26 +5,27 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PartnerResource\Pages;
-use BackedEnum;
 use App\Models\Partner;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-user-group';
+    /**
+     * Navigation icon identifier required by Filament.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
     protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
@@ -34,7 +35,7 @@ final class PartnerResource extends Resource
     {
         return $form
             ->schema([
-                \Filament\Schemas\Components\Section::make(__('admin.partners.sections.basic_information'))
+                Forms\Components\Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.partners.name'))
@@ -54,7 +55,7 @@ final class PartnerResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-                \Filament\Schemas\Components\Section::make(__('admin.partners.sections.contact_information'))
+                Forms\Components\Section::make(__('admin.partners.sections.contact_information'))
                     ->schema([
                         Forms\Components\TextInput::make('contact_email')
                             ->label(__('admin.partners.contact_email'))
@@ -66,7 +67,7 @@ final class PartnerResource extends Resource
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                \Filament\Schemas\Components\Section::make(__('admin.partners.sections.financial_settings'))
+                Forms\Components\Section::make(__('admin.partners.sections.financial_settings'))
                     ->schema([
                         Forms\Components\TextInput::make('discount_rate')
                             ->label(__('admin.partners.discount_rate'))
@@ -82,18 +83,18 @@ final class PartnerResource extends Resource
                             ->step(0.0001),
                     ])
                     ->columns(2),
-                \Filament\Schemas\Components\Section::make(__('admin.partners.sections.media'))
+                Forms\Components\Section::make(__('admin.partners.sections.media'))
                     ->schema([
                         Forms\Components\FileUpload::make('logo')
                             ->label(__('admin.partners.logo'))
                             ->image()
                             ->directory('partner-logos')
-                            ->visibility('public'),
+                            ->visibility('private'),
                         Forms\Components\FileUpload::make('banner')
                             ->label(__('admin.partners.banner'))
                             ->image()
                             ->directory('partner-banners')
-                            ->visibility('public'),
+                            ->visibility('private'),
                     ])
                     ->columns(2),
             ]);
@@ -161,9 +162,9 @@ final class PartnerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPartners::route('/'),
+            'index'  => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
-            'edit' => Pages\EditPartner::route('/{record}/edit'),
+            'edit'   => Pages\EditPartner::route('/{record}/edit'),
         ];
     }
 }

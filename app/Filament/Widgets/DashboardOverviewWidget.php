@@ -43,12 +43,12 @@ class DashboardOverviewWidget extends BaseWidget
         // Core Business Metrics
         $totalRevenue = Order::where('status', '!=', 'cancelled')->sum('total_amount');
         $lastMonthRevenue = Order::where('status', '!=', 'cancelled')
-            ->where('created_at', '>=', $lastMonth)
+            ->createdSince($lastMonth)
             ->sum('total_amount');
         $revenueGrowth = $lastMonthRevenue > 0 ? (($totalRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100 : 0;
 
         $totalOrders = Order::count();
-        $lastMonthOrders = Order::where('created_at', '>=', $lastMonth)->count();
+        $lastMonthOrders = Order::createdSince($lastMonth)->count();
         $orderGrowth = $lastMonthOrders > 0 ? (($totalOrders - $lastMonthOrders) / $lastMonthOrders) * 100 : 0;
 
         $totalUsers = User::count();
@@ -88,21 +88,21 @@ class DashboardOverviewWidget extends BaseWidget
         return [
             // Primary Business Metrics
             Stat::make(__('translations.total_revenue'), \Illuminate\Support\Number::currency($totalRevenue, 'EUR'))
-                ->description(__('translations.from_last_month').': '.\Illuminate\Support\Number::currency($lastMonthRevenue, 'EUR'))
+                ->description(__('translations.from_last_month') . ': ' . \Illuminate\Support\Number::currency($lastMonthRevenue, 'EUR'))
                 ->descriptionIcon($revenueGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueGrowth >= 0 ? 'success' : 'danger')
                 ->chart($this->getRevenueChart()),
             Stat::make(__('translations.total_orders'), \Illuminate\Support\Number::format($totalOrders))
-                ->description(__('translations.from_last_month').': '.\Illuminate\Support\Number::format($lastMonthOrders))
+                ->description(__('translations.from_last_month') . ': ' . \Illuminate\Support\Number::format($lastMonthOrders))
                 ->descriptionIcon($orderGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($orderGrowth >= 0 ? 'success' : 'danger')
                 ->chart($this->getOrdersChart()),
             Stat::make(__('translations.total_customers'), \Illuminate\Support\Number::format($totalUsers))
-                ->description(__('translations.new_customers_today').': '.\Illuminate\Support\Number::format($newUsersThisMonth))
+                ->description(__('translations.new_customers_today') . ': ' . \Illuminate\Support\Number::format($newUsersThisMonth))
                 ->descriptionIcon($userGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($userGrowth >= 0 ? 'success' : 'danger'),
             Stat::make(__('translations.total_products'), \Illuminate\Support\Number::format($totalProducts))
-                ->description(__('translations.active_products').': '.\Illuminate\Support\Number::format($activeProducts))
+                ->description(__('translations.active_products') . ': ' . \Illuminate\Support\Number::format($activeProducts))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
             // Performance Metrics
@@ -110,7 +110,7 @@ class DashboardOverviewWidget extends BaseWidget
                 ->description(__('translations.per_order'))
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('info'),
-            Stat::make(__('translations.average_rating'), number_format($avgRating, 1).'/5')
+            Stat::make(__('translations.average_rating'), number_format($avgRating, 1) . '/5')
                 ->description(__('translations.customer_satisfaction'))
                 ->descriptionIcon('heroicon-m-star')
                 ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
@@ -178,7 +178,7 @@ class DashboardOverviewWidget extends BaseWidget
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
             $revenue = Order::where('status', '!=', 'cancelled')
-                ->whereDate('created_at', $date)
+                ->createdOn($date)
                 ->sum('total_amount');
             $data[] = $revenue;
         }
@@ -191,7 +191,7 @@ class DashboardOverviewWidget extends BaseWidget
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
-            $orders = Order::whereDate('created_at', $date)->count();
+            $orders = Order::createdOn($date)->count();
             $data[] = $orders;
         }
 

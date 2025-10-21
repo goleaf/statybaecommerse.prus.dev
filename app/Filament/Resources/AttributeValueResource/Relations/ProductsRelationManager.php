@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeValueResource\Relations;
 
-use Filament\Forms\Form;
-
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ProductsRelationManager extends RelationManager
+class ProductsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'products';
 

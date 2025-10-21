@@ -130,7 +130,7 @@ title(__('users.reviews'));
                                 <!-- Product Image -->
                                 @if($review->product && $review->product->featured_image)
                                     <img 
-                                        src="{{ Storage::disk('public')->url($review->product->featured_image) }}" 
+                                        src="{{ $review->product->featured_image ? \App\Support\Storage\SecureStorage::temporarySignedUrl($review->product->featured_image) : '' }}"
                                         alt="{{ $review->product->name }}"
                                         class="h-16 w-16 rounded-md object-cover"
                                     >
@@ -197,10 +197,10 @@ title(__('users.reviews'));
                                     @foreach($review->images as $image)
                                         <div class="relative">
                                             <img 
-                                                src="{{ Storage::disk('public')->url($image) }}" 
+                                                src="{{ \App\Support\Storage\SecureStorage::temporarySignedUrl($image) }}"
                                                 alt="{{ __('users.review_image') }}"
                                                 class="h-24 w-full object-cover rounded-md cursor-pointer hover:opacity-75"
-                                                onclick="openImageModal('{{ Storage::disk('public')->url($image) }}')"
+                                                onclick="openImageModal('{{ \App\Support\Storage\SecureStorage::temporarySignedUrl($image) }}')"
                                             >
                                         </div>
                                     @endforeach

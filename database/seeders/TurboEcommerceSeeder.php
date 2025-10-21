@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -10,8 +12,8 @@ use App\Models\ProductImage;
 use App\Models\Translations\ProductTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
@@ -148,10 +150,10 @@ final class TurboEcommerceSeeder extends Seeder
                     ->for($brand, 'brand')
                     ->create([
                         'name' => $nameLt,
-                        'slug' => Str::slug($nameLt . '-' . Str::random(6)),
+                        'slug' => Str::slug($nameLt.'-'.Str::random(6)),
                         'description' => '—',
                         'short_description' => '—',
-                        'sku' => 'PRD-' . strtoupper(Str::random(10)),
+                        'sku' => 'PRD-'.strtoupper(Str::random(10)),
                         'price' => $price,
                         'sale_price' => (mt_rand(0, 100) < 20) ? round($price * 0.85, 2) : null,
                         'manage_stock' => (mt_rand(0, 100) < 85),
@@ -222,7 +224,7 @@ final class TurboEcommerceSeeder extends Seeder
             }
 
             // Use Eloquent relationship to attach attributes
-            if (!empty($attributeData)) {
+            if (! empty($attributeData)) {
                 $product->attributes()->sync($attributeData);
             }
         }
@@ -244,7 +246,7 @@ final class TurboEcommerceSeeder extends Seeder
                         ->make([
                             'locale' => $locale,
                             'name' => $this->translateLike($product->name, $locale),
-                            'slug' => Str::slug($this->translateLike($product->name, $locale) . '-' . substr($product->slug, -6)),
+                            'slug' => Str::slug($this->translateLike($product->name, $locale).'-'.substr($product->slug, -6)),
                             'summary' => $this->translateLike('Profesionalus įrankis', $locale),
                             'description' => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
                             'seo_title' => $this->translateLike($product->name, $locale),
@@ -277,7 +279,7 @@ final class TurboEcommerceSeeder extends Seeder
                         : Arr::random($this->sharedImagePool, $toAdd);
 
                     foreach ($picks as $index => $path) {
-                        if (!$path || !file_exists($path)) {
+                        if (! $path || ! file_exists($path)) {
                             continue;
                         }
 
@@ -285,7 +287,7 @@ final class TurboEcommerceSeeder extends Seeder
                         ProductImage::factory()
                             ->for($product, 'product')
                             ->create([
-                                'path' => 'storage/shared_product_images/' . basename($path),
+                                'path' => 'storage/shared_product_images/'.basename($path),
                                 'alt_text' => $product->name,
                                 'sort_order' => $current + $index + 1,
                             ]);
@@ -314,14 +316,15 @@ final class TurboEcommerceSeeder extends Seeder
 
     private function buildSharedImagePool(int $count = 100): void
     {
-        if (!is_dir($this->sharedImagePoolDir)) {
+        if (! is_dir($this->sharedImagePoolDir)) {
             @mkdir($this->sharedImagePoolDir, 0755, true);
         }
 
         // If directory already has enough images, reuse them
-        $existing = glob($this->sharedImagePoolDir . DIRECTORY_SEPARATOR . 'pool_image_*.webp') ?: [];
+        $existing = glob($this->sharedImagePoolDir.DIRECTORY_SEPARATOR.'pool_image_*.webp') ?: [];
         if (count($existing) >= $count) {
             $this->sharedImagePool = array_values($existing);
+
             return;
         }
 
@@ -332,18 +335,18 @@ final class TurboEcommerceSeeder extends Seeder
         $generated = [];
         for ($i = 1; $i <= $needed; $i++) {
             try {
-                $name = 'Sample Product Image ' . ($i + count($existing));
+                $name = 'Sample Product Image '.($i + count($existing));
                 $file = $this->imageGen->generateWebPImage(
                     text: $name,
                     width: 600,
                     height: 600,
                     backgroundColor: null,
                     textColor: '#FFFFFF',
-                    filename: 'pool_image_' . str_pad((string) ($i + count($existing)), 3, '0', STR_PAD_LEFT)
+                    filename: 'pool_image_'.str_pad((string) ($i + count($existing)), 3, '0', STR_PAD_LEFT)
                 );
 
                 // Move into pool directory if generated elsewhere
-                $dest = $this->sharedImagePoolDir . DIRECTORY_SEPARATOR . basename($file);
+                $dest = $this->sharedImagePoolDir.DIRECTORY_SEPARATOR.basename($file);
                 if ($file !== $dest) {
                     @rename($file, $dest);
                 }
@@ -371,7 +374,7 @@ final class TurboEcommerceSeeder extends Seeder
         $raw = (string) config('app.supported_locales', 'lt');
 
         return collect(explode(',', $raw))
-            ->map(fn($v) => trim((string) $v))
+            ->map(fn ($v) => trim((string) $v))
             ->filter()
             ->unique()
             ->values()
@@ -383,10 +386,10 @@ final class TurboEcommerceSeeder extends Seeder
         // Lightweight pseudo-translation to avoid network calls but ensure per-locale difference
         return match ($locale) {
             'lt' => $text,
-            'en' => $text . ' (EN)',
-            'ru' => $text . ' (RU)',
-            'de' => $text . ' (DE)',
-            default => $text . ' (' . strtoupper($locale) . ')',
+            'en' => $text.' (EN)',
+            'ru' => $text.' (RU)',
+            'de' => $text.' (DE)',
+            default => $text.' ('.strtoupper($locale).')',
         };
     }
 

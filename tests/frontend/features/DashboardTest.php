@@ -4,34 +4,21 @@ declare(strict_types=1);
 
 use App\Filament\Pages\Dashboard;
 use App\Models\User;
+use Database\Seeders\AdminAuthorizationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // Create necessary permissions
-    $permissions = [
-        'view_dashboard',
-        'view_admin_panel',
-        'view_any_product',
-        'view_any_user',
-        'view_any_order',
-    ];
+    $this->seed(AdminAuthorizationSeeder::class);
 
-    foreach ($permissions as $permission) {
-        Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-    }
+    $this->adminRole = Role::findByName('admin', 'web');
 
-    // Create admin role
-    $this->adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-    $this->adminRole->syncPermissions($permissions);
-
-    // Create admin user
     $this->admin = User::factory()->create([
         'name' => 'Test Admin',
         'email' => 'test@admin.com',
+        'is_admin' => true,
     ]);
     $this->admin->assignRole($this->adminRole);
 });

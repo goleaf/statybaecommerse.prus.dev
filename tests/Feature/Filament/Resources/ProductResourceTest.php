@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\Pages\CreateProduct;
 use App\Filament\Resources\ProductResource\Pages\EditProduct;
 use App\Filament\Resources\ProductResource\Pages\ListProducts;
+use App\Jobs\ProcessExportJob;
 use App\Models\Brand;
+use App\Models\Export;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -151,6 +156,31 @@ final class ProductResourceTest extends TestCase
         $this->assertSoftDeleted('products', ['id' => $product->id]);
     }
 
+    public function test_can_queue_product_export(): void
+    {
+        config()->set('filesystems.default', 'public');
+        Storage::fake('public');
+        Notification::fake();
+        Bus::fake();
+
+        $products = Product::factory()->count(2)->create();
+
+        Livewire::test(ListProducts::class)
+            ->call('loadTable')
+            ->callTableBulkAction('export_selected', $products, [
+                'format' => 'xlsx',
+                'columns' => ['sku', 'name'],
+            ])
+            ->assertHasNoTableBulkActionErrors();
+
+        $export = Export::query()->latest()->first();
+
+        $this->assertNotNull($export);
+        $this->assertSame('xlsx', $export->format);
+
+        Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
+    }
+
     public function test_can_bulk_feature_products(): void
     {
         $products = Product::factory()->count(3)->create([
@@ -271,5 +301,45 @@ final class ProductResourceTest extends TestCase
             ->assertDontSee('Hidden Draft Product');
 
         $this->assertNotNull(Product::withoutGlobalScopes()->find($draft->id));
+    }
+
+    public function test_product_images_are_uploaded_and_displayed(): void
+    {
+        config(['filesystems.default' => 'public']);
+        Storage::fake('public');
+
+        $image = UploadedFile::fake()->image('product.jpg');
+
+        Livewire::test(CreateProduct::class)
+            ->fillForm([
+                'name' => 'Image Product',
+                'slug' => 'image-product',
+                'sku' => 'IMG-001',
+                'price' => 49.99,
+                'status' => 'draft',
+                'is_visible' => true,
+                'stock_quantity' => 5,
+                'low_stock_threshold' => 1,
+                'images' => [$image],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $product = Product::query()->with('images')->first();
+
+        $this->assertNotNull($product);
+        $this->assertCount(1, $product->images);
+
+        $storedPath = $product->images->first()->path;
+
+        Storage::disk('public')->assertExists($storedPath);
+        $this->assertSame(Storage::disk('public')->url($storedPath), $product->main_image);
+
+        Livewire::test(EditProduct::class, ['record' => $product->getRouteKey()])
+            ->assertSet('data.images', [$storedPath]);
+
+        Livewire::test(ListProducts::class)
+            ->call('loadTable')
+            ->assertTableColumnStateSet('main_image', $product->main_image, $product);
     }
 }

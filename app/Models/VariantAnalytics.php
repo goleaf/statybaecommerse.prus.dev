@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 /**
  * VariantAnalytics
@@ -17,9 +22,17 @@ final class VariantAnalytics extends Model
 {
     use HasFactory;
 
+    public const BUCKET_DAILY = 'daily';
+
+    public const BUCKET_WEEKLY = 'weekly';
+
+    private const SUPPORTED_GRANULARITIES = [self::BUCKET_DAILY, self::BUCKET_WEEKLY];
+
     protected $fillable = [
+        'product_id',
         'variant_id',
         'date',
+        'date_bucket',
         'views',
         'clicks',
         'add_to_cart',
@@ -31,7 +44,9 @@ final class VariantAnalytics extends Model
     protected function casts(): array
     {
         return [
+            'product_id' => 'integer',
             'date' => 'date',
+            'date_bucket' => 'string',
             'views' => 'integer',
             'clicks' => 'integer',
             'add_to_cart' => 'integer',
@@ -106,11 +121,35 @@ final class VariantAnalytics extends Model
     }
 
     /**
+     * Scope to filter records for a specific granularity bucket.
+     */
+    public function scopeForGranularity($query, string $granularity)
+    {
+        return $query->where('date_bucket', 'like', sprintf('%s:%%', $granularity));
+    }
+
+    /**
+     * Scope to filter daily bucket rows.
+     */
+    public function scopeDaily($query)
+    {
+        return $query->forGranularity(self::BUCKET_DAILY);
+    }
+
+    /**
+     * Scope to filter weekly bucket rows.
+     */
+    public function scopeWeekly($query)
+    {
+        return $query->forGranularity(self::BUCKET_WEEKLY);
+    }
+
+    /**
      * Scope to get recent analytics.
      */
     public function scopeRecent($query, int $days = 30)
     {
-        return $query->where('date', '>=', now()->subDays($days));
+        return $query->daily()->where('date', '>=', now()->subDays($days));
     }
 
     /**
@@ -118,7 +157,7 @@ final class VariantAnalytics extends Model
      */
     public function scopeTopPerforming($query, int $limit = 10)
     {
-        return $query->orderBy('conversion_rate', 'desc')
+        return $query->daily()->orderBy('conversion_rate', 'desc')
             ->orderBy('revenue', 'desc')
             ->limit($limit);
     }
@@ -128,7 +167,7 @@ final class VariantAnalytics extends Model
      */
     public function scopeByMetric($query, string $metric, string $direction = 'desc')
     {
-        return $query->orderBy($metric, $direction);
+        return $query->daily()->orderBy($metric, $direction);
     }
 
     /**
@@ -136,24 +175,114 @@ final class VariantAnalytics extends Model
      */
     public static function recordAnalytics(
         int $variantId,
-        string|\DateTime $date,
-        array $data = []
+        string|DateTimeInterface $date,
+        array $data = [],
+        string $granularity = self::BUCKET_DAILY,
+        ?int $productId = null
     ): self {
-        $defaultData = [
+        $granularity = strtolower($granularity);
+        self::ensureValidGranularity($granularity);
+
+        $productId ??= self::resolveProductId($variantId);
+        $normalizedDate = self::normalizeDate($date, $granularity);
+        $bucket = self::buildDateBucket($granularity, $normalizedDate);
+        $now = now();
+
+        $payload = [
+            'product_id' => $productId,
             'variant_id' => $variantId,
-            'date' => $date,
-            'views' => $data['views'] ?? 0,
-            'clicks' => $data['clicks'] ?? 0,
-            'add_to_cart' => $data['add_to_cart'] ?? 0,
-            'purchases' => $data['purchases'] ?? 0,
-            'revenue' => $data['revenue'] ?? 0,
-            'conversion_rate' => $data['conversion_rate'] ?? 0,
+            'date' => $normalizedDate,
+            'date_bucket' => $bucket,
+            'views' => (int) ($data['views'] ?? 0),
+            'clicks' => (int) ($data['clicks'] ?? 0),
+            'add_to_cart' => (int) ($data['add_to_cart'] ?? 0),
+            'purchases' => (int) ($data['purchases'] ?? 0),
+            'revenue' => (float) ($data['revenue'] ?? 0),
+            'conversion_rate' => $data['conversion_rate'] ?? null,
+            'created_at' => $now,
+            'updated_at' => $now,
         ];
 
-        return self::updateOrCreate(
-            ['variant_id' => $variantId, 'date' => $date],
-            $defaultData
+        $updates = [
+            'updated_at' => $now,
+            'date' => $normalizedDate,
+            'views' => self::incrementExpression('views'),
+            'clicks' => self::incrementExpression('clicks'),
+            'add_to_cart' => self::incrementExpression('add_to_cart'),
+            'purchases' => self::incrementExpression('purchases'),
+            'revenue' => self::incrementExpression('revenue'),
+        ];
+
+        if (array_key_exists('conversion_rate', $data)) {
+            $updates['conversion_rate'] = self::replacementExpression('conversion_rate');
+        }
+
+        self::query()->upsert(
+            [$payload],
+            ['product_id', 'variant_id', 'date_bucket'],
+            $updates
         );
+
+        return self::query()
+            ->where('product_id', $productId)
+            ->where('variant_id', $variantId)
+            ->where('date_bucket', $bucket)
+            ->firstOrFail();
+    }
+
+    private static function normalizeDate(string|DateTimeInterface $date, string $granularity = self::BUCKET_DAILY): string
+    {
+        $carbon = $date instanceof DateTimeInterface
+            ? Carbon::instance($date)
+            : Carbon::parse($date);
+
+        if ($granularity === self::BUCKET_WEEKLY) {
+            return $carbon->copy()->startOfWeek()->toDateString();
+        }
+
+        return $carbon->toDateString();
+    }
+
+    private static function buildDateBucket(string $granularity, string $normalizedDate): string
+    {
+        return sprintf('%s:%s', $granularity, $normalizedDate);
+    }
+
+    private static function ensureValidGranularity(string $granularity): void
+    {
+        if (! in_array($granularity, self::SUPPORTED_GRANULARITIES, true)) {
+            throw new InvalidArgumentException(sprintf('Unsupported analytics granularity [%s].', $granularity));
+        }
+    }
+
+    private static function resolveProductId(int $variantId): int
+    {
+        $productId = ProductVariant::query()->whereKey($variantId)->value('product_id');
+
+        if (! $productId) {
+            throw new InvalidArgumentException(sprintf('Unable to resolve product for variant [%d].', $variantId));
+        }
+
+        return (int) $productId;
+    }
+
+    private static function incrementExpression(string $column): Expression
+    {
+        return self::connectionDriver() === 'sqlite'
+            ? DB::raw(sprintf('%1$s + excluded.%1$s', $column))
+            : DB::raw(sprintf('%1$s + VALUES(%1$s)', $column));
+    }
+
+    private static function replacementExpression(string $column): Expression
+    {
+        return self::connectionDriver() === 'sqlite'
+            ? DB::raw(sprintf('excluded.%s', $column))
+            : DB::raw(sprintf('VALUES(%s)', $column));
+    }
+
+    private static function connectionDriver(): string
+    {
+        return self::query()->getConnection()->getDriverName();
     }
 
     /**

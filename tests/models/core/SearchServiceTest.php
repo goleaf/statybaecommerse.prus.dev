@@ -21,7 +21,7 @@ final class SearchServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->searchService = new SearchService;
+        $this->searchService = app(SearchService::class);
         Cache::flush();
     }
 

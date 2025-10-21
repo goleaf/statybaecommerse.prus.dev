@@ -232,7 +232,7 @@ class RecommendationBlockResourceTest extends TestCase
             'record' => $recommendationBlock->getRouteKey(),
         ])
             ->assertFormSet([
-                'product_ids' => $products->pluck('id')->toArray(),
+                'products' => $products->pluck('id')->toArray(),
             ]);
     }
 
@@ -245,7 +245,7 @@ class RecommendationBlockResourceTest extends TestCase
             'record' => $recommendationBlock->getRouteKey(),
         ])
             ->fillForm([
-                'product_ids' => $products->pluck('id')->toArray(),
+                'products' => $products->pluck('id')->toArray(),
             ])
             ->call('save')
             ->assertHasNoFormErrors();

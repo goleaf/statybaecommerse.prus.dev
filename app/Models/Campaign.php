@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveCampaignScope;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use App\Traits\HasTranslations;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -450,7 +451,9 @@ final class Campaign extends Model
             return null;
         }
 
-        return asset('storage/campaigns/'.$this->banner_image);
+        $path = 'campaigns/'.ltrim((string) $this->banner_image, '/');
+
+        return SecureStorage::temporarySignedUrl($path);
     }
 
     /**

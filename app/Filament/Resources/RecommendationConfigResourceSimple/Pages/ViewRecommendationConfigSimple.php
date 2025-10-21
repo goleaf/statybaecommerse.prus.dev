@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 
 use App\Filament\Resources\RecommendationConfigResourceSimple;
+use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\RecommendationConfigSimple;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -12,12 +13,15 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 final class ViewRecommendationConfigSimple extends ViewRecord implements HasTable
 {
+    use ConfiguresToggleableTableLayout;
+    use HasToggleableTable;
     use Tables\Concerns\InteractsWithTable;
 
     protected static string $resource = RecommendationConfigResourceSimple::class;
@@ -37,7 +41,7 @@ final class ViewRecommendationConfigSimple extends ViewRecord implements HasTabl
 
     public function table(Table $table): Table
     {
-        return $table
+        $table = $table
             ->paginated([10])
             ->defaultGroup(null)
             ->striped()
@@ -46,6 +50,8 @@ final class ViewRecommendationConfigSimple extends ViewRecord implements HasTabl
                 TextColumn::make('name')->label(__('recommendation_configs_simple.name')),
                 TextColumn::make('code')->label(__('recommendation_configs_simple.code')),
             ]);
+
+        return $this->applyToggleableTableLayout($table);
     }
 
     public function getTableQuery(): Builder|QueryBuilderContract

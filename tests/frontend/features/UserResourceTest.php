@@ -3,8 +3,13 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\UserResource;
+use App\Jobs\ProcessExportJob;
+use App\Models\Export;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 
@@ -154,4 +159,27 @@ it('can bulk activate users', function () {
     foreach ($users as $user) {
         expect($user->refresh()->is_active)->toBeTrue();
     }
+});
+
+it('queues user export from bulk action', function () {
+    config()->set('filesystems.default', 'public');
+    Storage::fake('public');
+    Notification::fake();
+    Bus::fake();
+
+    $users = User::factory()->count(2)->create();
+
+    Livewire::test(UserResource\Pages\ListUsers::class)
+        ->loadTable()
+        ->callTableBulkAction('export_selected', $users, [
+            'format' => 'pdf',
+            'columns' => ['name', 'email'],
+        ]);
+
+    $export = Export::query()->latest()->first();
+
+    expect($export)->not->toBeNull();
+    expect($export->format)->toBe('pdf');
+
+    Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
 });

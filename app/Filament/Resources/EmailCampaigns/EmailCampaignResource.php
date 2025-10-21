@@ -7,23 +7,21 @@ namespace App\Filament\Resources\EmailCampaigns;
 use App\Filament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Pages\ListEmailCampaigns;
+use App\Filament\Resources\EmailCampaigns\Pages\ViewEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Schemas\EmailCampaignForm;
 use App\Filament\Resources\EmailCampaigns\Tables\EmailCampaignsTable;
 use App\Models\EmailCampaign;
+use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use BackedEnum;
-use UnitEnum;
-
-use Filament\Forms\Form;
 
 class EmailCampaignResource extends Resource
 {
     protected static ?string $model = EmailCampaign::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
@@ -45,9 +43,10 @@ class EmailCampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListEmailCampaigns::route('/'),
+            'index'  => ListEmailCampaigns::route('/'),
             'create' => CreateEmailCampaign::route('/create'),
-            'edit' => EditEmailCampaign::route('/{record}/edit'),
+            'view'   => ViewEmailCampaign::route('/{record}'),
+            'edit'   => EditEmailCampaign::route('/{record}/edit'),
         ];
     }
 }

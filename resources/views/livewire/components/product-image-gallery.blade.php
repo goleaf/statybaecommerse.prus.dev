@@ -144,7 +144,7 @@
         {{-- No Images State with placeholder --}}
         <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 relative">
             <img
-                 src="{{ asset('images/placeholder-product.png') }}"
+                 src="{{ product_placeholder_url('large') }}"
                  alt="{{ __('translations.no_image') }}"
                  class="w-full h-full object-cover"
                  loading="lazy" />

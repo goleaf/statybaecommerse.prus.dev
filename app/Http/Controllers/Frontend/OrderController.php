@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Traits\HandlesContentNegotiation;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -109,19 +110,19 @@ final class OrderController extends Controller
                 $subtotal += $total;
                 $items[] = ['product_id' => $product->id, 'product_variant_id' => $variant?->id, 'name' => $product->name, 'sku' => $variant ? $variant->sku : $product->sku, 'quantity' => $itemData['quantity'], 'unit_price' => $unitPrice, 'price' => $unitPrice, 'total' => $total];
             }
+            $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
+
             // Create order
             $order = Order::create([
                 'number' => 'ORD-'.strtoupper(uniqid()),
                 'user_id' => $user->id,
                 'status' => 'pending',
-                'subtotal' => $subtotal,
-                'tax_amount' => 0,
-                // Calculate based on business rules
-                'shipping_amount' => 0,
-                // Calculate based on shipping rules
-                'discount_amount' => 0,
-                'total' => $subtotal,
-                'currency' => 'EUR',
+                'subtotal' => $breakdown->subtotal,
+                'tax_amount' => $breakdown->tax,
+                'shipping_amount' => $breakdown->shipping,
+                'discount_amount' => $breakdown->discount,
+                'total' => $breakdown->total,
+                'currency' => $breakdown->currency,
                 'billing_address' => $validated['billing_address'],
                 'shipping_address' => $validated['shipping_address'],
                 'notes' => $validated['notes'],
@@ -192,7 +193,20 @@ final class OrderController extends Controller
                 $items[] = ['product_id' => $product->id, 'product_variant_id' => $variant?->id, 'name' => $product->name, 'sku' => $variant ? $variant->sku : $product->sku, 'quantity' => $itemData['quantity'], 'unit_price' => $unitPrice, 'price' => $unitPrice, 'total' => $total];
             }
             // Update order
-            $order->update(['subtotal' => $subtotal, 'total' => $subtotal, 'billing_address' => $validated['billing_address'], 'shipping_address' => $validated['shipping_address'], 'notes' => $validated['notes'], 'payment_method' => $validated['payment_method']]);
+            $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
+
+            $order->update([
+                'subtotal' => $breakdown->subtotal,
+                'tax_amount' => $breakdown->tax,
+                'shipping_amount' => $breakdown->shipping,
+                'discount_amount' => $breakdown->discount,
+                'total' => $breakdown->total,
+                'currency' => $breakdown->currency,
+                'billing_address' => $validated['billing_address'],
+                'shipping_address' => $validated['shipping_address'],
+                'notes' => $validated['notes'],
+                'payment_method' => $validated['payment_method'],
+            ]);
             // Create new order items
             foreach ($items as $item) {
                 $order->items()->create($item);
@@ -239,5 +253,22 @@ final class OrderController extends Controller
         $order->update(['status' => 'cancelled']);
 
         return redirect()->route('frontend.orders.show', $order)->with('success', __('orders.messages.cancelled_successfully'));
+    }
+
+    /**
+     * Handle return request functionality with proper error handling.
+     */
+    public function requestReturn(Order $order): RedirectResponse
+    {
+        $user = Auth::user();
+        if (! $user || $order->user_id !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+        if (! $order->canRequestReturn()) {
+            abort(403, __('orders.messages.cannot_request_return'));
+        }
+        $order->update(['status' => 'returned']);
+
+        return redirect()->route('frontend.orders.show', $order)->with('success', __('orders.messages.return_requested_successfully'));
     }
 }

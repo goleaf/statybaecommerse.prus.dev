@@ -1,10 +1,28 @@
 <?php
+use App\Support\Security\Captcha\CaptchaManager;
+use App\Support\Security\SuspiciousIpMonitor;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.base')] class extends Component {
+new #[Layout('components.layouts.base')] class extends Component
+{
     public string $email = '';
+
+    public ?string $captchaToken = null;
+
+    public ?string $captchaResponse = null;
+
+    public ?string $captchaQuestion = null;
+
+    public function mount(CaptchaManager $captchaManager): void
+    {
+        $this->syncCaptchaState($captchaManager);
+    }
 
     /**
      * Send a password reset link to the provided email address.
@@ -15,20 +33,151 @@ new #[Layout('components.layouts.base')] class extends Component {
             'email' => ['required', 'string', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
+        $captchaManager = app(CaptchaManager::class);
+        $monitor = app(SuspiciousIpMonitor::class);
+
+        $this->ensureIsNotRateLimited($captchaManager, $monitor);
+
+        if ($captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
+            $this->syncCaptchaState($captchaManager);
+
+            $this->validate([
+                'captchaToken'    => ['required', 'string'],
+                'captchaResponse' => ['required', 'string'],
+            ]);
+
+            if (! $captchaManager->verify($this->throttleKey(), 'auth.password_reset', (string) $this->captchaToken, (string) $this->captchaResponse)) {
+                $this->syncCaptchaState($captchaManager, true);
+                $this->captchaResponse = '';
+
+                throw ValidationException::withMessages([
+                    'captchaResponse' => __('The security check response did not match. Please try again.'),
+                ]);
+            }
+        } else {
+            $this->syncCaptchaState($captchaManager);
+        }
+
+        RateLimiter::hit($this->throttleKey(), $this->decaySeconds());
+
         $status = Password::sendResetLink($this->only('email'));
 
         if ($status != Password::RESET_LINK_SENT) {
             $this->addError('email', __($status));
+
+            $captchaManager->markRequired($this->throttleKey(), 'auth.password_reset');
+            $monitor->record($this->ipAddress(), 'password-reset', [
+                'email'        => $this->email,
+                'attempts'     => RateLimiter::attempts($this->throttleKey()),
+                'max_attempts' => $this->maxAttempts(),
+            ]);
+            $this->syncCaptchaState($captchaManager, true);
 
             return;
         }
 
         $this->reset('email');
 
+        RateLimiter::clear($this->throttleKey());
+        $captchaManager->clear($this->throttleKey(), 'auth.password_reset');
+        $monitor->reset($this->ipAddress(), 'password-reset');
+        $this->captchaResponse = null;
+
         session()->flash('status', __($status));
+    }
+
+    public function hydrate(CaptchaManager $captchaManager): void
+    {
+        $this->syncCaptchaState($captchaManager);
+    }
+
+    public function refreshCaptcha(CaptchaManager $captchaManager): void
+    {
+        $this->syncCaptchaState($captchaManager, true);
+    }
+
+    private function ensureIsNotRateLimited(CaptchaManager $captchaManager, SuspiciousIpMonitor $monitor): void
+    {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
+            return;
+        }
+
+        $captchaManager->markRequired($this->throttleKey(), 'auth.password_reset');
+        $monitor->record($this->ipAddress(), 'password-reset-rate-limit', [
+            'email'        => $this->email,
+            'attempts'     => RateLimiter::attempts($this->throttleKey()),
+            'max_attempts' => $this->maxAttempts(),
+        ]);
+        $this->syncCaptchaState($captchaManager, true);
+
+        event(new Lockout(request()));
+
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'email' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => (int) ceil($seconds / 60),
+            ]),
+        ]);
+    }
+
+    private function syncCaptchaState(CaptchaManager $captchaManager, bool $forceRefresh = false): void
+    {
+        if (! $captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
+            $this->resetCaptcha();
+
+            return;
+        }
+
+        $challenge = $captchaManager->challenge($this->throttleKey(), 'auth.password_reset', $forceRefresh);
+
+        if ($challenge === null) {
+            $this->resetCaptcha();
+
+            return;
+        }
+
+        $questionChanged = $this->captchaQuestion !== $challenge->question();
+
+        $this->captchaQuestion = $challenge->question();
+        $this->captchaToken = $challenge->token();
+
+        if ($forceRefresh || $questionChanged) {
+            $this->captchaResponse = '';
+        }
+    }
+
+    private function throttleKey(): string
+    {
+        $ip = request()->ip();
+        $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
+
+        return Str::transliterate('password-reset|' . Str::lower($this->email) . '|' . $ipAddress);
+    }
+
+    private function resetCaptcha(): void
+    {
+        $this->captchaQuestion = null;
+        $this->captchaToken = null;
+        $this->captchaResponse = null;
+    }
+
+    private function ipAddress(): string
+    {
+        $ip = request()->ip();
+
+        return is_string($ip) && $ip !== '' ? $ip : 'unknown';
+    }
+
+    private function maxAttempts(): int
+    {
+        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'max_attempts', 5));
+    }
+
+    private function decaySeconds(): int
+    {
+        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'decay_seconds', 300));
     }
 }; ?>
 
@@ -76,6 +225,37 @@ new #[Layout('components.layouts.base')] class extends Component {
                     />
                     <x-forms.errors :messages="$errors->get('email')" class="mt-1" />
                 </div>
+
+                @if ($captchaQuestion)
+                    <div class="space-y-2">
+                        <x-forms.label for="reset-captcha" :value="__('Security check')" />
+                        <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                            <span>{{ $captchaQuestion }}</span>
+                            <button
+                                type="button"
+                                wire:click="refreshCaptcha"
+                                wire:loading.attr="disabled"
+                                class="inline-flex items-center gap-1 rounded-lg bg-white/70 px-2 py-1 text-xs font-semibold text-indigo-600 shadow-sm transition hover:bg-white"
+                            >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0112.79-5.303M19.5 12a7.5 7.5 0 01-12.79 5.303" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 8.25H4.5v-3.75M19.5 15.75V19.5h-3.75" />
+                                </svg>
+                                <span>{{ __('New question') }}</span>
+                            </button>
+                        </div>
+                        <x-forms.input
+                            id="reset-captcha"
+                            type="text"
+                            wire:model.defer="captchaResponse"
+                            autocomplete="off"
+                            class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                            placeholder="{{ __('Enter the answer') }}"
+                        />
+                        <input type="hidden" wire:model="captchaToken" />
+                        <x-forms.errors :messages="$errors->get('captchaResponse')" class="mt-1" />
+                    </div>
+                @endif
 
                 <button
                     type="submit"

@@ -1,10 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
+use App\Models\Scopes\VisibleScope;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -14,16 +18,16 @@ use Filament\Forms\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use BackedEnum;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * MenuItemResource
@@ -36,8 +40,7 @@ final class MenuItemResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 5;
 
@@ -68,12 +71,34 @@ final class MenuItemResource extends Resource
                             ->schema([
                                 Select::make('menu_id')
                                     ->label(__('admin.menu_items.menu'))
-                                    ->options(Menu::pluck('name', 'id'))
+                                    ->options(
+                                        static fn (): array => Menu::withoutGlobalScopes()
+                                            ->pluck('name', 'id')
+                                            ->all()
+                                    )
                                     ->required()
                                     ->searchable(),
                                 Select::make('parent_id')
                                     ->label(__('admin.menu_items.parent'))
-                                    ->options(MenuItem::whereNull('parent_id')->pluck('label', 'id'))
+                                    ->options(function (Get $get, ?MenuItem $record): array {
+                                        $menuId = $get('menu_id') ?? $record?->menu_id;
+
+                                        if (blank($menuId)) {
+                                            return [];
+                                        }
+
+                                        return MenuItem::withoutGlobalScopes()
+                                            ->where('menu_id', $menuId)
+                                            ->whereNull('parent_id')
+                                            ->when(
+                                                $record?->exists,
+                                                fn (Builder $query): Builder => $query->whereKeyNot($record),
+                                            )
+                                            ->orderBy('label')
+                                            ->pluck('label', 'id')
+                                            ->all();
+                                    })
+                                    ->reactive()
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -125,10 +150,20 @@ final class MenuItemResource extends Resource
                 TextColumn::make('url')
                     ->label(__('admin.menu_items.url'))
                     ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 30 ? $state : null;
+                        if ($state === null || $state === '') {
+                            return null;
+                        }
+
+                        $stateString = (string) $state;
+
+                        if (strlen($stateString) <= 30) {
+                            return null;
+                        }
+
+                        return $stateString;
                     }),
                 TextColumn::make('route_name')
                     ->label(__('admin.menu_items.route_name'))
@@ -157,11 +192,30 @@ final class MenuItemResource extends Resource
             ->filters([
                 SelectFilter::make('menu_id')
                     ->label(__('admin.menu_items.menu'))
-                    ->options(Menu::pluck('name', 'id'))
+                    ->options(
+                        static fn (): array => Menu::withoutGlobalScopes()
+                            ->pluck('name', 'id')
+                            ->all()
+                    )
                     ->searchable(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.menu_items.parent'))
-                    ->options(MenuItem::whereNull('parent_id')->pluck('label', 'id'))
+                    ->options(function (SelectFilter $filter): array {
+                        $menuFilterState = $filter->getLivewire()?->getTableFilterState('menu_id');
+                        $menuId = $menuFilterState['value'] ?? null;
+
+                        $query = MenuItem::withoutGlobalScopes()
+                            ->whereNull('parent_id');
+
+                        if (filled($menuId)) {
+                            $query->where('menu_id', $menuId);
+                        }
+
+                        return $query
+                            ->orderBy('label')
+                            ->pluck('label', 'id')
+                            ->all();
+                    })
                     ->searchable(),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.menu_items.is_visible')),
@@ -188,10 +242,15 @@ final class MenuItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMenuItems::route('/'),
+            'index'  => Pages\ListMenuItems::route('/'),
             'create' => Pages\CreateMenuItem::route('/create'),
-            'view' => Pages\ViewMenuItem::route('/{record}'),
-            'edit' => Pages\EditMenuItem::route('/{record}/edit'),
+            'view'   => Pages\ViewMenuItem::route('/{record}'),
+            'edit'   => Pages\EditMenuItem::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([VisibleScope::class]);
     }
 }
