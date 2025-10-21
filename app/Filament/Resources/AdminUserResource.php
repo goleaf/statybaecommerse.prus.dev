@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AdminUserResource\Pages;
 use App\Models\AdminUser;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -29,7 +30,6 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class AdminUserResource extends Resource
 {
@@ -64,11 +64,12 @@ final class AdminUserResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema with fields and validation.
+     * Configure the Filament form schema with fields and validation on the provided Form instance for v4 compliance.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
+            // Returning the Form instance maintains Filament's schema pipeline for admin user management.
             Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -122,11 +123,12 @@ final class AdminUserResource extends Resource
     }
 
     /**
-     * Configure the Filament table with columns, filters, and actions.
+     * Configure the Filament table with columns, filters, and actions while preserving the Table return contract.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
+            // Returning the configured Table keeps action and bulk workflows type-safe in Filament v4.
             ->columns([
                 TextColumn::make('name')
                     ->label(__('admin.admin_users.form.fields.name'))
