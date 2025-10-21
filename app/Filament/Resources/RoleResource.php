@@ -9,10 +9,10 @@ use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Role;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -31,9 +31,9 @@ final class RoleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shield-check';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static string|\UnitEnum|null $navigationGroup = 'System';
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -90,9 +90,9 @@ final class RoleResource extends Resource
         return __('roles.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('roles.sections.general'))
                     ->schema([
@@ -119,7 +119,7 @@ final class RoleResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

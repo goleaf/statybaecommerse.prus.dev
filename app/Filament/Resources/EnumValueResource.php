@@ -14,14 +14,14 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -37,10 +37,10 @@ final class EnumValueResource extends Resource
     protected static ?string $model = EnumValue::class;
 
     /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -67,9 +67,9 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
                     Select::make('type')

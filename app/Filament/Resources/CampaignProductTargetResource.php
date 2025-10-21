@@ -8,19 +8,18 @@ use App\Filament\Resources\CampaignProductTargetResource\Pages;
 use App\Models\CampaignProductTarget;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Get;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkAction;
@@ -47,7 +46,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * @var string|BackedEnum|null Keep Filament navigation metadata flexible between enums and plain strings.
      */
-    protected static $navigationIcon = 'heroicon-o-bullseye-arrow';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bullseye-arrow';
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
@@ -74,9 +73,9 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Define the Campaign Product Target form with conditional selectors and marketing metadata.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('campaign_product_targets.basic_information'))
                 ->description(__('campaign_product_targets.campaign_selection_description'))
                 ->schema([
@@ -354,9 +353,9 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Provide a structured infolist for the record view page.
      */
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        return $schema->schema([
             InfolistSection::make(__('campaign_product_targets.view.sections.overview'))
                 ->schema([
                     TextEntry::make('campaign.name')

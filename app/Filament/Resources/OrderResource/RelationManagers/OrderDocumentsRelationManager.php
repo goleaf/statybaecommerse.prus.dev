@@ -17,7 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
@@ -55,9 +55,9 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order documents.
      */
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('orders.document_information'))
                     ->description(__('orders.document_information_description'))
@@ -179,7 +179,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order documents.
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

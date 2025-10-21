@@ -9,7 +9,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -22,9 +22,9 @@ final class ProductTargetsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Targets';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Select::make('product_id')
                 ->label('Product')
                 ->relationship('product', 'name')
@@ -41,7 +41,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

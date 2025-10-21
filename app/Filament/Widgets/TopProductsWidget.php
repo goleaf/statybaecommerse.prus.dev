@@ -35,7 +35,7 @@ final class TopProductsWidget extends BaseWidget
         return __('analytics.top_products');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         $since = Carbon::now()->subDays(7);
 

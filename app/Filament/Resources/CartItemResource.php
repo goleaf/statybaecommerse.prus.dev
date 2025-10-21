@@ -18,11 +18,11 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -40,7 +40,7 @@ final class CartItemResource extends Resource
      *
      * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -67,9 +67,9 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('cart_items.basic_information'))
                 ->schema([
                     Grid::make(2)

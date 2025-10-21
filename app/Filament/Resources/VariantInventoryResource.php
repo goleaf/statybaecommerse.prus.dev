@@ -23,12 +23,12 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select; // Select component import keeps dropdown definitions consistent across the resource.
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
@@ -61,9 +61,9 @@ final class VariantInventoryResource extends Resource
     /**
      * @var string|BackedEnum|null Navigation icon configured for the inventory module.
      */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     public static function getNavigationLabel(): string
     {
@@ -83,9 +83,9 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.variant_inventory.basic_information'))
                     ->columns(2)
@@ -385,7 +385,7 @@ final class VariantInventoryResource extends Resource
         ];
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

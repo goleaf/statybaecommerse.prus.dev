@@ -9,15 +9,14 @@ use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
@@ -41,17 +40,17 @@ final class ReferralRewardResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = ReferralReward::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-gift';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Referral';
+    protected static string|\UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
@@ -162,7 +161,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -269,7 +268,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist|array
+    public static function infolist(Schema $schema): Schema
     {
         return $infolist
             ->schema([

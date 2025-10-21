@@ -14,14 +14,14 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
@@ -69,9 +69,9 @@ final class NotificationResource extends Resource
         return __('admin.notifications.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.notifications.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -155,7 +155,7 @@ final class NotificationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

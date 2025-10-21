@@ -14,13 +14,13 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\HeaderAction;
@@ -44,9 +44,9 @@ final class VariantCombinationResource extends Resource
 {
     protected static ?string $model = VariantCombination::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 19;
 
@@ -65,9 +65,9 @@ final class VariantCombinationResource extends Resource
         return __('admin.variant_combinations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 Section::make(__('admin.variant_combinations.basic_information'))
                     ->description(__('admin.variant_combinations.basic_information_description'))
@@ -131,7 +131,7 @@ final class VariantCombinationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

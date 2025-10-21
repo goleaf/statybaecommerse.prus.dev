@@ -16,17 +16,17 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\BooleanColumn;
@@ -55,9 +55,9 @@ final class SystemSettingTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
     public static function getNavigationLabel(): string
     {
@@ -74,9 +74,9 @@ final class SystemSettingTranslationResource extends Resource
         return __('admin.system_setting_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('Translation Details')
                     ->tabs([
@@ -195,7 +195,7 @@ final class SystemSettingTranslationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

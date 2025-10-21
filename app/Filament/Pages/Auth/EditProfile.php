@@ -6,20 +6,20 @@ namespace App\Filament\Pages\Auth;
 
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Support\Filament\Components\Flatpickr;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 Section::make(__('admin.profile.personal_information'))
                     ->description(__('admin.profile.personal_information_description'))

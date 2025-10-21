@@ -16,15 +16,15 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -50,7 +50,7 @@ final class VariantImageResource extends Resource
     /**
      * Navigation icon override (string|\BackedEnum|null).
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
 
     public static function getNavigationGroup(): ?string
     {
@@ -74,9 +74,9 @@ final class VariantImageResource extends Resource
         return __('admin.variant_images.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->components([
+        return $schema->components([
             Section::make(__('admin.variant_images.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -183,7 +183,7 @@ final class VariantImageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -9,19 +9,19 @@ use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -43,7 +43,7 @@ use Illuminate\Support\Str;
  */
 final class DocumentTemplateResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     public static function getNavigationGroup(): ?string
     {
@@ -83,9 +83,9 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Tabs::make('document_template_form')
                 ->tabs([
                     Tab::make(__('admin/document_templates.form.tabs.basic_information'))
@@ -193,7 +193,7 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

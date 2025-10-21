@@ -11,7 +11,7 @@ use App\Filament\Resources\NotificationTemplates\Schemas\NotificationTemplateFor
 use App\Filament\Resources\NotificationTemplates\Tables\NotificationTemplatesTable;
 use App\Models\NotificationTemplate;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -20,14 +20,14 @@ class NotificationTemplateResource extends Resource
 {
     protected static ?string $model = NotificationTemplate::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
         return NotificationTemplateForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return NotificationTemplatesTable::configure($table);
     }
