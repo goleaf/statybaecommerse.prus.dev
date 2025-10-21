@@ -27,8 +27,9 @@
    ```php
    // Add if missing:
    use UnitEnum;
-   
+
    // Remove duplicates if found
+   // Drop stray imports on pages/resources without a navigation group property
    ```
 
 4. **Apply to ALL Filament Resources**
