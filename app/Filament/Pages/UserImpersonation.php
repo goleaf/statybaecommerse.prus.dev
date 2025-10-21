@@ -38,7 +38,7 @@ final class UserImpersonation extends Page implements HasTable
 
     protected string $view = 'filament.pages.user-impersonation';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         $table = $table
             ->query(User::query()->where('is_admin', false))
@@ -73,6 +73,7 @@ final class UserImpersonation extends Page implements HasTable
                     }),
             ]);
 
+        // Respect the shared table layout preferences so impersonation remains accessible and consistent.
         return $this->applyToggleableTableLayout($table);
     }
 }

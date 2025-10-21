@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
-use BackedEnum;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
@@ -29,21 +28,19 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use UnitEnum;
 
 final class CollectionRuleResource extends Resource
 {
+    /**
+     * @var string|\BackedEnum|null Use the documented property approach so Filament can resolve the navigation icon reliably.
+     */
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected static ?string $model = CollectionRule::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-cog-6-tooth';
-    }
-
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Products';
     }
@@ -69,7 +66,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Tabs::make('collection_rule_tabs')
@@ -151,7 +148,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -229,7 +226,14 @@ final class CollectionRuleResource extends Resource
                     ->label(__('admin.collection_rules.actions.reorder'))
                     ->icon('heroicon-o-arrows-up-down')
                     ->color('info')
+                    ->fillForm(static function (CollectionRule $record): array {
+                        // Prefill the modal so administrators can fine-tune the existing position quickly.
+                        return [
+                            'position' => $record->position,
+                        ];
+                    })
                     ->action(function (CollectionRule $record, array $data): void {
+                        // Persist the requested position and celebrate success with a Filament notification.
                         $record->update(['position' => $data['position'] ?? 0]);
                         FilamentNotification::make()
                             ->title(__('admin.collection_rules.reordered_successfully'))

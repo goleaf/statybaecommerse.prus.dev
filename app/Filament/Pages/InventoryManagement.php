@@ -43,7 +43,7 @@ final class InventoryManagement extends Page implements HasTable
         return 'Inventory Management';
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         $table = $table
             ->query(Product::query())
@@ -84,6 +84,7 @@ final class InventoryManagement extends Page implements HasTable
                     }),
             ]);
 
+        // Delegate to the shared helper so column toggle preferences are applied consistently.
         return $this->applyToggleableTableLayout($table);
     }
 }
