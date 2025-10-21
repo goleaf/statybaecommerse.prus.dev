@@ -26,6 +26,12 @@ return [
         'email_verified' => 'Email Verified',
         'locale' => 'Locale',
         'created_at' => 'Created At',
+        'permissions_matrix' => 'Permissions Matrix',
+    ],
+    'sections' => [
+        'basic_info' => 'Basic Information',
+        'profile' => 'Profile',
+        'permissions' => 'Permissions & Access',
     ],
     'gender' => [
         'male' => 'Male',
@@ -44,5 +50,22 @@ return [
     'notifications' => [
         'activated' => 'Users activated',
         'deactivated' => 'Users deactivated',
+    ],
+    'permissions' => [
+        'helper_text' => 'Select which module actions this user can perform. Leave rows empty to inherit role defaults.',
+        'rows' => [
+            'products' => 'Products',
+            'categories' => 'Categories',
+            'brands' => 'Brands',
+            'orders' => 'Orders',
+            'users' => 'Users',
+        ],
+        'columns' => [
+            'view_any' => 'List',
+            'view' => 'View',
+            'create' => 'Create',
+            'update' => 'Update',
+            'delete' => 'Delete',
+        ],
     ],
 ];

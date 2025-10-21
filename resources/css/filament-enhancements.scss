@@ -1,4 +1,5 @@
-@import './filament/widget-tabs.css';
+@use 'tailwindcss';
+@use './filament/widget-tabs' as *;
 
 /* Filament Enhancements CSS */
 /* This file provides additional styling for Filament admin panel */

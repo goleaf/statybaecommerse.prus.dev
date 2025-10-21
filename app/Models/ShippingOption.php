@@ -42,22 +42,24 @@ final class ShippingOption extends Model
         'estimated_days_min',
         'estimated_days_max',
         'metadata',
+        'shipping_matrix',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_enabled' => 'boolean',
-            'is_default' => 'boolean',
-            'price' => 'decimal:2',
-            'min_weight' => 'integer',
-            'max_weight' => 'integer',
-            'min_order_amount' => 'decimal:2',
-            'max_order_amount' => 'decimal:2',
+            'is_enabled'         => 'boolean',
+            'is_default'         => 'boolean',
+            'price'              => 'decimal:2',
+            'min_weight'         => 'integer',
+            'max_weight'         => 'integer',
+            'min_order_amount'   => 'decimal:2',
+            'max_order_amount'   => 'decimal:2',
             'estimated_days_min' => 'integer',
             'estimated_days_max' => 'integer',
-            'sort_order' => 'integer',
-            'metadata' => 'array',
+            'sort_order'         => 'integer',
+            'metadata'           => 'array',
+            'shipping_matrix'    => 'array',
         ];
     }
 
@@ -108,7 +110,7 @@ final class ShippingOption extends Model
      */
     public function getFormattedPriceAttribute(): string
     {
-        return number_format((float) $this->price, 2).' '.$this->currency_code;
+        return number_format((float) $this->price, 2) . ' ' . $this->currency_code;
     }
 
     /**
@@ -118,10 +120,10 @@ final class ShippingOption extends Model
     {
         if ($this->estimated_days_min && $this->estimated_days_max) {
             if ($this->estimated_days_min === $this->estimated_days_max) {
-                return $this->estimated_days_min.' '.__('days');
+                return $this->estimated_days_min . ' ' . __('days');
             }
 
-            return $this->estimated_days_min.'-'.$this->estimated_days_max.' '.__('days');
+            return $this->estimated_days_min . '-' . $this->estimated_days_max . ' ' . __('days');
         }
 
         return __('Standard delivery');

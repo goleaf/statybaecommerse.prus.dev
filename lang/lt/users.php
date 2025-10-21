@@ -26,6 +26,12 @@ return [
         'email_verified' => 'El. paštas patvirtintas',
         'locale' => 'Kalba',
         'created_at' => 'Sukurta',
+        'permissions_matrix' => 'Teisių matrica',
+    ],
+    'sections' => [
+        'basic_info' => 'Pagrindinė informacija',
+        'profile' => 'Profilis',
+        'permissions' => 'Teisės ir prieigos',
     ],
     'gender' => [
         'male' => 'Vyras',
@@ -44,5 +50,22 @@ return [
     'notifications' => [
         'activated' => 'Vartotojai aktyvuoti',
         'deactivated' => 'Vartotojai deaktyvuoti',
+    ],
+    'permissions' => [
+        'helper_text' => 'Pasirinkite, kokius veiksmus šis vartotojas gali atlikti. Palikite eilutę tuščią, jei norite paveldėti numatytas rolių teises.',
+        'rows' => [
+            'products' => 'Produktai',
+            'categories' => 'Kategorijos',
+            'brands' => 'Prekių ženklai',
+            'orders' => 'Užsakymai',
+            'users' => 'Vartotojai',
+        ],
+        'columns' => [
+            'view_any' => 'Sąrašas',
+            'view' => 'Peržiūrėti',
+            'create' => 'Kurti',
+            'update' => 'Atnaujinti',
+            'delete' => 'Ištrinti',
+        ],
     ],
 ];

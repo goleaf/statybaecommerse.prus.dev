@@ -42,6 +42,10 @@ return [
         'reviews_count' => 'Reviews Count',
         'average_rating' => 'Average Rating',
         'price_increase_percentage' => 'Price Increase Percentage',
+        'variant_attribute_matrix' => 'Variant attribute availability',
+    ],
+    'sections' => [
+        'variant_matrix' => 'Variant availability matrix',
     ],
     'status' => [
         'draft' => 'Draft',
@@ -82,6 +86,19 @@ return [
     ],
     'helpers' => [
         'price_increase' => 'Enter percentage to increase prices (e.g., 10 for 10% increase)',
+    ],
+    'matrix' => [
+        'helper_text' => 'Select which SKU groups support each attribute.',
+        'rows' => [
+            'size' => 'Size',
+            'color' => 'Color',
+            'material' => 'Material',
+        ],
+        'columns' => [
+            'primary' => 'Primary SKU',
+            'bundle' => 'Bundle SKU',
+            'limited' => 'Limited edition SKU',
+        ],
     ],
     'widgets' => [
         'total_products' => 'Total Products',
