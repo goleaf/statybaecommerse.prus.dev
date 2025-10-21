@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Facades\Gate;
 
@@ -13,9 +12,9 @@ class Dashboard extends BaseDashboard
     protected static ?int $navigationSort = 1;
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * @var string|\BackedEnum|null Navigation icon override kept docblocked for enum compatibility.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    protected static $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';
 

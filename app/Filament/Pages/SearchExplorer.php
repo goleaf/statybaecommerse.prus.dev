@@ -6,15 +6,14 @@ namespace App\Filament\Pages;
 
 use App\Data\SearchQueryData;
 use App\Services\SearchService;
-use BackedEnum;
 use Filament\Pages\Page;
 
 final class SearchExplorer extends Page
 {
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * @var string|\BackedEnum|null Navigation icon override maintained as docblock for enum compatibility.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     public static function getNavigationGroup(): ?string
     {

@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
-use BackedEnum;
 use Exception;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -28,7 +27,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * SystemSettingCategoryTranslationResource
@@ -43,9 +41,15 @@ final class SystemSettingCategoryTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
+    /**
+     * @var string|\BackedEnum|null Navigation icon override retained as docblock for Filament compatibility.
+     */
+    protected static $navigationIcon = 'heroicon-o-language';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Settings';
+    /**
+     * @var string|\UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
+     */
+    protected static $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 
