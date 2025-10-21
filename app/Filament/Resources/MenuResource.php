@@ -32,7 +32,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class MenuResource extends Resource
 {
@@ -40,7 +39,7 @@ final class MenuResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -182,12 +181,11 @@ final class MenuResource extends Resource
                     ->requiresConfirmation()
                     ->action(function (Menu $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
-
-                        Notification::make()
-                            ->title($record->is_active ? __('menus.activated_successfully') : __('menus.deactivated_successfully'))
-                            ->success()
-                            ->send();
-                    }),
+                    })
+                    ->successNotificationTitle(fn (Menu $record): string => $record->is_active
+                        ? __('menus.activated_successfully')
+                        : __('menus.deactivated_successfully')
+                    ),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
