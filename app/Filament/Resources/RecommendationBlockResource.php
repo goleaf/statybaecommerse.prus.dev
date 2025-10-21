@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
 use App\Models\Scopes\ActiveScope;
+use App\Support\Recommendations\RecommendationBlockOptions;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -16,7 +19,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Section;
 use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -24,7 +27,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 
 /**
  * RecommendationBlockResource
@@ -35,7 +37,10 @@ final class RecommendationBlockResource extends Resource
 {
     protected static ?string $model = RecommendationBlock::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /**
+     * @var string|BackedEnum|null Tracks the navigation group while remaining Filament compatible.
+     */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 13;
 
@@ -49,9 +54,13 @@ final class RecommendationBlockResource extends Resource
         return __('recommendation_blocks.title');
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Products';
+        // Delegates to the enum value so Filament keeps grouping consistent while still
+        // accepting plain strings when Filament expects a literal label.
+        return self::$navigationGroup instanceof BackedEnum
+            ? self::$navigationGroup->value
+            : self::$navigationGroup;
     }
 
     /**
@@ -84,7 +93,7 @@ final class RecommendationBlockResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->maxLength(255),
                     TextInput::make('title')
-                        ->label(__('recommendation_blocks.title'))
+                        ->label(__('recommendation_blocks.block_title'))
                         ->required()
                         ->maxLength(255),
                     Textarea::make('description')
@@ -93,23 +102,14 @@ final class RecommendationBlockResource extends Resource
                         ->rows(3),
                     Select::make('type')
                         ->label(__('recommendation_blocks.type'))
-                        ->options([
-                            'featured' => __('recommendation_blocks.featured'),
-                            'related' => __('recommendation_blocks.related'),
-                            'similar' => __('recommendation_blocks.similar'),
-                            'trending' => __('recommendation_blocks.trending'),
-                            'recent' => __('recommendation_blocks.recent'),
-                        ])
+                        // Ensure the UI values stay in sync with domain helpers.
+                        ->options(RecommendationBlockOptions::types())
                         ->required()
                         ->native(false),
                     Select::make('position')
                         ->label(__('recommendation_blocks.position'))
-                        ->options([
-                            'top' => __('recommendation_blocks.top'),
-                            'bottom' => __('recommendation_blocks.bottom'),
-                            'sidebar' => __('recommendation_blocks.sidebar'),
-                            'inline' => __('recommendation_blocks.inline'),
-                        ])
+                        // Position options rely on the same helper for filters and selects.
+                        ->options(RecommendationBlockOptions::positions())
                         ->required()
                         ->native(false),
                 ]),
@@ -222,26 +222,15 @@ final class RecommendationBlockResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('recommendation_blocks.type'))
-                    ->options([
-                        'featured' => __('recommendation_blocks.featured'),
-                        'related' => __('recommendation_blocks.related'),
-                        'similar' => __('recommendation_blocks.similar'),
-                        'trending' => __('recommendation_blocks.trending'),
-                        'recent' => __('recommendation_blocks.recent'),
-                    ]),
+                    ->options(RecommendationBlockOptions::types()),
                 SelectFilter::make('position')
                     ->label(__('recommendation_blocks.position'))
-                    ->options([
-                        'top' => __('recommendation_blocks.top'),
-                        'bottom' => __('recommendation_blocks.bottom'),
-                        'sidebar' => __('recommendation_blocks.sidebar'),
-                        'inline' => __('recommendation_blocks.inline'),
-                    ]),
+                    ->options(RecommendationBlockOptions::positions()),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_blocks.is_active'))
-                    ->placeholder(__('recommendation_blocks.all_records'))
-                    ->trueLabel(__('recommendation_blocks.active_only'))
-                    ->falseLabel(__('recommendation_blocks.inactive_only')),
+                    ->placeholder(__('recommendation_blocks.filters.all_records'))
+                    ->trueLabel(__('recommendation_blocks.filters.active_only'))
+                    ->falseLabel(__('recommendation_blocks.filters.inactive_only')),
             ])
             ->actions([
                 EditAction::make(),

@@ -111,6 +111,7 @@ A comprehensive, intelligent product recommendation system has been successfully
   - Assign algorithms to specific blocks
   - Set display limits and sorting options
   - Configure fallback behaviors
+  - Share centralised type/position helpers (`App\\Support\\Recommendations\\RecommendationBlockOptions`) so forms, filters, and list tabs stay synchronised
 
 #### 3. RecommendationSystemManagement Page
 - **Location**: `app/Filament/Pages/RecommendationSystemManagement.php`
