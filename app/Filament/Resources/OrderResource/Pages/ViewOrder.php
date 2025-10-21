@@ -20,14 +20,19 @@ use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableE
 use Illuminate\Support\Number;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as SpatieTranslatableViewRecord;
 
 final class ViewOrder extends ViewRecord
 {
+    use SpatieTranslatableViewRecord; // Keep the detail view synchronized with the active locale.
+
     protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            LocaleSwitcher::make(), // Allow locale switching while reviewing record details.
             Actions\EditAction::make(),
         ];
     }

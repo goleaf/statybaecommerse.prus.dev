@@ -26,6 +26,7 @@ A curated map of the most useful documents for day-to-day development and operat
 - [Matrix choice permission grids](forms/MATRIX_CHOICE.md) – which Filament resources consult the permission matrix, how rows/columns are mapped, and how to extend the config safely.
 - [REFERRAL_SYSTEM_IMPLEMENTATION](REFERRAL_SYSTEM_IMPLEMENTATION.md) – loyalty and referral programme operations for support teams.
 - [Table Column Resizing](ui/RESIZED_COLUMNS.md) – how column width adjustments are saved, reset, and recovered when troubleshooting.
+- [Admin Translations Guide](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md#spatie-translatable) – explains how the Spatie locale switcher plugin is configured and where to adjust supported languages.
 
 ### 5. Troubleshoot & Maintain
 - [TERMINAL_FREEZING_FIXES](TERMINAL_FREEZING_FIXES.md) – remedies for common local environment hiccups.
