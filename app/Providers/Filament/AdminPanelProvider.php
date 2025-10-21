@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
+use App\Support\Nav;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 
@@ -50,9 +51,14 @@ final class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        $resourceClasses = array_values(array_filter(
+        $configuredResources = array_values(array_filter(
             (array) config('filament.navigation.resources', []),
             static fn (mixed $resource): bool => is_string($resource),
+        ));
+
+        $resourceClasses = array_values(array_unique(
+            [...Nav::orderedResources(), ...$configuredResources],
+            SORT_STRING,
         ));
 
         /** @var array<class-string> $resourceClasses */
@@ -85,7 +91,6 @@ final class AdminPanelProvider extends PanelProvider
                 'danger'  => Color::Red,
                 'info'    => Color::Sky,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources($resourceClasses)
             ->pages($pageClasses)
             ->widgets([
@@ -199,35 +204,70 @@ final class AdminPanelProvider extends PanelProvider
     }
 
     /**
-     * Build Filament navigation groups from configuration.
+     * Build Filament navigation groups by combining the central Nav registry with optional configuration overrides.
      *
      * @return array<int, NavigationGroup>
      */
     private function configuredNavigationGroups(): array
     {
-        $groupConfigurations = array_values(array_filter(
+        $configuredGroups = array_values(array_filter(
             (array) config('filament.navigation.groups', []),
             static fn (mixed $group): bool => is_array($group),
         ));
 
-        /** @var array<int, array{label?: string, icon?: string|null, collapsed?: bool|null}> $groupConfigurations */
+        /** @var array<string, array{label?: string, icon?: string|null, collapsed?: bool|null}> $overrides */
+        $overrides = [];
+        $extras = [];
 
-        return collect($groupConfigurations)
-            ->map(static function (array $group, int|string $unused): NavigationGroup {
-                $navigationGroup = NavigationGroup::make()
-                    ->label(__($group['label'] ?? ''));
+        foreach ($configuredGroups as $group) {
+            $key = $group['key'] ?? $group['label'] ?? null;
 
-                if (! empty($group['icon'])) {
-                    $navigationGroup->icon($group['icon']);
-                }
+            if ($key !== null) {
+                $overrides[$key] = $group;
+            } else {
+                $extras[] = $group;
+            }
+        }
 
-                if (($group['collapsed'] ?? false) === true) {
-                    $navigationGroup->collapsed();
-                }
+        $navigationGroups = [];
 
-                return $navigationGroup;
-            })
-            ->all();
+        foreach (Nav::navigationGroups() as $group) {
+            $override = $overrides[$group['key']] ?? null;
+            $label = $override['label'] ?? $group['label'];
+            $icon = $override['icon'] ?? $group['icon'];
+            $collapsed = $override['collapsed'] ?? false;
+
+            $navigationGroup = NavigationGroup::make()->label(__($label));
+
+            if (! empty($icon)) {
+                $navigationGroup->icon($icon);
+            }
+
+            if ($collapsed === true) {
+                $navigationGroup->collapsed();
+            }
+
+            $navigationGroups[] = $navigationGroup;
+
+            unset($overrides[$group['key']]);
+        }
+
+        foreach (array_merge(array_values($overrides), $extras) as $group) {
+            $navigationGroup = NavigationGroup::make()
+                ->label(__($group['label'] ?? ''));
+
+            if (! empty($group['icon'])) {
+                $navigationGroup->icon($group['icon']);
+            }
+
+            if (($group['collapsed'] ?? false) === true) {
+                $navigationGroup->collapsed();
+            }
+
+            $navigationGroups[] = $navigationGroup;
+        }
+
+        return $navigationGroups;
     }
 
     private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
