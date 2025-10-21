@@ -8,10 +8,10 @@ use App\Filament\Resources\ProductVariantResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListProductVariants extends ListRecords
+final class ListProductVariants extends BaseListRecords
 {
     use HasWidgetTabs;
 

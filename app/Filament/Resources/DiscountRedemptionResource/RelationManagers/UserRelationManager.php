@@ -6,12 +6,12 @@ namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class UserRelationManager extends RelationManager
+class UserRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'user';
 

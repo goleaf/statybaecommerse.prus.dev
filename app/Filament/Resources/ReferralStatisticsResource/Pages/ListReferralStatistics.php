@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ReferralStatisticsResource\Pages;
 
 use App\Filament\Resources\ReferralStatisticsResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListReferralStatistics extends ListRecords
+final class ListReferralStatistics extends BaseListRecords
 {
     protected static string $resource = ReferralStatisticsResource::class;
 

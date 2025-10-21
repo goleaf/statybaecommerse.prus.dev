@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ShippingOptions\Pages;
 
 use App\Filament\Resources\ShippingOptions\ShippingOptionResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListShippingOptions extends ListRecords
+class ListShippingOptions extends BaseListRecords
 {
     protected static string $resource = ShippingOptionResource::class;
 

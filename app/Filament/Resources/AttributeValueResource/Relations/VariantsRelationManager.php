@@ -6,13 +6,13 @@ namespace App\Filament\Resources\AttributeValueResource\Relations;
 
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class VariantsRelationManager extends RelationManager
+class VariantsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'variants';
 

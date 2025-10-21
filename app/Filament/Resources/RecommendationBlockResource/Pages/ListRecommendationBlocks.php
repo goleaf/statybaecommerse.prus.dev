@@ -6,12 +6,12 @@ namespace App\Filament\Resources\RecommendationBlockResource\Pages;
 
 use App\Filament\Resources\RecommendationBlockResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListRecommendationBlocks extends ListRecords
+final class ListRecommendationBlocks extends BaseListRecords
 {
     use HasWidgetTabs;
 

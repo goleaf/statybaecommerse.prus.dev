@@ -6,9 +6,9 @@ namespace App\Filament\Resources\NewsTagResource\Pages;
 
 use App\Filament\Resources\NewsTagResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListNewsTags extends ListRecords
+final class ListNewsTags extends BaseListRecords
 {
     protected static string $resource = NewsTagResource::class;
 

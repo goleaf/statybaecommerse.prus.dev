@@ -6,9 +6,9 @@ namespace App\Filament\Resources\NotificationTemplateResource\Pages;
 
 use App\Filament\Resources\NotificationTemplateResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListNotificationTemplates extends ListRecords
+final class ListNotificationTemplates extends BaseListRecords
 {
     protected static string $resource = NotificationTemplateResource::class;
 

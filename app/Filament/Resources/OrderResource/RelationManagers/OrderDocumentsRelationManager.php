@@ -20,7 +20,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -42,7 +42,7 @@ use Illuminate\Database\Eloquent\Collection;
  * - Document sharing and access control
  * - Bulk operations
  */
-final class OrderDocumentsRelationManager extends RelationManager
+final class OrderDocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';
 

@@ -6,12 +6,12 @@ namespace App\Filament\Resources\CartItemResource\Pages;
 
 use App\Filament\Resources\CartItemResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListCartItems extends ListRecords
+final class ListCartItems extends BaseListRecords
 {
     use HasWidgetTabs;
 

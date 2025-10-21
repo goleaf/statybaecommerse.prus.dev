@@ -6,9 +6,9 @@ namespace App\Filament\Resources\SystemSettingTranslationResource\Pages;
 
 use App\Filament\Resources\SystemSettingTranslationResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListSystemSettingTranslations extends ListRecords
+final class ListSystemSettingTranslations extends BaseListRecords
 {
     protected static string $resource = SystemSettingTranslationResource::class;
 

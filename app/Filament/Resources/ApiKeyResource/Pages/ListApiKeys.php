@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ApiKeyResource\Pages;
 
 use App\Filament\Resources\ApiKeyResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListApiKeys extends ListRecords
+final class ListApiKeys extends BaseListRecords
 {
     protected static string $resource = ApiKeyResource::class;
 

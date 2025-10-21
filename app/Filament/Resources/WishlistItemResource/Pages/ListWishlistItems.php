@@ -6,9 +6,9 @@ namespace App\Filament\Resources\WishlistItemResource\Pages;
 
 use App\Filament\Resources\WishlistItemResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListWishlistItems extends ListRecords
+class ListWishlistItems extends BaseListRecords
 {
     protected static string $resource = WishlistItemResource::class;
 

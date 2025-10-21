@@ -6,9 +6,9 @@ namespace App\Filament\Resources\VariantImageResource\Pages;
 
 use App\Filament\Resources\VariantImageResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListVariantImages extends ListRecords
+final class ListVariantImages extends BaseListRecords
 {
     protected static string $resource = VariantImageResource::class;
 

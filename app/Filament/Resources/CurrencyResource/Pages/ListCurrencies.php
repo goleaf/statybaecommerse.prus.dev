@@ -6,9 +6,9 @@ namespace App\Filament\Resources\CurrencyResource\Pages;
 
 use App\Filament\Resources\CurrencyResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListCurrencies extends ListRecords
+final class ListCurrencies extends BaseListRecords
 {
     protected static string $resource = CurrencyResource::class;
 

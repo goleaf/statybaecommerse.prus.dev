@@ -6,9 +6,9 @@ namespace App\Filament\Resources\OrderItemResource\Pages;
 
 use App\Filament\Resources\OrderItemResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListOrderItems extends ListRecords
+final class ListOrderItems extends BaseListRecords
 {
     protected static string $resource = OrderItemResource::class;
 

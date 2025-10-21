@@ -6,11 +6,11 @@ namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class ActivityLogRelationManager extends RelationManager
+final class ActivityLogRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'activities';
 

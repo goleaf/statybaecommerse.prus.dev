@@ -9,9 +9,9 @@ use App\Filament\Resources\DiscountResource\Widgets\DiscountChartWidget;
 use App\Filament\Resources\DiscountResource\Widgets\DiscountStatsWidget;
 use App\Filament\Resources\DiscountResource\Widgets\RecentRedemptionsWidget;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListDiscounts extends ListRecords
+final class ListDiscounts extends BaseListRecords
 {
     protected static string $resource = DiscountResource::class;
 
