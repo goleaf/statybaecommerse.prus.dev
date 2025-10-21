@@ -28,15 +28,17 @@ Optional but helpful: Redis (for queue experiments) and pnpm (mirrors npm comman
 
 ```bash
 # 1. Clone the repository
- git clone https://github.com/prus-dev/statybaecommerse.prus.dev.git
- cd statybaecommerse.prus.dev
+git clone https://github.com/prus-dev/statybaecommerse.prus.dev.git
+cd statybaecommerse.prus.dev
 
 # 2. Install PHP dependencies
- composer install
+composer install
 
 # 3. Install Node dependencies
- npm install
+npm install
 ```
+
+> ✅ Running `npm install` also refreshes the Husky hook shim so older clones keep sourcing the modern `_/h` helper. Re-run `npm run prepare` if hooks stop firing—it reruns the install step and regenerates `.husky/_/husky.sh` via `scripts/ensure-husky-shim.mjs`.
 
 If you prefer the automated route, run `make setup` after cloning—it performs all three steps, copies the `.env`, and prepares the SQLite database.
 
@@ -88,17 +90,21 @@ Prefer MySQL/PostgreSQL? Update the `DB_*` values in `.env` and rerun the migrat
 You have two options:
 
 1. **Simple PHP server + Vite build**
-   ```bash
-   php artisan serve &
-   npm run dev
-   ```
-   Visit the storefront at <http://127.0.0.1:8000> and the admin at <http://127.0.0.1:8000/admin>.
+
+    ```bash
+    php artisan serve &
+    npm run dev
+    ```
+
+    Visit the storefront at <http://127.0.0.1:8000> and the admin at <http://127.0.0.1:8000/admin>.
 
 2. **All-in-one Make target**
-   ```bash
-   make dev
-   ```
-   This spins up the PHP server, queue worker, Vite, and Pail log viewer together.
+
+    ```bash
+    make dev
+    ```
+
+    This spins up the PHP server, queue worker, Vite, and Pail log viewer together.
 
 Stop background commands with `Ctrl+C` when you are done.
 
@@ -117,7 +123,7 @@ You can explore more helper commands in the `Makefile` (`make test`, `make analy
 
 | Symptom | Resolution |
 | --- | --- |
-| `Class "PDO" not found` or `could not find driver` | Ensure PHP’s SQLite extension is enabled (`php -m | grep sqlite`). On macOS with Homebrew: `brew install php` and restart your shell. |
+| `Class "PDO" not found` or `could not find driver` | Ensure PHP’s SQLite extension is enabled (`php -m \| grep sqlite`). On macOS with Homebrew: `brew install php` and restart your shell. |
 | `APP_KEY` related errors | Run `php artisan key:generate` after creating `.env`. |
 | Migrations fail because the SQLite file is read-only | Verify the `database/` folder and `database.sqlite` file are writable (`chmod 664 database/database.sqlite`). |
 | `npm run dev` fails with OpenSSL or incompatible Node errors | Confirm `node -v` reports ≥20. Reinstall via `nvm install 20` or `brew install node@20`. |
