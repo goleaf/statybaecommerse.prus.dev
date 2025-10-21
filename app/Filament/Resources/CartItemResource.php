@@ -30,6 +30,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\Quantity\Components\Quantity;
 
 final class CartItemResource extends Resource
 {
@@ -144,22 +145,23 @@ final class CartItemResource extends Resource
                         ->maxLength(255),
                     Grid::make(2)
                         ->components([
-                            TextInput::make('quantity')
+                            Quantity::make('quantity')
                                 ->label(__('cart_items.quantity'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
                                 ->default(1)
                                 ->required()
+                                ->live()
                                 ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
                                     $set('total_price', number_format($total, 2, '.', ''));
                                 }),
-                            TextInput::make('minimum_quantity')
+                            Quantity::make('minimum_quantity')
                                 ->label(__('cart_items.minimum_quantity'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
                                 ->default(1),
                         ]),
                     TextInput::make('session_id')
@@ -384,10 +386,10 @@ final class CartItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCartItems::route('/'),
+            'index'  => Pages\ListCartItems::route('/'),
             'create' => Pages\CreateCartItem::route('/create'),
-            'view' => Pages\ViewCartItem::route('/{record}'),
-            'edit' => Pages\EditCartItem::route('/{record}/edit'),
+            'view'   => Pages\ViewCartItem::route('/{record}'),
+            'edit'   => Pages\EditCartItem::route('/{record}/edit'),
         ];
     }
 }

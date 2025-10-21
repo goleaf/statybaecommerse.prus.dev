@@ -14,7 +14,6 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -27,6 +26,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\Quantity\Components\Quantity;
 
 /**
  * OrderItemsRelationManager
@@ -81,18 +81,16 @@ final class OrderItemsRelationManager extends RelationManager
                                         }
                                     })
                                     ->prefixIcon('heroicon-o-cube'),
-                                TextInput::make('quantity')
+                                Quantity::make('quantity')
                                     ->label(__('orders.quantity'))
-                                    ->numeric()
-                                    ->required()
-                                    ->default(1)
                                     ->minValue(1)
-                                    ->reactive()
+                                    ->steps(1)
+                                    ->default(1)
+                                    ->live()
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         $unitPrice = $get('unit_price') ?? 0;
                                         $set('total', $unitPrice * $state);
-                                    })
-                                    ->prefixIcon('heroicon-o-hashtag'),
+                                    }),
                             ]),
                         Grid::make(3)
                             ->components([
@@ -131,7 +129,7 @@ final class OrderItemsRelationManager extends RelationManager
 
                                         $total = ($unitPrice * $quantity) - $discount;
 
-                                        return '€'.number_format($total, 2);
+                                        return '€' . number_format($total, 2);
                                     }),
                             ]),
                         Hidden::make('product_id')
@@ -208,7 +206,7 @@ final class OrderItemsRelationManager extends RelationManager
                         'warning' => 'pending',
                         'primary' => 'processing',
                         'success' => 'completed',
-                        'danger' => 'cancelled',
+                        'danger'  => 'cancelled',
                     ])
                     ->formatStateUsing(fn (?string $state): string => $state ? __("orders.item_statuses.{$state}") : '-'),
                 TextColumn::make('created_at')
@@ -221,10 +219,10 @@ final class OrderItemsRelationManager extends RelationManager
                 SelectFilter::make('status')
                     ->label(__('orders.fields.status'))
                     ->options([
-                        'pending' => __('orders.item_statuses.pending'),
+                        'pending'    => __('orders.item_statuses.pending'),
                         'processing' => __('orders.item_statuses.processing'),
-                        'completed' => __('orders.item_statuses.completed'),
-                        'cancelled' => __('orders.item_statuses.cancelled'),
+                        'completed'  => __('orders.item_statuses.completed'),
+                        'cancelled'  => __('orders.item_statuses.cancelled'),
                     ])
                     ->multiple(),
                 TernaryFilter::make('has_discount')

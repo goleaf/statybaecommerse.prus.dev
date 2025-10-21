@@ -8,13 +8,12 @@ use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Support\Search\ProductSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use BackedEnum;
 use Closure;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -32,6 +31,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\Quantity\Components\Quantity;
 use UnitEnum;
 
 final class InventoryResource extends Resource
@@ -118,29 +118,29 @@ final class InventoryResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            TextInput::make('quantity')
+                            Quantity::make('quantity')
                                 ->label(__('Quantity'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0)
                                 ->required(),
-                            TextInput::make('reserved')
+                            Quantity::make('reserved')
                                 ->label(__('Reserved'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
                         ]),
                     Grid::make(2)
                         ->schema([
-                            TextInput::make('incoming')
+                            Quantity::make('incoming')
                                 ->label(__('Incoming'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
-                            TextInput::make('threshold')
+                            Quantity::make('threshold')
                                 ->label(__('Threshold'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
                         ]),
                     Toggle::make('is_tracked')
@@ -244,25 +244,25 @@ final class InventoryResource extends Resource
                     ->label(__('Adjust Stock'))
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->form([
-                        TextInput::make('quantity')
+                        Quantity::make('quantity')
                             ->label(__('Quantity'))
-                            ->numeric()
                             ->minValue(0)
+                            ->steps(1)
                             ->required(),
-                        TextInput::make('reserved')
+                        Quantity::make('reserved')
                             ->label(__('Reserved'))
-                            ->numeric()
                             ->minValue(0)
+                            ->steps(1)
                             ->default(0),
-                        TextInput::make('incoming')
+                        Quantity::make('incoming')
                             ->label(__('Incoming'))
-                            ->numeric()
                             ->minValue(0)
+                            ->steps(1)
                             ->default(0),
-                        TextInput::make('threshold')
+                        Quantity::make('threshold')
                             ->label(__('Threshold'))
-                            ->numeric()
                             ->minValue(0)
+                            ->steps(1)
                             ->default(0),
                     ])
                     ->action(function (Inventory $record, array $data): void {
@@ -282,10 +282,11 @@ final class InventoryResource extends Resource
                     ->label(__('Add Stock'))
                     ->icon('heroicon-o-plus')
                     ->form([
-                        TextInput::make('add_quantity')
+                        Quantity::make('add_quantity')
                             ->label(__('Quantity to Add'))
-                            ->numeric()
                             ->minValue(1)
+                            ->steps(1)
+                            ->default(1)
                             ->required(),
                     ])
                     ->action(function (Inventory $record, array $data): void {
@@ -300,10 +301,11 @@ final class InventoryResource extends Resource
                     ->label(__('Remove Stock'))
                     ->icon('heroicon-o-minus')
                     ->form([
-                        TextInput::make('remove_quantity')
+                        Quantity::make('remove_quantity')
                             ->label(__('Quantity to Remove'))
-                            ->numeric()
                             ->minValue(1)
+                            ->steps(1)
+                            ->default(1)
                             ->required()
                             ->rule(function (Inventory $record): Closure {
                                 return static function (string $attribute, $value, Closure $fail) use ($record): void {
@@ -327,10 +329,11 @@ final class InventoryResource extends Resource
                     ->label(__('Reserve Stock'))
                     ->icon('heroicon-o-shield-check')
                     ->form([
-                        TextInput::make('reserve_quantity')
+                        Quantity::make('reserve_quantity')
                             ->label(__('Quantity to Reserve'))
-                            ->numeric()
                             ->minValue(1)
+                            ->steps(1)
+                            ->default(1)
                             ->required()
                             ->rule(function (Inventory $record): Closure {
                                 return static function (string $attribute, $value, Closure $fail) use ($record): void {
@@ -358,25 +361,25 @@ final class InventoryResource extends Resource
                         ->label(__('Adjust Stock'))
                         ->icon('heroicon-o-adjustments-horizontal')
                         ->form([
-                            TextInput::make('quantity')
+                            Quantity::make('quantity')
                                 ->label(__('Quantity'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->required(),
-                            TextInput::make('reserved')
+                            Quantity::make('reserved')
                                 ->label(__('Reserved'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
-                            TextInput::make('incoming')
+                            Quantity::make('incoming')
                                 ->label(__('Incoming'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
-                            TextInput::make('threshold')
+                            Quantity::make('threshold')
                                 ->label(__('Threshold'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
                         ])
                         ->action(function (Collection $records, array $data): void {
@@ -398,10 +401,11 @@ final class InventoryResource extends Resource
                         ->label(__('Add Stock'))
                         ->icon('heroicon-o-plus')
                         ->form([
-                            TextInput::make('add_quantity')
+                            Quantity::make('add_quantity')
                                 ->label(__('Quantity to Add'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
+                                ->default(1)
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {

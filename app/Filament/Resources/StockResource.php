@@ -29,6 +29,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\Quantity\Components\Quantity;
 use UnitEnum;
 
 /**
@@ -100,29 +101,29 @@ final class StockResource extends Resource
                 ->schema([
                     Grid::make(3)
                         ->schema([
-                            TextInput::make('quantity')
+                            Quantity::make('quantity')
                                 ->label(__('inventory.quantity'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0)
                                 ->required(),
-                            TextInput::make('reserved')
+                            Quantity::make('reserved')
                                 ->label(__('inventory.reserved'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
-                            TextInput::make('incoming')
+                            Quantity::make('incoming')
                                 ->label(__('inventory.incoming'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
                         ]),
                     Grid::make(2)
                         ->schema([
-                            TextInput::make('threshold')
+                            Quantity::make('threshold')
                                 ->label(__('inventory.threshold'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
                             Toggle::make('is_tracked')
                                 ->label(__('inventory.is_tracked'))
@@ -213,9 +214,11 @@ final class StockResource extends Resource
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->color('warning')
                     ->form([
-                        TextInput::make('adjustment_quantity')
+                        Quantity::make('adjustment_quantity')
                             ->label(__('inventory.adjustment_quantity'))
-                            ->numeric()
+                            ->steps(1)
+                            ->minValue(-1000000)
+                            ->default(0)
                             ->required()
                             ->helperText(__('inventory.adjustment_help')),
                     ])
@@ -272,10 +275,10 @@ final class StockResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStocks::route('/'),
+            'index'  => Pages\ListStocks::route('/'),
             'create' => Pages\CreateStock::route('/create'),
-            'view' => Pages\ViewStock::route('/{record}'),
-            'edit' => Pages\EditStock::route('/{record}/edit'),
+            'view'   => Pages\ViewStock::route('/{record}'),
+            'edit'   => Pages\EditStock::route('/{record}/edit'),
         ];
     }
 }

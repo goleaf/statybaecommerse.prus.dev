@@ -25,6 +25,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use LaraZeus\Quantity\Components\Quantity;
 use UnitEnum;
 
 /**
@@ -85,17 +86,19 @@ final class StockMovementResource extends Resource
                         ]),
                     Grid::make(2)
                         ->components([
-                            TextInput::make('quantity')
+                            Quantity::make('quantity')
                                 ->label(__('stock_movement.fields.quantity'))
-                                ->numeric()
+                                ->minValue(1)
+                                ->steps(1)
+                                ->default(1)
                                 ->required(),
                             Select::make('type')
                                 ->label(__('stock_movement.fields.type'))
                                 ->options([
-                                    'in' => __('stock_movement.types.in'),
-                                    'out' => __('stock_movement.types.out'),
+                                    'in'         => __('stock_movement.types.in'),
+                                    'out'        => __('stock_movement.types.out'),
                                     'adjustment' => __('stock_movement.types.adjustment'),
-                                    'transfer' => __('stock_movement.types.transfer'),
+                                    'transfer'   => __('stock_movement.types.transfer'),
                                 ])
                                 ->required(),
                         ]),
@@ -144,11 +147,11 @@ final class StockMovementResource extends Resource
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'in' => 'success',
-                        'out' => 'danger',
+                        'in'         => 'success',
+                        'out'        => 'danger',
                         'adjustment' => 'warning',
-                        'transfer' => 'info',
-                        default => 'gray',
+                        'transfer'   => 'info',
+                        default      => 'gray',
                     }),
                 TextColumn::make('reason')
                     ->label(__('stock_movement.fields.reason'))
@@ -164,10 +167,10 @@ final class StockMovementResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'in' => __('stock_movement.types.in'),
-                        'out' => __('stock_movement.types.out'),
+                        'in'         => __('stock_movement.types.in'),
+                        'out'        => __('stock_movement.types.out'),
                         'adjustment' => __('stock_movement.types.adjustment'),
-                        'transfer' => __('stock_movement.types.transfer'),
+                        'transfer'   => __('stock_movement.types.transfer'),
                     ]),
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
@@ -203,10 +206,10 @@ final class StockMovementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStockMovements::route('/'),
+            'index'  => Pages\ListStockMovements::route('/'),
             'create' => Pages\CreateStockMovement::route('/create'),
-            'view' => Pages\ViewStockMovement::route('/{record}'),
-            'edit' => Pages\EditStockMovement::route('/{record}/edit'),
+            'view'   => Pages\ViewStockMovement::route('/{record}'),
+            'edit'   => Pages\EditStockMovement::route('/{record}/edit'),
         ];
     }
 }
