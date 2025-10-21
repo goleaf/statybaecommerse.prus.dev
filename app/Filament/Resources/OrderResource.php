@@ -14,6 +14,7 @@ use App\Services\Export\ExportService;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Search\CustomerSearch;
+use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
@@ -41,6 +42,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -49,6 +51,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
@@ -366,6 +369,51 @@ final class OrderResource extends Resource
                     ->sortable()
                     ->copyable()
                     ->weight('bold'),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Order $record): array {
+                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
+                        $locales = collect($localeUrlGenerator->supportedLocales());
+
+                        $items = $locales
+                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
+                                $url = $localeUrlGenerator->localizedRoute(
+                                    'localized.orders.show',
+                                    ['order' => $record->number],
+                                    $locale,
+                                );
+
+                                if (! $url && Route::has('frontend.orders.show')) {
+                                    $url = route('frontend.orders.show', $record);
+                                }
+
+                                if (! $url) {
+                                    return null;
+                                }
+
+                                return [
+                                    'label' => __('Order (:locale)', ['locale' => strtoupper($locale)]),
+                                    'url' => $url,
+                                    'icon' => 'heroicon-o-arrow-top-right-on-square',
+                                    'color' => 'primary',
+                                ];
+                            })
+                            ->filter()
+                            ->values();
+
+                        if (Route::has('api.orders.show')) {
+                            $items->push([
+                                'label' => __('Order API (:number)', ['number' => $record->number]),
+                                'url' => route('api.orders.show', ['order' => $record->number]),
+                                'icon' => 'heroicon-o-code-bracket',
+                                'color' => 'info',
+                            ]);
+                        }
+
+                        return $items->all();
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label(__('orders.fields.customer'))
                     ->limit(30)
