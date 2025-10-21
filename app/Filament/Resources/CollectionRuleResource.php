@@ -40,11 +40,13 @@ final class CollectionRuleResource extends Resource
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
+        // Surface a mechanical icon so merchandisers immediately identify automation tooling entries.
         return 'heroicon-o-cog-6-tooth';
     }
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
+        // Keep the resource collocated with product configuration utilities for quicker discovery.
         return 'Products';
     }
 
@@ -69,8 +71,9 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
         return $form->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
@@ -151,8 +154,9 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Publish the full table definition through the Filament v4 `Table` signature for consistency.
         return $table
             ->columns([
                 TextColumn::make('collection.name')
@@ -229,19 +233,27 @@ final class CollectionRuleResource extends Resource
                     ->label(__('admin.collection_rules.actions.reorder'))
                     ->icon('heroicon-o-arrows-up-down')
                     ->color('info')
-                    ->action(function (CollectionRule $record, array $data): void {
-                        $record->update(['position' => $data['position'] ?? 0]);
-                        FilamentNotification::make()
-                            ->title(__('admin.collection_rules.reordered_successfully'))
-                            ->success()
-                            ->send();
-                    })
+                    ->modalIcon('heroicon-o-arrows-up-down')
+                    ->modalHeading(__('admin.collection_rules.actions.reorder'))
+                    ->modalSubmitActionLabel(__('admin.collection_rules.actions.reorder'))
+                    ->fillForm(fn (CollectionRule $record): array => [
+                        // Prefill the modal with the existing position to streamline quick nudges.
+                        'position' => $record->position,
+                    ])
                     ->form([
                         TextInput::make('position')
                             ->label(__('admin.collection_rules.form.fields.position'))
                             ->numeric()
                             ->required(),
-                    ]),
+                    ])
+                    ->action(function (CollectionRule $record, array $data): void {
+                        // Persist the updated ordering after the modal confirmation and broadcast success.
+                        $record->update(['position' => $data['position'] ?? 0]);
+                        FilamentNotification::make()
+                            ->title(__('admin.collection_rules.reordered_successfully'))
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
