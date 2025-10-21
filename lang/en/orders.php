@@ -121,6 +121,19 @@ return [
     'address_value' => 'Field Value',
     'add_address_field' => 'Add Address Field',
 
+    'placeholders' => [
+        'billing_address' => 'Search saved billing addresses',
+        'shipping_address' => 'Search saved shipping addresses',
+        'channel' => 'Search channels by name or code',
+        'partner' => 'Search partners by name or email',
+        'product_variant' => 'Search product variants by name or SKU',
+    ],
+
+    'helpers' => [
+        'billing_address' => 'Selecting a saved address will hydrate the billing fields below.',
+        'shipping_address' => 'Selecting a saved address will hydrate the shipping fields below.',
+    ],
+
     // Actions
     'actions' => [
         'view' => 'View',

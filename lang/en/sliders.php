@@ -14,6 +14,8 @@ return [
     'description' => 'Description',
     'button_text' => 'Button Text',
     'button_url' => 'Button URL',
+    'button_url_placeholder' => 'Search for content or paste an URL',
+    'button_url_helper' => 'Select an internal page, product or enter an external URL.',
     'image' => 'Image',
     'background_color' => 'Background Color',
     'text_color' => 'Text Color',

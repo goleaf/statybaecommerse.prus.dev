@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
 use App\Enums\OrderStatus;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Order;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\AddressSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -15,6 +19,7 @@ use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -23,7 +28,6 @@ use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -32,7 +36,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -66,12 +69,90 @@ class OrdersRelationManager extends BaseRelationManager
                     ]),
                 Section::make(__('orders.shipping_information'))
                     ->schema([
-                        TextInput::make('shipping_address')
-                            ->label(__('orders.shipping_address'))
-                            ->maxLength(500),
-                        TextInput::make('billing_address')
-                            ->label(__('orders.billing_address'))
-                            ->maxLength(500),
+                        Grid::make(2)
+                            ->schema([
+                                SearchableInput::make('shipping_address_lookup')
+                                    ->label(__('orders.shipping_address'))
+                                    ->placeholder(__('orders.placeholders.shipping_address'))
+                                    ->helperText(__('orders.helpers.shipping_address'))
+                                    ->searchUsing(fn (string $term): array => AddressSearch::results($term))
+                                    ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
+                                        $payload = $record?->getAttribute('shipping_address');
+
+                                        if (! is_array($payload) || ! isset($payload['address_id'])) {
+                                            return;
+                                        }
+
+                                        $id = (int) $payload['address_id'];
+                                        $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
+
+                                        $component
+                                            ->state((string) $id)
+                                            ->options([
+                                                (string) $id => $label,
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state === null || $state === '') {
+                                            $set('shipping_address', null);
+
+                                            return;
+                                        }
+
+                                        $payload = AddressSearch::payloadFromId((int) $state);
+
+                                        if ($payload !== null) {
+                                            $set('shipping_address', $payload);
+                                        }
+                                    })
+                                    ->dehydrated(false),
+                                SearchableInput::make('billing_address_lookup')
+                                    ->label(__('orders.billing_address'))
+                                    ->placeholder(__('orders.placeholders.billing_address'))
+                                    ->helperText(__('orders.helpers.billing_address'))
+                                    ->searchUsing(fn (string $term): array => AddressSearch::results($term))
+                                    ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
+                                        $payload = $record?->getAttribute('billing_address');
+
+                                        if (! is_array($payload) || ! isset($payload['address_id'])) {
+                                            return;
+                                        }
+
+                                        $id = (int) $payload['address_id'];
+                                        $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
+
+                                        $component
+                                            ->state((string) $id)
+                                            ->options([
+                                                (string) $id => $label,
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state === null || $state === '') {
+                                            $set('billing_address', null);
+
+                                            return;
+                                        }
+
+                                        $payload = AddressSearch::payloadFromId((int) $state);
+
+                                        if ($payload !== null) {
+                                            $set('billing_address', $payload);
+                                        }
+                                    })
+                                    ->dehydrated(false),
+                            ]),
+                        Grid::make(2)
+                            ->schema([
+                                KeyValue::make('shipping_address')
+                                    ->label(__('orders.shipping_address'))
+                                    ->addActionLabel(__('orders.actions.create'))
+                                    ->columnSpan(1),
+                                KeyValue::make('billing_address')
+                                    ->label(__('orders.billing_address'))
+                                    ->addActionLabel(__('orders.actions.create'))
+                                    ->columnSpan(1),
+                            ]),
                         TextInput::make('tracking_number')
                             ->label(__('orders.tracking_number'))
                             ->maxLength(255),
@@ -112,15 +193,15 @@ class OrdersRelationManager extends BaseRelationManager
                                     ->label(__('orders.status'))
                                     ->badge()
                                     ->color(fn (string $state): string => match ($state) {
-                                        'pending' => 'warning',
-                                        'confirmed' => 'info',
+                                        'pending'    => 'warning',
+                                        'confirmed'  => 'info',
                                         'processing' => 'primary',
-                                        'shipped' => 'success',
-                                        'delivered' => 'success',
-                                        'cancelled' => 'danger',
-                                        'refunded' => 'secondary',
-                                        'returned' => 'warning',
-                                        default => 'gray',
+                                        'shipped'    => 'success',
+                                        'delivered'  => 'success',
+                                        'cancelled'  => 'danger',
+                                        'refunded'   => 'secondary',
+                                        'returned'   => 'warning',
+                                        default      => 'gray',
                                     }),
                                 TextEntry::make('total_amount')
                                     ->label(__('orders.total_amount'))
@@ -174,13 +255,13 @@ class OrdersRelationManager extends BaseRelationManager
                 BadgeColumn::make('status')
                     ->label(__('orders.status'))
                     ->colors([
-                        'warning' => fn ($state): bool => $state === 'pending',
-                        'info' => fn ($state): bool => $state === 'confirmed',
-                        'primary' => fn ($state): bool => $state === 'processing',
-                        'success' => fn ($state): bool => in_array($state, ['shipped', 'delivered']),
-                        'danger' => fn ($state): bool => $state === 'cancelled',
+                        'warning'   => fn ($state): bool => $state === 'pending',
+                        'info'      => fn ($state): bool => $state === 'confirmed',
+                        'primary'   => fn ($state): bool => $state === 'processing',
+                        'success'   => fn ($state): bool => in_array($state, ['shipped', 'delivered']),
+                        'danger'    => fn ($state): bool => $state === 'cancelled',
                         'secondary' => fn ($state): bool => $state === 'refunded',
-                        'warning' => fn ($state): bool => $state === 'returned',
+                        'warning'   => fn ($state): bool => $state === 'returned',
                     ]),
                 TextColumn::make('total_amount')
                     ->label(__('orders.total_amount'))
@@ -229,9 +310,9 @@ class OrdersRelationManager extends BaseRelationManager
                 SelectFilter::make('payment_method')
                     ->label(__('orders.payment_method'))
                     ->options([
-                        'credit_card' => __('orders.payment_methods.credit_card'),
-                        'bank_transfer' => __('orders.payment_methods.bank_transfer'),
-                        'paypal' => __('orders.payment_methods.paypal'),
+                        'credit_card'      => __('orders.payment_methods.credit_card'),
+                        'bank_transfer'    => __('orders.payment_methods.bank_transfer'),
+                        'paypal'           => __('orders.payment_methods.paypal'),
                         'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
                     ]),
                 Filter::make('created_at')

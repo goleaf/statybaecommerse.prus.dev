@@ -9,8 +9,12 @@ use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Search\AddressSearch;
+use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
+use App\Support\Search\PartnerSearch;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -53,7 +57,6 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderResource
@@ -298,6 +301,79 @@ final class OrderResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
+                            SearchableInput::make('billing_address_lookup')
+                                ->label(__('orders.fields.billing_address'))
+                                ->placeholder(__('orders.placeholders.billing_address'))
+                                ->helperText(__('orders.helpers.billing_address'))
+                                ->searchUsing(fn (string $term): array => AddressSearch::results($term))
+                                ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
+                                    $payload = $record?->getAttribute('billing_address');
+
+                                    if (! is_array($payload) || ! isset($payload['address_id'])) {
+                                        return;
+                                    }
+
+                                    $id = (int) $payload['address_id'];
+                                    $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
+
+                                    $component
+                                        ->state((string) $id)
+                                        ->options([
+                                            (string) $id => $label,
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        $set('billing_address', null);
+
+                                        return;
+                                    }
+
+                                    $payload = AddressSearch::payloadFromId((int) $state);
+
+                                    if ($payload !== null) {
+                                        $set('billing_address', $payload);
+                                    }
+                                })
+                                ->dehydrated(false),
+                            SearchableInput::make('shipping_address_lookup')
+                                ->label(__('orders.fields.shipping_address'))
+                                ->placeholder(__('orders.placeholders.shipping_address'))
+                                ->helperText(__('orders.helpers.shipping_address'))
+                                ->searchUsing(fn (string $term): array => AddressSearch::results($term))
+                                ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
+                                    $payload = $record?->getAttribute('shipping_address');
+
+                                    if (! is_array($payload) || ! isset($payload['address_id'])) {
+                                        return;
+                                    }
+
+                                    $id = (int) $payload['address_id'];
+                                    $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
+
+                                    $component
+                                        ->state((string) $id)
+                                        ->options([
+                                            (string) $id => $label,
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        $set('shipping_address', null);
+
+                                        return;
+                                    }
+
+                                    $payload = AddressSearch::payloadFromId((int) $state);
+
+                                    if ($payload !== null) {
+                                        $set('shipping_address', $payload);
+                                    }
+                                })
+                                ->dehydrated(false),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
                             KeyValue::make('billing_address')
                                 ->label(__('orders.fields.billing_address'))
                                 ->keyLabel(__('orders.fields.order_number'))
@@ -340,16 +416,44 @@ final class OrderResource extends Resource
                         ->helperText(__('orders.fields.internal_notes')),
                     Grid::make(3)
                         ->schema([
-                            Select::make('channel_id')
-                                ->label(__('orders.fields.customer'))
-                                ->relationship('channel', 'name')
-                                ->searchable()
-                                ->preload(),
-                            Select::make('partner_id')
-                                ->label(__('orders.fields.customer'))
-                                ->relationship('partner', 'name')
-                                ->searchable()
-                                ->preload(),
+                            SearchableInput::make('channel_id')
+                                ->label(__('orders.fields.channel'))
+                                ->placeholder(__('orders.placeholders.channel'))
+                                ->searchUsing(fn (string $term): array => ChannelSearch::results($term))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                                    if ($state === null || ! $record?->channel) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $record->channel_id => ChannelSearch::label($record->channel),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    $set('channel_id', $state !== null && $state !== '' ? (int) $state : null);
+                                }),
+                            SearchableInput::make('partner_id')
+                                ->label(__('orders.fields.partner'))
+                                ->placeholder(__('orders.placeholders.partner'))
+                                ->searchUsing(fn (string $term): array => PartnerSearch::results($term))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                                    if ($state === null || ! $record?->partner) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $record->partner_id => PartnerSearch::label($record->partner),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    $set('partner_id', $state !== null && $state !== '' ? (int) $state : null);
+                                }),
                         ]),
                 ])
                 ->collapsible(),
@@ -542,7 +646,7 @@ final class OrderResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('orders.created_at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

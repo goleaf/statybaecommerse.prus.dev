@@ -6,6 +6,9 @@ namespace App\Filament\Pages;
 
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\ContentLinkSearch;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -35,10 +38,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 
@@ -48,10 +48,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    /**
-     * @return string|UnitEnum|null
-     */
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Content';
     }
@@ -120,9 +117,11 @@ class SliderManagement extends Page implements HasActions, HasForms
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
-                            TextInput::make('button_url')
+                            SearchableInput::make('button_url')
                                 ->label(__('translations.button_url'))
-                                ->url()
+                                ->placeholder(__('translations.button_url_placeholder'))
+                                ->helperText(__('translations.button_url_helper'))
+                                ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
                                 ->maxLength(255),
                         ]),
                     ])
@@ -283,9 +282,12 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->label(__('translations.slide_image'))
                                     ->image()
                                     ->directory('sliders/slides'),
-                                TextInput::make('link')
+                                SearchableInput::make('link')
                                     ->label(__('translations.slide_link'))
-                                    ->url(),
+                                    ->placeholder(__('translations.button_url_placeholder'))
+                                    ->helperText(__('translations.button_url_helper'))
+                                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
+                                    ->maxLength(255),
                             ])
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),

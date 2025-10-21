@@ -121,6 +121,19 @@ return [
     'address_value' => 'Lauko reikšmė',
     'add_address_field' => 'Pridėti adreso lauką',
 
+    'placeholders' => [
+        'billing_address' => 'Ieškokite išsaugotų atsiskaitymo adresų',
+        'shipping_address' => 'Ieškokite išsaugotų pristatymo adresų',
+        'channel' => 'Ieškokite kanalų pagal pavadinimą ar kodą',
+        'partner' => 'Ieškokite partnerių pagal pavadinimą ar el. paštą',
+        'product_variant' => 'Ieškokite produktų variantų pagal pavadinimą ar SKU',
+    ],
+
+    'helpers' => [
+        'billing_address' => 'Pasirinkus išsaugotą adresą, atsiskaitymo laukai bus užpildyti automatiškai.',
+        'shipping_address' => 'Pasirinkus išsaugotą adresą, pristatymo laukai bus užpildyti automatiškai.',
+    ],
+
     // Actions
     'actions' => [
         'view' => 'Peržiūrėti',
