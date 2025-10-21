@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Support\Repositories\ProductRepository;
+use App\Support\Repositories\UserRepository;
 use Illuminate\Support\Str;
 
 $defaultMediaPaths = [
@@ -29,6 +31,11 @@ return [
                 : base_path($path);
         }, $paths);
     }),
+
+    'repositories' => [
+        'users'    => UserRepository::class,
+        'products' => ProductRepository::class,
+    ],
 
     'binaries' => [
         'tar'       => env('BACKUP_TAR_BINARY', 'tar'),
