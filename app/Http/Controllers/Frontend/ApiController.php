@@ -26,6 +26,7 @@ final class ApiController extends Controller
         $limit = max(1, min($limit, 25));
 
         $products = Product::query()
+            ->published()
             ->when($query !== '', static function ($productQuery) use ($query): void {
                 // Apply a scoped LIKE search across both name and description columns.
                 $productQuery->where(static function ($nestedQuery) use ($query): void {
@@ -41,10 +42,12 @@ final class ApiController extends Controller
             ->map(static function (Product $product): array {
                 // Normalize the payload so every consumer receives consistent media keys.
                 return [
-                    'id'         => $product->getKey(),
-                    'name'       => $product->name,
-                    'slug'       => $product->slug,
-                    'price'      => $product->price,
+                    'id'    => $product->getKey(),
+                    'name'  => $product->name,
+                    'slug'  => $product->slug,
+                    'price' => $product->price,
+                    // Preserve the historical `image` field while introducing explicit media aliases.
+                    'image'      => $product->main_image,
                     'main_image' => $product->main_image,
                     'thumbnail'  => $product->thumbnail,
                 ];
@@ -147,6 +150,7 @@ final class ApiController extends Controller
         $orderedIds = array_values(array_slice($recentlyViewed, 0, 10));
 
         $products = Product::query()
+            ->published()
             ->whereIn('id', $orderedIds)
             ->get(['id', 'name', 'slug', 'price'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
@@ -158,10 +162,12 @@ final class ApiController extends Controller
             ->map(static function (Product $product): array {
                 // Mirror the search payload structure so widgets can reuse adapters.
                 return [
-                    'id'         => $product->getKey(),
-                    'name'       => $product->name,
-                    'slug'       => $product->slug,
-                    'price'      => $product->price,
+                    'id'    => $product->getKey(),
+                    'name'  => $product->name,
+                    'slug'  => $product->slug,
+                    'price' => $product->price,
+                    // Maintain the legacy `image` attribute for downstream caches still expecting it.
+                    'image'      => $product->main_image,
                     'main_image' => $product->main_image,
                     'thumbnail'  => $product->thumbnail,
                 ];

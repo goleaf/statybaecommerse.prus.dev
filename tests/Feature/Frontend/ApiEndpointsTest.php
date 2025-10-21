@@ -19,18 +19,26 @@ final class ApiEndpointsTest extends TestCase
     public function test_search_products_returns_media_attributes(): void
     {
         // Arrange: create a visible product with media so the API has data to expose.
-        $product = Product::factory()
+        $visibleProduct = Product::factory()
             ->published()
             ->create([
                 'name' => 'Test Searchable Product',
             ]);
 
         ProductImage::factory()
-            ->for($product)
+            ->for($visibleProduct)
             ->create([
                 'path'       => 'product-images/test-search-product.jpg',
                 'sort_order' => 0,
             ]);
+
+        // Arrange: ensure drafts never leak into the storefront endpoint.
+        Product::factory()->create([
+            'name'         => 'Hidden Product',
+            'status'       => 'draft',
+            'is_visible'   => false,
+            'published_at' => null,
+        ]);
 
         // Act: hit the search endpoint with a query that should match the product.
         $response = $this->getJson(route('frontend.api.products.search', ['q' => 'Searchable']));
@@ -46,15 +54,19 @@ final class ApiEndpointsTest extends TestCase
         $result = array_values($payload)[0];
         self::assertIsArray($result);
 
+        // Assert: only the published product should be returned by the API.
+        self::assertSame($visibleProduct->getKey(), $result['id']);
         self::assertArrayHasKey('main_image', $result);
         self::assertArrayHasKey('thumbnail', $result);
-        self::assertArrayNotHasKey('image', $result);
+        self::assertArrayHasKey('image', $result);
 
-        $product = $product->fresh();
-        self::assertInstanceOf(Product::class, $product);
+        $visibleProduct = $visibleProduct->fresh();
+        self::assertInstanceOf(Product::class, $visibleProduct);
 
-        self::assertSame($product->main_image, $result['main_image']);
-        self::assertSame($product->thumbnail, $result['thumbnail']);
+        self::assertSame($visibleProduct->main_image, $result['main_image']);
+        // Confirm the legacy `image` key mirrors the new main image accessor.
+        self::assertSame($visibleProduct->main_image, $result['image']);
+        self::assertSame($visibleProduct->thumbnail, $result['thumbnail']);
     }
 
     public function test_recently_viewed_products_return_media_attributes(): void
@@ -105,12 +117,14 @@ final class ApiEndpointsTest extends TestCase
         self::assertSame($secondProduct->id, $firstResult['id']);
         self::assertArrayHasKey('main_image', $firstResult);
         self::assertArrayHasKey('thumbnail', $firstResult);
-        self::assertArrayNotHasKey('image', $firstResult);
+        self::assertArrayHasKey('image', $firstResult);
 
         $secondProduct = $secondProduct->fresh();
         self::assertInstanceOf(Product::class, $secondProduct);
 
         self::assertSame($secondProduct->main_image, $firstResult['main_image']);
+        // The compatibility alias should reflect the same media accessor as `main_image`.
+        self::assertSame($secondProduct->main_image, $firstResult['image']);
         self::assertSame($secondProduct->thumbnail, $firstResult['thumbnail']);
     }
 }
