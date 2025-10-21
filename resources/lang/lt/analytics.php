@@ -27,9 +27,12 @@ return [
     'date' => 'Data',
     'order_number' => 'Užsakymo Nr.',
     'customer' => 'Klientas',
+    'customer_email' => 'Kliento el. paštas',
     'items' => 'Prekės',
     'total' => 'Suma',
     'created' => 'Sukurta',
+    'updated' => 'Atnaujinta',
+    'channel' => 'Kanalas',
     // Summary Labels
     'total_revenue' => 'Bendros pajamos',
     'avg_order_value' => 'Vidutinė užsakymo vertė',
@@ -67,6 +70,7 @@ return [
     'export_report' => 'Eksportuoti ataskaitą',
     'refresh_data' => 'Atnaujinti duomenis',
     'view' => 'Peržiūrėti',
+    'view_order' => 'Peržiūrėti užsakymą',
     // Chart Types
     'line_chart' => 'Linijų Diagrama',
     'bar_chart' => 'Stulpelių Diagrama',

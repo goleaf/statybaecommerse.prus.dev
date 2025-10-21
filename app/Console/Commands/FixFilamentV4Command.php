@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Support\Filament\Constants\NavigationGroupConstants;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -172,7 +173,8 @@ class FixFilamentV4Command extends Command
     private function updateNavigationProperties(string $content): string
     {
         // Add UnitEnum import if needed
-        if (str_contains($content, 'NavigationGroup') && ! str_contains($content, 'use UnitEnum;')) {
+        // Add the shared UnitEnum import when navigation groups are present but not yet typed correctly.
+        if (str_contains($content, 'NavigationGroup') && ! str_contains($content, NavigationGroupConstants::UNIT_ENUM_USE)) {
             $lines = explode("\n", $content);
             $insertIndex = 0;
             foreach ($lines as $index => $line) {
@@ -180,7 +182,7 @@ class FixFilamentV4Command extends Command
                     $insertIndex = $index + 1;
                 }
             }
-            array_splice($lines, $insertIndex, 0, ['use UnitEnum;']);
+            array_splice($lines, $insertIndex, 0, [NavigationGroupConstants::UNIT_ENUM_USE]);
             $content = implode("\n", $lines);
         }
 

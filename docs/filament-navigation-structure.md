@@ -75,6 +75,12 @@ This document outlines the comprehensive Filament admin navigation structure bas
 - AnalyticsEventResource - Analytics events
 - ReportResource - Reports and analytics
 
+**Key translations:**
+- `analytics.analytics_dashboard` – primary navigation label for the dashboard entry.
+- `analytics.customer_email` / `analytics.channel` – localized columns for customer context and attribution.
+- `analytics.view_order` – action label used when linking to the detailed order view.
+- `analytics.updated` – timestamp header for the most recent order updates.
+
 **Description:** Analytics tracking, reporting, and business intelligence.
 
 ### 7. Content (Priority: 7)

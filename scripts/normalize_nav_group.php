@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 // Normalizes all $navigationGroup declarations across app/Filament/** to typed UnitEnum|string|null
 
+require_once __DIR__.'/../vendor/autoload.php';
+
+use App\Support\Filament\Constants\NavigationGroupConstants;
+
 $root = dirname(__DIR__);
 $targets = [
     $root.'/app/Filament/Resources',
@@ -36,8 +40,9 @@ function normalizeFile(string $path): bool
     $content = $orig;
 
     // Ensure import present
-    if (strpos($content, 'use UnitEnum;') === false) {
-        $content = preg_replace('/(use\s+[^;]+;\s*\n)(?!.*use UnitEnum;)/', "\$1use UnitEnum;\n", $content, 1) ?? $content;
+    if (strpos($content, NavigationGroupConstants::UNIT_ENUM_USE) === false) {
+        $pattern = sprintf('/(use\s+[^;]+;\s*\n)(?!.*%s)/', NavigationGroupConstants::unitEnumImportPattern());
+        $content = preg_replace($pattern, "\$1".NavigationGroupConstants::UNIT_ENUM_USE."\n", $content, 1) ?? $content;
     }
 
     // Remove any @var UnitEnum|string|null docblock directly above property and convert to typed property
