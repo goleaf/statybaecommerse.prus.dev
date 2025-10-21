@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
-use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
@@ -17,13 +16,17 @@ use UnitEnum;
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * @var string|\BackedEnum|null Navigation icon override so marketing teams recognise the widget quickly.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
 
-    protected static $navigationLabel = 'Enh. E-commerce Overview';
+    /** @var string|UnitEnum|null Ensure the widget stays surfaced within the dashboard group. */
+    protected static $navigationGroup = 'Dashboard';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
+    public static function getNavigationLabel(): string
+    {
+        return __('analytics.enhanced_overview.navigation_label');
+    }
 
     protected string $maxHeight = '32rem';
 

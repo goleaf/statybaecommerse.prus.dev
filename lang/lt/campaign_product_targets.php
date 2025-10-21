@@ -4,8 +4,16 @@ return [
     'single' => 'Kampanijos produkto taikinys',
     'plural' => 'Kampanijos produktų taikiniai',
     'navigation' => 'Produktų taikiniai',
+    'tab_label' => 'Skirtukai',
+    'tabs' => [
+        'all' => 'Visi taikiniai',
+        'product' => 'Produktų taikiniai',
+        'category' => 'Kategorijų taikiniai',
+        'brand' => 'Prekių ženklų taikiniai',
+        'collection' => 'Kolekcijų taikiniai',
+        'active' => 'Aktyvūs taikiniai',
+    ],
     // Form fields
-    'tabs' => 'Skirtukai',
     'basic_information' => 'Pagrindinė informacija',
     'advanced_settings' => 'Išplėstiniai nustatymai',
     'campaign_selection' => 'Kampanijos pasirinkimas',
@@ -26,8 +34,12 @@ return [
     'conditions' => 'Sąlygos',
     'conditions_description' => 'Papildomos sąlygos ir taisyklės',
     'conditions_help' => 'Papildomos sąlygos JSON formatu',
+    'conditions_key' => 'Sąlygos raktas',
+    'conditions_value' => 'Sąlygos reikšmė',
+    'no_conditions' => 'Sąlygos nenustatytos',
     'notes' => 'Pastabos',
     'notes_help' => 'Papildomos pastabos apie taikinį',
+    'no_notes' => 'Pastabų nėra',
     // Target types
     'types' => [
         'product' => 'Produktas',
@@ -43,7 +55,7 @@ return [
     // Table columns
     'id' => 'ID',
     'target_name' => 'Taikinio pavadinimas',
-    'target_sku' => 'Taikinio kodas',
+    'target_sku' => 'Taikinio identifikatorius',
     'campaign_status' => 'Kampanijos būsena',
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
@@ -66,6 +78,7 @@ return [
     'deactivate' => 'Deaktyvuoti',
     'feature' => 'Išskirti',
     'unfeature' => 'Neišskirti',
+    'delete_bulk' => 'Ištrinti pasirinktus',
     // Search
     'search_placeholder' => 'Ieškoti pagal kampaniją, produktą, kategoriją...',
     // Messages
@@ -76,4 +89,11 @@ return [
     'deactivated_successfully' => 'Taikinys sėkmingai deaktyvuotas',
     'featured_successfully' => 'Taikinys sėkmingai išskirtas',
     'unfeatured_successfully' => 'Taikinys sėkmingai neišskirtas',
+    // View page sections
+    'view' => [
+        'sections' => [
+            'overview' => 'Taikinio apžvalga',
+            'status' => 'Būsena ir reitingas',
+        ],
+    ],
 ];
