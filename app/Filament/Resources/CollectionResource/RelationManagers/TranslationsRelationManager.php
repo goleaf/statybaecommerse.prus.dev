@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class TranslationsRelationManager extends BaseRelationManager
 {
@@ -64,17 +66,17 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('admin.collections.fields.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'success',
-                        'en' => 'primary',
-                        'de' => 'warning',
-                        'ru' => 'danger',
+                        'lt'    => 'success',
+                        'en'    => 'primary',
+                        'de'    => 'warning',
+                        'ru'    => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'lt' => '🇱🇹 Lithuanian',
-                        'en' => '🇬🇧 English',
-                        'de' => '🇩🇪 German',
-                        'ru' => '🇷🇺 Russian',
+                        'lt'    => '🇱🇹 Lithuanian',
+                        'en'    => '🇬🇧 English',
+                        'de'    => '🇩🇪 German',
+                        'ru'    => '🇷🇺 Russian',
                         default => $state,
                     })
                     ->sortable(),
@@ -142,6 +144,15 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->searchable(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make()
                     ->label(__('admin.collections.actions.add_translation')),
             ])

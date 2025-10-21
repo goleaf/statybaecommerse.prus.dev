@@ -19,6 +19,7 @@ use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -35,6 +36,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -288,6 +290,15 @@ class OrdersRelationManager extends BaseRelationManager
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 CreateAction::make()
                     ->label(__('orders.create_order')),
                 AssociateAction::make()

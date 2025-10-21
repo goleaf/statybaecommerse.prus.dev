@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -19,6 +20,7 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class TranslationsRelationManager extends BaseRelationManager
 {
@@ -77,14 +79,14 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('system_setting_categories.translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'info',
-                        'en' => 'success',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
-                        'it' => 'secondary',
-                        'pl' => 'gray',
-                        'ru' => 'dark',
+                        'lt'    => 'info',
+                        'en'    => 'success',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
+                        'it'    => 'secondary',
+                        'pl'    => 'gray',
+                        'ru'    => 'dark',
                         default => 'gray',
                     })
                     ->sortable(),
@@ -138,6 +140,15 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 CreateAction::make(),
             ])
             ->actions([

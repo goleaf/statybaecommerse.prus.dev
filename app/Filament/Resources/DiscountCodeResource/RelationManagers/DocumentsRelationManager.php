@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class DocumentsRelationManager extends BaseRelationManager
 {
@@ -36,16 +38,16 @@ final class DocumentsRelationManager extends BaseRelationManager
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'draft' => __('Draft'),
+                        'draft'     => __('Draft'),
                         'generated' => __('Generated'),
-                        'sent' => __('Sent'),
+                        'sent'      => __('Sent'),
                     ])
                     ->required(),
                 Forms\Components\Select::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ])
                     ->required(),
             ]);
@@ -69,17 +71,17 @@ final class DocumentsRelationManager extends BaseRelationManager
                     ->label(__('Status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'draft' => 'warning',
+                        'draft'     => 'warning',
                         'generated' => 'success',
-                        'sent' => 'info',
-                        default => 'gray',
+                        'sent'      => 'info',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('format')
                     ->label(__('Format'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'html' => 'primary',
-                        'pdf' => 'danger',
+                        'html'  => 'primary',
+                        'pdf'   => 'danger',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('generated_at')
@@ -91,19 +93,28 @@ final class DocumentsRelationManager extends BaseRelationManager
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'draft' => __('Draft'),
+                        'draft'     => __('Draft'),
                         'generated' => __('Generated'),
-                        'sent' => __('Sent'),
+                        'sent'      => __('Sent'),
                     ]),
                 Tables\Filters\SelectFilter::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

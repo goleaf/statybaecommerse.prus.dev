@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class AttributesRelationManager extends BaseRelationManager
 {
@@ -37,13 +39,13 @@ final class AttributesRelationManager extends BaseRelationManager
                             ->maxLength(500),
                         Forms\Components\Select::make('type')
                             ->options([
-                                'text' => __('attributes.types.text'),
-                                'number' => __('attributes.types.number'),
-                                'boolean' => __('attributes.types.boolean'),
-                                'select' => __('attributes.types.select'),
+                                'text'        => __('attributes.types.text'),
+                                'number'      => __('attributes.types.number'),
+                                'boolean'     => __('attributes.types.boolean'),
+                                'select'      => __('attributes.types.select'),
                                 'multiselect' => __('attributes.types.multiselect'),
-                                'date' => __('attributes.types.date'),
-                                'file' => __('attributes.types.file'),
+                                'date'        => __('attributes.types.date'),
+                                'file'        => __('attributes.types.file'),
                             ])
                             ->required(),
                     ]),
@@ -87,14 +89,14 @@ final class AttributesRelationManager extends BaseRelationManager
                     ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'text' => 'blue',
-                        'number' => 'green',
-                        'boolean' => 'orange',
-                        'select' => 'purple',
+                        'text'        => 'blue',
+                        'number'      => 'green',
+                        'boolean'     => 'orange',
+                        'select'      => 'purple',
                         'multiselect' => 'pink',
-                        'date' => 'cyan',
-                        'file' => 'gray',
-                        default => 'gray',
+                        'date'        => 'cyan',
+                        'file'        => 'gray',
+                        default       => 'gray',
                     }),
 
                 Tables\Columns\TextColumn::make('value')
@@ -127,13 +129,13 @@ final class AttributesRelationManager extends BaseRelationManager
                     ->label(__('products.attributes.attribute_type'))
                     ->relationship('attribute', 'type')
                     ->options([
-                        'text' => __('attributes.types.text'),
-                        'number' => __('attributes.types.number'),
-                        'boolean' => __('attributes.types.boolean'),
-                        'select' => __('attributes.types.select'),
+                        'text'        => __('attributes.types.text'),
+                        'number'      => __('attributes.types.number'),
+                        'boolean'     => __('attributes.types.boolean'),
+                        'select'      => __('attributes.types.select'),
                         'multiselect' => __('attributes.types.multiselect'),
-                        'date' => __('attributes.types.date'),
-                        'file' => __('attributes.types.file'),
+                        'date'        => __('attributes.types.date'),
+                        'file'        => __('attributes.types.file'),
                     ]),
 
                 Tables\Filters\TernaryFilter::make('is_visible')
@@ -151,6 +153,15 @@ final class AttributesRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

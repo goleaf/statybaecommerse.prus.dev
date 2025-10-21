@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Storage\SecureStorage;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Support\Storage\SecureStorage;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class DocumentsRelationManager extends BaseRelationManager
 {
@@ -29,19 +31,19 @@ final class DocumentsRelationManager extends BaseRelationManager
                     ->maxLength(255),
                 Forms\Components\Select::make('type')
                     ->options([
-                        'invoice' => 'Invoice',
-                        'receipt' => 'Receipt',
-                        'contract' => 'Contract',
-                        'agreement' => 'Agreement',
+                        'invoice'     => 'Invoice',
+                        'receipt'     => 'Receipt',
+                        'contract'    => 'Contract',
+                        'agreement'   => 'Agreement',
                         'certificate' => 'Certificate',
                     ])
                     ->required(),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'draft' => 'Draft',
+                        'draft'     => 'Draft',
                         'generated' => 'Generated',
-                        'sent' => 'Sent',
-                        'archived' => 'Archived',
+                        'sent'      => 'Sent',
+                        'archived'  => 'Archived',
                     ])
                     ->required(),
                 Forms\Components\FileUpload::make('file_path')
@@ -63,22 +65,22 @@ final class DocumentsRelationManager extends BaseRelationManager
                     ->label(__('admin.fields.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'invoice' => 'primary',
-                        'receipt' => 'success',
-                        'contract' => 'warning',
-                        'agreement' => 'info',
+                        'invoice'     => 'primary',
+                        'receipt'     => 'success',
+                        'contract'    => 'warning',
+                        'agreement'   => 'info',
                         'certificate' => 'secondary',
-                        default => 'gray',
+                        default       => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('admin.fields.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'draft' => 'gray',
+                        'draft'     => 'gray',
                         'generated' => 'info',
-                        'sent' => 'success',
-                        'archived' => 'warning',
-                        default => 'gray',
+                        'sent'      => 'success',
+                        'archived'  => 'warning',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('file_path')
                     ->label(__('admin.fields.file'))
@@ -97,21 +99,30 @@ final class DocumentsRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'invoice' => 'Invoice',
-                        'receipt' => 'Receipt',
-                        'contract' => 'Contract',
-                        'agreement' => 'Agreement',
+                        'invoice'     => 'Invoice',
+                        'receipt'     => 'Receipt',
+                        'contract'    => 'Contract',
+                        'agreement'   => 'Agreement',
                         'certificate' => 'Certificate',
                     ]),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
+                        'draft'     => 'Draft',
                         'generated' => 'Generated',
-                        'sent' => 'Sent',
-                        'archived' => 'Archived',
+                        'sent'      => 'Sent',
+                        'archived'  => 'Archived',
                     ]),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

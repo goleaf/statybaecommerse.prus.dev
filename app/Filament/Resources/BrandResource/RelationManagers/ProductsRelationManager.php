@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Product;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ProductsRelationManager extends BaseRelationManager
 {
@@ -84,7 +86,7 @@ final class ProductsRelationManager extends BaseRelationManager
                     ->color(fn ($state) => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 5 => 'warning',
-                        default => 'success',
+                        default     => 'success',
                     }),
                 Tables\Columns\IconColumn::make('is_published')
                     ->label(__('admin.products.fields.is_published'))
@@ -111,6 +113,15 @@ final class ProductsRelationManager extends BaseRelationManager
                     ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
