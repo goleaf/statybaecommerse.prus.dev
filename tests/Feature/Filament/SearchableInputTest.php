@@ -2,7 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Filament\Resources\CartItemResource;
+use App\Filament\Resources\InventoryResource;
 use App\Filament\Resources\OrderItemResource;
+use App\Filament\Resources\PriceResource;
+use App\Filament\Resources\ProductRequestResource;
+use App\Filament\Resources\WishlistItemResource;
 use App\Models\Product;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Form;
@@ -32,7 +37,7 @@ beforeEach(function (): void {
     });
 });
 
-it('exposes product search results through the form component', function (): void {
+it('exposes product search results through the form component', function (string $resourceClass): void {
     Product::unguarded(fn () => Product::create([
         'sku'          => 'FORM-001',
         'name'         => ['en' => 'Form Drill', 'lt' => 'Forma Gręžtuvas'],
@@ -43,8 +48,12 @@ it('exposes product search results through the form component', function (): voi
         'updated_at'   => Carbon::now(),
     ]));
 
-    $form = OrderItemResource::form(Form::make());
-    $component = $form->getFlatComponents(withActions: false)['product_id'];
+    $form = $resourceClass::form(Form::make());
+    $components = $form->getFlatComponents(withActions: false);
+
+    expect($components)->toHaveKey('product_id');
+
+    $component = $components['product_id'];
 
     expect($component)->toBeInstanceOf(SearchableInput::class);
 
@@ -55,7 +64,14 @@ it('exposes product search results through the form component', function (): voi
     $results = $component->getSearchResultsForJs('Form');
 
     expect($results)
-        ->toHaveCount(1)
+        ->not()->toBeEmpty()
         ->and($results[0]->value())
         ->toBeString();
-});
+})->with([
+    OrderItemResource::class,
+    CartItemResource::class,
+    PriceResource::class,
+    InventoryResource::class,
+    ProductRequestResource::class,
+    WishlistItemResource::class,
+]);

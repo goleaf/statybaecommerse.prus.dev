@@ -25,6 +25,11 @@ final class ProductSearch
             ->all();
     }
 
+    public static function label(Product $product): string
+    {
+        return self::formatLabel($product);
+    }
+
     /**
      * @return array<int, SearchResult>
      */
