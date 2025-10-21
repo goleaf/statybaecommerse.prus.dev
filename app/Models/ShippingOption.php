@@ -48,18 +48,18 @@ final class ShippingOption extends Model
     protected function casts(): array
     {
         return [
-            'is_enabled' => 'boolean',
-            'is_default' => 'boolean',
-            'price' => 'decimal:2',
-            'min_weight' => 'integer',
-            'max_weight' => 'integer',
-            'min_order_amount' => 'decimal:2',
-            'max_order_amount' => 'decimal:2',
+            'is_enabled'         => 'boolean',
+            'is_default'         => 'boolean',
+            'price'              => 'decimal:2',
+            'min_weight'         => 'integer',
+            'max_weight'         => 'integer',
+            'min_order_amount'   => 'decimal:2',
+            'max_order_amount'   => 'decimal:2',
             'estimated_days_min' => 'integer',
             'estimated_days_max' => 'integer',
-            'sort_order' => 'integer',
-            'metadata' => 'array',
-            'shipping_matrix' => 'array',
+            'sort_order'         => 'integer',
+            'metadata'           => 'array',
+            'shipping_matrix'    => 'array',
         ];
     }
 
@@ -110,7 +110,7 @@ final class ShippingOption extends Model
      */
     public function getFormattedPriceAttribute(): string
     {
-        return number_format((float) $this->price, 2).' '.$this->currency_code;
+        return number_format((float) $this->price, 2) . ' ' . $this->currency_code;
     }
 
     /**
@@ -118,12 +118,16 @@ final class ShippingOption extends Model
      */
     public function getEstimatedDeliveryTextAttribute(): string
     {
-        if ($this->estimated_days_min && $this->estimated_days_max) {
-            if ($this->estimated_days_min === $this->estimated_days_max) {
-                return $this->estimated_days_min.' '.__('days');
+        // Mirror the admin listing logic by treating nulls as missing while preserving zero-day scenarios.
+        $minimum = is_numeric($this->estimated_days_min) ? (int) $this->estimated_days_min : null;
+        $maximum = is_numeric($this->estimated_days_max) ? (int) $this->estimated_days_max : null;
+
+        if ($minimum !== null && $maximum !== null) {
+            if ($minimum === $maximum) {
+                return $minimum . ' ' . __('days');
             }
 
-            return $this->estimated_days_min.'-'.$this->estimated_days_max.' '.__('days');
+            return $minimum . '-' . $maximum . ' ' . __('days');
         }
 
         return __('Standard delivery');

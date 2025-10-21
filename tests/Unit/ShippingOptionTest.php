@@ -69,6 +69,23 @@ test('shipping option has estimated delivery text accessor', function () {
     expect($shippingOption->estimated_delivery_text)->toBe('Standard delivery');
 });
 
+test('shipping option estimated delivery text tolerates zero-day windows', function () {
+    // Use zero as the minimum to confirm we no longer treat it as a falsy "missing" value.
+    $shippingOption = ShippingOption::factory()->create([
+        'estimated_days_min' => 0,
+        'estimated_days_max' => 2,
+    ]);
+
+    expect($shippingOption->estimated_delivery_text)->toBe('0-2 days');
+
+    $shippingOption->update([
+        'estimated_days_min' => 0,
+        'estimated_days_max' => 0,
+    ]);
+
+    expect($shippingOption->estimated_delivery_text)->toBe('0 days');
+});
+
 test('shipping option can check weight eligibility', function () {
     $shippingOption = ShippingOption::factory()->create([
         'min_weight' => 1,

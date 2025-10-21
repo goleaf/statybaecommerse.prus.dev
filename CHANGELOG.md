@@ -11,6 +11,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
 
+### Bug Fixes
+* Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
+
 ## [0.1.0] - 2025-10-20
 
 ### Features & Enhancements
