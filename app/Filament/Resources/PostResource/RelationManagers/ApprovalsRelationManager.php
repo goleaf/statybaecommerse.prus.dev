@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PostResource\RelationManagers;
 
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-final class ApprovalsRelationManager extends RelationManager
+final class ApprovalsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'approvals';
 

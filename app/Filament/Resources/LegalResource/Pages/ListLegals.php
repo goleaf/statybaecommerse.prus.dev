@@ -6,12 +6,12 @@ namespace App\Filament\Resources\LegalResource\Pages;
 
 use App\Filament\Resources\LegalResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListLegals extends ListRecords
+class ListLegals extends BaseListRecords
 {
     use HasWidgetTabs;
 

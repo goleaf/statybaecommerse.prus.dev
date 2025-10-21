@@ -4,9 +4,9 @@ namespace App\Filament\Resources\FeatureFlags\Pages;
 
 use App\Filament\Resources\FeatureFlags\FeatureFlagResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListFeatureFlags extends ListRecords
+class ListFeatureFlags extends BaseListRecords
 {
     protected static string $resource = FeatureFlagResource::class;
 

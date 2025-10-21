@@ -18,7 +18,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -40,7 +40,7 @@ use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
  * - Bulk operations
  * - Advanced filtering
  */
-final class OrderItemsRelationManager extends RelationManager
+final class OrderItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'items';
 

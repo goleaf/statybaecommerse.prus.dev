@@ -7,9 +7,9 @@ namespace App\Filament\Resources\AnalyticsResource\Pages;
 use App\Filament\Resources\AnalyticsResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class AnalyticsDashboard extends ListRecords
+final class AnalyticsDashboard extends BaseListRecords
 {
     protected static string $resource = AnalyticsResource::class;
 

@@ -9,10 +9,10 @@ use App\Filament\Resources\AddressResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListAddresses extends ListRecords
+final class ListAddresses extends BaseListRecords
 {
     use HasWidgetTabs;
 

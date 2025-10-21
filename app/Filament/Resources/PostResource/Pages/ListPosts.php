@@ -6,9 +6,9 @@ namespace App\Filament\Resources\PostResource\Pages;
 
 use App\Filament\Resources\PostResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListPosts extends ListRecords
+final class ListPosts extends BaseListRecords
 {
     protected static string $resource = PostResource::class;
 

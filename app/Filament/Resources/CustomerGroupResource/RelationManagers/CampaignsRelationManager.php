@@ -6,11 +6,11 @@ namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class CampaignsRelationManager extends RelationManager
+final class CampaignsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'targetCustomerGroups';
 

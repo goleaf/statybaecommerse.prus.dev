@@ -7,9 +7,9 @@ namespace App\Filament\Resources\BrandResource\Pages;
 use App\Filament\Resources\BrandResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListBrands extends ListRecords
+final class ListBrands extends BaseListRecords
 {
     protected static string $resource = BrandResource::class;
 

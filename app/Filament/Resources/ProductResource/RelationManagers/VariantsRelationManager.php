@@ -11,13 +11,13 @@ use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
-final class VariantsRelationManager extends RelationManager
+final class VariantsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'variants';
 

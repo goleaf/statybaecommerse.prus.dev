@@ -6,9 +6,9 @@ namespace App\Filament\Resources\SliderTranslationResource\Pages;
 
 use App\Filament\Resources\SliderTranslationResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListSliderTranslations extends ListRecords
+final class ListSliderTranslations extends BaseListRecords
 {
     protected static string $resource = SliderTranslationResource::class;
 

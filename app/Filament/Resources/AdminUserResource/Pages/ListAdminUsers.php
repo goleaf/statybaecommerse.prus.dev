@@ -6,9 +6,9 @@ namespace App\Filament\Resources\AdminUserResource\Pages;
 
 use App\Filament\Resources\AdminUserResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListAdminUsers extends ListRecords
+class ListAdminUsers extends BaseListRecords
 {
     protected static string $resource = AdminUserResource::class;
 

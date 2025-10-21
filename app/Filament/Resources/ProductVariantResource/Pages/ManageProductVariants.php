@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductVariantResource\Pages;
 
+use App\Filament\Pages\Support\BaseManageRecords;
 use App\Filament\Resources\ProductVariantResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
@@ -13,10 +14,9 @@ use App\Filament\Widgets\VariantPriceWidget;
 use App\Filament\Widgets\VariantStockWidget;
 use App\Models\ProductVariant;
 use Filament\Actions;
-use Filament\Resources\Pages\ManageRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ManageProductVariants extends ManageRecords
+final class ManageProductVariants extends BaseManageRecords
 {
     use HasWidgetTabs;
 

@@ -14,11 +14,11 @@ use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class DiscountsRelationManager extends RelationManager
+class DiscountsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'discounts';
 

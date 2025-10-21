@@ -6,9 +6,9 @@ namespace App\Filament\Resources\MenuItemResource\Pages;
 
 use App\Filament\Resources\MenuItemResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListMenuItems extends ListRecords
+final class ListMenuItems extends BaseListRecords
 {
     protected static string $resource = MenuItemResource::class;
 

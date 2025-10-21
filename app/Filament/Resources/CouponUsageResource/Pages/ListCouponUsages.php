@@ -6,9 +6,9 @@ namespace App\Filament\Resources\CouponUsageResource\Pages;
 
 use App\Filament\Resources\CouponUsageResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListCouponUsages extends ListRecords
+class ListCouponUsages extends BaseListRecords
 {
     protected static string $resource = CouponUsageResource::class;
 

@@ -6,9 +6,9 @@ namespace App\Filament\Resources\LegalResource\Pages;
 
 use App\Filament\Resources\LegalResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListLegal extends ListRecords
+final class ListLegal extends BaseListRecords
 {
     protected static string $resource = LegalResource::class;
 
