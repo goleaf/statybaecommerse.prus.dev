@@ -12,10 +12,10 @@ use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Storage;
 
+use Filament\Schemas\Schema;
 final class DataImportExport extends Page
 {
     protected string $view = 'filament.pages.data-import-export';
@@ -35,9 +35,9 @@ final class DataImportExport extends Page
 
     public array|string|null $file = null;
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('translations.data_import_export'))
                     ->schema([

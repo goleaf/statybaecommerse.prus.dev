@@ -20,7 +20,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -40,6 +39,7 @@ use Illuminate\Validation\Rules\Password;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 
+use Filament\Schemas\Schema;
 final class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
@@ -61,9 +61,9 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 SchemaSection::make(__('admin.user_product_interactions.basic_information'))
                     ->schema([
@@ -189,7 +189,7 @@ final class UserProductInteractionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->deferLoading(false)

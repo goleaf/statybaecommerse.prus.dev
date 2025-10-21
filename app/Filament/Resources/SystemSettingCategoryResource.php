@@ -21,7 +21,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -37,6 +36,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
+use Filament\Schemas\Schema;
+use UnitEnum;
 /**
  * SystemSettingCategoryResource
  *
@@ -47,9 +48,9 @@ final class SystemSettingCategoryResource extends Resource
     protected static ?string $model = SystemSettingCategory::class;
 
     /**
-     * @var string|\BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
+     * @var string|\UnitEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -92,9 +93,9 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 SchemaSection::make(__('system_setting_categories.basic_information'))
                     ->schema([
@@ -166,7 +167,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([ActiveScope::class]))

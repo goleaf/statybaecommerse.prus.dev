@@ -8,20 +8,20 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+use Filament\Schemas\Schema;
 final class CommentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'comments';
 
     protected static ?string $title = 'Comments';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 Forms\Components\TextInput::make('author_name')
                     ->label(__('news.fields.author_name'))
@@ -52,7 +52,7 @@ final class CommentsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('content')

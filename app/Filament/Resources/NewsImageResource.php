@@ -21,7 +21,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -43,6 +42,7 @@ use Illuminate\Support\Facades\Storage;
 use Throwable;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class NewsImageResource extends Resource
 {
     protected static ?string $model = NewsImage::class;
@@ -74,9 +74,9 @@ final class NewsImageResource extends Resource
         return __('admin.news_images.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make(__('admin.news_images.tabs'))
                     ->tabs([
@@ -263,7 +263,7 @@ final class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

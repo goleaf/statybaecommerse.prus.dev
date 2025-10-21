@@ -22,7 +22,6 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -33,14 +32,14 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
+use Filament\Schemas\Schema;
+use BackedEnum;
 final class CartItemResource extends Resource
 {
     /**
-     * Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
-     *
-     * @var string|\BackedEnum|null
+     * @var string|\BackedEnum|null Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
      */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -67,9 +66,9 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('cart_items.basic_information'))
                 ->schema([
                     Grid::make(2)

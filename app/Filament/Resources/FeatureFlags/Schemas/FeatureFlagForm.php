@@ -7,14 +7,13 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use App\Support\Filament\Components\Flatpickr;
 
 class FeatureFlagForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Form $schema): Form
     {
-        return $form
+        return $schema
             ->components([
                 TextInput::make('name')
                     ->required(),

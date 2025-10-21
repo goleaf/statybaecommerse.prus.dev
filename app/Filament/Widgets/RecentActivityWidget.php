@@ -23,7 +23,7 @@ class RecentActivityWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query($this->getTableQuery())

@@ -6,11 +6,11 @@ namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
 use App\Models\NewsCategory;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+use Filament\Schemas\Schema;
 final class ChildrenRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'children';
@@ -21,9 +21,9 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Sub Categories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('Category Information')
                     ->schema([
@@ -73,7 +73,7 @@ final class ChildrenRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')

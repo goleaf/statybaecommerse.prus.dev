@@ -11,12 +11,12 @@ use App\Filament\Resources\UserProductInteractions\Schemas\UserProductInteractio
 use App\Filament\Resources\UserProductInteractions\Tables\UserProductInteractionsTable;
 use App\Models\UserProductInteraction;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
+use Filament\Schemas\Schema;
 class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
@@ -26,12 +26,12 @@ class UserProductInteractionResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return UserProductInteractionForm::configure($form);
+        return UserProductInteractionForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return UserProductInteractionsTable::configure($table);
     }

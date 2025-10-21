@@ -14,7 +14,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -24,6 +23,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
+use Filament\Schemas\Schema;
 /**
  * RecommendationAnalyticsResource
  *
@@ -62,9 +62,9 @@ final class RecommendationAnalyticsResource extends Resource
         return __('admin.recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 SchemaSection::make(__('admin.recommendation_analytics.basic_information'))
                     ->schema([
@@ -137,7 +137,7 @@ final class RecommendationAnalyticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

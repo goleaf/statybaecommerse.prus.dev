@@ -9,13 +9,12 @@ use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 
 final class NewsCategoryForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Form $schema): Form
     {
-        return $form
+        return $schema
             ->schema([
                 Toggle::make('is_visible')
                     ->label('Is Visible')

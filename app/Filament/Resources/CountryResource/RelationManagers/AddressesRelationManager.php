@@ -6,21 +6,21 @@ namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 use App\Enums\AddressType;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
+use Filament\Schemas\Schema;
 final class AddressesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'addresses';
 
     protected static ?string $title = 'Addresses';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('addresses.address_information'))
                     ->columns(2)
@@ -127,7 +127,7 @@ final class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('full_name')

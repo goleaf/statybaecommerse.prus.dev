@@ -2,6 +2,8 @@
 
 The `App\\Support\\Filament\\SearchableComponentHelper` centralises the repetitive wiring required to keep [DefStudio's `SearchableInput`](https://github.com/defstudio/filament-searchable-input) fields hydrated with the correct state, options, and payload metadata inside our Filament forms. Use it whenever a Filament form component needs to look up a record, expose a human-readable label, and share structured payload data with sibling inputs.
 
+> **Filament v4 schema reminder:** All resources and page classes now receive `Filament\Schemas\Schema` instances inside their `form()`/`infolist()` methods. Make sure any searchable input examples are wrapped in `$schema->schema([...])` instead of the legacy `$form->schema([...])` pattern.
+
 ## Hydrating a component
 
 ```php

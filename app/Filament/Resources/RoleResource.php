@@ -12,7 +12,6 @@ use BackedEnum;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -23,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
@@ -90,9 +90,9 @@ final class RoleResource extends Resource
         return __('roles.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('roles.sections.general'))
                     ->schema([
@@ -119,7 +119,7 @@ final class RoleResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
