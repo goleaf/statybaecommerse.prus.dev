@@ -10,4 +10,18 @@ return [
         // 'EU' => 7.50,
         // 'US' => 9.90,
     ],
+    'matrix' => [
+        'zones' => [
+            'domestic' => 'Lithuania / Domestic',
+            'baltics' => 'Baltics',
+            'europe' => 'European Union',
+            'international' => 'International',
+        ],
+        'methods' => [
+            'courier' => 'Courier Delivery',
+            'parcel_locker' => 'Parcel Locker',
+            'post' => 'Postal Service',
+            'freight' => 'Freight / Oversized',
+        ],
+    ],
 ];
