@@ -6,9 +6,17 @@ namespace App\Support\Filament;
 
 use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Illuminate\Contracts\Support\Arrayable;
+use Stringable;
 
 /**
  * Centralises repetitive wiring around DefStudio's SearchableInput component.
+ *
+ * @phpstan-type NormalisedPayload array{
+ *     value: string|int|null,
+ *     label: string|Stringable|null,
+ *     payload?: array<array-key, mixed>|Arrayable|null,
+ * }
  */
 final class SearchableComponentHelper
 {
@@ -17,9 +25,9 @@ final class SearchableComponentHelper
     /**
      * Hydrate a SearchableInput with consistent state, options, and payload assignments.
      *
-     * @param Closure(mixed): (object|array|null) $resolveRecord Resolves the selected record from the persisted state.
-     * @param Closure(object|array): array{value: string|int|null, label: string, payload?: array} $normalizePayload Normalises
-     *        the resolved record into the component state + display payload tuple.
+     * @param Closure(mixed): (object|array|null)      $resolveRecord    Resolves the selected record from the persisted state.
+     * @param Closure(object|array): NormalisedPayload $normalizePayload Normalises the resolved record into the component state +
+     *                                                                   display payload tuple.
      */
     public static function hydrate(
         SearchableInput $component,
@@ -28,7 +36,7 @@ final class SearchableComponentHelper
         Closure $normalizePayload,
     ): void {
         // Early exit when no state is available so the component falls back to an empty input.
-        if ($state === null || $state === '') {
+        if (self::stateIsEmpty($state)) {
             self::clear($component);
 
             return;
@@ -43,17 +51,42 @@ final class SearchableComponentHelper
             return;
         }
 
+        /** @var NormalisedPayload $normalized */
         $normalized = $normalizePayload($record);
+
         $value = $normalized['value'] ?? $state;
+
+        // Treat a missing or empty value as a signal to clear the component entirely.
+        if (self::stateIsEmpty($value)) {
+            self::clear($component);
+
+            return;
+        }
+
         $label = $normalized['label'] ?? '';
+
+        if ($label instanceof Stringable) {
+            $label = (string) $label;
+        } elseif (! is_string($label)) {
+            // Fallback to a simple cast so the dropdown always receives a string label.
+            $label = (string) $label;
+        }
+
         $payload = $normalized['payload'] ?? [];
 
+        if ($payload instanceof Arrayable) {
+            $payload = $payload->toArray();
+        } elseif (! is_array($payload)) {
+            // Casting keeps loosely-typed payloads (for example, DTOs) compatible with Livewire serialisation.
+            $payload = (array) $payload;
+        }
+
         // Guarantee string state/options to match the SearchableInput expectation.
-        $stringValue = $value === null ? null : (string) $value;
+        $stringValue = (string) $value;
 
         $component
             ->state($stringValue)
-            ->options($stringValue === null ? [] : [$stringValue => $label])
+            ->options([$stringValue => $label])
             ->payload($payload);
     }
 
@@ -72,5 +105,21 @@ final class SearchableComponentHelper
         foreach ($clearRelated as $callback) {
             $callback();
         }
+    }
+
+    /**
+     * Determine whether the provided state should be considered empty and therefore cleared.
+     */
+    private static function stateIsEmpty(mixed $state): bool
+    {
+        if ($state === null) {
+            return true;
+        }
+
+        if (is_string($state) && trim($state) === '') {
+            return true;
+        }
+
+        return false;
     }
 }
