@@ -8,7 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,9 +20,10 @@ final class RedemptionsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'redemptions';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Forms\Components\Select::make('user_id')
                     ->label(__('Customer'))
@@ -46,8 +47,9 @@ final class RedemptionsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->recordTitleAttribute('id')
             ->columns([

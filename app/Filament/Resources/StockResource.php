@@ -13,12 +13,12 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -40,7 +40,7 @@ final class StockResource extends Resource
 {
     protected static ?string $model = Inventory::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 7;
 
@@ -61,9 +61,10 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('inventory.product_information'))
                 ->schema([
                     Grid::make(2)
@@ -132,8 +133,9 @@ final class StockResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('product.name')

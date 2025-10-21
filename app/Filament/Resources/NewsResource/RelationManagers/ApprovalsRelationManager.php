@@ -15,8 +15,9 @@ final class ApprovalsRelationManager extends BaseRelationManager
 
     protected static ?string $recordTitleAttribute = 'decision';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('decided_at')

@@ -14,7 +14,6 @@ use App\Models\OrderItem;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 use Illuminate\Support\Number;
@@ -22,6 +21,7 @@ use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as SpatieTranslatableViewRecord;
+use Filament\Schemas\Schema;
 
 final class ViewOrder extends ViewRecord
 {
@@ -37,9 +37,10 @@ final class ViewOrder extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        // Configure the Filament infolist schema using the v4 Schema API.
+        return $schema->schema([
             ListEntry::make('orderQuickLinks')
                 ->heading(__('Quick links'))
                 ->list()

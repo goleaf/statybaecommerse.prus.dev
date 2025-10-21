@@ -15,6 +15,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
+use BackedEnum;
 
 final class InventoryManagement extends Page implements HasTable
 {
@@ -25,7 +26,7 @@ final class InventoryManagement extends Page implements HasTable
     /**
      * @var string|\BackedEnum|null Navigation icon override documented to avoid redundant enum imports.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     public static function getNavigationGroup(): ?string
     {
@@ -44,6 +45,7 @@ final class InventoryManagement extends Page implements HasTable
 
     public function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         $table = $table
             ->query(Product::query())
             ->columns([

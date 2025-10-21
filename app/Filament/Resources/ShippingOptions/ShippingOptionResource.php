@@ -11,7 +11,7 @@ use App\Filament\Resources\ShippingOptions\Schemas\ShippingOptionForm;
 use App\Filament\Resources\ShippingOptions\Tables\ShippingOptionsTable;
 use App\Models\ShippingOption;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -22,13 +22,15 @@ class ShippingOptionResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+        // Configure the Filament resource form schema using the v4 Schema API.
         return ShippingOptionForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return ShippingOptionsTable::configure($table);
     }
 

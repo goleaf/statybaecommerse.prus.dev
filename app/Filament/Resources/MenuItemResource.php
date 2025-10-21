@@ -18,7 +18,7 @@ use Filament\Forms\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -38,7 +38,7 @@ final class MenuItemResource extends Resource
 {
     protected static ?string $model = MenuItem::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    protected static string|UnitEnum|null $navigationGroup = 'Content';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -61,9 +61,10 @@ final class MenuItemResource extends Resource
         return __('admin.menu_items.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 FormSection::make(__('admin.menu_items.basic_information'))
                     ->schema([
@@ -135,8 +136,9 @@ final class MenuItemResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('menu.name')

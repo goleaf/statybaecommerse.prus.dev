@@ -19,8 +19,9 @@ class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Orders';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('number')

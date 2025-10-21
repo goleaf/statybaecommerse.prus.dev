@@ -20,8 +20,9 @@ final class PartnersRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.partners.title');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')

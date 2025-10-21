@@ -48,7 +48,7 @@ final class SeoDataResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = SeoData::class;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {
@@ -67,6 +67,7 @@ final class SeoDataResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
+        // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
             ->columns(3)
             ->schema([
@@ -182,8 +183,9 @@ final class SeoDataResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('title')
@@ -369,8 +371,9 @@ final class SeoDataResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 Section::make(__('seo_data.sections.basic_info'))

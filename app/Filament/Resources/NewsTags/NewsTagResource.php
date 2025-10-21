@@ -12,7 +12,7 @@ use App\Filament\Resources\NewsTags\Schemas\NewsTagForm;
 use App\Filament\Resources\NewsTags\Tables\NewsTagsTable;
 use App\Models\NewsTag;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -23,13 +23,15 @@ class NewsTagResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+        // Configure the Filament resource form schema using the v4 Schema API.
         return NewsTagForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return NewsTagsTable::configure($table);
     }
 

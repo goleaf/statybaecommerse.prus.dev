@@ -10,11 +10,10 @@ use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,7 +30,7 @@ class NewsResource extends Resource
     protected static ?string $model = News::class;
 
     /** @phpstan-var string|BackedEnum|null */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
@@ -39,9 +38,10 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->components([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
                     LanguageTabs::make([
@@ -153,8 +153,9 @@ class NewsResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('featured_image')
@@ -380,8 +381,9 @@ class NewsResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 Infolists\Components\Section::make('Article Details')

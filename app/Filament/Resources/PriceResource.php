@@ -10,10 +10,10 @@ use App\Models\Product;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -25,13 +25,14 @@ final class PriceResource extends Resource
 {
     protected static ?string $model = Price::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Section::make(__('admin.prices.basic_information'))
                     ->schema([
@@ -91,8 +92,9 @@ final class PriceResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('product.name')

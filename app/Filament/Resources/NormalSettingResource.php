@@ -7,12 +7,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\NormalSettingResource\Pages;
 use App\Models\NormalSetting;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -25,7 +25,7 @@ final class NormalSettingResource extends Resource
 {
     protected static ?string $model = NormalSetting::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 8;
 
@@ -46,9 +46,10 @@ final class NormalSettingResource extends Resource
         return __('normal_settings.navigation');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Tabs::make(__('normal_settings.tabs.label'))
                 ->tabs([
                     Tab::make(__('normal_settings.basic_information'))
@@ -97,8 +98,9 @@ final class NormalSettingResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('key')

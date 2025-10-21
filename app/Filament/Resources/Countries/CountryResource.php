@@ -11,7 +11,7 @@ use App\Filament\Resources\Countries\Pages\ViewCountry;
 use App\Filament\Resources\Countries\Schemas\CountryForm;
 use App\Filament\Resources\Countries\Tables\CountriesTable;
 use App\Models\Country;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,13 +40,15 @@ final class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+        // Configure the Filament resource form schema using the v4 Schema API.
         return CountryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return CountriesTable::configure($table);
     }
 

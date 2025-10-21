@@ -16,8 +16,9 @@ final class DiscountConditionTableWidget extends BaseWidget
 
     protected static ?string $heading = 'Recent Discount Conditions';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->query(
                 DiscountCondition::query()->latest()->limit(10)

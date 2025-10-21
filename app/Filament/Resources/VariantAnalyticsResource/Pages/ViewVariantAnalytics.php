@@ -25,8 +25,9 @@ final class ViewVariantAnalytics extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema|array
+    public function infolist(Schema $schema): Schema
     {
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 Section::make(__('admin.variant_analytics.basic_info'))

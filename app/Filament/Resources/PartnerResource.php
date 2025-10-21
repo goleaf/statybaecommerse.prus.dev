@@ -8,8 +8,8 @@ use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -28,14 +28,15 @@ final class PartnerResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+        // Configure the Filament resource form schema using the v4 Schema API.
         // Build the Partner form using the Section helper to keep layouts consistent.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
@@ -102,8 +103,9 @@ final class PartnerResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')

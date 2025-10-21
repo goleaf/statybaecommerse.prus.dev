@@ -15,9 +15,9 @@ use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -31,9 +31,9 @@ final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 11;
 
@@ -52,9 +52,10 @@ final class ProductHistoryResource extends Resource
         return __('product_history.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('product_history.basic_information'))
                 ->columns(2)
                 ->schema([
@@ -97,8 +98,9 @@ final class ProductHistoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('product.name')

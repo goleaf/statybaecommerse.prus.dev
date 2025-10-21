@@ -17,7 +17,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -35,7 +35,7 @@ final class NormalSettingTranslationResource extends Resource
 {
     protected static ?string $model = NormalSettingTranslation::class;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 16;
 
@@ -66,9 +66,10 @@ final class NormalSettingTranslationResource extends Resource
         return __('admin.normal_setting_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 SchemaSection::make(__('admin.normal_setting_translations.basic_information'))
                     ->schema([
@@ -112,8 +113,9 @@ final class NormalSettingTranslationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('enhancedSetting.key')

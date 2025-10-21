@@ -28,8 +28,9 @@ final class ViewUserProductInteraction extends ViewRecord implements HasTable
         $this->isTableLoaded = true;
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         $table = $table
             ->deferLoading(false)
             ->query(UserProductInteraction::query()->whereKey($this->record->getKey()))

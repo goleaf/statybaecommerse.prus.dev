@@ -11,12 +11,12 @@ use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -66,9 +66,10 @@ final class InventoryResource extends Resource
         return __('Inventory');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('Inventory Details'))
                 ->schema([
                     Grid::make(2)
@@ -164,8 +165,9 @@ final class InventoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('product.name')
