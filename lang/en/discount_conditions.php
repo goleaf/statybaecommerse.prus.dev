@@ -26,6 +26,10 @@ return [
     'is_active'   => 'Active',
     'is_required' => 'Required',
     'metadata'    => 'Metadata',
+    'products_options_label'   => 'Available products',
+    'products_selected_label'  => 'Selected products',
+    'categories_options_label' => 'Available categories',
+    'categories_selected_label' => 'Selected categories',
 
     'value_help'    => 'Condition value depending on type',
     'priority_help' => 'Condition execution priority (0 = highest)',

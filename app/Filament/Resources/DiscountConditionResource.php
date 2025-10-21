@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Novadaemon\FilamentCombobox\Combobox;
 use UnitEnum;
 
 final class DiscountConditionResource extends Resource
@@ -143,18 +144,24 @@ final class DiscountConditionResource extends Resource
                                 Section::make()
                                     ->columns(2)
                                     ->schema([
-                                        Select::make('products')
+                                        Combobox::make('products')
                                             ->label(__('discount_conditions.products'))
                                             ->relationship('products', 'name')
                                             ->preload()
-                                            ->searchable()
+                                            ->boxSearchs()
+                                            ->height('340px')
+                                            ->optionsLabel(__('discount_conditions.products_options_label'))
+                                            ->selectedLabel(__('discount_conditions.products_selected_label'))
                                             ->multiple()
                                             ->columnSpanFull(),
-                                        Select::make('categories')
+                                        Combobox::make('categories')
                                             ->label(__('discount_conditions.categories'))
                                             ->relationship('categories', 'name')
                                             ->preload()
-                                            ->searchable()
+                                            ->boxSearchs()
+                                            ->height('340px')
+                                            ->optionsLabel(__('discount_conditions.categories_options_label'))
+                                            ->selectedLabel(__('discount_conditions.categories_selected_label'))
                                             ->multiple()
                                             ->columnSpanFull(),
                                     ]),
