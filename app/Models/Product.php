@@ -9,6 +9,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
 use App\Observers\ProductObserver;
+use App\Support\Html\HtmlSanitizer;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use DateTimeInterface;
@@ -77,6 +78,25 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     // Translation fields that should be handled by the translation system
     protected array $translatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
+
+    protected static function booted(): void
+    {
+        static::saving(static function (Product $product): void {
+            /** @var HtmlSanitizer $sanitizer */
+            $sanitizer = app(HtmlSanitizer::class);
+
+            foreach (['description', 'short_description'] as $field) {
+                $value = $product->{$field};
+
+                if (! is_string($value) || trim($value) === '') {
+                    continue;
+                }
+
+                // Ensure persisted rich text never exceeds the sanitized allow-list.
+                $product->{$field} = $sanitizer->sanitize($value);
+            }
+        });
+    }
 
     /**
      * Handle getActivitylogOptions functionality with proper error handling.
