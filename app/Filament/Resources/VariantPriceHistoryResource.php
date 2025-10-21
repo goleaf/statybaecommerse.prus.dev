@@ -4,37 +4,40 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
 {
     protected static ?string $model = VariantPriceHistory::class;
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * Navigation icon override (string|\BackedEnum|null) for Filament v4 alignment.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
+    protected static $navigationIcon = 'heroicon-o-currency-euro';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
+    protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        // Resolve enum-backed navigation label so the sidebar remains localized.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -47,7 +50,9 @@ final class VariantPriceHistoryResource extends Resource
                     ->label('Old Price')
                     ->numeric()
                     ->minValue(0)
-                    ->step(0.0001),
+                    ->step(0.0001)
+                    // Require the legacy price for audit trails and Filament 4 callbacks.
+                    ->required(),
                 Forms\Components\TextInput::make('new_price')
                     ->label('New Price')
                     ->numeric()
@@ -87,7 +92,7 @@ final class VariantPriceHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -131,14 +136,14 @@ final class VariantPriceHistoryResource extends Resource
                             number_format($percentage, 1)
                         );
                     })
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                    ->sortable(query: static function (Builder $query, string $direction): Builder {
                         $direction = $direction === 'asc' ? 'asc' : 'desc';
 
                         return $query->orderByRaw(
                             '(COALESCE(new_price, 0) - COALESCE(old_price, 0)) ' . $direction
                         );
                     })
-                    ->color(fn ($record) => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
+                    ->color(static fn (VariantPriceHistory $record): string => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
                 Tables\Columns\TextColumn::make('price_type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -207,15 +212,15 @@ final class VariantPriceHistoryResource extends Resource
                         Flatpickr::makeDate('effective_until')
                             ->label('Effective Until'),
                     ])
-                    ->query(function ($query, array $data) {
+                    ->query(static function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['effective_from'],
-                                fn ($query, $date) => $query->whereDate('effective_from', '>=', $date),
+                                $data['effective_from'] ?? null,
+                                static fn (Builder $builder, string $date): Builder => $builder->whereDate('effective_from', '>=', $date),
                             )
                             ->when(
-                                $data['effective_until'],
-                                fn ($query, $date) => $query->whereDate('effective_until', '<=', $date),
+                                $data['effective_until'] ?? null,
+                                static fn (Builder $builder, string $date): Builder => $builder->whereDate('effective_until', '<=', $date),
                             );
                     }),
                 Tables\Filters\TernaryFilter::make('price_change')
@@ -224,8 +229,8 @@ final class VariantPriceHistoryResource extends Resource
                     ->trueLabel('Increases only')
                     ->falseLabel('Decreases only')
                     ->queries(
-                        true: fn ($query) => $query->increases(),
-                        false: fn ($query) => $query->decreases(),
+                        true: static fn (Builder $query): Builder => $query->increases(),
+                        false: static fn (Builder $query): Builder => $query->decreases(),
                     ),
             ])
             ->actions([

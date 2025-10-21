@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumValueResource\Pages;
 use App\Models\EnumValue;
 use Filament\Actions\Action;
@@ -30,15 +31,23 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class EnumValueResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+
+    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
+    protected static $navigationGroup = NavigationGroup::System;
+
+    public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        // Resolve the translated label from the shared navigation enum.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     protected static ?int $navigationSort = 1;
@@ -58,7 +67,7 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
@@ -75,7 +84,7 @@ final class EnumValueResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ])
-                        ->createOptionUsing(function (array $data): string {
+                        ->createOptionUsing(static function (array $data): string {
                             return $data['new_type'];
                         }),
                     TextInput::make('key')
@@ -125,17 +134,17 @@ final class EnumValueResource extends Resource
                         ->columnSpanFull(),
                     Placeholder::make('usage_count')
                         ->label(__('admin.enum_values.form.fields.usage_count'))
-                        ->content(fn ($record) => $record?->usage_count ?? 0),
+                        ->content(static fn (?EnumValue $record): int => (int) ($record?->usage_count ?? 0)),
                     Placeholder::make('formatted_value')
                         ->label(__('admin.enum_values.form.fields.formatted_value'))
-                        ->content(fn ($record) => $record?->formatted_value ?? '-'),
+                        ->content(static fn (?EnumValue $record): string => $record?->formatted_value ?? '-'),
                 ])
                 ->columns(2)
                 ->collapsible(),
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -144,7 +153,7 @@ final class EnumValueResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(static fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
                         'order_status' => 'success',
                         'payment_status' => 'warning',
@@ -172,7 +181,7 @@ final class EnumValueResource extends Resource
                 TextColumn::make('description')
                     ->label(__('admin.enum_values.table.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
                         return strlen($state) > 50 ? $state : null;
