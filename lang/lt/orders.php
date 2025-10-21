@@ -121,6 +121,22 @@ return [
     'address_value' => 'Lauko reikšmė',
     'add_address_field' => 'Pridėti adreso lauką',
 
+    'lookups' => [
+        'billing_address' => 'Ieškoti sąskaitos adreso',
+        'shipping_address' => 'Ieškoti pristatymo adreso',
+        'address_placeholder' => 'Pradėkite rašyti adresą, miestą ar pašto kodą…',
+        'address_field' => 'Laukelis',
+        'address_value' => 'Reikšmė',
+        'channel_placeholder' => 'Ieškokite kanalų pagal pavadinimą ar kodą…',
+        'channel_unknown' => 'Neįvardintas kanalas',
+        'partner_placeholder' => 'Ieškokite partnerių pagal pavadinimą, kodą ar el. paštą…',
+        'partner_unknown' => 'Neįvardintas partneris',
+        'status_placeholder' => 'Ieškokite užsakymų būsenų…',
+        'variant_placeholder' => 'Ieškokite variantų pagal SKU ar pavadinimą…',
+        'variant_product' => 'Produktas: :product',
+        'variant_unknown' => 'Variantas',
+    ],
+
     // Actions
     'actions' => [
         'view' => 'Peržiūrėti',
