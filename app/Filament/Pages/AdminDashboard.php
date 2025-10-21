@@ -21,7 +21,7 @@ class AdminDashboard extends BaseDashboard
         ];
     }
 
-    public function getColumns(): array|int
+    public function getColumns(): int|array
     {
         return 2;
     }
