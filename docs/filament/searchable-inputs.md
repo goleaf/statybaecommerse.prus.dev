@@ -7,6 +7,7 @@ The `App\\Support\\Filament\\SearchableComponentHelper` centralises the repetiti
 ```php
 use App\Support\Filament\SearchableComponentHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms\Components\Hidden;
 
 SearchableInput::make('user_lookup')
     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
@@ -24,6 +25,10 @@ SearchableInput::make('user_lookup')
             ],
         );
     });
+
+Hidden::make('user_lookup_payload')
+    ->default([])
+    ->dehydrated(false); // Cache the lookup metadata for sibling components without persisting it.
 ```
 
 1. **Lookup closure** – receives the persisted state and returns the matched record (or `null` when nothing should hydrate).
@@ -58,6 +63,8 @@ SearchableInput::make('billing_address_lookup')
 ```
 
 Each callback receives no arguments, so close over the Filament `Set`/`Get` helpers you need. Returning a value is optional; the helper ignores it after invocation.
+
+Hidden payload fields (paired with `->dehydrated(false)`) keep the normalised metadata available to downstream components while ensuring `clear()` can wipe both the identifier and its cached payload in tandem.
 
 ## Normalisation tips
 
