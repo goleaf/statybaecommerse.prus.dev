@@ -26,7 +26,7 @@ class LiveNotifications {
         try {
             // Create Server-Sent Events connection
             this.eventSource = new EventSource('/api/notifications/stream');
-            
+
             this.eventSource.onopen = () => {
                 console.log('Live notifications connected');
                 this.isConnected = true;
@@ -47,7 +47,6 @@ class LiveNotifications {
                 this.isConnected = false;
                 this.handleReconnect();
             };
-
         } catch (error) {
             console.error('Failed to create SSE connection:', error);
             this.handleReconnect();
@@ -62,9 +61,9 @@ class LiveNotifications {
 
         this.reconnectAttempts++;
         const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-        
+
         console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
-        
+
         setTimeout(() => {
             this.connect();
         }, delay);
@@ -72,9 +71,11 @@ class LiveNotifications {
 
     handleNotification(data) {
         // Dispatch custom event for Livewire components to listen to
-        window.dispatchEvent(new CustomEvent('new-notification', {
-            detail: data
-        }));
+        window.dispatchEvent(
+            new CustomEvent('new-notification', {
+                detail: data,
+            }),
+        );
 
         // Show browser notification if permission is granted
         if (Notification.permission === 'granted') {
@@ -89,7 +90,7 @@ class LiveNotifications {
             badge: '/images/logo-admin.svg',
             tag: `notification-${data.id || Date.now()}`,
             requireInteraction: false,
-            silent: false
+            silent: false,
         });
 
         notification.onclick = () => {

@@ -1,309 +1,300 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://prus.dev/contracts/product.v1.schema.json",
-  "title": "Product contract v1",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["contract", "version", "data", "meta"],
-  "properties": {
-    "contract": {
-      "const": "product"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^v1(\\.\\d+)?$"
-    },
-    "data": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "item": {
-          "$ref": "#/$defs/product"
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://prus.dev/contracts/product.v1.schema.json",
+    "title": "Product contract v1",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["contract", "version", "data", "meta"],
+    "properties": {
+        "contract": {
+            "const": "product"
         },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/product"
-          }
+        "version": {
+            "type": "string",
+            "pattern": "^v1(\\.\\d+)?$"
         },
-        "pagination": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["current_page", "last_page", "per_page", "total"],
-          "properties": {
-            "current_page": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "last_page": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "per_page": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "total": {
-              "type": "integer",
-              "minimum": 0
-            }
-          }
-        }
-      },
-      "anyOf": [
-        {
-          "required": ["item"]
-        },
-        {
-          "required": ["items"]
-        }
-      ]
-    },
-    "meta": {
-      "type": "object",
-      "additionalProperties": true,
-      "properties": {
-        "query": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            },
-            {
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "page": {
-                  "type": "integer",
-                  "minimum": 1
+        "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "item": {
+                    "$ref": "#/$defs/product"
                 },
-                "per_page": {
-                  "type": "integer",
-                  "minimum": 1
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/product"
+                    }
                 },
-                "sort": {
-                  "type": "array",
-                  "items": {
+                "pagination": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["key", "direction"],
+                    "required": ["current_page", "last_page", "per_page", "total"],
                     "properties": {
-                      "key": {
-                        "type": "string"
-                      },
-                      "direction": {
-                        "type": "string",
-                        "enum": ["asc", "desc"]
-                      }
+                        "current_page": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "last_page": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "per_page": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "total": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
                     }
-                  }
-                },
-                "filters": {
-                  "type": "object",
-                  "additionalProperties": true
                 }
-              }
+            },
+            "anyOf": [
+                {
+                    "required": ["item"]
+                },
+                {
+                    "required": ["items"]
+                }
+            ]
+        },
+        "meta": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+                "query": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        },
+                        {
+                            "type": "object",
+                            "additionalProperties": true,
+                            "properties": {
+                                "page": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "per_page": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "sort": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "required": ["key", "direction"],
+                                        "properties": {
+                                            "key": {
+                                                "type": "string"
+                                            },
+                                            "direction": {
+                                                "type": "string",
+                                                "enum": ["asc", "desc"]
+                                            }
+                                        }
+                                    }
+                                },
+                                "filters": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        }
+                    ]
+                },
+                "total": {
+                    "type": ["integer", "null"],
+                    "minimum": 0
+                },
+                "limit": {
+                    "type": ["integer", "null"],
+                    "minimum": 1
+                }
             }
-          ]
-        },
-        "total": {
-          "type": ["integer", "null"],
-          "minimum": 0
-        },
-        "limit": {
-          "type": ["integer", "null"],
-          "minimum": 1
         }
-      }
-    }
-  },
-  "$defs": {
-    "price": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["amount", "currency"],
-      "properties": {
-        "amount": {
-          "type": "number"
-        },
-        "currency": {
-          "type": "string",
-          "minLength": 3,
-          "maxLength": 3
-        },
-        "sale_amount": {
-          "type": ["number", "null"]
-        }
-      }
     },
-    "image": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["url", "thumbnail"],
-      "properties": {
-        "url": {
-          "type": "string",
-          "format": "uri"
-        },
-        "thumbnail": {
-          "type": "string",
-          "format": "uri"
-        },
-        "alt": {
-          "type": "string"
-        }
-      }
-    },
-    "variant": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "name", "sku", "price", "stock_quantity"],
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "name": {
-          "type": "string"
-        },
-        "sku": {
-          "type": "string"
-        },
+    "$defs": {
         "price": {
-          "type": "number"
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["amount", "currency"],
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 3
+                },
+                "sale_amount": {
+                    "type": ["number", "null"]
+                }
+            }
         },
-        "stock_quantity": {
-          "type": ["integer", "null"]
+        "image": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["url", "thumbnail"],
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "format": "uri"
+                },
+                "thumbnail": {
+                    "type": "string",
+                    "format": "uri"
+                },
+                "alt": {
+                    "type": "string"
+                }
+            }
+        },
+        "variant": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "sku", "price", "stock_quantity"],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sku": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "stock_quantity": {
+                    "type": ["integer", "null"]
+                }
+            }
+        },
+        "product": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "slug", "name", "sku", "pricing", "inventory", "status", "links"],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sku": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": ["string", "null"]
+                },
+                "short_description": {
+                    "type": ["string", "null"]
+                },
+                "pricing": {
+                    "$ref": "#/$defs/price"
+                },
+                "brand": {
+                    "type": ["object", "null"],
+                    "additionalProperties": false,
+                    "required": ["id", "name", "slug"],
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "slug": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "category": {
+                    "type": ["object", "null"],
+                    "additionalProperties": false,
+                    "required": ["id", "name", "slug"],
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "slug": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "media": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "images": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/$defs/image"
+                            }
+                        }
+                    }
+                },
+                "variants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/variant"
+                    }
+                },
+                "inventory": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["manage_stock", "stock_quantity", "is_in_stock"],
+                    "properties": {
+                        "manage_stock": {
+                            "type": "boolean"
+                        },
+                        "stock_quantity": {
+                            "type": ["integer", "null"]
+                        },
+                        "is_in_stock": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "status": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["is_visible", "is_featured"],
+                    "properties": {
+                        "is_visible": {
+                            "type": "boolean"
+                        },
+                        "is_featured": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "links": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["self"],
+                    "properties": {
+                        "self": {
+                            "type": "string",
+                            "format": "uri"
+                        }
+                    }
+                }
+            }
         }
-      }
-    },
-    "product": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "slug",
-        "name",
-        "sku",
-        "pricing",
-        "inventory",
-        "status",
-        "links"
-      ],
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "slug": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "sku": {
-          "type": "string"
-        },
-        "description": {
-          "type": ["string", "null"]
-        },
-        "short_description": {
-          "type": ["string", "null"]
-        },
-        "pricing": {
-          "$ref": "#/$defs/price"
-        },
-        "brand": {
-          "type": ["object", "null"],
-          "additionalProperties": false,
-          "required": ["id", "name", "slug"],
-          "properties": {
-            "id": {
-              "type": "integer"
-            },
-            "name": {
-              "type": "string"
-            },
-            "slug": {
-              "type": "string"
-            }
-          }
-        },
-        "category": {
-          "type": ["object", "null"],
-          "additionalProperties": false,
-          "required": ["id", "name", "slug"],
-          "properties": {
-            "id": {
-              "type": "integer"
-            },
-            "name": {
-              "type": "string"
-            },
-            "slug": {
-              "type": "string"
-            }
-          }
-        },
-        "media": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "images": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/image"
-              }
-            }
-          }
-        },
-        "variants": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/variant"
-          }
-        },
-        "inventory": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["manage_stock", "stock_quantity", "is_in_stock"],
-          "properties": {
-            "manage_stock": {
-              "type": "boolean"
-            },
-            "stock_quantity": {
-              "type": ["integer", "null"]
-            },
-            "is_in_stock": {
-              "type": "boolean"
-            }
-          }
-        },
-        "status": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["is_visible", "is_featured"],
-          "properties": {
-            "is_visible": {
-              "type": "boolean"
-            },
-            "is_featured": {
-              "type": "boolean"
-            }
-          }
-        },
-        "links": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["self"],
-          "properties": {
-            "self": {
-              "type": "string",
-              "format": "uri"
-            }
-          }
-        }
-      }
     }
-  }
 }

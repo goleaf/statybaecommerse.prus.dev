@@ -10,6 +10,7 @@
 - Documented consistent JSON problem responses for the profile and checkout flows, falling back to user-owned carts when sessions rotate.
 - Localized the new customer badge labels (`customers.badges.*`) and surfaced them as email verification and activity chips in the admin customer table.
 - Localized the shared `common.timestamps` label for admin timestamp sections across the EN and LT translation files.
+- Introduced document audit logging with localized admin infolists, API exposure, and persisted attribution metadata for auditable history.
 
 ### Dependencies
 - Added `awcodes/filament-badgeable-column` (^3.0) to power reusable badge styling in Filament table columns while integrating the vendor Blade templates into our Tailwind build pipeline.
@@ -32,10 +33,11 @@
 - Modernized the CartItem administration surface by adopting Filament v4 form components, preventing non-persisted field dehydration, and wiring the model/migration updates that expose product metadata accessors alongside discount tracking.
 - Updated the Variant Inventory resource to use the Filament v4 `Form` return type and refreshed the navigation icon annotations for consistency across admin resources.
 - Recorded the shared Filament Number percentage helper adoption for Variant Inventory and Analytics resources so reviewers notice the locale-aware formatting upgrade.
-- Migrated all Filament resources, relation managers, pages, and widgets to the v4 `Schema` APIs, refreshed `Get`/`Set` utilities, and realigned navigation icon/group property types to match the core typed unions.
+- Migrated the Activity Log resource to the Filament v4 `Form` API and normalized its navigation icon annotation to keep admin resources consistent.
 
 ### Fixed
 - Eliminated redundant null coalescing in the Variant Stock widget aggregation logic to resolve phpstan nullability reports.
 - Reinstated the Husky shared bootstrap script so Git hooks run without deprecation notices or missing PATH exports during repository installs.
 - Captured the `sh -n .husky/_/husky.sh` smoke check that verifies the restored script syntax before publishing commits.
 - Removed the deprecated Husky v10 warning stub that overwrote the shim so local Git hooks keep executing through the repository toolchain instead of exiting early.
+- Normalized the storefront JSON contracts, CSS widgets, and shared JavaScript bundles with Prettier so `npm run lint` succeeds without manual intervention in local setups.

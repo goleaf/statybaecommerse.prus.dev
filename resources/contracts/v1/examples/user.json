@@ -1,47 +1,47 @@
 {
-  "contract": "user",
-  "version": "v1",
-  "data": {
-    "item": {
-      "id": 77,
-      "first_name": "Alex",
-      "last_name": "Doe",
-      "full_name": "Alex Doe",
-      "initials": "AD",
-      "avatar_url": "https://example.com/avatars/77.png",
-      "contact": {
-        "email": "alex@example.com",
-        "phone": "+37060000000"
-      },
-      "status": {
-        "is_email_verified": true,
-        "is_phone_verified": false,
-        "has_two_factor": true,
-        "is_on_trial": false,
-        "has_active_subscription": true
-      },
-      "metrics": {
-        "orders_count": 5,
-        "reviews_count": 3,
-        "total_spent": 640.50,
-        "average_order_value": 128.10,
-        "last_order_date": "2024-01-09T10:00:00+00:00"
-      },
-      "preferences": {
-        "preferred_locale": "lt",
-        "timezone": "Europe/Vilnius",
-        "locale_text": "Lithuanian",
-        "roles_label": "Customer"
-      },
-      "addresses": [],
-      "orders": [],
-      "wishlist": [],
-      "links": {
-        "self": "https://example.com/api/users/me"
-      }
+    "contract": "user",
+    "version": "v1",
+    "data": {
+        "item": {
+            "id": 77,
+            "first_name": "Alex",
+            "last_name": "Doe",
+            "full_name": "Alex Doe",
+            "initials": "AD",
+            "avatar_url": "https://example.com/avatars/77.png",
+            "contact": {
+                "email": "alex@example.com",
+                "phone": "+37060000000"
+            },
+            "status": {
+                "is_email_verified": true,
+                "is_phone_verified": false,
+                "has_two_factor": true,
+                "is_on_trial": false,
+                "has_active_subscription": true
+            },
+            "metrics": {
+                "orders_count": 5,
+                "reviews_count": 3,
+                "total_spent": 640.5,
+                "average_order_value": 128.1,
+                "last_order_date": "2024-01-09T10:00:00+00:00"
+            },
+            "preferences": {
+                "preferred_locale": "lt",
+                "timezone": "Europe/Vilnius",
+                "locale_text": "Lithuanian",
+                "roles_label": "Customer"
+            },
+            "addresses": [],
+            "orders": [],
+            "wishlist": [],
+            "links": {
+                "self": "https://example.com/api/users/me"
+            }
+        }
+    },
+    "meta": {
+        "generated_at": "2024-01-01T00:00:00+00:00"
     }
-  },
-  "meta": {
-    "generated_at": "2024-01-01T00:00:00+00:00"
-  }
 }

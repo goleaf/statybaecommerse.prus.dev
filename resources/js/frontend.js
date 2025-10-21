@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
 function initializeScrollAnimations() {
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px 0px -50px 0px',
     };
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
 
@@ -42,7 +42,7 @@ function initializeScrollAnimations() {
     }, observerOptions);
 
     // Observe all elements with animate-on-scroll class
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+    document.querySelectorAll('.animate-on-scroll').forEach((el) => {
         observer.observe(el);
     });
 }
@@ -56,7 +56,7 @@ function initializeParallaxEffects() {
     const handleScroll = () => {
         const scrolled = window.pageYOffset;
 
-        parallaxElements.forEach(element => {
+        parallaxElements.forEach((element) => {
             const rate = scrolled * -0.5;
             const rect = element.getBoundingClientRect();
 
@@ -72,7 +72,7 @@ function initializeParallaxEffects() {
 // Enhanced interactions for cards and buttons
 function initializeEnhancedInteractions() {
     // Product card hover effects
-    document.querySelectorAll('.product-card, .card-hover').forEach(card => {
+    document.querySelectorAll('.product-card, .card-hover').forEach((card) => {
         card.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-8px) scale(1.02)';
             this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -84,7 +84,7 @@ function initializeEnhancedInteractions() {
     });
 
     // Button ripple effect
-    document.querySelectorAll('.btn-gradient, .btn-primary').forEach(button => {
+    document.querySelectorAll('.btn-gradient, .btn-primary').forEach((button) => {
         button.addEventListener('click', function (e) {
             const ripple = document.createElement('span');
             const rect = this.getBoundingClientRect();
@@ -136,7 +136,7 @@ function initializeCartNotifications() {
             type: 'success',
             title: 'Product Added!',
             message: `${e.detail.product} has been added to your cart`,
-            duration: 4000
+            duration: 4000,
         });
     });
 
@@ -145,7 +145,7 @@ function initializeCartNotifications() {
             type: 'info',
             title: 'Product Removed',
             message: `${e.detail.product} has been removed from your cart`,
-            duration: 3000
+            duration: 3000,
         });
     });
 
@@ -154,7 +154,7 @@ function initializeCartNotifications() {
             type: 'success',
             title: 'Cart Updated',
             message: 'Your cart has been updated successfully',
-            duration: 2000
+            duration: 2000,
         });
     });
 }
@@ -171,13 +171,13 @@ function createNotification({ type = 'info', title, message, duration = 3000 }) 
         </svg>`,
         info: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>`
+        </svg>`,
     };
 
     const colors = {
         success: 'bg-green-500',
         error: 'bg-red-500',
-        info: 'bg-blue-500'
+        info: 'bg-blue-500',
     };
 
     const variant = icons[type] && colors[type] ? type : 'info';
@@ -216,9 +216,11 @@ function createNotification({ type = 'info', title, message, duration = 3000 }) 
 
 // Enhanced search functionality
 function initializeSearchEnhancements() {
-    const searchInputs = document.querySelectorAll('input[type="search"], input[placeholder*="search" i]');
+    const searchInputs = document.querySelectorAll(
+        'input[type="search"], input[placeholder*="search" i]',
+    );
 
-    searchInputs.forEach(input => {
+    searchInputs.forEach((input) => {
         const inputParent = input.parentElement;
 
         // Add search icon animation
@@ -235,20 +237,23 @@ function initializeSearchEnhancements() {
         });
 
         // Add search suggestions (if needed)
-        input.addEventListener('input', debounce(function (e) {
-            const query = e.target.value;
-            if (query.length > 2) {
-                // Implement search suggestions here
-                console.log('Searching for:', query);
-            }
-        }, 300));
+        input.addEventListener(
+            'input',
+            debounce(function (e) {
+                const query = e.target.value;
+                if (query.length > 2) {
+                    // Implement search suggestions here
+                    console.log('Searching for:', query);
+                }
+            }, 300),
+        );
     });
 }
 
 // Loading states and skeleton screens
 function initializeLoadingStates() {
     // Add loading states to forms
-    document.querySelectorAll('form').forEach(form => {
+    document.querySelectorAll('form').forEach((form) => {
         form.addEventListener('submit', function () {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
@@ -287,8 +292,8 @@ function initializeThemeSystem() {
 // Image lazy loading
 function initializeImageLazyLoading() {
     if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
                 if (!entry.isIntersecting) {
                     return;
                 }
@@ -309,7 +314,7 @@ function initializeImageLazyLoading() {
             });
         });
 
-        document.querySelectorAll('img[data-src], img[data-srcset]').forEach(img => {
+        document.querySelectorAll('img[data-src], img[data-srcset]').forEach((img) => {
             imageObserver.observe(img);
         });
     }
@@ -317,7 +322,7 @@ function initializeImageLazyLoading() {
 
 // Product quick view modal
 function initializeProductQuickView() {
-    document.querySelectorAll('[data-quick-view]').forEach(button => {
+    document.querySelectorAll('[data-quick-view]').forEach((button) => {
         button.addEventListener('click', function (e) {
             e.preventDefault();
             const productId = this.dataset.productId;
@@ -329,7 +334,7 @@ function initializeProductQuickView() {
 
 // Wishlist functionality
 function initializeWishlist() {
-    document.querySelectorAll('[data-wishlist-toggle]').forEach(button => {
+    document.querySelectorAll('[data-wishlist-toggle]').forEach((button) => {
         button.addEventListener('click', function (e) {
             e.preventDefault();
             const productId = this.dataset.productId;
@@ -337,10 +342,12 @@ function initializeWishlist() {
 
             if (isInWishlist) {
                 this.classList.remove('in-wishlist');
-                this.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>';
+                this.innerHTML =
+                    '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>';
             } else {
                 this.classList.add('in-wishlist');
-                this.innerHTML = '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>';
+                this.innerHTML =
+                    '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>';
             }
 
             // Send AJAX request to update wishlist
@@ -348,9 +355,11 @@ function initializeWishlist() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute('content'),
                 },
-                body: JSON.stringify({ product_id: productId })
+                body: JSON.stringify({ product_id: productId }),
             });
         });
     });
@@ -360,11 +369,14 @@ function initializeWishlist() {
 function initializeFilters() {
     const filterForms = document.querySelectorAll('[data-filter-form]');
 
-    filterForms.forEach(form => {
-        form.addEventListener('change', debounce(function () {
-            // Implement filter functionality
-            console.log('Filter changed');
-        }, 300));
+    filterForms.forEach((form) => {
+        form.addEventListener(
+            'change',
+            debounce(function () {
+                // Implement filter functionality
+                console.log('Filter changed');
+            }, 300),
+        );
     });
 }
 
@@ -376,7 +388,7 @@ function initializeInfiniteScroll() {
         return;
     }
 
-    scrollers.forEach(root => {
+    scrollers.forEach((root) => {
         if (root.dataset.infiniteScrollInitialized === 'true') {
             return;
         }
@@ -398,13 +410,13 @@ function initializeInfiniteScroll() {
         let observer = null;
         const loaderText = loader ? loader.textContent.trim() : '';
 
-        const announce = message => {
+        const announce = (message) => {
             if (status) {
                 status.textContent = message;
             }
         };
 
-        const setLoaderVisible = visible => {
+        const setLoaderVisible = (visible) => {
             if (!loader) {
                 return;
             }
@@ -413,7 +425,7 @@ function initializeInfiniteScroll() {
             loader.classList.toggle('hidden', !visible);
         };
 
-        const setTriggerVisible = visible => {
+        const setTriggerVisible = (visible) => {
             if (!trigger) {
                 return;
             }
@@ -461,23 +473,23 @@ function initializeInfiniteScroll() {
             fetch(nextPageUrl, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                    'X-Infinite-Scroll': '1'
-                }
+                    Accept: 'application/json',
+                    'X-Infinite-Scroll': '1',
+                },
             })
-                .then(response => {
+                .then((response) => {
                     if (!response.ok) {
                         throw new Error('Failed to load additional results.');
                     }
 
                     return response.json();
                 })
-                .then(data => {
+                .then((data) => {
                     if (typeof data?.html === 'string') {
                         const fragment = document.createElement('div');
                         fragment.innerHTML = data.html;
 
-                        Array.from(fragment.children).forEach(child => {
+                        Array.from(fragment.children).forEach((child) => {
                             if (child.nodeType === Node.ELEMENT_NODE) {
                                 itemsContainer.appendChild(child);
                             }
@@ -495,16 +507,18 @@ function initializeInfiniteScroll() {
                     }
 
                     hideFallback();
-                    root.dispatchEvent(new CustomEvent('infinite-scroll:appended', {
-                        detail: {
-                            context: root.dataset.infiniteScrollContext || null,
-                            hasMore: Boolean(nextPageUrl),
-                            meta: data?.meta ?? null
-                        }
-                    }));
+                    root.dispatchEvent(
+                        new CustomEvent('infinite-scroll:appended', {
+                            detail: {
+                                context: root.dataset.infiniteScrollContext || null,
+                                hasMore: Boolean(nextPageUrl),
+                                meta: data?.meta ?? null,
+                            },
+                        }),
+                    );
                     announce('');
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Infinite scroll error:', error);
                     resetFallback();
                     setTriggerVisible(true);
@@ -533,15 +547,18 @@ function initializeInfiniteScroll() {
         }
 
         if ('IntersectionObserver' in window) {
-            observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        loadMore();
-                    }
-                });
-            }, {
-                rootMargin: '0px 0px 200px 0px'
-            });
+            observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            loadMore();
+                        }
+                    });
+                },
+                {
+                    rootMargin: '0px 0px 200px 0px',
+                },
+            );
 
             observer.observe(controls);
             setTriggerVisible(false);
@@ -569,7 +586,7 @@ function initializeAccessibility() {
     }
 
     // Keyboard navigation for dropdowns
-    document.querySelectorAll('[data-dropdown]').forEach(dropdown => {
+    document.querySelectorAll('[data-dropdown]').forEach((dropdown) => {
         const button = dropdown.querySelector('[data-dropdown-toggle]');
         const menu = dropdown.querySelector('[data-dropdown-menu]');
 
@@ -602,7 +619,7 @@ function smoothScrollTo(element, offset = 0) {
     const targetPosition = element.offsetTop - offset;
     window.scrollTo({
         top: targetPosition,
-        behavior: 'smooth'
+        behavior: 'smooth',
     });
 }
 
@@ -610,7 +627,7 @@ function smoothScrollTo(element, offset = 0) {
 function formatCurrency(amount, currency = 'EUR', locale = 'en') {
     return new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: currency
+        currency: currency,
     }).format(amount);
 }
 
@@ -618,4 +635,3 @@ function formatCurrency(amount, currency = 'EUR', locale = 'en') {
 window.smoothScrollTo = smoothScrollTo;
 window.createNotification = createNotification;
 window.formatCurrency = formatCurrency;
-

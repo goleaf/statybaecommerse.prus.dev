@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -21,33 +23,38 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 final class ReferralResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+
     protected static ?string $model = Referral::class;
 
     /**
      * Navigation icon for the resource.
+     *
+     * @var string|BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
+    protected static $navigationIcon = 'heroicon-o-share';
 
     /**
      * Navigation group for organizing the resource in the admin panel.
+     *
+     * @var UnitEnum|string|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    protected static $navigationGroup = NavigationGroup::Marketing; // Keep referrals with other marketing touchpoints.
 
     protected static ?int $navigationSort = 17;
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Use the schema-based configuration to stay aligned with Filament v4 resource expectations.
         return $form
-            ->components([
+            ->schema([
                 Section::make('Referral Details')
                     ->columns(2)
                     ->components([
@@ -133,8 +140,9 @@ final class ReferralResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure table columns using the fluent Table API for Filament v4 compliance.
         return $table
             ->columns([
                 TextColumn::make('referral_code')
