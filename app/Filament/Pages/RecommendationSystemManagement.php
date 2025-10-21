@@ -19,6 +19,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use UnitEnum;
+
 final class RecommendationSystemManagement extends Page
 {
     protected static ?string $title = 'Recommendation System Management';
