@@ -20,10 +20,10 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -92,11 +92,11 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema with Filament v4 Schema class
+     * Configure the Filament schema using the dedicated Schema contract to avoid v3 regressions.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('translations.address_information'))
                 ->schema([
                     Grid::make(2)->schema([
@@ -322,9 +322,9 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table with comprehensive columns, filters, and actions
+     * Configure the Filament table while returning the Table instance for fluent chaining.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
