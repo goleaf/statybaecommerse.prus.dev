@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filament\Components\SearchableComponentHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Set;
 use Filament\Schemas\Components\Component;

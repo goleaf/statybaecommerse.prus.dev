@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
-use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filament\Components\SearchableComponentHelper;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\SearchResultPayload;
 use BackedEnum;
