@@ -27,6 +27,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
 /**
@@ -246,6 +247,16 @@ final class ShippingOptionResource extends Resource
                         'overnight' => __('admin.shipping_options.service_types.overnight'),
                         'economy'   => __('admin.shipping_options.service_types.economy'),
                     ]),
+                ValueRangeFilter::make('price')
+                    ->label(__('admin.shipping_options.price'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('min_weight')
+                    ->label(__('admin.shipping_options.min_weight')),
+                ValueRangeFilter::make('max_weight')
+                    ->label(__('admin.shipping_options.max_weight')),
                 TernaryFilter::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled')),
                 TernaryFilter::make('is_default')

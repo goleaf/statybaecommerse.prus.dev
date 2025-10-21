@@ -44,6 +44,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -58,6 +59,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
 /**
@@ -483,52 +485,28 @@ final class ProductResource extends Resource
                     ->label(__('products.fields.track_stock')),
                 TernaryFilter::make('allow_backorder')
                     ->label(__('products.fields.allow_backorder')),
-                Filter::make('price_range')
-                    ->label(__('products.filters.price_range'))
-                    ->form([
-                        TextInput::make('price_from')
-                            ->label(__('products.filters.price_from'))
-                            ->numeric()
-                            ->prefix('€'),
-                        TextInput::make('price_to')
-                            ->label(__('products.filters.price_to'))
-                            ->numeric()
-                            ->prefix('€'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['price_from'],
-                                fn (Builder $query, $price): Builder => $query->where('price', '>=', $price),
-                            )
-                            ->when(
-                                $data['price_to'],
-                                fn (Builder $query, $price): Builder => $query->where('price', '<=', $price),
-                            );
-                    }),
-                Filter::make('weight_range')
-                    ->label(__('products.filters.weight_range'))
-                    ->form([
-                        TextInput::make('weight_from')
-                            ->label(__('products.filters.weight_from'))
-                            ->numeric()
-                            ->suffix('kg'),
-                        TextInput::make('weight_to')
-                            ->label(__('products.filters.weight_to'))
-                            ->numeric()
-                            ->suffix('kg'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['weight_from'],
-                                fn (Builder $query, $weight): Builder => $query->where('weight', '>=', $weight),
-                            )
-                            ->when(
-                                $data['weight_to'],
-                                fn (Builder $query, $weight): Builder => $query->where('weight', '<=', $weight),
-                            );
-                    }),
+                ValueRangeFilter::make('price')
+                    ->label(__('products.fields.price'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('compare_price')
+                    ->label(__('products.fields.compare_price'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('cost_price')
+                    ->label(__('products.fields.cost_price'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('stock_quantity')
+                    ->label(__('products.fields.stock')),
+                ValueRangeFilter::make('weight')
+                    ->label(__('products.fields.weight')),
                 Filter::make('low_stock')
                     ->label(__('products.filters.low_stock'))
                     ->query(fn (Builder $query): Builder => $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold')),
@@ -555,6 +533,7 @@ final class ProductResource extends Resource
                     }),
                 TrashedFilter::make(),
             ])
+            ->filtersFormWidth(MaxWidth::Large)
             ->actions([
                 ActionGroup::make([
                     ViewAction::make()
