@@ -50,18 +50,30 @@ final class ErrorCodes
     public const INVENTORY_INSUFFICIENT = 'inventory.insufficient';
 
     /**
+     * Code returned when the authenticated user's profile cannot be resolved.
+     */
+    public const PROFILE_UNAVAILABLE = 'profile.unavailable';
+
+    /**
+     * Code returned when checkout cannot proceed due to an empty cart.
+     */
+    public const CHECKOUT_CART_EMPTY = 'checkout.cart_empty';
+
+    /**
      * Registry of error code descriptions keyed by the machine-readable code.
      *
      * @var array<string, string>
      */
     private const DEFINITIONS = [
-        self::NOT_FOUND => 'Resource requested by the client could not be located.',
-        self::SERVER_ERROR => 'Unexpected server exception occurred while handling the request.',
-        self::VALIDATION_FAILED => 'Provided data failed validation checks.',
-        self::UNAUTHORIZED => 'Request lacks valid authentication credentials.',
-        self::FORBIDDEN => 'Authenticated request does not have permission to access the resource.',
-        self::ORDER_NOT_FOUND => 'Requested order record is missing.',
+        self::NOT_FOUND              => 'Resource requested by the client could not be located.',
+        self::SERVER_ERROR           => 'Unexpected server exception occurred while handling the request.',
+        self::VALIDATION_FAILED      => 'Provided data failed validation checks.',
+        self::UNAUTHORIZED           => 'Request lacks valid authentication credentials.',
+        self::FORBIDDEN              => 'Authenticated request does not have permission to access the resource.',
+        self::ORDER_NOT_FOUND        => 'Requested order record is missing.',
         self::INVENTORY_INSUFFICIENT => 'Inventory could not satisfy the requested quantity.',
+        self::PROFILE_UNAVAILABLE    => 'Authenticated user profile is unavailable.',
+        self::CHECKOUT_CART_EMPTY    => 'Checkout aborted because the cart does not contain any items.',
     ];
 
     private function __construct() {}

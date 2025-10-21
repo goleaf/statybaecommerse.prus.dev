@@ -6,10 +6,11 @@ namespace Tests\Feature\Api;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Support\ErrorCodes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -42,7 +43,7 @@ final class NotificationApiTest extends TestCase
                     'created_at',
                     'meta',
                 ]],
-                'meta' => ['query', 'pagination'],
+                'meta'  => ['query', 'pagination'],
                 'links' => ['first', 'last', 'prev', 'next'],
             ]);
     }
@@ -76,11 +77,8 @@ final class NotificationApiTest extends TestCase
         ]));
 
         $response->assertStatus(422)
-            ->assertJson([
-                'success' => false,
-                'message' => 'The given data was invalid.',
-            ])
-            ->assertJsonValidationErrors(['per_page']);
+            ->assertJsonPath('error.code', ErrorCodes::VALIDATION_FAILED)
+            ->assertJsonPath('error.context.violations.0.field', 'per_page');
     }
 
     public function test_notifications_index_rejects_invalid_sort_direction(): void
@@ -94,15 +92,17 @@ final class NotificationApiTest extends TestCase
         ]));
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['sort']);
+            ->assertJsonPath('error.code', ErrorCodes::VALIDATION_FAILED)
+            ->assertJsonPath('error.context.violations.0.field', 'sort');
 
         $response = $this->getJson(route('api.v1.notifications.index', [
-            'sort' => 'created_at',
+            'sort'      => 'created_at',
             'direction' => 'sideways',
         ]));
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['direction']);
+            ->assertJsonPath('error.code', ErrorCodes::VALIDATION_FAILED)
+            ->assertJsonPath('error.context.violations.0.field', 'direction');
     }
 
     public function test_mark_as_read_requires_manage_ability(): void
@@ -127,7 +127,8 @@ final class NotificationApiTest extends TestCase
 
         $response = $this->postJson(route('api.v1.notifications.mark-as-read', $notification));
 
-        $response->assertNotFound();
+        $response->assertNotFound()
+            ->assertJsonPath('error.code', ErrorCodes::NOT_FOUND);
     }
 
     public function test_mark_as_read_returns_payload_for_owned_notification(): void
@@ -135,9 +136,9 @@ final class NotificationApiTest extends TestCase
         $user = User::factory()->create();
         $notification = Notification::factory()->forUser($user)->unread()->create([
             'data' => [
-                'title' => 'Order created',
+                'title'   => 'Order created',
                 'message' => 'Order #123 created',
-                'type' => 'order',
+                'type'    => 'order',
             ],
         ]);
 
@@ -165,7 +166,8 @@ final class NotificationApiTest extends TestCase
             'notification' => Str::uuid()->toString(),
         ]));
 
-        $response->assertNotFound();
+        $response->assertNotFound()
+            ->assertJsonPath('error.code', ErrorCodes::NOT_FOUND);
     }
 
     public function test_notification_search_requires_query_parameter(): void
@@ -177,11 +179,8 @@ final class NotificationApiTest extends TestCase
         $response = $this->getJson(route('api.v1.notifications.search'));
 
         $response->assertStatus(422)
-            ->assertJson([
-                'success' => false,
-                'message' => 'The given data was invalid.',
-            ])
-            ->assertJsonValidationErrors(['q']);
+            ->assertJsonPath('error.code', ErrorCodes::VALIDATION_FAILED)
+            ->assertJsonPath('error.context.violations.0.field', 'q');
     }
 
     public function test_notification_stats_requires_read_ability(): void
@@ -202,7 +201,7 @@ final class NotificationApiTest extends TestCase
 
         $originalLimit = config('security.rate_limiting.api.notifications');
         config(['security.rate_limiting.api.notifications' => 1]);
-        RateLimiter::clear('user:'.$user->id.'|notifications');
+        RateLimiter::clear('user:' . $user->id . '|notifications');
 
         Sanctum::actingAs($user, ['notifications.read']);
 
@@ -213,6 +212,6 @@ final class NotificationApiTest extends TestCase
         $secondResponse->assertStatus(429);
 
         config(['security.rate_limiting.api.notifications' => $originalLimit]);
-        RateLimiter::clear('user:'.$user->id.'|notifications');
+        RateLimiter::clear('user:' . $user->id . '|notifications');
     }
 }

@@ -25,10 +25,18 @@ return [
 
     // @translators: Shown when there is not enough stock to fulfill a request for a SKU.
     ErrorCodes::INVENTORY_INSUFFICIENT => 'Inventory for SKU :sku is unavailable.',
+    // @translators: Displayed when the authenticated user's profile data cannot be loaded.
+    ErrorCodes::PROFILE_UNAVAILABLE => 'Profile unavailable',
+    // @translators: Displayed when checkout cannot proceed because the cart is empty.
+    ErrorCodes::CHECKOUT_CART_EMPTY => 'Cart is empty',
 
     'messages' => [
         // @translators: Generic API-friendly message for unexpected server failures.
         'server_error' => 'Something went wrong. Please try again later.',
+        // @translators: API-friendly message when the authenticated profile payload cannot be produced.
+        'profile_unavailable' => 'We could not resolve your profile. Please refresh and try again.',
+        // @translators: API-friendly message when checkout is blocked by an empty cart.
+        'checkout_empty' => 'Your cart is empty. Add items before checking out.',
     ],
 
     'pages' => [

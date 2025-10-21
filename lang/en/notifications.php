@@ -76,6 +76,10 @@ return [
     'duplicated' => 'Notification duplicated',
     'cleanup_completed' => 'Cleaned up :count old notifications',
     'export_started' => 'Export started',
+    // Errors
+    'errors' => [
+        'not_found' => 'Notification not found',
+    ],
     // Form sections
     'form' => [
         'sections' => [

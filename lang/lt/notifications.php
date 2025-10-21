@@ -76,6 +76,10 @@ return [
     'duplicated' => 'Pranešimas dubluotas',
     'cleanup_completed' => 'Išvalyta :count senų pranešimų',
     'export_started' => 'Eksportavimas pradėtas',
+    // Errors
+    'errors' => [
+        'not_found' => 'Pranešimas nerastas',
+    ],
     // Form sections
     'form' => [
         'sections' => [
