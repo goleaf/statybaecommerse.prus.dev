@@ -136,12 +136,16 @@ it('displays correct table columns', function () {
 
     Livewire::test(AnalyticsDashboard::class)
         ->assertSuccessful()
+        ->assertTableColumnExists('number')
         ->assertTableColumnExists('order_date')
         ->assertTableColumnExists('user.name')
+        ->assertTableColumnExists('user.email')
+        ->assertTableColumnExists('channel.name')
         ->assertTableColumnExists('items_count')
         ->assertTableColumnExists('total')
         ->assertTableColumnExists('status')
-        ->assertTableColumnExists('created_at');
+        ->assertTableColumnExists('created_at')
+        ->assertTableColumnExists('updated_at');
 });
 
 it('can sort by different columns', function () {
@@ -190,7 +194,7 @@ it('can access analytics with proper permissions', function () {
 });
 
 it('displays correct labels and translations', function () {
-    expect(AnalyticsResource::getNavigationLabel())->toBe(__('analytics.analytics'));
+    expect(AnalyticsResource::getNavigationLabel())->toBe(__('analytics.analytics_dashboard'));
     expect(AnalyticsResource::getModelLabel())->toBe(__('analytics.analytics'));
     expect(AnalyticsResource::getPluralModelLabel())->toBe(__('analytics.analytics'));
 });
