@@ -35,7 +35,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * VariantAnalyticsResource
@@ -46,12 +45,21 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /**
+     * Display the analytics icon while supporting BackedEnum navigation icons.
+     *
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static string|UnitEnum|null $navigationGroup = null;
+    /**
+     * Default navigation group leveraging BackedEnum support for Filament 4.
+     */
+    protected static string|BackedEnum|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {
+        // Map the enum to its localized label so navigation remains translated.
         return NavigationGroup::Inventory->label();
     }
 
