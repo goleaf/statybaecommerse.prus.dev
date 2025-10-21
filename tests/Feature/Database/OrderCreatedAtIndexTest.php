@@ -34,9 +34,15 @@ final class OrderCreatedAtIndexTest extends TestCase
             'updated_at' => $start->copy()->subMonths(6),
         ]);
 
+        $query = Order::query()
+            ->completed()
+            // Apply the reusable scope instead of a raw predicate to guarantee index alignment.
+            ->createdBetween($start, $end)
+            ->selectRaw('SUM(total) AS total');
+
         $plan = DB::select(
-            $this->explain('SELECT SUM(total) AS total FROM orders WHERE status = ? AND created_at BETWEEN ? AND ?'),
-            ['completed', $start->toDateTimeString(), $end->toDateTimeString()]
+            $this->explain($query->toSql()),
+            $query->getBindings()
         );
 
         $this->assertOrdersPlanUsesCreatedAtIndex($plan);
