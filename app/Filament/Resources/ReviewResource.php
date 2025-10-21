@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
-use BackedEnum;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\NumericScale;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
@@ -36,7 +35,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
+use BackedEnum;
 
 final class ReviewResource extends Resource
 {
@@ -48,7 +47,7 @@ final class ReviewResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+    protected static ?string $navigationGroup = 'Content Management';
 
     public static function getNavigationLabel(): string
     {
@@ -170,7 +169,15 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.fields.rating'))
                     ->sortable()
                     ->alignCenter()
-                    ->formatStateUsing(fn (int $state): string => str_repeat('⭐', $state)),
+                    ->placeholder(__('reviews.placeholders.no_rating'))
+                    ->formatStateUsing(
+                        function (?int $state): string {
+                            // Guard against missing ratings to avoid formatting exceptions in table views.
+                            return $state !== null
+                                ? str_repeat('⭐', $state)
+                                : __('reviews.placeholders.no_rating');
+                        }
+                    ),
                 BadgeColumn::make('status')
                     ->label(__('reviews.fields.status'))
                     ->getStateUsing(fn (Review $record): string => $record->getStatus())
@@ -402,13 +409,26 @@ final class ReviewResource extends Resource
                         TextEntry::make('rating')
                             ->label(__('reviews.fields.rating'))
                             ->badge()
-                            ->color(fn (int $state): string => match ($state) {
-                                1, 2 => 'danger',
-                                3 => 'warning',
-                                4, 5 => 'success',
-                                default => 'gray',
-                            })
-                            ->formatStateUsing(fn (int $state): string => str_repeat('⭐', $state)),
+                            ->placeholder(__('reviews.placeholders.no_rating'))
+                            ->color(
+                                function (?int $state): string {
+                                    // Provide consistent colour coding even when the rating is absent.
+                                    return match ($state) {
+                                        1, 2 => 'danger',
+                                        3 => 'warning',
+                                        4, 5 => 'success',
+                                        default => 'gray',
+                                    };
+                                }
+                            )
+                            ->formatStateUsing(
+                                function (?int $state): string {
+                                    // Fall back to translated placeholder text when the rating has not been submitted yet.
+                                    return $state !== null
+                                        ? str_repeat('⭐', $state)
+                                        : __('reviews.placeholders.no_rating');
+                                }
+                            ),
                     ])
                     ->columns(2),
                 InfolistSection::make(__('reviews.sections.content'))

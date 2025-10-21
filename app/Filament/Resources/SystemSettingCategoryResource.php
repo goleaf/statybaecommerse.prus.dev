@@ -35,7 +35,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 /**
  * SystemSettingCategoryResource
@@ -46,7 +45,7 @@ final class SystemSettingCategoryResource extends Resource
 {
     protected static ?string $model = SystemSettingCategory::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'System';
     }
