@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Console\Commands\ProfiledSeedCommand;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Filament\Components\LiveNotificationFeed;
@@ -28,6 +29,7 @@ use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -54,11 +56,20 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(DocumentServiceContract::class, DocumentService::class);
 
         if ($this->app->runningInConsole()) {
+            // Register import utilities and override the core db:seed command with a profiled variant.
             $this->commands([
                 \App\Console\Commands\ImportProducts::class,
                 \App\Console\Commands\ImportPrices::class,
                 \App\Console\Commands\ImportInventory::class,
+                ProfiledSeedCommand::class,
             ]);
+
+            $this->app->extend('command.db.seed', function ($command, $app) {
+                /** @var Dispatcher|null $dispatcher */
+                $dispatcher = $app->bound('events') ? $app->make('events') : null;
+
+                return new ProfiledSeedCommand($app->make('db'), $dispatcher, $app->make('config'));
+            });
         }
     }
 
