@@ -8,6 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -22,7 +23,7 @@ final class NotificationResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -32,13 +33,13 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $notification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'type' => 'App\Notifications\TestNotification',
-            'data' => [
+            'type'            => 'App\Notifications\TestNotification',
+            'data'            => [
                 'title' => 'Test Notification',
-                'body' => 'Test body',
-                'type' => 'info',
+                'body'  => 'Test body',
+                'type'  => 'info',
             ],
         ]);
 
@@ -52,19 +53,24 @@ final class NotificationResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\CreateNotification::class)
             ->fillForm([
-                'user_id' => $this->adminUser->id,
-                'type' => 'info',
-                'title' => 'Test Notification',
-                'body' => 'Test body',
-                'is_read' => false,
+                'user_id'    => $this->adminUser->id,
+                'type'       => 'info',
+                'title'      => 'Test Notification',
+                'body'       => 'Test body',
+                'read_state' => 'unread',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('notifications', [
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'type' => 'info',
+            'type'            => 'info',
+        ]);
+
+        $this->assertDatabaseHas('notifications', [
+            'notifiable_id' => $this->adminUser->id,
+            'read_at'       => null,
         ]);
     }
 
@@ -73,12 +79,12 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $notification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'type' => 'info',
-            'data' => [
+            'type'            => 'info',
+            'data'            => [
                 'title' => 'Original Title',
-                'body' => 'Original body',
+                'body'  => 'Original body',
             ],
         ]);
 
@@ -87,7 +93,7 @@ final class NotificationResourceTest extends TestCase
         ])
             ->fillForm([
                 'title' => 'Updated Title',
-                'body' => 'Updated body',
+                'body'  => 'Updated body',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -102,12 +108,12 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $notification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'type' => 'info',
-            'data' => [
+            'type'            => 'info',
+            'data'            => [
                 'title' => 'Test Notification',
-                'body' => 'Test body',
+                'body'  => 'Test body',
             ],
         ]);
 
@@ -117,6 +123,8 @@ final class NotificationResourceTest extends TestCase
             ->assertCanSeeFormData([
                 'title' => 'Test Notification',
             ]);
+
+        $this->assertNotNull($notification->fresh()->read_at);
     }
 
     public function test_can_delete_notification(): void
@@ -124,7 +132,7 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $notification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
         ]);
 
@@ -144,11 +152,11 @@ final class NotificationResourceTest extends TestCase
         $user2 = User::factory()->create();
 
         $notification1 = Notification::factory()->create([
-            'notifiable_id' => $user1->id,
+            'notifiable_id'   => $user1->id,
             'notifiable_type' => User::class,
         ]);
         $notification2 = Notification::factory()->create([
-            'notifiable_id' => $user2->id,
+            'notifiable_id'   => $user2->id,
             'notifiable_type' => User::class,
         ]);
 
@@ -163,14 +171,14 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $infoNotification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'type' => 'info',
+            'type'            => 'info',
         ]);
         $successNotification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'type' => 'success',
+            'type'            => 'success',
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
@@ -184,18 +192,18 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $readNotification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'read_at' => now(),
+            'read_at'         => now(),
         ]);
         $unreadNotification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'read_at' => null,
+            'read_at'         => null,
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
-            ->filterTable('is_read', true)
+            ->filterTable('read_state', true)
             ->assertCanSeeTableRecords([$readNotification])
             ->assertCanNotSeeTableRecords([$unreadNotification]);
     }
@@ -205,18 +213,21 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $notification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'read_at' => null,
+            'read_at'         => null,
         ]);
+
+        Carbon::setTestNow(Carbon::parse('2024-01-01 12:00:00'));
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
             ->callTableAction('mark_as_read', $notification);
 
-        $this->assertDatabaseHas('notifications', [
-            'id' => $notification->id,
-            'read_at' => now(),
-        ]);
+        $notification->refresh();
+
+        $this->assertEquals(Carbon::now(), $notification->read_at);
+
+        Carbon::setTestNow();
     }
 
     public function test_can_mark_notification_as_unread(): void
@@ -224,18 +235,17 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $notification = Notification::factory()->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'read_at' => now(),
+            'read_at'         => now(),
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
             ->callTableAction('mark_as_unread', $notification);
 
-        $this->assertDatabaseHas('notifications', [
-            'id' => $notification->id,
-            'read_at' => null,
-        ]);
+        $notification->refresh();
+
+        $this->assertNull($notification->read_at);
     }
 
     public function test_can_bulk_mark_as_read(): void
@@ -243,20 +253,21 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $notifications = Notification::factory()->count(3)->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'read_at' => null,
+            'read_at'         => null,
         ]);
+
+        Carbon::setTestNow(Carbon::parse('2024-02-01 08:30:00'));
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
             ->callTableBulkAction('bulk_mark_as_read', $notifications);
 
         foreach ($notifications as $notification) {
-            $this->assertDatabaseHas('notifications', [
-                'id' => $notification->id,
-                'read_at' => now(),
-            ]);
+            $this->assertEquals(Carbon::now(), $notification->fresh()->read_at);
         }
+
+        Carbon::setTestNow();
     }
 
     public function test_can_bulk_mark_as_unread(): void
@@ -264,19 +275,16 @@ final class NotificationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $notifications = Notification::factory()->count(3)->create([
-            'notifiable_id' => $this->adminUser->id,
+            'notifiable_id'   => $this->adminUser->id,
             'notifiable_type' => User::class,
-            'read_at' => now(),
+            'read_at'         => now(),
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
             ->callTableBulkAction('bulk_mark_as_unread', $notifications);
 
         foreach ($notifications as $notification) {
-            $this->assertDatabaseHas('notifications', [
-                'id' => $notification->id,
-                'read_at' => null,
-            ]);
+            $this->assertNull($notification->fresh()->read_at);
         }
     }
 
@@ -286,9 +294,9 @@ final class NotificationResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\CreateNotification::class)
             ->fillForm([
-                'type' => 'info',
+                'type'  => 'info',
                 'title' => 'Test Notification',
-                'body' => 'Test body',
+                'body'  => 'Test body',
             ])
             ->call('create')
             ->assertHasFormErrors(['user_id']);
@@ -301,8 +309,8 @@ final class NotificationResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\CreateNotification::class)
             ->fillForm([
                 'user_id' => $this->adminUser->id,
-                'title' => 'Test Notification',
-                'body' => 'Test body',
+                'title'   => 'Test Notification',
+                'body'    => 'Test body',
             ])
             ->call('create')
             ->assertHasFormErrors(['type']);
@@ -315,8 +323,8 @@ final class NotificationResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\CreateNotification::class)
             ->fillForm([
                 'user_id' => $this->adminUser->id,
-                'type' => 'info',
-                'body' => 'Test body',
+                'type'    => 'info',
+                'body'    => 'Test body',
             ])
             ->call('create')
             ->assertHasFormErrors(['title']);
@@ -329,8 +337,8 @@ final class NotificationResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\CreateNotification::class)
             ->fillForm([
                 'user_id' => $this->adminUser->id,
-                'type' => 'info',
-                'title' => 'Test Notification',
+                'type'    => 'info',
+                'title'   => 'Test Notification',
             ])
             ->call('create')
             ->assertHasFormErrors(['body']);
