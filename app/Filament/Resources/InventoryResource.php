@@ -7,12 +7,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
-use App\Support\Search\SearchableComponentHelper;
-use App\Support\Search\SearchResultPayload;
-use DefStudio\SearchableInput\DTO\SearchResult;
 use BackedEnum;
-use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -83,47 +80,47 @@ final class InventoryResource extends Resource
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Inventory $record): void {
-                                    SearchableComponentHelper::hydrate(
+                                    // Hydrate via shared helper per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                    SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
-                                        function (int|string $productId) use ($record): ?\DefStudio\SearchableInput\DTO\SearchResult {
+                                        static function (int $value) use ($record): ?array {
                                             $product = $record?->product;
 
-                                            if (! $product instanceof Product || (int) $product->getKey() !== (int) $productId) {
+                                            if (! $product instanceof Product || $product->getKey() !== $value) {
                                                 $product = Product::query()
                                                     ->select(['id', 'sku', 'name'])
-                                                    ->find((int) $productId);
+                                                    ->find($value);
                                             }
 
                                             if (! $product instanceof Product) {
                                                 return null;
                                             }
 
-                                            return self::buildProductSearchResult($product);
+                                            return [
+                                                'value' => $product->getKey(),
+                                                'label' => ProductSearch::label($product),
+                                            ];
                                         },
                                     );
-
-                                    // Reference the searchable input helper docs for behaviour overview.
-                                    // See docs/i18n/SEARCHABLE_INPUT.md for expectations when hydrating/clearing selections.
                                 })
-                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                    SearchableComponentHelper::syncSelectedRecord(
-                                        component: $component,
-                                        state: $state,
-                                        set: $set,
-                                        attribute: 'product_id',
-                                        resolver: static function (string $productId): ?\DefStudio\SearchableInput\DTO\SearchResult {
-                                            $product = Product::query()
-                                                ->select(['id', 'sku', 'name'])
-                                                ->find((int) $productId);
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        // Reset persisted identifiers when lookup clears.
+                                        SearchableInputHelper::clear($set, ['product_id' => null]);
 
-                                            if (! $product instanceof Product) {
-                                                return null;
-                                            }
+                                        return;
+                                    }
 
-                                            return self::buildProductSearchResult($product);
-                                        },
-                                    );
+                                    $product = Product::query()
+                                        ->select(['id'])
+                                        ->find((int) $state);
+
+                                    if (! $product instanceof Product) {
+                                        return;
+                                    }
+
+                                    $set('product_id', $product->getKey());
                                 }),
                             Select::make('location_id')
                                 ->label(__('Location'))
@@ -496,28 +493,6 @@ final class InventoryResource extends Resource
                     ->heading(__('Threshold'))
                     ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
             ]);
-    }
-
-    /**
-     * Build a normalised search result for product selections shared across hydrate/update callbacks.
-     */
-    private static function buildProductSearchResult(Product $product): SearchResult
-    {
-        $result = SearchResult::make(
-            (string) $product->getKey(),
-            ProductSearch::label($product),
-        );
-
-        /** @var string|null $rawSku */
-        $rawSku = $product->getAttribute('sku');
-        $translatedName = $product->getTranslatedName();
-
-        // Normalise payload so Livewire and PHP callbacks always receive consistent metadata.
-        return SearchResultPayload::normalise($result, [
-            'product_id' => $product->getKey(),
-            'sku'        => is_string($rawSku) ? $rawSku : '',
-            'name'       => is_string($translatedName) ? $translatedName : '',
-        ]);
     }
 
     public static function getRelations(): array
