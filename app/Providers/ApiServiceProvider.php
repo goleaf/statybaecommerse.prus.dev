@@ -42,7 +42,7 @@ final class ApiServiceProvider extends ServiceProvider
                 return Limit::perMinute(60)->by('partner_api:anonymous:'.$request->ip());
             }
 
-            $key = 'partner_api:key:'.$apiKey->getKey();
+            $key = $apiKey->rateLimiterKey();
             $limit = $apiKey->rate_limit;
 
             if ($limit === null || $limit <= 0) {
@@ -114,7 +114,8 @@ final class ApiServiceProvider extends ServiceProvider
             return $resolved;
         }
 
-        $header = $request->headers->get('X-Api-Key');
+        $headerName = (string) config('services.partner_api.header', 'X-Api-Key');
+        $header = $request->headers->get($headerName);
         if (! is_string($header)) {
             return null;
         }
