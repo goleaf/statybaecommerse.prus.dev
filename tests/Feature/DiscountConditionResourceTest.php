@@ -237,4 +237,71 @@ final class DiscountConditionResourceTest extends TestCase
         $this->assertTrue($discountCondition->categories->contains($category));
         $this->assertEquals($discount->id, $discountCondition->discount->id);
     }
+
+    public function test_products_and_categories_sync_on_create(): void
+    {
+        $discount = Discount::factory()->create();
+        $product = Product::factory()->create();
+        $category = Category::factory()->create();
+
+        Livewire::test(CreateDiscountCondition::class)
+            ->fillForm([
+                'discount_id' => $discount->id,
+                'type' => 'product',
+                'operator' => 'equals_to',
+                'value' => 'sync-test',
+                'products' => [$product->id],
+                'categories' => [$category->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors()
+            ->assertNotified();
+
+        $discountCondition = DiscountCondition::query()->latest('id')->firstOrFail();
+
+        $this->assertTrue($discountCondition->products->contains($product));
+        $this->assertTrue($discountCondition->categories->contains($category));
+    }
+
+    public function test_products_and_categories_sync_on_update(): void
+    {
+        $discount = Discount::factory()->create();
+        $initialProduct = Product::factory()->create();
+        $initialCategory = Category::factory()->create();
+
+        $discountCondition = DiscountCondition::factory()->create([
+            'discount_id' => $discount->id,
+            'type' => 'product',
+            'operator' => 'equals_to',
+            'value' => 'sync-test',
+        ]);
+
+        $discountCondition->products()->attach($initialProduct->id);
+        $discountCondition->categories()->attach($initialCategory->id);
+
+        $newProduct = Product::factory()->create();
+        $newCategory = Category::factory()->create();
+
+        Livewire::test(EditDiscountCondition::class, [
+            'record' => $discountCondition->id,
+        ])
+            ->fillForm([
+                'discount_id' => $discount->id,
+                'type' => 'product',
+                'operator' => 'equals_to',
+                'value' => 'sync-test-updated',
+                'products' => [$newProduct->id],
+                'categories' => [$newCategory->id],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors()
+            ->assertNotified();
+
+        $discountCondition->refresh();
+
+        $this->assertTrue($discountCondition->products->contains($newProduct));
+        $this->assertFalse($discountCondition->products->contains($initialProduct));
+        $this->assertTrue($discountCondition->categories->contains($newCategory));
+        $this->assertFalse($discountCondition->categories->contains($initialCategory));
+    }
 }
