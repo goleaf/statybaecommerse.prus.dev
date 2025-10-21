@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -98,13 +99,20 @@ final class SliderResource extends Resource
                         ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                         ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                         ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                            if ($state === null || $state === '') {
+                            // Hydrate through helper to stay aligned with docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                            SearchableInputHelper::hydrate(
+                                $component,
+                                $state,
+                                static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                            );
+                        })
+                        ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
+                            if ($state !== null && $state !== '') {
                                 return;
                             }
 
-                            $component
-                                ->state($state)
-                                ->options([$state => $state]);
+                            // Clear button URL metadata whenever the selection resets.
+                            SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                         })
                         ->columnSpanFull(),
                 ]),

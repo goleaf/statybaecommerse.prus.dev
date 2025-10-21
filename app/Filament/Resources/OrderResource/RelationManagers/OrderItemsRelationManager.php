@@ -7,6 +7,7 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Support\Filament\ProductVariantFieldHelper;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -75,7 +76,25 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                     // Refer to docs/filament/searchable-inputs.md for helper usage guidance and payload expectations.
                                     ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
-                                    ->afterStateUpdated(fn (SearchableInput $component, ?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get, $component)),
+                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set, Get $get): void {
+                                        if ($state === null || $state === '') {
+                                            // Clear dependent pricing fields when the variant selection resets.
+                                            SearchableInputHelper::clear($component, $set, [
+                                                'product_variant_id' => null,
+                                                'product_id' => null,
+                                                'name' => null,
+                                                'sku' => null,
+                                                'unit_price' => null,
+                                                'total' => 0,
+                                            ]);
+
+                                            ProductVariantFieldHelper::handleVariantSelection(null, $set, $get, $component);
+
+                                            return;
+                                        }
+
+                                        ProductVariantFieldHelper::handleVariantSelection($state, $set, $get, $component);
+                                    }),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()

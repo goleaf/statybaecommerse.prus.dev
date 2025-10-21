@@ -7,7 +7,10 @@ namespace App\Filament\Resources;
 use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
+use App\Models\City;
 use App\Models\Country;
+use App\Models\User;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -104,20 +107,37 @@ final class AddressResource extends Resource
                             ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Address $record): void {
-                                if ($state === null || ! $record?->user) {
-                                    return;
-                                }
+                                // Hydrate via the shared helper so the metadata lifecycle matches the documentation.
+                                SearchableInputHelper::hydrate(
+                                    $component,
+                                    $state,
+                                    static function (int $value) use ($record): ?array {
+                                        $user = $record?->user;
 
-                                $label = trim(sprintf('%s <%s>', (string) ($record->user->name ?? ''), (string) ($record->user->email ?? '')));
+                                        if (! $user instanceof User || $user->getKey() !== $value) {
+                                            $user = User::query()
+                                                ->select(['id', 'name', 'email'])
+                                                ->find($value);
+                                        }
 
-                                $component
-                                    ->state((string) $state)
-                                    ->options([
-                                        (string) $record->user_id => $label,
-                                    ]);
+                                        if (! $user instanceof User) {
+                                            return null;
+                                        }
+
+                                        $label = trim(sprintf('%s <%s>', (string) ($user->name ?? ''), (string) ($user->email ?? '')));
+
+                                        return [
+                                            'value' => $user->getKey(),
+                                            'label' => $label,
+                                        ];
+                                    },
+                                );
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
+                                    // Reset the stored relation id when the lookup clears.
+                                    SearchableInputHelper::clear($component, $set, ['user_id' => null]);
+
                                     return;
                                 }
 
@@ -196,18 +216,33 @@ final class AddressResource extends Resource
                             ->searchUsing(fn (string $term): array => AddressSearch::cityResults($term))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Address $record): void {
-                                if ($state === null || ! $record?->cityById) {
-                                    return;
-                                }
+                                // Hydrate via helper so the metadata lifecycle mirrors docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                SearchableInputHelper::hydrate(
+                                    $component,
+                                    $state,
+                                    static function (int $value) use ($record): ?array {
+                                        $city = $record?->cityById ?? City::query()
+                                            ->select(['id', 'name', 'country_code'])
+                                            ->find($value);
 
-                                $component
-                                    ->state((string) $state)
-                                    ->options([
-                                        (string) $record->city_id => (string) ($record->cityById->name ?? ''),
-                                    ]);
+                                        if (! $city instanceof City) {
+                                            return null;
+                                        }
+
+                                        return [
+                                            'value' => $city->getKey(),
+                                            'label' => (string) ($city->name ?? ''),
+                                        ];
+                                    },
+                                );
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
+                                    // Clear cached identifiers when the lookup resets.
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'city_id' => null,
+                                    ]);
+
                                     return;
                                 }
 

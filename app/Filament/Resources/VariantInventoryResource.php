@@ -10,7 +10,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\ProductVariantSearch;
 use BackedEnum;
@@ -98,16 +98,19 @@ final class VariantInventoryResource extends Resource
                             ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                SearchableComponentHelper::hydrate(
+                                SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
-                                    static function (int|string $identifier): ?ProductVariant {
-                                        return ProductVariant::query()
+                                    static function (int $identifier): ?array {
+                                        $variant = ProductVariant::query()
                                             ->select(['id', 'product_id', 'sku', 'name', 'price'])
                                             ->with(['product:id,sku,name'])
-                                            ->find((int) $identifier);
-                                    },
-                                    static function (ProductVariant $variant): array {
+                                            ->find($identifier);
+
+                                        if (! $variant instanceof ProductVariant) {
+                                            return null;
+                                        }
+
                                         return [
                                             'value'   => $variant->getKey(),
                                             'label'   => ProductVariantSearch::label($variant),
@@ -117,36 +120,32 @@ final class VariantInventoryResource extends Resource
                                 ); // See docs/filament/searchable-inputs.md for helper expectations.
                             })
                             ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                $state = is_string($state) ? trim($state) : '';
+                                $identifier = is_string($state) ? trim($state) : '';
 
-                                if ($state === '') {
-                                    SearchableComponentHelper::clear(
-                                        $component,
-                                        static fn (): bool => $set('variant_id', null),
-                                        static fn (): array => $set('variant_payload', []),
-                                    );
+                                if ($identifier === '') {
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'variant_id'      => null,
+                                        'variant_payload' => [],
+                                    ]);
 
                                     return;
                                 }
-
-                                $identifier = (int) $state;
 
                                 $variant = ProductVariant::query()
                                     ->select(['id', 'product_id', 'sku', 'name', 'price'])
                                     ->with(['product:id,sku,name'])
-                                    ->find($identifier);
+                                    ->find((int) $identifier);
 
                                 if (! $variant instanceof ProductVariant) {
-                                    SearchableComponentHelper::clear(
-                                        $component,
-                                        static fn (): bool => $set('variant_id', null),
-                                        static fn (): array => $set('variant_payload', []),
-                                    );
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'variant_id'      => null,
+                                        'variant_payload' => [],
+                                    ]);
 
                                     return;
                                 }
 
-                                $set('variant_id', $identifier);
+                                $set('variant_id', $variant->getKey());
                                 $set('variant_payload', self::normaliseVariantPayload($variant));
                             }),
                         Hidden::make('variant_payload')
@@ -160,15 +159,18 @@ final class VariantInventoryResource extends Resource
                             ->searchUsing(fn (string $value): array => LocationSearch::results($value))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                SearchableComponentHelper::hydrate(
+                                SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
-                                    static function (int|string $identifier): ?Location {
-                                        return Location::query()
+                                    static function (int $identifier): ?array {
+                                        $location = Location::query()
                                             ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                            ->find((int) $identifier);
-                                    },
-                                    static function (Location $location): array {
+                                            ->find($identifier);
+
+                                        if (! $location instanceof Location) {
+                                            return null;
+                                        }
+
                                         return [
                                             'value'   => $location->getKey(),
                                             'label'   => LocationSearch::label($location),
@@ -178,35 +180,31 @@ final class VariantInventoryResource extends Resource
                                 ); // See docs/filament/searchable-inputs.md for helper expectations.
                             })
                             ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                $state = is_string($state) ? trim($state) : '';
+                                $identifier = is_string($state) ? trim($state) : '';
 
-                                if ($state === '') {
-                                    SearchableComponentHelper::clear(
-                                        $component,
-                                        static fn (): bool => $set('location_id', null),
-                                        static fn (): array => $set('location_payload', []),
-                                    );
+                                if ($identifier === '') {
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'location_id'      => null,
+                                        'location_payload' => [],
+                                    ]);
 
                                     return;
                                 }
-
-                                $identifier = (int) $state;
 
                                 $location = Location::query()
                                     ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                    ->find($identifier);
+                                    ->find((int) $identifier);
 
                                 if (! $location instanceof Location) {
-                                    SearchableComponentHelper::clear(
-                                        $component,
-                                        static fn (): bool => $set('location_id', null),
-                                        static fn (): array => $set('location_payload', []),
-                                    );
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'location_id'      => null,
+                                        'location_payload' => [],
+                                    ]);
 
                                     return;
                                 }
 
-                                $set('location_id', $identifier);
+                                $set('location_id', $location->getKey());
                                 $set('location_payload', self::normaliseLocationPayload($location));
                             }),
                         Hidden::make('location_payload')
