@@ -4,8 +4,13 @@ This project uses the [`defstudio/filament-searchable-input`](https://filamentph
 
 - **Orders** – customer selection now relies on an autocomplete field that searches by name, email, or phone and persists the chosen `user_id`.
 - **Order Items** – product lookups support SKU/EAN/name searches and hydrate related fields (name, SKU, unit price) without additional queries.
+- **Cart Items** – product selectors autocomplete SKUs and update price/name fields, while resetting variant picks appropriately.
 - **Addresses** – customer, address line, city, and city ID fields provide suggestions; selecting a city also synchronises the textual city and country code.
 - **Coupon Usages** – coupon and customer selectors use autocomplete for quick lookups.
+- **Inventory** – warehouses now attach products via free-text lookup instead of scrolling select menus.
+- **Prices** – administrators can find products by SKU or name before setting price amounts.
+- **Product Requests** – support agents can connect incoming requests to products using the same search experience.
+- **Wishlist Items** – product pickers are searchable and clear dependent variant selectors when the product changes.
 
 ### Supporting services
 
@@ -38,7 +43,7 @@ The admin panel registers `resources/css/filament/admin/theme.css` as its custom
 
 ### Testing
 
-Targeted Pest tests cover every search service and ensure the `OrderItemResource` form exposes the plugin’s `searchUsing` behaviour. Run the focused suite with:
+Targeted Pest tests cover every search service and assert that core product-centric resources (orders, carts, pricing, inventory, wishlists, requests) expose the plugin’s `searchUsing` behaviour. Run the focused suite with:
 
 ```bash
 php artisan test --group=searchable-input
