@@ -44,12 +44,14 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /**
-     * @var string|\BackedEnum|null Filament v4 expects an untyped navigation icon property.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    /**
+     * @var string|\BackedEnum|null
+     *
+     * Keep the navigation entry grouped with the rest of the inventory dashboards.
+     */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
