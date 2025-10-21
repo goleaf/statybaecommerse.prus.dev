@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use App\Models\Category;
+use App\Models\Collection;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
@@ -66,7 +67,7 @@ final class ViewProduct extends ViewRecord
                     return $items;
                 }),
             ListEntry::make('productCategories')
-                ->heading(__('Related categories'))
+                ->heading(__('products.related_categories'))
                 ->list()
                 ->state(function (Product $record): array {
                     $record->loadMissing(['categories']);
@@ -81,7 +82,28 @@ final class ViewProduct extends ViewRecord
                                 ->icon('heroicon-m-rectangle-stack')
                                 ->color('success')
                                 ->url(route('frontend.categories.show', $category))
-                                ->tooltip(__('View the :category category', ['category' => $categoryName]))
+                                ->tooltip(__('products.view_category_tooltip', ['category' => $categoryName]))
+                                ->toArray();
+                        })
+                        ->all();
+                }),
+            ListEntry::make('productCollections')
+                ->heading(__('products.related_collections'))
+                ->list()
+                ->state(function (Product $record): array {
+                    $record->loadMissing(['collections']);
+
+                    return $record->collections
+                        ->map(function (Collection $collection): array {
+                            $collectionName = $collection->getTranslation('name');
+
+                            return ListItem::make()
+                                ->id('product-collection-' . $collection->getKey())
+                                ->label($collectionName)
+                                ->icon('heroicon-m-queue-list')
+                                ->color('warning')
+                                ->url(route('frontend.collections.show', $collection))
+                                ->tooltip(__('products.explore_collection_tooltip', ['collection' => $collectionName]))
                                 ->toArray();
                         })
                         ->all();
