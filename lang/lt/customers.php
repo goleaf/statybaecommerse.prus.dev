@@ -66,6 +66,14 @@ return [
         'en' => 'English',
     ],
 
+    // Ženklelių vertimai klientų būsenoms.
+    'badges' => [
+        'active'     => 'Aktyvus',
+        'inactive'   => 'Neaktyvus',
+        'verified'   => 'Patvirtintas',
+        'unverified' => 'Nepatvirtintas',
+    ],
+
     'email_verified'  => 'El. paštas patvirtintas',
     'verified_only'   => 'Tik patvirtinti',
     'unverified_only' => 'Tik nepatvirtinti',

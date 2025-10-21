@@ -6,6 +6,7 @@
 - Enabled Laravel Sanctum API token support, including guard configuration, middleware aliases, and the published personal access token migration.
 - Introduced dedicated rate limiters for the authenticated user endpoint and storefront checkout requests.
 - Documented consistent JSON problem responses for the profile and checkout flows, falling back to user-owned carts when sessions rotate.
+- Localized the new customer badge labels (`customers.badges.*`) and surfaced them as email verification and activity chips in the admin customer table.
 
 ### Dependencies
 - Replaced wildcard constraints with caret ranges for `dutchcodingcompany/filament-socialite` (`^3.0`), `lara-zeus/bolt` (`^4.0.5`), and `pxlrbt/filament-excel` (`^3.1`) to resolve `composer validate` warnings.
