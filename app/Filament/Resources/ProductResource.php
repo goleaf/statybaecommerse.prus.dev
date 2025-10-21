@@ -19,6 +19,7 @@ use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -429,6 +430,37 @@ final class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Filter::make('product_lookup')
+                    ->label(__('products.filters.product'))
+                    ->form([
+                        SearchableInput::make('product_name')
+                            ->label(__('products.filters.product'))
+                            ->placeholder(__('products.filters.product_placeholder'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::searchProductSuggestions($search)),
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
+                            return [];
+                        }
+
+                        return [__('products.filters.product') . ': ' . $value];
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
+                            return $query;
+                        }
+
+                        return $query->where(function (Builder $query) use ($value): void {
+                            $query
+                                ->where('name', 'like', "%{$value}%")
+                                ->orWhere('sku', 'like', "%{$value}%");
+                        });
+                    }),
                 SelectFilter::make('brand')
                     ->label(__('products.filters.brand'))
                     ->relationship('brand', 'name')
@@ -729,5 +761,36 @@ final class ProductResource extends Resource
             'view'   => Pages\ViewProduct::route('/{record}'),
             'edit'   => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function searchProductSuggestions(string $search): array
+    {
+        $term = trim($search);
+
+        if ($term === '') {
+            return [];
+        }
+
+        return Product::query()
+            ->select(['name', 'sku'])
+            ->where(function (Builder $query) use ($term): void {
+                $query
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('sku', 'like', "%{$term}%");
+            })
+            ->orderBy('name')
+            ->limit(15)
+            ->get()
+            ->map(static function (Product $product): string {
+                $sku = $product->sku;
+
+                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
+            })
+            ->unique()
+            ->values()
+            ->all();
     }
 }

@@ -48,6 +48,11 @@ return [
         'settings' => 'Varianto Nustatymai',
     ],
 
+    'filters' => [
+        'product' => 'Produktas',
+        'product_placeholder' => 'Ieškokite pagal produkto pavadinimą arba SKU',
+    ],
+
     // Fields
     'fields' => [
         'product' => 'Produktas',

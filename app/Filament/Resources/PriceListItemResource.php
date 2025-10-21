@@ -6,7 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
+use App\Models\Product;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -263,10 +265,37 @@ final class PriceListItemResource extends Resource
                 SelectFilter::make('price_list_id')
                     ->relationship('priceList', 'name')
                     ->preload(),
-                SelectFilter::make('product_id')
-                    ->relationship('product', 'name')
-                    ->searchable()
-                    ->preload(),
+                Filter::make('product_lookup')
+                    ->label(__('price_list_items.product'))
+                    ->form([
+                        SearchableInput::make('product_name')
+                            ->label(__('price_list_items.product'))
+                            ->placeholder(__('products.filters.product_placeholder'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::searchProductOptions($search)),
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
+                            return [];
+                        }
+
+                        return [__('price_list_items.product') . ': ' . $value];
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
+                            return $query;
+                        }
+
+                        return $query->whereHas('product', function (Builder $relationQuery) use ($value): void {
+                            $relationQuery
+                                ->where('name', 'like', "%{$value}%")
+                                ->orWhere('sku', 'like', "%{$value}%");
+                        });
+                    }),
                 TernaryFilter::make('is_active')
                     ->label(__('price_list_items.is_active'))
                     ->trueLabel(__('price_list_items.active_only'))
@@ -400,10 +429,41 @@ final class PriceListItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPriceListItems::route('/'),
+            'index'  => Pages\ListPriceListItems::route('/'),
             'create' => Pages\CreatePriceListItem::route('/create'),
-            'view' => Pages\ViewPriceListItem::route('/{record}'),
-            'edit' => Pages\EditPriceListItem::route('/{record}/edit'),
+            'view'   => Pages\ViewPriceListItem::route('/{record}'),
+            'edit'   => Pages\EditPriceListItem::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function searchProductOptions(string $search): array
+    {
+        $term = trim($search);
+
+        if ($term === '') {
+            return [];
+        }
+
+        return Product::query()
+            ->select(['name', 'sku'])
+            ->where(function (Builder $query) use ($term): void {
+                $query
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('sku', 'like', "%{$term}%");
+            })
+            ->orderBy('name')
+            ->limit(15)
+            ->get()
+            ->map(static function (Product $product): string {
+                $sku = $product->sku;
+
+                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
+            })
+            ->unique()
+            ->values()
+            ->all();
     }
 }

@@ -48,6 +48,11 @@ return [
         'settings' => 'Variant Settings',
     ],
 
+    'filters' => [
+        'product' => 'Product',
+        'product_placeholder' => 'Search by product name or SKU',
+    ],
+
     // Fields
     'fields' => [
         'product' => 'Product',
