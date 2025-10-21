@@ -92,11 +92,12 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema with Filament v4 Schema class
+     * Configure the Filament form schema using the injected Form instance so Filament v4 stays type-safe.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
+            // Returning the schema on the provided Form keeps resource composition consistent with Filament expectations.
             Section::make(__('translations.address_information'))
                 ->schema([
                     Grid::make(2)->schema([
@@ -324,9 +325,13 @@ final class AddressResource extends Resource
     /**
      * Configure the Filament table with comprehensive columns, filters, and actions
      */
-    public static function table(Table $table): Table|array
+    /**
+     * Configure the Filament table definition on the provided Table instance to satisfy Filament v4 signatures.
+     */
+    public static function table(Table $table): Table
     {
         return $table
+            // Returning the configured Table instance ensures bulk actions remain type-checked by Filament.
             ->columns([
                 TextColumn::make('id')
                     ->label('ID')
