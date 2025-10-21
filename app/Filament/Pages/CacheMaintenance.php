@@ -16,13 +16,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Throwable;
-use UnitEnum;
 
 final class CacheMaintenance extends Page
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): string|\UnitEnum|null
     {
         return 'System';
     }

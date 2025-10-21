@@ -35,7 +35,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class EnumManagementResource extends Resource
 {
@@ -45,7 +44,7 @@ final class EnumManagementResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): string|\UnitEnum|null
     {
         return trans('admin.enums.navigation_groups.system');
     }
