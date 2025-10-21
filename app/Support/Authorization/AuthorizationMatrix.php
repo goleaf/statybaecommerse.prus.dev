@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Authorization;
 
 use App\Enums\AuthorizationRole;
+use Filament\FilamentManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -52,6 +53,23 @@ final class AuthorizationMatrix
      */
     public static function currentUser(): ?Authenticatable
     {
+        // Always prefer the active Filament panel guard so admin-only
+        // requests authenticate against the dedicated admin guard when
+        // Filament is booted without an explicit `filament.auth.guard`
+        // configuration entry. We guard the container lookup to avoid
+        // triggering facade resolution failures when Filament is not
+        // registered (e.g. storefront-only CLI tasks).
+        if (app()->bound('filament')) {
+            /** @var FilamentManager $filament */
+            $filament = app('filament');
+
+            $panelGuard = $filament->getCurrentPanel()?->getAuthGuard();
+
+            if (is_string($panelGuard) && $panelGuard !== '') {
+                return auth()->guard($panelGuard)->user();
+            }
+        }
+
         $guard = config('filament.auth.guard');
 
         if (is_string($guard) && $guard !== '') {
