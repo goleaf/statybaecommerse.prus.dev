@@ -98,6 +98,13 @@ class FilamentNavigationGroupFixer
                 }
             }
 
+            // Always deduplicate UnitEnum imports to avoid autoload clashes on pages without navigation metadata.
+            $dedupedContent = $this->dedupeUnitEnumImport($content);
+            if ($dedupedContent !== $content) {
+                $content = $dedupedContent;
+                $modified = true;
+            }
+
             // Only write if content changed
             if ($modified) {
                 file_put_contents($filePath, $content);
