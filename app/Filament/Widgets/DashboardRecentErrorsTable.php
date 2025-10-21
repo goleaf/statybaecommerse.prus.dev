@@ -32,8 +32,9 @@ final class DashboardRecentErrorsTable extends BaseTableWidget
         return trans('admin/dashboard.tables.recent_errors');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query(fn () => $this->tableRepository->recentFailedJobsQuery()->limit(10))
             ->columns([

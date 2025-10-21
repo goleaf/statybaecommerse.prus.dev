@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CampaignCustomerSegmentResource\Pages;
 use App\Models\CampaignCustomerSegment;
 use App\Models\Scopes\ActiveScope;
-use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -45,9 +44,11 @@ final class CampaignCustomerSegmentResource extends Resource
     protected static ?string $model = CampaignCustomerSegment::class;
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
+    protected static $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $recordTitleAttribute = 'segment_type';
 
@@ -71,8 +72,9 @@ final class CampaignCustomerSegmentResource extends Resource
         return __('campaign_customer_segments.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([
@@ -142,8 +144,9 @@ final class CampaignCustomerSegmentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('campaign.name')

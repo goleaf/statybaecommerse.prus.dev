@@ -91,8 +91,9 @@ final class AddressResource extends Resource
     /**
      * Configure the Filament form schema with Filament v4 Schema class
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('translations.address_information'))
                 ->schema([
@@ -289,8 +290,9 @@ final class AddressResource extends Resource
     /**
      * Configure the Filament table with comprehensive columns, filters, and actions
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('id')

@@ -9,7 +9,6 @@ use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignConversion;
 use App\Models\User;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -26,7 +25,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
-use UnitEnum;
 
 /**
  * CampaignConversionResource
@@ -37,9 +35,19 @@ final class CampaignConversionResource extends Resource
 {
     protected static ?string $model = CampaignConversion::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rocket-launch';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-rocket-launch';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = NavigationGroup::Campaigns;
 
     public static function getNavigationLabel(): string
     {
@@ -66,8 +74,9 @@ final class CampaignConversionResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('campaign_conversions.basic_information'))
                 ->schema([
@@ -141,8 +150,9 @@ final class CampaignConversionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('campaign.name')

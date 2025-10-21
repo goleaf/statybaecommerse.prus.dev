@@ -6,7 +6,6 @@ namespace App\Filament\Pages;
 
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
@@ -21,9 +20,11 @@ final class DataImportExport extends Page
     protected string $view = 'filament.pages.data-import-export';
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 
@@ -35,8 +36,9 @@ final class DataImportExport extends Page
 
     public array|string|null $file = null;
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('translations.data_import_export'))

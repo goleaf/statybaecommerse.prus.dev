@@ -40,8 +40,9 @@ class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->components([
                 Section::make(__('orders.basic_information'))
@@ -191,8 +192,9 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('order_number')
             ->columns([

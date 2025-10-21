@@ -41,11 +41,18 @@ final class EnumManagementResource extends Resource
     protected static ?string $model = EnumValue::class;
 
     /**
-     * Keep the navigation icon typed so Filament surfaces enum-backed icons reliably.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\BackedEnum|null Pin enum tools to the shared System navigation section. */
+    /** @var string|\BackedEnum|\UnitEnum|null Pin enum tools to the shared System navigation section. */
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
@@ -75,6 +82,7 @@ final class EnumManagementResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Tabs::make('enum_management_tabs')
                 ->tabs([
@@ -159,6 +167,7 @@ final class EnumManagementResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('type')

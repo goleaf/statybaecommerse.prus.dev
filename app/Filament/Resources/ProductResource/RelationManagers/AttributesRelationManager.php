@@ -19,8 +19,9 @@ final class AttributesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Attributes';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->components([
                 Forms\Components\Select::make('attribute_id')
@@ -72,8 +73,9 @@ final class AttributesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('attribute.name')
             ->columns([

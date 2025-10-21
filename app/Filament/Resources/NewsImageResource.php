@@ -52,7 +52,7 @@ final class NewsImageResource extends Resource
         return 'Content';
     }
 
-    public static function getNavigationIcon(): BackedEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
     {
         return 'heroicon-o-photo';
     }
@@ -74,8 +74,9 @@ final class NewsImageResource extends Resource
         return __('admin.news_images.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Tabs::make(__('admin.news_images.tabs'))
@@ -263,8 +264,9 @@ final class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('file_path')

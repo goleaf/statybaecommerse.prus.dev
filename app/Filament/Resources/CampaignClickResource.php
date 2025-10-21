@@ -37,7 +37,7 @@ final class CampaignClickResource extends Resource
 {
     protected static ?string $model = CampaignClick::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-chart-bar';
     }
@@ -69,8 +69,9 @@ final class CampaignClickResource extends Resource
      * @param  Forms\Form  $schema
      * @return Forms\Form
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
@@ -192,8 +193,9 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('campaign.name')
