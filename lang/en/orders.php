@@ -104,6 +104,7 @@ return [
     'mime_type' => 'MIME Type',
     'download' => 'Download',
     'description' => 'Description',
+    'document_version_tooltip' => 'Open generated document version :version',
 
     // Document types
     'document_types' => [

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CustomerResource\Pages;
 
 use App\Filament\Resources\CustomerResource;
+use App\Filament\Resources\ReviewResource;
 use App\Models\Address;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Review;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -16,6 +18,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
+use Illuminate\Support\Str;
 
 final class ViewCustomer extends ViewRecord
 {
@@ -71,12 +74,38 @@ final class ViewCustomer extends ViewRecord
                         ->map(function (Order $order): array {
                             return ListItem::make()
                                 ->id('customer-order-' . $order->getKey())
-                                ->label(__('Order #:number', ['number' => $order->number]))
+                                ->label(__('customers.order_number_label', ['number' => $order->number]))
                                 ->icon('heroicon-m-receipt-percent')
                                 ->color('info')
                                 ->url(route('account.orders.detail', ['number' => $order->number]))
-                                ->tooltip(__('Placed on :date', [
+                                ->tooltip(__('customers.order_placed_on', [
                                     'date' => optional($order->created_at)->toFormattedDateString(),
+                                ]))
+                                ->toArray();
+                        })
+                        ->all();
+                }),
+            ListEntry::make('customerReviews')
+                ->heading(__('customers.reviews'))
+                ->list()
+                ->state(function (Customer $record): array {
+                    $record->loadMissing(['reviews.product']);
+
+                    return $record->reviews
+                        ->sortByDesc('created_at')
+                        ->map(function (Review $review): array {
+                            $productName = $review->product?->getTranslation('name') ?? $review->product?->name ?? __('products.title');
+                            $reviewTitle = $review->getTranslation('title') ?? Str::limit($review->getTranslation('content') ?? '', 40);
+
+                            return ListItem::make()
+                                ->id('customer-review-' . $review->getKey())
+                                ->label(__('customers.review_for_product', ['product' => $productName]))
+                                ->icon('heroicon-m-star')
+                                ->color('warning')
+                                ->url(ReviewResource::getUrl('view', ['record' => $review]))
+                                ->tooltip(__('customers.review_rating_tooltip', [
+                                    'rating' => $review->rating,
+                                    'title'  => $reviewTitle,
                                 ]))
                                 ->toArray();
                         })

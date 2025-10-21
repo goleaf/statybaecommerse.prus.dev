@@ -104,6 +104,7 @@ return [
     'mime_type' => 'MIME tipas',
     'download' => 'Atsisiųsti',
     'description' => 'Aprašymas',
+    'document_version_tooltip' => 'Atidaryti sugeneruotą dokumento versiją :version',
 
     // Document types
     'document_types' => [

@@ -6,6 +6,12 @@ return [
     'title'  => 'Kunden',
     'plural' => 'Kunden',
     'single' => 'Kunde',
+    'orders' => 'Bestellungen',
+    'order_number_label' => 'Bestellung Nr. :number',
+    'order_placed_on' => 'Aufgegeben am :date',
+    'reviews' => 'Bewertungen',
+    'review_for_product' => 'Bewertung für :product',
+    'review_rating_tooltip' => 'Bewertet mit :rating/5 — :title',
 
     'basic_information'    => 'Grundinformationen',
     'account_settings'     => 'Kontoeinstellungen',
