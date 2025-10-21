@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 use App\Models\Scopes\ActiveScope;
@@ -35,7 +36,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 /**
  * SystemSettingCategoryResource
@@ -46,9 +46,17 @@ final class SystemSettingCategoryResource extends Resource
 {
     protected static ?string $model = SystemSettingCategory::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    /**
+     * @var string|\BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
+     */
+    protected static $navigationGroup = NavigationGroup::System;
+
+    public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        // Harmonize enum and string groups to avoid leaking raw enum values in the UI.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     protected static ?int $navigationSort = 2;
