@@ -17,6 +17,7 @@
 - Raised the floor for `novadaemon/filament-combobox` to `^2.0.1` as part of the scheduled Filament maintenance sweep so we can ship the upstream dropdown focus bugfix in the next admin UI release.
 
 ### Changed
+- Replaced the Variant Inventory form's nested grids with section column layouts to clarify bespoke spans and keep component imports aligned with the refactored schema.
 - Swapped Campaign resource schemas to Filament v4 `Section`/`Grid` components, refreshed table action imports, and synced the related translation manager plus Variant Analytics navigation icon docblock with v4 conventions.
 - Documented the Variant Inventory resource's Select form component import so dropdown dependencies stay transparent for reviewers.
 - Restored typed navigation icons for the Menu, Enum Management, and Variant Analytics resources while cleaning up redundant `UnitEnum` imports in favor of fully qualified annotations.
