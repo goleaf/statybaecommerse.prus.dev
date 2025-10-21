@@ -32,7 +32,7 @@ SearchableInput::make('user_lookup')
    - `label`: the display text shown inside the dropdown.
    - `payload` (optional): any associative array that dependent fields can consume.
 
-The helper converts the `value` to a string, registers it as the component state, and feeds the label through `options()` alongside the payload so downstream closures all read the same structure.
+The helper converts the `value` to a string, registers it as the component state, and feeds the label through `options()` alongside the payload so downstream closures all read the same structure. When the normaliser returns an `Arrayable` payload (for example, a DTO implementing `toArray()`), the helper coerces it into an array before handing it over to Livewire. Empty or falsy identifiers short-circuit into `clear()` so the UI cannot surface stale metadata.
 
 ## Clearing a component
 
@@ -64,6 +64,12 @@ Each callback receives no arguments, so close over the Filament `Set`/`Get` help
 - Keep the payload structure aligned with the search service that powers the component. For example, `AddressSearch::payload()` already exposes the exact fields expected by the order form, so return it directly from your normaliser.
 - When the component stores something other than the lookup identifier (for example, a composite key), make sure the `value` key reflects the final persisted state; the helper pushes that value back into the component before rendering.
 - If a lookup fails or the state is empty, the helper automatically calls `clear()` so the UI stays in sync with the database.
+
+## Resource integration checklist
+
+- Register `afterStateHydrated` closures on your Filament form components to call `SearchableComponentHelper::hydrate()` with a finder closure and normaliser that return the `[value, label, payload]` tuple described above. This keeps edit forms and relation managers aligned when records are re-opened.
+- Pair `afterStateUpdated` hooks with `SearchableComponentHelper::clear()` so clearing the lookup also wipes any dependent state (`Set` helpers for foreign keys, cached payload fields, and related dropdowns).
+- Prefer returning a payload array that is already shaped for the downstream Livewire data structure you need. The helper simply forwards the normalised payload, making the component the single source of truth for metadata.
 
 ## Related guidelines
 
