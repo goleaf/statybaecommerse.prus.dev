@@ -10,6 +10,8 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Support\Filament\ProductVariantFieldHelper;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -24,7 +26,7 @@ final class OrderItemResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -36,12 +38,12 @@ final class OrderItemResourceTest extends TestCase
         $order = Order::factory()->create();
         $product = Product::factory()->create();
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
-            'name' => 'Test Product',
-            'quantity' => 2,
+            'name'       => 'Test Product',
+            'quantity'   => 2,
             'unit_price' => 10.00,
-            'total' => 20.00,
+            'total'      => 20.00,
         ]);
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\ListOrderItems::class)
@@ -57,25 +59,25 @@ final class OrderItemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
-                'name' => 'Test Product',
-                'sku' => 'TEST-SKU',
-                'quantity' => 2,
+                'name'       => 'Test Product',
+                'sku'        => 'TEST-SKU',
+                'quantity'   => 2,
                 'unit_price' => 10.00,
-                'total' => 20.00,
-                'notes' => 'Test notes',
+                'total'      => 20.00,
+                'notes'      => 'Test notes',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_items', [
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
-            'name' => 'Test Product',
-            'quantity' => 2,
+            'name'       => 'Test Product',
+            'quantity'   => 2,
             'unit_price' => 10.00,
-            'total' => 20.00,
+            'total'      => 20.00,
         ]);
     }
 
@@ -86,31 +88,31 @@ final class OrderItemResourceTest extends TestCase
         $order = Order::factory()->create();
         $product = Product::factory()->create();
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
-            'name' => 'Original Product',
-            'quantity' => 1,
+            'name'       => 'Original Product',
+            'quantity'   => 1,
             'unit_price' => 5.00,
-            'total' => 5.00,
+            'total'      => 5.00,
         ]);
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\EditOrderItem::class, [
             'record' => $orderItem->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Product',
-                'quantity' => 3,
+                'name'       => 'Updated Product',
+                'quantity'   => 3,
                 'unit_price' => 15.00,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_items', [
-            'id' => $orderItem->id,
-            'name' => 'Updated Product',
-            'quantity' => 3,
+            'id'         => $orderItem->id,
+            'name'       => 'Updated Product',
+            'quantity'   => 3,
             'unit_price' => 15.00,
-            'total' => 45.00,
+            'total'      => 45.00,
         ]);
     }
 
@@ -121,20 +123,20 @@ final class OrderItemResourceTest extends TestCase
         $order = Order::factory()->create();
         $product = Product::factory()->create();
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
-            'name' => 'Test Product',
-            'quantity' => 2,
+            'name'       => 'Test Product',
+            'quantity'   => 2,
             'unit_price' => 10.00,
-            'total' => 20.00,
+            'total'      => 20.00,
         ]);
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\ViewOrderItem::class, [
             'record' => $orderItem->getRouteKey(),
         ])
             ->assertCanSeeFormData([
-                'name' => 'Test Product',
-                'quantity' => 2,
+                'name'       => 'Test Product',
+                'quantity'   => 2,
                 'unit_price' => 10.00,
             ]);
     }
@@ -146,7 +148,7 @@ final class OrderItemResourceTest extends TestCase
         $order = Order::factory()->create();
         $product = Product::factory()->create();
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
         ]);
 
@@ -167,11 +169,11 @@ final class OrderItemResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $orderItem1 = OrderItem::factory()->create([
-            'order_id' => $order1->id,
+            'order_id'   => $order1->id,
             'product_id' => $product->id,
         ]);
         $orderItem2 = OrderItem::factory()->create([
-            'order_id' => $order2->id,
+            'order_id'   => $order2->id,
             'product_id' => $product->id,
         ]);
 
@@ -190,11 +192,11 @@ final class OrderItemResourceTest extends TestCase
         $product2 = Product::factory()->create();
 
         $orderItem1 = OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product1->id,
         ]);
         $orderItem2 = OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product2->id,
         ]);
 
@@ -212,12 +214,12 @@ final class OrderItemResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $recentOrderItem = OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
             'created_at' => now(),
         ]);
         $oldOrderItem = OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
             'created_at' => now()->subDays(10),
         ]);
@@ -226,7 +228,7 @@ final class OrderItemResourceTest extends TestCase
             ->filterTable('created_at', [
                 'range' => [
                     'start' => now()->subDay()->format('Y-m-d'),
-                    'end' => now()->addDay()->format('Y-m-d'),
+                    'end'   => now()->addDay()->format('Y-m-d'),
                 ],
             ])
             ->assertCanSeeTableRecords([$recentOrderItem])
@@ -242,10 +244,10 @@ final class OrderItemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
                 'unit_price' => 10.00,
-                'quantity' => 3,
+                'quantity'   => 3,
             ])
             ->assertFormSet('total', '30.00');
     }
@@ -259,9 +261,9 @@ final class OrderItemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
-                'quantity' => 2,
+                'quantity'   => 2,
                 'unit_price' => 15.00,
             ])
             ->assertFormSet('total', '30.00');
@@ -276,10 +278,10 @@ final class OrderItemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'quantity' => 2,
-                'unit_price' => 10.00,
+                'order_id'        => $order->id,
+                'product_id'      => $product->id,
+                'quantity'        => 2,
+                'unit_price'      => 10.00,
                 'discount_amount' => 5.00,
             ])
             ->assertFormSet('total', '15.00');
@@ -291,14 +293,14 @@ final class OrderItemResourceTest extends TestCase
 
         $order = Order::factory()->create();
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'sku' => 'TEST-SKU',
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-SKU',
             'price' => 25.00,
         ]);
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
             ])
             ->assertFormSet('name', 'Test Product')
@@ -314,20 +316,71 @@ final class OrderItemResourceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create([
             'product_id' => $product->id,
-            'name' => 'Test Variant',
-            'sku' => 'VARIANT-SKU',
-            'price' => 30.00,
+            'name'       => 'Test Variant',
+            'sku'        => 'VARIANT-SKU',
+            'price'      => 30.00,
         ]);
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
+                'order_id'           => $order->id,
+                'product_id'         => $product->id,
                 'product_variant_id' => $variant->id,
             ])
             ->assertFormSet('name', 'Test Variant')
             ->assertFormSet('sku', 'VARIANT-SKU')
             ->assertFormSet('unit_price', 30.00);
+    }
+
+    public function test_clearing_variant_selection_resets_lookup_payload_and_snapshot_fields(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $order = Order::factory()->create();
+        $product = Product::factory()->create();
+        $variant = ProductVariant::factory()->create([
+            'product_id' => $product->id,
+            'name'       => 'Lookup Variant',
+            'sku'        => 'LOOKUP-SKU',
+            'price'      => 42.50,
+        ]);
+
+        $component = SearchableInput::make('product_variant_id');
+
+        // Prime the component using the helper to mirror the edit state before a user clears the lookup.
+        ProductVariantFieldHelper::hydrateSearchableVariant($component, $variant->getKey());
+
+        $fields = [
+            'product_variant_id' => $variant->getKey(),
+            'product_id'         => $product->getKey(),
+            'name'               => 'Persisted name',
+            'sku'                => 'PERSISTED-SKU',
+            'unit_price'         => 41.0,
+            'quantity'           => 3,
+            'discount_amount'    => 6.0,
+            'total'              => 117.0,
+        ];
+
+        $set = static function (string $field, mixed $value) use (&$fields): void {
+            $fields[$field] = $value;
+        };
+
+        $get = static function (string $field) use (&$fields): mixed {
+            return $fields[$field] ?? null;
+        };
+
+        ProductVariantFieldHelper::handleVariantSelection('', $set, $get, $component);
+
+        $this->assertNull($component->getState());
+        $this->assertSame([], $component->getOptions());
+        $this->assertSame([], $component->getPayload());
+
+        $this->assertNull($fields['product_variant_id']);
+        $this->assertNull($fields['product_id']);
+        $this->assertSame('', $fields['name']);
+        $this->assertSame('', $fields['sku']);
+        $this->assertSame(0.0, $fields['unit_price']);
+        $this->assertSame(0.0, $fields['total']);
     }
 
     public function test_validation_requires_order(): void
@@ -339,8 +392,8 @@ final class OrderItemResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
                 'product_id' => $product->id,
-                'name' => 'Test Product',
-                'quantity' => 1,
+                'name'       => 'Test Product',
+                'quantity'   => 1,
                 'unit_price' => 10.00,
             ])
             ->call('create')
@@ -355,9 +408,9 @@ final class OrderItemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
-                'name' => 'Test Product',
-                'quantity' => 1,
+                'order_id'   => $order->id,
+                'name'       => 'Test Product',
+                'quantity'   => 1,
                 'unit_price' => 10.00,
             ])
             ->call('create')
@@ -373,10 +426,10 @@ final class OrderItemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
-                'name' => 'Test Product',
-                'quantity' => 'invalid',
+                'name'       => 'Test Product',
+                'quantity'   => 'invalid',
                 'unit_price' => 10.00,
             ])
             ->call('create')
@@ -392,10 +445,10 @@ final class OrderItemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\CreateOrderItem::class)
             ->fillForm([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
-                'name' => 'Test Product',
-                'quantity' => 0,
+                'name'       => 'Test Product',
+                'quantity'   => 0,
                 'unit_price' => 10.00,
             ])
             ->call('create')

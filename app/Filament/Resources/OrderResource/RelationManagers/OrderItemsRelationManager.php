@@ -73,9 +73,9 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->reactive()
                                     ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    // Refer to docs/filament/variant-lookup-helpers.md for helper usage guidance.
+                                    // Refer to docs/filament/searchable-inputs.md for helper usage guidance and payload expectations.
                                     ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
-                                    ->afterStateUpdated(fn (?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get)),
+                                    ->afterStateUpdated(fn (SearchableInput $component, ?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get, $component)),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()
