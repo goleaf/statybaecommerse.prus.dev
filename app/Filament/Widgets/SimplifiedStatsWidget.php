@@ -9,9 +9,12 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use Carbon\Carbon;
+use DateInterval;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -127,7 +130,7 @@ class SimplifiedStatsWidget extends BaseWidget
             $endDate->toDateString()
         );
 
-        $chartData = Cache::remember($cacheKey, 60, function () use ($startDate, $endDate, $now) {
+        $chartData = $this->rememberDashboard($cacheKey, CacheKeys::TTL_MINUTE, function () use ($startDate, $endDate, $now) {
             $dateKeys = [];
             for ($i = 6; $i >= 0; $i--) {
                 $dateKeys[] = $now->copy()->subDays($i)->toDateString();
@@ -171,7 +174,7 @@ class SimplifiedStatsWidget extends BaseWidget
         $now = $this->getReferenceTime();
         $lastMonth = $now->copy()->subMonth();
 
-        return Cache::remember(CacheKeys::dashboardSummary(), CacheKeys::TTL_MINUTE, function () use ($lastMonth) {
+        return $this->rememberDashboard(CacheKeys::dashboardSummary(), CacheKeys::TTL_MINUTE, function () use ($lastMonth) {
             $orderStats = Order::query()
                 ->selectRaw('
                     SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
@@ -233,6 +236,22 @@ class SimplifiedStatsWidget extends BaseWidget
                 ],
             ];
         });
+    }
+
+    /**
+     * Remember dashboard cache entries while applying dashboard tags when supported.
+     *
+     * @return array<string, mixed>
+     */
+    private function rememberDashboard(string $key, int|DateInterval $ttl, callable $callback): array
+    {
+        $store = Cache::getStore();
+
+        if ($store instanceof TaggableStore) {
+            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
     }
 
     protected function getReferenceTime(): Carbon
