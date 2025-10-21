@@ -57,6 +57,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use LaraZeus\Quantity\Components\Quantity;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
 
@@ -226,13 +227,15 @@ final class ProductResource extends Resource
                                             ]),
                                         Grid::make(2)
                                             ->components([
-                                                TextInput::make('stock_quantity')
+                                                Quantity::make('stock_quantity')
                                                     ->label(__('products.fields.stock_quantity'))
-                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->steps(1)
                                                     ->default(0),
-                                                TextInput::make('low_stock_threshold')
+                                                Quantity::make('low_stock_threshold')
                                                     ->label(__('products.fields.low_stock_threshold'))
-                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->steps(1)
                                                     ->default(5),
                                             ]),
                                     ]),

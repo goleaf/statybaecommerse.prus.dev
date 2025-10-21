@@ -8,13 +8,14 @@ use App\Models\Product;
 use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use LaraZeus\Quantity\Components\Quantity;
 use UnitEnum;
+
 final class InventoryManagement extends Page implements HasTable
 {
     use InteractsWithTable;
@@ -54,9 +55,10 @@ final class InventoryManagement extends Page implements HasTable
                                 'decrease' => 'Decrease',
                             ])
                             ->required(),
-                        TextInput::make('quantity')
-                            ->numeric()
+                        Quantity::make('quantity')
                             ->minValue(0)
+                            ->steps(1)
+                            ->default(0)
                             ->required(),
                     ])
                     ->action(function (array $data, $records): void {
