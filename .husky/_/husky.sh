@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# This shim bootstraps Husky Git hooks so that repository scripts run consistently across environments.
+# Husky shim to bootstrap Git hooks with the repository's local toolchain and config.
 [ "$HUSKY" = "2" ] && set -x
 n=$(basename "$0")
 s=$(dirname "$(dirname "$0")")/$n
@@ -15,7 +15,7 @@ i="${XDG_CONFIG_HOME:-$HOME/.config}/husky/init.sh"
 [ "${HUSKY-}" = "0" ] && exit 0
 
 export PATH="node_modules/.bin:$PATH"
-# Ensure Git hooks execute using the repository's local toolchain so commands remain consistent.
+# Ensure Git hooks execute using the repository's local toolchain so commands remain consistent across environments.
 sh -e "$s" "$@"
 c=$?
 
