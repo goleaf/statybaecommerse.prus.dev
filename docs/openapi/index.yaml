@@ -1,0 +1,801 @@
+openapi: 3.1.0
+info:
+  title: Statyba Commerce API
+  description: |
+    Shared OpenAPI components for the Statyba commerce platform. The PHP controllers
+    reference these components through `OpenApi\Attributes` so the `zircote/swagger-php`
+    scanner can assemble a complete specification.
+  version: "1.0.0"
+servers:
+  - url: https://api.prus.dev
+    description: Production
+  - url: http://localhost
+    description: Local development
+tags:
+  - name: Campaigns
+    description: Campaign engagement tracking and analytics endpoints.
+  - name: System Settings
+    description: Public system configuration lookup endpoints.
+  - name: Discount Conditions
+    description: Discount condition evaluation and metadata endpoints.
+  - name: Autocomplete
+    description: Autocomplete search, export, and insight endpoints.
+components:
+  securitySchemes:
+    SanctumToken:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+  schemas:
+    SuccessMessage:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Click recorded
+    ErrorResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Validation failed
+        error:
+          type: string
+          nullable: true
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            errors:
+              type: object
+              additionalProperties: true
+    CampaignInteractionRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          example: cta
+        url:
+          type: string
+          format: uri
+          nullable: true
+    CampaignConversionRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          example: purchase
+        value:
+          type: number
+          format: float
+          example: 49.9
+        order_id:
+          type: string
+          nullable: true
+        data:
+          type: object
+          additionalProperties: true
+    CampaignStatistics:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            total_campaigns:
+              type: integer
+            active_campaigns:
+              type: integer
+            scheduled_campaigns:
+              type: integer
+            completed_campaigns:
+              type: integer
+            total_views:
+              type: integer
+            total_clicks:
+              type: integer
+            total_conversions:
+              type: integer
+            total_revenue:
+              type: number
+              format: float
+            average_conversion_rate:
+              type: number
+              format: float
+            average_click_through_rate:
+              type: number
+              format: float
+            average_roi:
+              type: number
+              format: float
+    CampaignTypes:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              label:
+                type: string
+              count:
+                type: integer
+              icon:
+                type: string
+              color:
+                type: string
+    CampaignPerformance:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          additionalProperties:
+            type: integer
+    CampaignAnalytics:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            period:
+              type: string
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+            campaigns_created:
+              type: integer
+            campaigns_started:
+              type: integer
+            campaigns_completed:
+              type: integer
+            total_views:
+              type: integer
+            total_clicks:
+              type: integer
+            total_conversions:
+              type: integer
+            total_revenue:
+              type: number
+              format: float
+            top_performing_campaigns:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  conversion_rate:
+                    type: number
+                    format: float
+                  total_revenue:
+                    type: number
+                    format: float
+            campaign_types_breakdown:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  count:
+                    type: integer
+                  avg_conversion_rate:
+                    type: number
+                    format: float
+    CampaignComparison:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              type:
+                type: string
+              status:
+                type: string
+              views:
+                type: integer
+              clicks:
+                type: integer
+              conversions:
+                type: integer
+              revenue:
+                type: number
+                format: float
+              conversion_rate:
+                type: number
+                format: float
+              click_through_rate:
+                type: number
+                format: float
+              roi:
+                type: number
+                format: float
+              performance_score:
+                type: number
+                format: float
+    CampaignRecommendations:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              priority:
+                type: string
+              title:
+                type: string
+              description:
+                type: string
+              action:
+                type: string
+    SystemSettingsIndex:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          additionalProperties: true
+    SystemSettingItem:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        key:
+          type: string
+        name:
+          type: string
+        value:
+          nullable: true
+        type:
+          type: string
+        group:
+          type: string
+        description:
+          type: string
+        help_text:
+          type: string
+    SystemSettingCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+        settings_count:
+          type: integer
+    SystemSettingCategories:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemSettingCategory'
+    SystemSettingGroup:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        settings_count:
+          type: integer
+    SystemSettingGroups:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemSettingGroup'
+    DiscountConditionTest:
+      type: object
+      required: [matches, is_valid, condition_description]
+      properties:
+        matches:
+          type: boolean
+        is_valid:
+          type: boolean
+        condition_description:
+          type: string
+        message:
+          type: string
+    DiscountConditionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        type_label:
+          type: string
+        operator:
+          type: string
+        operator_label:
+          type: string
+        value:
+          nullable: true
+        priority:
+          type: integer
+        position:
+          type: integer
+        description:
+          type: string
+        name:
+          type: string
+    DiscountConditions:
+      type: object
+      required: [conditions]
+      properties:
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscountConditionItem'
+    DiscountConditionOperators:
+      type: object
+      required: [operators]
+      properties:
+        operators:
+          type: array
+          items:
+            type: string
+    DiscountConditionStatistics:
+      type: object
+      required: [total, active, inactive]
+      properties:
+        total:
+          type: integer
+        active:
+          type: integer
+        inactive:
+          type: integer
+        by_type:
+          type: object
+          additionalProperties:
+            type: integer
+        by_operator:
+          type: object
+          additionalProperties:
+            type: integer
+    AutocompleteResult:
+      type: object
+      required: [value, label]
+      properties:
+        value:
+          oneOf:
+            - type: integer
+            - type: string
+        label:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+    AutocompleteResults:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutocompleteResult'
+        meta:
+          type: object
+          additionalProperties: true
+    AutocompleteSuggestions:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        meta:
+          type: object
+          additionalProperties: true
+    AutocompletePersonalized:
+      allOf:
+        - $ref: '#/components/schemas/AutocompleteSuggestions'
+    AutocompletePaginatedResults:
+      type: object
+      required: [success, data, pagination]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutocompleteResult'
+        pagination:
+          type: object
+          additionalProperties: true
+        infinite_scroll:
+          type: object
+          additionalProperties: true
+        filters:
+          type: object
+          additionalProperties: true
+        query:
+          type: string
+    AutocompleteExport:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          nullable: true
+        export_id:
+          type: string
+          nullable: true
+        download_url:
+          type: string
+          format: uri
+          nullable: true
+    AutocompleteShare:
+      type: object
+      required: [success, share_id]
+      properties:
+        success:
+          type: boolean
+        share_id:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        url:
+          type: string
+          format: uri
+    AutocompleteShareView:
+      type: object
+      required: [success, share_data]
+      properties:
+        success:
+          type: boolean
+        share_data:
+          type: object
+          additionalProperties: true
+    AutocompleteFilters:
+      type: object
+      required: [success, filters]
+      properties:
+        success:
+          type: boolean
+        filters:
+          type: object
+          additionalProperties: true
+        query:
+          type: string
+    AutocompleteInsights:
+      type: object
+      required: [success, insights]
+      properties:
+        success:
+          type: boolean
+        insights:
+          type: object
+          additionalProperties: true
+        query:
+          type: string
+    AutocompleteRecommendations:
+      type: object
+      required: [success, recommendations]
+      properties:
+        success:
+          type: boolean
+        recommendations:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        query:
+          type: string
+    AutocompleteAnalytics:
+      type: object
+      required: [success, analytics]
+      properties:
+        success:
+          type: boolean
+        analytics:
+          type: object
+          additionalProperties: true
+    AutocompleteSearchRequest:
+      type: object
+      required: [model_class, search_query]
+      properties:
+        model_class:
+          type: string
+        search_query:
+          type: string
+        search_field:
+          type: string
+        value_field:
+          type: string
+        label_field:
+          type: string
+        limit:
+          type: integer
+    AutocompleteSearchResults:
+      allOf:
+        - $ref: '#/components/schemas/AutocompleteResults'
+  responses:
+    SuccessMessage:
+      description: Generic success response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SuccessMessage'
+    CampaignAcknowledgement:
+      description: Campaign interaction recorded.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SuccessMessage'
+    CampaignStatistics:
+      description: Aggregated campaign statistics.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CampaignStatistics'
+    CampaignTypes:
+      description: Campaign types summary.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CampaignTypes'
+    CampaignPerformance:
+      description: Campaign performance buckets.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CampaignPerformance'
+    CampaignAnalytics:
+      description: Campaign analytics payload.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CampaignAnalytics'
+    CampaignComparison:
+      description: Campaign comparison dataset.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CampaignComparison'
+    CampaignComparisonError:
+      description: Missing campaign identifiers.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    CampaignRecommendations:
+      description: Campaign recommendation list.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CampaignRecommendations'
+    SystemSettingsIndex:
+      description: Key/value map of system settings.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SystemSettingsIndex'
+    SystemSettingItem:
+      description: Detailed system setting.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SystemSettingItem'
+    SystemSettingNotFound:
+      description: System setting missing.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    SystemSettingCategories:
+      description: Collection of system setting categories.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SystemSettingCategories'
+    SystemSettingGroups:
+      description: Collection of system setting groups.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SystemSettingGroups'
+    DiscountConditionTest:
+      description: Discount condition evaluation result.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DiscountConditionTest'
+    ValidationError:
+      description: Request validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+    DiscountConditions:
+      description: Discount conditions for a discount.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DiscountConditions'
+    DiscountConditionOperators:
+      description: Operator list for a discount condition type.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DiscountConditionOperators'
+    DiscountConditionStatistics:
+      description: Discount condition statistics.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DiscountConditionStatistics'
+    AutocompleteResults:
+      description: Autocomplete results payload.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteResults'
+    AutocompleteSuggestions:
+      description: Autocomplete suggestion payload.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteSuggestions'
+    AutocompletePersonalized:
+      description: Personalized autocomplete suggestions.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompletePersonalized'
+    AutocompletePaginatedResults:
+      description: Paginated autocomplete response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompletePaginatedResults'
+    AutocompleteExport:
+      description: Autocomplete export metadata.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteExport'
+    AutocompleteExportNotFound:
+      description: Autocomplete export not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    AutocompleteShare:
+      description: Shareable search descriptor.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteShare'
+    AutocompleteShareView:
+      description: Shared search payload.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteShareView'
+    AutocompleteShareNotFound:
+      description: Shared search not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    AutocompleteFilters:
+      description: Available filters derived from search results.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteFilters'
+    AutocompleteInsights:
+      description: Search insight payload.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteInsights'
+    AutocompleteRecommendations:
+      description: Search recommendation payload.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteRecommendations'
+    AutocompleteAnalytics:
+      description: Search analytics payload.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteAnalytics'
+    AutocompleteSearchResults:
+      description: Generic autocomplete search response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutocompleteSearchResults'
+    AutocompleteValidationError:
+      description: Autocomplete validation failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+    AutocompleteFailure:
+      description: Autocomplete processing error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    AuthenticationError:
+      description: Authentication is required to access the resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
