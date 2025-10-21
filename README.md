@@ -17,6 +17,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Start with the curated [documentation index](docs/INDEX.md) for the setup → deploy → data model → admin guide → troubleshooting path.
 - Browse the rest of the knowledge base directly in [docs/](docs/).
 
+## Latest updates
+- Feature flag administration now surfaces inactive and disabled flags so operators can audit and re-enable them without reaching for database tooling.
+
 ## Requirements
 - PHP 8.2+ with `ext-sqlite3`, `ext-fileinfo`, and `ext-gd`
 - Composer 2.6+
