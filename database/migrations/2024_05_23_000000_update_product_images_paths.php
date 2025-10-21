@@ -27,7 +27,20 @@ return new class extends Migration {
 
                     $normalized = ltrim($path, '/');
 
+                    // Skip already-normalised or external URLs so we do not corrupt remote assets.
                     if (Str::startsWith($normalized, 'storage/')) {
+                        continue;
+                    }
+
+                    if (preg_match('/^[a-z0-9]+:\/\//i', $normalized) === 1) {
+                        continue;
+                    }
+
+                    if (Str::startsWith($normalized, 'data:')) {
+                        continue;
+                    }
+
+                    if (str_contains($normalized, '..')) {
                         continue;
                     }
 
