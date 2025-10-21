@@ -33,7 +33,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 /**
  * VariantAnalyticsResource
@@ -50,7 +49,7 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /**
-     * @var string|UnitEnum|null
+     * @var string|null
      */
     protected static ?string $navigationGroup = 'Inventory';
 

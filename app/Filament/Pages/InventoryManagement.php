@@ -15,7 +15,6 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
-use UnitEnum;
 
 final class InventoryManagement extends Page implements HasTable
 {
@@ -29,7 +28,7 @@ final class InventoryManagement extends Page implements HasTable
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
     /**
-     * @return string|UnitEnum|null
+     * @return string|null
      */
     public static function getNavigationGroup(): ?string
     {

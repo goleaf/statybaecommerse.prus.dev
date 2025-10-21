@@ -29,7 +29,6 @@ use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class SliderManagement extends Page implements HasActions, HasForms
 {
@@ -49,7 +48,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     protected static ?int $navigationSort = 1;
 
     /**
-     * @return string|UnitEnum|null
+     * @return string|null
      */
     public static function getNavigationGroup(): ?string
     {
