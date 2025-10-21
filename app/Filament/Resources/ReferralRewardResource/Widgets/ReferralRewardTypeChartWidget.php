@@ -22,8 +22,8 @@ final class ReferralRewardTypeChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('referral_rewards.charts.rewards_by_type'),
-                    'data' => $data->pluck('count')->toArray(),
+                    'label'           => __('referral_rewards.charts.rewards_by_type'),
+                    'data'            => $data->pluck('count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // blue
                         '#10B981', // emerald

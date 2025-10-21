@@ -11,8 +11,8 @@ use App\Filament\Resources\OrderShippings\Schemas\OrderShippingForm;
 use App\Filament\Resources\OrderShippings\Tables\OrderShippingsTable;
 use App\Models\OrderShipping;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
@@ -26,12 +26,15 @@ class OrderShippingResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return OrderShippingForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return OrderShippingsTable::configure($table);
     }
@@ -46,9 +49,9 @@ class OrderShippingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListOrderShippings::route('/'),
+            'index'  => ListOrderShippings::route('/'),
             'create' => CreateOrderShipping::route('/create'),
-            'edit' => EditOrderShipping::route('/{record}/edit'),
+            'edit'   => EditOrderShipping::route('/{record}/edit'),
         ];
     }
 }

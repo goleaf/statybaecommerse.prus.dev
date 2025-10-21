@@ -12,9 +12,11 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ProductSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction as TableBulkAction;
@@ -29,9 +31,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -43,8 +45,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
+use Str;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * WishlistItemResource
@@ -107,8 +109,11 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 FormSection::make(__('admin.wishlist_items.sections.basic_info'))
@@ -290,7 +295,7 @@ final class WishlistItemResource extends Resource
 
                                 return view('components.product-image', [
                                     'image' => $product->featured_image,
-                                    'alt' => $product->name,
+                                    'alt'   => $product->name,
                                 ])->render();
                             })
                             ->columnSpanFull(),
@@ -304,7 +309,7 @@ final class WishlistItemResource extends Resource
 
                                 $product = Product::find($productId);
 
-                                return $product ? \Str::limit($product->description, 200) : '';
+                                return $product ? Str::limit($product->description, 200) : '';
                             })
                             ->columnSpanFull(),
                     ])
@@ -315,7 +320,7 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -547,7 +552,7 @@ final class WishlistItemResource extends Resource
                                     ->title(__('admin.wishlist_items.moved_to_cart_successfully'))
                                     ->success()
                                     ->send();
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.move_to_cart_error'))
                                     ->danger()
@@ -588,7 +593,7 @@ final class WishlistItemResource extends Resource
                                     ->title(__('admin.wishlist_items.bulk_moved_to_cart_successfully', ['count' => $moved]))
                                     ->success()
                                     ->send();
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.bulk_move_to_cart_error'))
                                     ->danger()
@@ -669,30 +674,30 @@ final class WishlistItemResource extends Resource
         $snapshotName = $variant?->name ?? $product->name;
 
         if (! empty($variantAttributes)) {
-            $snapshotName .= ' ('.collect($variantAttributes)
+            $snapshotName .= ' (' . collect($variantAttributes)
                 ->map(fn ($value, $key) => sprintf('%s: %s', $key, $value))
-                ->implode(', ').')';
+                ->implode(', ') . ')';
         }
 
         $productSnapshot = array_filter([
-            'name' => $snapshotName,
-            'sku' => $variant?->sku ?? $product->sku,
-            'price' => $unitPrice,
-            'variant_id' => $variant?->getKey(),
+            'name'               => $snapshotName,
+            'sku'                => $variant?->sku ?? $product->sku,
+            'price'              => $unitPrice,
+            'variant_id'         => $variant?->getKey(),
             'variant_attributes' => ! empty($variantAttributes) ? $variantAttributes : null,
         ], static fn ($value) => $value !== null);
 
         return [
-            'user_id' => $record->wishlist->user_id,
-            'product_id' => $product->getKey(),
-            'variant_id' => $variant?->getKey(),
+            'user_id'            => $record->wishlist->user_id,
+            'product_id'         => $product->getKey(),
+            'variant_id'         => $variant?->getKey(),
             'product_variant_id' => $variant?->getKey(),
-            'quantity' => $quantity,
-            'minimum_quantity' => $product->getMinimumQuantity(),
-            'unit_price' => $unitPrice,
-            'total_price' => $totalPrice,
-            'price' => $unitPrice,
-            'product_snapshot' => $productSnapshot,
+            'quantity'           => $quantity,
+            'minimum_quantity'   => $product->getMinimumQuantity(),
+            'unit_price'         => $unitPrice,
+            'total_price'        => $totalPrice,
+            'price'              => $unitPrice,
+            'product_snapshot'   => $productSnapshot,
         ];
     }
 
@@ -702,10 +707,10 @@ final class WishlistItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWishlistItems::route('/'),
+            'index'  => Pages\ListWishlistItems::route('/'),
             'create' => Pages\CreateWishlistItem::route('/create'),
-            'view' => Pages\ViewWishlistItem::route('/{record}'),
-            'edit' => Pages\EditWishlistItem::route('/{record}/edit'),
+            'view'   => Pages\ViewWishlistItem::route('/{record}'),
+            'edit'   => Pages\EditWishlistItem::route('/{record}/edit'),
         ];
     }
 }

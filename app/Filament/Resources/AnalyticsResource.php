@@ -6,12 +6,12 @@ namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
-use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\Summarizers\Average;
 use Filament\Tables\Columns\Summarizers\Count;
@@ -28,7 +28,7 @@ final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
@@ -65,12 +65,15 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form;
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.
@@ -134,7 +137,7 @@ final class AnalyticsResource extends Resource
                     ->label(__('analytics.status'))
                     ->sortable()
                     ->badge()
-                    ->formatStateUsing(static fn (string $state): string => __('analytics.'.strtolower($state)))
+                    ->formatStateUsing(static fn (string $state): string => __('analytics.' . strtolower($state)))
                     ->color(static fn (string $state): string => match ($state) {
                         'completed', 'delivered' => 'success',
                         'pending' => 'warning',
@@ -157,13 +160,13 @@ final class AnalyticsResource extends Resource
                 SelectFilter::make('status')
                     ->label(__('analytics.status'))
                     ->options([
-                        'pending' => __('analytics.pending'),
+                        'pending'    => __('analytics.pending'),
                         'processing' => __('analytics.processing'),
-                        'completed' => __('analytics.completed'),
-                        'cancelled' => __('analytics.cancelled'),
-                        'shipped' => __('analytics.shipped'),
-                        'delivered' => __('analytics.delivered'),
-                        'refunded' => __('analytics.refunded'),
+                        'completed'  => __('analytics.completed'),
+                        'cancelled'  => __('analytics.cancelled'),
+                        'shipped'    => __('analytics.shipped'),
+                        'delivered'  => __('analytics.delivered'),
+                        'refunded'   => __('analytics.refunded'),
                     ])
                     ->searchable(),
                 SelectFilter::make('user_id')
@@ -183,7 +186,7 @@ final class AnalyticsResource extends Resource
                             ->displayFormat('Y-m-d'),
                     ])
                     ->indicateUsing(static fn (array $data): ?string => isset($data['range']['start'], $data['range']['end'])
-                        ? __('analytics.order_date_range').': '.$data['range']['start'].' → '.$data['range']['end']
+                        ? __('analytics.order_date_range') . ': ' . $data['range']['start'] . ' → ' . $data['range']['end']
                         : null)
                     ->query(static fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

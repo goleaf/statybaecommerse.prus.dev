@@ -15,8 +15,8 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -66,8 +66,11 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.plural');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('api_keys.sections.details'))
                 ->columns(2)
@@ -141,7 +144,7 @@ final class ApiKeyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -219,7 +222,7 @@ final class ApiKeyResource extends Resource
                         $credentials = ApiKey::generateCredentials();
 
                         $record->forceFill([
-                            'key' => $credentials['hashed'],
+                            'key'          => $credentials['hashed'],
                             'last_used_at' => null,
                         ])->save();
 
@@ -241,9 +244,9 @@ final class ApiKeyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListApiKeys::route('/'),
+            'index'  => Pages\ListApiKeys::route('/'),
             'create' => Pages\CreateApiKey::route('/create'),
-            'edit' => Pages\EditApiKey::route('/{record}/edit'),
+            'edit'   => Pages\EditApiKey::route('/{record}/edit'),
         ];
     }
 }

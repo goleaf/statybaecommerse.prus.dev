@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\NewsTags\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\NewsTags\NewsTagResource;
 use Filament\Actions\CreateAction;
-use App\Filament\Pages\Support\BaseListRecords;
 
 class ListNewsTags extends BaseListRecords
 {

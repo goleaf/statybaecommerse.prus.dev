@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
@@ -15,8 +16,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -31,7 +32,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
-use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignResource extends Resource
 {
@@ -61,8 +61,11 @@ final class CampaignResource extends Resource
         return __('campaigns.models.campaign');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             // Section component keeps the basic information grouped for clarity in Filament v4.
             Section::make(__('campaigns.sections.basic_information'))
@@ -89,10 +92,10 @@ final class CampaignResource extends Resource
                     Select::make('status')
                         ->label(self::label('campaigns.fields.status', 'Status'))
                         ->options([
-                            'draft' => self::label('campaigns.status.draft', 'Draft'),
-                            'active' => self::label('campaigns.status.active', 'Active'),
+                            'draft'     => self::label('campaigns.status.draft', 'Draft'),
+                            'active'    => self::label('campaigns.status.active', 'Active'),
                             'scheduled' => self::label('campaigns.status.scheduled', 'Scheduled'),
-                            'paused' => self::label('campaigns.status.paused', 'Paused'),
+                            'paused'    => self::label('campaigns.status.paused', 'Paused'),
                             'completed' => self::label('campaigns.status.completed', 'Completed'),
                             'cancelled' => self::label('campaigns.status.cancelled', 'Cancelled'),
                         ])
@@ -243,13 +246,13 @@ final class CampaignResource extends Resource
                 TextColumn::make('status')
                     ->label(self::label('campaigns.fields.status', 'Status'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.'.$state, Str::headline($state)))
+                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.' . $state, Str::headline($state)))
                     ->colors([
                         'primary' => fn (string $state): bool => in_array($state, ['draft', 'scheduled']),
                         'success' => fn (string $state): bool => $state === 'active',
                         'warning' => fn (string $state): bool => $state === 'paused',
-                        'info' => fn (string $state): bool => $state === 'completed',
-                        'danger' => fn (string $state): bool => $state === 'cancelled',
+                        'info'    => fn (string $state): bool => $state === 'completed',
+                        'danger'  => fn (string $state): bool => $state === 'cancelled',
                     ]),
                 IconColumn::make('is_active')
                     ->label(self::label('campaigns.fields.is_active', 'Active'))
@@ -275,7 +278,7 @@ final class CampaignResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('conversion_rate')
                     ->label(self::label('campaigns.fields.conversion_rate', 'Conversion rate'))
-                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2).'%')
+                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2) . '%')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('translations_count')
@@ -293,10 +296,10 @@ final class CampaignResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => self::label('campaigns.status.draft', 'Draft'),
-                        'active' => self::label('campaigns.status.active', 'Active'),
+                        'draft'     => self::label('campaigns.status.draft', 'Draft'),
+                        'active'    => self::label('campaigns.status.active', 'Active'),
                         'scheduled' => self::label('campaigns.status.scheduled', 'Scheduled'),
-                        'paused' => self::label('campaigns.status.paused', 'Paused'),
+                        'paused'    => self::label('campaigns.status.paused', 'Paused'),
                         'completed' => self::label('campaigns.status.completed', 'Completed'),
                         'cancelled' => self::label('campaigns.status.cancelled', 'Cancelled'),
                     ]),
@@ -306,7 +309,7 @@ final class CampaignResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(self::label('campaigns.fields.created_at', 'Created at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
@@ -343,10 +346,10 @@ final class CampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaigns::route('/'),
+            'index'  => Pages\ListCampaigns::route('/'),
             'create' => Pages\CreateCampaign::route('/create'),
-            'view' => Pages\ViewCampaign::route('/{record}'),
-            'edit' => Pages\EditCampaign::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaign::route('/{record}'),
+            'edit'   => Pages\EditCampaign::route('/{record}/edit'),
         ];
     }
 

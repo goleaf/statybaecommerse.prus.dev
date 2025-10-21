@@ -25,7 +25,7 @@ final class AddressTableWidget extends BaseWidget
     /**
      * Get table
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query(
@@ -48,11 +48,11 @@ final class AddressTableWidget extends BaseWidget
                     ->badge()
                     ->color(fn ($state) => match ($state) {
                         \App\Enums\AddressType::SHIPPING => 'primary',
-                        \App\Enums\AddressType::BILLING => 'success',
-                        \App\Enums\AddressType::HOME => 'warning',
-                        \App\Enums\AddressType::WORK => 'info',
-                        \App\Enums\AddressType::OTHER => 'secondary',
-                        default => 'gray',
+                        \App\Enums\AddressType::BILLING  => 'success',
+                        \App\Enums\AddressType::HOME     => 'warning',
+                        \App\Enums\AddressType::WORK     => 'info',
+                        \App\Enums\AddressType::OTHER    => 'secondary',
+                        default                          => 'gray',
                     }),
                 TextColumn::make('city')
                     ->label(__('translations.city'))

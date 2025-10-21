@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -20,7 +20,7 @@ class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Documents';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -37,7 +37,7 @@ class DocumentsRelationManager extends BaseRelationManager
                     ->copyable(),
                 TextColumn::make('file_size')
                     ->label(__('documents.fields.file_size'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : ''),
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
             ])
             ->headerActions([
                 AttachAction::make()

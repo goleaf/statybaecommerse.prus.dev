@@ -63,18 +63,18 @@ final class SliderPerformanceChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Active Sliders',
-                    'data' => $activeData,
+                    'label'           => 'Active Sliders',
+                    'data'            => $activeData,
                     'backgroundColor' => 'rgba(34, 197, 94, 0.8)',
-                    'borderColor' => 'rgb(34, 197, 94)',
-                    'borderWidth' => 2,
+                    'borderColor'     => 'rgb(34, 197, 94)',
+                    'borderWidth'     => 2,
                 ],
                 [
-                    'label' => 'Inactive Sliders',
-                    'data' => $inactiveData,
+                    'label'           => 'Inactive Sliders',
+                    'data'            => $inactiveData,
                     'backgroundColor' => 'rgba(107, 114, 128, 0.8)',
-                    'borderColor' => 'rgb(107, 114, 128)',
-                    'borderWidth' => 2,
+                    'borderColor'     => 'rgb(107, 114, 128)',
+                    'borderWidth'     => 2,
                 ],
             ],
             'labels' => $weeks,
@@ -89,12 +89,12 @@ final class SliderPerformanceChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'scales' => [
+            'scales'              => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'stepSize' => 1,
                     ],
                 ],
@@ -105,7 +105,7 @@ final class SliderPerformanceChart extends ChartWidget
                 ],
                 'title' => [
                     'display' => true,
-                    'text' => 'Slider Performance Trends',
+                    'text'    => 'Slider Performance Trends',
                 ],
             ],
         ];

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages;
-use App\Support\Forms\MatrixFactory;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\ProductVariantAttributeMatrixService;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -29,10 +30,10 @@ use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -46,7 +47,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * ProductVariantResource
@@ -91,8 +91,11 @@ final class ProductVariantResource extends Resource
         return 'Products';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Tabs::make('Variant Information')
@@ -339,10 +342,10 @@ final class ProductVariantResource extends Resource
         return $attributes
             ->map(function (Attribute $attribute): array {
                 return [
-                    'key' => 'attribute_'.$attribute->getKey(),
+                    'key'          => 'attribute_' . $attribute->getKey(),
                     'attribute_id' => $attribute->getKey(),
-                    'label' => $attribute->trans('name') ?? $attribute->name,
-                    'options' => $attribute->values
+                    'label'        => $attribute->trans('name') ?? $attribute->name,
+                    'options'      => $attribute->values
                         ->mapWithKeys(fn (AttributeValue $value): array => [
                             (string) $value->getKey() => $value->display_value ?? $value->value,
                         ])
@@ -359,7 +362,7 @@ final class ProductVariantResource extends Resource
             ->every(fn ($item): bool => is_array($item) && array_key_exists('attribute_id', $item) && array_key_exists('attribute_value_id', $item));
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -33,7 +33,7 @@ final class ReferralRewardStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make(__('referral_rewards.stats.total_paid'), '€'.number_format($totalValue, 2))
+            Stat::make(__('referral_rewards.stats.total_paid'), '€' . number_format($totalValue, 2))
                 ->description(__('referral_rewards.stats.total_paid_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('info'),

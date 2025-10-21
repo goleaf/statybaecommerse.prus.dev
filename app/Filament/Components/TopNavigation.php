@@ -22,8 +22,8 @@ class TopNavigation extends Widget
 
         return [
             'navigationGroups' => $this->getNavigationGroups(),
-            'user' => $user,
-            'isAdmin' => $user?->is_admin ?? false,
+            'user'             => $user,
+            'isAdmin'          => $user?->is_admin ?? false,
         ];
     }
 
@@ -34,17 +34,17 @@ class TopNavigation extends Widget
         foreach (NavigationGroup::ordered() as $group) {
             if ($this->canAccessGroup($group)) {
                 $groups[] = [
-                    'key' => $group->value,
-                    'label' => $group->label(),
-                    'description' => $group->description(),
-                    'icon' => $group->icon(),
-                    'color' => $group->color(),
-                    'priority' => $group->priority(),
-                    'is_core' => $group->isCore(),
-                    'is_admin_only' => $group->isAdminOnly(),
-                    'is_public' => $group->isPublic(),
+                    'key'                 => $group->value,
+                    'label'               => $group->label(),
+                    'description'         => $group->description(),
+                    'icon'                => $group->icon(),
+                    'color'               => $group->color(),
+                    'priority'            => $group->priority(),
+                    'is_core'             => $group->isCore(),
+                    'is_admin_only'       => $group->isAdminOnly(),
+                    'is_public'           => $group->isPublic(),
                     'requires_permission' => $group->requiresPermission(),
-                    'permission' => $group->getPermission(),
+                    'permission'          => $group->getPermission(),
                 ];
             }
         }

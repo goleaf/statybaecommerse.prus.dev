@@ -31,20 +31,20 @@ final class NotificationTypesWidget extends ChartWidget
             'rgb(107, 114, 128)',  // gray
         ];
 
-        foreach ($types as $index => $type) {
+        foreach ($types as $type) {
             $count = Notification::where('type', $type)->count();
             if ($count > 0) {
                 $data[] = $count;
-                $labels[] = __('notifications.types.'.$type);
+                $labels[] = __('notifications.types.' . $type);
             }
         }
 
         return [
             'datasets' => [
                 [
-                    'data' => $data,
+                    'data'            => $data,
                     'backgroundColor' => array_slice($colors, 0, count($data)),
-                    'borderWidth' => 0,
+                    'borderWidth'     => 0,
                 ],
             ],
             'labels' => $labels,

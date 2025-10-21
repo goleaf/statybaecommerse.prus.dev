@@ -60,22 +60,22 @@ final class SliderViewsTimeline extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Views',
-                    'data' => $viewsData,
+                    'label'           => 'Views',
+                    'data'            => $viewsData,
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'borderColor' => 'rgb(59, 130, 246)',
-                    'borderWidth' => 2,
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'borderColor'     => 'rgb(59, 130, 246)',
+                    'borderWidth'     => 2,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'Clicks',
-                    'data' => $clicksData,
+                    'label'           => 'Clicks',
+                    'data'            => $clicksData,
                     'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
-                    'borderColor' => 'rgb(16, 185, 129)',
-                    'borderWidth' => 2,
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'borderColor'     => 'rgb(16, 185, 129)',
+                    'borderWidth'     => 2,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
             ],
             'labels' => $days,
@@ -90,12 +90,12 @@ final class SliderViewsTimeline extends ChartWidget
     public function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'scales' => [
+            'scales'              => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'stepSize' => 10,
                     ],
                 ],
@@ -106,7 +106,7 @@ final class SliderViewsTimeline extends ChartWidget
                 ],
                 'title' => [
                     'display' => true,
-                    'text' => 'Daily Views and Clicks',
+                    'text'    => 'Daily Views and Clicks',
                 ],
                 'filler' => [
                     'propagate' => false,

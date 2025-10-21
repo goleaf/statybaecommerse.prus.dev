@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
 
 class CodeRelationManager extends BaseRelationManager
 {
@@ -22,8 +22,11 @@ class CodeRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Section::make('Code Information')
@@ -56,9 +59,9 @@ class CodeRelationManager extends BaseRelationManager
                             ->default(true),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'active' => 'Active',
-                                'inactive' => 'Inactive',
-                                'expired' => 'Expired',
+                                'active'    => 'Active',
+                                'inactive'  => 'Inactive',
+                                'expired'   => 'Expired',
                                 'suspended' => 'Suspended',
                             ])
                             ->default('active'),
@@ -67,7 +70,7 @@ class CodeRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('code')
@@ -114,11 +117,11 @@ class CodeRelationManager extends BaseRelationManager
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'gray',
-                        'expired' => 'danger',
+                        'active'    => 'success',
+                        'inactive'  => 'gray',
+                        'expired'   => 'danger',
                         'suspended' => 'warning',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
@@ -129,9 +132,9 @@ class CodeRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                        'expired' => 'Expired',
+                        'active'    => 'Active',
+                        'inactive'  => 'Inactive',
+                        'expired'   => 'Expired',
                         'suspended' => 'Suspended',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')

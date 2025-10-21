@@ -62,17 +62,17 @@ final class CreateProductVariant extends CreateRecord
 
         $sku = $baseSku;
         if ($size) {
-            $sku .= '-'.strtoupper($size);
+            $sku .= '-' . strtoupper($size);
         }
         if ($suffix) {
-            $sku .= '-'.strtoupper($suffix);
+            $sku .= '-' . strtoupper($suffix);
         }
 
         // Ensure uniqueness
         $originalSku = $sku;
         $counter = 1;
         while (\App\Models\ProductVariant::where('sku', $sku)->exists()) {
-            $sku = $originalSku.'-'.$counter;
+            $sku = $originalSku . '-' . $counter;
             $counter++;
         }
 

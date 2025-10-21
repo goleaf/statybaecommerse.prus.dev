@@ -29,12 +29,12 @@ final class RecentProductChangesWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('product_histories.charts.recent_changes'),
-                    'data' => $data->pluck('count')->toArray(),
-                    'borderColor' => '#3B82F6',
+                    'label'           => __('product_histories.charts.recent_changes'),
+                    'data'            => $data->pluck('count')->toArray(),
+                    'borderColor'     => '#3B82F6',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
             ],
             'labels' => $data->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
@@ -52,7 +52,7 @@ final class RecentProductChangesWidget extends ChartWidget
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'stepSize' => 1,
                     ],
                 ],

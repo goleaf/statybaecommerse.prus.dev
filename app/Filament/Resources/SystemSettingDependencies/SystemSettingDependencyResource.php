@@ -11,8 +11,8 @@ use App\Filament\Resources\SystemSettingDependencies\Schemas\SystemSettingDepend
 use App\Filament\Resources\SystemSettingDependencies\Tables\SystemSettingDependenciesTable;
 use App\Models\SystemSettingDependency;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
@@ -22,12 +22,15 @@ class SystemSettingDependencyResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return SystemSettingDependencyForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return SystemSettingDependenciesTable::configure($table);
     }
@@ -42,9 +45,9 @@ class SystemSettingDependencyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSystemSettingDependencies::route('/'),
+            'index'  => ListSystemSettingDependencies::route('/'),
             'create' => CreateSystemSettingDependency::route('/create'),
-            'edit' => EditSystemSettingDependency::route('/{record}/edit'),
+            'edit'   => EditSystemSettingDependency::route('/{record}/edit'),
         ];
     }
 }

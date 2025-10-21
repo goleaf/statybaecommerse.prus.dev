@@ -27,11 +27,11 @@ final class NotificationTrendsWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('notifications.charts.notification_count'),
-                    'data' => $data,
-                    'borderColor' => 'rgb(59, 130, 246)',
+                    'label'           => __('notifications.charts.notification_count'),
+                    'data'            => $data,
+                    'borderColor'     => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'fill' => true,
+                    'fill'            => true,
                 ],
             ],
             'labels' => $labels,

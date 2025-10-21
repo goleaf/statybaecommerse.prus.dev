@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ProductSearch;
+use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -21,9 +22,9 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -36,10 +37,8 @@ final class CartItemResource extends Resource
 {
     /**
      * Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
-     *
-     * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -66,8 +65,11 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('cart_items.basic_information'))
                 ->schema([
@@ -135,7 +137,7 @@ final class CartItemResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
                             if ($state) {
                                 $variant = ProductVariant::find($state);
                                 if ($variant) {
@@ -165,7 +167,7 @@ final class CartItemResource extends Resource
                                 ->minValue(1)
                                 ->default(1)
                                 ->required()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
@@ -196,7 +198,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $state;
                                     $quantity = (int) $get('quantity');
                                     $total = $unitPrice * $quantity;
@@ -208,7 +210,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $get('quantity');
                                     $discount = (float) $state;
@@ -401,10 +403,10 @@ final class CartItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCartItems::route('/'),
+            'index'  => Pages\ListCartItems::route('/'),
             'create' => Pages\CreateCartItem::route('/create'),
-            'view' => Pages\ViewCartItem::route('/{record}'),
-            'edit' => Pages\EditCartItem::route('/{record}/edit'),
+            'view'   => Pages\ViewCartItem::route('/{record}'),
+            'edit'   => Pages\EditCartItem::route('/{record}/edit'),
         ];
     }
 }

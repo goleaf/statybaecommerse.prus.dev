@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -21,7 +22,6 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Filament\Components\Flatpickr;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -50,8 +50,11 @@ class StockMovementsRelationManager extends BaseRelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 TextInput::make('quantity')
@@ -62,7 +65,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                 Select::make('type')
                     ->label(__('inventory.movement_type'))
                     ->options([
-                        'in' => __('inventory.stock_in'),
+                        'in'  => __('inventory.stock_in'),
                         'out' => __('inventory.stock_out'),
                     ])
                     ->required()
@@ -70,14 +73,14 @@ class StockMovementsRelationManager extends BaseRelationManager
                 Select::make('reason')
                     ->label(__('inventory.reason'))
                     ->options([
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
+                        'sale'              => __('inventory.reason_sale'),
+                        'return'            => __('inventory.reason_return'),
+                        'adjustment'        => __('inventory.reason_adjustment'),
                         'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
+                        'restock'           => __('inventory.reason_restock'),
+                        'damage'            => __('inventory.reason_damage'),
+                        'theft'             => __('inventory.reason_theft'),
+                        'transfer'          => __('inventory.reason_transfer'),
                     ])
                     ->required()
                     ->searchable(),
@@ -96,7 +99,7 @@ class StockMovementsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('reference')
@@ -110,9 +113,9 @@ class StockMovementsRelationManager extends BaseRelationManager
                     ->label(__('inventory.movement_type'))
                     ->colors([
                         'success' => 'in',
-                        'danger' => 'out',
+                        'danger'  => 'out',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __('inventory.'.$state)),
+                    ->formatStateUsing(fn (string $state): string => __('inventory.' . $state)),
                 TextColumn::make('quantity')
                     ->label(__('inventory.quantity'))
                     ->sortable()
@@ -125,13 +128,13 @@ class StockMovementsRelationManager extends BaseRelationManager
                         'primary' => 'sale',
                         'success' => 'return',
                         'warning' => 'adjustment',
-                        'info' => 'manual_adjustment',
+                        'info'    => 'manual_adjustment',
                         'success' => 'restock',
-                        'danger' => 'damage',
-                        'danger' => 'theft',
-                        'info' => 'transfer',
+                        'danger'  => 'damage',
+                        'danger'  => 'theft',
+                        'info'    => 'transfer',
                     ])
-                    ->formatStateUsing(fn (string $state): string => __('inventory.reason_'.$state)),
+                    ->formatStateUsing(fn (string $state): string => __('inventory.reason_' . $state)),
                 TextColumn::make('reference')
                     ->label(__('inventory.reference'))
                     ->searchable()
@@ -154,20 +157,20 @@ class StockMovementsRelationManager extends BaseRelationManager
                 SelectFilter::make('type')
                     ->label(__('inventory.movement_type'))
                     ->options([
-                        'in' => __('inventory.stock_in'),
+                        'in'  => __('inventory.stock_in'),
                         'out' => __('inventory.stock_out'),
                     ]),
                 SelectFilter::make('reason')
                     ->label(__('inventory.reason'))
                     ->options([
-                        'sale' => __('inventory.reason_sale'),
-                        'return' => __('inventory.reason_return'),
-                        'adjustment' => __('inventory.reason_adjustment'),
+                        'sale'              => __('inventory.reason_sale'),
+                        'return'            => __('inventory.reason_return'),
+                        'adjustment'        => __('inventory.reason_adjustment'),
                         'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-                        'restock' => __('inventory.reason_restock'),
-                        'damage' => __('inventory.reason_damage'),
-                        'theft' => __('inventory.reason_theft'),
-                        'transfer' => __('inventory.reason_transfer'),
+                        'restock'           => __('inventory.reason_restock'),
+                        'damage'            => __('inventory.reason_damage'),
+                        'theft'             => __('inventory.reason_theft'),
+                        'transfer'          => __('inventory.reason_transfer'),
                     ])
                     ->multiple(),
                 Filter::make('recent')
@@ -187,7 +190,7 @@ class StockMovementsRelationManager extends BaseRelationManager
 
                         return $data;
                     })
-                    ->after(function ($record) {
+                    ->after(function ($record): void {
                         // Update the variant inventory stock based on movement
                         $variantInventory = $this->ownerRecord;
                         $quantity = $record->quantity;
@@ -210,7 +213,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
-                    ->after(function ($record) {
+                    ->after(function ($record): void {
                         // Reverse the stock movement when deleting
                         $variantInventory = $this->ownerRecord;
                         $quantity = $record->quantity;
@@ -225,7 +228,7 @@ class StockMovementsRelationManager extends BaseRelationManager
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->after(function ($records) {
+                        ->after(function ($records): void {
                             // Reverse all stock movements when bulk deleting
                             $variantInventory = $this->ownerRecord;
 

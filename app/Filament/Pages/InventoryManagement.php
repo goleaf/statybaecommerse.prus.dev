@@ -6,10 +6,11 @@ namespace App\Filament\Pages;
 
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
-use Filament\Tables\Actions\BulkAction;
+use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -23,9 +24,9 @@ final class InventoryManagement extends Page implements HasTable
     use InteractsWithTable;
 
     /**
-     * @var string|\BackedEnum|null Navigation icon override documented to avoid redundant enum imports.
+     * @var string|BackedEnum|null Navigation icon override documented to avoid redundant enum imports.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     public static function getNavigationGroup(): ?string
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Channels\Tables;
 
 use Filament\Actions\BulkActionGroup;
@@ -34,9 +36,9 @@ class ChannelsTable
                     ->label(__('admin.channels.type'))
                     ->colors([
                         'success' => 'web',
-                        'info' => 'mobile',
+                        'info'    => 'mobile',
                         'warning' => 'api',
-                        'danger' => 'pos',
+                        'danger'  => 'pos',
                     ]),
                 TextColumn::make('url')
                     ->label(__('admin.channels.url'))
@@ -65,10 +67,10 @@ class ChannelsTable
                 SelectFilter::make('type')
                     ->label(__('admin.channels.type'))
                     ->options([
-                        'web' => __('admin.channels.types.web'),
+                        'web'    => __('admin.channels.types.web'),
                         'mobile' => __('admin.channels.types.mobile'),
-                        'api' => __('admin.channels.types.api'),
-                        'pos' => __('admin.channels.types.pos'),
+                        'api'    => __('admin.channels.types.api'),
+                        'pos'    => __('admin.channels.types.pos'),
                     ]),
                 TernaryFilter::make('is_enabled')
                     ->label(__('admin.channels.is_enabled')),

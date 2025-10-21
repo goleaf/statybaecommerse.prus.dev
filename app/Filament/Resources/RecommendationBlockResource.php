@@ -13,20 +13,21 @@ use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Section;
-use Novadaemon\FilamentCombobox\Combobox;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Novadaemon\FilamentCombobox\Combobox;
+use UnitEnum;
 
 /**
  * RecommendationBlockResource
@@ -40,7 +41,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * @var string|BackedEnum|null Tracks the navigation group while remaining Filament compatible.
      */
-    protected static $navigationGroup = NavigationGroup::Products;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 13;
 
@@ -82,8 +83,11 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('recommendation_blocks.basic_information'))
                 ->schema([
@@ -159,7 +163,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -173,21 +177,21 @@ final class RecommendationBlockResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'featured' => 'success',
-                        'related' => 'info',
-                        'similar' => 'warning',
+                        'related'  => 'info',
+                        'similar'  => 'warning',
                         'trending' => 'danger',
-                        'recent' => 'gray',
-                        default => 'gray',
+                        'recent'   => 'gray',
+                        default    => 'gray',
                     }),
                 TextColumn::make('position')
                     ->label(__('recommendation_blocks.position'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'top' => 'success',
-                        'bottom' => 'info',
+                        'top'     => 'success',
+                        'bottom'  => 'info',
                         'sidebar' => 'warning',
-                        'inline' => 'danger',
-                        default => 'gray',
+                        'inline'  => 'danger',
+                        default   => 'gray',
                     }),
                 TextColumn::make('products_count')
                     ->label(__('recommendation_blocks.products_count'))
@@ -252,9 +256,9 @@ final class RecommendationBlockResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationBlocks::route('/'),
+            'index'  => Pages\ListRecommendationBlocks::route('/'),
             'create' => Pages\CreateRecommendationBlock::route('/create'),
-            'edit' => Pages\EditRecommendationBlock::route('/{record}/edit'),
+            'edit'   => Pages\EditRecommendationBlock::route('/{record}/edit'),
         ];
     }
 

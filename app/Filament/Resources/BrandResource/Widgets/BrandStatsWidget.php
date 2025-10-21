@@ -21,18 +21,18 @@ final class BrandStatsWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('brands.charts.products_count'),
-                    'data' => $data->pluck('products_count')->toArray(),
+                    'label'           => __('brands.charts.products_count'),
+                    'data'            => $data->pluck('products_count')->toArray(),
                     'backgroundColor' => 'rgba(59, 130, 246, 0.8)',
-                    'borderColor' => '#3B82F6',
-                    'borderWidth' => 1,
+                    'borderColor'     => '#3B82F6',
+                    'borderWidth'     => 1,
                 ],
                 [
-                    'label' => __('brands.charts.categories_count'),
-                    'data' => $data->pluck('categories_count')->toArray(),
+                    'label'           => __('brands.charts.categories_count'),
+                    'data'            => $data->pluck('categories_count')->toArray(),
                     'backgroundColor' => 'rgba(16, 185, 129, 0.8)',
-                    'borderColor' => '#10B981',
-                    'borderWidth' => 1,
+                    'borderColor'     => '#10B981',
+                    'borderWidth'     => 1,
                 ],
             ],
             'labels' => $data->pluck('name')->toArray(),
@@ -50,7 +50,7 @@ final class BrandStatsWidget extends ChartWidget
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'stepSize' => 1,
                     ],
                 ],

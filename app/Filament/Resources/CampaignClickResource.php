@@ -16,14 +16,14 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -66,11 +66,14 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      *
-     * @param  Forms\Form  $schema
+     * @param  Forms\Form $schema
      * @return Forms\Form
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
@@ -83,7 +86,7 @@ final class CampaignClickResource extends Resource
                                 ->preload()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $campaign = Campaign::find($state);
                                         if ($campaign) {
@@ -104,7 +107,7 @@ final class CampaignClickResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
                             if ($state) {
                                 $user = User::find($state);
                                 if ($user) {
@@ -192,7 +195,7 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -346,10 +349,10 @@ final class CampaignClickResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaignClicks::route('/'),
+            'index'  => Pages\ListCampaignClicks::route('/'),
             'create' => Pages\CreateCampaignClick::route('/create'),
-            'view' => Pages\ViewCampaignClick::route('/{record}'),
-            'edit' => Pages\EditCampaignClick::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaignClick::route('/{record}'),
+            'edit'   => Pages\EditCampaignClick::route('/{record}/edit'),
         ];
     }
 }

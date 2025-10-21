@@ -15,13 +15,13 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Schemas\Components\Utilities\Set as SchemaSet;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -36,6 +36,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -43,7 +44,6 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 
 final class CustomerResource extends Resource
 {
@@ -88,8 +88,11 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('customers.basic_information'))
                 ->schema([
@@ -187,7 +190,7 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -203,14 +206,14 @@ final class CustomerResource extends Resource
                         return collect([
                             filled($record->email) ? [
                                 'label' => __('Email :email', ['email' => $record->email]),
-                                'url' => 'mailto:'.$record->email,
-                                'icon' => 'heroicon-o-envelope',
+                                'url'   => 'mailto:' . $record->email,
+                                'icon'  => 'heroicon-o-envelope',
                                 'color' => 'info',
                             ] : null,
                             filled($record->phone) ? [
                                 'label' => __('Call :phone', ['phone' => $record->phone]),
-                                'url' => 'tel:'.preg_replace('/[^0-9+]/', '', (string) $record->phone),
-                                'icon' => 'heroicon-o-phone',
+                                'url'   => 'tel:' . preg_replace('/[^0-9+]/', '', (string) $record->phone),
+                                'icon'  => 'heroicon-o-phone',
                                 'color' => 'success',
                             ] : null,
                         ])

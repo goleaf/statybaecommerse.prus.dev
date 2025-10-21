@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
@@ -31,8 +31,11 @@ class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Section::make('Translation Details')
@@ -91,8 +94,8 @@ class TranslationsRelationManager extends BaseRelationManager
                             ->textColors([
                                 'primary' => '#1d4ed8',
                                 'emerald' => '#047857',
-                                'amber' => '#f59e0b',
-                                'slate' => '#475569',
+                                'amber'   => '#f59e0b',
+                                'slate'   => '#475569',
                             ])
                             ->helperText('The main content of this legal document'),
 
@@ -114,7 +117,7 @@ class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')
@@ -123,15 +126,15 @@ class TranslationsRelationManager extends BaseRelationManager
                     ->label('Language')
                     ->colors([
                         'success' => 'lt',
-                        'info' => 'en',
+                        'info'    => 'en',
                         'warning' => 'ru',
-                        'gray' => 'de',
+                        'gray'    => 'de',
                     ])
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'lt' => 'Lithuanian',
-                        'en' => 'English',
-                        'ru' => 'Russian',
-                        'de' => 'German',
+                        'lt'    => 'Lithuanian',
+                        'en'    => 'English',
+                        'ru'    => 'Russian',
+                        'de'    => 'German',
                         default => $state,
                     })
                     ->sortable(),

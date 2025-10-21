@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ContentLinkSearch;
+use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -37,9 +38,9 @@ class SliderManagement extends Page implements HasActions, HasForms
     use InteractsWithActions, InteractsWithForms;
 
     /**
-     * @var string|\BackedEnum|null Navigation icon override documented to support enums without extra imports.
+     * @var string|BackedEnum|null Navigation icon override documented to support enums without extra imports.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 

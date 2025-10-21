@@ -13,9 +13,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -82,8 +82,11 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Section::make(__('variant_pricing_rules.basic_information'))
@@ -98,9 +101,9 @@ final class VariantPricingRuleResource extends Resource
                                     ->label(__('variant_pricing_rules.type'))
                                     ->options([
                                         'percentage' => __('variant_pricing_rules.types.percentage'),
-                                        'fixed' => __('variant_pricing_rules.types.fixed'),
-                                        'tier' => __('variant_pricing_rules.types.tier'),
-                                        'bulk' => __('variant_pricing_rules.types.bulk'),
+                                        'fixed'      => __('variant_pricing_rules.types.fixed'),
+                                        'tier'       => __('variant_pricing_rules.types.tier'),
+                                        'bulk'       => __('variant_pricing_rules.types.bulk'),
                                     ])
                                     ->required()
                                     ->reactive(),
@@ -195,10 +198,10 @@ final class VariantPricingRuleResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'percentage' => 'blue',
-                        'fixed' => 'green',
-                        'tier' => 'purple',
-                        'bulk' => 'orange',
-                        default => 'gray',
+                        'fixed'      => 'green',
+                        'tier'       => 'purple',
+                        'bulk'       => 'orange',
+                        default      => 'gray',
                     }),
                 TextColumn::make('productVariant.name')
                     ->label(__('variant_pricing_rules.product_variant'))
@@ -212,7 +215,7 @@ final class VariantPricingRuleResource extends Resource
                     ->numeric()
                     ->formatStateUsing(function ($state, VariantPricingRule $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
+                            return $state . '%';
                         }
 
                         // Provide a predictable locale-aware currency string for administrators.
@@ -255,9 +258,9 @@ final class VariantPricingRuleResource extends Resource
                 SelectFilter::make('type')
                     ->options([
                         'percentage' => __('variant_pricing_rules.types.percentage'),
-                        'fixed' => __('variant_pricing_rules.types.fixed'),
-                        'tier' => __('variant_pricing_rules.types.tier'),
-                        'bulk' => __('variant_pricing_rules.types.bulk'),
+                        'fixed'      => __('variant_pricing_rules.types.fixed'),
+                        'tier'       => __('variant_pricing_rules.types.tier'),
+                        'bulk'       => __('variant_pricing_rules.types.bulk'),
                     ]),
                 SelectFilter::make('product_variant_id')
                     ->relationship('productVariant', 'name')
@@ -339,10 +342,10 @@ final class VariantPricingRuleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantPricingRules::route('/'),
+            'index'  => Pages\ListVariantPricingRules::route('/'),
             'create' => Pages\CreateVariantPricingRule::route('/create'),
-            'view' => Pages\ViewVariantPricingRule::route('/{record}'),
-            'edit' => Pages\EditVariantPricingRule::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantPricingRule::route('/{record}'),
+            'edit'   => Pages\EditVariantPricingRule::route('/{record}/edit'),
         ];
     }
 }

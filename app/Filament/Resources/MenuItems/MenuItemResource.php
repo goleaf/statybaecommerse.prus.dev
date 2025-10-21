@@ -11,8 +11,8 @@ use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
@@ -22,12 +22,15 @@ class MenuItemResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return MenuItemForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return MenuItemsTable::configure($table);
     }
@@ -42,9 +45,9 @@ class MenuItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListMenuItems::route('/'),
+            'index'  => ListMenuItems::route('/'),
             'create' => CreateMenuItem::route('/create'),
-            'edit' => EditMenuItem::route('/{record}/edit'),
+            'edit'   => EditMenuItem::route('/{record}/edit'),
         ];
     }
 }

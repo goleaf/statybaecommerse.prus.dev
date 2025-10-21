@@ -32,32 +32,32 @@ final class VariantPerformanceChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Views',
-                    'data' => $analytics->pluck('total_views')->toArray(),
-                    'borderColor' => 'rgb(59, 130, 246)',
+                    'label'           => 'Views',
+                    'data'            => $analytics->pluck('total_views')->toArray(),
+                    'borderColor'     => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'tension' => 0.4,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'Clicks',
-                    'data' => $analytics->pluck('total_clicks')->toArray(),
-                    'borderColor' => 'rgb(16, 185, 129)',
+                    'label'           => 'Clicks',
+                    'data'            => $analytics->pluck('total_clicks')->toArray(),
+                    'borderColor'     => 'rgb(16, 185, 129)',
                     'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
-                    'tension' => 0.4,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'Add to Cart',
-                    'data' => $analytics->pluck('total_add_to_cart')->toArray(),
-                    'borderColor' => 'rgb(245, 158, 11)',
+                    'label'           => 'Add to Cart',
+                    'data'            => $analytics->pluck('total_add_to_cart')->toArray(),
+                    'borderColor'     => 'rgb(245, 158, 11)',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
-                    'tension' => 0.4,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'Purchases',
-                    'data' => $analytics->pluck('total_purchases')->toArray(),
-                    'borderColor' => 'rgb(239, 68, 68)',
+                    'label'           => 'Purchases',
+                    'data'            => $analytics->pluck('total_purchases')->toArray(),
+                    'borderColor'     => 'rgb(239, 68, 68)',
                     'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
-                    'tension' => 0.4,
+                    'tension'         => 0.4,
                 ],
             ],
             'labels' => $analytics->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M j'))->toArray(),
@@ -72,21 +72,21 @@ final class VariantPerformanceChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'plugins' => [
+            'plugins'             => [
                 'legend' => [
                     'position' => 'top',
                 ],
                 'title' => [
                     'display' => true,
-                    'text' => 'Variant Performance Over Time',
+                    'text'    => 'Variant Performance Over Time',
                 ],
             ],
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'precision' => 0,
                     ],
                 ],

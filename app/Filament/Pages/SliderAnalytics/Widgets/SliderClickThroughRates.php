@@ -60,16 +60,16 @@ final class SliderClickThroughRates extends BaseWidget
         $internalCTR = $slidersWithInternalLinks > 0 ? round(($slidersWithInternalLinks / $totalSliders) * 100, 1) : 0;
 
         return [
-            Stat::make('Average CTR', $avgCTR.'%')
+            Stat::make('Average CTR', $avgCTR . '%')
                 ->description('Overall click-through rate')
                 ->descriptionIcon('heroicon-m-cursor-arrow-rays')
                 ->color('primary'),
             Stat::make('External Links', $slidersWithExternalLinks)
-                ->description($externalCTR.'% of sliders')
+                ->description($externalCTR . '% of sliders')
                 ->descriptionIcon('heroicon-m-arrow-top-right-on-square')
                 ->color('success'),
             Stat::make('Internal Links', $slidersWithInternalLinks)
-                ->description($internalCTR.'% of sliders')
+                ->description($internalCTR . '% of sliders')
                 ->descriptionIcon('heroicon-m-arrow-right')
                 ->color('info'),
             Stat::make('No Buttons', $totalSliders - $slidersWithButtons)

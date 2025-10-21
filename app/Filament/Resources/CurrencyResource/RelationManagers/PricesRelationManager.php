@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Support\Filament\Components\Flatpickr;
 
 final class PricesRelationManager extends BaseRelationManager
 {
@@ -26,8 +26,11 @@ final class PricesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Prices';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Forms\Components\Select::make('priceable_type')
@@ -51,8 +54,8 @@ final class PricesRelationManager extends BaseRelationManager
                     ->step(0.01),
                 Forms\Components\Select::make('type')
                     ->options([
-                        'regular' => 'Regular',
-                        'sale' => 'Sale',
+                        'regular'   => 'Regular',
+                        'sale'      => 'Sale',
                         'wholesale' => 'Wholesale',
                     ])
                     ->default('regular'),
@@ -65,7 +68,7 @@ final class PricesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('amount')
@@ -88,10 +91,10 @@ final class PricesRelationManager extends BaseRelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'regular' => 'gray',
-                        'sale' => 'success',
+                        'regular'   => 'gray',
+                        'sale'      => 'success',
                         'wholesale' => 'warning',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('starts_at')
                     ->dateTime()
@@ -110,20 +113,20 @@ final class PricesRelationManager extends BaseRelationManager
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'regular' => 'Regular',
-                        'sale' => 'Sale',
+                        'regular'   => 'Regular',
+                        'sale'      => 'Sale',
                         'wholesale' => 'Wholesale',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_enabled'),
                 Tables\Filters\Filter::make('active')
                     ->query(fn (Builder $query): Builder => $query
                         ->where('is_enabled', true)
-                        ->where(function ($q) {
+                        ->where(function ($q): void {
                             $q
                                 ->whereNull('starts_at')
                                 ->orWhere('starts_at', '<=', now());
                         })
-                        ->where(function ($q) {
+                        ->where(function ($q): void {
                             $q
                                 ->whereNull('ends_at')
                                 ->orWhere('ends_at', '>=', now());

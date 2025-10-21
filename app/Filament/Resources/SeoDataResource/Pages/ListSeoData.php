@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SeoDataResource\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\SeoDataResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;

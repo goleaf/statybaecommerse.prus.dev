@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
+use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -18,7 +20,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\RepeatableEntry\TableColumn;
@@ -37,7 +38,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr;
+use Str;
+use Throwable;
 
 final class ReportResource extends Resource
 {
@@ -49,9 +51,9 @@ final class ReportResource extends Resource
     protected static ?string $model = Report::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var string|BackedEnum|null
      */
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-document-chart-bar';
     }
@@ -75,8 +77,11 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->columns(3)
             ->schema([
@@ -89,7 +94,7 @@ final class ReportResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live()
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state))),
+                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                         TextInput::make('slug')
                             ->label(__('reports.fields.slug'))
                             ->required()
@@ -98,26 +103,26 @@ final class ReportResource extends Resource
                         Select::make('type')
                             ->label(__('reports.fields.type'))
                             ->options([
-                                'sales' => __('reports.types.sales'),
+                                'sales'     => __('reports.types.sales'),
                                 'inventory' => __('reports.types.inventory'),
-                                'customer' => __('reports.types.customer'),
-                                'product' => __('reports.types.product'),
+                                'customer'  => __('reports.types.customer'),
+                                'product'   => __('reports.types.product'),
                                 'financial' => __('reports.types.financial'),
                                 'analytics' => __('reports.types.analytics'),
-                                'custom' => __('reports.types.custom'),
+                                'custom'    => __('reports.types.custom'),
                             ])
                             ->required()
                             ->reactive(),
                         Select::make('category')
                             ->label(__('reports.fields.category'))
                             ->options([
-                                'sales' => __('reports.categories.sales'),
-                                'marketing' => __('reports.categories.marketing'),
-                                'operations' => __('reports.categories.operations'),
-                                'finance' => __('reports.categories.finance'),
+                                'sales'            => __('reports.categories.sales'),
+                                'marketing'        => __('reports.categories.marketing'),
+                                'operations'       => __('reports.categories.operations'),
+                                'finance'          => __('reports.categories.finance'),
                                 'customer_service' => __('reports.categories.customer_service'),
-                                'inventory' => __('reports.categories.inventory'),
-                                'analytics' => __('reports.categories.analytics'),
+                                'inventory'        => __('reports.categories.inventory'),
+                                'analytics'        => __('reports.categories.analytics'),
                             ])
                             ->required(),
                     ]),
@@ -158,11 +163,11 @@ final class ReportResource extends Resource
                         Select::make('schedule_frequency')
                             ->label(__('reports.fields.schedule_frequency'))
                             ->options([
-                                'daily' => __('reports.frequencies.daily'),
-                                'weekly' => __('reports.frequencies.weekly'),
-                                'monthly' => __('reports.frequencies.monthly'),
+                                'daily'     => __('reports.frequencies.daily'),
+                                'weekly'    => __('reports.frequencies.weekly'),
+                                'monthly'   => __('reports.frequencies.monthly'),
                                 'quarterly' => __('reports.frequencies.quarterly'),
-                                'yearly' => __('reports.frequencies.yearly'),
+                                'yearly'    => __('reports.frequencies.yearly'),
                             ])
                             ->visible(fn ($get) => $get('is_scheduled')),
                     ]),
@@ -211,7 +216,7 @@ final class ReportResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -226,13 +231,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'success' => ['sales'],
-                        'info' => ['inventory'],
-                        'warning' => ['customer'],
-                        'primary' => ['product'],
-                        'danger' => ['financial'],
+                        'success'   => ['sales'],
+                        'info'      => ['inventory'],
+                        'warning'   => ['customer'],
+                        'primary'   => ['product'],
+                        'danger'    => ['financial'],
                         'secondary' => ['analytics'],
-                        'gray' => ['custom'],
+                        'gray'      => ['custom'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
                 BadgeColumn::make('category')
@@ -240,13 +245,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'success' => ['sales'],
-                        'info' => ['marketing'],
-                        'warning' => ['operations'],
-                        'danger' => ['finance'],
-                        'primary' => ['customer_service'],
+                        'success'   => ['sales'],
+                        'info'      => ['marketing'],
+                        'warning'   => ['operations'],
+                        'danger'    => ['finance'],
+                        'primary'   => ['customer_service'],
                         'secondary' => ['inventory'],
-                        'gray' => ['analytics'],
+                        'gray'      => ['analytics'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
                 TextColumn::make('generator.name')
@@ -309,24 +314,24 @@ final class ReportResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('reports.filters.type'))
                     ->options([
-                        'sales' => __('reports.types.sales'),
+                        'sales'     => __('reports.types.sales'),
                         'inventory' => __('reports.types.inventory'),
-                        'customer' => __('reports.types.customer'),
-                        'product' => __('reports.types.product'),
+                        'customer'  => __('reports.types.customer'),
+                        'product'   => __('reports.types.product'),
                         'financial' => __('reports.types.financial'),
                         'analytics' => __('reports.types.analytics'),
-                        'custom' => __('reports.types.custom'),
+                        'custom'    => __('reports.types.custom'),
                     ]),
                 SelectFilter::make('category')
                     ->label(__('reports.filters.category'))
                     ->options([
-                        'sales' => __('reports.categories.sales'),
-                        'marketing' => __('reports.categories.marketing'),
-                        'operations' => __('reports.categories.operations'),
-                        'finance' => __('reports.categories.finance'),
+                        'sales'            => __('reports.categories.sales'),
+                        'marketing'        => __('reports.categories.marketing'),
+                        'operations'       => __('reports.categories.operations'),
+                        'finance'          => __('reports.categories.finance'),
                         'customer_service' => __('reports.categories.customer_service'),
-                        'inventory' => __('reports.categories.inventory'),
-                        'analytics' => __('reports.categories.analytics'),
+                        'inventory'        => __('reports.categories.inventory'),
+                        'analytics'        => __('reports.categories.analytics'),
                     ]),
                 SelectFilter::make('generated_by')
                     ->label(__('reports.filters.generated_by'))
@@ -399,7 +404,7 @@ final class ReportResource extends Resource
                                     $action->reportBulkProcessingSuccessfulRecordsCount(
                                         $action->getSelectedRecordsQuery()->forceDelete(),
                                     );
-                                } catch (\Throwable $exception) {
+                                } catch (Throwable $exception) {
                                     $action->reportCompleteBulkProcessingFailure();
 
                                     report($exception);
@@ -413,7 +418,7 @@ final class ReportResource extends Resource
                             $records->each(function (Report $record) use ($action, &$isFirstException): void {
                                 try {
                                     $record->forceDelete() || $action->reportBulkProcessingFailure();
-                                } catch (\Throwable $exception) {
+                                } catch (Throwable $exception) {
                                     $action->reportBulkProcessingFailure();
 
                                     if ($isFirstException) {
@@ -465,8 +470,11 @@ final class ReportResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->schema([
                 Section::make(__('reports.sections.basic_info'))
@@ -482,28 +490,28 @@ final class ReportResource extends Resource
                             ->label(__('reports.fields.type'))
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
-                                'sales' => 'success',
+                                'sales'     => 'success',
                                 'inventory' => 'info',
-                                'customer' => 'warning',
-                                'product' => 'primary',
+                                'customer'  => 'warning',
+                                'product'   => 'primary',
                                 'financial' => 'danger',
                                 'analytics' => 'secondary',
-                                'custom' => 'gray',
-                                default => 'gray',
+                                'custom'    => 'gray',
+                                default     => 'gray',
                             })
                             ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
                         TextEntry::make('category')
                             ->label(__('reports.fields.category'))
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
-                                'sales' => 'success',
-                                'marketing' => 'info',
-                                'operations' => 'warning',
-                                'finance' => 'danger',
+                                'sales'            => 'success',
+                                'marketing'        => 'info',
+                                'operations'       => 'warning',
+                                'finance'          => 'danger',
                                 'customer_service' => 'primary',
-                                'inventory' => 'secondary',
-                                'analytics' => 'gray',
-                                default => 'gray',
+                                'inventory'        => 'secondary',
+                                'analytics'        => 'gray',
+                                default            => 'gray',
                             })
                             ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
                     ])
@@ -647,10 +655,10 @@ final class ReportResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReports::route('/'),
+            'index'  => Pages\ListReports::route('/'),
             'create' => Pages\CreateReport::route('/create'),
-            'view' => Pages\ViewReport::route('/{record}'),
-            'edit' => Pages\EditReport::route('/{record}/edit'),
+            'view'   => Pages\ViewReport::route('/{record}'),
+            'edit'   => Pages\EditReport::route('/{record}/edit'),
         ];
     }
 

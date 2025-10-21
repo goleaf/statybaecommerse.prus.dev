@@ -55,7 +55,7 @@ final class VariantStockWidget extends BaseWidget
                 ->description(__('product_variants.stats.unavailable_variants'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            Stat::make(__('product_variants.stats.stock_value'), '€'.number_format($stockValue, 2))
+            Stat::make(__('product_variants.stats.stock_value'), '€' . number_format($stockValue, 2))
                 ->description(__('product_variants.stats.total_inventory_value'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('primary'),

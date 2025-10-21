@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -19,8 +19,11 @@ final class ReferralsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin.sections.referrals';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Select::make('referred_id')
@@ -34,7 +37,7 @@ final class ReferralsRelationManager extends BaseRelationManager
                     ->required(),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'pending'   => 'Pending',
                         'completed' => 'Completed',
                         'cancelled' => 'Cancelled',
                     ])
@@ -42,7 +45,7 @@ final class ReferralsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('referred.name')
@@ -62,10 +65,10 @@ final class ReferralsRelationManager extends BaseRelationManager
                     ->label(__('admin.fields.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
+                        'pending'   => 'warning',
                         'completed' => 'success',
                         'cancelled' => 'danger',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))
@@ -75,7 +78,7 @@ final class ReferralsRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'pending'   => 'Pending',
                         'completed' => 'Completed',
                         'cancelled' => 'Cancelled',
                     ]),

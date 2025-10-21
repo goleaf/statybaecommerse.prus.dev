@@ -34,7 +34,7 @@ final class DashboardLowStockTable extends BaseTableWidget
         return trans('admin/dashboard.tables.low_stock');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query(fn () => $this->tableRepository->lowStockProductsQuery()->limit(10))

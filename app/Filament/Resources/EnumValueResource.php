@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumValueResource\Pages;
 use App\Models\EnumValue;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -21,9 +22,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -31,21 +32,22 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class EnumValueResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    /** @var string|BackedEnum|null Provide a consistent icon for value maintenance. */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
-    protected static $navigationGroup = NavigationGroup::System;
+    /** @var string|BackedEnum|null Keep enum value tools inside the System cluster. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
         // Resolve the translated label from the shared navigation enum.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
@@ -67,8 +69,11 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
@@ -155,12 +160,12 @@ final class EnumValueResource extends Resource
                     ->badge()
                     ->color(static fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
-                        'order_status' => 'success',
-                        'payment_status' => 'warning',
-                        'shipping_status' => 'info',
-                        'user_role' => 'danger',
-                        'product_status' => 'secondary',
-                        default => 'gray',
+                        'order_status'     => 'success',
+                        'payment_status'   => 'warning',
+                        'shipping_status'  => 'info',
+                        'user_role'        => 'danger',
+                        'product_status'   => 'secondary',
+                        default            => 'gray',
                     }),
                 TextColumn::make('key')
                     ->label(__('admin.enum_values.table.key'))
@@ -352,10 +357,10 @@ final class EnumValueResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEnumValues::route('/'),
+            'index'  => Pages\ListEnumValues::route('/'),
             'create' => Pages\CreateEnumValue::route('/create'),
-            'view' => Pages\ViewEnumValue::route('/{record}'),
-            'edit' => Pages\EditEnumValue::route('/{record}/edit'),
+            'view'   => Pages\ViewEnumValue::route('/{record}'),
+            'edit'   => Pages\EditEnumValue::route('/{record}/edit'),
         ];
     }
 
@@ -392,8 +397,8 @@ final class EnumValueResource extends Resource
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
-            __('admin.enum_values.table.value') => $record->value,
-            __('admin.enum_values.table.name') => $record->name,
+            __('admin.enum_values.table.value')       => $record->value,
+            __('admin.enum_values.table.name')        => $record->name,
             __('admin.enum_values.table.description') => $record->description,
         ];
     }

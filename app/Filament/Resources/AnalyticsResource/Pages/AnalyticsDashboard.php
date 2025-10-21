@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AnalyticsResource\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\AnalyticsResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use App\Filament\Pages\Support\BaseListRecords;
 
 final class AnalyticsDashboard extends BaseListRecords
 {

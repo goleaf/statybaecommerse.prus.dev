@@ -8,9 +8,9 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -21,10 +21,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use Novadaemon\FilamentCombobox\Combobox;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use RuntimeException;
-use App\Support\Filament\Components\Flatpickr;
 
 class NewsResource extends Resource
 {
@@ -39,8 +38,11 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
@@ -153,7 +155,7 @@ class NewsResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -380,8 +382,11 @@ class NewsResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->components([
                 Infolists\Components\Section::make('Article Details')

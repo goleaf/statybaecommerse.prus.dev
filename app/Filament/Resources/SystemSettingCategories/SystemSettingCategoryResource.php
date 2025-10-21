@@ -11,8 +11,8 @@ use App\Filament\Resources\SystemSettingCategories\Schemas\SystemSettingCategory
 use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,12 +24,15 @@ class SystemSettingCategoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return SystemSettingCategoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return SystemSettingCategoriesTable::configure($table);
     }
@@ -44,9 +47,9 @@ class SystemSettingCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSystemSettingCategories::route('/'),
+            'index'  => ListSystemSettingCategories::route('/'),
             'create' => CreateSystemSettingCategory::route('/create'),
-            'edit' => EditSystemSettingCategory::route('/{record}/edit'),
+            'edit'   => EditSystemSettingCategory::route('/{record}/edit'),
         ];
     }
 

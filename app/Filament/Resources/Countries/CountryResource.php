@@ -11,11 +11,13 @@ use App\Filament\Resources\Countries\Pages\ViewCountry;
 use App\Filament\Resources\Countries\Schemas\CountryForm;
 use App\Filament\Resources\Countries\Tables\CountriesTable;
 use App\Models\Country;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 /**
  * CountryResource
@@ -26,12 +28,12 @@ final class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    public static function getNavigationIcon(): \BackedEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|string|null
     {
         return 'heroicon-o-globe-alt';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Locations';
     }
@@ -40,12 +42,15 @@ final class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return CountryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return CountriesTable::configure($table);
     }
@@ -75,10 +80,10 @@ final class CountryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListCountries::route('/'),
+            'index'  => ListCountries::route('/'),
             'create' => CreateCountry::route('/create'),
-            'view' => ViewCountry::route('/{record}'),
-            'edit' => EditCountry::route('/{record}/edit'),
+            'view'   => ViewCountry::route('/{record}'),
+            'edit'   => EditCountry::route('/{record}/edit'),
         ];
     }
 
