@@ -100,6 +100,14 @@ The analytics stack now relies on standalone `created_at` indexes for the busies
 
 Use these indexes when filtering dashboards and widgets by date ranges. Prefer range predicates (`BETWEEN`, `>=`, `<=`) or the dedicated Eloquent scopes so the optimizer can select the correct index.
 
+Key consumers already wired for these indexes include:
+
+- `App\Support\Stats\OrderMetrics` via the reusable `Order::createdBetween()` scope to drive the sales and revenue aggregates.
+- `App\Services\Dashboard\DashboardMetricsRepository` for "orders today" and the revenue rollups, again through the created-at scope.
+- `App\Support\Stats\Series\CustomerSeries` which backs the Filament customer sparkline widget and now leans on the scoped date window.
+
+> **Note:** When building new analytics features, reach for the `Order` date scopes instead of raw `whereBetween` clauses so you automatically benefit from the curated coverage.
+
 If the migration only affects analytics tables, re-run the targeted audit to confirm that missing index warnings disappear.
 
 ## 4. Verify improvements
