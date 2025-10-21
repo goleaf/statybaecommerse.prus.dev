@@ -27,7 +27,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Set as SchemaSet;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -40,7 +39,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class BrandResource extends Resource
 {
@@ -118,34 +117,29 @@ final class BrandResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        return $form->components([
             Section::make(__('brands.basic_information'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('brands.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, SchemaSet $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
-                            TextInput::make('slug')
-                                ->label(__('brands.slug'))
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
-                        ]),
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('name')
+                            ->label(__('brands.name'))
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('slug')
+                            ->label(__('brands.slug'))
+                            ->required()
+                            ->maxLength(255),
+                        Textarea::make('description')
+                            ->label(__('brands.description'))
+                            ->rows(3),
+                    ]),
                     TextInput::make('website')
                         ->label(__('brands.website'))
                         ->url()
                         ->maxLength(255),
-                    Textarea::make('description')
-                        ->label(__('brands.description'))
-                        ->rows(3)
-                        ->columnSpanFull(),
                 ]),
             Section::make(__('brands.media'))
-                ->schema([
+                ->components([
                     SpatieMediaLibraryFileUpload::make('logo')
                         ->label(__('brands.logo'))
                         ->image()
@@ -172,19 +166,21 @@ final class BrandResource extends Resource
                         ->visibility('private'),
                 ]),
             Section::make(__('brands.seo'))
-                ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('brands.seo_title'))
-                        ->maxLength(255),
-                    Textarea::make('seo_description')
-                        ->label(__('brands.seo_description'))
-                        ->rows(2)
-                        ->maxLength(500),
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('seo_title')
+                            ->label(__('brands.seo_title'))
+                            ->maxLength(255),
+                        Textarea::make('seo_description')
+                            ->label(__('brands.seo_description'))
+                            ->rows(2)
+                            ->maxLength(500),
+                    ]),
                 ]),
             Section::make(__('brands.settings'))
-                ->schema([
+                ->components([
                     Grid::make(3)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_enabled')
                                 ->label(__('brands.is_enabled'))
                                 ->default(true),

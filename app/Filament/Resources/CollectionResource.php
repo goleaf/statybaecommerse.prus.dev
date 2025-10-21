@@ -7,9 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
-use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -18,6 +15,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -31,7 +30,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Str;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
 
 final class CollectionResource extends Resource
@@ -71,32 +70,27 @@ final class CollectionResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        return $form->components([
             Section::make(__('collections.basic_information'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('collections.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
-                            TextInput::make('slug')
-                                ->label(__('collections.slug'))
-                                ->unique(table: Collection::class, column: 'slug', ignoreRecord: true)
-                                ->rules(['alpha_dash'])
-                                ->helperText(__('collections.help.slug')),
-                        ]),
-                    Textarea::make('description')
-                        ->label(__('collections.description'))
-                        ->rows(4)
-                        ->columnSpanFull(),
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('name')
+                            ->label(__('collections.name'))
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('slug')
+                            ->label(__('collections.slug'))
+                            ->rules(['alpha_dash'])
+                            ->helperText(__('collections.help.slug')),
+                        Textarea::make('description')
+                            ->label(__('collections.description'))
+                            ->rows(4),
+                    ]),
                 ]),
             Section::make(__('collections.business_info'))
-                ->schema([
+                ->components([
                     Grid::make(3)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_visible')
                                 ->label(__('collections.is_visible'))
                                 ->default(true),
@@ -108,7 +102,7 @@ final class CollectionResource extends Resource
                                 ->default(false),
                         ]),
                     Grid::make(3)
-                        ->schema([
+                        ->components([
                             TextInput::make('sort_order')
                                 ->label(__('collections.sort_order'))
                                 ->numeric()
@@ -129,9 +123,9 @@ final class CollectionResource extends Resource
                 ])
                 ->columns(1),
             Section::make(__('collections.display_type'))
-                ->schema([
+                ->components([
                     Grid::make(3)
-                        ->schema([
+                        ->components([
                             Select::make('display_type')
                                 ->label(__('collections.display_type'))
                                 ->options([
@@ -152,7 +146,7 @@ final class CollectionResource extends Resource
                         ]),
                 ]),
             Section::make(__('collections.media'))
-                ->schema([
+                ->components([
                     SpatieMediaLibraryFileUpload::make('images')
                         ->collection('images')
                         ->label(__('collections.image'))
@@ -168,7 +162,7 @@ final class CollectionResource extends Resource
                 ])
                 ->columns(2),
             Section::make(__('collections.collection_info'))
-                ->schema([
+                ->components([
                     Select::make('products')
                         ->label(__('translations.products'))
                         ->relationship('products', 'name')
@@ -177,27 +171,24 @@ final class CollectionResource extends Resource
                         ->preload(),
                 ]),
             Section::make(__('collections.seo_info'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('seo_title')
-                                ->label(__('collections.seo_title'))
-                                ->maxLength(255),
-                            TextInput::make('meta_title')
-                                ->label(__('collections.meta_title'))
-                                ->maxLength(255),
-                            Textarea::make('seo_description')
-                                ->label(__('collections.seo_description'))
-                                ->rows(2)
-                                ->columnSpan(2),
-                            Textarea::make('meta_description')
-                                ->label(__('collections.meta_description'))
-                                ->rows(2)
-                                ->columnSpan(2),
-                            TextInput::make('meta_keywords')
-                                ->label(__('collections.meta_keywords'))
-                                ->helperText(__('collections.help.meta_keywords')),
-                        ]),
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('seo_title')
+                            ->label(__('collections.seo_title'))
+                            ->maxLength(255),
+                        Textarea::make('seo_description')
+                            ->label(__('collections.seo_description'))
+                            ->rows(2),
+                        TextInput::make('meta_title')
+                            ->label(__('collections.meta_title'))
+                            ->maxLength(255),
+                        Textarea::make('meta_description')
+                            ->label(__('collections.meta_description'))
+                            ->rows(2),
+                        TextInput::make('meta_keywords')
+                            ->label(__('collections.meta_keywords'))
+                            ->helperText(__('collections.help.meta_keywords')),
+                    ]),
                 ]),
         ]);
     }
@@ -217,7 +208,8 @@ final class CollectionResource extends Resource
                     ->label(__('collections.name'))
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->formatStateUsing(fn (?string $state, Collection $record): ?string => $record->getTranslatedName(app()->getLocale()) ?? $state),
                 TextColumn::make('slug')
                     ->label(__('collections.slug'))
                     ->copyable()

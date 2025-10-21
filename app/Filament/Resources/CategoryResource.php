@@ -18,7 +18,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -37,7 +36,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
 
 final class CategoryResource extends Resource
@@ -104,26 +103,26 @@ final class CategoryResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        return $form->components([
             Section::make(__('categories.basic_information'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('categories.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(function (string $operation, $state, Set $set): void {
-                                    if ($operation === 'create') {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                }),
-                            TextInput::make('slug')
-                                ->label(__('categories.slug'))
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
-                        ]),
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('name')
+                            ->label(__('categories.name'))
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('slug')
+                            ->label(__('categories.slug'))
+                            ->required()
+                            ->maxLength(255),
+                        Textarea::make('description')
+                            ->label(__('categories.description'))
+                            ->rows(3),
+                        Textarea::make('short_description')
+                            ->label(__('categories.short_description'))
+                            ->rows(2)
+                            ->maxLength(500),
+                    ]),
                     Select::make('parent_id')
                         ->label(__('categories.parent_category'))
                         ->relationship('parent', 'name')
@@ -135,13 +134,9 @@ final class CategoryResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ]),
-                    Textarea::make('description')
-                        ->label(__('categories.description'))
-                        ->rows(3)
-                        ->columnSpanFull(),
                 ]),
             Section::make(__('categories.media'))
-                ->schema([
+                ->components([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
                         ->image()
@@ -164,9 +159,9 @@ final class CategoryResource extends Resource
                         ->visibility('private'),
                 ]),
             Section::make(__('categories.appearance'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
                                 ->hex(),
@@ -178,19 +173,21 @@ final class CategoryResource extends Resource
                         ]),
                 ]),
             Section::make(__('categories.seo'))
-                ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('categories.seo_title'))
-                        ->maxLength(255),
-                    Textarea::make('seo_description')
-                        ->label(__('categories.seo_description'))
-                        ->rows(2)
-                        ->maxLength(500),
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('seo_title')
+                            ->label(__('categories.seo_title'))
+                            ->maxLength(255),
+                        Textarea::make('seo_description')
+                            ->label(__('categories.seo_description'))
+                            ->rows(2)
+                            ->maxLength(500),
+                    ]),
                 ]),
             Section::make(__('categories.settings'))
-                ->schema([
+                ->components([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
                                 ->default(true),
