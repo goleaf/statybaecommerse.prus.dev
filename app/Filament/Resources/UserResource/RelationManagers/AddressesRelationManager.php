@@ -8,6 +8,8 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -16,6 +18,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class AddressesRelationManager extends RelationManager
 {
@@ -100,6 +103,54 @@ class AddressesRelationManager extends RelationManager
                     ->boolean(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit addresses')
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit customer addresses')
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        return $repeater
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->schema([
+                                Hidden::make('id'),
+                                TextInput::make('first_name')
+                                    ->label(__('addresses.fields.first_name'))
+                                    ->maxLength(255)
+                                    ->required(),
+                                TextInput::make('last_name')
+                                    ->label(__('addresses.fields.last_name'))
+                                    ->maxLength(255)
+                                    ->required(),
+                                TextInput::make('street_address')
+                                    ->label(__('addresses.fields.street_address'))
+                                    ->maxLength(255)
+                                    ->required(),
+                                TextInput::make('street_address_plus')
+                                    ->label(__('addresses.fields.street_address_plus'))
+                                    ->maxLength(255),
+                                TextInput::make('city')
+                                    ->label(__('addresses.fields.city'))
+                                    ->maxLength(255)
+                                    ->required(),
+                                TextInput::make('postal_code')
+                                    ->label(__('addresses.fields.postal_code'))
+                                    ->maxLength(20)
+                                    ->required(),
+                                TextInput::make('phone')
+                                    ->label(__('addresses.fields.phone'))
+                                    ->tel()
+                                    ->maxLength(255),
+                                Select::make('country_id')
+                                    ->label(__('addresses.fields.country'))
+                                    ->relationship('country', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                                Toggle::make('is_default')
+                                    ->label(__('addresses.fields.is_default')),
+                            ]);
+                    }),
                 CreateAction::make(),
             ])
             ->actions([
