@@ -38,3 +38,10 @@ Route::prefix('v1')
 Route::get('exports/download/{export:uuid}', SignedExportDownloadController::class)
     ->middleware(['signed'])
     ->name('exports.signed-download');
+
+Route::prefix('partner')
+    ->middleware(['partner.api', 'throttle:partner.api'])
+    ->name('api.partner.')
+    ->group(function (): void {
+        require __DIR__.'/api/partner.php';
+    });
