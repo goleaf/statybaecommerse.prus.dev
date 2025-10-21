@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -43,13 +43,19 @@ final class EnumManagementResource extends Resource
     /**
      * Keep the navigation icon typed so Filament surfaces enum-backed icons reliably.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+
+    /** @var string|\BackedEnum|null Pin enum tools to the shared System navigation section. */
+    protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return trans('admin.enums.navigation_groups.system');
+        // Share the navigation label via enum for localization consistency.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     public static function getNavigationLabel(): string
@@ -67,7 +73,7 @@ final class EnumManagementResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Tabs::make('enum_management_tabs')
@@ -151,7 +157,7 @@ final class EnumManagementResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
