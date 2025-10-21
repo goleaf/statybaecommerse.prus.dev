@@ -58,12 +58,12 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form;
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

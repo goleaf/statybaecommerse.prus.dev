@@ -167,7 +167,7 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('orders.sections.order_details'))
@@ -461,7 +461,7 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive table with advanced features.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

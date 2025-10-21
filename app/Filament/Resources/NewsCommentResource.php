@@ -63,7 +63,7 @@ final class NewsCommentResource extends Resource
         return __('admin.news_comments.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.news_comments.basic_information'))
@@ -144,7 +144,7 @@ final class NewsCommentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -23,7 +23,7 @@ class DiscountRedemptionsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'discountRedemptions';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->components([
@@ -41,7 +41,7 @@ class DiscountRedemptionsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('id')

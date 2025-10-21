@@ -66,7 +66,7 @@ final class InventoryResource extends Resource
         return __('Inventory');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('Inventory Details'))
@@ -155,7 +155,7 @@ final class InventoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -75,8 +75,9 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Filament 4 requires returning the configured Form builder instead of raw schema arrays.
         return $form
             ->columns(3)
             ->schema([
@@ -211,8 +212,9 @@ final class ReportResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Return the fully configured Table builder to satisfy the stricter Filament 4 signature.
         return $table
             ->columns([
                 TextColumn::make('name')

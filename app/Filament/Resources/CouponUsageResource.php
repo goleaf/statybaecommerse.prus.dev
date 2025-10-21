@@ -53,7 +53,7 @@ final class CouponUsageResource extends Resource
         return __('admin.coupon_usages.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form->components([
             Tabs::make('coupon_usage_tabs')
@@ -162,7 +162,7 @@ final class CouponUsageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

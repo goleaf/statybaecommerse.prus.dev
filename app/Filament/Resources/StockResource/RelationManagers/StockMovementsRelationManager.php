@@ -50,7 +50,7 @@ class StockMovementsRelationManager extends BaseRelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form
             ->components([
@@ -96,7 +96,7 @@ class StockMovementsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('reference')

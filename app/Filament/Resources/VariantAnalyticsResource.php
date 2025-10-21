@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
@@ -47,10 +49,10 @@ final class VariantAnalyticsResource extends Resource
     /**
      * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
      */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
-    protected static $navigationGroup = NavigationGroup::Inventory;
+    /** @var UnitEnum|string|null Ensure inventory analytics stay grouped centrally. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {

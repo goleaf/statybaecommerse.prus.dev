@@ -74,7 +74,7 @@ final class SystemSettingTranslationResource extends Resource
         return __('admin.system_setting_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -195,7 +195,7 @@ final class SystemSettingTranslationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

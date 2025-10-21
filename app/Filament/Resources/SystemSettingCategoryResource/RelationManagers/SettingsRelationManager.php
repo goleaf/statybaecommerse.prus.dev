@@ -33,7 +33,7 @@ final class SettingsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Settings';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('system_setting_categories.settings.basic_information'))
@@ -125,7 +125,7 @@ final class SettingsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

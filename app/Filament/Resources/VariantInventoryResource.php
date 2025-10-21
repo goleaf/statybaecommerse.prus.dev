@@ -73,7 +73,7 @@ final class VariantInventoryResource extends Resource
         return __('admin.variant_inventory.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -261,7 +261,7 @@ final class VariantInventoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

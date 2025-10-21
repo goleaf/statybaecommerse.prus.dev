@@ -65,7 +65,7 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -138,7 +138,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
