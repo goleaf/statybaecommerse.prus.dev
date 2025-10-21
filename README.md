@@ -16,6 +16,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 ## Documentation
 - Start with the curated [documentation index](docs/INDEX.md) for the setup → deploy → data model → admin guide → troubleshooting path.
 - Browse the rest of the knowledge base directly in [docs/](docs/).
+- Before contributing new guides, skim the [Documentation Style Guide](docs/CONTRIBUTING_DOCS.md) to keep tone and structure consistent.
 
 ## Requirements
 - PHP 8.2+ with `ext-sqlite3`, `ext-fileinfo`, and `ext-gd`

@@ -13,8 +13,37 @@ env:
   COMPOSER_FLAGS: --no-interaction --prefer-dist --no-progress
 
 jobs:
+  docs-size:
+    name: Documentation Asset Size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure documentation files stay under 2MB
+        run: |
+          # Guard introduced to keep documentation artefacts manageable after PR 92.
+          set -euo pipefail
+
+          if [ ! -d docs ]; then
+            # No documentation directory to validate; exit early.
+            exit 0
+          fi
+
+          # Identify any files larger than 2MB so they can be split or compressed.
+          offending_files=$(find docs -type f -size +2M)
+
+          if [ -n "${offending_files}" ]; then
+            echo "The following documentation files exceed 2MB:" >&2
+            echo "${offending_files}" >&2
+            exit 1
+          fi
+
+          echo "Documentation size check passed."
+
   migration-freeze:
     name: Migration Freeze Guard
+    needs: docs-size
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
