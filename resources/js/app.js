@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', function () {
 function initializeScrollAnimations() {
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px 0px -50px 0px',
     };
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
                 // Add stagger effect for multiple elements
@@ -48,7 +48,7 @@ function initializeScrollAnimations() {
     }, observerOptions);
 
     // Observe all elements with animate-on-scroll class
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+    document.querySelectorAll('.animate-on-scroll').forEach((el) => {
         observer.observe(el);
     });
 }
@@ -62,7 +62,7 @@ function initializeParallaxEffects() {
     const handleScroll = () => {
         const scrolled = window.pageYOffset;
 
-        parallaxElements.forEach(element => {
+        parallaxElements.forEach((element) => {
             const rate = scrolled * -0.5;
             const rect = element.getBoundingClientRect();
 
@@ -78,7 +78,7 @@ function initializeParallaxEffects() {
 // Enhanced interactions for cards and buttons
 function initializeEnhancedInteractions() {
     // Product card hover effects
-    document.querySelectorAll('.product-card, .card-hover').forEach(card => {
+    document.querySelectorAll('.product-card, .card-hover').forEach((card) => {
         card.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-8px) scale(1.02)';
             this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -90,7 +90,7 @@ function initializeEnhancedInteractions() {
     });
 
     // Button ripple effect
-    document.querySelectorAll('.btn-gradient, .btn-primary').forEach(button => {
+    document.querySelectorAll('.btn-gradient, .btn-primary').forEach((button) => {
         button.addEventListener('click', function (e) {
             const ripple = document.createElement('span');
             const rect = this.getBoundingClientRect();
@@ -142,7 +142,7 @@ function initializeCartNotifications() {
             type: 'success',
             title: 'Product Added!',
             message: `${e.detail.product} has been added to your cart`,
-            duration: 4000
+            duration: 4000,
         });
     });
 
@@ -151,7 +151,7 @@ function initializeCartNotifications() {
             type: 'info',
             title: 'Product Removed',
             message: `${e.detail.product} has been removed from your cart`,
-            duration: 3000
+            duration: 3000,
         });
     });
 
@@ -160,7 +160,7 @@ function initializeCartNotifications() {
             type: 'success',
             title: 'Cart Updated',
             message: 'Your cart has been updated successfully',
-            duration: 2000
+            duration: 2000,
         });
     });
 }
@@ -177,13 +177,13 @@ function createNotification({ type = 'info', title, message, duration = 3000 }) 
         </svg>`,
         info: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>`
+        </svg>`,
     };
 
     const colors = {
         success: 'bg-success-500',
         error: 'bg-danger-500',
-        info: 'bg-primary-500'
+        info: 'bg-primary-500',
     };
 
     notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-large z-50 transform translate-x-full transition-all duration-300 flex items-start gap-3 max-w-sm`;
@@ -218,9 +218,11 @@ function createNotification({ type = 'info', title, message, duration = 3000 }) 
 
 // Enhanced search functionality
 function initializeSearchEnhancements() {
-    const searchInputs = document.querySelectorAll('input[type="search"], input[placeholder*="search" i]');
+    const searchInputs = document.querySelectorAll(
+        'input[type="search"], input[placeholder*="search" i]',
+    );
 
-    searchInputs.forEach(input => {
+    searchInputs.forEach((input) => {
         // Add search icon animation
         input.addEventListener('focus', function () {
             this.parentElement.classList.add('ring-2', 'ring-primary-500', 'ring-offset-2');
@@ -231,20 +233,23 @@ function initializeSearchEnhancements() {
         });
 
         // Add search suggestions (if needed)
-        input.addEventListener('input', debounce(function (e) {
-            const query = e.target.value;
-            if (query.length > 2) {
-                // Implement search suggestions here
-                console.log('Searching for:', query);
-            }
-        }, 300));
+        input.addEventListener(
+            'input',
+            debounce(function (e) {
+                const query = e.target.value;
+                if (query.length > 2) {
+                    // Implement search suggestions here
+                    console.log('Searching for:', query);
+                }
+            }, 300),
+        );
     });
 }
 
 // Loading states and skeleton screens
 function initializeLoadingStates() {
     // Add loading states to forms
-    document.querySelectorAll('form').forEach(form => {
+    document.querySelectorAll('form').forEach((form) => {
         form.addEventListener('submit', function () {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
@@ -298,55 +303,55 @@ function smoothScrollTo(element, offset = 0) {
     const targetPosition = element.offsetTop - offset;
     window.scrollTo({
         top: targetPosition,
-        behavior: 'smooth'
+        behavior: 'smooth',
     });
 }
 
 // Initialize data attributes for dynamic styling
 function initializeDataAttributes() {
     // Handle animation delays
-    document.querySelectorAll('[data-delay]').forEach(element => {
+    document.querySelectorAll('[data-delay]').forEach((element) => {
         const delay = element.getAttribute('data-delay');
         element.style.setProperty('--delay', `${delay}s`);
     });
 
     // Handle progress bar widths
-    document.querySelectorAll('[data-width]').forEach(element => {
+    document.querySelectorAll('[data-width]').forEach((element) => {
         const width = element.getAttribute('data-width');
         element.style.setProperty('--w', `${width}%`);
     });
 
     // Handle dynamic transforms
-    document.querySelectorAll('[data-transform]').forEach(element => {
+    document.querySelectorAll('[data-transform]').forEach((element) => {
         const transform = element.getAttribute('data-transform');
         element.style.setProperty('--tx', transform);
     });
 
     // Handle dynamic colors
-    document.querySelectorAll('[data-color]').forEach(element => {
+    document.querySelectorAll('[data-color]').forEach((element) => {
         const color = element.getAttribute('data-color');
         element.style.setProperty('--color', color);
     });
 
     // Handle dynamic background images
-    document.querySelectorAll('[data-bg-img]').forEach(element => {
+    document.querySelectorAll('[data-bg-img]').forEach((element) => {
         const bgImg = element.getAttribute('data-bg-img');
         element.style.setProperty('--bg-img', `url('${bgImg}')`);
     });
 
     // Handle dynamic text colors
-    document.querySelectorAll('[data-text-color]').forEach(element => {
+    document.querySelectorAll('[data-text-color]').forEach((element) => {
         const textColor = element.getAttribute('data-text-color');
         element.style.setProperty('--text-color', textColor);
     });
 
     // Handle dynamic positioning
-    document.querySelectorAll('[data-left]').forEach(element => {
+    document.querySelectorAll('[data-left]').forEach((element) => {
         const left = element.getAttribute('data-left');
         element.style.setProperty('--left', `${left}px`);
     });
 
-    document.querySelectorAll('[data-top]').forEach(element => {
+    document.querySelectorAll('[data-top]').forEach((element) => {
         const top = element.getAttribute('data-top');
         element.style.setProperty('--top', `${top}px`);
     });

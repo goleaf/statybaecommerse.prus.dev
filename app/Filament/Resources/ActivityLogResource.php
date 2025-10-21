@@ -6,27 +6,24 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
-use BackedEnum;
-use Filament\Schemas\Schema;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Filters\DateRangeFilter;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
-use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
 
-    /**
-     * Icon used in the navigation menu. Type: string|BackedEnum|null.
-     */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -59,13 +56,13 @@ final class ActivityLogResource extends Resource
     }
 
     /**
-     * Define the create/edit form schema using the new Filament Schema API. The schema is
-     * currently empty because the Activity Log resource is read-only, but the method keeps
-     * the hook ready for future form fields if editing becomes necessary.
+     * Define the create/edit form schema using the Filament v4 Form API.
+     * The resource remains read-only for now, so we return an empty schema
+     * while keeping the hook available for future enhancements.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([]);
+        return $form->schema([]);
     }
 
     /**
