@@ -136,8 +136,13 @@ jobs:
         run: composer analyze
 
   phpunit:
-    name: PHPUnit (SQLite)
+    name: PHPUnit (PHP ${{ matrix.php-version }})
     runs-on: ubuntu-latest
+    # Run the test suite against the Renovate-supported PHP versions so
+    # dependency bumps get early feedback on cross-version compatibility.
+    strategy:
+      matrix:
+        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
     needs: phpstan
     steps:
       - name: Checkout repository
@@ -146,7 +151,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl, pdo_sqlite
           coverage: none
 
