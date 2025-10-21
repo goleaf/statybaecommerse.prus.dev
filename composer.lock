@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "467de24cc6001a44f2cde6ce0164f998",
+    "content-hash": "52c9d36b420370110824a497525aa6d0",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -1561,6 +1561,96 @@
             "time": "2025-02-21T08:52:11+00:00"
         },
         {
+            "name": "defstudio/filament-searchable-input",
+            "version": "v4.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/defstudio/filament-searchable-input.git",
+                "reference": "d337b14a797b19d584b2c97ba0e5a857c5215d42"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/defstudio/filament-searchable-input/zipball/d337b14a797b19d584b2c97ba0e5a857c5215d42",
+                "reference": "d337b14a797b19d584b2c97ba0e5a857c5215d42",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0",
+                "filament/forms": "^4.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-arch": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0",
+                "pestphp/pest-plugin-livewire": "^3.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "rector/rector": "^2.0",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "DefStudio\\SearchableInput\\SearchableInputServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "DefStudio\\SearchableInput\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabio Ivona",
+                    "email": "fabio.ivona@defstudio.it",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A searchable autocomplete input for Filament forms",
+            "homepage": "https://github.com/defstudio/filament-searchable-input",
+            "keywords": [
+                "Forms",
+                "defstudio",
+                "filament",
+                "filamentphp",
+                "input",
+                "laravel",
+                "searchable"
+            ],
+            "support": {
+                "issues": "https://github.com/defstudio/filament-searchable-input/issues",
+                "source": "https://github.com/defstudio/filament-searchable-input"
+            },
+            "funding": [
+                {
+                    "url": "https://paypal.me/defstudiosrl",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/defstudio",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/fabio-ivona",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-29T06:53:37+00:00"
+        },
+        {
             "name": "dflydev/dot-access-data",
             "version": "v3.0.3",
             "source": {
@@ -2224,6 +2314,79 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "eightynine/filament-advanced-widgets",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eighty9nine/filament-advanced-widgets.git",
+                "reference": "9deebe5d8ce7b3632bf0bad1ec517b8999fc4232"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eighty9nine/filament-advanced-widgets/zipball/9deebe5d8ce7b3632bf0bad1ec517b8999fc4232",
+                "reference": "9deebe5d8ce7b3632bf0bad1ec517b8999fc4232",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "nunomaduro/collision": "^8.1",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.7",
+                "pestphp/pest-plugin-arch": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FilamentAdvancedWidget": "EightyNine\\FilamentAdvancedWidget\\Facades\\FilamentAdvancedWidget"
+                    },
+                    "providers": [
+                        "EightyNine\\FilamentAdvancedWidget\\FilamentAdvancedWidgetServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "EightyNine\\FilamentAdvancedWidget\\": "src/",
+                    "EightyNine\\FilamentAdvancedWidget\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eighty Nine",
+                    "email": "eighty9nine@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Advanced widgets for your filament php application",
+            "homepage": "https://github.com/eightynine/filament-advanced-widgets",
+            "keywords": [
+                "eightynine",
+                "filament-advanced-widgets",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/eightynine/filament-advanced-widgets/issues",
+                "source": "https://github.com/eightynine/filament-advanced-widgets"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/eighty9nine",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-31T07:15:36+00:00"
         },
         {
             "name": "encoredigitalgroup/filament-helpers",
