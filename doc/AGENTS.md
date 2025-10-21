@@ -8,6 +8,23 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 - **Key directories**: `app/Filament` (admin resources/widgets), `app/Services` (business logic), `app/Data` (DTOs), `database/seeders` (multilingual fixtures), `resources/views` (Blade + Volt storefront), and `scripts/*.mjs` (Playwright/e2e diagnostics).
 - **Getting unstuck**: skim `README.md`, `docs/ARCHITECTURE_OVERVIEW.md`, and `docs/INDEX.md` for entry points; queue and cache nuances live in `docs/CachePolicy.md`.
 
+## 2025 baseline after merged PRs
+
+- Treat the repository as feature-complete: the closure artefacts in `docs/PROJECT_CLOSURE_DOCUMENT.md`, `docs/COMPLETE_PROJECT_ARCHIVE_INDEX.md`, and the roll-up status in `memory-bank/progress.md` reflect the fully delivered Laravel + Filament programme.
+- All Filament resources now follow the Schema-based APIs introduced in the compatibility PRs. Any reintroduction of legacy `Form` classes, mismatched method signatures, or navigation property types should be considered regressions and blocked in review.
+- Enum management, discount engines, legal content, and advanced merchandising panels are online. When adding to these domains, keep logic in their dedicated namespaces (`app/Enums/**`, `app/Services/Discounts/**`, `app/Filament/Resources/Legal/**`, `app/Filament/Resources/Collection*`) and extend existing policies/tests instead of duplicating behaviour.
+- The storefront Livewire flows (cart, checkout, recommendations) ship with production-ready translations and SEO defaults. Preserve LT/EN parity by updating both `resources/lang/lt` and `resources/lang/en` whenever adding copy.
+- PR automation is configured through Release Please (`npm run release:pr`). Respect the generated versioning notes and avoid force-pushing rewritten histories; follow-up work should layer on top of the closed programme.
+
+## Domain reference map
+
+- **Settings & System Configuration**: models such as `app/Models/SystemSetting*.php`, service logic in `app/Services/SystemSettingsService.php`, seeded via `database/seeders/SystemSetting*.php`, and panels in `app/Filament/Resources/SystemSetting*` plus `app/Filament/Resources/NormalSetting*`.
+- **Catalog & Merchandising**: core entities `app/Models/Product.php`, `app/Models/ProductVariant.php`, `app/Models/Brand.php`, `app/Models/Category.php`, supporting data transfer objects like `app/Data/ProductRequestData.php` and `app/Data/CatalogIntegrityReport.php`, importer/exporters under `app/Services/ImportExport/**`, pricing helpers in `app/Services/Pricing/**`, and admin resources like `app/Filament/Resources/Product*` and `app/Filament/Resources/Collection*`.
+- **Commerce & Orders**: order aggregates in `app/Models/Order*.php`, cart and checkout services under `app/Services/Cart/**` and `app/Services/Payments/**`, Livewire flows within `app/Livewire/Pages/Checkout*.php`, and Filament management screens in `app/Filament/Resources/Order*`.
+- **Customers & Reviews**: domain models `app/Models/Customer*.php`, `app/Models/Review*.php`, recommendation utilities in `app/Services/Recommendations/**`, customer dashboards in `app/Livewire/Pages/Account/**`, and Filament resources grouped beneath `app/Filament/Resources/Customer*` and `app/Filament/Resources/Review*`.
+- **Content & Marketing**: articles and sliders under `app/Models/News*.php` and `app/Models/Slider*.php`, promotion tooling inside `app/Services/Discounts/**`, email automation in `app/Services/EmailMarketingService.php`, seeded fixtures in `database/seeders/News*`, and Filament resources such as `app/Filament/Resources/News*`, `app/Filament/Resources/Slider*`, and `app/Filament/Resources/Campaign*`.
+- **Automation & Analytics**: background orchestration in `app/Console/Commands/**`, event/listener wiring under `app/Listeners/**`, scheduled exports inside `app/Services/Export/**`, diagnostics in `app/Services/Debug/**`, analytics widgets/resources at `app/Filament/Resources/Analytics*`, and telemetry capture in `app/Models/Analytics*.php`.
+
 ## Workflow Expectations
 
 - After editing PHP or Blade files, run the quick quality loop before committing:
