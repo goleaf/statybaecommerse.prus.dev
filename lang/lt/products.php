@@ -61,6 +61,8 @@ return [
         'weight_range' => 'Svorio intervalas',
         'weight_from' => 'Svoris nuo',
         'weight_to' => 'Svoris iki',
+        'product' => 'Produktas',
+        'product_placeholder' => 'Įveskite produkto pavadinimą arba SKU',
     ],
     'actions' => [
         'publish' => 'Publikuoti',

@@ -8,9 +8,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminUserResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * UserController
@@ -22,24 +25,70 @@ class UserController extends Controller
     /**
      * Display a listing of the resource with pagination and filtering.
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', User::class);
-        $users = User::with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals'])->when($request->has('search'), function ($query) use ($request) {
-            $search = $request->get('search');
+        $definition = new ListQueryDefinition(
+            filters: [
+                'search' => [
+                    'type' => 'string',
+                    'callback' => static function (Builder $builder, string $term): void {
+                        $builder->where(function (Builder $query) use ($term): void {
+                            $query->where('name', 'like', "%{$term}%")
+                                ->orWhere('email', 'like', "%{$term}%")
+                                ->orWhere('first_name', 'like', "%{$term}%")
+                                ->orWhere('last_name', 'like', "%{$term}%");
+                        });
+                    },
+                ],
+                'status' => [
+                    'type' => 'bool',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, bool $status): void {
+                        $builder->where('is_active', $status);
+                    },
+                ],
+                'role' => [
+                    'type' => 'string',
+                    'callback' => static function (Builder $builder, string $role): void {
+                        $builder->whereHas('roles', static function (Builder $query) use ($role): void {
+                            $query->where('name', $role);
+                        });
+                    },
+                ],
+            ],
+            sortable: [
+                'name' => ['column' => 'users.name'],
+                'email' => ['column' => 'users.email'],
+                'created_at' => ['column' => 'users.created_at', 'default_direction' => 'desc'],
+                'last_login_at' => ['column' => 'users.last_login_at', 'default_direction' => 'desc'],
+            ],
+            defaultSort: 'created_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 15,
+            maxPerPage: 100,
+        );
 
-            return $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")->orWhere('first_name', 'like', "%{$search}%")->orWhere('last_name', 'like', "%{$search}%");
-            });
-        })->when($request->has('status'), function ($query) use ($request) {
-            return $query->where('is_active', $request->boolean('status'));
-        })->when($request->has('role'), function ($query) use ($request) {
-            return $query->whereHas('roles', function ($q) use ($request) {
-                $q->where('name', $request->get('role'));
-            });
-        })->paginate($request->get('per_page', 15));
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        return AdminUserResource::collection($users);
+        $query = User::with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals']);
+        $listQuery->applyFilters($query);
+        $listQuery->applySorts($query);
+
+        $users = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
+
+        $items = AdminUserResource::collection($users->items())->resolve();
+
+        return response()->json([
+            'success' => true,
+            'data' => $items,
+            'meta' => array_merge([
+                'timestamp' => now()->toISOString(),
+                'version' => '1.0',
+                'admin_view' => true,
+            ], ListResponse::meta($listQuery, $users)),
+            'links' => ListResponse::links($users),
+        ]);
     }
 
     /**

@@ -1,31 +1,38 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
+use App\Observers\CategoryObserver;
 use App\Traits\HasTranslations;
+use DB;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Category
  *
  * Eloquent model representing the Category entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $fillable
- * @property mixed $casts
- * @property mixed $appends
+ * @property mixed  $fillable
+ * @property mixed  $casts
+ * @property mixed  $appends
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Category newModelQuery()
@@ -34,8 +41,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([CategoryObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
-final class Category extends Model implements HasMedia
+final class Category extends Model implements HasMedia, TranslatableRecord
 {
     use HasFactory, HasTranslations, InteractsWithMedia, SoftDeletes;
 
@@ -95,7 +103,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -105,7 +113,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeRoot functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRoot($query)
     {
@@ -115,7 +123,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOrdered($query)
     {
@@ -125,7 +133,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeWithProductCounts functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithProductCounts($query)
     {
@@ -135,7 +143,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeVisible functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeVisible($query)
     {
@@ -145,7 +153,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeRoots functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRoots($query)
     {
@@ -155,7 +163,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -165,7 +173,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeFeatured functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeFeatured($query)
     {
@@ -177,7 +185,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeWithChildren functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithChildren($query)
     {
@@ -187,7 +195,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeWithParent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithParent($query)
     {
@@ -197,11 +205,25 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeWithAllRelations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithAllRelations($query)
     {
         return $query->with(['parent', 'children', 'products', 'translations']);
+    }
+
+    public function scopeWithLocale(Builder $query, ?string $locale = null): Builder
+    {
+        $resolvedLocale = $locale ?? app()->getLocale();
+
+        return $query->with([
+            'translations' => static fn ($translationQuery) => $translationQuery->where('locale', $resolvedLocale),
+        ]);
+    }
+
+    public function scopeTopLevelVisible(Builder $query): Builder
+    {
+        return $query->visible()->roots()->ordered();
     }
 
     /**
@@ -246,10 +268,10 @@ final class Category extends Model implements HasMedia
     public function getMetaTagsAttribute(): array
     {
         return [
-            'title' => $this->seo_title ?? $this->name,
+            'title'       => $this->seo_title ?? $this->name,
             'description' => $this->seo_description ?? $this->description,
-            'keywords' => $this->seo_keywords ?? [],
-            'canonical' => $this->canonical_url,
+            'keywords'    => $this->seo_keywords ?? [],
+            'canonical'   => $this->canonical_url,
         ];
     }
 
@@ -351,13 +373,13 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -380,10 +402,10 @@ final class Category extends Model implements HasMedia
         return $this->translations()->firstOrCreate(
             ['locale' => $locale],
             [
-                'name' => $this->name,
-                'slug' => $this->slug,
-                'description' => $this->description,
-                'seo_title' => $this->seo_title,
+                'name'            => $this->name,
+                'slug'            => $this->slug,
+                'description'     => $this->description,
+                'seo_title'       => $this->seo_title,
                 'seo_description' => $this->seo_description,
             ]
         );
@@ -492,7 +514,7 @@ final class Category extends Model implements HasMedia
      */
     public function getTotalRevenue(): float
     {
-        return (float) ($this->products()->join('order_items', 'products.id', '=', 'order_items.product_id')->join('orders', 'order_items.order_id', '=', 'orders.id')->where('orders.status', 'completed')->sum(\DB::raw('order_items.quantity * order_items.price')) ?? 0.0);
+        return (float) ($this->products()->join('order_items', 'products.id', '=', 'order_items.product_id')->join('orders', 'order_items.order_id', '=', 'orders.id')->where('orders.status', 'completed')->sum(DB::raw('order_items.quantity * order_items.price')) ?? 0.0);
     }
 
     /**
@@ -598,7 +620,7 @@ final class Category extends Model implements HasMedia
      */
     public function getImageUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             return $this->getFirstMediaUrl('images');
         }
 
@@ -610,7 +632,7 @@ final class Category extends Model implements HasMedia
      */
     public function getBannerUrl(?string $size = null): ?string
     {
-        if (!$size) {
+        if (! $size) {
             return $this->getFirstMediaUrl('banner');
         }
 
@@ -690,7 +712,7 @@ final class Category extends Model implements HasMedia
      */
     public function hasParent(): bool
     {
-        return !is_null($this->parent_id);
+        return ! is_null($this->parent_id);
     }
 
     // Additional scopes
@@ -698,7 +720,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeWithoutParent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithoutParent($query)
     {
@@ -708,7 +730,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeHidden functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeHidden($query)
     {
@@ -718,7 +740,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeInMenu functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInMenu($query)
     {
@@ -728,7 +750,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeNotInMenu functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeNotInMenu($query)
     {
@@ -738,7 +760,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopePopular functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePopular($query, int $minProducts = 5)
     {
@@ -748,7 +770,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query, int $days = 30)
     {
@@ -758,14 +780,14 @@ final class Category extends Model implements HasMedia
     /**
      * Handle scopeDeep functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeDeep($query, int $minDepth = 2)
     {
-        return $query->whereHas('parent', function ($q) use ($minDepth) {
-            $q->whereHas('parent', function ($q2) use ($minDepth) {
+        return $query->whereHas('parent', function ($q) use ($minDepth): void {
+            $q->whereHas('parent', function ($q2) use ($minDepth): void {
                 if ($minDepth > 2) {
-                    $q2->whereHas('parent', function ($q3) {
+                    $q2->whereHas('parent', function ($q3): void {
                         $q3->whereNotNull('parent_id');
                     });
                 } else {

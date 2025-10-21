@@ -30,6 +30,14 @@ return [
     'valid_until' => 'Valid Until',
     'notes' => 'Notes',
 
+    'customer_group' => 'Customer Group',
+    'code' => 'Code',
+    'discount_percentage' => 'Discount Percentage',
+    'partner' => 'Partner',
+    'email' => 'Email',
+    'phone' => 'Phone',
+    'commission_rate' => 'Commission Rate',
+
     // Status labels
     'all_records' => 'All Records',
     'active_only' => 'Active Only',

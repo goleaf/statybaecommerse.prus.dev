@@ -6,6 +6,7 @@ namespace App\Observers;
 
 use App\Models\Product;
 use App\Services\Images\GradientImageService;
+use App\UseCases\Cache\InvalidateProductCache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -15,11 +16,17 @@ use Illuminate\Support\Facades\Log;
  */
 final class ProductObserver
 {
+    public function __construct(
+        private readonly InvalidateProductCache $invalidateProductCache,
+    ) {}
+
     /**
      * Handle created functionality with proper error handling.
      */
     public function created(Product $product): void
     {
+        $this->flushProductCaches();
+
         // Skip placeholder image generation during tests to prevent memory issues
         if (app()->environment('testing')) {
             return;
@@ -37,5 +44,30 @@ final class ProductObserver
         } catch (\Throwable $e) {
             Log::warning('Failed to attach placeholder image for product', ['product_id' => $product->id, 'error' => $e->getMessage()]);
         }
+    }
+
+    public function updated(Product $product): void
+    {
+        $this->flushProductCaches();
+    }
+
+    public function deleted(Product $product): void
+    {
+        $this->flushProductCaches();
+    }
+
+    public function restored(Product $product): void
+    {
+        $this->flushProductCaches();
+    }
+
+    public function forceDeleted(Product $product): void
+    {
+        $this->flushProductCaches();
+    }
+
+    private function flushProductCaches(): void
+    {
+        ($this->invalidateProductCache)();
     }
 }

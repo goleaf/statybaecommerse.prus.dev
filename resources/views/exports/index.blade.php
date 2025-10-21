@@ -24,9 +24,11 @@
                         @foreach($files as $file)
                             <tr>
                                 <td class="px-4 py-2 text-sm text-gray-900">{{ $file['name'] }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">{{ number_format($file['size'] / 1024, 2) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">
+                                    {{ $file['size'] ? number_format($file['size'] / 1024, 2) : '—' }}
+                                </td>
                                 <td class="px-4 py-2 text-sm">
-                                    <x-link :href="route('exports.download', ['filename' => $file['name']])" class="text-primary-600">{{ __('Download') }}</x-link>
+                                    <x-link :href="$file['url']" class="text-primary-600">{{ __('Download') }}</x-link>
                                 </td>
                             </tr>
                         @endforeach

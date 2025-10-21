@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories\Translations;
 
-use App\Models\Translations\CityTranslation;
 use App\Models\City;
+use App\Models\Translations\CityTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,14 +29,14 @@ final class CityTranslationFactory extends Factory
 
     public function forCity(City $city): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'city_id' => $city->id,
         ]);
     }
 
     public function forLocale(string $locale): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'locale' => $locale,
         ]);
     }

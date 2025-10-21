@@ -11,19 +11,22 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -64,20 +67,20 @@ final class ChannelResource extends Resource
         return __('admin.channels.model_label');
     }
 
-    public static function schema(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
-                SchemaSection::make(__('admin.channels.basic_information'))
+                Section::make(__('admin.channels.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('admin.channels.name'))
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.channels.slug'))
                                     ->required()
@@ -93,10 +96,10 @@ final class ChannelResource extends Resource
                                 Select::make('type')
                                     ->label(__('admin.channels.type'))
                                     ->options([
-                                        'web' => __('admin.channels.types.web'),
+                                        'web'    => __('admin.channels.types.web'),
                                         'mobile' => __('admin.channels.types.mobile'),
-                                        'api' => __('admin.channels.types.api'),
-                                        'pos' => __('admin.channels.types.pos'),
+                                        'api'    => __('admin.channels.types.api'),
+                                        'pos'    => __('admin.channels.types.pos'),
                                     ])
                                     ->required()
                                     ->default('web'),
@@ -106,9 +109,9 @@ final class ChannelResource extends Resource
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
-                SchemaSection::make(__('admin.channels.configuration'))
+                Section::make(__('admin.channels.configuration'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('url')
                                     ->label(__('admin.channels.url'))
@@ -133,14 +136,14 @@ final class ChannelResource extends Resource
                                     ->label(__('admin.channels.currency_position'))
                                     ->options([
                                         'before' => __('admin.channels.currency_positions.before'),
-                                        'after' => __('admin.channels.currency_positions.after'),
+                                        'after'  => __('admin.channels.currency_positions.after'),
                                     ])
                                     ->default('after'),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.channels.status'))
+                Section::make(__('admin.channels.status'))
                     ->schema([
-                        SchemaGrid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Toggle::make('is_enabled')
                                     ->label(__('admin.channels.is_enabled'))
@@ -182,11 +185,11 @@ final class ChannelResource extends Resource
                     ->label(__('admin.channels.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'web' => 'success',
+                        'web'    => 'success',
                         'mobile' => 'info',
-                        'api' => 'warning',
-                        'pos' => 'danger',
-                        default => 'gray',
+                        'api'    => 'warning',
+                        'pos'    => 'danger',
+                        default  => 'gray',
                     }),
                 TextColumn::make('url')
                     ->label(__('admin.channels.url'))
@@ -215,10 +218,10 @@ final class ChannelResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('admin.channels.type'))
                     ->options([
-                        'web' => __('admin.channels.types.web'),
+                        'web'    => __('admin.channels.types.web'),
                         'mobile' => __('admin.channels.types.mobile'),
-                        'api' => __('admin.channels.types.api'),
-                        'pos' => __('admin.channels.types.pos'),
+                        'api'    => __('admin.channels.types.api'),
+                        'pos'    => __('admin.channels.types.pos'),
                     ]),
                 TernaryFilter::make('is_enabled')
                     ->label(__('admin.channels.is_enabled')),
@@ -249,10 +252,10 @@ final class ChannelResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListChannels::route('/'),
+            'index'  => Pages\ListChannels::route('/'),
             'create' => Pages\CreateChannel::route('/create'),
-            'view' => Pages\ViewChannel::route('/{record}'),
-            'edit' => Pages\EditChannel::route('/{record}/edit'),
+            'view'   => Pages\ViewChannel::route('/{record}'),
+            'edit'   => Pages\EditChannel::route('/{record}/edit'),
         ];
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
+use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Resources\ProductResource;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -11,7 +12,14 @@ use Illuminate\Support\Str;
 
 final class CreateProduct extends CreateRecord
 {
+    use InteractsWithTranslationTabs;
+
     protected static string $resource = ProductResource::class;
+
+    protected function getTranslatableFields(): array
+    {
+        return ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
+    }
 
     protected function getRedirectUrl(): string
     {
@@ -28,16 +36,36 @@ final class CreateProduct extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Generate slug if not provided
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['name']);
+        [$data, $translations] = $this->extractTranslationsFromForm($data);
+        $this->languageTabsPayload = $translations;
+
+        $data = $this->mutateMainDataWithDefaultLocale($data, $translations);
+
+        $defaultLocale = $this->getDefaultLocale();
+        $defaultName = $translations[$defaultLocale]['name'] ?? $data['name'] ?? null;
+        $defaultSlug = $translations[$defaultLocale]['slug'] ?? null;
+
+        if (blank($defaultSlug) && filled($defaultName)) {
+            $slug = Str::slug($defaultName);
+            $this->languageTabsPayload[$defaultLocale]['slug'] = $slug;
+            $data['slug'] = $slug;
         }
 
-        // Set published date if not provided and product is visible
+        if (empty($data['slug']) && filled($defaultName)) {
+            $data['slug'] = Str::slug($defaultName);
+        }
+
         if (! isset($data['published_at']) && ($data['is_visible'] ?? false)) {
             $data['published_at'] = now();
         }
 
         return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
+
+        parent::afterCreate();
     }
 }

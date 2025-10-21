@@ -14,29 +14,54 @@ final class CurrencyFactory extends Factory
 {
     protected $model = Currency::class;
 
+    private const PRESET_CURRENCIES = [
+        'eur' => [
+            'name' => ['en' => 'Euro', 'lt' => 'Euras'],
+            'code' => 'EUR',
+            'symbol' => '€',
+            'exchange_rate' => 1.0,
+            'decimal_places' => 2,
+            'is_default' => true,
+        ],
+        'usd' => [
+            'name' => ['en' => 'US Dollar', 'lt' => 'JAV doleris'],
+            'code' => 'USD',
+            'symbol' => '$',
+            'exchange_rate' => 1.10,
+            'decimal_places' => 2,
+        ],
+        'gbp' => [
+            'name' => ['en' => 'British Pound Sterling', 'lt' => 'Svaras sterlingų'],
+            'code' => 'GBP',
+            'symbol' => '£',
+            'exchange_rate' => 0.85,
+            'decimal_places' => 2,
+        ],
+        'sek' => [
+            'name' => ['en' => 'Swedish Krona', 'lt' => 'Švedijos krona'],
+            'code' => 'SEK',
+            'symbol' => 'kr',
+            'exchange_rate' => 10.50,
+            'decimal_places' => 2,
+        ],
+    ];
+
     public function definition(): array
     {
-        $currencies = [
-            ['code' => 'EUR', 'symbol' => '€', 'name' => 'Euro', 'exchange_rate' => 1.0],
-            ['code' => 'USD', 'symbol' => '$', 'name' => 'US Dollar', 'exchange_rate' => 0.85],
-            ['code' => 'GBP', 'symbol' => '£', 'name' => 'British Pound', 'exchange_rate' => 1.15],
-            ['code' => 'JPY', 'symbol' => '¥', 'name' => 'Japanese Yen', 'exchange_rate' => 0.0065],
-            ['code' => 'CAD', 'symbol' => 'C$', 'name' => 'Canadian Dollar', 'exchange_rate' => 0.65],
-        ];
-
-        $currency = fake()->randomElement($currencies);
-
-        // Add a random suffix to make the code unique for testing
-        $uniqueCode = $currency['code'].'_'.fake()->unique()->randomNumber(3);
-
         return [
-            'name' => $currency['name'],
-            'code' => $uniqueCode,
-            'symbol' => $currency['symbol'],
-            'exchange_rate' => $currency['exchange_rate'],
-            'decimal_places' => fake()->numberBetween(0, 4),
-            'is_enabled' => fake()->boolean(80), // 80% chance of being enabled
-            'is_default' => false, // Will be set manually in tests
+            'name' => [
+                'en' => $this->faker->currencyCode().' Currency',
+                'lt' => 'Valiuta '.$this->faker->word(),
+            ],
+            'code' => strtoupper($this->faker->lexify('???')),
+            'symbol' => $this->faker->randomElement(['€', '$', '£', '¥', '₿']),
+            'exchange_rate' => $this->faker->randomFloat(4, 0.2, 2.5),
+            'decimal_places' => $this->faker->numberBetween(0, 4),
+            'is_active' => true,
+            'is_enabled' => true,
+            'is_default' => false,
+            'sort_order' => $this->faker->numberBetween(0, 100),
+            'auto_update_rate' => false,
         ];
     }
 
@@ -62,25 +87,49 @@ final class CurrencyFactory extends Factory
         ]);
     }
 
-    public function eur(): static
+    public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => 'Euro',
-            'code' => 'EUR',
-            'symbol' => '€',
-            'exchange_rate' => 1.0,
-            'decimal_places' => 2,
+            'is_active' => true,
         ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+
+    public function eur(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('eur'));
     }
 
     public function usd(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'name' => 'US Dollar',
-            'code' => 'USD',
-            'symbol' => '$',
-            'exchange_rate' => 0.85,
-            'decimal_places' => 2,
-        ]);
+        return $this->state(fn (array $attributes) => $this->preset('usd'));
+    }
+
+    public function gbp(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('gbp'));
+    }
+
+    public function sek(): static
+    {
+        return $this->state(fn (array $attributes) => $this->preset('sek'));
+    }
+
+    private function preset(string $key): array
+    {
+        $preset = self::PRESET_CURRENCIES[$key] ?? [];
+
+        return array_merge([
+            'is_active' => true,
+            'is_enabled' => true,
+            'sort_order' => array_search($key, array_keys(self::PRESET_CURRENCIES), true) ?: 0,
+            'auto_update_rate' => false,
+        ], $preset);
     }
 }

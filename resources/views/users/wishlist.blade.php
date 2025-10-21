@@ -82,7 +82,7 @@ title(__('users.wishlist'));
                         <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 relative">
                             @if($item->productVariant && $item->productVariant->product && $item->productVariant->product->featured_image)
                                 <img 
-                                    src="{{ Storage::disk('public')->url($item->productVariant->product->featured_image) }}" 
+                                    src="{{ $item->productVariant->product->featured_image ? \App\Support\Storage\SecureStorage::temporarySignedUrl($item->productVariant->product->featured_image) : '' }}"
                                     alt="{{ $item->productVariant->product->name }}"
                                     class="h-64 w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
                                 >
@@ -155,9 +155,9 @@ title(__('users.wishlist'));
                             <!-- Actions -->
                             <div class="space-y-2">
                                 @if($item->productVariant && $item->productVariant->product && $item->productVariant->product->stock_quantity > 0)
-                                    <button 
+                                    <button
                                         type="button"
-                                        onclick="addToCart({{ $item->productVariant->id }})"
+                                        onclick="addToCart({{ $item->productVariant->id }}, {{ $item->productVariant->product_id }})"
                                         class="w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                     >
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,14 +277,16 @@ function clearWishlist() {
     }
 }
 
-function addToCart(productVariantId, quantity = 1) {
-    fetch('{{ route("cart.add") }}', {
+function addToCart(productVariantId, productId, quantity = 1) {
+    fetch('{{ route('frontend.cart.add') }}', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
         },
         body: JSON.stringify({
+            product_id: productId,
             product_variant_id: productVariantId,
             quantity: quantity
         }),
@@ -320,7 +322,7 @@ function addAllToCart() {
         
         inStockItems.forEach((item, index) => {
             setTimeout(() => {
-                addToCart(item.productVariant.id, 1)
+                addToCart(item.productVariant.id, item.productVariant.product_id, 1)
                     .then(() => {
                         addedCount++;
                         if (addedCount + errorCount === inStockItems.length) {

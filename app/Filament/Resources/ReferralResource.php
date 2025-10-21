@@ -13,12 +13,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -28,8 +28,14 @@ final class ReferralResource extends Resource
 {
     protected static ?string $model = Referral::class;
 
+    /**
+     * Navigation icon for the resource.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
 
+    /**
+     * Navigation group for organizing the resource in the admin panel.
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 17;
@@ -54,10 +60,10 @@ final class ReferralResource extends Resource
                             ->maxLength(255),
                         Select::make('status')
                             ->options([
-                                'pending' => 'Pending',
-                                'active' => 'Active',
+                                'pending'   => 'Pending',
+                                'active'    => 'Active',
                                 'completed' => 'Completed',
-                                'expired' => 'Expired',
+                                'expired'   => 'Expired',
                                 'cancelled' => 'Cancelled',
                             ])
                             ->required(),
@@ -167,10 +173,10 @@ final class ReferralResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
-                        'active' => 'Active',
+                        'pending'   => 'Pending',
+                        'active'    => 'Active',
                         'completed' => 'Completed',
-                        'expired' => 'Expired',
+                        'expired'   => 'Expired',
                         'cancelled' => 'Cancelled',
                     ]),
                 SelectFilter::make('referrer_id')
@@ -205,10 +211,10 @@ final class ReferralResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferrals::route('/'),
+            'index'  => Pages\ListReferrals::route('/'),
             'create' => Pages\CreateReferral::route('/create'),
-            'view' => Pages\ViewReferral::route('/{record}'),
-            'edit' => Pages\EditReferral::route('/{record}/edit'),
+            'view'   => Pages\ViewReferral::route('/{record}'),
+            'edit'   => Pages\EditReferral::route('/{record}/edit'),
         ];
     }
 

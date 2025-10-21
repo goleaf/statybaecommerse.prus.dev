@@ -37,6 +37,7 @@ final class DocumentFactory extends Factory
             'documentable_type' => Order::class,
             'documentable_id' => Order::factory(),
             'created_by' => User::factory(),
+            'updated_by' => User::factory(),
             'generated_at' => $this->faker->optional(0.8)->dateTimeBetween('-1 month', 'now'),
         ];
     }

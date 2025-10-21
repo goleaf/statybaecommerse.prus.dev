@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
 use App\Observers\ProductObserver;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -32,12 +37,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * Eloquent model representing the Product entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $fillable
- * @property mixed $casts
- * @property mixed $appends
- * @property mixed $table
+ * @property mixed  $fillable
+ * @property mixed  $casts
+ * @property mixed  $appends
+ * @property mixed  $table
  * @property string $translationModel
- * @property array $translatable
+ * @property array  $translatable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
@@ -47,7 +52,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 #[ObservedBy([ProductObserver::class])]
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
-final class Product extends Model implements HasMedia
+final class Product extends Model implements HasMedia, TranslatableRecord
 {
     use HasFactory, SoftDeletes;
     use HasProductPricing;
@@ -102,8 +107,9 @@ final class Product extends Model implements HasMedia
      */
     public function reservedQuantity(): int
     {
-        // For simple products, no reservations for now
-        return 0;
+        return (int) $this->stockReservations()
+            ->active()
+            ->sum('quantity');
     }
 
     /**
@@ -233,7 +239,7 @@ final class Product extends Model implements HasMedia
     {
         return [
             'length' => $this->length ?? 0,
-            'width' => $this->width ?? 0,
+            'width'  => $this->width ?? 0,
             'height' => $this->height ?? 0,
         ];
     }
@@ -277,17 +283,54 @@ final class Product extends Model implements HasMedia
     /**
      * Handle decreaseStock functionality with proper error handling.
      */
-    public function decreaseStock(int $quantity): bool
+    public function decreaseStock(int $quantity, ?StockReservation $reservation = null): bool
     {
+        if ($quantity <= 0) {
+            return false;
+        }
+
         if (! $this->manage_stock) {
             return true;
-            // Always allow if not tracking
         }
-        if ($this->availableQuantity() < $quantity) {
+
+        $decreased = DB::transaction(function () use ($quantity, $reservation): bool {
+            $product = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            $activeReservations = StockReservation::query()
+                ->where('product_id', $product->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->get();
+
+            $reserved = (int) $activeReservations->sum('quantity');
+
+            if (($product->stock_quantity - $reserved) < $quantity) {
+                return false;
+            }
+
+            $product->decrement('stock_quantity', $quantity);
+
+            if ($reservation !== null) {
+                $lockedReservation = StockReservation::query()
+                    ->whereKey($reservation->getKey())
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($lockedReservation !== null) {
+                    $lockedReservation->consume(min($quantity, $lockedReservation->quantity));
+                }
+            }
+
+            $this->setRawAttributes($product->getAttributes(), true);
+
+            return true;
+        });
+
+        if (! $decreased) {
             return false;
-            // Not enough stock
         }
-        $this->decrement('stock_quantity', $quantity);
+
+        $this->refresh();
 
         return true;
     }
@@ -297,9 +340,80 @@ final class Product extends Model implements HasMedia
      */
     public function increaseStock(int $quantity): void
     {
-        if ($this->manage_stock) {
-            $this->increment('stock_quantity', $quantity);
+        if ($quantity <= 0 || ! $this->manage_stock) {
+            return;
         }
+
+        DB::transaction(function () use ($quantity): void {
+            $product = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+            $product->increment('stock_quantity', $quantity);
+            $this->setRawAttributes($product->getAttributes(), true);
+        });
+
+        $this->refresh();
+    }
+
+    public function reserveStock(
+        int $quantity,
+        ?DateTimeInterface $expiresAt = null,
+        array $meta = [],
+        ?string $referenceType = null,
+        ?string $referenceId = null
+    ): ?StockReservation {
+        if ($quantity <= 0 || ! $this->manage_stock) {
+            return null;
+        }
+
+        $reservation = DB::transaction(function () use ($quantity, $expiresAt, $meta, $referenceType, $referenceId): ?StockReservation {
+            $product = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+
+            $reserved = (int) StockReservation::query()
+                ->where('product_id', $product->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->get()
+                ->sum('quantity');
+
+            if (($product->stock_quantity - $reserved) < $quantity) {
+                return null;
+            }
+
+            return $product->stockReservations()->create([
+                'quantity'       => $quantity,
+                'status'         => StockReservation::STATUS_RESERVED,
+                'reserved_at'    => now(),
+                'expires_at'     => $expiresAt,
+                'meta'           => $meta ?: null,
+                'reference_type' => $referenceType,
+                'reference_id'   => $referenceId,
+            ]);
+        });
+
+        $this->refresh();
+
+        return $reservation;
+    }
+
+    public function releaseReservation(StockReservation $reservation, ?int $quantity = null): void
+    {
+        DB::transaction(function () use ($reservation, $quantity): void {
+            $lockedReservation = StockReservation::query()
+                ->whereKey($reservation->getKey())
+                ->lockForUpdate()
+                ->first();
+
+            if ($lockedReservation === null) {
+                return;
+            }
+
+            if ($lockedReservation->product_id !== $this->getKey()) {
+                return;
+            }
+
+            $lockedReservation->release($quantity);
+        });
+
+        $this->refresh();
     }
 
     /**
@@ -345,6 +459,11 @@ final class Product extends Model implements HasMedia
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
+    }
+
+    public function stockReservations(): HasMany
+    {
+        return $this->hasMany(StockReservation::class);
     }
 
     /**
@@ -445,7 +564,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestApprovedReview(): HasOne
     {
-        return $this->reviews()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->reviews()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('is_approved', true);
         });
     }
@@ -578,7 +697,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestPriceChange(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('field_name', 'price');
         });
     }
@@ -588,7 +707,7 @@ final class Product extends Model implements HasMedia
      */
     public function latestStockUpdate(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max'], function ($query): void {
             $query->where('field_name', 'stock_quantity');
         });
     }
@@ -598,7 +717,7 @@ final class Product extends Model implements HasMedia
      */
     public function currentPrice(): HasOne
     {
-        return $this->histories()->one()->ofMany(['created_at' => 'max', 'id' => 'max'], function ($query) {
+        return $this->histories()->one()->ofMany(['created_at' => 'max', 'id' => 'max'], function ($query): void {
             $query->where('field_name', 'price')->where('created_at', '<=', now());
         });
     }
@@ -712,7 +831,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopePublished functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePublished($query)
     {
@@ -722,7 +841,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeFeatured functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeFeatured($query)
     {
@@ -732,7 +851,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeVisible functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeVisible($query)
     {
@@ -742,7 +861,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeByBrand functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByBrand($query, int $brandId)
     {
@@ -752,11 +871,11 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeByCategory functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCategory($query, int $categoryId)
     {
-        return $query->whereHas('categories', function ($q) use ($categoryId) {
+        return $query->whereHas('categories', function ($q) use ($categoryId): void {
             $q->where('category_id', $categoryId);
         });
     }
@@ -764,11 +883,11 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeByCollection functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCollection($query, int $collectionId)
     {
-        return $query->whereHas('collections', function ($q) use ($collectionId) {
+        return $query->whereHas('collections', function ($q) use ($collectionId): void {
             $q->where('collection_id', $collectionId);
         });
     }
@@ -776,7 +895,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeInStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInStock($query)
     {
@@ -786,7 +905,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeLowStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeLowStock($query)
     {
@@ -796,7 +915,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeRequestable functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRequestable($query)
     {
@@ -806,7 +925,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeNeedsRestocking functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeNeedsRestocking($query)
     {
@@ -816,7 +935,7 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeWithRequests functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithRequests($query)
     {
@@ -942,9 +1061,9 @@ final class Product extends Model implements HasMedia
      */
     public function getMainImageAttribute(): ?string
     {
-        $img = $this->images()->orderBy('sort_order')->first();
+        $image = $this->resolvePrimaryImageModel();
 
-        return $img ? $this->resolvePublicUrl($img->path) : null;
+        return $image ? $this->resolvePublicUrl($image->path) : null;
     }
 
     /**
@@ -952,9 +1071,9 @@ final class Product extends Model implements HasMedia
      */
     public function getThumbnailAttribute(): ?string
     {
-        $img = $this->images()->orderBy('sort_order')->first();
+        $image = $this->resolvePrimaryImageModel();
 
-        return $img ? $this->resolvePublicUrl($img->path) : null;
+        return $image ? $this->resolvePublicUrl($image->path) : null;
     }
 
     /**
@@ -962,9 +1081,34 @@ final class Product extends Model implements HasMedia
      */
     public function getImageUrl(?string $size = null): ?string
     {
-        $img = $this->images()->orderBy('sort_order')->first();
+        $image = $this->resolvePrimaryImageModel();
 
-        return $img ? $this->resolvePublicUrl($img->path) : null;
+        return $image ? $this->resolvePublicUrl($image->path) : null;
+    }
+
+    private function resolvePrimaryImageModel(): ?ProductImage
+    {
+        if ($this->relationLoaded('primaryImage')) {
+            $image = $this->getRelation('primaryImage');
+
+            return $image instanceof ProductImage ? $image : null;
+        }
+
+        if ($this->relationLoaded('images')) {
+            $images = $this->getRelation('images');
+
+            if ($images instanceof EloquentCollection) {
+                $image = $images->first();
+
+                return $image instanceof ProductImage ? $image : null;
+            }
+
+            return null;
+        }
+
+        $image = $this->primaryImage()->first();
+
+        return $image instanceof ProductImage ? $image : null;
     }
 
     /**
@@ -1010,9 +1154,10 @@ final class Product extends Model implements HasMedia
         if (empty($images)) {
             return ['src' => null, 'srcset' => '', 'sizes' => '', 'alt' => $this->name];
         }
-        $srcset = [$images['xs'] ?? null ? $images['xs'].' 150w' : null, $images['sm'] ?? null ? $images['sm'].' 300w' : null, $images['md'] ?? null ? $images['md'].' 500w' : null, $images['lg'] ?? null ? $images['lg'].' 800w' : null, $images['xl'] ?? null ? $images['xl'].' 1200w' : null];
+        $srcset = [$images['xs'] ?? null ? $images['xs'] . ' 150w' : null, $images['sm'] ?? null ? $images['sm'] . ' 300w' : null, $images['md'] ?? null ? $images['md'] . ' 500w' : null, $images['lg'] ?? null ? $images['lg'] . ' 800w' : null, $images['xl'] ?? null ? $images['xl'] . ' 1200w' : null];
+        $sizeKey = $defaultSize ?? 'md';
 
-        return ['src' => $images[$defaultSize] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];
+        return ['src' => $images[$sizeKey] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];
     }
 
     /**
@@ -1039,15 +1184,32 @@ final class Product extends Model implements HasMedia
      */
     private function resolvePublicUrl(string $path): string
     {
-        // Assume stored under public disk or public path
-        $prefixes = ['http://', 'https://', '/'];
-        foreach ($prefixes as $prefix) {
+        if ($path === '') {
+            return $path;
+        }
+
+        $absolutePrefixes = ['http://', 'https://'];
+        foreach ($absolutePrefixes as $prefix) {
             if (str_starts_with($path, $prefix)) {
                 return $path;
             }
         }
 
-        return asset(trim($path, '/'));
+        if (str_starts_with($path, '/')) {
+            return asset(ltrim($path, '/'));
+        }
+
+        $defaultDisk = config('filesystems.default', 'public');
+        $disksToCheck = array_unique([$defaultDisk, 'public']);
+
+        foreach ($disksToCheck as $disk) {
+            if (Storage::disk($disk)->exists($path)) {
+                return Storage::disk($disk)->url($path);
+            }
+        }
+
+        // Fall back to the public disk URL even if the file is missing so the UI has a consistent path format
+        return Storage::disk('public')->url($path);
     }
 
     // Translation methods
@@ -1113,13 +1275,13 @@ final class Product extends Model implements HasMedia
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -1195,7 +1357,7 @@ final class Product extends Model implements HasMedia
         $query = Product::published()->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations']);
         // First try to get products from same categories
         if (! empty($categoryIds)) {
-            $query->whereHas('categories', function ($q) use ($categoryIds) {
+            $query->whereHas('categories', function ($q) use ($categoryIds): void {
                 $q->whereIn('category_id', $categoryIds);
             });
         }
@@ -1232,7 +1394,7 @@ final class Product extends Model implements HasMedia
             return collect();
         }
 
-        return Product::published()->whereHas('categories', function ($query) use ($categoryIds) {
+        return Product::published()->whereHas('categories', function ($query) use ($categoryIds): void {
             $query->whereIn('category_id', $categoryIds);
         })->where('id', '!=', $this->id)->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
@@ -1265,7 +1427,7 @@ final class Product extends Model implements HasMedia
         $minPrice = $currentPrice * (1 - $priceRange);
         $maxPrice = $currentPrice * (1 + $priceRange);
 
-        return Product::published()->where('id', '!=', $this->id)->where(function ($query) use ($minPrice, $maxPrice) {
+        return Product::published()->where('id', '!=', $this->id)->where(function ($query) use ($minPrice, $maxPrice): void {
             $query->whereBetween('price', [$minPrice, $maxPrice])->orWhereBetween('sale_price', [$minPrice, $maxPrice]);
         })->with(['media', 'brand', 'categories', 'translations'])->limit($limit)->get();
     }
@@ -1423,7 +1585,7 @@ final class Product extends Model implements HasMedia
         $name = $this->getTranslatedName($locale);
         $sku = $this->sku ? " ({$this->sku})" : '';
 
-        return $name.$sku;
+        return $name . $sku;
     }
 
     /**

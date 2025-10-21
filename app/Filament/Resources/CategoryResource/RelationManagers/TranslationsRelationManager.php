@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -19,8 +20,9 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
-final class TranslationsRelationManager extends RelationManager
+final class TranslationsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'translations';
 
@@ -81,13 +83,13 @@ final class TranslationsRelationManager extends RelationManager
                     ->label(__('translations.locale'))
                     ->badge()
                     ->color(fn ($state) => match ($state) {
-                        'en' => 'success',
-                        'lt' => 'info',
+                        'en'    => 'success',
+                        'lt'    => 'info',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'en' => 'English',
-                        'lt' => 'Lietuvių',
+                        'en'    => 'English',
+                        'lt'    => 'Lietuvių',
                         default => $state,
                     }),
                 TextColumn::make('name')
@@ -142,6 +144,53 @@ final class TranslationsRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit translations')
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit category translations')
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        return $repeater
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->schema([
+                                Hidden::make('id'),
+                                Select::make('locale')
+                                    ->label(__('translations.locale'))
+                                    ->options([
+                                        'en' => 'English',
+                                        'lt' => 'Lietuvių',
+                                    ])
+                                    ->required()
+                                    ->searchable()
+                                    ->disabled(fn (callable $get): bool => filled($get('id')))
+                                    ->dehydrated(true),
+                                TextInput::make('name')
+                                    ->label(__('translations.name'))
+                                    ->required()
+                                    ->maxLength(255),
+                                TextInput::make('slug')
+                                    ->label(__('translations.slug'))
+                                    ->required()
+                                    ->maxLength(255),
+                                Textarea::make('description')
+                                    ->label(__('translations.description'))
+                                    ->rows(3)
+                                    ->columnSpanFull(),
+                                Textarea::make('short_description')
+                                    ->label(__('translations.short_description'))
+                                    ->rows(2)
+                                    ->maxLength(500)
+                                    ->columnSpanFull(),
+                                TextInput::make('seo_title')
+                                    ->label(__('translations.seo_title'))
+                                    ->maxLength(255),
+                                Textarea::make('seo_description')
+                                    ->label(__('translations.seo_description'))
+                                    ->rows(2)
+                                    ->maxLength(500),
+                            ]);
+                    }),
                 CreateAction::make(),
             ])
             ->actions([

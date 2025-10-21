@@ -19,51 +19,63 @@ trait HandlesContentNegotiation
     /**
      * Handle content negotiation for different response formats
      */
-    protected function handleContentNegotiation(Request $request, array $data, ?string $viewName = null, array $viewData = []): JsonResponse|View|Response
+    protected function handleContentNegotiation(Request $request, array $data, ?string $viewName = null, array $viewData = [], bool $wrap = true): JsonResponse|View|Response
     {
+        $payload = $wrap
+            ? ['success' => true, 'data' => $data, 'timestamp' => now()->toISOString()]
+            : $data;
+
         // JSON response (API clients, AJAX requests)
         if ($request->accepts(['application/json', 'text/json'])) {
-            return response()->json(['success' => true, 'data' => $data, 'timestamp' => now()->toISOString()]);
+            return response()->json($payload);
         }
         // XML response (legacy systems, RSS feeds)
         if ($request->accepts(['application/xml', 'text/xml'])) {
-            $xml = $this->arrayToXml($data, 'response');
+            $xml = $this->arrayToXml($payload, 'response');
 
             return response($xml, 200, ['Content-Type' => 'application/xml; charset=utf-8']);
         }
         // CSV response (data export, spreadsheet applications)
         if ($request->accepts(['text/csv', 'application/csv'])) {
-            $csv = $this->arrayToCsv($data);
+            $csv = $this->arrayToCsv($payload);
 
             return response($csv, 200, ['Content-Type' => 'text/csv; charset=utf-8', 'Content-Disposition' => 'attachment; filename="export_'.now()->format('Y-m-d_H-i-s').'.csv"']);
         }
         // HTML response (web browsers, default)
         if ($viewName) {
-            return view($viewName, array_merge($viewData, ['data' => $data]));
+            return view($viewName, array_merge($viewData, ['data' => $payload]));
         }
 
         // Fallback to JSON if no view specified
-        return response()->json(['success' => true, 'data' => $data, 'timestamp' => now()->toISOString()]);
+        return response()->json($payload);
     }
 
     /**
      * Handle content negotiation for product data specifically
      */
-    protected function handleProductContentNegotiation(Request $request, $products, ?string $viewName = null, array $viewData = []): JsonResponse|View|Response
+    protected function handleProductContentNegotiation(Request $request, $products, ?string $viewName = null, array $viewData = [], bool $wrap = true): JsonResponse|View|Response
     {
         $data = $this->formatProductData($products);
 
-        return $this->handleContentNegotiation($request, $data, $viewName, $viewData);
+        return $this->handleContentNegotiation($request, $data, $viewName, $viewData, $wrap);
     }
 
     /**
      * Handle content negotiation for category data specifically
      */
-    protected function handleCategoryContentNegotiation(Request $request, $categories, ?string $viewName = null, array $viewData = []): JsonResponse|View|Response
+    protected function handleCategoryContentNegotiation(Request $request, $categories, ?string $viewName = null, array $viewData = [], bool $wrap = true): JsonResponse|View|Response
     {
         $data = $this->formatCategoryData($categories);
 
-        return $this->handleContentNegotiation($request, $data, $viewName, $viewData);
+        return $this->handleContentNegotiation($request, $data, $viewName, $viewData, $wrap);
+    }
+
+    /**
+     * Return a JSON contract payload without the legacy success envelope.
+     */
+    protected function respondWithContract(Request $request, array $payload): JsonResponse|View|Response
+    {
+        return $this->handleContentNegotiation($request, $payload, wrap: false);
     }
 
     /**

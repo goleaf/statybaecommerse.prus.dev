@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\OrderResource;
+use App\Jobs\ProcessExportJob;
 use App\Models\Channel;
+use App\Models\Export;
 use App\Models\Order;
 use App\Models\Partner;
 use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -190,8 +195,10 @@ class OrderResourceTest extends TestCase
 
         Livewire::test(OrderResource\Pages\ListOrders::class)
             ->filterTable('created_at', [
-                'created_from' => now()->subDay()->format('Y-m-d'),
-                'created_until' => now()->addDay()->format('Y-m-d'),
+                'range' => [
+                    'start' => now()->subDay()->format('Y-m-d'),
+                    'end' => now()->addDay()->format('Y-m-d'),
+                ],
             ])
             ->assertCanSeeTableRecords([$newOrder])
             ->assertCanNotSeeTableRecords([$oldOrder]);
@@ -273,6 +280,30 @@ class OrderResourceTest extends TestCase
         foreach ($orders as $order) {
             $this->assertSoftDeleted('orders', ['id' => $order->id]);
         }
+    }
+
+    public function test_can_queue_bulk_export(): void
+    {
+        config()->set('filesystems.default', 'public');
+        Storage::fake('public');
+        Notification::fake();
+        Bus::fake();
+
+        $orders = Order::factory()->count(2)->create();
+
+        Livewire::test(OrderResource\Pages\ListOrders::class)
+            ->callTableBulkAction('export_selected', $orders, [
+                'format' => 'csv',
+                'columns' => ['number', 'status'],
+            ])
+            ->assertHasNoTableBulkActionErrors();
+
+        $export = Export::query()->latest()->first();
+
+        $this->assertNotNull($export);
+        $this->assertSame('csv', $export->format);
+
+        Bus::assertDispatched(ProcessExportJob::class, fn (ProcessExportJob $job): bool => $job->exportId === $export->getKey());
     }
 
     public function test_can_search_orders(): void

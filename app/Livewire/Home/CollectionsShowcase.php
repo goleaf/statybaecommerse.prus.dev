@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Home;
 
 use App\Models\Collection as ProductCollection;
+use App\Support\Cache\CacheKeys;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -22,10 +23,9 @@ final class CollectionsShowcase extends Component implements HasSchemas
     #[Computed]
     public function collections(): EloquentCollection
     {
-        $cacheKey = sprintf('home:collections:%s', app()->getLocale());
+        $locale = app()->getLocale();
 
-        return Cache::remember($cacheKey, 300, function () {
-            $locale = app()->getLocale();
+        return Cache::remember(CacheKeys::homeCollections($locale), CacheKeys::TTL_FIVE_MINUTES, function () use ($locale) {
 
             return ProductCollection::query()
                 ->with('media')

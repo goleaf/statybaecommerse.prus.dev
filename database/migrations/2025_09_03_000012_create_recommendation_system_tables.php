@@ -1,17 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         // User behavior tracking table
-        if (!Schema::hasTable('user_behaviors')) {
+        if (! Schema::hasTable('user_behaviors')) {
             Schema::create('user_behaviors', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
@@ -32,7 +35,7 @@ return new class extends Migration {
         }
 
         // Product similarity matrix table
-        if (!Schema::hasTable('product_similarities')) {
+        if (! Schema::hasTable('product_similarities')) {
             Schema::create('product_similarities', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('product_id')->constrained()->onDelete('cascade');
@@ -51,7 +54,7 @@ return new class extends Migration {
         }
 
         // User preferences and profiles
-        if (!Schema::hasTable('user_preferences')) {
+        if (! Schema::hasTable('user_preferences')) {
             Schema::create('user_preferences', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -68,7 +71,7 @@ return new class extends Migration {
         }
 
         // Recommendation configurations
-        if (!Schema::hasTable('recommendation_configs')) {
+        if (! Schema::hasTable('recommendation_configs')) {
             Schema::create('recommendation_configs', function (Blueprint $table) {
                 $table->id();
                 $table->string('name')->unique();
@@ -87,7 +90,7 @@ return new class extends Migration {
         }
 
         // Recommendation blocks (related_products, you_might_also_like, etc.)
-        if (!Schema::hasTable('recommendation_blocks')) {
+        if (! Schema::hasTable('recommendation_blocks')) {
             Schema::create('recommendation_blocks', function (Blueprint $table) {
                 $table->id();
                 $table->string('name')->unique();  // related_products, you_might_also_like, similar_products
@@ -105,7 +108,7 @@ return new class extends Migration {
         }
 
         // Cached recommendations
-        if (!Schema::hasTable('recommendation_cache')) {
+        if (! Schema::hasTable('recommendation_cache')) {
             Schema::create('recommendation_cache', function (Blueprint $table) {
                 $table->id();
                 $table->string('cache_key')->unique();
@@ -126,7 +129,7 @@ return new class extends Migration {
         }
 
         // Recommendation performance analytics
-        if (!Schema::hasTable('recommendation_analytics')) {
+        if (! Schema::hasTable('recommendation_analytics')) {
             Schema::create('recommendation_analytics', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('block_id')->nullable()->constrained('recommendation_blocks')->onDelete('cascade');
@@ -147,7 +150,7 @@ return new class extends Migration {
         }
 
         // Product feature vectors for content-based recommendations
-        if (!Schema::hasTable('product_features')) {
+        if (! Schema::hasTable('product_features')) {
             Schema::create('product_features', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('product_id')->constrained()->onDelete('cascade');
@@ -164,7 +167,7 @@ return new class extends Migration {
         }
 
         // User-item interaction matrix for collaborative filtering
-        if (!Schema::hasTable('user_product_interactions')) {
+        if (! Schema::hasTable('user_product_interactions')) {
             Schema::create('user_product_interactions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductRequestResource\Pages;
+use App\Models\Product;
 use App\Models\ProductRequest;
+use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -13,12 +16,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class ProductRequestResource extends Resource
 {
@@ -52,11 +55,46 @@ final class ProductRequestResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('product_id')
-                    ->relationship('product', 'name')
+                SearchableInput::make('product_id')
+                    ->label(__('product_requests.fields.product'))
+                    ->placeholder('SKU / EAN / name')
                     ->required()
-                    ->searchable()
-                    ->preload(),
+                    ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?ProductRequest $record): void {
+                        if ($state === null) {
+                            return;
+                        }
+
+                        $product = $record?->product ?? Product::query()
+                            ->select(['id', 'sku', 'name'])
+                            ->find($state);
+
+                        if (! $product instanceof Product) {
+                            return;
+                        }
+
+                        $component
+                            ->state((string) $state)
+                            ->options([
+                                (string) $product->getKey() => ProductSearch::label($product),
+                            ]);
+                    })
+                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                        if ($state === null || $state === '') {
+                            return;
+                        }
+
+                        $product = Product::query()
+                            ->select(['id'])
+                            ->find((int) $state);
+
+                        if (! $product instanceof Product) {
+                            return;
+                        }
+
+                        $set('product_id', $product->getKey());
+                    }),
                 Forms\Components\Select::make('user_id')
                     ->relationship('user', 'name')
                     ->searchable()

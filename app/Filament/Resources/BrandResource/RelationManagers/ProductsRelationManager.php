@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use App\Models\Product;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-final class ProductsRelationManager extends RelationManager
+final class ProductsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'products';
 

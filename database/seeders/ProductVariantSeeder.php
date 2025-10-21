@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -10,6 +12,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Models\VariantPricingRule;
+use App\Services\ProductVariantAttributeMatrixService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -137,9 +140,12 @@ final class ProductVariantSeeder extends Seeder
 
     private function createProductsWithVariants(): void
     {
+        $sizeAttribute = Attribute::query()->where('slug', 'size')->with('values')->first();
+        $colorAttribute = Attribute::query()->where('slug', 'color')->with('values')->first();
+
         // Use existing brand instead of creating a new one
         $brand = Brand::query()->firstWhere('slug', 'fashion-brand');
-        if (!$brand) {
+        if (! $brand) {
             $existingBrands = Brand::query()->enabled()->get();
             if ($existingBrands->isNotEmpty()) {
                 $brand = $existingBrands->first();
@@ -260,8 +266,8 @@ final class ProductVariantSeeder extends Seeder
                 $variant = ProductVariant::factory()
                     ->for($product)
                     ->state([
-                        'name' => $productData['name'] . ' - ' . $variantData['size'],
-                        'sku' => $product->sku . '-' . $variantData['size'],
+                        'name' => $productData['name'].' - '.$variantData['size'],
+                        'sku' => $product->sku.'-'.$variantData['size'],
                         'price' => $productData['base_price'] + $variantData['price_modifier'],
                         'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
                         'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
@@ -272,6 +278,33 @@ final class ProductVariantSeeder extends Seeder
                         'attributes' => ['size' => $variantData['size']],
                     ])
                     ->create();
+
+                $matrix = [];
+
+                if ($sizeAttribute) {
+                    $sizeValue = $sizeAttribute->values->firstWhere(fn (AttributeValue $value) => strcasecmp($value->value, $variantData['size']) === 0)
+                        ?? $sizeAttribute->values->firstWhere(fn (AttributeValue $value) => strcasecmp($value->display_value ?? '', $variantData['size']) === 0);
+
+                    if ($sizeValue) {
+                        $matrix['attribute_'.$sizeAttribute->getKey()] = $sizeValue->getKey();
+                        $product->attributes()->syncWithoutDetaching([
+                            $sizeAttribute->getKey() => ['attribute_value_id' => $sizeValue->getKey()],
+                        ]);
+                    }
+                }
+
+                if ($colorAttribute && $colorAttribute->values->isNotEmpty()) {
+                    $colorValue = $colorAttribute->values->random();
+                    $matrix['attribute_'.$colorAttribute->getKey()] = $colorValue->getKey();
+                    $product->attributes()->syncWithoutDetaching([
+                        $colorAttribute->getKey() => ['attribute_value_id' => $colorValue->getKey()],
+                    ]);
+                }
+
+                if (! empty($matrix)) {
+                    $variant->forceFill(['variant_attribute_matrix' => $matrix])->save();
+                    ProductVariantAttributeMatrixService::sync($variant->fresh(), $matrix);
+                }
 
                 VariantInventory::factory()
                     ->for($variant)

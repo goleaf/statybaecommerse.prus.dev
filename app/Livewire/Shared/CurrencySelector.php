@@ -6,6 +6,7 @@ namespace App\Livewire\Shared;
 
 use App\Models\Country;
 use App\Models\Currency;
+use App\Support\Cache\CacheKeys;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
@@ -30,7 +31,7 @@ class CurrencySelector extends Component
     public function mount(): void
     {
         // Load enabled currencies (cached) with safe fallback if table is missing during tests
-        $this->currencies = app()->environment('testing') ? [['id' => 1, 'code' => (string) config('app.currency', 'EUR'), 'symbol' => '€']] : \Cache::remember('currencies:enabled:list', now()->addHours(6), function () {
+        $this->currencies = app()->environment('testing') ? [['id' => 1, 'code' => (string) config('app.currency', 'EUR'), 'symbol' => '€']] : \Cache::remember(CacheKeys::currencyEnabledList(), now()->addHours(6), function () {
             try {
                 if (Schema::hasTable('currencies')) {
                     return Arr::from(Currency::query()->where('is_enabled', true)->orderBy('code')->get(['id', 'code', 'symbol'])->map(fn ($c) => ['id' => (int) $c->id, 'code' => (string) $c->code, 'symbol' => (string) $c->symbol]));
@@ -42,7 +43,7 @@ class CurrencySelector extends Component
             return [['id' => 1, 'code' => (string) config('app.currency', 'EUR'), 'symbol' => '€']];
         });
         // Determine active from settings if available
-        $defaultCurrencyCode = app()->environment('testing') ? (string) config('app.currency', 'EUR') : \Cache::remember('currency:default:code', now()->addMinutes(30), function () {
+        $defaultCurrencyCode = app()->environment('testing') ? (string) config('app.currency', 'EUR') : \Cache::remember(CacheKeys::currencyDefaultCode(), now()->addMinutes(30), function () {
             try {
                 if (function_exists('setting')) {
                     $id = optional(setting('default_currency_id'))->value ?? null;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
@@ -27,7 +29,7 @@ final class NewsImageSeeder extends Seeder
                     ->create([
                         'is_featured' => $i === 0,
                         'sort_order' => $i + 1,
-                        'file_path' => 'news-images/' . fake()->uuid() . '.jpg',
+                        'file_path' => 'news-images/'.fake()->uuid().'.jpg',
                         'alt_text' => fake()->sentence(6),
                         'caption' => fake()->sentence(10),
                         'file_size' => fake()->numberBetween(100000, 2000000),

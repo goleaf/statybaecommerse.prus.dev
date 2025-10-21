@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NormalSettingResource\Pages;
-use BackedEnum;
 use App\Models\NormalSetting;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -18,8 +20,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class NormalSettingResource extends Resource
 {
@@ -49,7 +49,7 @@ final class NormalSettingResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Tabs::make(__('normal_settings.tabs'))
+            Tabs::make(__('normal_settings.tabs.label'))
                 ->tabs([
                     Tab::make(__('normal_settings.basic_information'))
                         ->icon('heroicon-o-information-circle')
@@ -70,11 +70,11 @@ final class NormalSettingResource extends Resource
                             Select::make('type')
                                 ->label(__('normal_settings.type'))
                                 ->options([
-                                    'string' => __('normal_settings.types.string'),
+                                    'string'  => __('normal_settings.types.string'),
                                     'integer' => __('normal_settings.types.integer'),
                                     'boolean' => __('normal_settings.types.boolean'),
-                                    'array' => __('normal_settings.types.array'),
-                                    'json' => __('normal_settings.types.json'),
+                                    'array'   => __('normal_settings.types.array'),
+                                    'json'    => __('normal_settings.types.json'),
                                 ])
                                 ->required()
                                 ->native(false),
@@ -108,9 +108,40 @@ final class NormalSettingResource extends Resource
                     ->copyable(),
                 TextColumn::make('value')
                     ->label(__('normal_settings.value'))
+                    ->formatStateUsing(static function ($state): string {
+                        if (is_array($state) || is_object($state)) {
+                            $encoded = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+                            if ($encoded !== false) {
+                                return $encoded;
+                            }
+
+                            return (string) $state;
+                        }
+
+                        if (is_bool($state)) {
+                            return $state ? 'true' : 'false';
+                        }
+
+                        return (string) $state;
+                    })
                     ->limit(50)
+                    ->copyable()
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (is_array($state) || is_object($state)) {
+                            $state = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                        } elseif (is_bool($state)) {
+                            $state = $state ? 'true' : 'false';
+                        } elseif ($state !== null && ! is_string($state)) {
+                            $state = (string) $state;
+                        }
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
                         if (strlen($state) <= 50) {
                             return null;
                         }
@@ -134,11 +165,11 @@ final class NormalSettingResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('normal_settings.type'))
                     ->options([
-                        'string' => __('normal_settings.types.string'),
+                        'string'  => __('normal_settings.types.string'),
                         'integer' => __('normal_settings.types.integer'),
                         'boolean' => __('normal_settings.types.boolean'),
-                        'array' => __('normal_settings.types.array'),
-                        'json' => __('normal_settings.types.json'),
+                        'array'   => __('normal_settings.types.array'),
+                        'json'    => __('normal_settings.types.json'),
                     ]),
                 TernaryFilter::make('is_public')
                     ->label(__('normal_settings.is_public'))
@@ -155,9 +186,9 @@ final class NormalSettingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNormalSettings::route('/'),
+            'index'  => Pages\ListNormalSettings::route('/'),
             'create' => Pages\CreateNormalSetting::route('/create'),
-            'edit' => Pages\EditNormalSetting::route('/{record}/edit'),
+            'edit'   => Pages\EditNormalSetting::route('/{record}/edit'),
         ];
     }
 }

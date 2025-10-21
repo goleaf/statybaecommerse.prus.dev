@@ -6,26 +6,30 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
+use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
+use Illuminate\Support\Str;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * ShippingOptionResource
@@ -69,16 +73,16 @@ final class ShippingOptionResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.shipping_options.basic_information'))
+                Section::make(__('admin.shipping_options.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('admin.shipping_options.name'))
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.shipping_options.slug'))
                                     ->required()
@@ -91,10 +95,10 @@ final class ShippingOptionResource extends Resource
                                 Select::make('service_type')
                                     ->label(__('admin.shipping_options.service_type'))
                                     ->options([
-                                        'standard' => __('admin.shipping_options.service_types.standard'),
-                                        'express' => __('admin.shipping_options.service_types.express'),
+                                        'standard'  => __('admin.shipping_options.service_types.standard'),
+                                        'express'   => __('admin.shipping_options.service_types.express'),
                                         'overnight' => __('admin.shipping_options.service_types.overnight'),
-                                        'economy' => __('admin.shipping_options.service_types.economy'),
+                                        'economy'   => __('admin.shipping_options.service_types.economy'),
                                     ])
                                     ->required()
                                     ->default('standard'),
@@ -104,14 +108,14 @@ final class ShippingOptionResource extends Resource
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
-                SchemaSection::make(__('admin.shipping_options.pricing'))
+                Section::make(__('admin.shipping_options.pricing'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('price')
                                     ->label(__('admin.shipping_options.price'))
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn (Get $get): string => self::resolveCurrencySymbol($get('currency_code')))
                                     ->step(0.01)
                                     ->required(),
                                 Select::make('currency_code')
@@ -125,9 +129,9 @@ final class ShippingOptionResource extends Resource
                                     ->required(),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.shipping_options.constraints'))
+                Section::make(__('admin.shipping_options.constraints'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('min_weight')
                                     ->label(__('admin.shipping_options.min_weight'))
@@ -142,18 +146,30 @@ final class ShippingOptionResource extends Resource
                                 TextInput::make('min_order_amount')
                                     ->label(__('admin.shipping_options.min_order_amount'))
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn (Get $get): string => self::resolveCurrencySymbol($get('currency_code')))
                                     ->step(0.01),
                                 TextInput::make('max_order_amount')
                                     ->label(__('admin.shipping_options.max_order_amount'))
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn (Get $get): string => self::resolveCurrencySymbol($get('currency_code')))
                                     ->step(0.01),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.shipping_options.delivery'))
+                Section::make(__('admin.shipping_options.availability'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        MatrixFactory::checkboxGrid(
+                            'shipping_matrix',
+                            (array) config('shipping.matrix.zones', []),
+                            (array) config('shipping.matrix.methods', []),
+                        )
+                            ->label(__('admin.shipping_options.shipping_matrix'))
+                            ->helperText(__('admin.shipping_options.shipping_matrix_help'))
+                            ->rowSelectRequired(false),
+                    ])
+                    ->collapsible(),
+                Section::make(__('admin.shipping_options.delivery'))
+                    ->schema([
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('estimated_days_min')
                                     ->label(__('admin.shipping_options.estimated_days_min'))
@@ -167,9 +183,9 @@ final class ShippingOptionResource extends Resource
                                     ->minValue(1),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.shipping_options.status'))
+                Section::make(__('admin.shipping_options.status'))
                     ->schema([
-                        SchemaGrid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Toggle::make('is_enabled')
                                     ->label(__('admin.shipping_options.is_enabled'))
@@ -202,21 +218,27 @@ final class ShippingOptionResource extends Resource
                     ->label(__('admin.shipping_options.service_type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'standard' => 'success',
-                        'express' => 'warning',
+                        'standard'  => 'success',
+                        'express'   => 'warning',
                         'overnight' => 'danger',
-                        'economy' => 'info',
-                        default => 'gray',
+                        'economy'   => 'info',
+                        default     => 'gray',
                     }),
                 TextColumn::make('price')
                     ->label(__('admin.shipping_options.price'))
-                    ->money('EUR')
+                    ->formatStateUsing(
+                        fn ($state, ShippingOption $record): string => $state === null
+                            ? '-'
+                            : Number::currency((float) $state, $record->currency_code ?? 'EUR', app()->getLocale())
+                    )
                     ->sortable(),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
-                    ->formatStateUsing(fn ($record) => $record->estimated_days_min && $record->estimated_days_max
-                        ? "{$record->estimated_days_min}-{$record->estimated_days_max} ".__('admin.shipping_options.days')
-                        : '-'),
+                    ->formatStateUsing(
+                        fn ($state, ShippingOption $record): string => $record->estimated_days_min && $record->estimated_days_max
+                            ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
+                            : '-'
+                    ),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled'))
                     ->boolean(),
@@ -233,11 +255,21 @@ final class ShippingOptionResource extends Resource
                 SelectFilter::make('service_type')
                     ->label(__('admin.shipping_options.service_type'))
                     ->options([
-                        'standard' => __('admin.shipping_options.service_types.standard'),
-                        'express' => __('admin.shipping_options.service_types.express'),
+                        'standard'  => __('admin.shipping_options.service_types.standard'),
+                        'express'   => __('admin.shipping_options.service_types.express'),
                         'overnight' => __('admin.shipping_options.service_types.overnight'),
-                        'economy' => __('admin.shipping_options.service_types.economy'),
+                        'economy'   => __('admin.shipping_options.service_types.economy'),
                     ]),
+                ValueRangeFilter::make('price')
+                    ->label(__('admin.shipping_options.price'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('min_weight')
+                    ->label(__('admin.shipping_options.min_weight')),
+                ValueRangeFilter::make('max_weight')
+                    ->label(__('admin.shipping_options.max_weight')),
                 TernaryFilter::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled')),
                 TernaryFilter::make('is_default')
@@ -265,10 +297,20 @@ final class ShippingOptionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListShippingOptions::route('/'),
+            'index'  => Pages\ListShippingOptions::route('/'),
             'create' => Pages\CreateShippingOption::route('/create'),
-            'view' => Pages\ViewShippingOption::route('/{record}'),
-            'edit' => Pages\EditShippingOption::route('/{record}/edit'),
+            'view'   => Pages\ViewShippingOption::route('/{record}'),
+            'edit'   => Pages\EditShippingOption::route('/{record}/edit'),
         ];
+    }
+
+    private static function resolveCurrencySymbol(?string $currencyCode): string
+    {
+        return match ($currencyCode) {
+            'USD' => '$',
+            'GBP' => '£',
+            'EUR', null, '' => '€',
+            default => $currencyCode,
+        };
     }
 }

@@ -139,7 +139,7 @@ it('shows empty state when no categories found', function () {
 
 it('shows proper breadcrumb navigation', function () {
     get(route('categories.index'))
-        ->assertSee(__('Home'))
+        ->assertSee(__('frontend.navigation.home'))
         ->assertSee(__('Categories'));
 });
 

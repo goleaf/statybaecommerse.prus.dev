@@ -4,24 +4,30 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\DocumentServiceContract;
 use App\Models\Document;
 use App\Models\DocumentTemplate;
+use App\Models\User;
 use App\Notifications\DocumentGenerated;
+use App\Support\Storage\SecureStorage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 /**
  * DocumentService
  *
  * Service class containing DocumentService business logic, external integrations, and complex operations with proper error handling and logging.
  */
-final class DocumentService
+final class DocumentService implements DocumentServiceContract
 {
     /**
      * Handle generateDocument functionality with proper error handling.
+     *
+     * @param  array<string, mixed>  $variables
      */
     public function generateDocument(DocumentTemplate $template, Model $relatedModel, array $variables = [], ?string $title = null, bool $sendNotification = false): Document
     {
@@ -30,7 +36,31 @@ final class DocumentService
         // Sanitize variables
         $variables = $this->sanitizeVariables($variables);
         $processedContent = $this->processTemplate($template->content, $variables);
-        $document = Document::create(['document_template_id' => $template->id, 'title' => $title ?? $template->name.' - '.$relatedModel->id, 'content' => $processedContent, 'variables' => $variables, 'status' => 'draft', 'format' => 'html', 'documentable_type' => get_class($relatedModel), 'documentable_id' => $relatedModel->id, 'created_by' => Auth::id(), 'generated_at' => now()]);
+        /** @var int|string|null $relatedModelKey */
+        $relatedModelKey = $relatedModel->getKey();
+
+        if ($relatedModelKey === null) {
+            $relatedModelKey = '';
+        }
+
+        /** @var int|string $relatedModelKey */
+        $relatedModelKey = $relatedModelKey;
+
+        $documentTitle = $title ?? sprintf('%s - %s', $template->name, (string) $relatedModelKey);
+
+        $document = Document::create([
+            'document_template_id' => $template->id,
+            'title' => $documentTitle,
+            'content' => $processedContent,
+            'variables' => $variables,
+            'status' => 'draft',
+            'format' => 'html',
+            'documentable_type' => get_class($relatedModel),
+            'documentable_id' => $relatedModelKey,
+            'created_by' => Auth::id(),
+            'updated_by' => Auth::id(),
+            'generated_at' => now(),
+        ]);
         // Send notification if requested
         if ($sendNotification && Auth::user()) {
             Auth::user()->notify(new DocumentGenerated($document, false));
@@ -45,6 +75,11 @@ final class DocumentService
     public function generatePdf(Document $document): string
     {
         $template = $document->template;
+
+        if (! $template instanceof DocumentTemplate) {
+            throw new RuntimeException(__('documents.errors.missing_template'));
+        }
+
         $settings = $template->getPrintSettings();
         $pdf = Pdf::loadHTML($document->content);
         // Apply settings
@@ -52,7 +87,8 @@ final class DocumentService
         // Generate filename
         $filename = 'documents/'.$document->id.'_'.now()->format('Y-m-d_H-i-s').'.pdf';
         // Save to storage
-        Storage::disk('public')->put($filename, $pdf->output());
+        $disk = SecureStorage::disk();
+        Storage::disk($disk)->put($filename, $pdf->output());
         // Update document record
         $document->update(['format' => 'pdf', 'file_path' => $filename, 'status' => 'published']);
         // Send notification with PDF attachment
@@ -60,11 +96,13 @@ final class DocumentService
             Auth::user()->notify(new DocumentGenerated($document, true));
         }
 
-        return Storage::disk('public')->url($filename);
+        return SecureStorage::temporarySignedUrl($filename, now()->addMinutes((int) config('media-security.url_lifetime', 30)), true);
     }
 
     /**
      * Handle processTemplate functionality with proper error handling.
+     *
+     * @param  array<string, mixed>  $variables
      */
     private function processTemplate(string $content, array $variables): string
     {
@@ -74,10 +112,16 @@ final class DocumentService
             if (is_array($value)) {
                 $value = implode(', ', $value);
             } elseif (is_object($value)) {
-                $value = (string) $value;
+                if ($value instanceof \Stringable || method_exists($value, '__toString')) {
+                    $value = (string) $value;
+                } else {
+                    $value = get_debug_type($value);
+                }
             } elseif (is_bool($value)) {
                 $value = $value ? __('documents.yes') : __('documents.no');
             }
+
+            assert(is_scalar($value) || $value === null);
             $processedContent = str_replace($key, (string) $value, $processedContent);
         }
 
@@ -86,17 +130,33 @@ final class DocumentService
 
     /**
      * Handle getAvailableVariables functionality with proper error handling.
+     *
+     * @return array<string, string>
      */
     public function getAvailableVariables(): array
     {
         $resolver = function (): array {
+            /** @var User|null $user */
+            $user = Auth::user();
+            $currentUserName = $user?->name;
+
+            if (! is_string($currentUserName)) {
+                $currentUserName = '';
+            }
+
+            $companyName = config('app.name', '');
+
+            if (! is_string($companyName)) {
+                $companyName = '';
+            }
+
             return [
                 // Global variables
-                '$COMPANY_NAME' => config('app.name'),
+                '$COMPANY_NAME' => $companyName,
                 '$CURRENT_DATE' => now()->format('Y-m-d'),
                 '$CURRENT_DATETIME' => now()->format('Y-m-d H:i:s'),
-                '$CURRENT_YEAR' => now()->year,
-                '$CURRENT_USER' => Auth::user()?->name ?? '',
+                '$CURRENT_YEAR' => now()->format('Y'),
+                '$CURRENT_USER' => $currentUserName,
                 // Common e-commerce variables
                 '$ORDER_NUMBER' => 'Order number',
                 '$ORDER_DATE' => 'Order date',
@@ -115,8 +175,15 @@ final class DocumentService
 
         $storeName = config('documents.cache_store', 'array');
 
+        if (! is_string($storeName)) {
+            $storeName = 'array';
+        }
+
         try {
-            return Cache::store($storeName)->remember('document_variables_'.app()->getLocale(), 3600, $resolver);
+            /** @var array<string, string> $variables */
+            $variables = Cache::store($storeName)->remember('document_variables_'.app()->getLocale(), 3600, $resolver);
+
+            return $variables;
         } catch (\Throwable $exception) {
             if (app()->runningInConsole()) {
                 return $resolver();
@@ -130,6 +197,8 @@ final class DocumentService
 
     /**
      * Handle extractVariablesFromModel functionality with proper error handling.
+     *
+     * @return array<string, mixed>
      */
     public function extractVariablesFromModel(Model $model, string $prefix = ''): array
     {
@@ -156,6 +225,8 @@ final class DocumentService
 
     /**
      * Handle renderTemplate functionality with proper error handling.
+     *
+     * @param  array<string, mixed>  $variables
      */
     public function renderTemplate(DocumentTemplate $template, array $variables): string
     {
@@ -164,16 +235,20 @@ final class DocumentService
 
     /**
      * Handle generateDocumentAsync functionality with proper error handling.
+     *
+     * @param  array<string, mixed>  $variables
      */
     public function generateDocumentAsync(DocumentTemplate $template, Model $relatedModel, array $variables = [], ?string $title = null): void
     {
-        dispatch(function () use ($template, $relatedModel, $variables, $title) {
+        dispatch(function () use ($template, $relatedModel, $variables, $title): void {
             $this->generateDocument($template, $relatedModel, $variables, $title, true);
         });
     }
 
     /**
      * Handle previewTemplate functionality with proper error handling.
+     *
+     * @param  array<string, mixed>  $sampleVariables
      */
     public function previewTemplate(DocumentTemplate $template, array $sampleVariables = []): string
     {
@@ -184,10 +259,35 @@ final class DocumentService
 
     /**
      * Handle getSampleVariables functionality with proper error handling.
+     *
+     * @return array<string, string>
      */
     public function getSampleVariables(): array
     {
-        return ['$COMPANY_NAME' => config('app.name', 'Sample Company'), '$CURRENT_DATE' => now()->format('Y-m-d'), '$CURRENT_YEAR' => now()->year, '$ORDER_NUMBER' => 'ORD-2025-001', '$ORDER_DATE' => now()->format('Y-m-d'), '$ORDER_TOTAL' => '€99.99', '$ORDER_SUBTOTAL' => '€85.00', '$ORDER_TAX' => '€14.99', '$ORDER_SHIPPING' => '€5.00', '$CUSTOMER_NAME' => 'John Doe', '$CUSTOMER_EMAIL' => 'john.doe@example.com', '$CUSTOMER_PHONE' => '+370 600 12345', '$PRODUCT_NAME' => 'Sample Product', '$PRODUCT_SKU' => 'SKU-001', '$PRODUCT_PRICE' => '€49.99', '$BRAND_NAME' => 'Sample Brand'];
+        $companyName = config('app.name', 'Sample Company');
+
+        if (! is_string($companyName)) {
+            $companyName = 'Sample Company';
+        }
+
+        return [
+            '$COMPANY_NAME' => $companyName,
+            '$CURRENT_DATE' => now()->format('Y-m-d'),
+            '$CURRENT_YEAR' => now()->format('Y'),
+            '$ORDER_NUMBER' => 'ORD-2025-001',
+            '$ORDER_DATE' => now()->format('Y-m-d'),
+            '$ORDER_TOTAL' => '€99.99',
+            '$ORDER_SUBTOTAL' => '€85.00',
+            '$ORDER_TAX' => '€14.99',
+            '$ORDER_SHIPPING' => '€5.00',
+            '$CUSTOMER_NAME' => 'John Doe',
+            '$CUSTOMER_EMAIL' => 'john.doe@example.com',
+            '$CUSTOMER_PHONE' => '+370 600 12345',
+            '$PRODUCT_NAME' => 'Sample Product',
+            '$PRODUCT_SKU' => 'SKU-001',
+            '$PRODUCT_PRICE' => '€49.99',
+            '$BRAND_NAME' => 'Sample Brand',
+        ];
     }
 
     /**
@@ -207,6 +307,9 @@ final class DocumentService
 
     /**
      * Handle sanitizeVariables functionality with proper error handling.
+     *
+     * @param  array<string, mixed>  $variables
+     * @return array<string, mixed>
      */
     private function sanitizeVariables(array $variables): array
     {

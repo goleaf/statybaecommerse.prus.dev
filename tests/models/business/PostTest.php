@@ -7,6 +7,8 @@ namespace Tests\Unit;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 final class PostTest extends TestCase
@@ -368,12 +370,31 @@ final class PostTest extends TestCase
     public function test_post_media_methods(): void
     {
         $user = $this->createTestUser();
+        Storage::fake(config('media-library.disk_name'));
+
         $post = Post::factory()->create(['user_id' => $user->id]);
 
-        // Test media methods (without actual media files)
+        // Test media methods before attachments
         $this->assertFalse($post->hasFeaturedImage());
         $this->assertEquals(0, $post->getGalleryCount());
         $this->assertEquals(0, $post->getMediaCount());
+
+        $post
+            ->addMedia(UploadedFile::fake()->image('featured.jpg', 1200, 630))
+            ->toMediaCollection('images');
+
+        foreach (range(1, 2) as $index) {
+            $post
+                ->addMedia(UploadedFile::fake()->image("gallery-{$index}.jpg", 800, 600))
+                ->toMediaCollection('gallery');
+        }
+
+        $post->refresh();
+
+        // Test media methods after attachments
+        $this->assertTrue($post->hasFeaturedImage());
+        $this->assertEquals(2, $post->getGalleryCount());
+        $this->assertEquals(3, $post->getMediaCount());
     }
 
     public function test_post_days_methods(): void

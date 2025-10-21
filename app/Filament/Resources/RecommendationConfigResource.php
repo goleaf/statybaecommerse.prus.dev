@@ -5,25 +5,24 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationConfigResource\Pages;
-use BackedEnum;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
+use Novadaemon\FilamentCombobox\Combobox;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class RecommendationConfigResource extends Resource
 {
@@ -66,11 +65,11 @@ final class RecommendationConfigResource extends Resource
                                 ->options([
                                     'collaborative' => 'collaborative',
                                     'content_based' => 'content_based',
-                                    'hybrid' => 'hybrid',
-                                    'popularity' => 'popularity',
-                                    'trending' => 'trending',
-                                    'cross_sell' => 'cross_sell',
-                                    'up_sell' => 'up_sell',
+                                    'hybrid'        => 'hybrid',
+                                    'popularity'    => 'popularity',
+                                    'trending'      => 'trending',
+                                    'cross_sell'    => 'cross_sell',
+                                    'up_sell'       => 'up_sell',
                                 ])
                                 ->required()
                                 ->native(false),
@@ -116,21 +115,27 @@ final class RecommendationConfigResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Select::make('products')
+                            Combobox::make('products')
                                 ->label(__('recommendation_config.fields.products'))
                                 ->relationship('products', 'name')
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
+                                ->boxSearchs()
+                                ->height('360px')
                                 ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
+                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
                                 ->native(false),
-                            Select::make('categories')
+                            Combobox::make('categories')
                                 ->label(__('recommendation_config.fields.categories'))
                                 ->relationship('categories', 'name')
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
+                                ->boxSearchs()
+                                ->height('360px')
                                 ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
+                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
                                 ->native(false),
                         ]),
                 ]),
@@ -166,11 +171,11 @@ final class RecommendationConfigResource extends Resource
                     ->options([
                         'collaborative' => 'collaborative',
                         'content_based' => 'content_based',
-                        'hybrid' => 'hybrid',
-                        'popularity' => 'popularity',
-                        'trending' => 'trending',
-                        'cross_sell' => 'cross_sell',
-                        'up_sell' => 'up_sell',
+                        'hybrid'        => 'hybrid',
+                        'popularity'    => 'popularity',
+                        'trending'      => 'trending',
+                        'cross_sell'    => 'cross_sell',
+                        'up_sell'       => 'up_sell',
                     ]),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_config.fields.is_active')),
@@ -199,7 +204,10 @@ final class RecommendationConfigResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationConfigs::route('/'),
+            'index'  => Pages\ListRecommendationConfigs::route('/'),
+            'create' => Pages\CreateRecommendationConfig::route('/create'),
+            'view'   => Pages\ViewRecommendationConfig::route('/{record}'),
+            'edit'   => Pages\EditRecommendationConfig::route('/{record}/edit'),
         ];
     }
 }

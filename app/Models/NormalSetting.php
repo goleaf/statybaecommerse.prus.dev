@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,9 +31,9 @@ final class NormalSetting extends Model
 
     protected $table = 'enhanced_settings';
 
-    protected $fillable = ['group', 'key', 'locale', 'value', 'type', 'description', 'is_public', 'is_encrypted', 'validation_rules', 'sort_order'];
+    protected $fillable = ['group', 'key', 'locale', 'value', 'type', 'description', 'is_public', 'is_encrypted', 'is_active', 'validation_rules', 'sort_order'];
 
-    protected $casts = ['is_public' => 'boolean', 'is_encrypted' => 'boolean', 'sort_order' => 'integer', 'validation_rules' => 'json'];
+    protected $casts = ['is_public' => 'boolean', 'is_encrypted' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'validation_rules' => 'json'];
 
     /**
      * Handle value functionality with proper error handling.
@@ -51,7 +52,7 @@ final class NormalSetting extends Model
                         }
 
                         return $decrypted;
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                     }
                 }
             }
@@ -77,7 +78,7 @@ final class NormalSetting extends Model
             if (($this->attributes['is_encrypted'] ?? false) && $value !== null) {
                 try {
                     return encrypt($value);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return $value;
                 }
             }
@@ -114,7 +115,7 @@ final class NormalSetting extends Model
     /**
      * Handle scopeByGroup functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByGroup($query, string $group)
     {
@@ -124,7 +125,7 @@ final class NormalSetting extends Model
     /**
      * Handle scopePublic functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePublic($query)
     {
@@ -132,9 +133,19 @@ final class NormalSetting extends Model
     }
 
     /**
+     * Scope query to only include active settings.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOrdered($query)
     {
@@ -144,7 +155,7 @@ final class NormalSetting extends Model
     /**
      * Handle getValue functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public static function getValue(string $key, $default = null, ?string $locale = null)
     {
@@ -157,12 +168,20 @@ final class NormalSetting extends Model
     /**
      * Handle setValue functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public static function setValue(string $key, $value, string $group = 'general', ?string $locale = null): void
     {
         $locale = $locale ?? app()->getLocale();
-        self::updateOrCreate(['key' => $key, 'locale' => $locale], ['value' => $value, 'group' => $group, 'type' => is_array($value) || is_object($value) ? 'json' : 'text']);
+        self::updateOrCreate(
+            ['key' => $key, 'locale' => $locale],
+            [
+                'value'     => $value,
+                'group'     => $group,
+                'type'      => is_array($value) || is_object($value) ? 'json' : 'text',
+                'is_active' => true,
+            ]
+        );
     }
 
     /**
@@ -216,7 +235,7 @@ final class NormalSetting extends Model
     /**
      * Handle scopeForLocale functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeForLocale($query, ?string $locale = null)
     {

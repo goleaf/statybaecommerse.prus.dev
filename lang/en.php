@@ -2,6 +2,8 @@
 
 return [
     // Common
+    'exceptions_orders_not_found' => 'Order :order could not be found.',
+    'exceptions_inventory_insufficient' => 'Inventory for SKU :sku is unavailable.',
     'common' => [
         'back_to_list' => 'Back to List',
         'back_to_list_tooltip' => 'Return to the list view',
@@ -74,6 +76,7 @@ return [
                     'campaign_name' => 'Campaign Name',
                     'campaign_status' => 'Campaign Status',
                     'campaign_type' => 'Campaign Type',
+                    'status' => 'Status',
                     'schedule_type' => 'Schedule Type',
                     'schedule_status' => 'Schedule Status',
                     'schedule_config' => 'Schedule Configuration',
@@ -1898,12 +1901,15 @@ return [
         'is_active' => 'Active',
         'targeting_tags' => 'Targeting Tags',
         'add_targeting_tag' => 'Add targeting tag',
+        'no_targeting_tags' => 'No targeting tags',
         'custom_conditions' => 'Custom Conditions',
         'custom_conditions_help' => 'Additional conditions for segment definition',
         'targeting_options' => 'Targeting Options',
         'performance_settings' => 'Performance Settings',
         'track_performance' => 'Track Performance',
         'auto_optimize' => 'Auto Optimize',
+        'sort_order' => 'Sort Order',
+        'sort_order_help' => 'Lower numbers appear first',
         'types' => [
             'demographic' => 'Demographic',
             'behavioral' => 'Behavioral',

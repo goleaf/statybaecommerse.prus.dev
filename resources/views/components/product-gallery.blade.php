@@ -16,7 +16,7 @@
     // If no images, use placeholder
     if ($images->isEmpty()) {
         $images = collect([
-            (object) ['url' => asset('images/placeholder-product.jpg'), 'alt' => $product->name ?? 'Product Image'],
+            (object) ['url' => product_placeholder_url('large'), 'alt' => $product->name ?? 'Product Image'],
         ]);
     }
 

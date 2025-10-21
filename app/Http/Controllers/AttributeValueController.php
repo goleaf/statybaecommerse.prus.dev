@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attribute;
 use App\Models\AttributeValue;
+use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -22,7 +23,12 @@ final class AttributeValueController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = AttributeValue::with(['attribute', 'translations'])->enabled()->ordered();
+        $query = AttributeValue::with(['attribute.translations', 'translations'])
+            ->withCount(['products', 'variants'])
+            ->enabled()
+            ->ordered()
+            ->whereNotNull('value')
+            ->whereHas('attribute');
         // Filter by attribute if provided
         if ($request->has('attribute_id') && $request->attribute_id) {
             $query->forAttribute((int) $request->attribute_id);
@@ -48,10 +54,8 @@ final class AttributeValueController extends Controller
         if ($request->has('default') && $request->default) {
             $query->default();
         }
-        $attributeValues = $query->get()->skipWhile(function ($attributeValue) {
-            // Skip attribute values that are not properly configured for display
-            return empty($attributeValue->value) || ! $attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
-        })->paginate(20);
+        $attributeValues = PaginationService::paginateWithOnEachSide($query, 20);
+        $attributeValues->appends($request->query());
         $attributes = Attribute::enabled()->ordered()->get();
 
         return view('attribute-values.index', compact('attributeValues', 'attributes'));
@@ -72,10 +76,12 @@ final class AttributeValueController extends Controller
      */
     public function byAttribute(Attribute $attribute): View
     {
-        $attributeValues = $attribute->values()->enabled()->ordered()->with('translations')->get()->skipWhile(function ($attributeValue) {
-            // Skip attribute values that are not properly configured for display
-            return empty($attributeValue->value) || ! $attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
-        })->paginate(20);
+        $attributeValuesQuery = $attribute->values()
+            ->with(['translations'])
+            ->withCount(['products', 'variants'])
+            ->whereNotNull('value');
+        $attributeValues = PaginationService::paginateWithOnEachSide($attributeValuesQuery, 20);
+        $attributeValues->appends(request()->query());
 
         return view('attribute-values.by-attribute', compact('attribute', 'attributeValues'));
     }

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -77,7 +78,7 @@ final class VariantImage extends Model implements HasMedia
             return null;
         }
 
-        return asset('storage/'.$this->image_path);
+        return SecureStorage::temporarySignedUrl($this->image_path);
     }
 
     /**
@@ -93,7 +94,7 @@ final class VariantImage extends Model implements HasMedia
         $extension = $pathInfo['extension'] ?? 'jpg';
         $thumbnailPath = $pathInfo['dirname'].'/thumbnails/'.$pathInfo['filename'].'_thumb.'.$extension;
 
-        return asset('storage/'.$thumbnailPath);
+        return SecureStorage::temporarySignedUrl($thumbnailPath);
     }
 
     /**

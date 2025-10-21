@@ -11,21 +11,16 @@ use App\Filament\Resources\NotificationTemplates\Schemas\NotificationTemplateFor
 use App\Filament\Resources\NotificationTemplates\Tables\NotificationTemplatesTable;
 use App\Models\NotificationTemplate;
 use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
-
-use Filament\Forms\Form;
 
 class NotificationTemplateResource extends Resource
 {
     protected static ?string $model = NotificationTemplate::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return Heroicon::OutlinedRectangleStack;
-    }
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
@@ -47,9 +42,9 @@ class NotificationTemplateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListNotificationTemplates::route('/'),
+            'index'  => ListNotificationTemplates::route('/'),
             'create' => CreateNotificationTemplate::route('/create'),
-            'edit' => EditNotificationTemplate::route('/{record}/edit'),
+            'edit'   => EditNotificationTemplate::route('/{record}/edit'),
         ];
     }
 }

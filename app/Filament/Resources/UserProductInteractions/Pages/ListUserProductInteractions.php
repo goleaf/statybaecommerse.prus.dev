@@ -4,9 +4,9 @@ namespace App\Filament\Resources\UserProductInteractions\Pages;
 
 use App\Filament\Resources\UserProductInteractions\UserProductInteractionResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListUserProductInteractions extends ListRecords
+class ListUserProductInteractions extends BaseListRecords
 {
     protected static string $resource = UserProductInteractionResource::class;
 

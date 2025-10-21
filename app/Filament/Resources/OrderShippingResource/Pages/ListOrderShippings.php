@@ -6,9 +6,9 @@ namespace App\Filament\Resources\OrderShippingResource\Pages;
 
 use App\Filament\Resources\OrderShippingResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListOrderShippings extends ListRecords
+class ListOrderShippings extends BaseListRecords
 {
     protected static string $resource = OrderShippingResource::class;
 

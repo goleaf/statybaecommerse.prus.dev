@@ -13,7 +13,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -21,8 +23,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -36,7 +36,7 @@ use UnitEnum;
  *
  * Filament v4 resource for SystemSetting management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
-final class SystemSettingResource extends Resource
+class SystemSettingResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
 
@@ -108,19 +108,19 @@ final class SystemSettingResource extends Resource
                                     ->label(__('system_settings.type'))
                                     ->default('string')
                                     ->options([
-                                        'string' => __('system_settings.types.string'),
-                                        'email' => 'Email',
-                                        'url' => 'URL',
+                                        'string'   => __('system_settings.types.string'),
+                                        'email'    => 'Email',
+                                        'url'      => 'URL',
                                         'password' => 'Password',
-                                        'integer' => __('system_settings.types.integer'),
-                                        'boolean' => __('system_settings.types.boolean'),
-                                        'float' => __('system_settings.types.float'),
-                                        'array' => __('system_settings.types.array'),
-                                        'json' => __('system_settings.types.json'),
-                                        'file' => __('system_settings.types.file'),
-                                        'image' => __('system_settings.types.image'),
-                                        'color' => __('system_settings.types.color'),
-                                        'date' => __('system_settings.types.date'),
+                                        'integer'  => __('system_settings.types.integer'),
+                                        'boolean'  => __('system_settings.types.boolean'),
+                                        'float'    => __('system_settings.types.float'),
+                                        'array'    => __('system_settings.types.array'),
+                                        'json'     => __('system_settings.types.json'),
+                                        'file'     => __('system_settings.types.file'),
+                                        'image'    => __('system_settings.types.image'),
+                                        'color'    => __('system_settings.types.color'),
+                                        'date'     => __('system_settings.types.date'),
                                         'datetime' => __('system_settings.types.datetime'),
                                     ])
                                     ->live()
@@ -245,19 +245,19 @@ final class SystemSettingResource extends Resource
                 TextColumn::make('type')
                     ->label(__('system_settings.type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'string' => 'gray',
-                        'integer' => 'blue',
-                        'boolean' => 'green',
-                        'float' => 'yellow',
-                        'array' => 'purple',
-                        'json' => 'indigo',
-                        'file' => 'pink',
-                        'image' => 'orange',
-                        'color' => 'pink',
-                        'date' => 'cyan',
+                    ->color(fn (?string $state): string => match ($state) {
+                        'string'   => 'gray',
+                        'integer'  => 'blue',
+                        'boolean'  => 'green',
+                        'float'    => 'yellow',
+                        'array'    => 'purple',
+                        'json'     => 'indigo',
+                        'file'     => 'pink',
+                        'image'    => 'orange',
+                        'color'    => 'pink',
+                        'date'     => 'cyan',
                         'datetime' => 'cyan',
-                        default => 'gray',
+                        default    => 'gray',
                     }),
                 TextColumn::make('value')
                     ->label(__('system_settings.value'))
@@ -283,21 +283,21 @@ final class SystemSettingResource extends Resource
                     }),
                 TextColumn::make('category')
                     ->label(__('system_settings.category'))
-                    ->formatStateUsing(fn (string $state): string => __("system_settings.categories.{$state}"))
+                    ->formatStateUsing(fn (?string $state): string => $state !== null ? __("system_settings.categories.{$state}") : __('system_settings.category'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'general' => 'gray',
-                        'appearance' => 'blue',
-                        'email' => 'green',
-                        'payment' => 'purple',
-                        'shipping' => 'orange',
-                        'security' => 'red',
+                    ->color(fn (?string $state): string => match ($state) {
+                        'general'     => 'gray',
+                        'appearance'  => 'blue',
+                        'email'       => 'green',
+                        'payment'     => 'purple',
+                        'shipping'    => 'orange',
+                        'security'    => 'red',
                         'performance' => 'indigo',
                         'integration' => 'pink',
-                        'analytics' => 'cyan',
+                        'analytics'   => 'cyan',
                         'maintenance' => 'teal',
-                        'custom' => 'yellow',
-                        default => 'gray',
+                        'custom'      => 'yellow',
+                        default       => 'gray',
                     }),
                 TextColumn::make('group')
                     ->label(__('system_settings.group'))
@@ -349,31 +349,31 @@ final class SystemSettingResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'string' => __('system_settings.types.string'),
-                        'integer' => __('system_settings.types.integer'),
-                        'boolean' => __('system_settings.types.boolean'),
-                        'float' => __('system_settings.types.float'),
-                        'array' => __('system_settings.types.array'),
-                        'json' => __('system_settings.types.json'),
-                        'file' => __('system_settings.types.file'),
-                        'image' => __('system_settings.types.image'),
-                        'color' => __('system_settings.types.color'),
-                        'date' => __('system_settings.types.date'),
+                        'string'   => __('system_settings.types.string'),
+                        'integer'  => __('system_settings.types.integer'),
+                        'boolean'  => __('system_settings.types.boolean'),
+                        'float'    => __('system_settings.types.float'),
+                        'array'    => __('system_settings.types.array'),
+                        'json'     => __('system_settings.types.json'),
+                        'file'     => __('system_settings.types.file'),
+                        'image'    => __('system_settings.types.image'),
+                        'color'    => __('system_settings.types.color'),
+                        'date'     => __('system_settings.types.date'),
                         'datetime' => __('system_settings.types.datetime'),
                     ]),
                 SelectFilter::make('category')
                     ->options([
-                        'general' => __('system_settings.categories.general'),
-                        'appearance' => __('system_settings.categories.appearance'),
-                        'email' => __('system_settings.categories.email'),
-                        'payment' => __('system_settings.categories.payment'),
-                        'shipping' => __('system_settings.categories.shipping'),
-                        'security' => __('system_settings.categories.security'),
+                        'general'     => __('system_settings.categories.general'),
+                        'appearance'  => __('system_settings.categories.appearance'),
+                        'email'       => __('system_settings.categories.email'),
+                        'payment'     => __('system_settings.categories.payment'),
+                        'shipping'    => __('system_settings.categories.shipping'),
+                        'security'    => __('system_settings.categories.security'),
                         'performance' => __('system_settings.categories.performance'),
                         'integration' => __('system_settings.categories.integration'),
-                        'analytics' => __('system_settings.categories.analytics'),
+                        'analytics'   => __('system_settings.categories.analytics'),
                         'maintenance' => __('system_settings.categories.maintenance'),
-                        'custom' => __('system_settings.categories.custom'),
+                        'custom'      => __('system_settings.categories.custom'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->trueLabel(__('system_settings.active_only'))
@@ -491,10 +491,10 @@ final class SystemSettingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettings::route('/'),
+            'index'  => Pages\ListSystemSettings::route('/'),
             'create' => Pages\CreateSystemSetting::route('/create'),
-            'view' => Pages\ViewSystemSetting::route('/{record}'),
-            'edit' => Pages\EditSystemSetting::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSetting::route('/{record}'),
+            'edit'   => Pages\EditSystemSetting::route('/{record}/edit'),
         ];
     }
 

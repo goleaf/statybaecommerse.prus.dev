@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\NormalSettingResource\Pages\ListNormalSettings;
 use App\Models\NormalSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Livewire\Livewire;
+use Tests\TestCase;
 
 final class NormalSettingResourceTest extends TestCase
 {
@@ -23,7 +24,7 @@ final class NormalSettingResourceTest extends TestCase
 
         // Create admin user with proper permissions
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -44,6 +45,36 @@ final class NormalSettingResourceTest extends TestCase
         $response->assertSee('Normal Settings');
     }
 
+    public function test_index_handles_non_string_values_without_type_errors(): void
+    {
+        NormalSetting::factory()->create([
+            'key' => 'boolean_setting',
+            'value' => true,
+            'type' => 'boolean',
+        ]);
+
+        NormalSetting::factory()->create([
+            'key' => 'array_setting',
+            'value' => ['foo' => 'bar'],
+            'type' => 'array',
+        ]);
+
+        NormalSetting::factory()->create([
+            'key' => 'json_setting',
+            'value' => ['baz' => ['qux']],
+            'type' => 'json',
+        ]);
+
+        $this->actingAs($this->admin);
+
+        $response = $this->get('/admin/normal-settings');
+
+        $response->assertStatus(200);
+        $response->assertSee('boolean_setting');
+        $response->assertSee('array_setting');
+        $response->assertSee('json_setting');
+    }
+
     public function test_can_create_normal_setting(): void
     {
         $this->actingAs($this->admin);
@@ -59,21 +90,21 @@ final class NormalSettingResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $settingData = [
-            'key' => 'test_setting',
-            'value' => 'test_value',
-            'description' => 'Test description',
-            'type' => 'string',
-            'is_public' => true,
+            'key'          => 'test_setting',
+            'value'        => 'test_value',
+            'description'  => 'Test description',
+            'type'         => 'string',
+            'is_public'    => true,
             'is_encrypted' => false,
-            'is_active' => true,
+            'is_active'    => true,
         ];
 
         $response = $this->post('/admin/normal-settings', $settingData);
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'key' => 'test_setting',
+            'key'   => 'test_setting',
             'value' => 'test_value',
-            'type' => 'string',
+            'type'  => 'string',
         ]);
     }
 
@@ -108,22 +139,22 @@ final class NormalSettingResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $updateData = [
-            'key' => 'updated_setting',
-            'value' => 'updated_value',
-            'description' => 'Updated description',
-            'type' => 'integer',
-            'is_public' => false,
+            'key'          => 'updated_setting',
+            'value'        => 'updated_value',
+            'description'  => 'Updated description',
+            'type'         => 'integer',
+            'is_public'    => false,
             'is_encrypted' => true,
-            'is_active' => false,
+            'is_active'    => false,
         ];
 
         $response = $this->put("/admin/normal-settings/{$setting->id}", $updateData);
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'id' => $setting->id,
-            'key' => 'updated_setting',
+            'id'    => $setting->id,
+            'key'   => 'updated_setting',
             'value' => 'updated_value',
-            'type' => 'integer',
+            'type'  => 'integer',
         ]);
     }
 
@@ -165,14 +196,15 @@ final class NormalSettingResourceTest extends TestCase
 
     public function test_can_filter_active_normal_settings(): void
     {
-        NormalSetting::factory()->create(['is_active' => true]);
-        NormalSetting::factory()->create(['is_active' => false]);
+        $activeSetting = NormalSetting::factory()->create(['is_active' => true]);
+        $inactiveSetting = NormalSetting::factory()->create(['is_active' => false]);
 
         $this->actingAs($this->admin);
 
-        $response = $this->get('/admin/normal-settings?filter[is_active]=1');
-
-        $response->assertStatus(200);
+        Livewire::test(ListNormalSettings::class)
+            ->filterTable('is_active', true)
+            ->assertCanSeeTableRecords([$activeSetting])
+            ->assertCanNotSeeTableRecords([$inactiveSetting]);
     }
 
     public function test_can_search_normal_settings(): void
@@ -279,8 +311,8 @@ final class NormalSettingResourceTest extends TestCase
     public function test_normal_setting_static_get_value(): void
     {
         $setting = NormalSetting::factory()->create([
-            'key' => 'test_key',
-            'value' => 'test_value',
+            'key'    => 'test_key',
+            'value'  => 'test_value',
             'locale' => 'en',
         ]);
 
@@ -294,9 +326,9 @@ final class NormalSettingResourceTest extends TestCase
         NormalSetting::setValue('new_key', 'new_value', 'general', 'en');
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'key' => 'new_key',
-            'value' => 'new_value',
-            'group' => 'general',
+            'key'    => 'new_key',
+            'value'  => 'new_value',
+            'group'  => 'general',
             'locale' => 'en',
         ]);
     }
@@ -304,7 +336,7 @@ final class NormalSettingResourceTest extends TestCase
     public function test_normal_setting_value_casting(): void
     {
         $setting = NormalSetting::factory()->create([
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => '1',
         ]);
 
@@ -315,7 +347,7 @@ final class NormalSettingResourceTest extends TestCase
     public function test_normal_setting_json_value_casting(): void
     {
         $setting = NormalSetting::factory()->create([
-            'type' => 'json',
+            'type'  => 'json',
             'value' => json_encode(['key' => 'value']),
         ]);
 
@@ -327,7 +359,7 @@ final class NormalSettingResourceTest extends TestCase
     {
         $setting = NormalSetting::factory()->create([
             'is_encrypted' => true,
-            'value' => 'sensitive_data',
+            'value'        => 'sensitive_data',
         ]);
 
         // The value should be encrypted in the database
@@ -340,14 +372,14 @@ final class NormalSettingResourceTest extends TestCase
     public function test_normal_setting_has_fillable_attributes(): void
     {
         $setting = NormalSetting::factory()->create([
-            'group' => 'test',
-            'key' => 'test_key',
-            'value' => 'test_value',
-            'type' => 'string',
-            'description' => 'Test description',
-            'is_public' => true,
+            'group'        => 'test',
+            'key'          => 'test_key',
+            'value'        => 'test_value',
+            'type'         => 'string',
+            'description'  => 'Test description',
+            'is_public'    => true,
             'is_encrypted' => false,
-            'sort_order' => 1,
+            'sort_order'   => 1,
         ]);
 
         $this->assertEquals('test', $setting->group);
@@ -363,14 +395,27 @@ final class NormalSettingResourceTest extends TestCase
     public function test_normal_setting_has_casts(): void
     {
         $setting = NormalSetting::factory()->create([
-            'is_public' => '1',
+            'is_public'    => '1',
             'is_encrypted' => '0',
-            'sort_order' => '5',
+            'is_active'    => '1',
+            'sort_order'   => '5',
         ]);
 
         $this->assertIsBool($setting->is_public);
         $this->assertIsBool($setting->is_encrypted);
+        $this->assertIsBool($setting->is_active);
         $this->assertIsInt($setting->sort_order);
+    }
+
+    public function test_normal_setting_scope_active(): void
+    {
+        NormalSetting::factory()->create(['is_active' => true]);
+        NormalSetting::factory()->create(['is_active' => false]);
+
+        $activeSettings = NormalSetting::active()->get();
+
+        $this->assertCount(1, $activeSettings);
+        $this->assertTrue($activeSettings->first()->is_active);
     }
 
     public function test_normal_setting_validation_rules_casting(): void
@@ -398,10 +443,10 @@ final class NormalSettingResourceTest extends TestCase
     public function test_normal_setting_booted_encryption(): void
     {
         $setting = new NormalSetting([
-            'key' => 'test_key',
-            'value' => 'sensitive_data',
+            'key'          => 'test_key',
+            'value'        => 'sensitive_data',
             'is_encrypted' => true,
-            'type' => 'string',
+            'type'         => 'string',
         ]);
 
         $setting->save();

@@ -70,6 +70,7 @@ final class ProductFeatureResourceTest extends TestCase
                 'feature_key' => 'weight',
                 'feature_value' => 1.2,
                 'weight' => 5,
+                'is_active' => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -80,6 +81,7 @@ final class ProductFeatureResourceTest extends TestCase
             'feature_key' => 'weight',
             'feature_value' => 1.2,
             'weight' => 5,
+            'is_active' => true,
         ]);
     }
 
@@ -97,6 +99,7 @@ final class ProductFeatureResourceTest extends TestCase
             ->fillForm([
                 'feature_value' => 2.5,
                 'weight' => 10,
+                'is_active' => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -105,6 +108,7 @@ final class ProductFeatureResourceTest extends TestCase
             'id' => $feature->id,
             'feature_value' => 2.5,
             'weight' => 10,
+            'is_active' => false,
         ]);
     }
 
@@ -167,5 +171,32 @@ final class ProductFeatureResourceTest extends TestCase
         foreach ($features as $feature) {
             $this->assertDatabaseMissing('product_features', ['id' => $feature->id]);
         }
+    }
+
+    public function test_can_filter_features_by_active_state(): void
+    {
+        $activeFeature = ProductFeature::factory()->create([
+            'product_id' => $this->product->id,
+            'feature_type' => 'performance',
+            'is_active' => true,
+        ]);
+
+        $inactiveFeature = ProductFeature::factory()->create([
+            'product_id' => $this->product->id,
+            'feature_type' => 'benefit',
+            'is_active' => false,
+        ]);
+
+        Livewire::test(ListProductFeatures::class)
+            ->call('loadTable')
+            ->filterTable('is_active', true)
+            ->assertSee('Performance')
+            ->assertDontSee('Benefit');
+
+        Livewire::test(ListProductFeatures::class)
+            ->call('loadTable')
+            ->filterTable('is_active', false)
+            ->assertSee('Benefit')
+            ->assertDontSee('Performance');
     }
 }

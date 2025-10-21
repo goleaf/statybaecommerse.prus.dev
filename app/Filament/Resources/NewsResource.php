@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\ModerationState;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
@@ -11,22 +12,25 @@ use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Novadaemon\FilamentCombobox\Combobox;
+use RuntimeException;
 
 class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-newspaper';
-    }
+    /** @phpstan-var string|BackedEnum|null */
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
@@ -36,32 +40,35 @@ class NewsResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        return $form->components([
             Forms\Components\Section::make('Article Information')
-                ->schema([
-                    Forms\Components\TextInput::make('title')
-                        ->label(__('news.fields.title'))
-                        ->required()
-                        ->maxLength(255)
-                        ->live()
-                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
-                    Forms\Components\TextInput::make('slug')
-                        ->label(__('news.fields.slug'))
-                        ->required()
-                        ->maxLength(255)
-                        ->unique(News::class, 'slug', ignoreRecord: true),
-                    Forms\Components\Textarea::make('excerpt')
-                        ->label(__('news.fields.excerpt'))
-                        ->maxLength(500)
-                        ->rows(3),
-                    Forms\Components\RichEditor::make('content')
-                        ->label(__('news.fields.content'))
-                        ->required()
-                        ->columnSpanFull(),
+                ->components([
+                    LanguageTabs::make([
+                        Forms\Components\TextInput::make('title')
+                            ->label(__('news.fields.title'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, callable $set): void {
+                                $set('slug', \Illuminate\Support\Str::slug((string) $state));
+                            }),
+                        Forms\Components\TextInput::make('slug')
+                            ->label(__('news.fields.slug'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('summary')
+                            ->label(__('news.fields.excerpt'))
+                            ->maxLength(500)
+                            ->rows(3),
+                        Forms\Components\RichEditor::make('content')
+                            ->label(__('news.fields.content'))
+                            ->required()
+                            ->columnSpanFull(),
+                    ])->columnSpanFull(),
                 ])
-                ->columns(2),
+                ->columns(1),
             Forms\Components\Section::make('Publishing')
-                ->schema([
+                ->components([
                     Forms\Components\DateTimePicker::make('published_at')
                         ->label(__('news.fields.published_at'))
                         ->default(now()),
@@ -74,30 +81,47 @@ class NewsResource extends Resource
                         ->maxLength(255),
                     Forms\Components\Toggle::make('is_visible')
                         ->label(__('news.fields.is_visible'))
-                        ->default(true),
+                        ->default(false)
+                        ->helperText(__('news.visibility_managed'))
+                        ->disabled(),
                     Forms\Components\Toggle::make('is_featured')
                         ->label(__('news.fields.is_featured')),
+                    Forms\Components\Toggle::make('is_breaking')
+                        ->label(__('news.fields.is_breaking')),
+                    Forms\Components\Placeholder::make('moderation_state')
+                        ->label(__('news.fields.moderation_state'))
+                        ->content(fn (?News $record): string => $record?->moderation_state?->label() ?? ModerationState::Draft->label()),
+                    Forms\Components\Placeholder::make('submitted_for_review_at')
+                        ->label(__('news.fields.submitted_for_review_at'))
+                        ->content(fn (?News $record): string => $record?->submitted_for_review_at?->format('Y-m-d H:i') ?? '—'),
+                    Forms\Components\Placeholder::make('approved_at')
+                        ->label(__('news.fields.approved_at'))
+                        ->content(fn (?News $record): string => $record?->approved_at?->format('Y-m-d H:i') ?? '—'),
+                    Forms\Components\Placeholder::make('approved_by')
+                        ->label(__('news.fields.approved_by'))
+                        ->content(fn (?News $record): string => $record?->approvedBy?->name ?? '—'),
                 ])
                 ->columns(2),
             Forms\Components\Section::make('SEO & Metadata')
-                ->schema([
-                    Forms\Components\TextInput::make('meta_title')
-                        ->label(__('news.fields.meta_title'))
-                        ->maxLength(255),
-                    Forms\Components\Textarea::make('meta_description')
-                        ->label(__('news.fields.meta_description'))
-                        ->maxLength(500)
-                        ->rows(3),
+                ->components([
+                    LanguageTabs::make([
+                        Forms\Components\TextInput::make('meta_title')
+                            ->label(__('news.fields.meta_title'))
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('meta_description')
+                            ->label(__('news.fields.meta_description'))
+                            ->maxLength(500)
+                            ->rows(3),
+                    ]),
                     Forms\Components\TextInput::make('meta_keywords')
                         ->label(__('news.fields.meta_keywords'))
                         ->maxLength(255),
-                ])
-                ->columns(1),
+                ]),
             Forms\Components\Section::make(__('news.podcast.section_title'))
                 ->description(__('news.podcast.section_description'))
                 ->collapsible()
                 ->collapsed()
-                ->schema([
+                ->components([
                     Forms\Components\TextInput::make('meta_data.podcast_url')
                         ->label(__('news.fields.podcast_url'))
                         ->placeholder('https://share.transistor.fm/s/...')
@@ -108,17 +132,21 @@ class NewsResource extends Resource
                         ->helperText(__('news.podcast.field_help')),
                 ]),
             Forms\Components\Section::make('Categories & Tags')
-                ->schema([
-                    Forms\Components\Select::make('categories')
+                ->components([
+                    Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->multiple()
-                        ->preload(),
-                    Forms\Components\Select::make('tags')
+                        ->boxSearchs()
+                        ->height('320px')
+                        ->optionsLabel(__('news.combobox.categories.available'))
+                        ->selectedLabel(__('news.combobox.categories.selected')),
+                    Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->multiple()
-                        ->preload(),
+                        ->boxSearchs()
+                        ->height('320px')
+                        ->optionsLabel(__('news.combobox.tags.available'))
+                        ->selectedLabel(__('news.combobox.tags.selected')),
                 ])
                 ->columns(2),
         ]);
@@ -136,7 +164,8 @@ class NewsResource extends Resource
                     ->label(__('news.fields.title'))
                     ->searchable()
                     ->sortable()
-                    ->limit(50),
+                    ->limit(50)
+                    ->formatStateUsing(fn (?string $state, News $record): ?string => $record->trans('title')),
                 Tables\Columns\TextColumn::make('author_name')
                     ->label(__('news.fields.author_name'))
                     ->searchable()
@@ -145,6 +174,15 @@ class NewsResource extends Resource
                     ->label(__('news.fields.categories'))
                     ->badge()
                     ->separator(','),
+                Tables\Columns\BadgeColumn::make('moderation_state')
+                    ->label(__('news.fields.moderation_state'))
+                    ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
+                    ->colors([
+                        'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
+                        'info'    => fn (?ModerationState $state): bool => $state === ModerationState::Review,
+                        'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
+                    ])
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('published_at')
                     ->label(__('news.fields.published_at'))
                     ->dateTime()
@@ -154,6 +192,9 @@ class NewsResource extends Resource
                     ->boolean(),
                 Tables\Columns\IconColumn::make('is_featured')
                     ->label(__('news.fields.is_featured'))
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_breaking')
+                    ->label(__('news.fields.is_breaking'))
                     ->boolean(),
                 Tables\Columns\TextColumn::make('view_count')
                     ->label(__('news.fields.view_count'))
@@ -167,6 +208,9 @@ class NewsResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('moderation_state')
+                    ->label(__('news.fields.moderation_state'))
+                    ->options(ModerationState::options()),
                 Tables\Filters\SelectFilter::make('categories')
                     ->relationship('categories', 'name')
                     ->multiple(),
@@ -177,6 +221,8 @@ class NewsResource extends Resource
                     ->label(__('news.fields.is_visible')),
                 Tables\Filters\TernaryFilter::make('is_featured')
                     ->label(__('news.fields.is_featured')),
+                Tables\Filters\TernaryFilter::make('is_breaking')
+                    ->label(__('news.fields.is_breaking')),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
                         Forms\Components\DatePicker::make('published_from')
@@ -199,6 +245,126 @@ class NewsResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('submit_for_review')
+                    ->label(__('moderation.actions.submit_for_review'))
+                    ->icon('heroicon-o-paper-airplane')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->visible(fn (News $record): bool => $record->moderation_state === ModerationState::Draft)
+                    ->action(function (News $record): void {
+                        $record->update([
+                            'moderation_state'        => ModerationState::Review,
+                            'submitted_for_review_at' => now(),
+                            'is_visible'              => false,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('submitted_for_review')
+                            ->log('News submitted for review');
+
+                        Notification::make()
+                            ->title(__('moderation.messages.submitted'))
+                            ->success()
+                            ->send();
+                    }),
+                Tables\Actions\Action::make('approve')
+                    ->label(__('moderation.actions.approve'))
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->form([
+                        Forms\Components\Textarea::make('notes')
+                            ->label(__('news.approvals.notes'))
+                            ->maxLength(500)
+                            ->rows(3)
+                            ->helperText(__('news.approvals.notes_help')),
+                    ])
+                    ->visible(fn (News $record): bool => $record->moderation_state === ModerationState::Review)
+                    ->action(function (News $record, array $data): void {
+                        $userId = Auth::id();
+
+                        if (! $userId) {
+                            throw new RuntimeException('Approvals require an authenticated user.');
+                        }
+
+                        DB::transaction(function () use ($record, $userId, $data): void {
+                            $record->approvals()->create([
+                                'user_id'    => $userId,
+                                'decision'   => 'approved',
+                                'notes'      => $data['notes'] ?? null,
+                                'decided_at' => now(),
+                            ]);
+
+                            $record->update([
+                                'moderation_state' => ModerationState::Published,
+                                'approved_at'      => now(),
+                                'approved_by_id'   => $userId,
+                                'is_visible'       => true,
+                                'published_at'     => $record->published_at ?? now(),
+                            ]);
+                        });
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('approved')
+                            ->log('News approved and published');
+
+                        Notification::make()
+                            ->title(__('moderation.messages.approved'))
+                            ->success()
+                            ->send();
+                    }),
+                Tables\Actions\Action::make('request_changes')
+                    ->label(__('moderation.actions.return_to_draft'))
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->form([
+                        Forms\Components\Textarea::make('notes')
+                            ->label(__('news.approvals.notes'))
+                            ->maxLength(500)
+                            ->rows(3)
+                            ->required(),
+                    ])
+                    ->visible(fn (News $record): bool => $record->moderation_state !== ModerationState::Draft)
+                    ->action(function (News $record, array $data): void {
+                        $userId = Auth::id();
+
+                        if (! $userId) {
+                            throw new RuntimeException('Return to draft requires an authenticated user.');
+                        }
+
+                        DB::transaction(function () use ($record, $userId, $data): void {
+                            $record->approvals()->create([
+                                'user_id'    => $userId,
+                                'decision'   => 'returned',
+                                'notes'      => $data['notes'] ?? null,
+                                'decided_at' => now(),
+                            ]);
+
+                            $record->update([
+                                'moderation_state'        => ModerationState::Draft,
+                                'submitted_for_review_at' => null,
+                                'approved_at'             => null,
+                                'approved_by_id'          => null,
+                                'is_visible'              => false,
+                            ]);
+                        });
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('returned_to_draft')
+                            ->log('News returned to draft');
+
+                        Notification::make()
+                            ->title(__('moderation.messages.returned'))
+                            ->warning()
+                            ->send();
+                    }),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
@@ -242,11 +408,25 @@ class NewsResource extends Resource
                         Infolists\Components\TextEntry::make('published_at')
                             ->label(__('news.fields.published_at'))
                             ->dateTime(),
+                        Infolists\Components\TextEntry::make('moderation_state')
+                            ->label(__('news.fields.moderation_state'))
+                            ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label()),
+                        Infolists\Components\TextEntry::make('submitted_for_review_at')
+                            ->label(__('news.fields.submitted_for_review_at'))
+                            ->dateTime(),
+                        Infolists\Components\TextEntry::make('approved_at')
+                            ->label(__('news.fields.approved_at'))
+                            ->dateTime(),
+                        Infolists\Components\TextEntry::make('approvedBy.name')
+                            ->label(__('news.fields.approved_by')),
                         Infolists\Components\IconEntry::make('is_visible')
                             ->label(__('news.fields.is_visible'))
                             ->boolean(),
                         Infolists\Components\IconEntry::make('is_featured')
                             ->label(__('news.fields.is_featured'))
+                            ->boolean(),
+                        Infolists\Components\IconEntry::make('is_breaking')
+                            ->label(__('news.fields.is_breaking'))
                             ->boolean(),
                         Infolists\Components\TextEntry::make('view_count')
                             ->label(__('news.fields.view_count'))
@@ -271,6 +451,7 @@ class NewsResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\ApprovalsRelationManager::class,
             RelationManagers\CommentsRelationManager::class,
             RelationManagers\ImagesRelationManager::class,
         ];
@@ -279,10 +460,10 @@ class NewsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNews::route('/'),
+            'index'  => Pages\ListNews::route('/'),
             'create' => Pages\CreateNews::route('/create'),
-            'view' => Pages\ViewNews::route('/{record}'),
-            'edit' => Pages\EditNews::route('/{record}/edit'),
+            'view'   => Pages\ViewNews::route('/{record}'),
+            'edit'   => Pages\EditNews::route('/{record}/edit'),
         ];
     }
 

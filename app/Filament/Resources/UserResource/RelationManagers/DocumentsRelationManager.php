@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Storage\SecureStorage;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class DocumentsRelationManager extends RelationManager
+final class DocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';
 
@@ -83,7 +83,11 @@ final class DocumentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('file_path')
                     ->label(__('admin.fields.file'))
                     ->formatStateUsing(fn ($state) => $state ? 'Download' : 'No file')
-                    ->url(fn ($record) => $record->file_path ? asset('storage/'.$record->file_path) : null)
+                    ->url(fn ($record) => $record->file_path ? SecureStorage::temporarySignedUrl(
+                        $record->file_path,
+                        now()->addMinutes((int) config('media-security.url_lifetime', 30)),
+                        true
+                    ) : null)
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))

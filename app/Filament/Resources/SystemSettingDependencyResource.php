@@ -19,10 +19,11 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -35,10 +36,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 final class SystemSettingDependencyResource extends Resource
 {
+    protected static ?string $model = SystemSettingDependency::class;
+
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-link';
@@ -158,6 +159,10 @@ final class SystemSettingDependencyResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
                         return strlen($state) > 50 ? $state : null;
                     })
                     ->searchable()
@@ -266,7 +271,7 @@ final class SystemSettingDependencyResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingDependency $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->condition = $record->condition.' (Copy)';
+                        $newRecord->condition = $record->condition . ' (Copy)';
                         $newRecord->is_active = false;
                         $newRecord->save();
 
@@ -321,9 +326,9 @@ final class SystemSettingDependencyResource extends Resource
                         ->icon('heroicon-o-document-duplicate')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            $records->each(function (SystemSettingDependency $record) {
+                            $records->each(function (SystemSettingDependency $record): void {
                                 $newRecord = $record->replicate();
-                                $newRecord->condition = $record->condition.' (Copy)';
+                                $newRecord->condition = $record->condition . ' (Copy)';
                                 $newRecord->is_active = false;
                                 $newRecord->save();
                             });
@@ -351,10 +356,10 @@ final class SystemSettingDependencyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettingDependencies::route('/'),
+            'index'  => Pages\ListSystemSettingDependencies::route('/'),
             'create' => Pages\CreateSystemSettingDependency::route('/create'),
-            'view' => Pages\ViewSystemSettingDependency::route('/{record}'),
-            'edit' => Pages\EditSystemSettingDependency::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingDependency::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingDependency::route('/{record}/edit'),
         ];
     }
 }

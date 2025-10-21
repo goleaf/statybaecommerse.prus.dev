@@ -6,11 +6,11 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class DocumentsRelationManager extends RelationManager
+class DocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';
 

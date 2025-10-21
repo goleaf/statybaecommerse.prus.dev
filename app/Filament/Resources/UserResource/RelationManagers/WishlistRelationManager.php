@@ -6,12 +6,12 @@ namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class WishlistRelationManager extends RelationManager
+class WishlistRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'wishlists';
 

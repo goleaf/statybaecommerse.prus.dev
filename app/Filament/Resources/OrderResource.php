@@ -7,35 +7,54 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use App\Services\Pricing\PriceCalculator;
+use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Search\CustomerSearch;
+use App\Support\Seo\LocaleUrlGenerator;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * OrderResource
@@ -63,7 +82,47 @@ final class OrderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'orders.models.orders';
 
-    public static function getNavigationIcon(): string|\BackedEnum|null
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'viewAny');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'viewAny');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'view');
+    }
+
+    public static function canCreate(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'create');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'update');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'delete');
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'delete');
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'update');
+    }
+
+    public static function getNavigationIcon(): string|BackedEnum|null
     {
         return 'heroicon-o-shopping-bag';
     }
@@ -115,29 +174,41 @@ final class OrderResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(255)
                                 ->helperText(__('orders.number_help')),
-                            Select::make('user_id')
+                            SearchableInput::make('user_id')
                                 ->label(__('orders.fields.customer'))
-                                ->relationship('user', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    TextInput::make('email')
-                                        ->email()
-                                        ->required()
-                                        ->maxLength(255),
-                                ]),
+                                ->placeholder('Name, email or phone')
+                                ->required()
+                                ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                                    if ($state === null || ! $record?->user) {
+                                        return;
+                                    }
+
+                                    $label = trim(sprintf('%s <%s>', (string) ($record->user->name ?? ''), (string) ($record->user->email ?? '')));
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $record->user_id => $label,
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $set('user_id', (int) $state);
+                                }),
                             Select::make('status')
                                 ->label(__('orders.fields.status'))
                                 ->options([
-                                    'pending' => __('orders.status.pending'),
+                                    'pending'    => __('orders.status.pending'),
                                     'processing' => __('orders.status.processing'),
-                                    'shipped' => __('orders.status.shipped'),
-                                    'delivered' => __('orders.status.delivered'),
-                                    'cancelled' => __('orders.status.cancelled'),
-                                    'refunded' => __('orders.status.refunded'),
+                                    'shipped'    => __('orders.status.shipped'),
+                                    'delivered'  => __('orders.status.delivered'),
+                                    'cancelled'  => __('orders.status.cancelled'),
+                                    'refunded'   => __('orders.status.refunded'),
                                 ])
                                 ->default('pending'),
                         ]),
@@ -146,21 +217,21 @@ final class OrderResource extends Resource
                             Select::make('payment_status')
                                 ->label(__('orders.fields.payment_status'))
                                 ->options([
-                                    'pending' => __('orders.payment_status.pending'),
-                                    'paid' => __('orders.payment_status.paid'),
-                                    'failed' => __('orders.payment_status.failed'),
+                                    'pending'  => __('orders.payment_status.pending'),
+                                    'paid'     => __('orders.payment_status.paid'),
+                                    'failed'   => __('orders.payment_status.failed'),
                                     'refunded' => __('orders.payment_status.refunded'),
                                 ]),
                             Select::make('payment_method')
                                 ->label(__('orders.fields.payment_method'))
                                 ->options([
-                                    'credit_card' => __('orders.payment_methods.credit_card'),
-                                    'bank_transfer' => __('orders.payment_methods.bank_transfer'),
+                                    'credit_card'      => __('orders.payment_methods.credit_card'),
+                                    'bank_transfer'    => __('orders.payment_methods.bank_transfer'),
                                     'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
-                                    'paypal' => __('orders.payment_methods.paypal'),
-                                    'stripe' => __('orders.payment_methods.stripe'),
-                                    'apple_pay' => __('orders.payment_methods.credit_card'),
-                                    'google_pay' => __('orders.payment_methods.credit_card'),
+                                    'paypal'           => __('orders.payment_methods.paypal'),
+                                    'stripe'           => __('orders.payment_methods.stripe'),
+                                    'apple_pay'        => __('orders.payment_methods.credit_card'),
+                                    'google_pay'       => __('orders.payment_methods.credit_card'),
                                 ]),
                             TextInput::make('payment_reference')
                                 ->label(__('orders.fields.tracking_number')),
@@ -202,9 +273,11 @@ final class OrderResource extends Resource
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
                             $discount = (float) $get('discount_amount') ?? 0;
-                            $total = $subtotal + $tax + $shipping - $discount;
+                            $taxable = max(0.0, $subtotal - $discount);
+                            $rate = $taxable > 0 ? $tax / $taxable : null;
+                            $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discount, $shipping, $rate);
 
-                            return '€'.number_format($total, 2);
+                            return $breakdown->toSummary()['formatted_total'];
                         }),
                     Hidden::make('total')
                         ->default(function (\Filament\Schemas\Components\Utilities\Get $get): float {
@@ -212,8 +285,11 @@ final class OrderResource extends Resource
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
                             $discount = (float) $get('discount_amount') ?? 0;
+                            $taxable = max(0.0, $subtotal - $discount);
+                            $rate = $taxable > 0 ? $tax / $taxable : null;
+                            $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discount, $shipping, $rate);
 
-                            return $subtotal + $tax + $shipping - $discount;
+                            return $breakdown->total;
                         }),
                 ])
                 ->collapsible(),
@@ -294,6 +370,51 @@ final class OrderResource extends Resource
                     ->sortable()
                     ->copyable()
                     ->weight('bold'),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Order $record): array {
+                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
+                        $locales = collect($localeUrlGenerator->supportedLocales());
+
+                        $items = $locales
+                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
+                                $url = $localeUrlGenerator->localizedRoute(
+                                    'localized.orders.show',
+                                    ['order' => $record->number],
+                                    $locale,
+                                );
+
+                                if (! $url && Route::has('frontend.orders.show')) {
+                                    $url = route('frontend.orders.show', $record);
+                                }
+
+                                if (! $url) {
+                                    return null;
+                                }
+
+                                return [
+                                    'label' => __('Order (:locale)', ['locale' => strtoupper($locale)]),
+                                    'url'   => $url,
+                                    'icon'  => 'heroicon-o-arrow-top-right-on-square',
+                                    'color' => 'primary',
+                                ];
+                            })
+                            ->filter()
+                            ->values();
+
+                        if (Route::has('api.orders.show')) {
+                            $items->push([
+                                'label' => __('Order API (:number)', ['number' => $record->number]),
+                                'url'   => route('api.orders.show', ['order' => $record->number]),
+                                'icon'  => 'heroicon-o-code-bracket',
+                                'color' => 'info',
+                            ]);
+                        }
+
+                        return $items->all();
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label(__('orders.fields.customer'))
                     ->limit(30)
@@ -307,11 +428,11 @@ final class OrderResource extends Resource
                 BadgeColumn::make('status')
                     ->label(__('orders.fields.status'))
                     ->colors([
-                        'warning' => 'pending',
-                        'primary' => 'processing',
-                        'info' => 'shipped',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
+                        'warning'   => 'pending',
+                        'primary'   => 'processing',
+                        'info'      => 'shipped',
+                        'success'   => 'delivered',
+                        'danger'    => 'cancelled',
                         'secondary' => 'refunded',
                     ])
                     ->formatStateUsing(fn (string $state): string => __("orders.status.{$state}"))
@@ -319,9 +440,9 @@ final class OrderResource extends Resource
                 BadgeColumn::make('payment_status')
                     ->label(__('orders.fields.payment_status'))
                     ->colors([
-                        'warning' => 'pending',
-                        'success' => 'paid',
-                        'danger' => 'failed',
+                        'warning'   => 'pending',
+                        'success'   => 'paid',
+                        'danger'    => 'failed',
                         'secondary' => 'refunded',
                     ])
                     ->formatStateUsing(fn (string $state): string => __("orders.payment_status.{$state}"))
@@ -356,31 +477,31 @@ final class OrderResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'pending' => __('orders.statuses.pending'),
+                        'pending'    => __('orders.statuses.pending'),
                         'processing' => __('orders.statuses.processing'),
-                        'shipped' => __('orders.statuses.shipped'),
-                        'delivered' => __('orders.statuses.delivered'),
-                        'cancelled' => __('orders.statuses.cancelled'),
-                        'refunded' => __('orders.statuses.refunded'),
+                        'shipped'    => __('orders.statuses.shipped'),
+                        'delivered'  => __('orders.statuses.delivered'),
+                        'cancelled'  => __('orders.statuses.cancelled'),
+                        'refunded'   => __('orders.statuses.refunded'),
                     ])
                     ->multiple(),
                 SelectFilter::make('payment_status')
                     ->options([
-                        'pending' => __('orders.payment_statuses.pending'),
-                        'paid' => __('orders.payment_statuses.paid'),
-                        'failed' => __('orders.payment_statuses.failed'),
+                        'pending'  => __('orders.payment_statuses.pending'),
+                        'paid'     => __('orders.payment_statuses.paid'),
+                        'failed'   => __('orders.payment_statuses.failed'),
                         'refunded' => __('orders.payment_statuses.refunded'),
                     ])
                     ->multiple(),
                 SelectFilter::make('payment_method')
                     ->options([
-                        'credit_card' => __('orders.payment_methods.credit_card'),
-                        'bank_transfer' => __('orders.payment_methods.bank_transfer'),
+                        'credit_card'      => __('orders.payment_methods.credit_card'),
+                        'bank_transfer'    => __('orders.payment_methods.bank_transfer'),
                         'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
-                        'paypal' => __('orders.payment_methods.paypal'),
-                        'stripe' => __('orders.payment_methods.stripe'),
-                        'apple_pay' => __('orders.payment_methods.apple_pay'),
-                        'google_pay' => __('orders.payment_methods.google_pay'),
+                        'paypal'           => __('orders.payment_methods.paypal'),
+                        'stripe'           => __('orders.payment_methods.stripe'),
+                        'apple_pay'        => __('orders.payment_methods.apple_pay'),
+                        'google_pay'       => __('orders.payment_methods.google_pay'),
                     ])
                     ->multiple(),
                 SelectFilter::make('channel')
@@ -392,53 +513,62 @@ final class OrderResource extends Resource
                         true: fn (Builder $query) => $query->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
                         false: fn (Builder $query) => $query->whereNotIn('payment_status', ['paid', 'captured', 'settled', 'authorized']),
                     ),
+                ValueRangeFilter::make('subtotal')
+                    ->label(__('orders.fields.subtotal'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('discount_amount')
+                    ->label(__('orders.fields.discount_amount'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('shipping_amount')
+                    ->label(__('orders.fields.shipping_amount'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('total')
+                    ->label(__('orders.fields.total'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('items_count')
+                    ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
-                        Forms\Components\DatePicker::make('created_from')
-                            ->label(__('orders.created_from')),
-                        Forms\Components\DatePicker::make('created_until')
-                            ->label(__('orders.created_until')),
+                        Flatpickr::make('range')
+                            ->label(__('orders.created_at'))
+                            ->rangePicker()
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'] ?? null,
-                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'] ?? null,
-                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date),
-                            );
-                    }),
-                Filter::make('total_range')
-                    ->form([
-                        TextInput::make('total_from')
-                            ->label(__('orders.total_from'))
-                            ->numeric()
-                            ->prefix('€'),
-                        TextInput::make('total_until')
-                            ->label(__('orders.total_until'))
-                            ->numeric()
-                            ->prefix('€'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['total_from'],
-                                fn (Builder $query, $amount): Builder => $query->where('total', '>=', $amount),
-                            )
-                            ->when(
-                                $data['total_until'],
-                                fn (Builder $query, $amount): Builder => $query->where('total', '<=', $amount),
-                            );
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
+                TrashedFilter::make(),
+            ])
+            ->filtersFormWidth(MaxWidth::Large)
+            ->headerActions([
+                ExportAction::make('export')
+                    ->label(__('Export'))
+                    ->exports(self::getExportPresets()),
             ])
             ->actions([
                 ViewAction::make()
-                    ->color('info'),
+                    ->color('info')
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'view')),
                 EditAction::make()
-                    ->color('warning'),
-                \Filament\Tables\Actions\DeleteAction::make(),
+                    ->color('warning')
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                \Filament\Tables\Actions\DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
                 Action::make('mark_processing')
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')
@@ -451,7 +581,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                 Action::make('mark_shipped')
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
@@ -459,7 +590,7 @@ final class OrderResource extends Resource
                     ->visible(fn (Order $record): bool => $record->status === 'processing')
                     ->action(function (Order $record): void {
                         $record->update([
-                            'status' => 'shipped',
+                            'status'     => 'shipped',
                             'shipped_at' => now(),
                         ]);
                         Notification::make()
@@ -467,7 +598,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                 Action::make('mark_delivered')
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
@@ -475,7 +607,7 @@ final class OrderResource extends Resource
                     ->visible(fn (Order $record): bool => $record->status === 'shipped')
                     ->action(function (Order $record): void {
                         $record->update([
-                            'status' => 'delivered',
+                            'status'       => 'delivered',
                             'delivered_at' => now(),
                         ]);
                         Notification::make()
@@ -483,7 +615,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                 Action::make('cancel_order')
                     ->label(__('orders.cancel_order'))
                     ->icon('heroicon-o-x-circle')
@@ -496,7 +629,8 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                 Action::make('refund_order')
                     ->label(__('orders.refund_order'))
                     ->icon('heroicon-o-arrow-uturn-left')
@@ -509,11 +643,20 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    ExportBulkAction::make('export_selected')
+                        ->label(__('Export selected'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->exports(self::getExportPresets())
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
                     BulkAction::make('mark_processing')
                         ->label(__('orders.bulk_mark_processing'))
                         ->icon('heroicon-o-cog')
@@ -525,14 +668,15 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('mark_shipped')
                         ->label(__('orders.bulk_mark_shipped'))
                         ->icon('heroicon-o-truck')
                         ->color('info')
                         ->action(function (Collection $records): void {
                             $records->each->update([
-                                'status' => 'shipped',
+                                'status'     => 'shipped',
                                 'shipped_at' => now(),
                             ]);
                             Notification::make()
@@ -540,14 +684,15 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('mark_delivered')
                         ->label(__('orders.bulk_mark_delivered'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update([
-                                'status' => 'delivered',
+                                'status'       => 'delivered',
                                 'delivered_at' => now(),
                             ]);
                             Notification::make()
@@ -555,7 +700,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('cancel_orders')
                         ->label(__('orders.bulk_cancel'))
                         ->icon('heroicon-o-x-circle')
@@ -567,7 +713,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('export_orders')
                         ->label(__('orders.export'))
                         ->icon('heroicon-o-arrow-down-tray')
@@ -578,13 +725,78 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
             ->poll('30s')
             ->striped()
             ->paginated([10, 25, 50, 100]);
+    }
+
+    /**
+     * @return array<int, ExcelExport>
+     */
+    protected static function getExportPresets(): array
+    {
+        return [
+            ExcelExport::make('visible_orders')
+                ->label(__('orders.exports.visible_orders'))
+                ->fromTable()
+                ->queue()
+                ->withChunkSize(500),
+            ExcelExport::make('exportable_orders')
+                ->label(__('orders.exports.exportable_orders'))
+                ->fromTable()
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('exportable', true))
+                ->queue()
+                ->withColumns(self::getExportableOrderColumns()),
+        ];
+    }
+
+    /**
+     * Columns used for export presets.
+     *
+     * @return array<int, Column>
+     */
+    protected static function getExportableOrderColumns(): array
+    {
+        return [
+            Column::make('number')
+                ->heading(__('orders.fields.order_number')),
+            Column::make('customer_email')
+                ->heading(__('orders.fields.customer_email'))
+                ->getStateUsing(fn (Order $record): ?string => $record->user?->email),
+            Column::make('subtotal')
+                ->heading(__('orders.fields.subtotal'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->subtotal),
+            Column::make('tax_amount')
+                ->heading(__('orders.fields.tax_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->tax_amount),
+            Column::make('shipping_amount')
+                ->heading(__('orders.fields.shipping_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->shipping_amount),
+            Column::make('discount_amount')
+                ->heading(__('orders.fields.discount_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->discount_amount),
+            Column::make('total')
+                ->heading(__('orders.fields.total'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->total),
+            Column::make('status')
+                ->heading(__('orders.fields.status'))
+                ->getStateUsing(fn (Order $record): ?string => $record->status)
+                ->formatStateUsing(fn (?string $state): string => $state ? __("orders.status.{$state}") : ''),
+            Column::make('payment_status')
+                ->heading(__('orders.fields.payment_status'))
+                ->getStateUsing(fn (Order $record): ?string => $record->payment_status)
+                ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_status.{$state}") : ''),
+        ];
     }
 
     /**
@@ -605,10 +817,10 @@ final class OrderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrders::route('/'),
+            'index'  => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
-            'view' => Pages\ViewOrder::route('/{record}'),
-            'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'view'   => Pages\ViewOrder::route('/{record}'),
+            'edit'   => Pages\EditOrder::route('/{record}/edit'),
         ];
     }
 
@@ -619,8 +831,8 @@ final class OrderResource extends Resource
     {
         return [
             'Customer' => $record->user->name ?? 'N/A',
-            'Total' => '€'.number_format((float) $record->total, 2),
-            'Status' => __("orders.statuses.{$record->status}"),
+            'Total'    => '€' . number_format((float) $record->total, 2),
+            'Status'   => __("orders.statuses.{$record->status}"),
         ];
     }
 
@@ -636,7 +848,7 @@ final class OrderResource extends Resource
                 ->label(__('orders.actions.view'))
                 ->icon('heroicon-o-eye')
                 ->url(self::getUrl('view', ['record' => $record]));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 
@@ -645,7 +857,7 @@ final class OrderResource extends Resource
                 ->label(__('orders.actions.edit'))
                 ->icon('heroicon-o-pencil')
                 ->url(self::getUrl('edit', ['record' => $record]));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 

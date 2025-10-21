@@ -6,12 +6,15 @@ namespace App\Filament\Resources\DiscountConditionResource\Pages;
 
 use App\Filament\Resources\DiscountConditionResource;
 use Filament\Actions;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListDiscountConditions extends ListRecords
+final class ListDiscountConditions extends BaseListRecords
 {
+    use HasWidgetTabs;
+
     protected static string $resource = DiscountConditionResource::class;
 
     protected function getHeaderActions(): array
@@ -21,33 +24,34 @@ final class ListDiscountConditions extends ListRecords
         ];
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all' => Tab::make(__('discount_conditions.tabs.all')),
-            'active' => Tab::make(__('discount_conditions.tabs.active'))
+            'all' => WidgetTab::make(__('discount_conditions.tabs.all'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'active' => WidgetTab::make(__('discount_conditions.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
-            'minimum_amount' => Tab::make(__('discount_conditions.tabs.minimum_amount'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
+            'minimum_amount' => WidgetTab::make(__('discount_conditions.tabs.minimum_amount'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'minimum_amount'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'minimum_amount')->count()),
-            'minimum_quantity' => Tab::make(__('discount_conditions.tabs.minimum_quantity'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'minimum_amount')->count()),
+            'minimum_quantity' => WidgetTab::make(__('discount_conditions.tabs.minimum_quantity'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'minimum_quantity'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'minimum_quantity')->count()),
-            'customer_group' => Tab::make(__('discount_conditions.tabs.customer_group'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'minimum_quantity')->count()),
+            'customer_group' => WidgetTab::make(__('discount_conditions.tabs.customer_group'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'customer_group'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'customer_group')->count()),
-            'product_category' => Tab::make(__('discount_conditions.tabs.product_category'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'customer_group')->count()),
+            'product_category' => WidgetTab::make(__('discount_conditions.tabs.product_category'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product_category'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'product_category')->count()),
-            'date_range' => Tab::make(__('discount_conditions.tabs.date_range'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'product_category')->count()),
+            'date_range' => WidgetTab::make(__('discount_conditions.tabs.date_range'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'date_range'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'date_range')->count()),
-            'current' => Tab::make(__('discount_conditions.tabs.current'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'date_range')->count()),
+            'current' => WidgetTab::make(__('discount_conditions.tabs.current'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('valid_from', '<=', now())->where(function ($q) {
                     $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
                 }))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('valid_from', '<=', now())->where(function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('valid_from', '<=', now())->where(function ($q) {
                     $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
                 })->count()),
         ];

@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
-use Filament\Forms\Form;
-
 use App\Models\DiscountCode;
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Forms\Form;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CodesRelationManager extends RelationManager
+final class CodesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'codes';
 

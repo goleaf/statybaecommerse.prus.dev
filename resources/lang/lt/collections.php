@@ -2,6 +2,8 @@
 
 return [
     // Basic fields
+    'basic_information' => 'Pagrindinė informacija',
+    'media' => 'Medija',
     'name' => 'Pavadinimas',
     'slug' => 'Nuoroda',
     'description' => 'Aprašymas',
@@ -21,6 +23,17 @@ return [
     'show_filters' => 'Rodyti filtrus',
     'image' => 'Paveikslėlis',
     'banner' => 'Baneris',
+    'products' => 'Produktai',
+    'activate' => 'Aktyvuoti',
+    'deactivate' => 'Deaktyvuoti',
+    'activate_selected' => 'Aktyvuoti pasirinktus',
+    'deactivate_selected' => 'Deaktyvuoti pasirinktus',
+    'activated_successfully' => 'Kolekcija sėkmingai aktyvuota',
+    'deactivated_successfully' => 'Kolekcija sėkmingai deaktyvuota',
+    'bulk_activated_success' => 'Pasirinktos kolekcijos sėkmingai aktyvuotos',
+    'bulk_deactivated_success' => 'Pasirinktos kolekcijos sėkmingai deaktyvuotos',
+    'created_at' => 'Sukurta',
+    'updated_at' => 'Atnaujinta',
     // Helpers
     'full_display_name' => 'Pilnas rodymo pavadinimas',
     'seo_info' => 'SEO informacija',

@@ -12,12 +12,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class ProductImageResource extends Resource
 {
@@ -47,8 +46,11 @@ final class ProductImageResource extends Resource
                 Forms\Components\FileUpload::make('path')
                     ->label('Image')
                     ->image()
+                    ->disk('public')
                     ->directory('product-images')
-                    ->visibility('public'),
+                    ->visibility('public')
+                    ->dehydrateStateUsing(static fn (?string $state): ?string => $state ? 'storage/' . ltrim($state, '/') : null)
+                    ->formatStateUsing(static fn (?string $state): ?string => $state && str_starts_with($state, 'storage/') ? substr($state, strlen('storage/')) : $state),
                 Forms\Components\TextInput::make('alt_text')
                     ->label('Alt Text')
                     ->maxLength(255),
@@ -64,12 +66,14 @@ final class ProductImageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('path')
+                    ->getStateUsing(static fn (ProductImage $record): ?string => $record->path ? asset(trim($record->path, '/')) : null)
                     ->size(60),
                 Tables\Columns\TextColumn::make('product.name')
                     ->label('Product')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('alt_text')
-                    ->limit(30),
+                    ->limit(30)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('sort_order'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

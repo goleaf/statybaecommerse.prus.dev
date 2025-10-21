@@ -2,6 +2,15 @@
 
 return [
     'title' => 'Posts',
+    'single' => 'Post',
+    'plural' => 'Posts',
+    'sections' => [
+        'basic_information' => 'Basic Information',
+        'media' => 'Media',
+        'seo' => 'SEO',
+        'settings' => 'Settings',
+    ],
+    'add_tag' => 'Add tag',
     'create_title' => 'Create Post',
     'edit_title' => 'Edit Post',
     'view_title' => 'View Post',
@@ -12,6 +21,10 @@ return [
         'content' => 'Content',
         'excerpt' => 'Excerpt',
         'status' => 'Status',
+        'moderation_state' => 'Moderation State',
+        'submitted_for_review_at' => 'Submitted For Review',
+        'approved_at' => 'Approved At',
+        'approved_by' => 'Approved By',
         'published_at' => 'Published At',
         'user_id' => 'Author',
         'meta_title' => 'Meta Title',
@@ -19,12 +32,19 @@ return [
         'featured' => 'Featured',
         'images' => 'Featured Image',
         'gallery' => 'Gallery Images',
+        'tags' => 'Tags',
+        'is_pinned' => 'Pinned',
+        'allow_comments' => 'Allow Comments',
+        'created_at' => 'Created At',
     ],
     'status' => [
         'draft' => 'Draft',
+        'review' => 'In Review',
         'published' => 'Published',
         'archived' => 'Archived',
     ],
+
+    'status_managed_by_workflow' => 'Status is managed by the moderation workflow.',
     'actions' => [
         'create' => 'Create',
         'edit' => 'Edit',
@@ -35,6 +55,20 @@ return [
         'archive' => 'Archive',
         'feature' => 'Feature',
         'unfeature' => 'Unfeature',
+    ],
+
+    'approvals' => [
+        'notes' => 'Approval Notes',
+        'notes_help' => 'Share any context around this decision (optional).',
+        'decided_at' => 'Decided At',
+        'reviewer' => 'Reviewer',
+        'decision' => 'Decision',
+        'decisions' => [
+            'approved' => 'Approved',
+            'returned' => 'Returned to Draft',
+        ],
+        'empty_heading' => 'No approvals yet',
+        'empty_description' => 'Approval history will appear here once reviewers make a decision.',
     ],
     'messages' => [
         'created' => 'Post created successfully',
@@ -55,6 +89,8 @@ return [
         'all_posts' => 'All Posts',
         'featured_only' => 'Featured Only',
         'not_featured' => 'Not Featured',
+        'pinned_only' => 'Pinned Only',
+        'not_pinned' => 'Not Pinned',
     ],
     'widgets' => [
         'total_posts' => 'Total Posts',

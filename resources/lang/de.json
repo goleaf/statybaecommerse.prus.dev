@@ -30,5 +30,18 @@
     "Legal": "Rechtliches",
     "Warehouse Stock": "Lagerbestand",
     "Warehouse Stock shows available = stock - reserved across all inventories.": "Lagerbestand zeigt Verfügbar = Bestand - reserviert über alle Lager.",
-    "If missing, it is computed live.": "Wenn fehlend, wird es live berechnet."
+    "If missing, it is computed live.": "Wenn fehlend, wird es live berechnet.",
+    "company_email": "support@statybae.com",
+    "company_phone": "+370 600 00 000",
+    "nav_account": "Konto",
+    "nav_brands": "Marken",
+    "nav_cart": "Warenkorb",
+    "nav_categories": "Kategorien",
+    "nav_collections": "Kollektionen",
+    "nav_exports": "Exporte",
+    "nav_home": "Startseite",
+    "nav_locations": "Standorte",
+    "nav_search": "Suche",
+    "nav_toggle": "Navigation umschalten",
+    "support_centre": "Kundendienst"
 }

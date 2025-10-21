@@ -6,9 +6,9 @@ namespace App\Filament\Resources\DocumentTemplateResource\Pages;
 
 use App\Filament\Resources\DocumentTemplateResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListDocumentTemplates extends ListRecords
+class ListDocumentTemplates extends BaseListRecords
 {
     protected static string $resource = DocumentTemplateResource::class;
 

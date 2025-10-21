@@ -12,39 +12,29 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 final class DocumentResource extends Resource
 {
-    protected static ?string $model = Document::class;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-document';
-    }
+    protected static ?string $model = Document::class;
 
     protected static ?int $navigationSort = 20;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /**
-     * @var UnitEnum|string|null
-     */
     public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'System';
@@ -69,33 +59,62 @@ final class DocumentResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.documents.basic_information'))
+                Section::make(__('admin.documents.form.sections.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
-                                    ->label(__('admin.documents.name'))
+                                    ->label(__('admin.documents.form.fields.name'))
                                     ->required()
                                     ->maxLength(255),
                                 Select::make('type')
-                                    ->label(__('admin.documents.type'))
+                                    ->label(__('admin.documents.form.fields.type'))
                                     ->options([
-                                        'pdf' => 'PDF',
-                                        'doc' => 'DOC',
-                                        'docx' => 'DOCX',
-                                        'xls' => 'XLS',
-                                        'xlsx' => 'XLSX',
+                                        'pdf'   => 'PDF',
+                                        'doc'   => 'DOC',
+                                        'docx'  => 'DOCX',
+                                        'xls'   => 'XLS',
+                                        'xlsx'  => 'XLSX',
                                         'image' => 'Image',
                                         'other' => 'Other',
                                     ])
                                     ->required(),
                                 FileUpload::make('file_path')
-                                    ->label(__('admin.documents.file'))
+                                    ->label(__('admin.documents.form.fields.file_path'))
                                     ->required()
-                                    ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'image/*']),
+                                    ->directory('documents')
+                                    ->acceptedFileTypes([
+                                        'application/pdf',
+                                        'application/msword',
+                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                        'application/vnd.ms-excel',
+                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                        'image/jpeg',
+                                        'image/png',
+                                        'image/webp',
+                                    ])
+                                    ->allowedFileExtensions(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp'])
+                                    ->maxSize(10 * 1024),
                                 Textarea::make('description')
-                                    ->label(__('admin.documents.description'))
+                                    ->label(__('admin.documents.form.fields.description'))
                                     ->maxLength(65535)
+                                    ->nullable(),
+                                Select::make('created_by')
+                                    ->label(__('admin.documents.form.fields.created_by'))
+                                    ->relationship('creator', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->default(function (): ?int {
+                                        $userId = Auth::id();
+
+                                        return $userId !== null ? (int) $userId : null;
+                                    })
+                                    ->nullable(),
+                                Select::make('updated_by')
+                                    ->label(__('admin.documents.form.fields.updated_by'))
+                                    ->relationship('updater', 'name')
+                                    ->searchable()
+                                    ->preload()
                                     ->nullable(),
                             ]),
                     ]),
@@ -107,42 +126,52 @@ final class DocumentResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('admin.documents.name'))
+                    ->label(__('admin.documents.form.fields.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('type')
-                    ->label(__('admin.documents.type'))
+                    ->label(__('admin.documents.form.fields.type'))
                     ->searchable()
                     ->sortable()
                     ->badge(),
                 TextColumn::make('file_path')
-                    ->label(__('admin.documents.file'))
+                    ->label(__('admin.documents.form.fields.file_path'))
                     ->searchable()
                     ->limit(50),
                 TextColumn::make('description')
-                    ->label(__('admin.documents.description'))
+                    ->label(__('admin.documents.form.fields.description'))
                     ->searchable()
                     ->limit(30),
+                TextColumn::make('creator.name')
+                    ->label(__('admin.documents.form.fields.created_by'))
+                    ->badge()
+                    ->color('success')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updater.name')
+                    ->label(__('admin.documents.form.fields.updated_by'))
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->label(__('admin.common.created_at'))
+                    ->label(__('admin.documents.form.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label(__('admin.common.updated_at'))
+                    ->label(__('admin.documents.form.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label(__('admin.documents.type'))
+                    ->label(__('admin.documents.form.fields.type'))
                     ->options([
-                        'pdf' => 'PDF',
-                        'doc' => 'DOC',
-                        'docx' => 'DOCX',
-                        'xls' => 'XLS',
-                        'xlsx' => 'XLSX',
+                        'pdf'   => 'PDF',
+                        'doc'   => 'DOC',
+                        'docx'  => 'DOCX',
+                        'xls'   => 'XLS',
+                        'xlsx'  => 'XLSX',
                         'image' => 'Image',
                         'other' => 'Other',
                     ]),
@@ -169,10 +198,10 @@ final class DocumentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDocuments::route('/'),
+            'index'  => Pages\ListDocuments::route('/'),
             'create' => Pages\CreateDocument::route('/create'),
-            'view' => Pages\ViewDocument::route('/{record}'),
-            'edit' => Pages\EditDocument::route('/{record}/edit'),
+            'view'   => Pages\ViewDocument::route('/{record}'),
+            'edit'   => Pages\EditDocument::route('/{record}/edit'),
         ];
     }
 
@@ -181,8 +210,8 @@ final class DocumentResource extends Resource
         return ['name', 'description'];
     }
 
-    public static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): string
     {
-        return (string) self::$model::count();
+        return (string) Document::count();
     }
 }

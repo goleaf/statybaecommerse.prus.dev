@@ -338,22 +338,4 @@ final class DiscountCode extends Model
     {
         return (float) ($this->attributes['value'] ?? 0);
     }
-
-    /**
-     * Boot the service provider or trait functionality.
-     */
-    protected static function boot(): void
-    {
-        parent::boot();
-        self::creating(function ($model) {
-            if (auth()->check()) {
-                $model->created_by = auth()->id();
-            }
-        });
-        self::updating(function ($model) {
-            if (auth()->check()) {
-                $model->updated_by = auth()->id();
-            }
-        });
-    }
 }

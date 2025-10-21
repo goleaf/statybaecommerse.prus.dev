@@ -1,13 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages;
-use App\Models\Product;
 use App\Models\RecommendationAnalytics;
-use App\Models\RecommendationBlock;
-use App\Models\RecommendationConfig;
-use App\Models\User;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -15,6 +14,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -22,9 +22,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * RecommendationAnalyticsResource
@@ -35,7 +34,7 @@ final class RecommendationAnalyticsResource extends Resource
 {
     protected static ?string $model = RecommendationAnalytics::class;
 
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-chart-bar';
     }
@@ -74,31 +73,39 @@ final class RecommendationAnalyticsResource extends Resource
                             ->schema([
                                 Select::make('block_id')
                                     ->label(__('admin.recommendation_analytics.block'))
-                                    ->options(RecommendationBlock::pluck('name', 'id'))
+                                    ->relationship('block', 'name')
                                     ->required()
-                                    ->searchable(),
+                                    ->searchable()
+                                    ->preload(),
                                 Select::make('config_id')
                                     ->label(__('admin.recommendation_analytics.config'))
-                                    ->options(RecommendationConfig::pluck('name', 'id'))
+                                    ->relationship('config', 'name')
                                     ->required()
-                                    ->searchable(),
+                                    ->searchable()
+                                    ->preload(),
                                 Select::make('user_id')
                                     ->label(__('admin.recommendation_analytics.user'))
-                                    ->options(User::pluck('name', 'id'))
+                                    ->relationship('user', 'name')
                                     ->required()
-                                    ->searchable(),
+                                    ->searchable()
+                                    ->preload(),
                                 Select::make('product_id')
                                     ->label(__('admin.recommendation_analytics.product'))
-                                    ->options(Product::pluck('name', 'id'))
-                                    ->required()
-                                    ->searchable(),
+                                    ->relationship(
+                                        'product',
+                                        'name',
+                                        fn (Builder $query): Builder => $query->withoutGlobalScopes()
+                                    )
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable(),
                                 Select::make('action')
                                     ->label(__('admin.recommendation_analytics.action'))
                                     ->options([
-                                        'view' => __('admin.recommendation_analytics.actions.view'),
-                                        'click' => __('admin.recommendation_analytics.actions.click'),
+                                        'view'        => __('admin.recommendation_analytics.actions.view'),
+                                        'click'       => __('admin.recommendation_analytics.actions.click'),
                                         'add_to_cart' => __('admin.recommendation_analytics.actions.add_to_cart'),
-                                        'purchase' => __('admin.recommendation_analytics.actions.purchase'),
+                                        'purchase'    => __('admin.recommendation_analytics.actions.purchase'),
                                     ])
                                     ->required()
                                     ->default('view'),
@@ -155,17 +162,21 @@ final class RecommendationAnalyticsResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 30 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return mb_strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('action')
                     ->label(__('admin.recommendation_analytics.action'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'view' => 'info',
-                        'click' => 'success',
+                    ->color(fn (string $state): string => match ($state) {
+                        'view'        => 'info',
+                        'click'       => 'success',
                         'add_to_cart' => 'warning',
-                        'purchase' => 'danger',
-                        default => 'gray',
+                        'purchase'    => 'danger',
+                        default       => 'gray',
                     }),
                 TextColumn::make('ctr')
                     ->label(__('admin.recommendation_analytics.ctr'))
@@ -190,27 +201,35 @@ final class RecommendationAnalyticsResource extends Resource
             ->filters([
                 SelectFilter::make('block_id')
                     ->label(__('admin.recommendation_analytics.block'))
-                    ->options(RecommendationBlock::pluck('name', 'id'))
-                    ->searchable(),
+                    ->relationship('block', 'name')
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('config_id')
                     ->label(__('admin.recommendation_analytics.config'))
-                    ->options(RecommendationConfig::pluck('name', 'id'))
-                    ->searchable(),
+                    ->relationship('config', 'name')
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('user_id')
                     ->label(__('admin.recommendation_analytics.user'))
-                    ->options(User::pluck('name', 'id'))
-                    ->searchable(),
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('product_id')
                     ->label(__('admin.recommendation_analytics.product'))
-                    ->options(Product::pluck('name', 'id'))
-                    ->searchable(),
+                    ->relationship(
+                        'product',
+                        'name',
+                        fn (Builder $query): Builder => $query->withoutGlobalScopes()
+                    )
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('action')
                     ->label(__('admin.recommendation_analytics.action'))
                     ->options([
-                        'view' => __('admin.recommendation_analytics.actions.view'),
-                        'click' => __('admin.recommendation_analytics.actions.click'),
+                        'view'        => __('admin.recommendation_analytics.actions.view'),
+                        'click'       => __('admin.recommendation_analytics.actions.click'),
                         'add_to_cart' => __('admin.recommendation_analytics.actions.add_to_cart'),
-                        'purchase' => __('admin.recommendation_analytics.actions.purchase'),
+                        'purchase'    => __('admin.recommendation_analytics.actions.purchase'),
                     ]),
                 DateFilter::make('date')
                     ->label(__('admin.recommendation_analytics.date')),
@@ -237,10 +256,10 @@ final class RecommendationAnalyticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRecommendationAnalytics::route('/'),
+            'index'  => Pages\ListRecommendationAnalytics::route('/'),
             'create' => Pages\CreateRecommendationAnalytics::route('/create'),
-            'view' => Pages\ViewRecommendationAnalytics::route('/{record}'),
-            'edit' => Pages\EditRecommendationAnalytics::route('/{record}/edit'),
+            'view'   => Pages\ViewRecommendationAnalytics::route('/{record}'),
+            'edit'   => Pages\EditRecommendationAnalytics::route('/{record}/edit'),
         ];
     }
 }

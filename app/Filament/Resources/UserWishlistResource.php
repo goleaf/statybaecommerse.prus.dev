@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserWishlistResource\Pages;
-use BackedEnum;
 use App\Models\UserWishlist;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -17,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -27,8 +28,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
-use Filament\Forms\Form;
-
 /**
  * UserWishlistResource
  *
@@ -38,14 +37,11 @@ final class UserWishlistResource extends Resource
 {
     protected static ?string $model = UserWishlist::class;
 
-    public static function getNavigationIcon(): \BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-heart';
     }
 
-    /**
-     * @var UnitEnum|string|null
-     */
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 8;
@@ -148,11 +144,11 @@ final class UserWishlistResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_public')
-                    ->label(fn(UserWishlist $record): string => $record->is_public ? __('admin.user_wishlists.make_private') : __('admin.user_wishlists.make_public'))
-                    ->icon(fn(UserWishlist $record): string => $record->is_public ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(UserWishlist $record): string => $record->is_public ? 'warning' : 'success')
+                    ->label(fn (UserWishlist $record): string => $record->is_public ? __('admin.user_wishlists.make_private') : __('admin.user_wishlists.make_public'))
+                    ->icon(fn (UserWishlist $record): string => $record->is_public ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (UserWishlist $record): string => $record->is_public ? 'warning' : 'success')
                     ->action(function (UserWishlist $record): void {
-                        $record->update(['is_public' => !$record->is_public]);
+                        $record->update(['is_public' => ! $record->is_public]);
                         Notification::make()
                             ->title($record->is_public ? __('admin.user_wishlists.made_public_successfully') : __('admin.user_wishlists.made_private_successfully'))
                             ->success()
@@ -202,10 +198,10 @@ final class UserWishlistResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserWishlists::route('/'),
+            'index'  => Pages\ListUserWishlists::route('/'),
             'create' => Pages\CreateUserWishlist::route('/create'),
-            'view' => Pages\ViewUserWishlist::route('/{record}'),
-            'edit' => Pages\EditUserWishlist::route('/{record}/edit'),
+            'view'   => Pages\ViewUserWishlist::route('/{record}'),
+            'edit'   => Pages\EditUserWishlist::route('/{record}/edit'),
         ];
     }
 }

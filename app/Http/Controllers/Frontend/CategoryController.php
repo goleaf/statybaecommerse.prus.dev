@@ -5,19 +5,26 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 final class CategoryController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(private readonly CategoryCatalogueDataProvider $dataProvider) {}
+
+    public function index(Request $request): View
     {
-        // TODO: Implement category listing
-        return response()->json(['message' => 'Category listing not implemented yet']);
+        $data = $this->dataProvider->index();
+
+        return view('frontend.categories.index', $data);
     }
 
-    public function show(string $id)
+    public function show(Category $category, Request $request): View
     {
-        // TODO: Implement category details
-        return response()->json(['message' => 'Category details not implemented yet', 'id' => $id]);
+        $data = $this->dataProvider->show($category, $request->all());
+
+        return view('frontend.categories.show', $data);
     }
 }

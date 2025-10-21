@@ -13,6 +13,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -24,18 +25,18 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
-use Filament\Forms\Form;
-
 final class EmailCampaignResource extends Resource
 {
     protected static ?string $model = EmailCampaign::class;
 
     protected static ?int $navigationSort = 4;
 
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-envelope';
-    }
+    /**
+     * Navigation icon displayed in the Filament sidebar.
+     *
+     * @var string|BackedEnum|null Navigation icon identifier.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
 
     public static function getNavigationLabel(): string
     {
@@ -115,7 +116,7 @@ final class EmailCampaignResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('from_email')
                     ->label(__('admin.email_campaigns.from_email'))
@@ -177,10 +178,10 @@ final class EmailCampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEmailCampaigns::route('/'),
+            'index'  => Pages\ListEmailCampaigns::route('/'),
             'create' => Pages\CreateEmailCampaign::route('/create'),
-            'view' => Pages\ViewEmailCampaign::route('/{record}'),
-            'edit' => Pages\EditEmailCampaign::route('/{record}/edit'),
+            'view'   => Pages\ViewEmailCampaign::route('/{record}'),
+            'edit'   => Pages\EditEmailCampaign::route('/{record}/edit'),
         ];
     }
 }

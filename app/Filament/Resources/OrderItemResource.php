@@ -8,13 +8,19 @@ use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -25,8 +31,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-
-use Filament\Forms\Form;
 
 /**
  * OrderItemResource
@@ -86,20 +90,60 @@ final class OrderItemResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->required(),
-                            Select::make('product_id')
+                            SearchableInput::make('product_id')
                                 ->label(__('order_items.product'))
-                                ->relationship('product', 'name')
+                                ->placeholder('SKU / EAN / name')
                                 ->required()
-                                ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                    if ($state) {
-                                        $product = Product::find($state);
-                                        if ($product) {
-                                            $set('name', $product->name);
-                                            $set('sku', $product->sku);
-                                            $set('unit_price', $product->price);
-                                        }
+                                ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?OrderItem $record): void {
+                                    if ($state === null || ! $record?->product) {
+                                        return;
                                     }
+
+                                    $label = sprintf('[%s] %s', $record->product->sku ?? '—', $record->product->name ?? '');
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $record->product_id => $label,
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $product = Product::query()
+                                        ->select(['id', 'sku', 'name', 'price'])
+                                        ->find((int) $state);
+
+                                    if (! $product instanceof Product) {
+                                        return;
+                                    }
+
+                                    $set('product_id', $product->getKey());
+
+                                    $name = $product->getAttribute('name');
+                                    if (is_array($name)) {
+                                        $locale = app()->getLocale();
+                                        $value = $name[$locale] ?? reset($name);
+                                        $set('name', is_string($value) ? $value : '');
+                                    } elseif (is_string($name)) {
+                                        $set('name', $name);
+                                    }
+
+                                    $sku = $product->getAttribute('sku');
+                                    if (is_string($sku)) {
+                                        $set('sku', $sku);
+                                    }
+
+                                    $price = $product->getAttribute('price');
+                                    if (is_numeric($price)) {
+                                        $set('unit_price', number_format((float) $price, 2, '.', ''));
+                                    }
+
+                                    $set('product_variant_id', null);
                                 }),
                         ]),
                     Grid::make(2)
@@ -108,7 +152,7 @@ final class OrderItemResource extends Resource
                                 ->label(__('order_items.product_variant'))
                                 ->relationship('productVariant', 'name')
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $variant = ProductVariant::find($state);
                                         if ($variant) {
@@ -133,7 +177,7 @@ final class OrderItemResource extends Resource
                                 ->minValue(1)
                                 ->default(1)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
@@ -150,7 +194,7 @@ final class OrderItemResource extends Resource
                                 ->prefix('€')
                                 ->numeric()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $state;
                                     $quantity = (int) $get('quantity');
                                     $total = $unitPrice * $quantity;
@@ -162,7 +206,7 @@ final class OrderItemResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $get('quantity');
                                     $discount = (float) $state;
@@ -246,22 +290,17 @@ final class OrderItemResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Forms\Components\DatePicker::make('created_from')
-                            ->label(__('order_items.created_from')),
-                        Forms\Components\DatePicker::make('created_until')
-                            ->label(__('order_items.created_until')),
+                        Flatpickr::make('range')
+                            ->label(__('order_items.created_at'))
+                            ->rangePicker()
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -292,10 +331,10 @@ final class OrderItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrderItems::route('/'),
+            'index'  => Pages\ListOrderItems::route('/'),
             'create' => Pages\CreateOrderItem::route('/create'),
-            'view' => Pages\ViewOrderItem::route('/{record}'),
-            'edit' => Pages\EditOrderItem::route('/{record}/edit'),
+            'view'   => Pages\ViewOrderItem::route('/{record}'),
+            'edit'   => Pages\EditOrderItem::route('/{record}/edit'),
         ];
     }
 }

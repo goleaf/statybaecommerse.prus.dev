@@ -1,5 +1,6 @@
 includes:
   - vendor/larastan/larastan/extension.neon
+  - phpstan-baseline.neon
 
 parameters:
   level: 9
@@ -7,6 +8,19 @@ parameters:
     - app
     - database
     - config
+  scanFiles:
+    - stubs/phpstan/livewire-components.php
+    - stubs/optional-packages.php
+  checkExplicitMixed: true
+  checkImplicitMixed: true
+  checkMissingTypehints: true
+  checkMissingVarTagTypehint: true
+  checkMissingCallableSignature: true
+  checkTooWideReturnTypesInProtectedAndPublicMethods: true
+  checkTooWideParameterOutInProtectedAndPublicMethods: true
+  checkTooWideThrowTypesInProtectedAndPublicMethods: true
+  reportMaybesInMethodSignatures: true
+  reportMaybesInPropertyPhpDocTypes: true
   treatPhpDocTypesAsCertain: true
   reportUnmatchedIgnoredErrors: true
   tmpDir: storage/framework/cache/phpstan

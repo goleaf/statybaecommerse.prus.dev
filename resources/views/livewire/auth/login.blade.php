@@ -135,6 +135,37 @@
                         />
                         <x-forms.errors :messages="$errors->get('loginForm.password')" class="mt-1" />
                     </div>
+
+                    @if ($loginForm->captchaQuestion)
+                        <div class="space-y-2">
+                            <x-forms.label for="captcha" :value="__('Security check')" />
+                            <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                                <span>{{ $loginForm->captchaQuestion }}</span>
+                                <button
+                                    type="button"
+                                    wire:click="refreshCaptcha"
+                                    wire:loading.attr="disabled"
+                                    class="inline-flex items-center gap-1 rounded-lg bg-white/70 px-2 py-1 text-xs font-semibold text-indigo-600 shadow-sm transition hover:bg-white"
+                                >
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0112.79-5.303M19.5 12a7.5 7.5 0 01-12.79 5.303" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 8.25H4.5v-3.75M19.5 15.75V19.5h-3.75" />
+                                    </svg>
+                                    <span>{{ __('New question') }}</span>
+                                </button>
+                            </div>
+                            <x-forms.input
+                                id="captcha"
+                                type="text"
+                                wire:model.defer="loginForm.captchaResponse"
+                                autocomplete="off"
+                                class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                placeholder="{{ __('Enter the answer') }}"
+                            />
+                            <input type="hidden" wire:model="loginForm.captchaToken" />
+                            <x-forms.errors :messages="$errors->get('loginForm.captchaResponse')" class="mt-1" />
+                        </div>
+                    @endif
                 </div>
 
                 <div class="flex flex-wrap items-center justify-between gap-4">

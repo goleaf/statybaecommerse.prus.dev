@@ -8,7 +8,6 @@ use Closure;
 use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Livewire\Component;
 
 /**
  * AutocompleteSelect Component
@@ -45,16 +44,20 @@ final class AutocompleteSelect extends Select
         return parent::make($name);
     }
 
-    public function searchable(bool|Closure|array $condition = true): static
+    public function searchable(Closure|array|bool $condition = true): static
     {
-        $this->searchable = is_bool($condition) ? $condition : true;
+        parent::searchable($condition);
+
+        $this->searchable = (bool) $this->evaluate($condition);
 
         return $this;
     }
 
     public function multiple(bool|Closure $condition = true): static
     {
-        $this->multiple = is_bool($condition) ? $condition : true;
+        parent::multiple($condition);
+
+        $this->multiple = (bool) $this->evaluate($condition);
 
         return $this;
     }
@@ -96,13 +99,19 @@ final class AutocompleteSelect extends Select
 
     public function model(Model|Closure|array|string|null $model = null): static
     {
-        parent::model($model);
+        $evaluatedModel = $this->evaluate($model);
 
-        if (is_string($model)) {
-            $this->modelClass = $model;
-        } elseif ($model instanceof Model) {
-            $this->modelClass = $model::class;
+        $modelClass = match (true) {
+            $evaluatedModel instanceof Model => $evaluatedModel::class,
+            is_string($evaluatedModel) => $evaluatedModel,
+            default => null,
+        };
+
+        if ($modelClass !== null) {
+            parent::model($modelClass);
         }
+
+        $this->modelClass = $modelClass;
 
         return $this;
     }

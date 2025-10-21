@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
@@ -38,7 +40,7 @@ final class WidgetsTest extends TestCase
 
     private function withoutObservers(callable $callback): mixed
     {
-        return Order::withoutEvents(fn() => Product::withoutEvents(fn() => Review::withoutEvents(fn() => $callback())));
+        return Order::withoutEvents(fn () => Product::withoutEvents(fn () => Review::withoutEvents(fn () => $callback())));
     }
 
     #[\PHPUnit\Framework\Attributes\Test]

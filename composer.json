@@ -10,31 +10,43 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "andreia/filament-nord-theme": "^2.0",
+        "asmit/resized-column": "^1.1.0",
         "awcodes/overlook": "^3.0",
         "barryvdh/laravel-dompdf": "^3.1",
         "bezhansalleh/filament-shield": "^4.0",
-        "dutchcodingcompany/filament-socialite": "*",
+        "coolsam/flatpickr": "^5.0",
+        "defstudio/filament-searchable-input": "^4.0",
+        "dutchcodingcompany/filament-socialite": "^3.0",
+        "eightynine/filament-advanced-widgets": "^4.0",
+        "encoredigitalgroup/filament-helpers": "^4.0@rc",
         "filament/filament": "^4.1",
-        "filament/forms": "^4.1",
-        "filament/tables": "^4.1",
-        "filament/infolists": "^4.1",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
+        "hydrat/filament-table-layout-toggle": "^3.0",
+        "icetalker/filament-table-repeatable-entry": "^2.0",
         "kenepa/resource-lock": "^4.0",
-        "lara-zeus/bolt": "*",
+        "lara-zeus/bolt": "^4.0.5",
+        "lara-zeus/list-group": "^2.0",
+        "lara-zeus/matrix-choice": "*",
         "laravel/framework": "^12.0",
         "laravel/horizon": "^5.33",
         "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",
         "livewire/volt": "^1.0",
+        "novadaemon/filament-combobox": "^2.0",
+        "pixelpeter/filament-language-tabs": "^3.0",
         "predis/predis": "^3.2",
-        "pxlrbt/filament-excel": "*",
+        "pxlrbt/filament-excel": "^3.1",
         "solution-forest/tab-layout-plugin": "^3.2",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-data": "^4.17",
         "spatie/laravel-medialibrary": "^11",
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-sluggable": "^3.7",
-        "spatie/laravel-translatable": "^6.11"
+        "spatie/laravel-translatable": "^6.11",
+        "tapp/filament-value-range-filter": "^2.0",
+        "zircote/swagger-php": "^4.9",
+        "zvizvi/relation-manager-repeater": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
@@ -48,11 +60,12 @@
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "pestphp/pest": "^4.0",
-        "pestphp/pest-plugin-laravel": "^4.0",
-        "pestphp/pest-plugin-livewire": "^4.0",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest-plugin-livewire": "^3.0",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^12.3"
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpunit/phpunit": "^11.5"
     },
     "autoload": {
         "psr-4": {
@@ -88,16 +101,29 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
+        "api:spec": "@php artisan api:spec",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+        ],
+        "ci": [
+            "@analyze",
+            "@test:ci"
         ],
         "app:install": [
             "@php artisan migrate --force",
             "@php artisan storage:link"
         ],
+        "analyse": "@analyze",
+        "seed:fresh": "@php artisan migrate:fresh --seed --ansi",
+        "build": [
+            "@php artisan optimize --ansi",
+            "npm run build"
+        ],
+        "serve": "@php artisan serve --ansi",
         "lint:php": "vendor/bin/pint --test",
         "fix:php": "vendor/bin/pint -v",
+        "format": "vendor/bin/pint",
         "analyze": "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G",
         "rector": "vendor/bin/rector process --ansi",
         "blade:format": "php artisan view:clear && php artisan view:cache",
@@ -164,6 +190,48 @@
         ],
         "docs:full": [
             "php artisan docs:full"
+        ],
+        "diagnose:filament-pages": [
+            "@php artisan filament:diagnose-pages"
+        ],
+        "scan:filament-pages": [
+            "@php artisan filament:scan-resource-pages"
+        ],
+        "scan:filament-uninitialized": [
+            "@php artisan filament:scan-uninitialized-pages"
+        ],
+        "filament:analyze": [
+            "@php artisan filament:analyze"
+        ],
+        "filament:fix-form-schema": [
+            "@php artisan filament:fix-form-schema"
+        ],
+        "filament:fix-navigation": [
+            "@php artisan filament:navigation-groups:fix-all"
+        ],
+        "filament:fix-navigation-comprehensive": [
+            "@php artisan filament:navigation-groups:fix-comprehensive"
+        ],
+        "filament:fix-navigation-recursive": [
+            "@php artisan filament:navigation-groups:fix-recursive"
+        ],
+        "filament:fix-navigation-final": [
+            "@php artisan filament:navigation-groups:fix-final --skip-tests"
+        ],
+        "filament:fix-critical": [
+            "@php artisan filament:fix-critical-errors"
+        ],
+        "filament:fix-simple": [
+            "@php artisan filament:fix-simple-issues"
+        ],
+        "app:test-analytics": [
+            "@php artisan app:test-analytics-simple"
+        ],
+        "app:test-brand": [
+            "@php artisan app:test-brand-resource"
+        ],
+        "app:test-seeders": [
+            "@php artisan app:test-seeders"
         ]
     },
     "extra": {
@@ -175,6 +243,9 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform": {
+            "php": "8.3.0"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true

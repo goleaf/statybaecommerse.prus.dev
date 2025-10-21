@@ -1,18 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
+use App\Enums\ModerationState;
+use App\Models\PostApproval;
 use App\Models\Scopes\PublishedScope;
+use App\Services\Security\HtmlContentSanitizer;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Activitylog\LogOptions;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Post
@@ -32,14 +38,56 @@ final class Post extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, LogsActivity;
 
-    protected $fillable = ['title', 'title_translations', 'slug', 'content', 'content_translations', 'excerpt', 'excerpt_translations', 'status', 'published_at', 'user_id', 'meta_title', 'meta_title_translations', 'meta_description', 'meta_description_translations', 'featured', 'tags', 'tags_translations', 'views_count', 'likes_count', 'comments_count', 'allow_comments', 'is_pinned'];
+    protected $fillable = [
+        'title',
+        'title_translations',
+        'slug',
+        'content',
+        'content_translations',
+        'excerpt',
+        'excerpt_translations',
+        'status',
+        'moderation_state',
+        'submitted_for_review_at',
+        'approved_at',
+        'approved_by_id',
+        'published_at',
+        'user_id',
+        'meta_title',
+        'meta_title_translations',
+        'meta_description',
+        'meta_description_translations',
+        'featured',
+        'tags',
+        'tags_translations',
+        'views_count',
+        'likes_count',
+        'comments_count',
+        'allow_comments',
+        'is_pinned',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['published_at' => 'datetime', 'featured' => 'boolean', 'title_translations' => 'array', 'content_translations' => 'array', 'excerpt_translations' => 'array', 'meta_title_translations' => 'array', 'meta_description_translations' => 'array', 'tags_translations' => 'array', 'allow_comments' => 'boolean', 'is_pinned' => 'boolean'];
+        return [
+            'published_at' => 'datetime',
+            'featured' => 'boolean',
+            'title_translations' => 'array',
+            'content_translations' => 'array',
+            'excerpt_translations' => 'array',
+            'meta_title_translations' => 'array',
+            'meta_description_translations' => 'array',
+            'tags_translations' => 'array',
+            'allow_comments' => 'boolean',
+            'is_pinned' => 'boolean',
+            'moderation_state' => ModerationState::class,
+            'submitted_for_review_at' => 'datetime',
+            'approved_at' => 'datetime',
+            'approved_by_id' => 'integer',
+        ];
     }
 
     /**
@@ -73,7 +121,46 @@ final class Post extends Model implements HasMedia
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['title', 'content', 'status', 'published_at'])->logOnlyDirty()->dontSubmitEmptyLogs();
+        return LogOptions::defaults()
+            ->logOnly([
+                'title',
+                'content',
+                'status',
+                'moderation_state',
+                'submitted_for_review_at',
+                'approved_at',
+                'approved_by_id',
+                'published_at',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by_id');
+    }
+
+    public function approvals(): HasMany
+    {
+        return $this->hasMany(PostApproval::class);
+    }
+
+    public function latestApproval(): HasOne
+    {
+        return $this->approvals()->one()->latestOfMany('decided_at');
+    }
+
+    private function resolveModerationState(): ModerationState
+    {
+        if ($this->moderation_state instanceof ModerationState) {
+            return $this->moderation_state;
+        }
+
+        return match ($this->status) {
+            'published' => ModerationState::Published,
+            default => ModerationState::Draft,
+        };
     }
 
     // Translation methods
@@ -97,7 +184,11 @@ final class Post extends Model implements HasMedia
         $locale = $locale ?? app()->getLocale();
         $translations = $this->content_translations ?? [];
 
-        return $translations[$locale] ?? $this->content;
+        $content = (string) ($translations[$locale] ?? $this->content ?? '');
+
+        $sanitized = app(HtmlContentSanitizer::class)->sanitize($content);
+
+        return $sanitized ?? '';
     }
 
     /**
@@ -128,7 +219,7 @@ final class Post extends Model implements HasMedia
     public function trans(string $field, ?string $locale = null): mixed
     {
         $locale = $locale ?? app()->getLocale();
-        $translationField = $field . '_translations';
+        $translationField = $field.'_translations';
         if (property_exists($this, $translationField)) {
             $translations = $this->{$translationField} ?? [];
 
@@ -217,12 +308,11 @@ final class Post extends Model implements HasMedia
      */
     public function getStatusLabelAttribute(): string
     {
-        return match ($this->status) {
-            'draft' => __('posts.status.draft'),
-            'published' => __('posts.status.published'),
-            'archived' => __('posts.status.archived'),
-            default => $this->status,
-        };
+        if ($this->status === 'archived') {
+            return __('posts.status.archived');
+        }
+
+        return $this->resolveModerationState()->label();
     }
 
     // Enhanced Translation Methods
@@ -290,7 +380,7 @@ final class Post extends Model implements HasMedia
         $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
         foreach ($translationFields as $field) {
             if (isset($data[$field])) {
-                $translationField = $field . '_translations';
+                $translationField = $field.'_translations';
                 $translations = $this->{$translationField} ?? [];
                 $translations[$locale] = $data[$field];
                 $this->{$translationField} = $translations;
@@ -308,9 +398,9 @@ final class Post extends Model implements HasMedia
         $translation = [];
         $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
         foreach ($translationFields as $field) {
-            $translationField = $field . '_translations';
+            $translationField = $field.'_translations';
             $translations = $this->{$translationField} ?? [];
-            if (!isset($translations[$locale])) {
+            if (! isset($translations[$locale])) {
                 $translations[$locale] = $this->{$field};
                 $this->{$translationField} = $translations;
             }
@@ -363,7 +453,18 @@ final class Post extends Model implements HasMedia
      */
     public function getStatusInfo(): array
     {
-        return ['status' => $this->status, 'status_label' => $this->getStatusLabelAttribute(), 'status_color' => $this->getStatusColor(), 'is_published' => $this->isPublished(), 'is_draft' => $this->isDraft(), 'is_archived' => $this->isArchived(), 'featured' => $this->featured, 'is_pinned' => $this->is_pinned, 'published_at' => $this->published_at?->toISOString()];
+        return [
+            'status' => $this->status,
+            'moderation_state' => $this->resolveModerationState()->value,
+            'status_label' => $this->getStatusLabelAttribute(),
+            'status_color' => $this->getStatusColor(),
+            'is_published' => $this->isPublished(),
+            'is_draft' => $this->isDraft(),
+            'is_archived' => $this->isArchived(),
+            'featured' => $this->featured,
+            'is_pinned' => $this->is_pinned,
+            'published_at' => $this->published_at?->toISOString(),
+        ];
     }
 
     /**
@@ -397,12 +498,11 @@ final class Post extends Model implements HasMedia
      */
     public function getStatusColor(): string
     {
-        return match ($this->status) {
-            'published' => 'success',
-            'draft' => 'warning',
-            'archived' => 'danger',
-            default => 'gray',
-        };
+        if ($this->status === 'archived') {
+            return 'danger';
+        }
+
+        return $this->resolveModerationState()->color();
     }
 
     /**
@@ -410,7 +510,7 @@ final class Post extends Model implements HasMedia
      */
     public function isPublished(): bool
     {
-        return $this->status === 'published';
+        return $this->resolveModerationState() === ModerationState::Published;
     }
 
     /**
@@ -418,7 +518,7 @@ final class Post extends Model implements HasMedia
      */
     public function isDraft(): bool
     {
-        return $this->status === 'draft';
+        return $this->resolveModerationState() === ModerationState::Draft;
     }
 
     /**

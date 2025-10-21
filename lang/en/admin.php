@@ -49,6 +49,9 @@ return [
         'max_weight' => 'Max Weight',
         'min_order_amount' => 'Min Order Amount',
         'max_order_amount' => 'Max Order Amount',
+        'availability' => 'Availability',
+        'shipping_matrix' => 'Shipping availability matrix',
+        'shipping_matrix_help' => 'Enable the delivery methods that apply to each region.',
         'delivery' => 'Delivery',
         'estimated_days_min' => 'Min Days',
         'estimated_days_max' => 'Max Days',
@@ -70,6 +73,8 @@ return [
         'description' => 'Description',
         'button_text' => 'Button Text',
     ],
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
+    'product_history' => require __DIR__ . '/admin/product_history.php',
     'variant_combinations' => [
         'navigation_label' => 'Variant Combinations',
         'plural_model_label' => 'Variant Combinations',
@@ -405,5 +410,8 @@ return [
         'view' => 'View',
         'edit' => 'Edit',
         'delete_selected' => 'Delete Selected',
+        'none' => 'None',
+        'yes' => 'Yes',
+        'no' => 'No',
     ],
 ];

@@ -6,9 +6,9 @@ namespace App\Filament\Resources\PriceListItemResource\Pages;
 
 use App\Filament\Resources\PriceListItemResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListPriceListItems extends ListRecords
+final class ListPriceListItems extends BaseListRecords
 {
     protected static string $resource = PriceListItemResource::class;
 

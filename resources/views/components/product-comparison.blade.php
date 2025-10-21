@@ -56,7 +56,7 @@ $comparisonAttributes = [
                                         <div class="flex flex-col items-center">
                                             {{-- Product Image --}}
                                             <div class="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden mb-3">
-                                                <img src="{{ $product->getFirstMediaUrl('images') ?? asset('images/placeholder-product.jpg') }}"
+                                                <img src="{{ $product->getFirstMediaUrl('images') ?? product_placeholder_url('medium') }}"
                                                      alt="{{ $product->name }}"
                                                      class="w-full h-full object-cover">
                                             </div>

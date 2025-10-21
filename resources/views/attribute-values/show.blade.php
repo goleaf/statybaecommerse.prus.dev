@@ -213,13 +213,20 @@
                 @endif
 
                 <!-- Meta Data -->
-                @if ($attributeValue->meta_data && count($attributeValue->meta_data) > 0)
+                @php
+                    $metadata = $attributeValue->metadata ?? [];
+
+                    if (! is_array($metadata)) {
+                        $metadata = (array) $metadata;
+                    }
+                @endphp
+                @if (count($metadata) > 0)
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                             {{ __('attributes.meta_data') }}
                         </h3>
                         <div class="space-y-2">
-                            @foreach ($attributeValue->meta_data as $key => $value)
+                            @foreach ($metadata as $key => $value)
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-600 dark:text-gray-400">{{ $key }}:</span>
                                     <span

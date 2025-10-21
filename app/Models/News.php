@@ -4,26 +4,32 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\TranslatableRecord;
+use App\Enums\ModerationState;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
+use App\Services\Security\HtmlContentSanitizer;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * News
  *
  * Eloquent model representing the News entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|News newModelQuery()
@@ -33,31 +39,98 @@ use Illuminate\Support\Str;
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
-final class News extends Model
+final class News extends Model implements TranslatableRecord
 {
     use HasFactory;
     use HasTranslations;
+    use LogsActivity;
 
     protected $table = 'news';
 
-    protected $fillable = ['is_visible', 'is_featured', 'published_at', 'author_name', 'author_email', 'view_count', 'meta_data'];
+    protected $fillable = [
+        'is_visible',
+        'is_featured',
+        'is_breaking',
+        'moderation_state',
+        'submitted_for_review_at',
+        'approved_at',
+        'approved_by_id',
+        'published_at',
+        'author_name',
+        'author_email',
+        'view_count',
+        'meta_data',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_visible' => 'boolean', 'is_featured' => 'boolean', 'published_at' => 'datetime', 'view_count' => 'integer', 'meta_data' => 'array'];
+        return [
+            'is_visible'              => 'boolean',
+            'is_featured'             => 'boolean',
+            'is_breaking'             => 'boolean',
+            'moderation_state'        => ModerationState::class,
+            'submitted_for_review_at' => 'datetime',
+            'approved_at'             => 'datetime',
+            'approved_by_id'          => 'integer',
+            'published_at'            => 'datetime',
+            'view_count'              => 'integer',
+            'meta_data'               => 'array',
+        ];
     }
 
     protected string $translationModel = \App\Models\Translations\NewsTranslation::class;
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by_id');
+    }
+
+    public function approvals(): HasMany
+    {
+        return $this->hasMany(NewsApproval::class);
+    }
+
+    public function latestApproval(): HasOne
+    {
+        return $this->approvals()->one()->latestOfMany('decided_at');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'moderation_state',
+                'submitted_for_review_at',
+                'approved_at',
+                'approved_by_id',
+                'is_visible',
+                'is_featured',
+                'is_breaking',
+                'published_at',
+                'author_name',
+                'author_email',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
 
     /**
      * Handle isPublished functionality with proper error handling.
      */
     public function isPublished(): bool
     {
-        return (bool) $this->is_visible && (bool) $this->published_at && $this->published_at <= now();
+        return $this->moderation_state === ModerationState::Published
+            && (bool) $this->is_visible
+            && (bool) $this->published_at
+            && $this->published_at <= now();
+    }
+
+    public function getIsPublishedAttribute(): bool
+    {
+        return $this->isPublished();
     }
 
     /**
@@ -129,7 +202,10 @@ final class News extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('is_visible', true)->where('published_at', '<=', now());
+        return $query
+            ->where('moderation_state', ModerationState::Published->value)
+            ->where('is_visible', true)
+            ->where('published_at', '<=', now());
     }
 
     /**
@@ -145,7 +221,7 @@ final class News extends Model
      */
     public function scopeByCategory(Builder $query, int $categoryId): Builder
     {
-        return $query->whereHas('categories', function (Builder $q) use ($categoryId) {
+        return $query->whereHas('categories', function (Builder $q) use ($categoryId): void {
             $q->where('news_category_id', $categoryId);
         });
     }
@@ -155,7 +231,7 @@ final class News extends Model
      */
     public function scopeByTag(Builder $query, int $tagId): Builder
     {
-        return $query->whereHas('tags', function (Builder $q) use ($tagId) {
+        return $query->whereHas('tags', function (Builder $q) use ($tagId): void {
             $q->where('news_tag_id', $tagId);
         });
     }
@@ -165,7 +241,7 @@ final class News extends Model
      */
     public function scopeSearch(Builder $query, string $search): Builder
     {
-        return $query->whereHas('translations', function (Builder $q) use ($search) {
+        return $query->whereHas('translations', function (Builder $q) use ($search): void {
             $q->where('title', 'like', "%{$search}%")->orWhere('summary', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%");
         });
     }
@@ -207,7 +283,12 @@ final class News extends Model
      */
     public function getContentAttribute(): ?string
     {
-        return $this->getTranslation('content', app()->getLocale());
+        $content = $this->getTranslation('content', app()->getLocale());
+        if ($content === null || ! is_string($content)) {
+            return null;
+        }
+
+        return app(HtmlContentSanitizer::class)->sanitize($content);
     }
 
     /**
@@ -289,7 +370,7 @@ final class News extends Model
         }
 
         $path = $parsed['path'] ?? '';
-        $path = '/'.ltrim($path, '/');
+        $path = '/' . ltrim($path, '/');
         if ($path === '/') {
             return null;
         }
@@ -308,6 +389,6 @@ final class News extends Model
             }
         }
 
-        return 'https://share.transistor.fm'.$path;
+        return 'https://share.transistor.fm' . $path;
     }
 }
