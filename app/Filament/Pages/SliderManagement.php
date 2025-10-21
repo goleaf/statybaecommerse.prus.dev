@@ -6,6 +6,9 @@ namespace App\Filament\Pages;
 
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\ContentLinkSearch;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -36,7 +39,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     use InteractsWithActions, InteractsWithForms;
 
     /**
-     * @var string|\BackedEnum|null
+     * @var string|BackedEnum|null
      */
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -120,10 +123,21 @@ class SliderManagement extends Page implements HasActions, HasForms
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
-                            TextInput::make('button_url')
+                            SearchableInput::make('button_url')
                                 ->label(__('translations.button_url'))
-                                ->url()
-                                ->maxLength(255),
+                                ->placeholder(__('translations.slider_link_placeholder'))
+                                ->maxLength(255)
+                                ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state($state)
+                                        ->options([$state => $state]);
+                                }),
                         ]),
                     ])
                     ->collapsible(),
@@ -283,9 +297,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->label(__('translations.slide_image'))
                                     ->image()
                                     ->directory('sliders/slides'),
-                                TextInput::make('link')
+                                SearchableInput::make('link')
                                     ->label(__('translations.slide_link'))
-                                    ->url(),
+                                    ->placeholder(__('translations.slider_link_placeholder'))
+                                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state($state)
+                                            ->options([$state => $state]);
+                                    }),
                             ])
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
