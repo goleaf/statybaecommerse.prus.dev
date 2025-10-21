@@ -33,10 +33,13 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 final class ReferralRewardResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = ReferralReward::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-gift';

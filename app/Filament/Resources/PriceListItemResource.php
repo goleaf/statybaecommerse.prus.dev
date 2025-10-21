@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
 use App\Models\Product;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -33,8 +34,8 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * PriceListItemResource
@@ -43,6 +44,8 @@ use App\Support\Filament\Components\Flatpickr;
  */
 final class PriceListItemResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = PriceListItem::class;
 
     protected static ?int $navigationSort = 16;
