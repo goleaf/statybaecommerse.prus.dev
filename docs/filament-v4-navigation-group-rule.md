@@ -27,9 +27,12 @@
    ```php
    // Add if missing:
    use UnitEnum;
-   
+
    // Remove duplicates if found
    ```
+
+   > The `scripts/fix_filament_navigation_group.php` helper now also scans Filament pages and widgets that do not declare a
+   > `$navigationGroup` property, ensuring stray duplicate `use UnitEnum;` imports are removed during the same run.
 
 4. **Apply to ALL Filament Resources**
    - Resources extending `Filament\Resources\Resource`
