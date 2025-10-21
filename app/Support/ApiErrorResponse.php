@@ -37,7 +37,7 @@ final class ApiErrorResponse
         $traceId = RequestContext::resolveTraceId($request);
         $problem = [
             'type' => self::typeFor($errorCode),
-            'title' => $title ?? self::titleFor($errorCode),
+            'title' => $title ?? self::titleFor($errorCode, $locale),
             'status' => $status,
             'detail' => $detail,
             'instance' => $request->fullUrl(),
@@ -75,9 +75,12 @@ final class ApiErrorResponse
         return rtrim($base, '/').'/'.$errorCode;
     }
 
-    public static function titleFor(string $errorCode): string
+    public static function titleFor(string $errorCode, ?string $locale = null): string
     {
-        return ErrorCodes::describe($errorCode)
+        // Prefer localized labels from the translation files and gracefully
+        // fall back to the built-in descriptions if a translation is missing.
+        return ErrorCodes::title($errorCode, $locale)
+            ?? ErrorCodes::describe($errorCode)
             ?? 'Application error';
     }
 }

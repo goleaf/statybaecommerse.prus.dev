@@ -16,7 +16,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -100,7 +99,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 errorCode: $exception->errorCode(),
                 detail: $message,
                 status: $exception->status(),
-                title: ApiErrorResponse::titleFor($exception->errorCode()),
+                title: ApiErrorResponse::titleFor($exception->errorCode(), $locale),
                 context: $exception->context(),
                 locale: $locale,
             );
@@ -135,12 +134,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->values()
                 ->all();
 
+            $detail = $exception->getMessage();
+            if ($detail === '') {
+                // Prefer localized defaults when Laravel does not provide a custom validation message.
+                $detail = ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale)
+                    ?? 'The given data was invalid.';
+            }
+
             return ApiErrorResponse::problem(
                 request: $request,
                 errorCode: ErrorCodes::VALIDATION_FAILED,
-                detail: $exception->getMessage() !== '' ? $exception->getMessage() : 'The given data was invalid.',
+                detail: $detail,
                 status: $exception->status,
-                title: ApiErrorResponse::titleFor(ErrorCodes::VALIDATION_FAILED),
+                title: ApiErrorResponse::titleFor(ErrorCodes::VALIDATION_FAILED, $locale),
                 context: ['violations' => $violations],
                 locale: $locale,
             );
@@ -171,12 +177,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 $context['guards'] = $exception->guards();
             }
 
+            $detail = $exception->getMessage();
+            if ($detail === '') {
+                // Provide a localized baseline message when the exception lacks details.
+                $detail = ErrorCodes::message(ErrorCodes::UNAUTHORIZED, $locale)
+                    ?? 'Unauthenticated.';
+            }
+
             return ApiErrorResponse::problem(
                 request: $request,
                 errorCode: ErrorCodes::UNAUTHORIZED,
-                detail: $exception->getMessage() !== '' ? $exception->getMessage() : 'Unauthenticated.',
+                detail: $detail,
                 status: 401,
-                title: ApiErrorResponse::titleFor(ErrorCodes::UNAUTHORIZED),
+                title: ApiErrorResponse::titleFor(ErrorCodes::UNAUTHORIZED, $locale),
                 context: $context,
                 locale: $locale,
             );
@@ -207,12 +220,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 $context['reason'] = $exception->getMessage();
             }
 
+            $detail = $exception->getMessage();
+            if ($detail === '') {
+                // Provide a localized fallback when the authorization exception omits a message.
+                $detail = ErrorCodes::message(ErrorCodes::FORBIDDEN, $locale)
+                    ?? 'This action is unauthorized.';
+            }
+
             return ApiErrorResponse::problem(
                 request: $request,
                 errorCode: ErrorCodes::FORBIDDEN,
-                detail: $exception->getMessage() !== '' ? $exception->getMessage() : 'This action is unauthorized.',
+                detail: $detail,
                 status: 403,
-                title: ApiErrorResponse::titleFor(ErrorCodes::FORBIDDEN),
+                title: ApiErrorResponse::titleFor(ErrorCodes::FORBIDDEN, $locale),
                 context: $context,
                 locale: $locale,
             );
@@ -255,14 +275,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
                     $detail = $throwable->getMessage() !== ''
                         ? $throwable->getMessage()
-                        : (SymfonyResponse::$statusTexts[$status] ?? 'HTTP Error');
+                        : (ErrorCodes::message($code, $locale)
+                            ?? (SymfonyResponse::$statusTexts[$status] ?? 'HTTP Error'));
 
                     $response = ApiErrorResponse::problem(
                         request: $request,
                         errorCode: $code,
                         detail: $detail,
                         status: $status,
-                        title: ApiErrorResponse::titleFor($code),
+                        title: ApiErrorResponse::titleFor($code, $locale),
                         context: $throwable->getHeaders() !== [] ? ['headers' => $throwable->getHeaders()] : [],
                         locale: $locale,
                     );
@@ -279,17 +300,15 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message'   => $throwable->getMessage(),
                 ]);
 
-                $message = Lang::get('errors.messages.server_error', [], $locale);
-                if ($message === 'errors.messages.server_error') {
-                    $message = __('Something went wrong. Please try again later.', [], $locale);
-                }
+                $message = ErrorCodes::message(ErrorCodes::SERVER_ERROR, $locale)
+                    ?? __('Something went wrong. Please try again later.', [], $locale);
 
                 return ApiErrorResponse::problem(
                     request: $request,
                     errorCode: ErrorCodes::SERVER_ERROR,
                     detail: $message,
                     status: 500,
-                    title: ApiErrorResponse::titleFor(ErrorCodes::SERVER_ERROR),
+                    title: ApiErrorResponse::titleFor(ErrorCodes::SERVER_ERROR, $locale),
                     locale: $locale,
                 );
             }
