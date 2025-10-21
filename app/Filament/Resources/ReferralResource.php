@@ -22,10 +22,13 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 final class ReferralResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = Referral::class;
 
     /**

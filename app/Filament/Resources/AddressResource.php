@@ -40,6 +40,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 
 /**
  * AddressResource
@@ -49,6 +50,8 @@ use Illuminate\Database\Eloquent\Collection;
  */
 final class AddressResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = Address::class;
 
     protected static ?int $navigationSort = 3;

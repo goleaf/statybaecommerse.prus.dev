@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
-use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -17,12 +15,15 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
+use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
+use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -40,6 +41,16 @@ final class AdminPanelProvider extends PanelProvider
         ));
 
         /** @var array<class-string> $pageClasses */
+        $configuredLocales = config('app.supported_locales', ['lt', 'en']);
+        $defaultLocales = collect(is_array($configuredLocales) ? $configuredLocales : explode(',', (string) $configuredLocales))
+            ->map(static fn (mixed $locale): string => trim((string) $locale))
+            ->filter()
+            ->values()
+            ->all();
+
+        if ($defaultLocales === []) {
+            $defaultLocales = ['en'];
+        }
 
         return $panel
             ->default()
@@ -108,23 +119,30 @@ final class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
                     ->icon('heroicon-o-language'),
             ])
+            ->plugin(
+                SpatieTranslatablePlugin::make()
+                    ->defaultLocales($defaultLocales)
+                    ->persist()
+            )
             ->when(app()->environment('testing'),
-                fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins([
-                    FilamentShieldPlugin::make(),
-                    TableLayoutTogglePlugin::make()
-                        ->setDefaultLayout('grid')
-                        ->persistLayoutUsing(
-                            persister: LocalStoragePersister::class,
-                            cacheStore: 'redis',
-                            cacheTtl: 60 * 24,
-                        )
-                        ->shareLayoutBetweenPages(false)
-                        ->displayToggleAction()
-                        ->toggleActionHook('tables::toolbar.search.after')
-                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
-                ]))
+                static fn (Panel $p) => $p,
+                static fn (Panel $p) => $p
+                    ->plugin(FilamentShieldPlugin::make())
+                    ->plugin(
+                        TableLayoutTogglePlugin::make()
+                            ->setDefaultLayout('grid')
+                            ->persistLayoutUsing(
+                                persister: LocalStoragePersister::class,
+                                cacheStore: 'redis',
+                                cacheTtl: 60 * 24,
+                            )
+                            ->shareLayoutBetweenPages(false)
+                            ->displayToggleAction()
+                            ->toggleActionHook('tables::toolbar.search.after')
+                            ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                            ->gridLayoutButtonIcon('heroicon-o-squares-2x2')
+                    )
+            )
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.css')
