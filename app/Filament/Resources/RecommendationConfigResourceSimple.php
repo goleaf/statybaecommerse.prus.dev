@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 use App\Models\RecommendationConfigSimple;
 use Filament\Actions\Action;
@@ -124,11 +125,9 @@ final class RecommendationConfigResourceSimple extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            Select::make('products')
+                            Combobox::make('products')
                                 ->label(__('recommendation_configs_simple.products'))
                                 ->relationship('products', 'name')
-                                ->multiple()
-                                ->searchable()
                                 ->preload()
                                 ->afterStateHydrated(fn (Select $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
@@ -139,11 +138,9 @@ final class RecommendationConfigResourceSimple extends Resource
                                     Textarea::make('description')
                                         ->maxLength(500),
                                 ]),
-                            Select::make('categories')
+                            Combobox::make('categories')
                                 ->label(__('recommendation_configs_simple.categories'))
                                 ->relationship('categories', 'name')
-                                ->multiple()
-                                ->searchable()
                                 ->preload()
                                 ->createOptionForm([
                                     TextInput::make('name')

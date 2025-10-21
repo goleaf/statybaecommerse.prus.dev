@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\ModerationState;
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
@@ -149,15 +150,13 @@ class NewsResource extends Resource
                 ]),
             Forms\Components\Section::make('Categories & Tags')
                 ->schema([
-                    Forms\Components\Select::make('categories')
+                    Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->multiple()
                         ->preload(),
-                    Forms\Components\Select::make('tags')
+                    Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->multiple()
                         ->preload(),
                 ])
                 ->columns(2),

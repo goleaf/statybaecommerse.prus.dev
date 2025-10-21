@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
@@ -83,10 +84,10 @@ final class CampaignResource extends Resource
                     Select::make('status')
                         ->label(self::label('campaigns.fields.status', 'Status'))
                         ->options([
-                            'draft' => self::label('campaigns.status.draft', 'Draft'),
-                            'active' => self::label('campaigns.status.active', 'Active'),
+                            'draft'     => self::label('campaigns.status.draft', 'Draft'),
+                            'active'    => self::label('campaigns.status.active', 'Active'),
                             'scheduled' => self::label('campaigns.status.scheduled', 'Scheduled'),
-                            'paused' => self::label('campaigns.status.paused', 'Paused'),
+                            'paused'    => self::label('campaigns.status.paused', 'Paused'),
                             'completed' => self::label('campaigns.status.completed', 'Completed'),
                             'cancelled' => self::label('campaigns.status.cancelled', 'Cancelled'),
                         ])
@@ -137,32 +138,24 @@ final class CampaignResource extends Resource
                 ]),
             SchemaSection::make(__('campaigns.sections.targeting'))
                 ->schema([
-                    Select::make('targetCategories')
+                    Combobox::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
-                        ->multiple()
-                        ->searchable()
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('targetProducts')
+                    Combobox::make('targetProducts')
                         ->label(self::label('campaigns.fields.target_products', 'Target products'))
                         ->relationship('targetProducts', 'name')
-                        ->multiple()
-                        ->searchable()
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('targetCustomerGroups')
+                    Combobox::make('targetCustomerGroups')
                         ->label(self::label('campaigns.fields.target_customer_groups', 'Target customer groups'))
                         ->relationship('targetCustomerGroups', 'name')
-                        ->multiple()
-                        ->searchable()
                         ->preload()
                         ->columnSpanFull(),
-                    Select::make('discounts')
+                    Combobox::make('discounts')
                         ->label(self::label('campaigns.fields.discounts', 'Discounts'))
                         ->relationship('discounts', 'name')
-                        ->multiple()
-                        ->searchable()
                         ->preload()
                         ->columnSpanFull(),
                 ]),
@@ -226,13 +219,13 @@ final class CampaignResource extends Resource
                 TextColumn::make('status')
                     ->label(self::label('campaigns.fields.status', 'Status'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.'.$state, Str::headline($state)))
+                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.' . $state, Str::headline($state)))
                     ->colors([
                         'primary' => fn (string $state): bool => in_array($state, ['draft', 'scheduled']),
                         'success' => fn (string $state): bool => $state === 'active',
                         'warning' => fn (string $state): bool => $state === 'paused',
-                        'info' => fn (string $state): bool => $state === 'completed',
-                        'danger' => fn (string $state): bool => $state === 'cancelled',
+                        'info'    => fn (string $state): bool => $state === 'completed',
+                        'danger'  => fn (string $state): bool => $state === 'cancelled',
                     ]),
                 IconColumn::make('is_active')
                     ->label(self::label('campaigns.fields.is_active', 'Active'))
@@ -258,7 +251,7 @@ final class CampaignResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('conversion_rate')
                     ->label(self::label('campaigns.fields.conversion_rate', 'Conversion rate'))
-                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2).'%')
+                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2) . '%')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('translations_count')
@@ -276,10 +269,10 @@ final class CampaignResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => self::label('campaigns.status.draft', 'Draft'),
-                        'active' => self::label('campaigns.status.active', 'Active'),
+                        'draft'     => self::label('campaigns.status.draft', 'Draft'),
+                        'active'    => self::label('campaigns.status.active', 'Active'),
                         'scheduled' => self::label('campaigns.status.scheduled', 'Scheduled'),
-                        'paused' => self::label('campaigns.status.paused', 'Paused'),
+                        'paused'    => self::label('campaigns.status.paused', 'Paused'),
                         'completed' => self::label('campaigns.status.completed', 'Completed'),
                         'cancelled' => self::label('campaigns.status.cancelled', 'Cancelled'),
                     ]),
@@ -313,10 +306,10 @@ final class CampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaigns::route('/'),
+            'index'  => Pages\ListCampaigns::route('/'),
             'create' => Pages\CreateCampaign::route('/create'),
-            'view' => Pages\ViewCampaign::route('/{record}'),
-            'edit' => Pages\EditCampaign::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaign::route('/{record}'),
+            'edit'   => Pages\EditCampaign::route('/{record}/edit'),
         ];
     }
 
