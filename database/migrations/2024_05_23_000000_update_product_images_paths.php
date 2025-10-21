@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         if (! Schema::hasTable('product_images')) {
@@ -26,6 +27,16 @@ return new class extends Migration {
                     }
 
                     $normalized = ltrim($path, '/');
+
+                    if (Str::contains($normalized, '://') || Str::startsWith($normalized, 'data:')) {
+                        // Skip remote assets or embedded data URIs to avoid corrupting external paths.
+                        continue;
+                    }
+
+                    if (str_contains($normalized, '..')) {
+                        // Skip suspicious relative segments that could introduce traversal issues.
+                        continue;
+                    }
 
                     if (Str::startsWith($normalized, 'storage/')) {
                         continue;
