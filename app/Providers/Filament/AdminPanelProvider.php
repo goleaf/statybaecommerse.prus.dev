@@ -7,8 +7,6 @@ namespace App\Providers\Filament;
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
-use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -19,15 +17,17 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
+use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
+use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use Illuminate\Support\Facades\URL;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentExcel\FilamentExport;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -126,13 +126,15 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins([
+                fn (Panel $p) => $p->plugins(array_values(array_filter([
                     FilamentShieldPlugin::make(),
-                    FilamentFullCalendarPlugin::make()
-                        ->selectable(true)
-                        ->editable(true)
-                        ->timezone('Europe/Vilnius')
-                        ->locale('lt'),
+                    class_exists(FilamentFullCalendarPlugin::class)
+                        ? FilamentFullCalendarPlugin::make()
+                            ->selectable(true)
+                            ->editable(true)
+                            ->timezone('Europe/Vilnius')
+                            ->locale('lt')
+                        : null,
                     TableLayoutTogglePlugin::make()
                         ->setDefaultLayout('grid')
                         ->persistLayoutUsing(
@@ -147,7 +149,7 @@ final class AdminPanelProvider extends PanelProvider
                         ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
                     FilamentNordThemePlugin::make(),
                     ResizedColumnPlugin::make()->preserveOnDB(),
-                ]))
+                ], static fn ($plugin) => $plugin !== null))))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.css')
