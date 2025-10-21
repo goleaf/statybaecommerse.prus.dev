@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\MenuItems\Tables;
 
 use Filament\Actions\BulkActionGroup;
@@ -13,6 +15,7 @@ class MenuItemsTable
 {
     public static function configure(Table $table): Table
     {
+        // Shared table configuration keeps the columns uniform between standalone and relation managers.
         return $table
             ->columns([
                 TextColumn::make('menu.name')
