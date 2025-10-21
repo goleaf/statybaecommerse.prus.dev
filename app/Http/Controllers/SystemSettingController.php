@@ -9,6 +9,7 @@ use App\Models\SystemSettingCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use OpenApi\Attributes as OA;
 
 /**
  * SystemSettingController
@@ -22,16 +23,16 @@ final class SystemSettingController extends Controller
      */
     public function index(Request $request): View
     {
-        $categories = SystemSettingCategory::active()->with(['settings' => function ($query) {
+        $categories = SystemSettingCategory::active()->with(['settings' => function ($query): void {
             $query->active()->public()->ordered();
         }])->ordered()->get();
-        $settings = SystemSetting::active()->public()->when($request->filled('category'), function ($query) use ($request) {
-            $query->whereHas('category', function ($q) use ($request) {
+        $settings = SystemSetting::active()->public()->when($request->filled('category'), function ($query) use ($request): void {
+            $query->whereHas('category', function ($q) use ($request): void {
                 $q->where('slug', $request->category);
             });
-        })->when($request->filled('group'), function ($query) use ($request) {
+        })->when($request->filled('group'), function ($query) use ($request): void {
             $query->where('group', $request->group);
-        })->when($request->filled('search'), function ($query) use ($request) {
+        })->when($request->filled('search'), function ($query) use ($request): void {
             $query->searchable($request->search);
         })->ordered()->get()->skipWhile(function ($setting) {
             // Skip system settings that are not properly configured for display
@@ -82,7 +83,7 @@ final class SystemSettingController extends Controller
             // Skip system settings that are not properly configured for display
             return empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name);
         })->paginate(20);
-        $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query) use ($group) {
+        $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query) use ($group): void {
             $query->where('group', $group)->active()->public();
         }])->having('settings_count', '>', 0)->get();
 
@@ -96,25 +97,43 @@ final class SystemSettingController extends Controller
     {
         $query = $request->get('q', '');
         $settings = SystemSetting::active()->public()->searchable($query)->ordered()->paginate(20);
-        $categories = SystemSettingCategory::active()->where(function ($q) use ($query) {
+        $categories = SystemSettingCategory::active()->where(function ($q) use ($query): void {
             $q->where('name', 'like', "%{$query}%")->orWhere('description', 'like', "%{$query}%");
         })->get();
 
         return view('system-settings.search', compact('settings', 'categories', 'query'));
     }
 
+    #[OA\Get(
+        path: '/system-settings',
+        summary: 'List public system settings',
+        description: 'Return key-value pairs for public system settings. Results can be filtered by group, category, or key whitelist.',
+        tags: ['System Settings'],
+        parameters: [
+            new OA\QueryParameter(name: 'group', in: 'query', description: 'Filter settings by group slug.', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'category', in: 'query', description: 'Filter by category slug.', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'keys', in: 'query', description: 'Comma separated list of keys to include.', schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Key-value map of public system settings.',
+                content: new OA\JsonContent(ref: '#/components/schemas/SystemSettingValueMap')
+            ),
+        ]
+    )]
     /**
      * Handle api functionality with proper error handling.
      */
     public function api(Request $request): JsonResponse
     {
-        $settings = SystemSetting::active()->public()->when($request->filled('group'), function ($query) use ($request) {
+        $settings = SystemSetting::active()->public()->when($request->filled('group'), function ($query) use ($request): void {
             $query->where('group', $request->group);
-        })->when($request->filled('category'), function ($query) use ($request) {
-            $query->whereHas('category', function ($q) use ($request) {
+        })->when($request->filled('category'), function ($query) use ($request): void {
+            $query->whereHas('category', function ($q) use ($request): void {
                 $q->where('slug', $request->category);
             });
-        })->when($request->filled('keys'), function ($query) use ($request) {
+        })->when($request->filled('keys'), function ($query) use ($request): void {
             $keys = explode(',', $request->keys);
             $query->whereIn('key', $keys);
         })->get()->mapWithKeys(function ($setting) {
@@ -124,6 +143,26 @@ final class SystemSettingController extends Controller
         return response()->json($settings);
     }
 
+    #[OA\Get(
+        path: '/system-settings/{key}',
+        summary: 'Retrieve a single system setting',
+        tags: ['System Settings'],
+        parameters: [
+            new OA\Parameter(name: 'key', in: 'path', required: true, description: 'System setting key.', schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Public system setting payload.',
+                content: new OA\JsonContent(ref: '#/components/schemas/SystemSettingEntry')
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Setting not found.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+        ]
+    )]
     /**
      * Handle apiByKey functionality with proper error handling.
      */
@@ -140,12 +179,24 @@ final class SystemSettingController extends Controller
         return response()->json(['key' => $setting->key, 'name' => $setting->getTranslatedName(), 'value' => $setting->value, 'type' => $setting->type, 'group' => $setting->group, 'description' => $setting->getTranslatedDescription(), 'help_text' => $setting->getTranslatedHelpText()]);
     }
 
+    #[OA\Get(
+        path: '/system-settings/categories',
+        summary: 'List system setting categories',
+        tags: ['System Settings'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Active system setting categories.',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SystemSettingCategory'))
+            ),
+        ]
+    )]
     /**
      * Handle categories functionality with proper error handling.
      */
     public function categories(): JsonResponse
     {
-        $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query) {
+        $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query): void {
             $query->active()->public();
         }])->having('settings_count', '>', 0)->ordered()->get()->map(function ($category) {
             return ['id' => $category->id, 'name' => $category->getTranslatedName(), 'slug' => $category->slug, 'description' => $category->getTranslatedDescription(), 'icon' => $category->getIconClass(), 'color' => $category->color, 'settings_count' => $category->settings_count];
@@ -154,6 +205,18 @@ final class SystemSettingController extends Controller
         return response()->json($categories);
     }
 
+    #[OA\Get(
+        path: '/system-settings/groups',
+        summary: 'List system setting groups',
+        tags: ['System Settings'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Active groups with counts.',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SystemSettingGroup'))
+            ),
+        ]
+    )]
     /**
      * Handle groups functionality with proper error handling.
      */
