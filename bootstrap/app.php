@@ -23,7 +23,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-require_once __DIR__ . '/../app/Support/filament_compat.php';
+require_once __DIR__ . '/filament_compat.php';
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -51,14 +51,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(AddSecurityHeaders::class);
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
-            'role'               => Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission'         => Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'permissions'        => Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            'localize'           => App\Http\Middleware\SetLocale::class,
-            'partner.api'        => App\Http\Middleware\EnsurePartnerApiKey::class,
-            'partner.api.auth'   => App\Http\Middleware\EnsurePartnerApiKey::class,
-            'partner.api.scope'  => App\Http\Middleware\EnsurePartnerApiScope::class,
+            'role'                   => Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission'             => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'permissions'            => Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission'     => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'localize'               => App\Http\Middleware\SetLocale::class,
+            'partner.api'            => App\Http\Middleware\EnsurePartnerApiKey::class,
+            'partner.api.auth'       => App\Http\Middleware\EnsurePartnerApiKey::class,
+            'partner.api.scope'      => App\Http\Middleware\EnsurePartnerApiScope::class,
             'partner.api.rate_limit' => App\Http\Middleware\EnsurePartnerApiRateLimit::class,
         ]);
     })

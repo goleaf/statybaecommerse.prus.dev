@@ -13,6 +13,7 @@ use Filament\Support\Colors\Color;
 use Filament\Widgets\StatsOverviewWidget;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use InvalidArgumentException;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -35,6 +36,18 @@ class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
+        $configuredLocales = array_values(array_filter(
+            (array) config('shared.localization.supported_locales', [])
+        ));
+
+        if ($configuredLocales === []) {
+            $configuredLocales = [config('app.locale') ?? 'en'];
+        }
+
+        $translatablePlugin = SpatieTranslatablePlugin::make()
+            ->defaultLocales($configuredLocales)
+            ->persist();
+
         if ($this->isTestingEnvironment()) {
             return $panel
                 ->default()
@@ -45,6 +58,9 @@ class AdminPanelProvider extends PanelProvider
                 ->userMenu(position: UserMenuPosition::Sidebar)
                 ->colors([
                     'primary' => Color::Blue,
+                ])
+                ->plugins([
+                    $translatablePlugin,
                 ])
                 ->resources([
                     \App\Filament\Resources\ApiKeyResource::class,
@@ -88,6 +104,9 @@ class AdminPanelProvider extends PanelProvider
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->colors([
                 'primary' => Color::Blue,
+            ])
+            ->plugins([
+                $translatablePlugin,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
