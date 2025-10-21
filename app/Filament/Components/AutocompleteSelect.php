@@ -6,6 +6,7 @@ namespace App\Filament\Components;
 
 use Closure;
 use Filament\Forms\Components\Select;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -38,6 +39,8 @@ final class AutocompleteSelect extends Select
     protected ?Collection $searchResults = null;
 
     protected ?string $searchQuery = null;
+
+    protected ?array $formattedResultsCache = null;
 
     public static function make(?string $name = null): static
     {
@@ -158,24 +161,33 @@ final class AutocompleteSelect extends Select
 
     public function getSearchResults(string $search): array
     {
-        $this->setSearchQuery($search);
+        $search = trim($search);
 
-        $results = $this->searchResults ?? collect();
+        if ($this->searchQuery === $search && $this->formattedResultsCache !== null) {
+            return $this->formattedResultsCache;
+        }
 
-        return $results
-            ->mapWithKeys(function (array $item): array {
-                $value = $item['value'] ?? null;
-                $label = $item['label'] ?? (is_array($item['data'] ?? null) ? ($item['data']['name'] ?? (string) $value) : (string) $value);
+        $this->searchQuery = $search;
 
-                return $value !== null ? [$value => $label] : [];
-            })
-            ->all();
+        $this->searchResults = $this->performSearch($search);
+
+        return $this->formattedResultsCache = $this->formatResults($this->searchResults);
     }
 
     public function setSearchQuery(?string $query): static
     {
+        $query = $query !== null ? trim($query) : null;
+
         $this->searchQuery = $query;
-        $this->performSearch();
+
+        if (empty($query)) {
+            $this->searchResults = collect();
+            $this->formattedResultsCache = [];
+
+            return $this;
+        }
+
+        $this->formattedResultsCache = $this->getSearchResults($query);
 
         return $this;
     }
@@ -185,31 +197,58 @@ final class AutocompleteSelect extends Select
         return $this->searchQuery;
     }
 
-    protected function performSearch(): void
+    protected function performSearch(string $search): Collection
     {
-        if (! $this->modelClass || ! $this->searchQuery || strlen($this->searchQuery) < $this->minSearchLength) {
-            $this->searchResults = collect();
-
-            return;
+        if (! $this->modelClass || $search === '' || mb_strlen($search) < $this->minSearchLength) {
+            return collect();
         }
 
+        /** @var Model $model */
         $model = app($this->modelClass);
         $searchField = $this->searchField ?? $this->getLabelField();
         $valueField = $this->getValueField();
         $labelField = $this->getLabelField();
 
+        $terms = collect(preg_split('/\s+/u', $search, -1, PREG_SPLIT_NO_EMPTY));
+
         $query = $model
-            ->query()
-            ->where($searchField, 'like', '%'.$this->searchQuery.'%')
+            ->newQuery()
+            ->when(
+                $terms->isNotEmpty(),
+                fn (Builder $builder): Builder => $builder->where(function (Builder $query) use ($searchField, $terms): void {
+                    foreach ($terms as $term) {
+                        $query->where($searchField, 'like', '%'.$term.'%');
+                    }
+                }),
+            )
             ->limit($this->maxSearchResults);
 
-        $this->searchResults = $query->get()->map(function (Model $item) use ($valueField, $labelField) {
+        return $query->get()->map(function (Model $item) use ($valueField, $labelField) {
             return [
                 'value' => $item->{$valueField},
                 'label' => $item->{$labelField},
                 'data' => $item->toArray(),
             ];
         });
+    }
+
+    /**
+     * @param  Collection<int, array{value:mixed,label:scalar|null,data:array}>  $results
+     * @return array<mixed, scalar|null>
+     */
+    protected function formatResults(Collection $results): array
+    {
+        return $results
+            ->mapWithKeys(function (array $item): array {
+                $value = $item['value'] ?? null;
+                $label = $item['label']
+                    ?? (is_array($item['data'] ?? null)
+                        ? ($item['data']['name'] ?? (string) $value)
+                        : (string) $value);
+
+                return $value !== null ? [$value => $label] : [];
+            })
+            ->all();
     }
 
     public function getViewData(): array
