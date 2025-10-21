@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\SignedExportDownloadController;
@@ -31,7 +33,7 @@ Route::prefix('v1')
                 ->withoutMiddleware('throttle:api.default')
                 ->name('autocomplete.search');
 
-            require __DIR__.'/api/notifications.php';
+            require __DIR__ . '/api/notifications.php';
         });
     });
 

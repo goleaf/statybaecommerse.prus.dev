@@ -9,12 +9,14 @@ use App\Models\SystemSettingCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use OpenApi\Attributes as OA;
 
 /**
  * SystemSettingController
  *
  * HTTP controller handling SystemSettingController related web requests, responses, and business logic with proper validation and error handling.
  */
+#[OA\Tag(name: 'System Settings', description: 'Public system configuration lookup endpoints.')]
 final class SystemSettingController extends Controller
 {
     /**
@@ -22,16 +24,16 @@ final class SystemSettingController extends Controller
      */
     public function index(Request $request): View
     {
-        $categories = SystemSettingCategory::active()->with(['settings' => function ($query) {
+        $categories = SystemSettingCategory::active()->with(['settings' => function ($query): void {
             $query->active()->public()->ordered();
         }])->ordered()->get();
-        $settings = SystemSetting::active()->public()->when($request->filled('category'), function ($query) use ($request) {
-            $query->whereHas('category', function ($q) use ($request) {
+        $settings = SystemSetting::active()->public()->when($request->filled('category'), function ($query) use ($request): void {
+            $query->whereHas('category', function ($q) use ($request): void {
                 $q->where('slug', $request->category);
             });
-        })->when($request->filled('group'), function ($query) use ($request) {
+        })->when($request->filled('group'), function ($query) use ($request): void {
             $query->where('group', $request->group);
-        })->when($request->filled('search'), function ($query) use ($request) {
+        })->when($request->filled('search'), function ($query) use ($request): void {
             $query->searchable($request->search);
         })->ordered()->get()->skipWhile(function ($setting) {
             // Skip system settings that are not properly configured for display
@@ -82,7 +84,7 @@ final class SystemSettingController extends Controller
             // Skip system settings that are not properly configured for display
             return empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name);
         })->paginate(20);
-        $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query) use ($group) {
+        $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query) use ($group): void {
             $query->where('group', $group)->active()->public();
         }])->having('settings_count', '>', 0)->get();
 
@@ -96,7 +98,7 @@ final class SystemSettingController extends Controller
     {
         $query = $request->get('q', '');
         $settings = SystemSetting::active()->public()->searchable($query)->ordered()->paginate(20);
-        $categories = SystemSettingCategory::active()->where(function ($q) use ($query) {
+        $categories = SystemSettingCategory::active()->where(function ($q) use ($query): void {
             $q->where('name', 'like', "%{$query}%")->orWhere('description', 'like', "%{$query}%");
         })->get();
 
@@ -106,15 +108,43 @@ final class SystemSettingController extends Controller
     /**
      * Handle api functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/api/system-settings',
+        summary: 'List public system settings.',
+        tags: ['System Settings'],
+        parameters: [
+            new OA\QueryParameter(
+                name: 'group',
+                description: 'Filter settings by group.',
+                required: false,
+                schema: new OA\Schema(type: 'string'),
+            ),
+            new OA\QueryParameter(
+                name: 'category',
+                description: 'Filter settings by category slug.',
+                required: false,
+                schema: new OA\Schema(type: 'string'),
+            ),
+            new OA\QueryParameter(
+                name: 'keys',
+                description: 'Comma separated list of setting keys to include.',
+                required: false,
+                schema: new OA\Schema(type: 'string'),
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingsIndex'),
+        ]
+    )]
     public function api(Request $request): JsonResponse
     {
-        $settings = SystemSetting::active()->public()->when($request->filled('group'), function ($query) use ($request) {
+        $settings = SystemSetting::active()->public()->when($request->filled('group'), function ($query) use ($request): void {
             $query->where('group', $request->group);
-        })->when($request->filled('category'), function ($query) use ($request) {
-            $query->whereHas('category', function ($q) use ($request) {
+        })->when($request->filled('category'), function ($query) use ($request): void {
+            $query->whereHas('category', function ($q) use ($request): void {
                 $q->where('slug', $request->category);
             });
-        })->when($request->filled('keys'), function ($query) use ($request) {
+        })->when($request->filled('keys'), function ($query) use ($request): void {
             $keys = explode(',', $request->keys);
             $query->whereIn('key', $keys);
         })->get()->mapWithKeys(function ($setting) {
@@ -127,6 +157,23 @@ final class SystemSettingController extends Controller
     /**
      * Handle apiByKey functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/api/system-settings/{key}',
+        summary: 'Retrieve a single system setting by key.',
+        tags: ['System Settings'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'key',
+                description: 'Unique setting key.',
+                required: true,
+                schema: new OA\Schema(type: 'string'),
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingItem'),
+            new OA\Response(response: 404, ref: '#/components/responses/SystemSettingNotFound'),
+        ]
+    )]
     public function apiByKey(string $key): JsonResponse
     {
         $setting = SystemSetting::where('key', $key)->active()->public()->first();
@@ -143,9 +190,17 @@ final class SystemSettingController extends Controller
     /**
      * Handle categories functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/api/system-settings/categories',
+        summary: 'List public system setting categories.',
+        tags: ['System Settings'],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingCategories'),
+        ]
+    )]
     public function categories(): JsonResponse
     {
-        $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query) {
+        $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query): void {
             $query->active()->public();
         }])->having('settings_count', '>', 0)->ordered()->get()->map(function ($category) {
             return ['id' => $category->id, 'name' => $category->getTranslatedName(), 'slug' => $category->slug, 'description' => $category->getTranslatedDescription(), 'icon' => $category->getIconClass(), 'color' => $category->color, 'settings_count' => $category->settings_count];
@@ -157,6 +212,14 @@ final class SystemSettingController extends Controller
     /**
      * Handle groups functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/api/system-settings/groups',
+        summary: 'List public system setting groups.',
+        tags: ['System Settings'],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingGroups'),
+        ]
+    )]
     public function groups(): JsonResponse
     {
         $groups = SystemSetting::active()->public()->select('group')->selectRaw('count(*) as settings_count')->groupBy('group')->orderBy('settings_count', 'desc')->get()->map(function ($group) {
