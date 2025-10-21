@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -14,26 +15,25 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Section as InfolistSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralRewardResource extends Resource
 {
@@ -50,7 +50,7 @@ final class ReferralRewardResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
                     ->schema([
@@ -230,43 +230,45 @@ final class ReferralRewardResource extends Resource
                 Action::make('apply')
                     ->label(__('referral_rewards.actions.apply'))
                     ->requiresConfirmation()
-                    ->action(fn (ReferralReward $record) => $record->apply()),
+                    ->action(static function (ReferralReward $record): void {
+                        $record->apply();
+                    }),
                 Action::make('expire')
                     ->label(__('referral_rewards.actions.expire'))
                     ->requiresConfirmation()
-                    ->action(fn (ReferralReward $record) => $record->markAsExpired()),
+                    ->action(static function (ReferralReward $record): void {
+                        $record->markAsExpired();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     BulkAction::make('apply')
                         ->label(__('referral_rewards.actions.apply_selected'))
                         ->requiresConfirmation()
-                        ->action(function (iterable $records): void {
-                            foreach ($records as $record) {
-                                if ($record instanceof ReferralReward) {
-                                    $record->apply();
-                                }
-                            }
+                        ->action(static function (EloquentCollection $records): void {
+                            /** @var EloquentCollection<int, ReferralReward> $records */
+                            $records->each(static function (ReferralReward $record): void {
+                                $record->apply();
+                            });
                         }),
                     BulkAction::make('expire')
                         ->label(__('referral_rewards.actions.expire_selected'))
                         ->requiresConfirmation()
-                        ->action(function (iterable $records): void {
-                            foreach ($records as $record) {
-                                if ($record instanceof ReferralReward) {
-                                    $record->markAsExpired();
-                                }
-                            }
+                        ->action(static function (EloquentCollection $records): void {
+                            /** @var EloquentCollection<int, ReferralReward> $records */
+                            $records->each(static function (ReferralReward $record): void {
+                                $record->markAsExpired();
+                            });
                         }),
                     DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return $schema
-            ->components([
+        return $infolist
+            ->schema([
                 InfolistSection::make(__('referral_rewards.sections.reward_details'))
                     ->schema([
                         TextEntry::make('title')->label(__('referral_rewards.fields.title')),
@@ -306,7 +308,7 @@ final class ReferralRewardResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $modelClass = static::getModel();
+        $modelClass = self::getModel();
         $count = (int) $modelClass::count();
 
         return $count > 0 ? (string) $count : null;
@@ -321,8 +323,8 @@ final class ReferralRewardResource extends Resource
             ->withoutGlobalScopes()
             ->with([
                 'referral' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
-                'user' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
-                'order' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
+                'user'     => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
+                'order'    => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
             ]);
     }
 }
