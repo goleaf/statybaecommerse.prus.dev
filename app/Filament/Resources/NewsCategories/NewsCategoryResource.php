@@ -14,7 +14,6 @@ use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class NewsCategoryResource extends Resource
 {
@@ -22,8 +21,9 @@ final class NewsCategoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
+        // Return type stays fully qualified so duplicate UnitEnum imports are unnecessary in nested resources.
         return 'News';
     }
 

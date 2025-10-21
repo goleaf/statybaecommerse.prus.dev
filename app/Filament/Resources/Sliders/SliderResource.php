@@ -16,7 +16,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class SliderResource extends Resource
 {
@@ -24,10 +23,11 @@ final class SliderResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    // Use the fully qualified UnitEnum type to avoid duplicate imports across similarly named resources.
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     /**
-     * @var UnitEnum|string|null
+     * @var \UnitEnum|string|null
      */
     protected static ?int $navigationSort = 1;
 
