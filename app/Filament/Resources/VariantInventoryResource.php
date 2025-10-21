@@ -6,9 +6,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\Location;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\ProductVariantSearch;
 use BackedEnum;
@@ -19,6 +21,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select; // Select component import keeps dropdown definitions consistent across the resource.
@@ -95,28 +98,61 @@ final class VariantInventoryResource extends Resource
                             ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                if ($state === null) {
+                                SearchableComponentHelper::hydrate(
+                                    $component,
+                                    $state,
+                                    static function (int|string $identifier): ?ProductVariant {
+                                        return ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find((int) $identifier);
+                                    },
+                                    static function (ProductVariant $variant): array {
+                                        return [
+                                            'value'   => $variant->getKey(),
+                                            'label'   => ProductVariantSearch::label($variant),
+                                            'payload' => self::normaliseVariantPayload($variant),
+                                        ];
+                                    },
+                                ); // See docs/filament/searchable-inputs.md for helper expectations.
+                            })
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                $state = is_string($state) ? trim($state) : '';
+
+                                if ($state === '') {
+                                    SearchableComponentHelper::clear(
+                                        $component,
+                                        static fn (): bool => $set('variant_id', null),
+                                        static fn (): array => $set('variant_payload', []),
+                                    );
+
                                     return;
                                 }
+
+                                $identifier = (int) $state;
 
                                 $variant = ProductVariant::query()
                                     ->select(['id', 'product_id', 'sku', 'name', 'price'])
                                     ->with(['product:id,sku,name'])
-                                    ->find($state);
+                                    ->find($identifier);
 
                                 if (! $variant instanceof ProductVariant) {
+                                    SearchableComponentHelper::clear(
+                                        $component,
+                                        static fn (): bool => $set('variant_id', null),
+                                        static fn (): array => $set('variant_payload', []),
+                                    );
+
                                     return;
                                 }
 
-                                $component
-                                    ->state((string) $state)
-                                    ->options([
-                                        (string) $variant->getKey() => ProductVariantSearch::label($variant),
-                                    ]);
-                            })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
-                                $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
+                                $set('variant_id', $identifier);
+                                $set('variant_payload', self::normaliseVariantPayload($variant));
                             }),
+                        Hidden::make('variant_payload')
+                            ->default([])
+                            ->dehydrated(false)
+                            ->columnSpanFull(), // Preserve resolved variant metadata for downstream automation without persisting it.
                         SearchableInput::make('location_id')
                             ->label(__('admin.variant_inventory.location'))
                             ->placeholder(__('admin.variant_inventory.location_placeholder'))
@@ -124,27 +160,59 @@ final class VariantInventoryResource extends Resource
                             ->searchUsing(fn (string $value): array => LocationSearch::results($value))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                if ($state === null) {
+                                SearchableComponentHelper::hydrate(
+                                    $component,
+                                    $state,
+                                    static function (int|string $identifier): ?Location {
+                                        return Location::query()
+                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                            ->find((int) $identifier);
+                                    },
+                                    static function (Location $location): array {
+                                        return [
+                                            'value'   => $location->getKey(),
+                                            'label'   => LocationSearch::label($location),
+                                            'payload' => self::normaliseLocationPayload($location),
+                                        ];
+                                    },
+                                ); // See docs/filament/searchable-inputs.md for helper expectations.
+                            })
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                $state = is_string($state) ? trim($state) : '';
+
+                                if ($state === '') {
+                                    SearchableComponentHelper::clear(
+                                        $component,
+                                        static fn (): bool => $set('location_id', null),
+                                        static fn (): array => $set('location_payload', []),
+                                    );
+
                                     return;
                                 }
+
+                                $identifier = (int) $state;
 
                                 $location = Location::query()
                                     ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                    ->find($state);
+                                    ->find($identifier);
 
                                 if (! $location instanceof Location) {
+                                    SearchableComponentHelper::clear(
+                                        $component,
+                                        static fn (): bool => $set('location_id', null),
+                                        static fn (): array => $set('location_payload', []),
+                                    );
+
                                     return;
                                 }
 
-                                $component
-                                    ->state((string) $state)
-                                    ->options([
-                                        (string) $location->getKey() => LocationSearch::label($location),
-                                    ]);
-                            })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
-                                $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
+                                $set('location_id', $identifier);
+                                $set('location_payload', self::normaliseLocationPayload($location));
                             }),
+                        Hidden::make('location_payload')
+                            ->default([])
+                            ->dehydrated(false)
+                            ->columnSpanFull(), // Store the resolved location metadata locally while avoiding persistence to the database.
                         // Row 2: warehouse and batch identifiers reuse the same column count for clarity.
                         TextInput::make('warehouse_code')
                             ->label(__('admin.variant_inventory.warehouse_code'))
@@ -252,6 +320,75 @@ final class VariantInventoryResource extends Resource
                     ])
                     ->visible(fn (?VariantInventory $record): bool => $record !== null),
             ]);
+    }
+
+    /**
+     * Normalise the ProductVariant lookup payload into a consistent metadata shape.
+     *
+     * @return array<string, mixed>
+     */
+    private static function normaliseVariantPayload(ProductVariant $variant): array
+    {
+        $product = $variant->getRelationValue('product');
+
+        /** @var string|null $rawSku */
+        $rawSku = $variant->getAttribute('sku');
+        /** @var string|null $rawName */
+        $rawName = $variant->getAttribute('name');
+        /** @var float|int|string|null $rawPrice */
+        $rawPrice = $variant->getAttribute('price');
+
+        $productSku = '';
+        $productName = '';
+
+        if ($product instanceof Product) {
+            // Guard against misconfigured relations; fall back to string casts when the product is missing.
+            $productSku = (string) ($product->getAttribute('sku') ?? '');
+            $productName = (string) ($product->getAttribute('name') ?? '');
+        } elseif ($product !== null && method_exists($product, 'getAttribute')) {
+            /** @var mixed $resolvedProductSku */
+            $resolvedProductSku = $product->getAttribute('sku');
+            /** @var mixed $resolvedProductName */
+            $resolvedProductName = $product->getAttribute('name');
+
+            $productSku = is_string($resolvedProductSku) ? $resolvedProductSku : (string) ($resolvedProductSku ?? '');
+            $productName = is_string($resolvedProductName) ? $resolvedProductName : (string) ($resolvedProductName ?? '');
+        }
+
+        return [
+            'variant_id'   => $variant->getKey(),
+            'sku'          => is_string($rawSku) ? $rawSku : (string) ($rawSku ?? ''),
+            'name'         => is_string($rawName) ? $rawName : (string) ($rawName ?? ''),
+            'price'        => is_numeric($rawPrice) ? (float) $rawPrice : 0.0,
+            'product_id'   => $variant->getAttribute('product_id'),
+            'product_sku'  => $productSku,
+            'product_name' => $productName,
+        ];
+    }
+
+    /**
+     * Normalise the Location lookup payload into the metadata array consumed by dependent inputs.
+     *
+     * @return array<string, mixed>
+     */
+    private static function normaliseLocationPayload(Location $location): array
+    {
+        /** @var string|null $rawName */
+        $rawName = $location->getAttribute('name');
+        /** @var string|null $rawCode */
+        $rawCode = $location->getAttribute('code');
+        /** @var string|null $rawCity */
+        $rawCity = $location->getAttribute('city');
+        /** @var string|null $rawCountry */
+        $rawCountry = $location->getAttribute('country_code');
+
+        return [
+            'location_id'  => $location->getKey(),
+            'name'         => is_string($rawName) ? $rawName : (string) ($rawName ?? ''),
+            'code'         => is_string($rawCode) ? $rawCode : (string) ($rawCode ?? ''),
+            'city'         => is_string($rawCity) ? $rawCity : (string) ($rawCity ?? ''),
+            'country_code' => is_string($rawCountry) ? $rawCountry : (string) ($rawCountry ?? ''),
+        ];
     }
 
     public static function table(Table $table): Table|array
