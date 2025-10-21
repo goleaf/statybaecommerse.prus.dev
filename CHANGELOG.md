@@ -12,6 +12,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
 * Updated the Feature Flag resource to bypass active/enabled scopes so administrators can review inactive toggles directly from the listing view.
 * Restored the Husky bootstrap shim so Git hooks keep executing with the repository's local toolchain while still surfacing the upstream v10 deprecation guidance.
+* Ensured the User Product Interaction Filament resource now returns concrete `Form`/`Table` instances so Filament v4 boots without schema contract errors during analytics validation.
 
 ### Bug Fixes
 * Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
