@@ -13,6 +13,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
@@ -67,11 +68,21 @@ final class ItemsRelationManager extends BaseRelationManager
                     ->numeric()
                     ->minValue(1),
 
-                Forms\Components\DateTimePicker::make('valid_from')
+                Flatpickr::make('valid_from')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
+                    ->rangePicker()
                     ->label(__('price_list_items.valid_from'))
                     ->default(now()),
 
-                Forms\Components\DateTimePicker::make('valid_until')
+                Flatpickr::make('valid_until')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
+                    ->rangePicker()
                     ->label(__('price_list_items.valid_until'))
                     ->after('valid_from'),
 

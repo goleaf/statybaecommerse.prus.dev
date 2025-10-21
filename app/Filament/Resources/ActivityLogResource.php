@@ -15,6 +15,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ActivityLogResource extends Resource
 {
@@ -109,8 +110,16 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')->label(__('From')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')->label(__('Until')),
+                        Flatpickr::make('created_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
+                            ->label(__('From')),
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
+                            ->label(__('Until')),
                     ])
                     ->query(function ($query, array $data) {
                         return $query

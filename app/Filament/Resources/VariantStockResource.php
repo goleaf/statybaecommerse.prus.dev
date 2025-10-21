@@ -15,7 +15,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -32,6 +32,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class VariantStockResource extends Resource
 {
@@ -89,7 +90,9 @@ final class VariantStockResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            DatePicker::make('expiry_date'),
+                            Flatpickr::make('expiry_date')
+                                ->time(false)
+                                ->format('Y-m-d'),
                             Select::make('status')
                                 ->options([
                                     'active'       => 'active',

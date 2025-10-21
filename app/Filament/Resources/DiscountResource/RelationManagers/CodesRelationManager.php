@@ -11,6 +11,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class CodesRelationManager extends BaseRelationManager
 {
@@ -41,7 +42,11 @@ final class CodesRelationManager extends BaseRelationManager
                     ->default(0)
                     ->disabled()
                     ->helperText('How many times this code has been used'),
-                Forms\Components\DateTimePicker::make('expires_at')
+                Flatpickr::make('expires_at')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
                     ->label('Expires At')
                     ->helperText('When this specific code expires'),
                 Forms\Components\Toggle::make('is_active')

@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
-use Filament\Forms\Components\DatePicker;
+
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -30,6 +30,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ReferralCodeResource extends Resource
 {
@@ -67,7 +68,9 @@ final class ReferralCodeResource extends Resource
                             ->label(__('referral.form.is_active'))
                             ->inline(false)
                             ->default(true),
-                        DatePicker::make('expires_at')
+                        Flatpickr::make('expires_at')
+                            ->time(false)
+                            ->format('Y-m-d')
                             ->label(__('referral.form.expires_at'))
                             ->nullable(),
                         TextInput::make('usage_limit')

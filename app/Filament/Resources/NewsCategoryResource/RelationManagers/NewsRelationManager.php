@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class NewsRelationManager extends BaseRelationManager
 {
@@ -47,7 +48,11 @@ final class NewsRelationManager extends BaseRelationManager
                             ->default(true),
                         Forms\Components\Toggle::make('is_featured')
                             ->default(false),
-                        Forms\Components\DateTimePicker::make('published_at')
+                        Flatpickr::make('published_at')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
                             ->default(now()),
                     ])
                     ->columns(2),
@@ -101,8 +106,14 @@ final class NewsRelationManager extends BaseRelationManager
                 Tables\Filters\TernaryFilter::make('is_featured'),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Forms\Components\DatePicker::make('published_from'),
-                        Forms\Components\DatePicker::make('published_until'),
+                        Flatpickr::make('published_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker(),
+                        Flatpickr::make('published_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker(),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

@@ -14,7 +14,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -33,6 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * UserBehaviorResource
@@ -121,7 +122,11 @@ final class UserBehaviorResource extends Resource
                             ->options(self::behaviorTypeOptions())
                             ->required()
                             ->searchable(),
-                        DateTimePicker::make('created_at')
+                        Flatpickr::make('created_at')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
                             ->label(__('admin.user_behaviors.created_at'))
                             ->default(now())
                             ->displayFormat('d/m/Y H:i:s'),
@@ -270,9 +275,15 @@ final class UserBehaviorResource extends Resource
                     ),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')
+                        Flatpickr::make('created_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('admin.user_behaviors.created_from')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('admin.user_behaviors.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

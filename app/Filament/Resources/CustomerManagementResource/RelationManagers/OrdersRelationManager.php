@@ -15,7 +15,7 @@ use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -33,6 +33,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -75,9 +76,17 @@ class OrdersRelationManager extends BaseRelationManager
                         TextInput::make('tracking_number')
                             ->label(__('orders.tracking_number'))
                             ->maxLength(255),
-                        DateTimePicker::make('shipped_at')
+                        Flatpickr::make('shipped_at')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
                             ->label(__('orders.shipped_at')),
-                        DateTimePicker::make('delivered_at')
+                        Flatpickr::make('delivered_at')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
                             ->label(__('orders.delivered_at')),
                     ]),
                 Section::make(__('orders.additional_information'))
@@ -236,9 +245,15 @@ class OrdersRelationManager extends BaseRelationManager
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from')
+                        Flatpickr::make('created_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('orders.created_from')),
-                        \Filament\Forms\Components\DatePicker::make('created_until')
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('orders.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

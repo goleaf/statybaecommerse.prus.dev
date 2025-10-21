@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
 use BackedEnum;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -24,6 +24,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class EmailCampaignResource extends Resource
 {
@@ -91,7 +92,11 @@ final class EmailCampaignResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('scheduled_at')
+                            Flatpickr::make('scheduled_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
                                 ->label(__('admin.email_campaigns.scheduled_at')),
                             Toggle::make('is_active')
                                 ->label(__('admin.email_campaigns.is_active'))

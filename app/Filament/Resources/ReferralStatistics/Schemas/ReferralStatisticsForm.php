@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralStatistics\Schemas;
 
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 class ReferralStatisticsForm
 {
@@ -19,7 +19,9 @@ class ReferralStatisticsForm
                 Select::make('user_id')
                     ->relationship('user', 'name')
                     ->required(),
-                DatePicker::make('date')
+                Flatpickr::make('date')
+                    ->time(false)
+                    ->format('Y-m-d')
                     ->required(),
                 TextInput::make('total_referrals')
                     ->required()

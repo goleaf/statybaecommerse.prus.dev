@@ -18,7 +18,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
@@ -46,6 +46,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * ProductVariantResource
@@ -231,9 +232,19 @@ final class ProductVariantResource extends Resource
                                             ]),
                                         Grid::make(2)
                                             ->schema([
-                                                DateTimePicker::make('sale_start_date')
+                                                Flatpickr::make('sale_start_date')
+                                                    ->time(true)
+                                                    ->time24hr(true)
+                                                    ->seconds(false)
+                                                    ->format('Y-m-d H:i')
+                                                    ->rangePicker()
                                                     ->label(__('product_variants.fields.sale_start_date')),
-                                                DateTimePicker::make('sale_end_date')
+                                                Flatpickr::make('sale_end_date')
+                                                    ->time(true)
+                                                    ->time24hr(true)
+                                                    ->seconds(false)
+                                                    ->format('Y-m-d H:i')
+                                                    ->rangePicker()
                                                     ->label(__('product_variants.fields.sale_end_date')),
                                             ]),
                                     ]),

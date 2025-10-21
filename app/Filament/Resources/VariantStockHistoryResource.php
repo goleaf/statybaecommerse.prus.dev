@@ -6,7 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
-use Filament\Forms\Components\DatePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -24,6 +24,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class VariantStockHistoryResource extends Resource
 {
@@ -219,9 +220,15 @@ final class VariantStockHistoryResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.variant_stock_histories.filters.created_at'))
                     ->form([
-                        DatePicker::make('created_from')
+                        Flatpickr::make('created_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('admin.variant_stock_histories.filters.created_from')),
-                        DatePicker::make('created_until')
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('admin.variant_stock_histories.filters.created_until')),
                     ])
                     ->query(function ($query, array $data) {

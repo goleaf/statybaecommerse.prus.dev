@@ -12,7 +12,7 @@ use App\Models\DiscountRedemption;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -33,6 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class DiscountRedemptionResource extends Resource
 {
@@ -118,7 +119,11 @@ final class DiscountRedemptionResource extends Resource
                                 ->default('pending')
                                 ->required(),
                         ]),
-                    DateTimePicker::make('redeemed_at')
+                    Flatpickr::make('redeemed_at')
+                        ->time(true)
+                        ->time24hr(true)
+                        ->seconds(false)
+                        ->format('Y-m-d H:i')
                         ->label(__('discount_redemptions.fields.redeemed_at'))
                         ->seconds(false)
                         ->displayFormat('Y-m-d H:i')
@@ -218,9 +223,19 @@ final class DiscountRedemptionResource extends Resource
                     ]),
                 Filter::make('redeemed_range')
                     ->form([
-                        DateTimePicker::make('from')
+                        Flatpickr::make('from')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
                             ->label(__('discount_redemptions.filters.redeemed_from')),
-                        DateTimePicker::make('until')
+                        Flatpickr::make('until')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
                             ->label(__('discount_redemptions.filters.redeemed_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
