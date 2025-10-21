@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ReportResource\Pages;
 
 use App\Filament\Resources\ReportResource;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListReports extends ListRecords
 {
+    use HasWidgetTabs;
+
     protected static string $resource = ReportResource::class;
 
     protected function getHeaderActions(): array
@@ -21,42 +24,43 @@ final class ListReports extends ListRecords
         ];
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all' => Tab::make(__('reports.tabs.all')),
+            'all' => WidgetTab::make(__('reports.tabs.all'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
 
-            'sales' => Tab::make(__('reports.tabs.sales'))
+            'sales' => WidgetTab::make(__('reports.tabs.sales'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'sales'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'sales')->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'sales')->count()),
 
-            'inventory' => Tab::make(__('reports.tabs.inventory'))
+            'inventory' => WidgetTab::make(__('reports.tabs.inventory'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'inventory'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'inventory')->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'inventory')->count()),
 
-            'customer' => Tab::make(__('reports.tabs.customer'))
+            'customer' => WidgetTab::make(__('reports.tabs.customer'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'customer'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'customer')->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'customer')->count()),
 
-            'product' => Tab::make(__('reports.tabs.product'))
+            'product' => WidgetTab::make(__('reports.tabs.product'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'product')->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'product')->count()),
 
-            'financial' => Tab::make(__('reports.tabs.financial'))
+            'financial' => WidgetTab::make(__('reports.tabs.financial'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'financial'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'financial')->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'financial')->count()),
 
-            'analytics' => Tab::make(__('reports.tabs.analytics'))
+            'analytics' => WidgetTab::make(__('reports.tabs.analytics'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'analytics'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', 'analytics')->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'analytics')->count()),
 
-            'active' => Tab::make(__('reports.tabs.active'))
+            'active' => WidgetTab::make(__('reports.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
 
-            'scheduled' => Tab::make(__('reports.tabs.scheduled'))
+            'scheduled' => WidgetTab::make(__('reports.tabs.scheduled'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_scheduled', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('is_scheduled', true)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_scheduled', true)->count()),
         ];
     }
 }

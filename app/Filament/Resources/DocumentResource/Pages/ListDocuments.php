@@ -6,12 +6,15 @@ namespace App\Filament\Resources\DocumentResource\Pages;
 
 use App\Filament\Resources\DocumentResource;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListDocuments extends ListRecords
 {
+    use HasWidgetTabs;
+
     protected static string $resource = DocumentResource::class;
 
     protected function getHeaderActions(): array
@@ -21,18 +24,19 @@ class ListDocuments extends ListRecords
         ];
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all' => Tab::make(__('admin.documents.tabs.all'))
-                ->icon('heroicon-o-document-text'),
-            'draft' => Tab::make(__('admin.documents.tabs.draft'))
+            'all' => WidgetTab::make(__('admin.documents.tabs.all'))
+                ->icon('heroicon-o-document-text')
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'draft' => WidgetTab::make(__('admin.documents.tabs.draft'))
                 ->icon('heroicon-o-pencil-square')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'draft')),
-            'generated' => Tab::make(__('admin.documents.tabs.generated'))
+            'generated' => WidgetTab::make(__('admin.documents.tabs.generated'))
                 ->icon('heroicon-o-cog-6-tooth')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'generated')),
-            'published' => Tab::make(__('admin.documents.tabs.published'))
+            'published' => WidgetTab::make(__('admin.documents.tabs.published'))
                 ->icon('heroicon-o-check-circle')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'published')),
         ];
