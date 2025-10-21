@@ -12,14 +12,15 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Support\Filament\Components\Flatpickr;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema
     {
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->components([
                 Section::make(__('admin.profile.personal_information'))
                     ->description(__('admin.profile.personal_information_description'))

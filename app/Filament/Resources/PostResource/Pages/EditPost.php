@@ -14,6 +14,7 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
+use Filament\Schemas\Schema;
 
 final class EditPost extends EditRecord
 {

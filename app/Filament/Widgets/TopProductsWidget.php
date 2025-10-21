@@ -37,6 +37,7 @@ final class TopProductsWidget extends BaseWidget
 
     public function table(Table $table): Table|array
     {
+        // Configure the Filament table definition for the resource.
         $since = Carbon::now()->subDays(7);
 
         $query = Product::query()

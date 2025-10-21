@@ -8,21 +8,20 @@ use App\Filament\Resources\CampaignCustomerSegmentResource\Pages;
 use App\Models\CampaignCustomerSegment;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -71,9 +70,10 @@ final class CampaignCustomerSegmentResource extends Resource
         return __('campaign_customer_segments.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -142,8 +142,9 @@ final class CampaignCustomerSegmentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('campaign.name')
@@ -247,8 +248,9 @@ final class CampaignCustomerSegmentResource extends Resource
             ->paginated([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema->schema([
             InfolistSection::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([

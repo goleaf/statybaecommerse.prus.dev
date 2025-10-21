@@ -12,7 +12,7 @@ use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Enums\NavigationGroup;
 use App\Models\Slider;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -24,7 +24,7 @@ final class SliderResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Content;
 
     /**
      * @var UnitEnum|string|null
@@ -33,13 +33,15 @@ final class SliderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
+        // Configure the Filament resource form schema using the v4 Schema API.
         return SliderForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return SlidersTable::configure($table);
     }
 

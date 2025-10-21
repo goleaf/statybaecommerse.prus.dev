@@ -31,6 +31,7 @@ final class TopSellingProductsWidget extends BaseWidget
 
     public function table(Table $table): Table|array
     {
+        // Configure the Filament table definition for the resource.
         $query = Product::query()
             ->select(['products.*'])
             ->leftJoin('order_items', 'order_items.product_id', '=', 'products.id')

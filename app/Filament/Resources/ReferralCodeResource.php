@@ -8,12 +8,12 @@ use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
@@ -37,11 +37,12 @@ final class ReferralCodeResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = ReferralCode::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Referral';
+    protected static string|UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->components([
                 Section::make(__('referral.resource.referral_code.section.code_details'))
                     ->columns(2)
@@ -127,8 +128,9 @@ final class ReferralCodeResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->query(ReferralCode::query()->withoutGlobalScopes())
             ->columns([

@@ -15,7 +15,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -39,7 +39,7 @@ final class SliderTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+    protected static string|UnitEnum|null $navigationGroup = 'Content Management';
 
     public static function getNavigationLabel(): string
     {
@@ -56,9 +56,10 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
                 ->components([
                     SchemaGrid::make(2)
@@ -95,8 +96,9 @@ final class SliderTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('slider.name')

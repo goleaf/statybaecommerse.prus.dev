@@ -27,8 +27,9 @@ class ViewLegal extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema|array
+    public function infolist(Schema $schema): Schema
     {
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 Section::make(__('legal.basic_information'))

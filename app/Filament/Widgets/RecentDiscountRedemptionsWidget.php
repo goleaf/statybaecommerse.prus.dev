@@ -22,6 +22,7 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
 
     public function table(Table $table): Table|array
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->query(
                 DiscountRedemption::query()

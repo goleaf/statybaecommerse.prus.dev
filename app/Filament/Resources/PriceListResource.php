@@ -9,12 +9,12 @@ use App\Models\PriceList;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -35,7 +35,7 @@ final class PriceListResource extends Resource
 {
     protected static ?string $model = PriceList::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 15;
 
@@ -61,9 +61,10 @@ final class PriceListResource extends Resource
         return __('price_lists.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('price_lists.basic_information'))
                 ->columns(2)
                 ->schema([
@@ -117,8 +118,9 @@ final class PriceListResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('name')

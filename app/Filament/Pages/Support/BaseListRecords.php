@@ -21,6 +21,7 @@ abstract class BaseListRecords extends ListRecords
      */
     public function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         $table = parent::table($table);
 
         return $this->applyToggleableTableLayout($table);

@@ -9,12 +9,12 @@ use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
 use BackedEnum;
 use Exception;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -45,7 +45,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static string|UnitEnum|null $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -64,9 +64,10 @@ final class SystemSettingCategoryTranslationResource extends Resource
         return __('admin.system_setting_category_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('admin.system_setting_category_translations.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -108,8 +109,9 @@ final class SystemSettingCategoryTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('systemSettingCategory.name')
