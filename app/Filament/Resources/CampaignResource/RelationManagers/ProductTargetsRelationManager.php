@@ -22,7 +22,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Targets';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form->schema([
             Select::make('product_id')
@@ -41,7 +41,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([

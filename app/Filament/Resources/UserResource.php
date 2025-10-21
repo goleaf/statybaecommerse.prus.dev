@@ -123,7 +123,7 @@ final class UserResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -185,7 +185,7 @@ final class UserResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([

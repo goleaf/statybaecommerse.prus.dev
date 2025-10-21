@@ -56,7 +56,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order items.
      */
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -211,7 +211,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order items.
      */
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([

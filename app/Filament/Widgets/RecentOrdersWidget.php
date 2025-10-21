@@ -16,7 +16,7 @@ final class RecentOrdersWidget extends BaseWidget
 
     protected static ?int $sort = 2;
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->query(fn (): Builder => Order::query()

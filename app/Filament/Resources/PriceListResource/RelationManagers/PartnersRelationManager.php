@@ -20,7 +20,7 @@ final class PartnersRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.partners.title');
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([

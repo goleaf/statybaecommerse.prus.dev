@@ -30,7 +30,7 @@ final class ViewProduct extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Infolist $infolist): Infolist|array
     {
         return $infolist->schema([
             ListEntry::make('productQuickLinks')

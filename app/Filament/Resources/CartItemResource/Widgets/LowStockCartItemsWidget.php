@@ -17,7 +17,7 @@ final class LowStockCartItemsWidget extends BaseWidget
 
     protected static ?string $heading = 'Low Stock Cart Items';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->query(

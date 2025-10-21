@@ -55,7 +55,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order documents.
      */
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -179,7 +179,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order documents.
      */
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([

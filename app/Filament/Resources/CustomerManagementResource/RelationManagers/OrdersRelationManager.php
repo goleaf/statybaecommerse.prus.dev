@@ -40,7 +40,7 @@ class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->components([
@@ -130,7 +130,7 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $schema): Schema|array
     {
         return $schema
             ->components([
@@ -191,7 +191,7 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('order_number')

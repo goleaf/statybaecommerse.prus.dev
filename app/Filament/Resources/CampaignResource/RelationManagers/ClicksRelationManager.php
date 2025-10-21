@@ -23,7 +23,7 @@ final class ClicksRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Clicks';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form->schema([
             Select::make('click_type')
@@ -57,7 +57,7 @@ final class ClicksRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([

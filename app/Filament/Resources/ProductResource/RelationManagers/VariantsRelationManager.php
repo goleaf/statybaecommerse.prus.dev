@@ -23,7 +23,7 @@ final class VariantsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Variants';
 
-    public function form(Form $form): Form
+    public function form(Form $form): Form|array
     {
         return $form
             ->components([
@@ -69,7 +69,7 @@ final class VariantsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('name')
