@@ -63,6 +63,7 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * OrderResource
@@ -169,8 +170,9 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->schema([
             Section::make(__('orders.sections.order_details'))
                 ->description(__('orders.sections.customer_information'))
@@ -540,8 +542,9 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive table with advanced features.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('number')

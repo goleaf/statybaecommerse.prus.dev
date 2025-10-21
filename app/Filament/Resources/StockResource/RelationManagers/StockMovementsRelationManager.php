@@ -22,6 +22,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -50,8 +51,9 @@ class StockMovementsRelationManager extends BaseRelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
         return $form
             ->components([
                 TextInput::make('quantity')
@@ -96,8 +98,9 @@ class StockMovementsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('reference')
             ->columns([

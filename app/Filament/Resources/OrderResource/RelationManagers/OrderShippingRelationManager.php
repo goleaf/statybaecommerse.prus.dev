@@ -27,6 +27,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 /**
  * OrderShippingRelationManager
@@ -51,8 +52,9 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order shipping.
      */
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
         return $form
             ->schema([
                 Section::make(__('orders.shipping_information'))
@@ -157,8 +159,9 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the table for order shipping.
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('shipping_method')

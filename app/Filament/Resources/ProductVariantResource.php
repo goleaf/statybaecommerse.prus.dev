@@ -47,6 +47,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 /**
  * ProductVariantResource
@@ -91,8 +92,9 @@ final class ProductVariantResource extends Resource
         return 'Products';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form
             ->schema([
                 Tabs::make('Variant Information')
@@ -359,8 +361,9 @@ final class ProductVariantResource extends Resource
             ->every(fn ($item): bool => is_array($item) && array_key_exists('attribute_id', $item) && array_key_exists('attribute_value_id', $item));
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('primaryImage.thumbnail_url')

@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class CampaignResource extends Resource
 {
@@ -61,8 +62,9 @@ final class CampaignResource extends Resource
         return __('campaigns.models.campaign');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->schema([
             // Section component keeps the basic information grouped for clarity in Filament v4.
             Section::make(__('campaigns.sections.basic_information'))
@@ -234,6 +236,7 @@ final class CampaignResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

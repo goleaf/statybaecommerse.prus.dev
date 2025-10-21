@@ -66,6 +66,7 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use App\Support\Filament\Components\Flatpickr;
 use LaraZeus\InlineChart\Tables\Columns\InlineChart;
+use Filament\Schemas\Schema;
 
 /**
  * ProductResource
@@ -145,8 +146,9 @@ final class ProductResource extends Resource
         return __('products.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form
             ->components([
                 Tabs::make('Product Information')
@@ -351,8 +353,9 @@ final class ProductResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->defaultPaginationPageOption(25)
             ->paginationPageOptions([25, 50, 100])

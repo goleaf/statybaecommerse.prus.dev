@@ -15,6 +15,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class ProductSimilarityResource extends Resource
 {
@@ -22,13 +23,15 @@ class ProductSimilarityResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return ProductSimilarityForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return ProductSimilaritiesTable::configure($table);
     }
 

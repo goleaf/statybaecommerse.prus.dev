@@ -23,6 +23,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * SliderTranslationResource
@@ -56,8 +57,9 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
                 ->components([
@@ -95,8 +97,9 @@ final class SliderTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('slider.name')

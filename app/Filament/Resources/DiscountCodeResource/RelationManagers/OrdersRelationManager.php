@@ -11,13 +11,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
 final class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
         return $form
             ->components([
                 Forms\Components\TextInput::make('order_number')
@@ -42,8 +44,9 @@ final class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('order_number')
             ->columns([

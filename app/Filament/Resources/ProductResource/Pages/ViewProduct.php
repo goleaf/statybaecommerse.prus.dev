@@ -18,6 +18,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
+use Filament\Schemas\Schema;
 
 final class ViewProduct extends ViewRecord
 {
@@ -30,9 +31,10 @@ final class ViewProduct extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        // Provide the view record infolist using the Schema-based API required by Filament v4.
+        return $schema->schema([
             ListEntry::make('productQuickLinks')
                 ->heading(__('Quick links'))
                 ->list()

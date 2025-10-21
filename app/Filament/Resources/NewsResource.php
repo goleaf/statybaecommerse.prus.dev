@@ -31,7 +31,7 @@ class NewsResource extends Resource
     protected static ?string $model = News::class;
 
     /** @phpstan-var string|BackedEnum|null */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
@@ -39,8 +39,9 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
@@ -153,8 +154,9 @@ class NewsResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('featured_image')
@@ -380,8 +382,9 @@ class NewsResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 Infolists\Components\Section::make('Article Details')

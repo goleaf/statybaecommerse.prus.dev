@@ -28,6 +28,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Schemas\Schema;
 
 final class RecommendationConfigResourceSimple extends Resource
 {
@@ -52,8 +53,9 @@ final class RecommendationConfigResourceSimple extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->components([
             Section::make(__('recommendation_configs_simple.basic_information'))
                 ->components([
@@ -268,8 +270,9 @@ final class RecommendationConfigResourceSimple extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

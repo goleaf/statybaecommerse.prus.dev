@@ -20,6 +20,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class TranslationsRelationManager extends BaseRelationManager
 {
@@ -31,8 +32,9 @@ class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
         return $form
             ->schema([
                 Section::make('Translation Details')
@@ -114,8 +116,9 @@ class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('title')
             ->columns([

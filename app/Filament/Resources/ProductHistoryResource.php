@@ -26,12 +26,13 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
@@ -52,8 +53,9 @@ final class ProductHistoryResource extends Resource
         return __('product_history.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->schema([
             Section::make(__('product_history.basic_information'))
                 ->columns(2)
@@ -97,8 +99,9 @@ final class ProductHistoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('product.name')

@@ -21,8 +21,9 @@ class WishlistRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Wishlist Items';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 ImageColumn::make('product.main_image')

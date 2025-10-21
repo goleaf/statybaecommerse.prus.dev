@@ -31,6 +31,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class ApiKeyResource extends Resource
 {
@@ -66,8 +67,9 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.plural');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->schema([
             Section::make(__('api_keys.sections.details'))
                 ->columns(2)
@@ -141,8 +143,9 @@ final class ApiKeyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

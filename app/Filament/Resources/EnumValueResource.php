@@ -31,16 +31,19 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 
 final class EnumValueResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
     /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -67,8 +70,9 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
@@ -146,6 +150,7 @@ final class EnumValueResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('type')

@@ -20,13 +20,15 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
         return $form
             ->schema([
                 // Keep the identifier locked because the relationship is read-only in this manager.

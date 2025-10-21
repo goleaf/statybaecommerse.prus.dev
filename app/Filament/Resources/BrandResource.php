@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Filament\Schemas\Schema;
 
 final class BrandResource extends Resource
 {
@@ -115,8 +116,9 @@ final class BrandResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->components([
             Section::make(__('brands.basic_information'))
                 ->components([
@@ -199,8 +201,9 @@ final class BrandResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('logo')

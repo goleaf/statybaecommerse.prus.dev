@@ -35,6 +35,9 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 
 final class EnumManagementResource extends Resource
 {
@@ -43,10 +46,10 @@ final class EnumManagementResource extends Resource
     /**
      * Keep the navigation icon typed so Filament surfaces enum-backed icons reliably.
      */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Pin enum tools to the shared System navigation section. */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
@@ -73,8 +76,9 @@ final class EnumManagementResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->schema([
             Tabs::make('enum_management_tabs')
                 ->tabs([
@@ -159,6 +163,7 @@ final class EnumManagementResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('type')

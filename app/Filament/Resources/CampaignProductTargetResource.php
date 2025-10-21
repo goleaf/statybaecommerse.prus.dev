@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Lang;
+use Filament\Schemas\Schema;
 
 final class CampaignProductTargetResource extends Resource
 {
@@ -47,7 +48,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * @var string|BackedEnum|null Keep Filament navigation metadata flexible between enums and plain strings.
      */
-    protected static $navigationIcon = 'heroicon-o-bullseye-arrow';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bullseye-arrow';
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
@@ -74,8 +75,9 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Define the Campaign Product Target form with conditional selectors and marketing metadata.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form->schema([
             Section::make(__('campaign_product_targets.basic_information'))
                 ->description(__('campaign_product_targets.campaign_selection_description'))
@@ -185,6 +187,7 @@ final class CampaignProductTargetResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('id')

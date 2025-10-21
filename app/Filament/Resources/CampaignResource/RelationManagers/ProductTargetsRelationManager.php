@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class ProductTargetsRelationManager extends BaseRelationManager
 {
@@ -22,8 +23,9 @@ final class ProductTargetsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Targets';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
         return $form->schema([
             Select::make('product_id')
                 ->label('Product')
@@ -41,8 +43,9 @@ final class ProductTargetsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('product.name')

@@ -20,6 +20,7 @@
 - Raised the floor for `novadaemon/filament-combobox` to `^2.0.1` as part of the scheduled Filament maintenance sweep so we can ship the upstream dropdown focus bugfix in the next admin UI release.
 
 ### Changed
+- Migrated Filament resources, relation managers, and record pages to the Schema-based form, table, and infolist signatures required by Filament v4 while normalizing navigation metadata types for icons and groups so package discovery succeeds after dependency installs.
 - Normalized storefront API product payloads to expose `main_image`/`thumbnail` attributes, updated Livewire autocomplete widgets to respect the new fields, and documented coverage with new feature tests.
 - Documented the Collection Rule resource's Filament v4 form/table signatures, modal reorder workflow, and cache maintenance page alignment to guide future admin updates.
 - Added translation-backed fallbacks for missing review ratings while aligning Filament navigation icon docblocks and shared navigation group helpers across the review, system setting category, and enhanced ecommerce widgets.

@@ -33,6 +33,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class CollectionRuleResource extends Resource
 {
@@ -71,8 +72,9 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
         return $form->schema([
             Tabs::make('collection_rule_tabs')
@@ -156,6 +158,7 @@ final class CollectionRuleResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         // Publish the full table definition through the Filament v4 `Table` signature for consistency.
         return $table
             ->columns([

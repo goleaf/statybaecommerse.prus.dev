@@ -21,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 final class TranslationsRelationManager extends BaseRelationManager
 {
@@ -32,8 +33,9 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
         return $form->schema([
             Section::make(__('translations.basic_information'))
                 ->schema([
@@ -75,8 +77,9 @@ final class TranslationsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('locale')

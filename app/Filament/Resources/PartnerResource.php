@@ -18,6 +18,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class PartnerResource extends Resource
 {
@@ -32,8 +33,9 @@ final class PartnerResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Build the Partner form using the Section helper to keep layouts consistent.
         return $form
             ->schema([
@@ -102,8 +104,9 @@ final class PartnerResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')

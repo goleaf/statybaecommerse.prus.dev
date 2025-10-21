@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class ProductImageResource extends Resource
 {
@@ -34,8 +35,9 @@ final class ProductImageResource extends Resource
 
     protected static ?int $navigationSort = 14;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return $form
             ->schema([
                 Forms\Components\Select::make('product_id')
@@ -61,8 +63,9 @@ final class ProductImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('path')
