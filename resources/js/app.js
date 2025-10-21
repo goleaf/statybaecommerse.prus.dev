@@ -2,13 +2,8 @@ import './bootstrap';
 import './shared/utilities.js';
 import './frontend.js';
 import './modern-interactions.js';
-import './livewire-bridge.js';
-import '@fontsource/inter/latin.css';
-import '@fontsource/space-grotesk/latin.css';
-import '@fontsource/figtree/latin.css';
-import '@fontsource/instrument-sans/latin.css';
 // import '../../vendor/shopper/framework/resources/js/index.js'; // Temporarily disabled
-// Fonts are provided by @fontsource packages and bundled by Vite
+// Local fonts are now loaded via CSS @font-face declarations
 
 // Modern frontend enhancements
 document.addEventListener('DOMContentLoaded', function () {
