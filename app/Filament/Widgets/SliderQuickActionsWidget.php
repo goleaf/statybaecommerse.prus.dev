@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
@@ -53,13 +54,20 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                        if ($state === null || $state === '') {
+                        // Hydrate via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md expectations.
+                        SearchableInputHelper::hydrate(
+                            $component,
+                            $state,
+                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                        );
+                    })
+                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
+                        if ($state !== null && $state !== '') {
                             return;
                         }
 
-                        $component
-                            ->state($state)
-                            ->options([$state => $state]);
+                        // Clear persisted URLs when the lookup resets to avoid stale metadata.
+                        SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                     }),
                 ColorPicker::make('background_color')
                     ->label(__('translations.background_color'))
