@@ -35,17 +35,19 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class EnumManagementResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
+    /**
+     * Keep the navigation icon typed so Filament surfaces enum-backed icons reliably.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return trans('admin.enums.navigation_groups.system');
     }
