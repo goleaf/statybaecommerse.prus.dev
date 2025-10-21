@@ -8,7 +8,7 @@ use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,7 +25,7 @@ final class PartnerTierResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -83,7 +83,7 @@ final class PartnerTierResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

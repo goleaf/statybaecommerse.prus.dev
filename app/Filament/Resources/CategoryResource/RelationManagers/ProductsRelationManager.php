@@ -7,7 +7,7 @@ namespace App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Support\Storage\SecureStorage;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\AttachAction;
@@ -32,7 +32,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Products';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             TextInput::make('name')
@@ -71,7 +71,7 @@ final class ProductsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

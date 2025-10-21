@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
@@ -19,7 +21,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -44,7 +45,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|\BackedEnum|null Normalize Filament icon typing for consistency.
      */
-    protected static $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
@@ -53,7 +54,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|\BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static $navigationGroup = NavigationGroup::ContentManagement;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {
@@ -78,7 +79,7 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -151,7 +152,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -393,7 +394,7 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([

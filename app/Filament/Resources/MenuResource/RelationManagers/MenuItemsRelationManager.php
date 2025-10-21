@@ -10,7 +10,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
@@ -24,7 +24,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'allItems';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Grid::make(2)
@@ -63,7 +63,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

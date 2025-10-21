@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
@@ -40,7 +41,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     /**
      * @var string|\BackedEnum|null Navigation icon override documented to support enums without extra imports.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 

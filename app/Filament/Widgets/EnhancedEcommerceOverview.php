@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use UnitEnum;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
@@ -18,10 +19,10 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     /**
      * @var string|BackedEnum|null Navigation icon override so marketing teams recognise the widget quickly.
      */
-    protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     /** @var string|UnitEnum|null Ensure the widget stays surfaced within the dashboard group. */
-    protected static $navigationGroup = 'Dashboard';
+    protected static string|UnitEnum|null $navigationGroup = 'Dashboard';
 
     /**
      * Localize the navigation label to align with analytics translations.

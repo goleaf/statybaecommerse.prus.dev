@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
@@ -24,7 +26,7 @@ use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -43,10 +45,10 @@ final class EnumManagementResource extends Resource
     /**
      * Keep the navigation icon typed so Filament surfaces enum-backed icons reliably.
      */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Pin enum tools to the shared System navigation section. */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
@@ -73,7 +75,7 @@ final class EnumManagementResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Tabs::make('enum_management_tabs')

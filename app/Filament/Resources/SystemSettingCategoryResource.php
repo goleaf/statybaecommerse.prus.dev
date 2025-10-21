@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
@@ -21,7 +22,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -49,7 +50,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|\BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -92,7 +93,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -166,7 +167,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([ActiveScope::class]))

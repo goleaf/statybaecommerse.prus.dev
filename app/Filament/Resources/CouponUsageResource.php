@@ -25,7 +25,7 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
@@ -56,7 +56,7 @@ final class CouponUsageResource extends Resource
         return __('admin.coupon_usages.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->components([
             Tabs::make('coupon_usage_tabs')
@@ -190,7 +190,7 @@ final class CouponUsageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

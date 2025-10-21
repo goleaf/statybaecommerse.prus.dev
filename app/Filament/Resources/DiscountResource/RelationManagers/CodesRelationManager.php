@@ -6,7 +6,7 @@ namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
 use App\Models\DiscountCode;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,7 +23,7 @@ final class CodesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -51,7 +51,7 @@ final class CodesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('code')

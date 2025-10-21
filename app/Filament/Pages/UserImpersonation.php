@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
 use Filament\Pages\Page;
@@ -24,7 +25,7 @@ final class UserImpersonation extends Page implements HasTable
     /**
      * @var string|\BackedEnum|null Navigation icon override documented to keep BackedEnum usage inline.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationGroup(): ?string
     {

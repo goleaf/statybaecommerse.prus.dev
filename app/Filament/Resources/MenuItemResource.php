@@ -18,7 +18,7 @@ use Filament\Forms\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -61,7 +61,7 @@ final class MenuItemResource extends Resource
         return __('admin.menu_items.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -135,7 +135,7 @@ final class MenuItemResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
