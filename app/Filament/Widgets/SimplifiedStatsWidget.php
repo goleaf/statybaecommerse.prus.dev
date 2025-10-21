@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -21,6 +22,11 @@ class SimplifiedStatsWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    /**
+     * Cached chart payload for the current request lifecycle.
+     *
+     * @var array{revenue: array<int, float>, orders: array<int, int>}|null
+     */
     protected ?array $chartData = null;
 
     protected ?Carbon $referenceTime = null;
@@ -101,16 +107,25 @@ class SimplifiedStatsWidget extends BaseWidget
         ];
     }
 
+    /**
+     * @return array<int, float>
+     */
     public function getRevenueChart(): array
     {
         return $this->getChartData()['revenue'];
     }
 
+    /**
+     * @return array<int, int>
+     */
     public function getOrdersChart(): array
     {
         return $this->getChartData()['orders'];
     }
 
+    /**
+     * @return array{revenue: array<int, float>, orders: array<int, int>}
+     */
     protected function getChartData(): array
     {
         if ($this->chartData !== null) {
@@ -121,13 +136,16 @@ class SimplifiedStatsWidget extends BaseWidget
         $startDate = $now->copy()->subDays(6)->startOfDay();
         $endDate = $now->copy()->endOfDay();
 
-        $cacheKey = sprintf(
-            'dashboard.simplified-stats.chart.%s.%s',
+        $cacheKey = CacheKeys::dashboardSimplifiedChart(
             $startDate->toDateString(),
             $endDate->toDateString()
         );
 
-        $chartData = Cache::remember($cacheKey, 60, function () use ($startDate, $endDate, $now) {
+        // Tagging keeps the cache easy to purge from Filament's maintenance tools.
+        $chartData = Cache::tags([
+            CacheTags::dashboard(),
+            CacheTags::orders(),
+        ])->remember($cacheKey, now()->addSeconds(180), function () use ($startDate, $endDate, $now): array {
             $dateKeys = [];
             for ($i = 6; $i >= 0; $i--) {
                 $dateKeys[] = $now->copy()->subDays($i)->toDateString();
@@ -137,12 +155,16 @@ class SimplifiedStatsWidget extends BaseWidget
                 ->createdBetween($startDate, $endDate)
                 ->selectRaw('DATE(created_at) as date, SUM(CASE WHEN status != ? THEN total ELSE 0 END) as revenue, COUNT(*) as total_orders', ['cancelled'])
                 ->groupBy('date')
+                ->toBase()
                 ->get()
-                ->mapWithKeys(static function ($row) {
+                ->mapWithKeys(static function (object $row): array {
+                    $data = (array) $row;
+                    $date = isset($data['date']) ? (string) $data['date'] : '';
+
                     return [
-                        $row->date => [
-                            'revenue' => (float) $row->revenue,
-                            'orders'  => (int) $row->total_orders,
+                        $date => [
+                            'revenue' => isset($data['revenue']) ? (float) $data['revenue'] : 0.0,
+                            'orders' => isset($data['total_orders']) ? (int) $data['total_orders'] : 0,
                         ],
                     ];
                 })
@@ -159,19 +181,36 @@ class SimplifiedStatsWidget extends BaseWidget
 
             return [
                 'revenue' => $revenueChart,
-                'orders'  => $ordersChart,
+                'orders' => $ordersChart,
             ];
         });
 
         return $this->chartData = $chartData;
     }
 
+    /**
+     * @return array{
+     *     orders: array<string, float|int>,
+     *     users: array<string, int>,
+     *     products: array<string, int>,
+     *     catalog: array<string, int>,
+     *     reviews: array<string, int|float>
+     * }
+     */
     protected function getSummaryStats(): array
     {
         $now = $this->getReferenceTime();
         $lastMonth = $now->copy()->subMonth();
 
-        return Cache::remember(CacheKeys::dashboardSummary(), CacheKeys::TTL_MINUTE, function () use ($lastMonth) {
+        return Cache::tags([
+            CacheTags::dashboard(),
+            CacheTags::orders(),
+            CacheTags::users(),
+            CacheTags::products(),
+            CacheTags::categories(),
+            CacheTags::brands(),
+            CacheTags::reviews(),
+        ])->remember(CacheKeys::dashboardSimplifiedSummary(), now()->addSeconds(300), function () use ($lastMonth): array {
             $orderStats = Order::query()
                 ->selectRaw('
                     SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
