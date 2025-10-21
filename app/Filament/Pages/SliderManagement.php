@@ -7,7 +7,9 @@ namespace App\Filament\Pages;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ContentLinkSearch;
+use App\Support\Search\SearchableComponentHelper;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -37,10 +39,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 
@@ -126,13 +125,15 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                    ContentLinkSearch::hydrateComponent($component, $state);
+                                })
+                                ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
+                                    SearchableComponentHelper::apply($component, $item);
+                                })
+                                ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
                                     if ($state === null || $state === '') {
-                                        return;
+                                        SearchableComponentHelper::forget($component);
                                     }
-
-                                    $component
-                                        ->state($state)
-                                        ->options([$state => $state]);
                                 }),
                         ]),
                     ])
@@ -299,13 +300,15 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                        ContentLinkSearch::hydrateComponent($component, $state);
+                                    })
+                                    ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
+                                        SearchableComponentHelper::apply($component, $item);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
                                         if ($state === null || $state === '') {
-                                            return;
+                                            SearchableComponentHelper::forget($component);
                                         }
-
-                                        $component
-                                            ->state($state)
-                                            ->options([$state => $state]);
                                     }),
                             ])
                             ->collapsible()

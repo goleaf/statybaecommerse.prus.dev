@@ -6,6 +6,7 @@ namespace App\Support\Search;
 
 use App\Models\Location;
 use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
@@ -22,23 +23,7 @@ final class LocationSearch
             ->get();
 
         return $locations
-            ->map(static function (Location $location): SearchResult {
-                /** @var int|string|null $identifier */
-                $identifier = $location->getKey();
-
-                $label = self::label($location);
-
-                $result = SearchResult::make((string) ($identifier ?? ''), $label);
-
-                $result
-                    ->withData('location_id', $location->getKey())
-                    ->withData('name', self::stringValue($location->getAttribute('name')))
-                    ->withData('code', self::stringValue($location->getAttribute('code')))
-                    ->withData('city', self::stringValue($location->getAttribute('city')))
-                    ->withData('country_code', self::stringValue($location->getAttribute('country_code')));
-
-                return $result;
-            })
+            ->map(static fn (Location $location): SearchResult => self::toResult($location))
             ->all();
     }
 
@@ -66,6 +51,25 @@ final class LocationSearch
         ])));
     }
 
+    public static function hydrateComponent(SearchableInput $component, ?int $state): void
+    {
+        if ($state === null) {
+            SearchableComponentHelper::forget($component);
+
+            return;
+        }
+
+        $location = Location::query()
+            ->select(['id', 'name', 'code', 'city', 'country_code'])
+            ->find($state);
+
+        if (! $location instanceof Location) {
+            return;
+        }
+
+        SearchableComponentHelper::apply($component, self::toResult($location));
+    }
+
     /**
      * @return Builder<Location>
      */
@@ -91,5 +95,23 @@ final class LocationSearch
     {
         return is_string($value) ? $value : '';
     }
-}
 
+    private static function toResult(Location $location): SearchResult
+    {
+        /** @var int|string|null $identifier */
+        $identifier = $location->getKey();
+
+        $label = self::label($location);
+
+        $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+        $result
+            ->withData('location_id', $location->getKey())
+            ->withData('name', self::stringValue($location->getAttribute('name')))
+            ->withData('code', self::stringValue($location->getAttribute('code')))
+            ->withData('city', self::stringValue($location->getAttribute('city')))
+            ->withData('country_code', self::stringValue($location->getAttribute('country_code')));
+
+        return $result;
+    }
+}

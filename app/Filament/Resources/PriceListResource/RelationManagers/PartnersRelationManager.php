@@ -9,12 +9,13 @@ use Filament\Actions\DetachAction;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 final class PartnersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'partners';
 
-    public static function getTitle(): ?string
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return __('price_lists.relation_managers.partners.title');
     }

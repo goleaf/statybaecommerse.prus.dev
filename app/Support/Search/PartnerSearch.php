@@ -6,6 +6,7 @@ namespace App\Support\Search;
 
 use App\Models\Partner;
 use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
 
 final class PartnerSearch
@@ -21,22 +22,7 @@ final class PartnerSearch
             ->get();
 
         return $partners
-            ->map(static function (Partner $partner): SearchResult {
-                /** @var int|string|null $identifier */
-                $identifier = $partner->getKey();
-
-                $label = self::label($partner);
-
-                $result = SearchResult::make((string) ($identifier ?? ''), $label);
-
-                $result
-                    ->withData('partner_id', $partner->getKey())
-                    ->withData('name', self::stringValue($partner->getAttribute('name')))
-                    ->withData('code', self::stringValue($partner->getAttribute('code')))
-                    ->withData('email', self::stringValue($partner->getAttribute('contact_email')));
-
-                return $result;
-            })
+            ->map(static fn (Partner $partner): SearchResult => self::toResult($partner))
             ->all();
     }
 
@@ -58,6 +44,25 @@ final class PartnerSearch
             $code !== '' ? $code : null,
             $email !== '' ? $email : null,
         ])));
+    }
+
+    public static function hydrateComponent(SearchableInput $component, int|string|null $state): void
+    {
+        if ($state === null || $state === '') {
+            SearchableComponentHelper::forget($component);
+
+            return;
+        }
+
+        $partner = Partner::query()
+            ->select(['id', 'name', 'code', 'contact_email'])
+            ->find($state);
+
+        if (! $partner instanceof Partner) {
+            return;
+        }
+
+        SearchableComponentHelper::apply($component, self::toResult($partner));
     }
 
     /**
@@ -84,5 +89,22 @@ final class PartnerSearch
     {
         return is_string($value) ? $value : '';
     }
-}
 
+    private static function toResult(Partner $partner): SearchResult
+    {
+        /** @var int|string|null $identifier */
+        $identifier = $partner->getKey();
+
+        $label = self::label($partner);
+
+        $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+        $result
+            ->withData('partner_id', $partner->getKey())
+            ->withData('name', self::stringValue($partner->getAttribute('name')))
+            ->withData('code', self::stringValue($partner->getAttribute('code')))
+            ->withData('email', self::stringValue($partner->getAttribute('contact_email')));
+
+        return $result;
+    }
+}

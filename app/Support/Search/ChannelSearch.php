@@ -6,6 +6,7 @@ namespace App\Support\Search;
 
 use App\Models\Channel;
 use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
@@ -22,22 +23,7 @@ final class ChannelSearch
             ->get();
 
         return $channels
-            ->map(static function (Channel $channel): SearchResult {
-                /** @var int|string|null $identifier */
-                $identifier = $channel->getKey();
-
-                $label = self::label($channel);
-
-                $result = SearchResult::make((string) ($identifier ?? ''), $label);
-
-                $result
-                    ->withData('channel_id', $channel->getKey())
-                    ->withData('name', self::stringValue($channel->getAttribute('name')))
-                    ->withData('code', self::stringValue($channel->getAttribute('code')))
-                    ->withData('type', self::stringValue($channel->getAttribute('type')));
-
-                return $result;
-            })
+            ->map(static fn (Channel $channel): SearchResult => self::toResult($channel))
             ->all();
     }
 
@@ -61,6 +47,25 @@ final class ChannelSearch
         ]);
 
         return implode(' • ', $fragments);
+    }
+
+    public static function hydrateComponent(SearchableInput $component, int|string|null $state): void
+    {
+        if ($state === null || $state === '') {
+            SearchableComponentHelper::forget($component);
+
+            return;
+        }
+
+        $channel = Channel::query()
+            ->select(['id', 'name', 'code', 'type'])
+            ->find($state);
+
+        if (! $channel instanceof Channel) {
+            return;
+        }
+
+        SearchableComponentHelper::apply($component, self::toResult($channel));
     }
 
     /**
@@ -87,5 +92,22 @@ final class ChannelSearch
     {
         return is_string($value) ? $value : '';
     }
-}
 
+    private static function toResult(Channel $channel): SearchResult
+    {
+        /** @var int|string|null $identifier */
+        $identifier = $channel->getKey();
+
+        $label = self::label($channel);
+
+        $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+        $result
+            ->withData('channel_id', $channel->getKey())
+            ->withData('name', self::stringValue($channel->getAttribute('name')))
+            ->withData('code', self::stringValue($channel->getAttribute('code')))
+            ->withData('type', self::stringValue($channel->getAttribute('type')));
+
+        return $result;
+    }
+}
