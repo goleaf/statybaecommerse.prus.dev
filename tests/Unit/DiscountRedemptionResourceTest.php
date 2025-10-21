@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\DiscountRedemptionResource;
+use App\Support\Nav;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 
@@ -21,7 +22,9 @@ it('has correct model', function (): void {
 });
 
 it('has correct navigation group', function (): void {
-    expect(DiscountRedemptionResource::getNavigationGroup())->toBe('Marketing');
+    expect(DiscountRedemptionResource::getNavigationGroup())->toBe(
+        Nav::groupForResource(DiscountRedemptionResource::class)
+    );
 });
 
 it('has correct navigation icon', function (): void {

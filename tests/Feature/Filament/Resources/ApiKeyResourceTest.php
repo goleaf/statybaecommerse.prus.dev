@@ -11,6 +11,7 @@ use App\Filament\Resources\ApiKeyResource\Pages\EditApiKey;
 use App\Filament\Resources\ApiKeyResource\Pages\ListApiKeys;
 use App\Models\ApiKey;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -145,7 +146,7 @@ final class ApiKeyResourceTest extends TestCase
     public function test_navigation_and_labels_are_localized(): void
     {
         $this->assertSame(__('api_keys.navigation.label'), ApiKeyResource::getNavigationLabel());
-        $this->assertSame(__('navigation.groups.system'), ApiKeyResource::getNavigationGroup());
+        $this->assertSame(Nav::groupForResource(ApiKeyResource::class), ApiKeyResource::getNavigationGroup());
         $this->assertSame(__('api_keys.navigation.singular'), ApiKeyResource::getModelLabel());
         $this->assertSame(__('api_keys.navigation.plural'), ApiKeyResource::getPluralModelLabel());
 

@@ -12,6 +12,7 @@ use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingHistory;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -314,7 +315,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     public function test_navigation_group_is_settings(): void
     {
         $this->assertEquals(
-            'Settings',
+            Nav::groupForResource(SystemSettingHistoryResource::class),
             SystemSettingHistoryResource::getNavigationGroup()
         );
     }

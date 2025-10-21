@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Nav;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -116,7 +117,7 @@ class ProductResourceTest extends TestCase
 
     public function test_product_resource_navigation_group(): void
     {
-        $this->assertEquals('Products', ProductResource::getNavigationGroup());
+        $this->assertEquals(Nav::groupForResource(ProductResource::class), ProductResource::getNavigationGroup());
     }
 
     public function test_product_resource_navigation_label(): void

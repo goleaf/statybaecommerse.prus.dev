@@ -7,6 +7,7 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\ReportResource;
 use App\Models\Report;
 use App\Models\User;
+use App\Support\Nav;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -680,7 +681,7 @@ class ReportResourceComprehensiveTest extends TestCase
 
         // Test navigation properties
         $this->assertEquals('heroicon-o-document-chart-bar', ReportResource::getNavigationIcon());
-        $this->assertEquals(__('navigation.groups.analytics'), ReportResource::getNavigationGroup());
+        $this->assertEquals(Nav::groupForResource(ReportResource::class), ReportResource::getNavigationGroup());
         $this->assertEquals(__('admin.navigation.reports'), ReportResource::getNavigationLabel());
         $this->assertEquals(__('admin.models.report'), ReportResource::getModelLabel());
         $this->assertEquals(__('admin.models.reports'), ReportResource::getPluralModelLabel());

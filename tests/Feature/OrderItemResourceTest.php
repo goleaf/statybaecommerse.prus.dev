@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Enums\NavigationGroup;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Support\Nav;
 use App\Support\Filament\ProductVariantFieldHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -457,7 +457,10 @@ final class OrderItemResourceTest extends TestCase
 
     public function test_navigation_group_is_orders(): void
     {
-        $this->assertEquals(NavigationGroup::Orders, \App\Filament\Resources\OrderItemResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(\App\Filament\Resources\OrderItemResource::class),
+            \App\Filament\Resources\OrderItemResource::getNavigationGroup()
+        );
     }
 
     public function test_has_correct_navigation_sort(): void
