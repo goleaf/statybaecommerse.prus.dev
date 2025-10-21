@@ -7,6 +7,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
 use BackedEnum;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\NumericScale;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -14,9 +17,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
@@ -72,47 +73,35 @@ final class ReviewResource extends Resource
                     ->description(__('reviews.sections.basic_info_description'))
                     ->columns(2)
                     ->schema([
-                        Select::make('product_id')
-                            ->label(__('reviews.fields.product_id'))
+                        SelectInput::make('product_id', __('reviews.fields.product_id'))
                             ->relationship('product', 'name')
                             ->searchable()
                             ->preload()
                             ->required(),
-                        Select::make('user_id')
-                            ->label(__('reviews.fields.user_id'))
+                        SelectInput::make('user_id', __('reviews.fields.user_id'))
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
                             ->nullable(),
-                        TextInput::make('reviewer_name')
-                            ->label(__('reviews.fields.reviewer_name'))
+                        TextInputInput::make('reviewer_name', __('reviews.fields.reviewer_name'))
+                            ->columnSpan(1)
                             ->required()
                             ->maxLength(255),
-                        TextInput::make('reviewer_email')
-                            ->label(__('reviews.fields.reviewer_email'))
+                        TextInputInput::make('reviewer_email', __('reviews.fields.reviewer_email'))
+                            ->columnSpan(1)
                             ->email()
                             ->required()
                             ->maxLength(255),
-                        Select::make('rating')
-                            ->label(__('reviews.fields.rating'))
-                            ->required()
-                            ->options([
-                                1 => '1',
-                                2 => '2',
-                                3 => '3',
-                                4 => '4',
-                                5 => '5',
-                            ]),
+                        NumericScale::make('rating', __('reviews.fields.rating'))
+                            ->required(),
                     ]),
                 Section::make(__('reviews.sections.content'))
                     ->description(__('reviews.sections.content_description'))
                     ->columns(1)
                     ->schema([
-                        TextInput::make('title')
-                            ->label(__('reviews.fields.title'))
+                        TextInputInput::make('title', __('reviews.fields.title'))
                             ->required()
-                            ->maxLength(255)
-                            ->columnSpanFull(),
+                            ->maxLength(255),
                         Textarea::make('content')
                             ->label(__('reviews.fields.content'))
                             ->required()
@@ -132,8 +121,8 @@ final class ReviewResource extends Resource
                             ->label(__('reviews.fields.is_featured'))
                             ->inline(false)
                             ->default(false),
-                        TextInput::make('locale')
-                            ->label(__('reviews.fields.locale'))
+                        TextInputInput::make('locale', __('reviews.fields.locale'))
+                            ->columnSpan(1)
                             ->default('lt')
                             ->maxLength(10),
                     ]),
@@ -141,8 +130,7 @@ final class ReviewResource extends Resource
                     ->description(__('reviews.sections.advanced_description'))
                     ->collapsible()
                     ->schema([
-                        TextInput::make('metadata')
-                            ->label(__('reviews.fields.metadata'))
+                        TextInputInput::make('metadata', __('reviews.fields.metadata'))
                             ->json()
                             ->columnSpanFull()
                             ->placeholder(__('reviews.placeholders.metadata_json')),
