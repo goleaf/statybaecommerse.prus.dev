@@ -1,4 +1,6 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+# Run commitlint without the deprecated Husky bootstrap so future updates remain noise-free.
+
+set -eu
 
 npx --no -- commitlint --edit "$1"

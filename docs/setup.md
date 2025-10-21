@@ -13,14 +13,14 @@ The project is routinely developed on:
 
 ## 2. Required tooling
 
-| Tool | Version | Notes |
-| --- | --- | --- |
-| PHP | 8.2 or newer | Ensure `ext-sqlite3`, `ext-fileinfo`, and `ext-gd` are enabled. |
-| Composer | 2.6 or newer | Ships with the PHP installer on most platforms. |
-| Node.js | 20.x LTS | Installs with npm 10+, required for Vite and frontend builds. |
-| npm | 10.x | Bundled with Node 20. |
-| SQLite | 3.x | Default development database backend. |
-| Make (optional) | Latest | Simplifies the bootstrap commands via provided targets. |
+| Tool            | Version      | Notes                                                           |
+| --------------- | ------------ | --------------------------------------------------------------- |
+| PHP             | 8.2 or newer | Ensure `ext-sqlite3`, `ext-fileinfo`, and `ext-gd` are enabled. |
+| Composer        | 2.6 or newer | Ships with the PHP installer on most platforms.                 |
+| Node.js         | 20.x LTS     | Installs with npm 10+, required for Vite and frontend builds.   |
+| npm             | 10.x         | Bundled with Node 20.                                           |
+| SQLite          | 3.x          | Default development database backend.                           |
+| Make (optional) | Latest       | Simplifies the bootstrap commands via provided targets.         |
 
 Optional but helpful: Redis (for queue experiments) and pnpm (mirrors npm commands).
 
@@ -36,7 +36,10 @@ Optional but helpful: Redis (for queue experiments) and pnpm (mirrors npm comman
 
 # 3. Install Node dependencies
  npm install
+
 ```
+
+> ✅ Husky hooks install automatically during `npm install`. If hooks ever stop running, execute `npm run prepare` to refresh the modern shim.
 
 If you prefer the automated route, run `make setup` after cloning—it performs all three steps, copies the `.env`, and prepares the SQLite database.
 
@@ -51,15 +54,15 @@ php artisan key:generate
 
 Key environment toggles from `.env.example`:
 
-| Variable | Purpose | Default |
-| --- | --- | --- |
-| `APP_ENV` / `APP_DEBUG` | Toggle debugging locally. | `local` / `true` |
-| `APP_LOCALE` / `APP_FALLBACK_LOCALE` | Default and fallback languages. | `lt` / `en` |
-| `DB_CONNECTION` | Database driver. Use `sqlite` to stay zero-config. | `sqlite` |
-| `DB_DATABASE` | Path to the SQLite file. | `database/database.sqlite` |
-| `QUEUE_CONNECTION` | `database` gives async queues; swap to `sync` if you lack a worker. | `database` |
-| `MAIL_MAILER` | Logs emails locally via `log`. | `log` |
-| `SCOUT_DRIVER` | Search driver (`null` disables). | `null` |
+| Variable                             | Purpose                                                             | Default                    |
+| ------------------------------------ | ------------------------------------------------------------------- | -------------------------- |
+| `APP_ENV` / `APP_DEBUG`              | Toggle debugging locally.                                           | `local` / `true`           |
+| `APP_LOCALE` / `APP_FALLBACK_LOCALE` | Default and fallback languages.                                     | `lt` / `en`                |
+| `DB_CONNECTION`                      | Database driver. Use `sqlite` to stay zero-config.                  | `sqlite`                   |
+| `DB_DATABASE`                        | Path to the SQLite file.                                            | `database/database.sqlite` |
+| `QUEUE_CONNECTION`                   | `database` gives async queues; swap to `sync` if you lack a worker. | `database`                 |
+| `MAIL_MAILER`                        | Logs emails locally via `log`.                                      | `log`                      |
+| `SCOUT_DRIVER`                       | Search driver (`null` disables).                                    | `null`                     |
 
 > 🗒️ Keep `APP_URL=http://127.0.0.1:8000` if you intend to use the built-in PHP server.
 
@@ -88,17 +91,19 @@ Prefer MySQL/PostgreSQL? Update the `DB_*` values in `.env` and rerun the migrat
 You have two options:
 
 1. **Simple PHP server + Vite build**
-   ```bash
-   php artisan serve &
-   npm run dev
-   ```
-   Visit the storefront at <http://127.0.0.1:8000> and the admin at <http://127.0.0.1:8000/admin>.
+
+    ```bash
+    php artisan serve &
+    npm run dev
+    ```
+
+    Visit the storefront at <http://127.0.0.1:8000> and the admin at <http://127.0.0.1:8000/admin>.
 
 2. **All-in-one Make target**
-   ```bash
-   make dev
-   ```
-   This spins up the PHP server, queue worker, Vite, and Pail log viewer together.
+    ```bash
+    make dev
+    ```
+    This spins up the PHP server, queue worker, Vite, and Pail log viewer together.
 
 Stop background commands with `Ctrl+C` when you are done.
 
@@ -115,15 +120,15 @@ You can explore more helper commands in the `Makefile` (`make test`, `make analy
 
 ## 8. Common issues & quick fixes (FAQ)
 
-| Symptom | Resolution |
-| --- | --- |
-| `Class "PDO" not found` or `could not find driver` | Ensure PHP’s SQLite extension is enabled (`php -m | grep sqlite`). On macOS with Homebrew: `brew install php` and restart your shell. |
-| `APP_KEY` related errors | Run `php artisan key:generate` after creating `.env`. |
-| Migrations fail because the SQLite file is read-only | Verify the `database/` folder and `database.sqlite` file are writable (`chmod 664 database/database.sqlite`). |
-| `npm run dev` fails with OpenSSL or incompatible Node errors | Confirm `node -v` reports ≥20. Reinstall via `nvm install 20` or `brew install node@20`. |
-| Admin panel styles are missing | Ensure Vite is running (`npm run dev`) or run `npm run build` for a static build. |
-| Queue jobs pile up | Switch to synchronous processing locally by setting `QUEUE_CONNECTION=sync` in `.env` and rerun `php artisan queue:restart`. |
-| Storage symlink missing 404s for media | Execute `php artisan storage:link` to recreate `public/storage`. |
+| Symptom                                                      | Resolution                                                                                                                   |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `Class "PDO" not found` or `could not find driver`           | Ensure PHP’s SQLite extension is enabled (`php -m                                                                            | grep sqlite`). On macOS with Homebrew: `brew install php` and restart your shell. |
+| `APP_KEY` related errors                                     | Run `php artisan key:generate` after creating `.env`.                                                                        |
+| Migrations fail because the SQLite file is read-only         | Verify the `database/` folder and `database.sqlite` file are writable (`chmod 664 database/database.sqlite`).                |
+| `npm run dev` fails with OpenSSL or incompatible Node errors | Confirm `node -v` reports ≥20. Reinstall via `nvm install 20` or `brew install node@20`.                                     |
+| Admin panel styles are missing                               | Ensure Vite is running (`npm run dev`) or run `npm run build` for a static build.                                            |
+| Queue jobs pile up                                           | Switch to synchronous processing locally by setting `QUEUE_CONNECTION=sync` in `.env` and rerun `php artisan queue:restart`. |
+| Storage symlink missing 404s for media                       | Execute `php artisan storage:link` to recreate `public/storage`.                                                             |
 
 ---
 
