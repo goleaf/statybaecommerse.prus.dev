@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
 use App\Enums\OrderStatus;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Order;
+use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -21,10 +24,10 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -112,15 +115,15 @@ class OrdersRelationManager extends BaseRelationManager
                                     ->label(__('orders.status'))
                                     ->badge()
                                     ->color(fn (string $state): string => match ($state) {
-                                        'pending' => 'warning',
-                                        'confirmed' => 'info',
+                                        'pending'    => 'warning',
+                                        'confirmed'  => 'info',
                                         'processing' => 'primary',
-                                        'shipped' => 'success',
-                                        'delivered' => 'success',
-                                        'cancelled' => 'danger',
-                                        'refunded' => 'secondary',
-                                        'returned' => 'warning',
-                                        default => 'gray',
+                                        'shipped'    => 'success',
+                                        'delivered'  => 'success',
+                                        'cancelled'  => 'danger',
+                                        'refunded'   => 'secondary',
+                                        'returned'   => 'warning',
+                                        default      => 'gray',
                                     }),
                                 TextEntry::make('total_amount')
                                     ->label(__('orders.total_amount'))
@@ -174,13 +177,13 @@ class OrdersRelationManager extends BaseRelationManager
                 BadgeColumn::make('status')
                     ->label(__('orders.status'))
                     ->colors([
-                        'warning' => fn ($state): bool => $state === 'pending',
-                        'info' => fn ($state): bool => $state === 'confirmed',
-                        'primary' => fn ($state): bool => $state === 'processing',
-                        'success' => fn ($state): bool => in_array($state, ['shipped', 'delivered']),
-                        'danger' => fn ($state): bool => $state === 'cancelled',
+                        'warning'   => fn ($state): bool => $state === 'pending',
+                        'info'      => fn ($state): bool => $state === 'confirmed',
+                        'primary'   => fn ($state): bool => $state === 'processing',
+                        'success'   => fn ($state): bool => in_array($state, ['shipped', 'delivered']),
+                        'danger'    => fn ($state): bool => $state === 'cancelled',
                         'secondary' => fn ($state): bool => $state === 'refunded',
-                        'warning' => fn ($state): bool => $state === 'returned',
+                        'warning'   => fn ($state): bool => $state === 'returned',
                     ]),
                 TextColumn::make('total_amount')
                     ->label(__('orders.total_amount'))
@@ -229,9 +232,9 @@ class OrdersRelationManager extends BaseRelationManager
                 SelectFilter::make('payment_method')
                     ->label(__('orders.payment_method'))
                     ->options([
-                        'credit_card' => __('orders.payment_methods.credit_card'),
-                        'bank_transfer' => __('orders.payment_methods.bank_transfer'),
-                        'paypal' => __('orders.payment_methods.paypal'),
+                        'credit_card'      => __('orders.payment_methods.credit_card'),
+                        'bank_transfer'    => __('orders.payment_methods.bank_transfer'),
+                        'paypal'           => __('orders.payment_methods.paypal'),
                         'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
                     ]),
                 Filter::make('created_at')
@@ -257,7 +260,56 @@ class OrdersRelationManager extends BaseRelationManager
                 CreateAction::make()
                     ->label(__('orders.create_order')),
                 AssociateAction::make()
-                    ->label(__('orders.associate_order')),
+                    ->label(__('orders.associate_order'))
+                    ->form([
+                        SearchableInput::make('recordId')
+                            ->label(__('orders.order'))
+                            ->placeholder(__('orders.search_placeholder'))
+                            ->searchUsing(function (string $search): array {
+                                $term = trim($search);
+
+                                return Order::query()
+                                    ->select(['id', 'number', 'status', 'total'])
+                                    ->when($term !== '', function (Builder $query) use ($term): void {
+                                        $query->where(function (Builder $nested) use ($term): void {
+                                            $nested
+                                                ->where('number', 'like', "%{$term}%")
+                                                ->orWhere('status', 'like', "%{$term}%");
+                                        });
+                                    })
+                                    ->orderByDesc('created_at')
+                                    ->limit(15)
+                                    ->get()
+                                    ->map(function (Order $order): SearchResult {
+                                        $number = (string) ($order->getAttribute('number') ?? '');
+                                        $status = (string) ($order->getAttribute('status') ?? '');
+                                        $total = (float) ($order->getAttribute('total') ?? 0.0);
+                                        $label = trim(sprintf('#%s — %s — €%s', $number, __('orders.statuses.' . $status) ?? $status, number_format($total, 2)));
+
+                                        return SearchResult::make((string) $order->getKey(), $label)
+                                            ->withData('order_id', $order->getKey());
+                                    })
+                                    ->all();
+                            })
+                            ->required()
+                            ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                            ->onItemSelected(function (SearchResult $item): void {
+                                app()->call(function (Set $set) use ($item): void {
+                                    $rawId = $item->get('order_id');
+
+                                    if (! is_numeric($rawId)) {
+                                        $rawId = $item->value();
+                                    }
+
+                                    if (! is_numeric($rawId)) {
+                                        return;
+                                    }
+
+                                    $set('recordId', (int) $rawId);
+                                });
+                            })
+                            ->suffixIcon('heroicon-o-queue-list'),
+                    ]),
             ])
             ->recordActions([
                 ViewAction::make(),

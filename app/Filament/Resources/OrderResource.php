@@ -7,14 +7,17 @@ namespace App\Filament\Resources;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Search\CouponSearch;
 use App\Support\Search\CustomerSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -262,6 +265,48 @@ final class OrderResource extends Resource
                                 ->prefix('€')
                                 ->step(0.01),
                         ]),
+                    SearchableInput::make('coupon_id')
+                        ->label(__('orders.fields.coupon'))
+                        ->placeholder(__('orders.fields.coupon_placeholder'))
+                        ->searchUsing(fn (string $search): array => CouponSearch::byCode($search))
+                        ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                        ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                            if ($state === null) {
+                                return;
+                            }
+
+                            $coupon = $record?->coupon ?? Coupon::query()->select(['id', 'code', 'name'])->find($state);
+
+                            if (! $coupon instanceof Coupon) {
+                                return;
+                            }
+
+                            $code = (string) ($coupon->getAttribute('code') ?? '');
+                            $name = (string) ($coupon->getAttribute('name') ?? '');
+                            $label = trim(sprintf('%s — %s', $code, $name));
+
+                            $component
+                                ->state((string) $state)
+                                ->options([
+                                    (string) $coupon->getKey() => $label,
+                                ]);
+                        })
+                        ->onItemSelected(function (SearchResult $item): void {
+                            app()->call(function (Set $set) use ($item): void {
+                                $rawId = $item->get('coupon_id');
+
+                                if (! is_numeric($rawId)) {
+                                    $rawId = $item->value();
+                                }
+
+                                if (! is_numeric($rawId)) {
+                                    return;
+                                }
+
+                                $set('coupon_id', (int) $rawId);
+                            });
+                        })
+                        ->suffixIcon('heroicon-o-ticket'),
                     Placeholder::make('total')
                         ->label(__('orders.fields.total'))
                         ->content(function (\Filament\Schemas\Components\Utilities\Get $get): string {

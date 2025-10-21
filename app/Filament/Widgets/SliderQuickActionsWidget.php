@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
+use App\Support\Search\ContentLinkSearch;
+use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -14,6 +18,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
 
@@ -43,6 +48,22 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                 TextInput::make('button_text')
                     ->label(__('translations.button_text'))
                     ->maxLength(255),
+                SearchableInput::make('link_target')
+                    ->label(__('translations.link_target'))
+                    ->placeholder(__('translations.link_target_placeholder'))
+                    ->searchUsing(fn (string $search): array => ContentLinkSearch::suggestions($search))
+                    ->onItemSelected(function (SearchResult $item): void {
+                        app()->call(function (Set $set) use ($item): void {
+                            $url = $item->value();
+
+                            if ($url !== '') {
+                                $set('button_url', $url);
+                            }
+                        });
+                    })
+                    ->dehydrated(false)
+                    ->helperText(__('translations.link_target_hint'))
+                    ->suffixIcon('heroicon-o-link'),
                 TextInput::make('button_url')
                     ->label(__('translations.button_url'))
                     ->url()
@@ -108,7 +129,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
             ->url(function () {
                 try {
                     return route('filament.admin.resources.sliders.index');
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return '#';
                 }
             })
