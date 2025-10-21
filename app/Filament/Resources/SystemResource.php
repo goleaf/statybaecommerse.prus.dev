@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SystemResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
@@ -42,7 +43,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * System Resource - Comprehensive System Management
@@ -90,7 +90,7 @@ final class SystemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'System';
     }

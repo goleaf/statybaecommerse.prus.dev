@@ -14,6 +14,8 @@ return [
     'description' => 'Aprašymas',
     'button_text' => 'Mygtuko tekstas',
     'button_url' => 'Mygtuko URL',
+    'button_url_placeholder' => 'Ieškokite turinio arba įklijuokite URL',
+    'button_url_helper' => 'Pasirinkite vidinį puslapį, produktą arba įveskite išorinį URL.',
     'image' => 'Paveikslėlis',
     'background_color' => 'Fono spalva',
     'text_color' => 'Teksto spalva',

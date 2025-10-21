@@ -6,7 +6,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\VariantInventory;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\LocationSearch;
+use App\Support\Search\PartnerSearch;
+use App\Support\Search\ProductVariantSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -34,7 +39,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * VariantInventoryResource
@@ -76,18 +80,46 @@ final class VariantInventoryResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Select::make('variant_id')
+                                SearchableInput::make('variant_id')
                                     ->label(__('admin.variant_inventory.variant'))
-                                    ->relationship('variant', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
-                                Select::make('location_id')
+                                    ->placeholder(__('admin.variant_inventory.placeholders.variant'))
+                                    ->searchUsing(fn (string $term): array => ProductVariantSearch::results($term))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
+                                        if ($state === null || ! $record?->variant) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->variant_id => ProductVariantSearch::label($record->variant),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    })
+                                    ->required(),
+                                SearchableInput::make('location_id')
                                     ->label(__('admin.variant_inventory.location'))
-                                    ->relationship('location', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
+                                    ->placeholder(__('admin.variant_inventory.placeholders.location'))
+                                    ->searchUsing(fn (string $term): array => LocationSearch::results($term))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
+                                        if ($state === null || ! $record?->location) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->location_id => LocationSearch::label($record->location),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    })
+                                    ->required(),
                             ]),
                         Grid::make(2)
                             ->schema([
@@ -157,9 +189,25 @@ final class VariantInventoryResource extends Resource
                             ->schema([
                                 Flatpickr::makeDate('expiry_date')
                                     ->label(__('admin.variant_inventory.expiry_date')),
-                                TextInput::make('supplier_id')
+                                SearchableInput::make('supplier_id')
                                     ->label(__('admin.variant_inventory.supplier_id'))
-                                    ->numeric(),
+                                    ->placeholder(__('admin.variant_inventory.placeholders.supplier'))
+                                    ->searchUsing(fn (string $term): array => PartnerSearch::results($term))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
+                                        if ($state === null || ! $record?->supplier) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->supplier_id => PartnerSearch::label($record->supplier),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        $set('supplier_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    }),
                             ]),
                     ]),
                 Section::make(__('admin.variant_inventory.additional_info'))

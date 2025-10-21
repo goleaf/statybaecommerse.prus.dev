@@ -97,6 +97,10 @@ return [
     'sort_by' => 'Сортировать по',
     'clear_filters' => 'Очистить фильтры',
     'apply_filters' => 'Применить фильтры',
+    'button_url' => 'URL кнопки',
+    'button_url_placeholder' => 'Найдите контент или вставьте URL',
+    'button_url_helper' => 'Выберите внутреннюю страницу, товар или введите внешний URL.',
+    'slide_link' => 'Ссылка слайда',
     'showing_results' => 'Показано :from-:to из :total результатов',
     // Account
     'my_account' => 'Мой аккаунт',

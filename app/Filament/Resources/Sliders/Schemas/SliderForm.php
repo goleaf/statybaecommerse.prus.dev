@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
+use App\Support\Search\ContentLinkSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -69,9 +71,11 @@ final class SliderForm
                                     ->label(__('admin.sliders.button_text'))
                                     ->maxLength(255)
                                     ->columnSpan(1),
-                                TextInput::make('button_url')
+                                SearchableInput::make('button_url')
                                     ->label(__('admin.sliders.button_url'))
-                                    ->url()
+                                    ->placeholder(__('admin.sliders.button_url_placeholder'))
+                                    ->helperText(__('admin.sliders.button_url_helper'))
+                                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
                                     ->maxLength(255)
                                     ->columnSpan(1),
                             ]),

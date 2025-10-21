@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
+use App\Support\Search\ContentLinkSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -43,9 +46,11 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                 TextInput::make('button_text')
                     ->label(__('translations.button_text'))
                     ->maxLength(255),
-                TextInput::make('button_url')
+                SearchableInput::make('button_url')
                     ->label(__('translations.button_url'))
-                    ->url()
+                    ->placeholder(__('translations.button_url_placeholder'))
+                    ->helperText(__('translations.button_url_helper'))
+                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
                     ->maxLength(255),
                 ColorPicker::make('background_color')
                     ->label(__('translations.background_color'))
@@ -108,7 +113,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
             ->url(function () {
                 try {
                     return route('filament.admin.resources.sliders.index');
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return '#';
                 }
             })

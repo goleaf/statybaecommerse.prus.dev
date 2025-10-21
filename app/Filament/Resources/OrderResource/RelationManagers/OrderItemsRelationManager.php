@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
-use App\Models\ProductVariant;
+use App\Support\Search\ProductVariantSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -13,12 +15,10 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -63,25 +63,44 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ->components([
                         Grid::make(2)
                             ->components([
-                                Select::make('product_variant_id')
+                                SearchableInput::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
-                                    ->relationship('productVariant', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
-                                        if ($state) {
-                                            $variant = ProductVariant::find($state);
-                                            if ($variant) {
-                                                $set('unit_price', $variant->price);
-                                                $set('total', $variant->price * ($get('quantity') ?? 1));
-                                                $set('product_id', $variant->product_id);
-                                                $set('name', $variant->name ?? ($variant->product->name ?? ''));
-                                                $set('sku', $variant->sku ?? ($variant->product->sku ?? ''));
-                                            }
+                                    ->placeholder(__('orders.placeholders.product_variant'))
+                                    ->searchUsing(fn (string $term): array => ProductVariantSearch::results($term))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?OrderItem $record): void {
+                                        if ($state === null || ! $record?->productVariant) {
+                                            return;
                                         }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->product_variant_id => ProductVariantSearch::label($record->productVariant),
+                                            ]);
                                     })
+                                    ->afterStateUpdated(function (?string $state, callable $set, callable $get): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $payload = ProductVariantSearch::hydrate((int) $state);
+
+                                        if ($payload === null) {
+                                            return;
+                                        }
+
+                                        $set('product_variant_id', (int) $state);
+                                        $set('product_id', $payload['product_id']);
+                                        $set('unit_price', $payload['price']);
+                                        $set('name', $payload['name'] !== '' ? $payload['name'] : $payload['product_name']);
+                                        $set('sku', $payload['sku']);
+
+                                        $quantity = (int) ($get('quantity') ?? 1);
+                                        $discount = (float) ($get('discount_amount') ?? 0);
+                                        $set('total', ($payload['price'] * $quantity) - $discount);
+                                    })
+                                    ->reactive()
                                     ->prefixIcon('heroicon-o-cube'),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
