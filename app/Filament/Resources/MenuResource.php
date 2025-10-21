@@ -8,7 +8,6 @@ use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
 use App\Models\Scopes\ActiveScope;
-use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -32,15 +31,20 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    /**
+     * @var string|\UnitEnum|null
+     */
+    protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -182,12 +186,11 @@ final class MenuResource extends Resource
                     ->requiresConfirmation()
                     ->action(function (Menu $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
-
-                        Notification::make()
-                            ->title($record->is_active ? __('menus.activated_successfully') : __('menus.deactivated_successfully'))
-                            ->success()
-                            ->send();
-                    }),
+                    })
+                    ->successNotificationTitle(fn (Menu $record): string => (string) ($record->is_active
+                        ? __('menus.activated_successfully')
+                        : __('menus.deactivated_successfully')
+                    )),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
