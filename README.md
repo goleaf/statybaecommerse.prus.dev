@@ -57,6 +57,10 @@ Need background workers, logs, and Vite in one go? Use the existing dev loop:
 composer run dev
 ```
 
+## Latest maintenance
+
+- 2025-10-21: Tightened the User Product Interaction Filament resource to return concrete `Form` and `Table` instances so Filament v4 boots cleanly when analytics interactions are seeded.
+
 ## Architecture cheatsheet
 
 | Area | Location(s) | Notes |
