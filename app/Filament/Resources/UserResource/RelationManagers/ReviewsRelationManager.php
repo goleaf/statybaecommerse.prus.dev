@@ -9,6 +9,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class ReviewsRelationManager extends BaseRelationManager
 {
@@ -20,7 +21,7 @@ class ReviewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Reviews';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

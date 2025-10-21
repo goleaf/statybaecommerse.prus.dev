@@ -14,6 +14,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
+use BackedEnum;
 
 final class UserImpersonation extends Page implements HasTable
 {
@@ -24,7 +25,7 @@ final class UserImpersonation extends Page implements HasTable
     /**
      * @var string|\BackedEnum|null Navigation icon override documented to keep BackedEnum usage inline.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationGroup(): ?string
     {

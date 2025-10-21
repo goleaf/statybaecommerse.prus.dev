@@ -11,10 +11,10 @@ use App\Filament\Resources\ReferralCodeStatistics\Schemas\ReferralCodeStatistics
 use App\Filament\Resources\ReferralCodeStatistics\Tables\ReferralCodeStatisticsTable;
 use App\Models\ReferralCodeStatistics;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class ReferralCodeStatisticsResource extends Resource
 {
@@ -22,12 +22,12 @@ class ReferralCodeStatisticsResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return ReferralCodeStatisticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ReferralCodeStatisticsTable::configure($table);
     }

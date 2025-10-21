@@ -7,7 +7,6 @@ namespace App\Filament\Resources\CampaignResource\RelationManagers;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -17,6 +16,7 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\CreateAction;
+use Filament\Schemas\Schema;
 
 final class TranslationsRelationManager extends BaseRelationManager
 {
@@ -24,7 +24,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Translations';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             // Select helper keeps locale choices consistent across the admin panel.

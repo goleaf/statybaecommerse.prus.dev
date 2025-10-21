@@ -131,3 +131,5 @@ Root: `<products>` with multiple `<product>` entries.
 ## Notes
 - Currency default: EUR; Language default: lt.
 - Export service: `App\Services\XmlCatalogService` already supports products/categories and can be extended to parse additional blocks shown above.
+- The `data:import` console command remains `final`; PHPUnit coverage relies on `\Closure::bind` to exercise the protected
+  `truncateTable` helper without subclassing, so keep the method signature stable when refining import logic.

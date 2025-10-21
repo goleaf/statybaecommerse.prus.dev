@@ -11,10 +11,10 @@ use App\Filament\Resources\SystemSettingHistories\Schemas\SystemSettingHistoryFo
 use App\Filament\Resources\SystemSettingHistories\Tables\SystemSettingHistoriesTable;
 use App\Models\SystemSettingHistory;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class SystemSettingHistoryResource extends Resource
 {
@@ -22,12 +22,12 @@ class SystemSettingHistoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return SystemSettingHistoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return SystemSettingHistoriesTable::configure($table);
     }

@@ -8,6 +8,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class ApprovalsRelationManager extends BaseRelationManager
 {
@@ -15,7 +16,7 @@ final class ApprovalsRelationManager extends BaseRelationManager
 
     protected static ?string $recordTitleAttribute = 'decision';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
