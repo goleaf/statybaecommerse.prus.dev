@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Enums\NavigationGroup;
+use App\Support\Nav;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
 use App\Models\User;
@@ -223,7 +223,10 @@ final class NormalSettingTranslationResourceTest extends TestCase
 
     public function test_navigation_group_is_system(): void
     {
-        $this->assertEquals(NavigationGroup::System, \App\Filament\Resources\NormalSettingTranslationResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(\App\Filament\Resources\NormalSettingTranslationResource::class),
+            \App\Filament\Resources\NormalSettingTranslationResource::getNavigationGroup(),
+        );
     }
 
     public function test_has_correct_navigation_sort(): void
