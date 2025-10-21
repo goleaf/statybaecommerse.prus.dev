@@ -10,6 +10,7 @@ use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Components\Combobox;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
@@ -132,16 +133,24 @@ class NewsResource extends Resource
                 ]),
             Forms\Components\Section::make('Categories & Tags')
                 ->components([
-                    Forms\Components\Select::make('categories')
+                    Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
                         ->multiple()
-                        ->preload(),
-                    Forms\Components\Select::make('tags')
+                        ->preload()
+                        ->boxSearchs()
+                        ->height('320px')
+                        ->optionsLabel(__('news.combobox.categories.available'))
+                        ->selectedLabel(__('news.combobox.categories.selected')),
+                    Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
                         ->multiple()
-                        ->preload(),
+                        ->preload()
+                        ->boxSearchs()
+                        ->height('320px')
+                        ->optionsLabel(__('news.combobox.tags.available'))
+                        ->selectedLabel(__('news.combobox.tags.selected')),
                 ])
                 ->columns(2),
         ]);
