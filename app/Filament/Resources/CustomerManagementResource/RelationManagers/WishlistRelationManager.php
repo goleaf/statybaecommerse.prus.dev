@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class WishlistRelationManager extends RelationManager
 {
@@ -88,10 +89,10 @@ final class WishlistRelationManager extends RelationManager
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state >= 100 => 'danger',
-                        $state >= 50 => 'warning',
-                        $state >= 20 => 'info',
-                        $state >= 10 => 'success',
-                        default => 'gray',
+                        $state >= 50  => 'warning',
+                        $state >= 20  => 'info',
+                        $state >= 10  => 'success',
+                        default       => 'gray',
                     }),
 
                 Tables\Columns\TextColumn::make('wishlist.created_at')
@@ -122,6 +123,7 @@ final class WishlistRelationManager extends RelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

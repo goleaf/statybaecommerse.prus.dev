@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ConditionsRelationManager extends RelationManager
 {
@@ -26,15 +27,15 @@ final class ConditionsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('type')
                     ->options([
-                        'minimum_amount' => 'Minimum Amount',
-                        'minimum_quantity' => 'Minimum Quantity',
-                        'customer_group' => 'Customer Group',
-                        'product_category' => 'Product Category',
-                        'product_brand' => 'Product Brand',
-                        'time_period' => 'Time Period',
-                        'day_of_week' => 'Day of Week',
+                        'minimum_amount'      => 'Minimum Amount',
+                        'minimum_quantity'    => 'Minimum Quantity',
+                        'customer_group'      => 'Customer Group',
+                        'product_category'    => 'Product Category',
+                        'product_brand'       => 'Product Brand',
+                        'time_period'         => 'Time Period',
+                        'day_of_week'         => 'Day of Week',
                         'first_time_customer' => 'First Time Customer',
-                        'loyalty_tier' => 'Loyalty Tier',
+                        'loyalty_tier'        => 'Loyalty Tier',
                     ])
                     ->required()
                     ->live(),
@@ -43,14 +44,14 @@ final class ConditionsRelationManager extends RelationManager
                     ->helperText('Condition value (amount, quantity, etc.)'),
                 Forms\Components\Select::make('operator')
                     ->options([
-                        'equals' => 'Equals',
-                        'greater_than' => 'Greater Than',
-                        'less_than' => 'Less Than',
+                        'equals'                => 'Equals',
+                        'greater_than'          => 'Greater Than',
+                        'less_than'             => 'Less Than',
                         'greater_than_or_equal' => 'Greater Than or Equal',
-                        'less_than_or_equal' => 'Less Than or Equal',
-                        'not_equals' => 'Not Equals',
-                        'contains' => 'Contains',
-                        'not_contains' => 'Not Contains',
+                        'less_than_or_equal'    => 'Less Than or Equal',
+                        'not_equals'            => 'Not Equals',
+                        'contains'              => 'Contains',
+                        'not_contains'          => 'Not Contains',
                     ])
                     ->required(),
                 Forms\Components\Textarea::make('description')
@@ -70,24 +71,24 @@ final class ConditionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'minimum_amount' => 'primary',
+                        'minimum_amount'   => 'primary',
                         'minimum_quantity' => 'success',
-                        'customer_group' => 'info',
+                        'customer_group'   => 'info',
                         'product_category' => 'warning',
-                        'product_brand' => 'danger',
-                        default => 'gray',
+                        'product_brand'    => 'danger',
+                        default            => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'minimum_amount' => 'Minimum Amount',
-                        'minimum_quantity' => 'Minimum Quantity',
-                        'customer_group' => 'Customer Group',
-                        'product_category' => 'Product Category',
-                        'product_brand' => 'Product Brand',
-                        'time_period' => 'Time Period',
-                        'day_of_week' => 'Day of Week',
+                        'minimum_amount'      => 'Minimum Amount',
+                        'minimum_quantity'    => 'Minimum Quantity',
+                        'customer_group'      => 'Customer Group',
+                        'product_category'    => 'Product Category',
+                        'product_brand'       => 'Product Brand',
+                        'time_period'         => 'Time Period',
+                        'day_of_week'         => 'Day of Week',
                         'first_time_customer' => 'First Time Customer',
-                        'loyalty_tier' => 'Loyalty Tier',
-                        default => $state,
+                        'loyalty_tier'        => 'Loyalty Tier',
+                        default               => $state,
                     }),
                 Tables\Columns\TextColumn::make('operator')
                     ->label('Operator')
@@ -110,20 +111,21 @@ final class ConditionsRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'minimum_amount' => 'Minimum Amount',
-                        'minimum_quantity' => 'Minimum Quantity',
-                        'customer_group' => 'Customer Group',
-                        'product_category' => 'Product Category',
-                        'product_brand' => 'Product Brand',
-                        'time_period' => 'Time Period',
-                        'day_of_week' => 'Day of Week',
+                        'minimum_amount'      => 'Minimum Amount',
+                        'minimum_quantity'    => 'Minimum Quantity',
+                        'customer_group'      => 'Customer Group',
+                        'product_category'    => 'Product Category',
+                        'product_brand'       => 'Product Brand',
+                        'time_period'         => 'Time Period',
+                        'day_of_week'         => 'Day of Week',
                         'first_time_customer' => 'First Time Customer',
-                        'loyalty_tier' => 'Loyalty Tier',
+                        'loyalty_tier'        => 'Loyalty Tier',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active Only'),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

@@ -27,6 +27,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 /**
  * OrderShippingRelationManager
@@ -64,10 +65,10 @@ final class OrderShippingRelationManager extends RelationManager
                                 Select::make('shipping_method')
                                     ->label(__('orders.shipping_method'))
                                     ->options([
-                                        'standard' => __('orders.shipping_methods.standard'),
-                                        'express' => __('orders.shipping_methods.express'),
-                                        'overnight' => __('orders.shipping_methods.overnight'),
-                                        'pickup' => __('orders.shipping_methods.pickup'),
+                                        'standard'      => __('orders.shipping_methods.standard'),
+                                        'express'       => __('orders.shipping_methods.express'),
+                                        'overnight'     => __('orders.shipping_methods.overnight'),
+                                        'pickup'        => __('orders.shipping_methods.pickup'),
                                         'international' => __('orders.shipping_methods.international'),
                                     ])
                                     ->required(),
@@ -133,7 +134,7 @@ final class OrderShippingRelationManager extends RelationManager
                         Toggle::make('is_delivered')
                             ->label(__('orders.is_delivered'))
                             ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set) {
+                            ->afterStateUpdated(function ($state, callable $set): void {
                                 if ($state) {
                                     $set('delivered_at', now());
                                 }
@@ -182,11 +183,11 @@ final class OrderShippingRelationManager extends RelationManager
                 BadgeColumn::make('status')
                     ->label(__('orders.fields.status'))
                     ->colors([
-                        'warning' => 'pending',
-                        'primary' => 'processing',
-                        'info' => 'shipped',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
+                        'warning'   => 'pending',
+                        'primary'   => 'processing',
+                        'info'      => 'shipped',
+                        'success'   => 'delivered',
+                        'danger'    => 'cancelled',
                         'secondary' => 'returned',
                     ])
                     ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_statuses.{$state}") : '-'),
@@ -217,22 +218,22 @@ final class OrderShippingRelationManager extends RelationManager
                 SelectFilter::make('shipping_method')
                     ->label(__('orders.shipping_method'))
                     ->options([
-                        'standard' => __('orders.shipping_methods.standard'),
-                        'express' => __('orders.shipping_methods.express'),
-                        'overnight' => __('orders.shipping_methods.overnight'),
-                        'pickup' => __('orders.shipping_methods.pickup'),
+                        'standard'      => __('orders.shipping_methods.standard'),
+                        'express'       => __('orders.shipping_methods.express'),
+                        'overnight'     => __('orders.shipping_methods.overnight'),
+                        'pickup'        => __('orders.shipping_methods.pickup'),
                         'international' => __('orders.shipping_methods.international'),
                     ])
                     ->multiple(),
                 SelectFilter::make('status')
                     ->label(__('orders.fields.status'))
                     ->options([
-                        'pending' => __('orders.shipping_statuses.pending'),
+                        'pending'    => __('orders.shipping_statuses.pending'),
                         'processing' => __('orders.shipping_statuses.processing'),
-                        'shipped' => __('orders.shipping_statuses.shipped'),
-                        'delivered' => __('orders.shipping_statuses.delivered'),
-                        'cancelled' => __('orders.shipping_statuses.cancelled'),
-                        'returned' => __('orders.shipping_statuses.returned'),
+                        'shipped'    => __('orders.shipping_statuses.shipped'),
+                        'delivered'  => __('orders.shipping_statuses.delivered'),
+                        'cancelled'  => __('orders.shipping_statuses.cancelled'),
+                        'returned'   => __('orders.shipping_statuses.returned'),
                     ])
                     ->multiple(),
                 TernaryFilter::make('is_delivered')
@@ -243,6 +244,7 @@ final class OrderShippingRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_shipping'))
                     ->icon('heroicon-o-plus')
@@ -251,10 +253,10 @@ final class OrderShippingRelationManager extends RelationManager
                         Select::make('shipping_method')
                             ->label(__('orders.shipping_method'))
                             ->options([
-                                'standard' => __('orders.shipping_methods.standard'),
-                                'express' => __('orders.shipping_methods.express'),
-                                'overnight' => __('orders.shipping_methods.overnight'),
-                                'pickup' => __('orders.shipping_methods.pickup'),
+                                'standard'      => __('orders.shipping_methods.standard'),
+                                'express'       => __('orders.shipping_methods.express'),
+                                'overnight'     => __('orders.shipping_methods.overnight'),
+                                'pickup'        => __('orders.shipping_methods.pickup'),
                                 'international' => __('orders.shipping_methods.international'),
                             ])
                             ->required(),
@@ -310,11 +312,11 @@ final class OrderShippingRelationManager extends RelationManager
                         $record->update([
                             'shipping_method' => $data['shipping_method'] ?? ($record->shipping_method ?? 'express'),
                             'tracking_number' => $data['tracking_number'] ?? $record->tracking_number,
-                            'carrier' => $data['carrier'] ?? ($record->carrier ?? 'DHL'),
-                            'service_type' => $data['service_type'] ?? ($record->service_type ?? 'Express'),
-                            'base_cost' => $data['base_cost'] ?? ($record->base_cost ?? 0),
-                            'insurance_cost' => $data['insurance_cost'] ?? ($record->insurance_cost ?? 0),
-                            'total_cost' => $data['total_cost'] ?? ($record->base_cost + ($record->insurance_cost ?? 0)),
+                            'carrier'         => $data['carrier'] ?? ($record->carrier ?? 'DHL'),
+                            'service_type'    => $data['service_type'] ?? ($record->service_type ?? 'Express'),
+                            'base_cost'       => $data['base_cost'] ?? ($record->base_cost ?? 0),
+                            'insurance_cost'  => $data['insurance_cost'] ?? ($record->insurance_cost ?? 0),
+                            'total_cost'      => $data['total_cost'] ?? ($record->base_cost + ($record->insurance_cost ?? 0)),
                         ]);
                     }),
             ])
@@ -332,7 +334,7 @@ final class OrderShippingRelationManager extends RelationManager
                         \Illuminate\Support\Facades\DB::table('order_shippings')
                             ->where('id', $record->getKey())
                             ->update([
-                                'status' => 'shipped',
+                                'status'     => 'shipped',
                                 'shipped_at' => now(),
                                 'updated_at' => now(),
                             ]);
@@ -351,10 +353,10 @@ final class OrderShippingRelationManager extends RelationManager
                         \Illuminate\Support\Facades\DB::table('order_shippings')
                             ->where('id', $record->getKey())
                             ->update([
-                                'status' => 'delivered',
+                                'status'       => 'delivered',
                                 'is_delivered' => true,
                                 'delivered_at' => now(),
-                                'updated_at' => now(),
+                                'updated_at'   => now(),
                             ]);
 
                         Notification::make()
@@ -383,7 +385,7 @@ final class OrderShippingRelationManager extends RelationManager
                                     \Illuminate\Support\Facades\DB::table('order_shippings')
                                         ->where('id', $rec->getKey())
                                         ->update([
-                                            'status' => 'shipped',
+                                            'status'     => 'shipped',
                                             'shipped_at' => now(),
                                             'updated_at' => now(),
                                         ]);
@@ -401,7 +403,7 @@ final class OrderShippingRelationManager extends RelationManager
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update([
-                                'status' => 'delivered',
+                                'status'       => 'delivered',
                                 'is_delivered' => true,
                                 'delivered_at' => now(),
                             ]);

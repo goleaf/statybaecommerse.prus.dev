@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ChildrenRelationManager extends RelationManager
 {
@@ -48,21 +49,21 @@ final class ChildrenRelationManager extends RelationManager
                             ->placeholder('#000000'),
                         Forms\Components\Select::make('icon')
                             ->options([
-                                'heroicon-o-tag' => 'Tag',
-                                'heroicon-o-document-text' => 'Document',
-                                'heroicon-o-newspaper' => 'Newspaper',
-                                'heroicon-o-folder' => 'Folder',
-                                'heroicon-o-rectangle-stack' => 'Stack',
-                                'heroicon-o-squares-2x2' => 'Grid',
-                                'heroicon-o-bookmark' => 'Bookmark',
-                                'heroicon-o-star' => 'Star',
-                                'heroicon-o-fire' => 'Fire',
-                                'heroicon-o-bolt' => 'Bolt',
-                                'heroicon-o-light-bulb' => 'Light Bulb',
-                                'heroicon-o-cog' => 'Settings',
+                                'heroicon-o-tag'                => 'Tag',
+                                'heroicon-o-document-text'      => 'Document',
+                                'heroicon-o-newspaper'          => 'Newspaper',
+                                'heroicon-o-folder'             => 'Folder',
+                                'heroicon-o-rectangle-stack'    => 'Stack',
+                                'heroicon-o-squares-2x2'        => 'Grid',
+                                'heroicon-o-bookmark'           => 'Bookmark',
+                                'heroicon-o-star'               => 'Star',
+                                'heroicon-o-fire'               => 'Fire',
+                                'heroicon-o-bolt'               => 'Bolt',
+                                'heroicon-o-light-bulb'         => 'Light Bulb',
+                                'heroicon-o-cog'                => 'Settings',
                                 'heroicon-o-wrench-screwdriver' => 'Tools',
-                                'heroicon-o-building-office' => 'Building',
-                                'heroicon-o-home' => 'Home',
+                                'heroicon-o-building-office'    => 'Building',
+                                'heroicon-o-home'               => 'Home',
                             ])
                             ->searchable()
                             ->preload(),
@@ -118,6 +119,7 @@ final class ChildrenRelationManager extends RelationManager
                 Tables\Filters\TernaryFilter::make('is_visible'),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

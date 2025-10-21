@@ -20,6 +20,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class TranslationsRelationManager extends RelationManager
 {
@@ -91,8 +92,8 @@ class TranslationsRelationManager extends RelationManager
                             ->textColors([
                                 'primary' => '#1d4ed8',
                                 'emerald' => '#047857',
-                                'amber' => '#f59e0b',
-                                'slate' => '#475569',
+                                'amber'   => '#f59e0b',
+                                'slate'   => '#475569',
                             ])
                             ->helperText('The main content of this legal document'),
 
@@ -123,15 +124,15 @@ class TranslationsRelationManager extends RelationManager
                     ->label('Language')
                     ->colors([
                         'success' => 'lt',
-                        'info' => 'en',
+                        'info'    => 'en',
                         'warning' => 'ru',
-                        'gray' => 'de',
+                        'gray'    => 'de',
                     ])
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'lt' => 'Lithuanian',
-                        'en' => 'English',
-                        'ru' => 'Russian',
-                        'de' => 'German',
+                        'lt'    => 'Lithuanian',
+                        'en'    => 'English',
+                        'ru'    => 'Russian',
+                        'de'    => 'German',
                         default => $state,
                     })
                     ->sortable(),
@@ -182,6 +183,7 @@ class TranslationsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make()
                     ->label('Add Translation')
                     ->icon('heroicon-o-plus'),

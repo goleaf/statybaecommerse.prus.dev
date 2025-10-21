@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ImagesRelationManager extends RelationManager
 {
@@ -45,11 +46,11 @@ final class ImagesRelationManager extends RelationManager
                 Forms\Components\Select::make('type')
                     ->label(__('products.images.type'))
                     ->options([
-                        'main' => __('products.images.types.main'),
-                        'gallery' => __('products.images.types.gallery'),
+                        'main'      => __('products.images.types.main'),
+                        'gallery'   => __('products.images.types.gallery'),
                         'thumbnail' => __('products.images.types.thumbnail'),
-                        'banner' => __('products.images.types.banner'),
-                        'icon' => __('products.images.types.icon'),
+                        'banner'    => __('products.images.types.banner'),
+                        'icon'      => __('products.images.types.icon'),
                     ])
                     ->required()
                     ->default('gallery'),
@@ -92,12 +93,12 @@ final class ImagesRelationManager extends RelationManager
                     ->formatStateUsing(fn (string $state): string => __("products.images.types.{$state}"))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'main' => 'primary',
-                        'gallery' => 'success',
+                        'main'      => 'primary',
+                        'gallery'   => 'success',
                         'thumbnail' => 'warning',
-                        'banner' => 'info',
-                        'icon' => 'gray',
-                        default => 'gray',
+                        'banner'    => 'info',
+                        'icon'      => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('is_primary')
                     ->label(__('products.images.is_primary'))
@@ -120,11 +121,11 @@ final class ImagesRelationManager extends RelationManager
                 Tables\Filters\SelectFilter::make('type')
                     ->label(__('products.images.type'))
                     ->options([
-                        'main' => __('products.images.types.main'),
-                        'gallery' => __('products.images.types.gallery'),
+                        'main'      => __('products.images.types.main'),
+                        'gallery'   => __('products.images.types.gallery'),
                         'thumbnail' => __('products.images.types.thumbnail'),
-                        'banner' => __('products.images.types.banner'),
-                        'icon' => __('products.images.types.icon'),
+                        'banner'    => __('products.images.types.banner'),
+                        'icon'      => __('products.images.types.icon'),
                     ]),
                 Tables\Filters\TernaryFilter::make('is_primary')
                     ->label(__('products.images.is_primary'))
@@ -140,6 +141,7 @@ final class ImagesRelationManager extends RelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

@@ -9,6 +9,7 @@ use Filament\Actions\DetachAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class CollectionsRelationManager extends RelationManager
 {
@@ -38,6 +39,7 @@ class CollectionsRelationManager extends RelationManager
                     ->toggleable(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()
                     ->preloadRecordSelect(),
             ])

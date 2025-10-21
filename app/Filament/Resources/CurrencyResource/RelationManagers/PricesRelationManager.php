@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class PricesRelationManager extends RelationManager
 {
@@ -50,8 +51,8 @@ final class PricesRelationManager extends RelationManager
                     ->step(0.01),
                 Forms\Components\Select::make('type')
                     ->options([
-                        'regular' => 'Regular',
-                        'sale' => 'Sale',
+                        'regular'   => 'Regular',
+                        'sale'      => 'Sale',
                         'wholesale' => 'Wholesale',
                     ])
                     ->default('regular'),
@@ -87,10 +88,10 @@ final class PricesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'regular' => 'gray',
-                        'sale' => 'success',
+                        'regular'   => 'gray',
+                        'sale'      => 'success',
                         'wholesale' => 'warning',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('starts_at')
                     ->dateTime()
@@ -109,26 +110,27 @@ final class PricesRelationManager extends RelationManager
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'regular' => 'Regular',
-                        'sale' => 'Sale',
+                        'regular'   => 'Regular',
+                        'sale'      => 'Sale',
                         'wholesale' => 'Wholesale',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_enabled'),
                 Tables\Filters\Filter::make('active')
                     ->query(fn (Builder $query): Builder => $query
                         ->where('is_enabled', true)
-                        ->where(function ($q) {
+                        ->where(function ($q): void {
                             $q
                                 ->whereNull('starts_at')
                                 ->orWhere('starts_at', '<=', now());
                         })
-                        ->where(function ($q) {
+                        ->where(function ($q): void {
                             $q
                                 ->whereNull('ends_at')
                                 ->orWhere('ends_at', '>=', now());
                         })),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

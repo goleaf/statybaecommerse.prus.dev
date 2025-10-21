@@ -19,6 +19,7 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class TranslationsRelationManager extends RelationManager
 {
@@ -77,14 +78,14 @@ final class TranslationsRelationManager extends RelationManager
                     ->label(__('system_setting_categories.translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'info',
-                        'en' => 'success',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
-                        'it' => 'secondary',
-                        'pl' => 'gray',
-                        'ru' => 'dark',
+                        'lt'    => 'info',
+                        'en'    => 'success',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
+                        'it'    => 'secondary',
+                        'pl'    => 'gray',
+                        'ru'    => 'dark',
                         default => 'gray',
                     })
                     ->sortable(),
@@ -138,6 +139,7 @@ final class TranslationsRelationManager extends RelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make(),
             ])
             ->actions([

@@ -11,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class OrdersRelationManager extends RelationManager
 {
@@ -27,11 +28,11 @@ final class OrdersRelationManager extends RelationManager
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'pending' => __('Pending'),
+                        'pending'    => __('Pending'),
                         'processing' => __('Processing'),
-                        'shipped' => __('Shipped'),
-                        'delivered' => __('Delivered'),
-                        'cancelled' => __('Cancelled'),
+                        'shipped'    => __('Shipped'),
+                        'delivered'  => __('Delivered'),
+                        'cancelled'  => __('Cancelled'),
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('total')
@@ -60,12 +61,12 @@ final class OrdersRelationManager extends RelationManager
                     ->label(__('Status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
+                        'pending'    => 'warning',
                         'processing' => 'info',
-                        'shipped' => 'primary',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
+                        'shipped'    => 'primary',
+                        'delivered'  => 'success',
+                        'cancelled'  => 'danger',
+                        default      => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('Total'))
@@ -80,15 +81,16 @@ final class OrdersRelationManager extends RelationManager
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'pending' => __('Pending'),
+                        'pending'    => __('Pending'),
                         'processing' => __('Processing'),
-                        'shipped' => __('Shipped'),
-                        'delivered' => __('Delivered'),
-                        'cancelled' => __('Cancelled'),
+                        'shipped'    => __('Shipped'),
+                        'delivered'  => __('Delivered'),
+                        'cancelled'  => __('Cancelled'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])
             ->actions([

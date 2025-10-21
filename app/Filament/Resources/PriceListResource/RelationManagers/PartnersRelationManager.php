@@ -9,6 +9,7 @@ use Filament\Actions\DetachAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class PartnersRelationManager extends RelationManager
 {
@@ -50,6 +51,7 @@ final class PartnersRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()->preloadRecordSelect(),
             ])
             ->actions([

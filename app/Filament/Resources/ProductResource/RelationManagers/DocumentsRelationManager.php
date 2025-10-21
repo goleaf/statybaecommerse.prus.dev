@@ -9,6 +9,7 @@ use Filament\Actions\DetachAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class DocumentsRelationManager extends RelationManager
 {
@@ -37,9 +38,10 @@ class DocumentsRelationManager extends RelationManager
                     ->copyable(),
                 TextColumn::make('file_size')
                     ->label(__('documents.fields.file_size'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : ''),
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()
                     ->preloadRecordSelect(),
             ])

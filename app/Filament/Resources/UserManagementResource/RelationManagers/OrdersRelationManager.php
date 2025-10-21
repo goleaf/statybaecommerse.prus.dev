@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class OrdersRelationManager extends RelationManager
 {
@@ -30,11 +31,11 @@ final class OrdersRelationManager extends RelationManager
                     ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'pending'    => 'Pending',
                         'processing' => 'Processing',
-                        'shipped' => 'Shipped',
-                        'delivered' => 'Delivered',
-                        'cancelled' => 'Cancelled',
+                        'shipped'    => 'Shipped',
+                        'delivered'  => 'Delivered',
+                        'cancelled'  => 'Cancelled',
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('total')
@@ -56,12 +57,12 @@ final class OrdersRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
+                        'pending'    => 'warning',
                         'processing' => 'info',
-                        'shipped' => 'primary',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
+                        'shipped'    => 'primary',
+                        'delivered'  => 'success',
+                        'cancelled'  => 'danger',
+                        default      => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('total')
                     ->money('EUR'),
@@ -73,6 +74,7 @@ final class OrdersRelationManager extends RelationManager
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

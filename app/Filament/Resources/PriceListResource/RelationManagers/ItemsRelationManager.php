@@ -13,6 +13,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ItemsRelationManager extends RelationManager
 {
@@ -167,9 +168,9 @@ final class ItemsRelationManager extends RelationManager
 
                 Tables\Filters\Filter::make('valid_now')
                     ->label(__('price_list_items.valid_now'))
-                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $query) {
+                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $query): void {
                         $query->where('valid_from', '<=', now())
-                            ->where(function (Builder $query) {
+                            ->where(function (Builder $query): void {
                                 $query->whereNull('valid_until')
                                     ->orWhere('valid_until', '>=', now());
                             });
@@ -180,6 +181,7 @@ final class ItemsRelationManager extends RelationManager
                     ->query(fn (Builder $query): Builder => $query->where('valid_until', '<', now())),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

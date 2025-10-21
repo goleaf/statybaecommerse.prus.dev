@@ -21,6 +21,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Str;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ProductsRelationManager extends RelationManager
 {
@@ -40,7 +42,7 @@ final class ProductsRelationManager extends RelationManager
                 ->required()
                 ->maxLength(255)
                 ->live(onBlur: true)
-                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
             TextInput::make('slug')
                 ->label(__('products.slug'))
                 ->unique(ignoreRecord: true)
@@ -138,20 +140,21 @@ final class ProductsRelationManager extends RelationManager
                 SelectFilter::make('stock_status')
                     ->label(__('products.stock_status'))
                     ->options([
-                        'in_stock' => __('products.in_stock'),
-                        'low_stock' => __('products.low_stock'),
+                        'in_stock'     => __('products.in_stock'),
+                        'low_stock'    => __('products.low_stock'),
                         'out_of_stock' => __('products.out_of_stock'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value'] ?? null) {
-                            'in_stock' => $query->where('stock_quantity', '>', 10),
-                            'low_stock' => $query->whereBetween('stock_quantity', [1, 10]),
+                            'in_stock'     => $query->where('stock_quantity', '>', 10),
+                            'low_stock'    => $query->whereBetween('stock_quantity', [1, 10]),
                             'out_of_stock' => $query->where('stock_quantity', 0),
-                            default => $query,
+                            default        => $query,
                         };
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()
                     ->preloadRecordSelect()
                     ->form(fn (AttachAction $action): array => [

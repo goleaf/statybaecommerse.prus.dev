@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ReviewsRelationManager extends RelationManager
 {
@@ -57,7 +58,7 @@ final class ReviewsRelationManager extends RelationManager
                     ->color(fn (int $state): string => match (true) {
                         $state >= 4 => 'success',
                         $state >= 3 => 'warning',
-                        default => 'danger',
+                        default     => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('title')
                     ->limit(50),
@@ -86,6 +87,7 @@ final class ReviewsRelationManager extends RelationManager
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

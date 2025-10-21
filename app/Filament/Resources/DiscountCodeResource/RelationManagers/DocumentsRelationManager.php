@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class DocumentsRelationManager extends RelationManager
 {
@@ -36,16 +37,16 @@ final class DocumentsRelationManager extends RelationManager
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'draft' => __('Draft'),
+                        'draft'     => __('Draft'),
                         'generated' => __('Generated'),
-                        'sent' => __('Sent'),
+                        'sent'      => __('Sent'),
                     ])
                     ->required(),
                 Forms\Components\Select::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ])
                     ->required(),
             ]);
@@ -69,17 +70,17 @@ final class DocumentsRelationManager extends RelationManager
                     ->label(__('Status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'draft' => 'warning',
+                        'draft'     => 'warning',
                         'generated' => 'success',
-                        'sent' => 'info',
-                        default => 'gray',
+                        'sent'      => 'info',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('format')
                     ->label(__('Format'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'html' => 'primary',
-                        'pdf' => 'danger',
+                        'html'  => 'primary',
+                        'pdf'   => 'danger',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('generated_at')
@@ -91,19 +92,20 @@ final class DocumentsRelationManager extends RelationManager
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('Status'))
                     ->options([
-                        'draft' => __('Draft'),
+                        'draft'     => __('Draft'),
                         'generated' => __('Generated'),
-                        'sent' => __('Sent'),
+                        'sent'      => __('Sent'),
                     ]),
                 Tables\Filters\SelectFilter::make('format')
                     ->label(__('Format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ]),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
