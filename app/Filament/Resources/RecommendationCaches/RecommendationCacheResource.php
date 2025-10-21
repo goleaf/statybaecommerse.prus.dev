@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationCaches;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\RecommendationCaches\Pages\CreateRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\EditRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\ListRecommendationCaches;
@@ -16,21 +17,31 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class RecommendationCacheResource extends Resource
 {
     protected static ?string $model = RecommendationCache::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /**
+     * @var string|BackedEnum|null Keep the caches under a consistent hero icon.
+     */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    /**
+     * @var string|BackedEnum|null Ensure analytics tooling stays grouped together.
+     */
+    protected static $navigationGroup = NavigationGroup::Analytics;
 
     protected static ?int $navigationSort = 20;
 
     protected static ?string $recordTitleAttribute = 'cache_key';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return 'Analytics';
+        // Translate enum driven grouping for the Filament sidebar.
+        $group = self::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     public static function getNavigationLabel(): string
@@ -66,10 +77,10 @@ final class RecommendationCacheResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListRecommendationCaches::route('/'),
+            'index'  => ListRecommendationCaches::route('/'),
             'create' => CreateRecommendationCache::route('/create'),
-            'view' => ViewRecommendationCache::route('/{record}'),
-            'edit' => EditRecommendationCache::route('/{record}/edit'),
+            'view'   => ViewRecommendationCache::route('/{record}'),
+            'edit'   => EditRecommendationCache::route('/{record}/edit'),
         ];
     }
 }
