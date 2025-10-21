@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\LegalResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListLegals extends ListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = LegalResource::class;

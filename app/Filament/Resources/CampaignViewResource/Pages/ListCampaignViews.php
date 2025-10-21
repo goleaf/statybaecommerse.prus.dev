@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignViewResource\Pages;
 
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CampaignViewResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCampaignViews extends ListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = CampaignViewResource::class;
