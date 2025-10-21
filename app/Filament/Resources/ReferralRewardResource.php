@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -30,13 +31,14 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralRewardResource extends Resource
 {
+    use TranslatableResource;
+
     protected static ?string $model = ReferralReward::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-gift';
@@ -306,7 +308,7 @@ final class ReferralRewardResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $modelClass = static::getModel();
+        $modelClass = self::getModel();
         $count = (int) $modelClass::count();
 
         return $count > 0 ? (string) $count : null;
@@ -321,8 +323,8 @@ final class ReferralRewardResource extends Resource
             ->withoutGlobalScopes()
             ->with([
                 'referral' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
-                'user' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
-                'order' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
+                'user'     => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
+                'order'    => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
             ]);
     }
 }

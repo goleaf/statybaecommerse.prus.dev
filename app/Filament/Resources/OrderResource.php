@@ -9,6 +9,7 @@ use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\CustomerSearch;
 use App\Support\Seo\LocaleUrlGenerator;
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -53,7 +55,6 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderResource
@@ -69,6 +70,8 @@ use App\Support\Filament\Components\Flatpickr;
  */
 final class OrderResource extends Resource
 {
+    use TranslatableResource;
+
     protected static ?string $model = Order::class;
 
     protected static ?int $navigationSort = 1;
@@ -542,7 +545,7 @@ final class OrderResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('orders.created_at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

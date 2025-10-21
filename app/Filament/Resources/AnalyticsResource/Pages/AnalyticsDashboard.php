@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AnalyticsResource\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\AnalyticsResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use App\Filament\Pages\Support\BaseListRecords;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
 
 final class AnalyticsDashboard extends BaseListRecords
 {
+    use TranslatableListRecords;
+
     protected static string $resource = AnalyticsResource::class;
 
     /**
@@ -19,6 +23,7 @@ final class AnalyticsDashboard extends BaseListRecords
     protected function getHeaderActions(): array
     {
         return [
+            LocaleSwitcher::make(),
             Action::make('export_report')
                 ->label(__('analytics.export_report'))
                 ->icon('heroicon-m-arrow-down-tray')

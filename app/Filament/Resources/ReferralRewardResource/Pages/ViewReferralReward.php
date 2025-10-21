@@ -10,14 +10,19 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as TranslatableViewRecord;
 
 final class ViewReferralReward extends ViewRecord
 {
+    use TranslatableViewRecord;
+
     protected static string $resource = ReferralRewardResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            LocaleSwitcher::make(),
             Actions\EditAction::make(),
         ];
     }
@@ -31,9 +36,9 @@ final class ViewReferralReward extends ViewRecord
         }
 
         $this->record->loadMissing([
-            'user' => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+            'user'     => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
             'referral' => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
-            'order' => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+            'order'    => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
         ]);
     }
 
@@ -54,6 +59,6 @@ final class ViewReferralReward extends ViewRecord
             return $headingString;
         }
 
-        return $headingString.' ('.(string) $referralCode.')';
+        return $headingString . ' (' . (string) $referralCode . ')';
     }
 }
