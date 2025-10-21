@@ -7,6 +7,8 @@ declare(strict_types=1);
  *
  * This script fixes the navigationGroup type compatibility issues
  * in Filament v4 by adding proper UnitEnum imports and docblocks.
+ * It now also cleans up stray duplicate UnitEnum imports across
+ * Filament pages so the codebase stays tidy after automated runs.
  */
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -96,6 +98,14 @@ class FilamentNavigationGroupFixer
                 if ($content !== $originalContent) {
                     $modified = true;
                 }
+            }
+
+            // Always deduplicate UnitEnum imports even if the file lacks a navigation group.
+            $dedupedContent = $this->dedupeUnitEnumImport($content);
+            if ($dedupedContent !== $content) {
+                // Record the cleanup to make reporting transparent.
+                $content = $dedupedContent;
+                $modified = true;
             }
 
             // Only write if content changed
