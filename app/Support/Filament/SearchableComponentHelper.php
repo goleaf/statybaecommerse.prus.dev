@@ -5,72 +5,95 @@ declare(strict_types=1);
 namespace App\Support\Filament;
 
 use Closure;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 
 /**
- * Centralises repetitive wiring around DefStudio's SearchableInput component.
+ * Shared glue for SearchableInput components so search result labels and payloads stay consistent.
  */
 final class SearchableComponentHelper
 {
-    private function __construct() {}
-
     /**
-     * Hydrate a SearchableInput with consistent state, options, and payload assignments.
+     * Hydrate a searchable component with its canonical SearchResult option.
      *
-     * @param Closure(mixed): (object|array|null) $resolveRecord Resolves the selected record from the persisted state.
-     * @param Closure(object|array): array{value: string|int|null, label: string, payload?: array} $normalizePayload Normalises
-     *        the resolved record into the component state + display payload tuple.
+     * @param Closure(int|string):?SearchResult $resolveResult Resolves a persisted state into a SearchResult DTO.
      */
-    public static function hydrate(
-        SearchableInput $component,
-        mixed $state,
-        Closure $resolveRecord,
-        Closure $normalizePayload,
-    ): void {
-        // Early exit when no state is available so the component falls back to an empty input.
-        if ($state === null || $state === '') {
+    public static function hydrate(SearchableInput $component, int|string|null $state, Closure $resolveResult): void
+    {
+        if (blank($state)) {
             self::clear($component);
 
             return;
         }
 
-        $record = $resolveRecord($state);
+        $result = $resolveResult($state);
 
-        // If the lookup fails we still want the UI to behave as if nothing was selected.
-        if ($record === null) {
+        if (! $result instanceof SearchResult) {
             self::clear($component);
 
             return;
         }
 
-        $normalized = $normalizePayload($record);
-        $value = $normalized['value'] ?? $state;
-        $label = $normalized['label'] ?? '';
-        $payload = $normalized['payload'] ?? [];
-
-        // Guarantee string state/options to match the SearchableInput expectation.
-        $stringValue = $value === null ? null : (string) $value;
-
-        $component
-            ->state($stringValue)
-            ->options($stringValue === null ? [] : [$stringValue => $label])
-            ->payload($payload);
+        self::applyResult($component, $result);
     }
 
     /**
-     * Reset a SearchableInput to its pristine state while allowing callers to clear related form fields.
+     * Synchronise the underlying model key with the component state.
+     *
+     * The helper keeps the component options in sync with the canonical payload and wipes
+     * everything when the state is empty so Livewire does not keep stale labels or metadata.
+     *
+     * @param Closure(int|string):?SearchResult $resolveResult Resolves the current state into a SearchResult DTO.
+     * @param callable(string, mixed):void      $set           Filament's Set helper (or compatible callable) for updating state.
      */
-    public static function clear(SearchableInput $component, Closure ...$clearRelated): void
+    public static function sync(
+        SearchableInput $component,
+        ?string $state,
+        callable $set,
+        string $targetField,
+        Closure $resolveResult
+    ): void {
+        if ($state === null || $state === '') {
+            $set($targetField, null);
+            self::clear($component);
+
+            return;
+        }
+
+        $result = $resolveResult($state);
+
+        if (! $result instanceof SearchResult) {
+            $set($targetField, null);
+            self::clear($component);
+
+            return;
+        }
+
+        $value = $result->value();
+        $set($targetField, is_numeric($value) ? (int) $value : $value);
+
+        self::applyResult($component, $result);
+    }
+
+    /**
+     * Reset the component back to an empty state.
+     */
+    public static function clear(SearchableInput $component): void
     {
-        // Wipe the component so Filament renders an empty dropdown and no metadata payload.
         $component
             ->state(null)
-            ->options([])
-            ->payload([]);
+            ->options([]);
+    }
 
-        // Execute any downstream clean-up callbacks so surrounding form state stays in sync.
-        foreach ($clearRelated as $callback) {
-            $callback();
-        }
+    /**
+     * Inject the canonical SearchResult into the component options so Livewire re-renders the stored label.
+     */
+    private static function applyResult(SearchableInput $component, SearchResult $result): void
+    {
+        // Inject the canonical state and single-option list so Filament renders the stored label
+        // and metadata payload exactly as the search services define it.
+        $component
+            ->state($result->value())
+            ->options([$result]);
     }
 }
