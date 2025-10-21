@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -30,7 +26,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('system_setting_categories.translations.basic_information'))
@@ -69,7 +65,7 @@ final class TranslationsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -77,14 +73,14 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('system_setting_categories.translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'info',
-                        'en' => 'success',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
-                        'it' => 'secondary',
-                        'pl' => 'gray',
-                        'ru' => 'dark',
+                        'lt'    => 'info',
+                        'en'    => 'success',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
+                        'it'    => 'secondary',
+                        'pl'    => 'gray',
+                        'ru'    => 'dark',
                         default => 'gray',
                     })
                     ->sortable(),
@@ -94,19 +90,19 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
                     }),
 
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.translations.description'))
                     ->limit(100)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 100 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 100 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -138,15 +134,15 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
-                CreateAction::make(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('locale');
     }
