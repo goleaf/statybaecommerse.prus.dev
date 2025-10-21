@@ -81,5 +81,7 @@ return [
         'no_content' => 'No content',
         'no_metadata' => 'No metadata',
         'metadata_json' => 'Enter JSON metadata',
+        // Atsarginis tekstas, kai atsiliepimas neturi įvertinimo reikšmės.
+        'no_rating' => 'Įvertinimas nepateiktas',
     ],
 ];

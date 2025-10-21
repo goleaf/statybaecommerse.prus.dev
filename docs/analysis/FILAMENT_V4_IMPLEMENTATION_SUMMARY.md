@@ -9,6 +9,8 @@
 - **Form → Schema Updates**: Updated multiple resources from old Form class to new Schema class
 - **Syntax Errors**: Resolved critical syntax errors in 28+ resources
 - **Import Issues**: Fixed duplicate imports and missing dependencies
+- **Review Rating Resilience**: Admin tables and infolists now surface a friendly placeholder when rating data is absent
+- **Navigation Metadata Cleanup**: Variant analytics navigation icons follow Filament docblock expectations and redundant `UnitEnum` imports were removed from affected pages
 
 #### 2. **Model and Resource Analysis Completed**
 - **Total Models**: 110 models identified
