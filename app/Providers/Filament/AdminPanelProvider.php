@@ -111,6 +111,8 @@ final class AdminPanelProvider extends PanelProvider
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
                 ]))
+            // Enable the custom Filament theme so third-party plugin views (like the searchable input)
+            // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->spa();
     }
