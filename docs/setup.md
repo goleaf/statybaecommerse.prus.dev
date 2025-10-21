@@ -109,9 +109,12 @@ Run the basic application checks to confirm everything is wired correctly:
 ```bash
 php artisan test
 npm run lint
+composer test
 ```
 
 You can explore more helper commands in the `Makefile` (`make test`, `make analyse`, `make build`).
+
+> 💡 The `composer test` script proxies to `vendor/bin/pest`, so you do not need a global PHPUnit or Pest binary installed.
 
 ## 8. Common issues & quick fixes (FAQ)
 

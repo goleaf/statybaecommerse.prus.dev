@@ -14,16 +14,16 @@ use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -92,14 +92,14 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema with Filament v4 Schema class
+     * Configure the Filament schema using the Filament v4 Schema API.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             Section::make(__('translations.address_information'))
-                ->schema([
-                    Grid::make(2)->schema([
+                ->components([
+                    Grid::make(2)->components([
                         SearchableInput::make('user_id')
                             ->label(__('translations.user'))
                             ->placeholder('Name, email or phone')
@@ -149,7 +149,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->default(AddressType::SHIPPING),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         TextInput::make('first_name')
                             ->label(__('translations.first_name'))
                             ->maxLength(255),
@@ -157,7 +157,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.last_name'))
                             ->maxLength(255),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         TextInput::make('company_name')
                             ->label(__('translations.company'))
                             ->maxLength(255),
@@ -167,7 +167,7 @@ final class AddressResource extends Resource
                     ]),
                 ]),
             Section::make(__('translations.address_details'))
-                ->schema([
+                ->components([
                     SearchableInput::make('address_line_1')
                         ->label(__('translations.address_line_1'))
                         ->placeholder(__('translations.address_line_1'))
@@ -177,7 +177,7 @@ final class AddressResource extends Resource
                     TextInput::make('address_line_2')
                         ->label(__('translations.address_line_2'))
                         ->maxLength(255),
-                    Grid::make(3)->schema([
+                    Grid::make(3)->components([
                         TextInput::make('apartment')
                             ->label(__('translations.apartment'))
                             ->maxLength(100),
@@ -188,7 +188,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.building'))
                             ->maxLength(100),
                     ]),
-                    Grid::make(3)->schema([
+                    Grid::make(3)->components([
                         SearchableInput::make('city')
                             ->label(__('translations.city'))
                             ->placeholder(__('translations.city'))
@@ -203,7 +203,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->maxLength(20),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         Select::make('country_code')
                             ->label(__('translations.country'))
                             ->options(fn (): array => Country::query()->orderBy('name')->pluck('name', 'cca2')->all())
@@ -270,8 +270,8 @@ final class AddressResource extends Resource
                     ]),
                 ]),
             Section::make(__('translations.contact_information'))
-                ->schema([
-                    Grid::make(2)->schema([
+                ->components([
+                    Grid::make(2)->components([
                         TextInput::make('phone')
                             ->label(__('translations.phone'))
                             ->tel()
@@ -286,7 +286,7 @@ final class AddressResource extends Resource
                         ->maxLength(255),
                 ]),
             Section::make(__('translations.additional_information'))
-                ->schema([
+                ->components([
                     Textarea::make('notes')
                         ->label(__('translations.notes'))
                         ->maxLength(1000)
@@ -299,8 +299,8 @@ final class AddressResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('translations.settings'))
-                ->schema([
-                    Grid::make(2)->schema([
+                ->components([
+                    Grid::make(2)->components([
                         Toggle::make('is_default')
                             ->label(__('translations.is_default'))
                             ->helperText(__('translations.is_default_help')),
@@ -309,7 +309,7 @@ final class AddressResource extends Resource
                             ->default(true)
                             ->helperText(__('translations.is_active_help')),
                     ]),
-                    Grid::make(2)->schema([
+                    Grid::make(2)->components([
                         Toggle::make('is_billing')
                             ->label(__('translations.is_billing'))
                             ->helperText(__('translations.is_billing_help')),
@@ -322,9 +322,9 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table with comprehensive columns, filters, and actions
+     * Configure the Filament table with comprehensive columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
