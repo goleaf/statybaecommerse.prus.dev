@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
+use App\Filament\Widgets\InlineCharts\CustomerOrdersSparkline;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Scopes\ActiveScope;
@@ -42,6 +43,7 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 
 final class CustomerResource extends Resource
 {
@@ -254,6 +256,13 @@ final class CustomerResource extends Resource
                     ->label(__('customers.orders_count'))
                     ->counts('orders')
                     ->sortable(),
+                // Inline orders sparkline to visualize recent activity without leaving the table.
+                InlineChart::make('orders_sparkline')
+                    ->label(__('customers.orders_trend'))
+                    ->chart(CustomerOrdersSparkline::class)
+                    ->maxWidth(160)
+                    ->maxHeight(48)
+                    ->icon('heroicon-o-chart-bar'),
                 TextColumn::make('created_at')
                     ->label(__('customers.created_at'))
                     ->dateTime()
