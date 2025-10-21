@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantInventoryResource\Pages;
-use App\Models\Location;
-use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\ProductVariantSearch;
+use App\Support\Search\SearchableComponentHelper;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -88,27 +88,21 @@ final class VariantInventoryResource extends Resource
                                     ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
-
-                                        $variant = ProductVariant::query()
-                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                            ->with(['product:id,sku,name'])
-                                            ->find($state);
-
-                                        if (! $variant instanceof ProductVariant) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
-                                            ]);
+                                        ProductVariantSearch::hydrateComponent($component, $state);
                                     })
-                                    ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
+                                        SearchableComponentHelper::apply($component, $item);
+                                        $set('variant_id', (int) $item->value());
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
+                                        if ($state === null || $state === '') {
+                                            SearchableComponentHelper::forget($component);
+                                            $set('variant_id', null);
+
+                                            return;
+                                        }
+
+                                        $set('variant_id', (int) $state);
                                     }),
                                 SearchableInput::make('location_id')
                                     ->label(__('admin.variant_inventory.location'))
@@ -117,26 +111,21 @@ final class VariantInventoryResource extends Resource
                                     ->searchUsing(fn (string $value): array => LocationSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
-
-                                        $location = Location::query()
-                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                            ->find($state);
-
-                                        if (! $location instanceof Location) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $location->getKey() => LocationSearch::label($location),
-                                            ]);
+                                        LocationSearch::hydrateComponent($component, $state);
                                     })
-                                    ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
+                                        SearchableComponentHelper::apply($component, $item);
+                                        $set('location_id', (int) $item->value());
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
+                                        if ($state === null || $state === '') {
+                                            SearchableComponentHelper::forget($component);
+                                            $set('location_id', null);
+
+                                            return;
+                                        }
+
+                                        $set('location_id', (int) $state);
                                     }),
                             ]),
                         Grid::make(2)
