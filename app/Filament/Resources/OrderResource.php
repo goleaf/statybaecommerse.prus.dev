@@ -8,11 +8,15 @@ use App\Data\ExportRequestData;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
-use App\Services\Pricing\PriceCalculator;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;
+use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Search\CustomerSearch;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -29,6 +33,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -111,7 +116,7 @@ final class OrderResource extends Resource
         return AuthorizationMatrix::check('orders', 'update');
     }
 
-    public static function getNavigationIcon(): string|\BackedEnum|null
+    public static function getNavigationIcon(): string|BackedEnum|null
     {
         return 'heroicon-o-shopping-bag';
     }
@@ -163,29 +168,41 @@ final class OrderResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(255)
                                 ->helperText(__('orders.number_help')),
-                            Select::make('user_id')
+                            SearchableInput::make('user_id')
                                 ->label(__('orders.fields.customer'))
-                                ->relationship('user', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                    TextInput::make('email')
-                                        ->email()
-                                        ->required()
-                                        ->maxLength(255),
-                                ]),
+                                ->placeholder('Name, email or phone')
+                                ->required()
+                                ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                                    if ($state === null || ! $record?->user) {
+                                        return;
+                                    }
+
+                                    $label = trim(sprintf('%s <%s>', (string) ($record->user->name ?? ''), (string) ($record->user->email ?? '')));
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $record->user_id => $label,
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $set('user_id', (int) $state);
+                                }),
                             Select::make('status')
                                 ->label(__('orders.fields.status'))
                                 ->options([
-                                    'pending' => __('orders.status.pending'),
+                                    'pending'    => __('orders.status.pending'),
                                     'processing' => __('orders.status.processing'),
-                                    'shipped' => __('orders.status.shipped'),
-                                    'delivered' => __('orders.status.delivered'),
-                                    'cancelled' => __('orders.status.cancelled'),
-                                    'refunded' => __('orders.status.refunded'),
+                                    'shipped'    => __('orders.status.shipped'),
+                                    'delivered'  => __('orders.status.delivered'),
+                                    'cancelled'  => __('orders.status.cancelled'),
+                                    'refunded'   => __('orders.status.refunded'),
                                 ])
                                 ->default('pending'),
                         ]),
@@ -194,21 +211,21 @@ final class OrderResource extends Resource
                             Select::make('payment_status')
                                 ->label(__('orders.fields.payment_status'))
                                 ->options([
-                                    'pending' => __('orders.payment_status.pending'),
-                                    'paid' => __('orders.payment_status.paid'),
-                                    'failed' => __('orders.payment_status.failed'),
+                                    'pending'  => __('orders.payment_status.pending'),
+                                    'paid'     => __('orders.payment_status.paid'),
+                                    'failed'   => __('orders.payment_status.failed'),
                                     'refunded' => __('orders.payment_status.refunded'),
                                 ]),
                             Select::make('payment_method')
                                 ->label(__('orders.fields.payment_method'))
                                 ->options([
-                                    'credit_card' => __('orders.payment_methods.credit_card'),
-                                    'bank_transfer' => __('orders.payment_methods.bank_transfer'),
+                                    'credit_card'      => __('orders.payment_methods.credit_card'),
+                                    'bank_transfer'    => __('orders.payment_methods.bank_transfer'),
                                     'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
-                                    'paypal' => __('orders.payment_methods.paypal'),
-                                    'stripe' => __('orders.payment_methods.stripe'),
-                                    'apple_pay' => __('orders.payment_methods.credit_card'),
-                                    'google_pay' => __('orders.payment_methods.credit_card'),
+                                    'paypal'           => __('orders.payment_methods.paypal'),
+                                    'stripe'           => __('orders.payment_methods.stripe'),
+                                    'apple_pay'        => __('orders.payment_methods.credit_card'),
+                                    'google_pay'       => __('orders.payment_methods.credit_card'),
                                 ]),
                             TextInput::make('payment_reference')
                                 ->label(__('orders.fields.tracking_number')),
@@ -360,11 +377,11 @@ final class OrderResource extends Resource
                 BadgeColumn::make('status')
                     ->label(__('orders.fields.status'))
                     ->colors([
-                        'warning' => 'pending',
-                        'primary' => 'processing',
-                        'info' => 'shipped',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
+                        'warning'   => 'pending',
+                        'primary'   => 'processing',
+                        'info'      => 'shipped',
+                        'success'   => 'delivered',
+                        'danger'    => 'cancelled',
                         'secondary' => 'refunded',
                     ])
                     ->formatStateUsing(fn (string $state): string => __("orders.status.{$state}"))
@@ -372,9 +389,9 @@ final class OrderResource extends Resource
                 BadgeColumn::make('payment_status')
                     ->label(__('orders.fields.payment_status'))
                     ->colors([
-                        'warning' => 'pending',
-                        'success' => 'paid',
-                        'danger' => 'failed',
+                        'warning'   => 'pending',
+                        'success'   => 'paid',
+                        'danger'    => 'failed',
                         'secondary' => 'refunded',
                     ])
                     ->formatStateUsing(fn (string $state): string => __("orders.payment_status.{$state}"))
@@ -409,31 +426,31 @@ final class OrderResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'pending' => __('orders.statuses.pending'),
+                        'pending'    => __('orders.statuses.pending'),
                         'processing' => __('orders.statuses.processing'),
-                        'shipped' => __('orders.statuses.shipped'),
-                        'delivered' => __('orders.statuses.delivered'),
-                        'cancelled' => __('orders.statuses.cancelled'),
-                        'refunded' => __('orders.statuses.refunded'),
+                        'shipped'    => __('orders.statuses.shipped'),
+                        'delivered'  => __('orders.statuses.delivered'),
+                        'cancelled'  => __('orders.statuses.cancelled'),
+                        'refunded'   => __('orders.statuses.refunded'),
                     ])
                     ->multiple(),
                 SelectFilter::make('payment_status')
                     ->options([
-                        'pending' => __('orders.payment_statuses.pending'),
-                        'paid' => __('orders.payment_statuses.paid'),
-                        'failed' => __('orders.payment_statuses.failed'),
+                        'pending'  => __('orders.payment_statuses.pending'),
+                        'paid'     => __('orders.payment_statuses.paid'),
+                        'failed'   => __('orders.payment_statuses.failed'),
                         'refunded' => __('orders.payment_statuses.refunded'),
                     ])
                     ->multiple(),
                 SelectFilter::make('payment_method')
                     ->options([
-                        'credit_card' => __('orders.payment_methods.credit_card'),
-                        'bank_transfer' => __('orders.payment_methods.bank_transfer'),
+                        'credit_card'      => __('orders.payment_methods.credit_card'),
+                        'bank_transfer'    => __('orders.payment_methods.bank_transfer'),
                         'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
-                        'paypal' => __('orders.payment_methods.paypal'),
-                        'stripe' => __('orders.payment_methods.stripe'),
-                        'apple_pay' => __('orders.payment_methods.apple_pay'),
-                        'google_pay' => __('orders.payment_methods.google_pay'),
+                        'paypal'           => __('orders.payment_methods.paypal'),
+                        'stripe'           => __('orders.payment_methods.stripe'),
+                        'apple_pay'        => __('orders.payment_methods.apple_pay'),
+                        'google_pay'       => __('orders.payment_methods.google_pay'),
                     ])
                     ->multiple(),
                 SelectFilter::make('channel')
@@ -517,7 +534,7 @@ final class OrderResource extends Resource
                     ->visible(fn (Order $record): bool => $record->status === 'processing')
                     ->action(function (Order $record): void {
                         $record->update([
-                            'status' => 'shipped',
+                            'status'     => 'shipped',
                             'shipped_at' => now(),
                         ]);
                         Notification::make()
@@ -534,7 +551,7 @@ final class OrderResource extends Resource
                     ->visible(fn (Order $record): bool => $record->status === 'shipped')
                     ->action(function (Order $record): void {
                         $record->update([
-                            'status' => 'delivered',
+                            'status'       => 'delivered',
                             'delivered_at' => now(),
                         ]);
                         Notification::make()
@@ -583,9 +600,9 @@ final class OrderResource extends Resource
                             Select::make('format')
                                 ->label(__('Format'))
                                 ->options([
-                                    'csv' => 'CSV',
+                                    'csv'  => 'CSV',
                                     'xlsx' => 'XLSX',
-                                    'pdf' => 'PDF',
+                                    'pdf'  => 'PDF',
                                 ])
                                 ->default('csv')
                                 ->required(),
@@ -640,7 +657,7 @@ final class OrderResource extends Resource
                         ->color('info')
                         ->action(function (Collection $records): void {
                             $records->each->update([
-                                'status' => 'shipped',
+                                'status'     => 'shipped',
                                 'shipped_at' => now(),
                             ]);
                             Notification::make()
@@ -656,7 +673,7 @@ final class OrderResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update([
-                                'status' => 'delivered',
+                                'status'       => 'delivered',
                                 'delivered_at' => now(),
                             ]);
                             Notification::make()
@@ -717,10 +734,10 @@ final class OrderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrders::route('/'),
+            'index'  => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
-            'view' => Pages\ViewOrder::route('/{record}'),
-            'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'view'   => Pages\ViewOrder::route('/{record}'),
+            'edit'   => Pages\EditOrder::route('/{record}/edit'),
         ];
     }
 
@@ -731,8 +748,8 @@ final class OrderResource extends Resource
     {
         return [
             'Customer' => $record->user->name ?? 'N/A',
-            'Total' => '€'.number_format((float) $record->total, 2),
-            'Status' => __("orders.statuses.{$record->status}"),
+            'Total'    => '€' . number_format((float) $record->total, 2),
+            'Status'   => __("orders.statuses.{$record->status}"),
         ];
     }
 
@@ -748,7 +765,7 @@ final class OrderResource extends Resource
                 ->label(__('orders.actions.view'))
                 ->icon('heroicon-o-eye')
                 ->url(self::getUrl('view', ['record' => $record]));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 
@@ -757,7 +774,7 @@ final class OrderResource extends Resource
                 ->label(__('orders.actions.edit'))
                 ->icon('heroicon-o-pencil')
                 ->url(self::getUrl('edit', ['record' => $record]));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 
