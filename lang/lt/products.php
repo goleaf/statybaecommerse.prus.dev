@@ -4,6 +4,10 @@ return [
     'title' => 'Produktai',
     'plural' => 'Produktai',
     'single' => 'Produktas',
+    'related_categories' => 'Susijusios kategorijos',
+    'related_collections' => 'Susijusios kolekcijos',
+    'view_category_tooltip' => 'Peržiūrėti kategoriją :category',
+    'explore_collection_tooltip' => 'Naršyti kolekciją :collection',
     'fields' => [
         'name' => 'Pavadinimas',
         'slug' => 'Slug',
