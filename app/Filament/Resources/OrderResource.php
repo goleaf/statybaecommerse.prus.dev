@@ -6,11 +6,18 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Models\Address;
+use App\Models\Channel;
 use App\Models\Order;
+use App\Models\Partner;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Search\AddressSearch;
+use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
+use App\Support\Search\PartnerSearch;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -53,7 +60,6 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderResource
@@ -298,18 +304,67 @@ final class OrderResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
+                            SearchableInput::make('billing_address_lookup')
+                                ->label(__('orders.lookups.billing_address'))
+                                ->placeholder(__('orders.lookups.address_placeholder'))
+                                ->searchUsing(fn (string $value): array => AddressSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if ($state === null) {
+                                        $set('billing_address', []);
+
+                                        return;
+                                    }
+
+                                    $address = Address::query()
+                                        ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+                                        ->find($state);
+
+                                    if (! $address instanceof Address) {
+                                        return;
+                                    }
+
+                                    $set('billing_address', AddressSearch::payload($address));
+                                })
+                                ->dehydrated(false),
+                            SearchableInput::make('shipping_address_lookup')
+                                ->label(__('orders.lookups.shipping_address'))
+                                ->placeholder(__('orders.lookups.address_placeholder'))
+                                ->searchUsing(fn (string $value): array => AddressSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if ($state === null) {
+                                        $set('shipping_address', []);
+
+                                        return;
+                                    }
+
+                                    $address = Address::query()
+                                        ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+                                        ->find($state);
+
+                                    if (! $address instanceof Address) {
+                                        return;
+                                    }
+
+                                    $set('shipping_address', AddressSearch::payload($address));
+                                })
+                                ->dehydrated(false),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
                             KeyValue::make('billing_address')
                                 ->label(__('orders.fields.billing_address'))
-                                ->keyLabel(__('orders.fields.order_number'))
-                                ->valueLabel(__('orders.fields.customer_name'))
+                                ->keyLabel(__('orders.lookups.address_field'))
+                                ->valueLabel(__('orders.lookups.address_value'))
                                 ->addActionLabel(__('orders.actions.create'))
-                                ->helperText(__('orders.fields.billing_address')),
+                                ->default([]),
                             KeyValue::make('shipping_address')
                                 ->label(__('orders.fields.shipping_address'))
-                                ->keyLabel(__('orders.fields.order_number'))
-                                ->valueLabel(__('orders.fields.customer_name'))
+                                ->keyLabel(__('orders.lookups.address_field'))
+                                ->valueLabel(__('orders.lookups.address_value'))
                                 ->addActionLabel(__('orders.actions.create'))
-                                ->helperText(__('orders.fields.shipping_address')),
+                                ->default([]),
                         ]),
                 ])
                 ->collapsible(),
@@ -340,16 +395,60 @@ final class OrderResource extends Resource
                         ->helperText(__('orders.fields.internal_notes')),
                     Grid::make(3)
                         ->schema([
-                            Select::make('channel_id')
-                                ->label(__('orders.fields.customer'))
-                                ->relationship('channel', 'name')
-                                ->searchable()
-                                ->preload(),
-                            Select::make('partner_id')
-                                ->label(__('orders.fields.customer'))
-                                ->relationship('partner', 'name')
-                                ->searchable()
-                                ->preload(),
+                            SearchableInput::make('channel_id')
+                                ->label(__('orders.fields.channel'))
+                                ->placeholder(__('orders.lookups.channel_placeholder'))
+                                ->searchUsing(fn (string $value): array => ChannelSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    if ($state === null) {
+                                        return;
+                                    }
+
+                                    $channel = Channel::query()
+                                        ->select(['id', 'name', 'code', 'type'])
+                                        ->find($state);
+
+                                    if (! $channel instanceof Channel) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $channel->getKey() => ChannelSearch::label($channel),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    $set('channel_id', $state !== null && $state !== '' ? (int) $state : null);
+                                }),
+                            SearchableInput::make('partner_id')
+                                ->label(__('orders.fields.partner'))
+                                ->placeholder(__('orders.lookups.partner_placeholder'))
+                                ->searchUsing(fn (string $value): array => PartnerSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    if ($state === null) {
+                                        return;
+                                    }
+
+                                    $partner = Partner::query()
+                                        ->select(['id', 'name', 'code', 'contact_email'])
+                                        ->find($state);
+
+                                    if (! $partner instanceof Partner) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $partner->getKey() => PartnerSearch::label($partner),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    $set('partner_id', $state !== null && $state !== '' ? (int) $state : null);
+                                }),
                         ]),
                 ])
                 ->collapsible(),
@@ -542,7 +641,7 @@ final class OrderResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('orders.created_at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

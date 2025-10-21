@@ -81,6 +81,48 @@ final class AddressSearch
     }
 
     /**
+     * @return array<int, SearchResult>
+     */
+    public static function results(string $term, int $limit = 15): array
+    {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Address> $addresses */
+        $addresses = self::addressQuery($term)
+            ->limit($limit)
+            ->get();
+
+        return $addresses
+            ->map(static function (Address $address): SearchResult {
+                /** @var int|string|null $identifier */
+                $identifier = $address->getKey();
+                $label = self::formatAddress($address);
+
+                $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+                $result
+                    ->withData('address_id', $address->getKey())
+                    ->withData('payload', self::payload($address));
+
+                return $result;
+            })
+            ->all();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function payload(Address $address): array
+    {
+        return [
+            'address_line_1' => self::stringValue($address->getAttribute('address_line_1')),
+            'address_line_2' => self::stringValue($address->getAttribute('address_line_2')),
+            'city'           => self::stringValue($address->getAttribute('city')),
+            'state'          => self::stringValue($address->getAttribute('state')),
+            'postal_code'    => self::stringValue($address->getAttribute('postal_code')),
+            'country_code'   => self::stringValue($address->getAttribute('country_code')),
+        ];
+    }
+
+    /**
      * @return Builder<Address>
      */
     private static function addressQuery(string $term): Builder
@@ -141,5 +183,10 @@ final class AddressSearch
         ], fn (string $value): bool => $value !== '');
 
         return implode(', ', $parts);
+    }
+
+    private static function stringValue(mixed $value): string
+    {
+        return is_string($value) ? $value : '';
     }
 }

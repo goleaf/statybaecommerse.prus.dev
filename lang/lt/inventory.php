@@ -55,6 +55,9 @@ return [
     'variant' => 'Variantas',
     'variant_name' => 'Varianto pavadinimas',
     'location' => 'Vieta',
+    'locations' => [
+        'unknown' => 'Nežinoma vieta',
+    ],
     'current_stock' => 'Dabartinės atsargos',
 
     // New fields for StockResource
