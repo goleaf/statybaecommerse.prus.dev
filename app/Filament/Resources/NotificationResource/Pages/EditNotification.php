@@ -19,4 +19,13 @@ final class EditNotification extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    /**
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return NotificationResource::mutateReadState($data);
+    }
 }

@@ -33,14 +33,20 @@ final class AutocompleteSelect extends Select
 
     protected ?string $labelField = null;
 
+    /**
+     * @var class-string<Model>|null
+     */
     protected ?string $modelClass = null;
 
+    /**
+     * @var Collection<int, array{value: string, label: string, data: array<string, mixed>}>|null
+     */
     protected ?Collection $searchResults = null;
 
     protected ?string $searchQuery = null;
 
     /**
-     * @var array<string, array<int, array{value:mixed, label:string, data:array}>>
+     * @var array<string, array<int, array{value: string, label: string, data: array<string, mixed>}>>
      */
     protected array $searchResultCache = [];
 
@@ -108,8 +114,8 @@ final class AutocompleteSelect extends Select
 
         $modelClass = match (true) {
             $evaluatedModel instanceof Model => $evaluatedModel::class,
-            is_string($evaluatedModel) => $evaluatedModel,
-            default => null,
+            is_string($evaluatedModel)       => $evaluatedModel,
+            default                          => null,
         };
 
         if ($modelClass !== null) {
@@ -150,12 +156,12 @@ final class AutocompleteSelect extends Select
         return $this->searchField;
     }
 
-    public function getValueField(): ?string
+    public function getValueField(): string
     {
         return $this->valueField ?? 'id';
     }
 
-    public function getLabelField(): ?string
+    public function getLabelField(): string
     {
         return $this->labelField ?? 'name';
     }
@@ -165,17 +171,38 @@ final class AutocompleteSelect extends Select
         return $this->modelClass;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getSearchResults(string $search): array
     {
         $this->setSearchQuery($search);
 
         return ($this->searchResults ?? collect())
-            ->mapWithKeys(function (array $item): array {
-                $value = $item['value'] ?? null;
-                $label = $item['label'] ?? (is_array($item['data'] ?? null) ? ($item['data']['name'] ?? (string) $value) : (string) $value);
+            ->mapWithKeys(
+                /**
+                 * @param  array{value: string, label: string, data: array<string, mixed>} $item
+                 * @return array<string, string>
+                 */
+                function (array $item, int|string $_): array {
+                    $value = $item['value'];
+                    $label = $item['label'];
 
-                return $value !== null ? [$value => $label] : [];
-            })
+                    if ($label === '' && array_key_exists('name', $item['data'])) {
+                        $name = $item['data']['name'];
+
+                        if (is_string($name)) {
+                            $label = $name;
+                        }
+                    }
+
+                    if ($label === '') {
+                        $label = $value;
+                    }
+
+                    return [$value => $label];
+                },
+            )
             ->all();
     }
 
@@ -184,9 +211,14 @@ final class AutocompleteSelect extends Select
         $normalizedQuery = $this->normalizeSearchQuery($query);
 
         $this->searchQuery = $normalizedQuery;
-        $this->searchResults = $normalizedQuery !== null
-            ? $this->performSearch($normalizedQuery)
-            : collect();
+
+        if ($normalizedQuery === null) {
+            $this->searchResults = $this->emptyResults();
+
+            return $this;
+        }
+
+        $this->searchResults = $this->performSearch($normalizedQuery);
 
         return $this;
     }
@@ -196,56 +228,98 @@ final class AutocompleteSelect extends Select
         return $this->searchQuery;
     }
 
+    /**
+     * @return Collection<int, array{value: string, label: string, data: array<string, mixed>}>
+     */
     protected function performSearch(string $search): Collection
     {
-        if ($this->shouldSkipSearch($search)) {
-            return collect();
+        $normalizedSearch = $this->normalizeSearchQuery($search);
+
+        if ($normalizedSearch === null || $this->shouldSkipSearch($normalizedSearch) || $this->modelClass === null) {
+            return $this->emptyResults();
         }
 
-        $cacheKey = $this->cacheKey($search);
+        $cacheKey = $this->cacheKey($normalizedSearch);
 
         if (array_key_exists($cacheKey, $this->searchResultCache)) {
-            return collect($this->searchResultCache[$cacheKey]);
+            /** @var array<int, array{value: string, label: string, data: array<string, mixed>}> $cachedResults */
+            $cachedResults = $this->searchResultCache[$cacheKey];
+
+            /** @var Collection<int, array{value: string, label: string, data: array<string, mixed>}> $collection */
+            $collection = new Collection($cachedResults);
+
+            return $collection;
         }
 
-        $model = app($this->modelClass);
+        /** @var class-string<Model> $modelClass */
+        $modelClass = $this->modelClass;
+
+        $model = app($modelClass);
+
+        if (! $model instanceof Model) {
+            return $this->emptyResults();
+        }
+
         $searchField = $this->searchField ?? $this->getLabelField();
+
         $valueField = $this->getValueField();
         $labelField = $this->getLabelField();
 
-        $results = $model
+        $resultsArray = $model
             ->newQuery()
-            ->where($searchField, 'like', '%'.$search.'%')
+            ->where($searchField, 'like', '%' . $normalizedSearch . '%')
             ->limit($this->maxSearchResults)
             ->get()
-            ->map(function (Model $item) use ($valueField, $labelField): array {
-                return [
-                    'value' => $item->{$valueField},
-                    'label' => $item->{$labelField},
-                    'data' => $item->toArray(),
-                ];
+            ->flatMap(function (Model $item) use ($valueField, $labelField): array {
+                $rawValue = $item->getAttribute($valueField);
+
+                if ($rawValue === null) {
+                    return [];
+                }
+
+                if (! is_scalar($rawValue)) {
+                    return [];
+                }
+
+                $value = (string) $rawValue;
+
+                $rawLabel = $item->getAttribute($labelField);
+                $label = is_string($rawLabel) ? $rawLabel : $value;
+
+                /** @var array<string, mixed> $data */
+                $data = $item->toArray();
+
+                return [[
+                    'value' => $value,
+                    'label' => $label,
+                    'data'  => $data,
+                ]];
             })
             ->values()
             ->all();
 
-        $this->searchResultCache[$cacheKey] = $results;
+        /** @var array<int, array{value: string, label: string, data: array<string, mixed>}> $resultsArray */
+        $this->searchResultCache[$cacheKey] = $resultsArray;
 
-        return collect($results);
+        /** @var Collection<int, array{value: string, label: string, data: array<string, mixed>}> $results */
+        $results = new Collection($resultsArray);
+
+        return $results;
     }
 
     public function getViewData(): array
     {
         return [
-            'searchable' => $this->getSearchable(),
-            'multiple' => $this->getMultiple(),
-            'minSearchLength' => $this->getMinSearchLength(),
+            'searchable'       => $this->getSearchable(),
+            'multiple'         => $this->getMultiple(),
+            'minSearchLength'  => $this->getMinSearchLength(),
             'maxSearchResults' => $this->getMaxSearchResults(),
-            'searchField' => $this->getSearchField(),
-            'valueField' => $this->getValueField(),
-            'labelField' => $this->getLabelField(),
-            'modelClass' => $this->getModelClass(),
-            'searchResults' => $this->searchResults ?? collect(),
-            'searchQuery' => $this->getSearchQuery(),
+            'searchField'      => $this->getSearchField(),
+            'valueField'       => $this->getValueField(),
+            'labelField'       => $this->getLabelField(),
+            'modelClass'       => $this->getModelClass(),
+            'searchResults'    => $this->searchResults ?? $this->emptyResults(),
+            'searchQuery'      => $this->getSearchQuery(),
         ];
     }
 
@@ -268,13 +342,24 @@ final class AutocompleteSelect extends Select
 
     protected function cacheKey(string $search): string
     {
-        return mb_strtolower($search);
+        return mb_strtolower(trim($search));
     }
 
     protected function resetSearchState(): void
     {
-        $this->searchResults = collect();
+        $this->searchResults = $this->emptyResults();
         $this->searchQuery = null;
         $this->searchResultCache = [];
+    }
+
+    /**
+     * @return Collection<int, array{value: string, label: string, data: array<string, mixed>}>
+     */
+    protected function emptyResults(): Collection
+    {
+        /** @var Collection<int, array{value: string, label: string, data: array<string, mixed>}> $collection */
+        $collection = new Collection;
+
+        return $collection;
     }
 }

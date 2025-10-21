@@ -25,7 +25,7 @@ describe('NotificationResource', function () {
         it('can render view page', function () {
             $notification = Notification::factory()->create([
                 'notifiable_type' => User::class,
-                'notifiable_id' => $this->adminUser->id,
+                'notifiable_id'   => $this->adminUser->id,
             ]);
 
             $this->get(NotificationResource::getUrl('view', ['record' => $notification]))
@@ -44,35 +44,35 @@ describe('NotificationResource', function () {
         beforeEach(function () {
             $this->notifications = collect([
                 Notification::factory()->create([
-                    'type' => 'App\Notifications\OrderNotification',
+                    'type'            => 'App\Notifications\OrderNotification',
                     'notifiable_type' => User::class,
-                    'notifiable_id' => $this->adminUser->id,
-                    'data' => [
-                        'title' => 'Order Confirmed',
+                    'notifiable_id'   => $this->adminUser->id,
+                    'data'            => [
+                        'title'   => 'Order Confirmed',
                         'message' => 'Your order has been confirmed',
-                        'type' => 'order',
+                        'type'    => 'order',
                     ],
                     'read_at' => null,
                 ]),
                 Notification::factory()->create([
-                    'type' => 'App\Notifications\ProductNotification',
+                    'type'            => 'App\Notifications\ProductNotification',
                     'notifiable_type' => User::class,
-                    'notifiable_id' => $this->adminUser->id,
-                    'data' => [
-                        'title' => 'New Product Available',
+                    'notifiable_id'   => $this->adminUser->id,
+                    'data'            => [
+                        'title'   => 'New Product Available',
                         'message' => 'Check out our new product',
-                        'type' => 'product',
+                        'type'    => 'product',
                     ],
                     'read_at' => now(),
                 ]),
                 Notification::factory()->create([
-                    'type' => 'App\Notifications\SystemNotification',
+                    'type'            => 'App\Notifications\SystemNotification',
                     'notifiable_type' => User::class,
-                    'notifiable_id' => $this->adminUser->id,
-                    'data' => [
-                        'title' => 'System Maintenance',
+                    'notifiable_id'   => $this->adminUser->id,
+                    'data'            => [
+                        'title'   => 'System Maintenance',
                         'message' => 'Scheduled maintenance tonight',
-                        'type' => 'system',
+                        'type'    => 'system',
                     ],
                     'read_at' => null,
                 ]),
@@ -90,24 +90,23 @@ describe('NotificationResource', function () {
             livewire(NotificationResource\Pages\ListNotifications::class)
                 ->assertCanSeeTableRecord($notification)
                 ->assertTableColumnExists('id')
+                ->assertTableColumnExists('notification_type')
                 ->assertTableColumnExists('type')
-                ->assertTableColumnExists('data.title')
-                ->assertTableColumnExists('data.message')
-                ->assertTableColumnExists('data.type')
+                ->assertTableColumnExists('title')
                 ->assertTableColumnExists('read_at')
                 ->assertTableColumnExists('created_at');
         });
 
         it('can filter notifications by type', function () {
             livewire(NotificationResource\Pages\ListNotifications::class)
-                ->filterTable('data.type', 'order')
+                ->filterTable('notification_type', ['value' => 'order'])
                 ->assertCanSeeTableRecord($this->notifications->first())
                 ->assertCanNotSeeTableRecord($this->notifications->last());
         });
 
         it('can filter notifications by read status', function () {
             livewire(NotificationResource\Pages\ListNotifications::class)
-                ->filterTable('read_at', true)
+                ->filterTable('read_state', true)
                 ->assertCanSeeTableRecord($this->notifications->get(1))
                 ->assertCanNotSeeTableRecord($this->notifications->first());
         });
@@ -141,11 +140,11 @@ describe('NotificationResource', function () {
         beforeEach(function () {
             $this->notification = Notification::factory()->create([
                 'notifiable_type' => User::class,
-                'notifiable_id' => $this->adminUser->id,
-                'data' => [
-                    'title' => 'Test Notification',
+                'notifiable_id'   => $this->adminUser->id,
+                'data'            => [
+                    'title'   => 'Test Notification',
                     'message' => 'This is a test notification',
-                    'type' => 'system',
+                    'type'    => 'system',
                 ],
             ]);
         });
@@ -170,7 +169,7 @@ describe('NotificationResource', function () {
         it('can bulk delete notifications', function () {
             $notifications = Notification::factory()->count(3)->create([
                 'notifiable_type' => User::class,
-                'notifiable_id' => $this->adminUser->id,
+                'notifiable_id'   => $this->adminUser->id,
             ]);
 
             livewire(NotificationResource\Pages\ListNotifications::class)
@@ -214,11 +213,11 @@ describe('NotificationResource', function () {
 
         it('formats notifiable type correctly', function () {
             $notification = Notification::factory()->create([
-                'notifiable_type' => User::class,
+                'data' => ['type' => 'product'],
             ]);
 
             livewire(NotificationResource\Pages\ListNotifications::class)
-                ->assertTableColumnState('notifiable_type', $notification, 'User');
+                ->assertTableColumnState('notification_type', $notification, 'product');
         });
 
         it('displays notification type badges with correct colors', function () {
