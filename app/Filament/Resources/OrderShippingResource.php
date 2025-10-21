@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -30,7 +31,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class OrderShippingResource extends Resource
 {
@@ -129,7 +129,7 @@ final class OrderShippingResource extends Resource
                                 ->numeric()
                                 ->step(0.001)
                                 ->suffix('kg'),
-                            TextInput::make('cost')
+                            TextInput::make('total_cost')
                                 ->label(__('admin.order_shippings.cost'))
                                 ->numeric()
                                 ->step(0.01)
@@ -201,7 +201,7 @@ final class OrderShippingResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('cost')
+                TextColumn::make('total_cost')
                     ->label(__('admin.order_shippings.cost'))
                     ->money('EUR')
                     ->sortable()
@@ -237,7 +237,16 @@ final class OrderShippingResource extends Resource
                     ->preload(),
                 SelectFilter::make('carrier_name')
                     ->label(__('admin.order_shippings.carrier_name'))
-                    ->options(fn () => OrderShipping::distinct()->pluck('carrier_name', 'carrier_name'))
+                    ->options(
+                        fn () => OrderShipping::query()
+                            ->select('carrier_name')
+                            ->whereNotNull('carrier_name')
+                            ->distinct()
+                            ->orderBy('carrier_name')
+                            ->pluck('carrier_name', 'carrier_name')
+                            ->filter()
+                            ->all(),
+                    )
                     ->searchable(),
                 Filter::make('shipped_at')
                     ->label(__('admin.order_shippings.shipped_at'))
@@ -270,14 +279,14 @@ final class OrderShippingResource extends Resource
                     BulkAction::make('mark_shipped')
                         ->label(__('admin.order_shippings.mark_shipped'))
                         ->icon('heroicon-o-truck')
-                        ->action(function ($records) {
+                        ->action(function ($records): void {
                             $records->each->update(['shipped_at' => now()]);
                         })
                         ->requiresConfirmation(),
                     BulkAction::make('mark_delivered')
                         ->label(__('admin.order_shippings.mark_delivered'))
                         ->icon('heroicon-o-check-circle')
-                        ->action(function ($records) {
+                        ->action(function ($records): void {
                             $records->each->update(['delivered_at' => now()]);
                         })
                         ->requiresConfirmation(),
