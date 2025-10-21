@@ -15,10 +15,11 @@ use App\Support\ListQuery\ListQueryValidator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
+use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * CampaignClickController
@@ -27,6 +28,43 @@ use Illuminate\Support\LazyCollection;
  */
 final class CampaignClickController extends Controller
 {
+    #[OA\Get(
+        path: '/campaign-clicks',
+        summary: 'List campaign clicks',
+        description: 'Return a paginated collection of tracked campaign clicks. Unauthenticated requests receive public data, while authenticated requests are scoped to the current customer.',
+        tags: ['Campaign Clicks'],
+        parameters: [
+            new OA\QueryParameter(name: 'page', description: 'Page number to retrieve.', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1)),
+            new OA\QueryParameter(name: 'per_page', description: 'Items per page (1-100).', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100)),
+            new OA\QueryParameter(name: 'sort', description: 'Sort definition, e.g. `-clicked_at` or `conversion_value`.', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'campaign_id', description: 'Filter clicks by campaign identifier.', in: 'query', schema: new OA\Schema(type: 'integer', format: 'int64')),
+            new OA\QueryParameter(name: 'click_type', description: 'Filter by click type (cta, banner, link, button, image).', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'device_type', description: 'Filter by originating device type.', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'is_converted', description: 'Limit to converted (true) or unconverted (false) clicks.', in: 'query', schema: new OA\Schema(type: 'boolean')),
+            new OA\QueryParameter(name: 'country', description: 'Filter by ISO country code.', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'utm_source', description: 'Filter by UTM source.', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'date_from', description: 'Filter clicks recorded after this ISO-8601 timestamp.', in: 'query', schema: new OA\Schema(type: 'string', format: 'date-time')),
+            new OA\QueryParameter(name: 'date_to', description: 'Filter clicks recorded before this ISO-8601 timestamp.', in: 'query', schema: new OA\Schema(type: 'string', format: 'date-time')),
+            new OA\QueryParameter(name: 'search', description: 'Full-text search across UTM and device details.', in: 'query', schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Paginated campaign click collection.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignClickCollectionResponse')
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthenticated access attempt.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Invalid filter or pagination parameters.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ValidationProblemDetails')
+            ),
+        ]
+    )]
     /**
      * Display a listing of the resource with pagination and filtering.
      */
@@ -34,16 +72,16 @@ final class CampaignClickController extends Controller
     {
         $definition = new ListQueryDefinition(
             filters: [
-                'campaign_id' => ['type' => 'int', 'column' => 'campaign_clicks.campaign_id'],
-                'click_type' => ['type' => 'string', 'column' => 'campaign_clicks.click_type'],
-                'device_type' => ['type' => 'string', 'column' => 'campaign_clicks.device_type'],
+                'campaign_id'  => ['type' => 'int', 'column' => 'campaign_clicks.campaign_id'],
+                'click_type'   => ['type' => 'string', 'column' => 'campaign_clicks.click_type'],
+                'device_type'  => ['type' => 'string', 'column' => 'campaign_clicks.device_type'],
                 'is_converted' => ['type' => 'bool', 'column' => 'campaign_clicks.is_converted'],
-                'country' => ['type' => 'string', 'column' => 'campaign_clicks.country'],
-                'utm_source' => ['type' => 'string', 'column' => 'campaign_clicks.utm_source'],
-                'date_from' => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '>='],
-                'date_to' => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '<='],
-                'search' => [
-                    'type' => 'string',
+                'country'      => ['type' => 'string', 'column' => 'campaign_clicks.country'],
+                'utm_source'   => ['type' => 'string', 'column' => 'campaign_clicks.utm_source'],
+                'date_from'    => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '>='],
+                'date_to'      => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '<='],
+                'search'       => [
+                    'type'     => 'string',
                     'callback' => static function (Builder $builder, string $value): void {
                         $builder->where(function (Builder $query) use ($value): void {
                             $query->where('utm_source', 'like', "%{$value}%")
@@ -55,7 +93,7 @@ final class CampaignClickController extends Controller
                 ],
             ],
             sortable: [
-                'clicked_at' => ['column' => 'campaign_clicks.clicked_at', 'default_direction' => 'desc'],
+                'clicked_at'       => ['column' => 'campaign_clicks.clicked_at', 'default_direction' => 'desc'],
                 'conversion_value' => ['column' => 'campaign_clicks.conversion_value'],
             ],
             defaultSort: 'clicked_at',
@@ -85,6 +123,33 @@ final class CampaignClickController extends Controller
         return response()->json((new CampaignClickCollection($clicks))->withListQuery($listQuery));
     }
 
+    #[OA\Post(
+        path: '/campaign-clicks',
+        summary: 'Record a campaign click',
+        description: 'Create a campaign click entry from storefront or partner telemetry.',
+        tags: ['Campaign Clicks'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/CampaignClickCreate')
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Campaign click recorded.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignClickResourceResponse')
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation failed.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ValidationProblemDetails')
+            ),
+            new OA\Response(
+                response: 500,
+                description: 'Unexpected error while recording the click.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+        ]
+    )]
     /**
      * Store a newly created resource in storage with validation.
      */
@@ -95,6 +160,32 @@ final class CampaignClickController extends Controller
         return response()->json(['data' => new CampaignClickResource($click), 'message' => __('campaign_clicks.created_successfully')], 201);
     }
 
+    #[OA\Get(
+        path: '/campaign-clicks/{id}',
+        summary: 'View a campaign click',
+        description: 'Retrieve a single campaign click record with related campaign and customer information.',
+        tags: ['Campaign Clicks'],
+        parameters: [
+            new OA\Parameter(name: 'id', description: 'Campaign click identifier.', in: 'path', required: true, schema: new OA\Schema(type: 'integer', format: 'int64')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Campaign click details.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignClickResourceResponse')
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'Authenticated user is not allowed to view this click.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Click not found.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+        ]
+    )]
     /**
      * Display the specified resource with related data.
      */
@@ -108,6 +199,36 @@ final class CampaignClickController extends Controller
         return response()->json(['data' => new CampaignClickResource($campaignClick->load(['campaign', 'customer', 'conversions']))]);
     }
 
+    #[OA\Put(
+        path: '/campaign-clicks/{id}',
+        summary: 'Update a campaign click',
+        description: 'Update a campaign click that belongs to the authenticated customer.',
+        tags: ['Campaign Clicks'],
+        parameters: [
+            new OA\Parameter(name: 'id', description: 'Campaign click identifier.', in: 'path', required: true, schema: new OA\Schema(type: 'integer', format: 'int64')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/CampaignClickUpdate')
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Campaign click updated.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignClickResourceResponse')
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'Authenticated user is not allowed to modify this click.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation failed.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ValidationProblemDetails')
+            ),
+        ]
+    )]
     /**
      * Update the specified resource in storage with validation.
      */
@@ -122,6 +243,23 @@ final class CampaignClickController extends Controller
         return response()->json(['data' => new CampaignClickResource($campaignClick), 'message' => __('campaign_clicks.updated_successfully')]);
     }
 
+    #[OA\Delete(
+        path: '/campaign-clicks/{id}',
+        summary: 'Delete a campaign click',
+        description: 'Delete a campaign click that belongs to the authenticated customer.',
+        tags: ['Campaign Clicks'],
+        parameters: [
+            new OA\Parameter(name: 'id', description: 'Campaign click identifier.', in: 'path', required: true, schema: new OA\Schema(type: 'integer', format: 'int64')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Campaign click deleted.'),
+            new OA\Response(
+                response: 403,
+                description: 'Authenticated user is not allowed to delete this click.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+        ]
+    )]
     /**
      * Remove the specified resource from storage.
      */
@@ -136,6 +274,24 @@ final class CampaignClickController extends Controller
         return response()->json(['message' => __('campaign_clicks.deleted_successfully')], 204);
     }
 
+    #[OA\Get(
+        path: '/campaign-clicks/statistics',
+        summary: 'Summarise campaign click statistics',
+        description: 'Aggregate quick statistics for campaign clicks available to the current caller.',
+        tags: ['Campaign Clicks'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Aggregate statistics.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignClickStatistics')
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthenticated access attempt.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+        ]
+    )]
     /**
      * Handle statistics functionality with proper error handling.
      */
@@ -156,6 +312,27 @@ final class CampaignClickController extends Controller
         return response()->json(['total_clicks' => $totalClicks, 'converted_clicks' => $convertedClicks, 'conversion_rate' => $conversionRate, 'total_conversion_value' => $totalConversionValue, 'today_clicks' => $todayClicks, 'this_week_clicks' => $thisWeekClicks]);
     }
 
+    #[OA\Get(
+        path: '/campaign-clicks/analytics',
+        summary: 'Get campaign click analytics',
+        description: 'Return grouped analytics such as daily counts, device mix, and geographic summaries.',
+        tags: ['Campaign Clicks'],
+        parameters: [
+            new OA\QueryParameter(name: 'days', description: 'Number of trailing days to include (default 30).', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1)),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Analytics payload.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CampaignClickAnalytics')
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthenticated access attempt.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ProblemDetails')
+            ),
+        ]
+    )]
     /**
      * Handle analytics functionality with proper error handling.
      */
@@ -182,12 +359,33 @@ final class CampaignClickController extends Controller
         return response()->json(['clicks_over_time' => $clicksOverTime, 'device_types' => $deviceTypes, 'browsers' => $browsers, 'countries' => $countries, 'utm_sources' => $utmSources]);
     }
 
+    #[OA\Get(
+        path: '/campaign-clicks/export',
+        summary: 'Export campaign clicks',
+        description: 'Export campaign click data as a streamed CSV file with the active filters applied.',
+        tags: ['Campaign Clicks'],
+        parameters: [
+            new OA\QueryParameter(name: 'campaign_id', in: 'query', schema: new OA\Schema(type: 'integer', format: 'int64')),
+            new OA\QueryParameter(name: 'click_type', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'date_from', in: 'query', schema: new OA\Schema(type: 'string', format: 'date-time')),
+            new OA\QueryParameter(name: 'date_to', in: 'query', schema: new OA\Schema(type: 'string', format: 'date-time')),
+            new OA\QueryParameter(name: 'device_type', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'country', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'utm_source', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'search', in: 'query', schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'CSV export of campaign clicks.',
+                content: new OA\MediaType(mediaType: 'text/csv')
+            ),
+        ]
+    )]
     /**
      * Handle export functionality with proper error handling.
-     *
-     * @return Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function export(Request $request): StreamedResponse
     {
         $query = CampaignClick::with(['campaign', 'customer']);
         // Apply same filters as index
@@ -209,7 +407,7 @@ final class CampaignClickController extends Controller
         }
         $clicks = $query->orderBy('clicked_at', 'desc')->get();
         $format = $request->get('format', 'csv');
-        $filename = 'campaign_clicks_'.now()->format('Y-m-d_H-i-s').'.'.$format;
+        $filename = 'campaign_clicks_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
         if ($format === 'csv') {
             return $this->exportCsv($clicks, $filename);
         }
@@ -220,14 +418,14 @@ final class CampaignClickController extends Controller
     /**
      * Handle exportCsv functionality with proper error handling.
      *
-     * @param  mixed  $clicks
+     * @param  mixed                                             $clicks
      * @return Symfony\Component\HttpFoundation\StreamedResponse
      */
     private function exportCsv($clicks, string $filename): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $headers = ['Content-Type' => 'text/csv; charset=UTF-8', 'Content-Disposition' => 'attachment; filename="'.$filename.'"'];
+        $headers = ['Content-Type' => 'text/csv; charset=UTF-8', 'Content-Disposition' => 'attachment; filename="' . $filename . '"'];
 
-        return response()->stream(function () use ($clicks) {
+        return response()->stream(function () use ($clicks): void {
             $handle = fopen('php://output', 'w');
             // Add BOM for UTF-8
             fwrite($handle, '﻿');
@@ -236,7 +434,7 @@ final class CampaignClickController extends Controller
             // Use LazyCollection with timeout to prevent long-running export operations
             $timeout = now()->addMinutes(10);
             // 10 minute timeout for campaign click exports
-            LazyCollection::make($clicks)->takeUntilTimeout($timeout)->each(function ($click) use ($handle) {
+            LazyCollection::make($clicks)->takeUntilTimeout($timeout)->each(function ($click) use ($handle): void {
                 fputcsv($handle, [$click->id, $click->campaign->name ?? '', $click->customer->name ?? __('campaign_clicks.guest'), $click->click_type_label, $click->clicked_url, $click->clicked_at->format('Y-m-d H:i:s'), $click->device_type_label, $click->browser_label, $click->country, $click->utm_source, $click->is_converted ? __('campaign_clicks.yes') : __('campaign_clicks.no'), $click->conversion_value]);
             });
             fclose($handle);
