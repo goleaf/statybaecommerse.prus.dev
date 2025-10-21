@@ -81,8 +81,9 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Form $form): Form|array
+    public function form(Form $form): Form
     {
+        // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.
         return $form
             ->schema([
                 Section::make('Targeted Cache Operations')
