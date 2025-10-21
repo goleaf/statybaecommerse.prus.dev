@@ -20,12 +20,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -36,14 +31,16 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use UnitEnum;
 
 final class CategoryResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
+    protected static $navigationIcon = 'heroicon-o-tag';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -101,9 +98,9 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
-        return $form->components([
+        return $form->schema([
             Section::make(__('categories.basic_information'))
                 ->components([
                     LanguageTabs::make([
@@ -198,7 +195,7 @@ final class CategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -215,7 +212,11 @@ final class CategoryResource extends Resource
                         $state = $column->getState();
                         $record = $column->getRecord();
                         if ($record->parent) {
-                            return "{$record->parent->name} → {$state}";
+                            // Use the Str helper to avoid deprecated string helper aliases while building the breadcrumb label.
+                            return Str::of($record->parent->name)
+                                ->append(' → ')
+                                ->append((string) $state)
+                                ->toString();
                         }
 
                         return $state;
@@ -268,11 +269,11 @@ final class CategoryResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make()
+                Tables\Actions\ViewAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
-                EditAction::make()
+                Tables\Actions\EditAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
-                Action::make('toggle_active')
+                Tables\Actions\Action::make('toggle_active')
                     ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
                     ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Category $record): string => $record->is_active ? 'warning' : 'success')
@@ -287,10 +288,10 @@ final class CategoryResource extends Resource
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn () => AuthorizationMatrix::check('categories', 'delete')),
-                    BulkAction::make('activate')
+                    Tables\Actions\BulkAction::make('activate')
                         ->label(__('categories.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -303,7 +304,7 @@ final class CategoryResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
-                    BulkAction::make('deactivate')
+                    Tables\Actions\BulkAction::make('deactivate')
                         ->label(__('categories.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
