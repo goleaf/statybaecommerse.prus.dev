@@ -7,7 +7,9 @@ namespace App\Providers;
 use App\Console\Commands\ProfiledSeedCommand;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
+use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
+use App\Infrastructure\Product\Repositories\EloquentProductRepository;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\Document;
@@ -71,6 +73,9 @@ class AppServiceProvider extends ServiceProvider
                 return new ProfiledSeedCommand($app->make('db'), $dispatcher, $app->make('config'));
             });
         }
+
+        // Bind the domain-level product repository to its Eloquent implementation.
+        $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
     }
 
     public function boot(): void
