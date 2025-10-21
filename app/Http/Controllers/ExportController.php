@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Enums\ExportStatus;
 use App\Models\Export;
 use App\Services\Export\ExportService;
+use App\Support\Exports\ExportUrlGenerator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Http\RedirectResponse;
@@ -48,7 +49,7 @@ class ExportController extends Controller
                 'name' => $export->artifact_filename ?? basename((string) $path),
                 'path' => $path,
                 'size' => $size,
-                'url' => $this->service->downloadUrl($export, 60),
+                'url' => ExportUrlGenerator::temporarySignedDownloadUrl($export, 60),
             ];
         })->filter(fn (array $file): bool => $file['path'] !== null)->values()->all();
 
@@ -66,7 +67,7 @@ class ExportController extends Controller
             ->first();
 
         if ($export instanceof Export && $export->status === ExportStatus::Completed) {
-            return redirect()->away($this->service->downloadUrl($export));
+            return redirect()->away(ExportUrlGenerator::temporarySignedDownloadUrl($export));
         }
 
         $path = 'exports/'.$filename;

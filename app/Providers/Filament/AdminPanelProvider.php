@@ -25,9 +25,22 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use Illuminate\Support\Facades\URL;
+use pxlrbt\FilamentExcel\FilamentExport;
 
 final class AdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        FilamentExport::createExportUrlUsing(
+            static fn ($export): string => URL::temporarySignedRoute(
+                'exports.signed-download',
+                now()->addMinutes(60),
+                ['export' => $export],
+            ),
+        );
+    }
+
     public function panel(Panel $panel): Panel
     {
         $resourceClasses = array_values(array_filter(
