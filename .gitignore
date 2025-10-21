@@ -2,6 +2,8 @@
 .DS_Store
 .env*
 !.env.example
+# Composer lock file should remain local only
+composer.lock
 .phpactor.json
 .phpunit.result.cache
 /.fleet
