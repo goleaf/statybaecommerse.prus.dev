@@ -12,7 +12,9 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
+use App\Support\Search\ProductSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction as TableBulkAction;
@@ -155,19 +157,49 @@ final class WishlistItemResource extends Resource
                             ]),
                         FormGrid::make(2)
                             ->schema([
-                                Select::make('product_id')
+                                SearchableInput::make('product_id')
                                     ->label(__('admin.wishlist_items.fields.product'))
-                                    ->relationship('product', 'name')
+                                    ->placeholder('SKU / EAN / name')
                                     ->required()
-                                    ->searchable()
-                                    ->preload()
                                     ->live()
-                                    ->afterStateUpdated(function ($state, callable $set) {
-                                        if ($state) {
-                                            $product = Product::find($state);
-                                            if ($product && $product->variants()->exists()) {
-                                                $set('variant_id', null);
-                                            }
+                                    ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?WishlistItem $record): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $product = $record?->product ?? Product::query()
+                                            ->select(['id', 'sku', 'name'])
+                                            ->find($state);
+
+                                        if (! $product instanceof Product) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $product->getKey() => ProductSearch::label($product),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $product = Product::query()
+                                            ->select(['id'])
+                                            ->find((int) $state);
+
+                                        if (! $product instanceof Product) {
+                                            return;
+                                        }
+
+                                        $set('product_id', $product->getKey());
+
+                                        if ($product->variants()->exists()) {
+                                            $set('variant_id', null);
                                         }
                                     }),
                                 Select::make('variant_id')

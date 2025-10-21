@@ -8,6 +8,8 @@ use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -69,19 +71,52 @@ final class CartItemResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->required(),
-                            Select::make('product_id')
+                            SearchableInput::make('product_id')
                                 ->label(__('cart_items.product'))
-                                ->relationship('product', 'name')
+                                ->placeholder('SKU / EAN / name')
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                    if ($state) {
-                                        $product = Product::find($state);
-                                        if ($product) {
-                                            $set('product_name', $product->name);
-                                            $set('product_sku', $product->sku);
-                                            $set('unit_price', $product->price);
-                                        }
+                                ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CartItem $record): void {
+                                    if ($state === null) {
+                                        return;
+                                    }
+
+                                    $product = $record?->product ?? Product::query()
+                                        ->select(['id', 'sku', 'name'])
+                                        ->find($state);
+
+                                    if (! $product instanceof Product) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $product->getKey() => ProductSearch::label($product),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $product = Product::query()
+                                        ->select(['id', 'name', 'sku', 'price'])
+                                        ->find((int) $state);
+
+                                    if (! $product instanceof Product) {
+                                        return;
+                                    }
+
+                                    $set('product_id', $product->getKey());
+                                    $set('product_name', $product->name);
+                                    $set('product_sku', $product->sku);
+                                    $set('unit_price', $product->price);
+
+                                    if ($product->variants()->exists()) {
+                                        $set('product_variant_id', null);
                                     }
                                 }),
                         ]),
