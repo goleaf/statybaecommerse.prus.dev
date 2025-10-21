@@ -8,16 +8,16 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
-use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
-use Filament\Tables\Actions\EditAction as TablesEditAction;
+use Filament\Actions\BulkActionGroup as TablesBulkActionGroup;
+use Filament\Actions\DeleteAction as TablesDeleteAction;
+use Filament\Actions\DeleteBulkAction as TablesDeleteBulkAction;
+use Filament\Actions\EditAction as TablesEditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class ProductFeatureResource extends Resource
 {
@@ -29,9 +29,9 @@ final class ProductFeatureResource extends Resource
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\Select::make('product_id')
                 ->label('Product')
                 ->relationship('product', 'name')
@@ -67,7 +67,7 @@ final class ProductFeatureResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

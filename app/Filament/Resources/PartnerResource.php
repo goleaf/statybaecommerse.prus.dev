@@ -9,15 +9,15 @@ use App\Models\Partner;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class PartnerResource extends Resource
 {
@@ -32,10 +32,10 @@ final class PartnerResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
         // Build the Partner form using the Section helper to keep layouts consistent.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
@@ -102,7 +102,7 @@ final class PartnerResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

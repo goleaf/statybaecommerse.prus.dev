@@ -65,14 +65,29 @@ return new class extends Migration
     private function indexExists(string $tableName, string $indexName): bool
     {
         $connection = Schema::getConnection();
+        $table = $connection->getTablePrefix() . $tableName;
+
+        if ($connection->getDriverName() === 'sqlite') {
+            // SQLite keeps schema state between Pest invocations, so we must query the pragma
+            // metadata directly to detect an existing index when Doctrine DBAL is unavailable.
+            $existing = $connection->select("PRAGMA index_list('{$table}')");
+
+            foreach ($existing as $definition) {
+                if (($definition->name ?? null) === $indexName) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         if (! method_exists($connection, 'getDoctrineSchemaManager')) {
-            // When Doctrine DBAL is missing (such as in lightweight testing setups), we skip the check.
+            // Without Doctrine we cannot safely introspect other drivers, so default to false.
             return false;
         }
 
         $schemaManager = $connection->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($connection->getTablePrefix() . $tableName);
+        $indexes = $schemaManager->listTableIndexes($table);
 
         return array_key_exists($indexName, $indexes);
     }

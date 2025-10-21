@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\VariantInventoryResource;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 
 // Bridge the new Filament namespace layout so the resource signature resolves during tests.
 if (! class_exists(\Filament\Forms\Form::class)) {
@@ -18,7 +19,7 @@ if (! class_exists(\Filament\Forms\Set::class)) {
 uses()->group('filament');
 
 it('clears lookup payload when the variant and location inputs are emptied', function (): void {
-    $form = VariantInventoryResource::form(\Filament\Forms\Form::make());
+    $form = VariantInventoryResource::form(Schema::make());
 
     $components = $form->getFlatComponents(withActions: false, withHidden: true);
 

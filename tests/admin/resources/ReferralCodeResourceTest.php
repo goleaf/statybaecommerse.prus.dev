@@ -8,7 +8,7 @@ use App\Filament\Resources\ReferralCodeResource;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
 use App\Models\User;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
