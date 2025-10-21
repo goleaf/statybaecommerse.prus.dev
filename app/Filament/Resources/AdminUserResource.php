@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AdminUserResource\Pages;
 use App\Models\AdminUser;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -17,9 +18,9 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -29,7 +30,6 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class AdminUserResource extends Resource
 {
@@ -64,11 +64,12 @@ final class AdminUserResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema with fields and validation.
+     * Configure the Filament form schema using the v4 Schema contract so the
+     * resource signature remains compatible with the upstream Resource base class.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -122,9 +123,10 @@ final class AdminUserResource extends Resource
     }
 
     /**
-     * Configure the Filament table with columns, filters, and actions.
+     * Configure the Filament table while returning the Table instance to satisfy
+     * Filament v4's stricter resource method typing.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
