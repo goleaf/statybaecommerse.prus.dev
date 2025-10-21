@@ -42,7 +42,7 @@ class Dashboard extends BaseDashboard
         ];
     }
 
-    public function getColumns(): array
+    public function getColumns(): int|array
     {
         return [
             'sm' => 1,
