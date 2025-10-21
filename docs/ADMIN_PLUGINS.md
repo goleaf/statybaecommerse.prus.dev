@@ -109,6 +109,17 @@ This document provides an overview of all Filament v4 plugins installed and conf
   - Custom field types
 - **Documentation**: https://filamentphp.com/plugins/lara-zeus-bolt
 
+### 11. Inline Chart - Table Sparklines
+- **Package**: `lara-zeus/inline-chart`
+- **Version**: v2.0.4
+- **Purpose**: Render reusable sparkline charts inside Filament tables
+- **Features**:
+  - Lightweight inline charts for list views
+  - Reusable Livewire widgets for products and customers
+  - Cached helpers for product (`App\\Support\\Stats\\Series\\ProductSeries::dailySales`) and customer (`App\\Support\\Stats\\Series\\CustomerSeries::dailyOrders`) activity
+  - Seamless integration via `LaraZeus\\InlineChart\\Tables\\Columns\\InlineChart`
+- **Usage**: Apply the `InlineChart` column in table definitions and point it to `App\\Filament\\Widgets\\InlineCharts\\ProductSalesSparkline` or `CustomerOrdersSparkline` to share the cached datasets.
+
 ## Demo Implementation
 
 The project includes a complete demonstration of all plugins through the `Post` model and `PostResource`:

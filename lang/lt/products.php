@@ -16,6 +16,7 @@ return [
         'description' => 'Aprašymas',
         'short_description' => 'Trumpas aprašymas',
         'price' => 'Kaina',
+        'sales_trend' => 'Pardavimų dinamika',
         'compare_price' => 'Palyginimo kaina',
         'cost_price' => 'Savikaina',
         'manage_stock' => 'Valdyti atsargus',
@@ -86,6 +87,9 @@ return [
     ],
     'helpers' => [
         'price_increase' => 'Įveskite procentą kainų padidinimui (pvz., 10 reiškia 10% padidinimą)',
+    ],
+    'sparkline' => [
+        'revenue_label' => 'Pajamos per paskutines :days dienas',
     ],
     'widgets' => [
         'total_products' => 'Iš viso produktų',

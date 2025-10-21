@@ -13,8 +13,9 @@ use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManage
 use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Models\Product;
-use App\Support\Seo\LocaleUrlGenerator;
+use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
@@ -64,6 +65,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use App\Support\Filament\Components\Flatpickr;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 
 /**
  * ProductResource
@@ -419,6 +421,13 @@ final class ProductResource extends Resource
                     ->label(__('products.fields.price'))
                     ->money('EUR')
                     ->sortable(),
+                // Inline revenue sparkline powered by the cached product series helper.
+                InlineChart::make('sales_sparkline')
+                    ->label(__('products.fields.sales_trend'))
+                    ->chart(ProductSalesSparkline::class)
+                    ->maxWidth(160)
+                    ->maxHeight(48)
+                    ->icon('heroicon-o-chart-bar'),
                 TextColumn::make('stock_quantity')
                     ->label(__('products.fields.stock'))
                     ->sortable()

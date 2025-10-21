@@ -16,6 +16,7 @@ return [
         'description' => 'Description',
         'short_description' => 'Short Description',
         'price' => 'Price',
+        'sales_trend' => 'Sales Trend',
         'compare_price' => 'Compare Price',
         'cost_price' => 'Cost Price',
         'manage_stock' => 'Manage Stock',
@@ -86,6 +87,9 @@ return [
     ],
     'helpers' => [
         'price_increase' => 'Enter percentage to increase prices (e.g., 10 for 10% increase)',
+    ],
+    'sparkline' => [
+        'revenue_label' => 'Revenue over the last :days days',
     ],
     'widgets' => [
         'total_products' => 'Total Products',

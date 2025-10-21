@@ -50,6 +50,7 @@ return [
     'verified'     => 'Verified',
     'unverified'   => 'Unverified',
     'orders_count' => 'Orders Count',
+    'orders_trend' => 'Orders Trend',
     'total_spent'  => 'Total Spent',
     'created_at'   => 'Created At',
     'updated_at'   => 'Updated At',
@@ -86,4 +87,7 @@ return [
     'bulk_verified_success'    => 'Selected records verified successfully',
     'bulk_activated_success'   => 'Selected records activated successfully',
     'bulk_deactivated_success' => 'Selected records deactivated successfully',
+    'sparkline' => [
+        'orders_label' => 'Orders over the last :days days',
+    ],
 ];
