@@ -43,8 +43,8 @@ final class RealtimeAnalyticsWidget extends ChartWidget
         $today = Carbon::today();
         $yesterday = (clone $today)->subDay();
 
-        $ordersToday = $this->orders()->whereDate('created_at', $today)->count();
-        $ordersYesterday = $this->orders()->whereDate('created_at', $yesterday)->count();
+        $ordersToday = $this->orders()->createdOn($today)->count();
+        $ordersYesterday = $this->orders()->createdOn($yesterday)->count();
         $ordersChange = $ordersYesterday > 0
             ? (($ordersToday - $ordersYesterday) / $ordersYesterday) * 100
             : ($ordersToday > 0 ? 100 : 0);
@@ -52,12 +52,12 @@ final class RealtimeAnalyticsWidget extends ChartWidget
         $revenueToday = (float) ($this
             ->orders()
             ->where('status', '!=', 'cancelled')
-            ->whereDate('created_at', $today)
+            ->createdOn($today)
             ->sum('total') ?? 0);
         $revenueYesterday = (float) ($this
             ->orders()
             ->where('status', '!=', 'cancelled')
-            ->whereDate('created_at', $yesterday)
+            ->createdOn($yesterday)
             ->sum('total') ?? 0);
         $revenueChange = $revenueYesterday > 0
             ? (($revenueToday - $revenueYesterday) / $revenueYesterday) * 100
@@ -71,7 +71,7 @@ final class RealtimeAnalyticsWidget extends ChartWidget
                 ->description(sprintf('%+0.1f%%', $ordersChange))
                 ->descriptionIcon($ordersChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($ordersChange >= 0 ? 'success' : 'danger'),
-            Stat::make(__('admin.widgets.today_revenue'), '€'.number_format($revenueToday, 2))
+            Stat::make(__('admin.widgets.today_revenue'), '€' . number_format($revenueToday, 2))
                 ->description(sprintf('%+0.1f%%', $revenueChange))
                 ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueChange >= 0 ? 'success' : 'danger'),
@@ -89,18 +89,18 @@ final class RealtimeAnalyticsWidget extends ChartWidget
         for ($i = 23; $i >= 0; $i--) {
             $hour = Carbon::now()->subHours($i);
             $labels[] = $hour->format('H:00');
-            $orders[] = $this->orders()->whereBetween('created_at', [$hour->copy()->startOfHour(), $hour->copy()->endOfHour()])->count();
+            $orders[] = $this->orders()->createdBetween($hour->copy()->startOfHour(), $hour->copy()->endOfHour())->count();
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => __('admin.widgets.orders_last_24h'),
-                    'data' => $orders,
-                    'borderColor' => 'rgb(59, 130, 246)',
+                    'label'           => __('admin.widgets.orders_last_24h'),
+                    'data'            => $orders,
+                    'borderColor'     => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'tension' => 0.4,
-                    'fill' => true,
+                    'tension'         => 0.4,
+                    'fill'            => true,
                 ],
             ],
             'labels' => $labels,
