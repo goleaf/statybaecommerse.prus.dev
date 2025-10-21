@@ -18,6 +18,7 @@ use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
@@ -325,6 +326,30 @@ final class ProductResource extends Resource
                                                     ->step(0.01),
                                             ]),
                                     ]),
+                            ]),
+                        Tab::make('Variants & Attributes')
+                            ->components([
+                                Section::make(__('products.sections.variant_matrix'))
+                                    ->components([
+                                        MatrixFactory::checkboxGrid(
+                                            'variant_attribute_matrix',
+                                            [
+                                                'size'     => __('products.matrix.rows.size'),
+                                                'color'    => __('products.matrix.rows.color'),
+                                                'material' => __('products.matrix.rows.material'),
+                                            ],
+                                            [
+                                                'primary_sku' => __('products.matrix.columns.primary'),
+                                                'bundle_sku'  => __('products.matrix.columns.bundle'),
+                                                'limited_sku' => __('products.matrix.columns.limited'),
+                                            ],
+                                            __('products.fields.variant_attribute_matrix'),
+                                        )
+                                            ->helperText(__('products.matrix.helper_text'))
+                                            ->columnSpanFull()
+                                            ->live(),
+                                    ])
+                                    ->columns(1),
                             ]),
                         Tab::make('Advanced')
                             ->components([

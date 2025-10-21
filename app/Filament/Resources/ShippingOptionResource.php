@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
+use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -153,6 +154,31 @@ final class ShippingOptionResource extends Resource
                                     ->step(0.01),
                             ]),
                     ]),
+                Section::make(__('admin.shipping_options.availability'))
+                    ->schema([
+                        MatrixFactory::checkboxGrid(
+                            'shipping_matrix',
+                            [
+                                'lt' => __('admin.shipping_options.zones.lt'),
+                                'lv' => __('admin.shipping_options.zones.lv'),
+                                'ee' => __('admin.shipping_options.zones.ee'),
+                                'pl' => __('admin.shipping_options.zones.pl'),
+                                'eu' => __('admin.shipping_options.zones.eu'),
+                            ],
+                            [
+                                'courier'     => __('admin.shipping_options.methods.courier'),
+                                'pickup'      => __('admin.shipping_options.methods.pickup'),
+                                'locker'      => __('admin.shipping_options.methods.locker'),
+                                'express'     => __('admin.shipping_options.methods.express'),
+                                'free_over_x' => __('admin.shipping_options.methods.free_over_x'),
+                            ],
+                            __('admin.shipping_options.fields.shipping_matrix'),
+                        )
+                            ->helperText(__('admin.shipping_options.shipping_matrix_help'))
+                            ->columnSpanFull()
+                            ->live(),
+                    ])
+                    ->columns(1),
                 Section::make(__('admin.shipping_options.delivery'))
                     ->schema([
                         Grid::make(2)
