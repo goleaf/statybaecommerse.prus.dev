@@ -51,7 +51,7 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.label');
     }
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return __('navigation.groups.system');
     }
@@ -219,7 +219,7 @@ final class ApiKeyResource extends Resource
                         $credentials = ApiKey::generateCredentials();
 
                         $record->forceFill([
-                            'key' => $credentials['hashed'],
+                            'key'          => $credentials['hashed'],
                             'last_used_at' => null,
                         ])->save();
 
@@ -241,9 +241,9 @@ final class ApiKeyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListApiKeys::route('/'),
+            'index'  => Pages\ListApiKeys::route('/'),
             'create' => Pages\CreateApiKey::route('/create'),
-            'edit' => Pages\EditApiKey::route('/{record}/edit'),
+            'edit'   => Pages\EditApiKey::route('/{record}/edit'),
         ];
     }
 }

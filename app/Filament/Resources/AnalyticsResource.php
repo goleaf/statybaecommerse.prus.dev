@@ -7,22 +7,23 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Filters\DateRangeFilter;
+use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
-use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
@@ -53,7 +54,7 @@ final class AnalyticsResource extends Resource
         return $count > 0 ? (string) $count : null;
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         return 'warning';
     }
@@ -83,16 +84,16 @@ final class AnalyticsResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'pending'    => 'Pending',
                         'processing' => 'Processing',
-                        'completed' => 'Completed',
-                        'cancelled' => 'Cancelled',
+                        'completed'  => 'Completed',
+                        'cancelled'  => 'Cancelled',
                     ]),
                 Filter::make('created_at')
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('analytics.from_date'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

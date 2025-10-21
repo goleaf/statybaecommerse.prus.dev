@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
+use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -15,6 +16,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
+use UnitEnum;
 
 final class InventoryManagement extends Page implements HasTable
 {
@@ -22,12 +24,9 @@ final class InventoryManagement extends Page implements HasTable
     use HasToggleableTable;
     use InteractsWithTable;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Products';
     }

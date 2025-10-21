@@ -146,12 +146,12 @@ final class EnumValueResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
-                        'order_status' => 'success',
-                        'payment_status' => 'warning',
-                        'shipping_status' => 'info',
-                        'user_role' => 'danger',
-                        'product_status' => 'secondary',
-                        default => 'gray',
+                        'order_status'     => 'success',
+                        'payment_status'   => 'warning',
+                        'shipping_status'  => 'info',
+                        'user_role'        => 'danger',
+                        'product_status'   => 'secondary',
+                        default            => 'gray',
                     }),
                 TextColumn::make('key')
                     ->label(__('admin.enum_values.table.key'))
@@ -343,10 +343,10 @@ final class EnumValueResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEnumValues::route('/'),
+            'index'  => Pages\ListEnumValues::route('/'),
             'create' => Pages\CreateEnumValue::route('/create'),
-            'view' => Pages\ViewEnumValue::route('/{record}'),
-            'edit' => Pages\EditEnumValue::route('/{record}/edit'),
+            'view'   => Pages\ViewEnumValue::route('/{record}'),
+            'edit'   => Pages\EditEnumValue::route('/{record}/edit'),
         ];
     }
 
@@ -361,7 +361,7 @@ final class EnumValueResource extends Resource
         return $activeCount === $count ? (string) $count : "{$activeCount}/{$count}";
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         $count = self::getModel()::count();
         $activeCount = self::getModel()::where('is_active', true)->count();
@@ -383,8 +383,8 @@ final class EnumValueResource extends Resource
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
-            __('admin.enum_values.table.value') => $record->value,
-            __('admin.enum_values.table.name') => $record->name,
+            __('admin.enum_values.table.value')       => $record->value,
+            __('admin.enum_values.table.name')        => $record->name,
             __('admin.enum_values.table.description') => $record->description,
         ];
     }

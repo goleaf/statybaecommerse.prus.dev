@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -31,7 +32,6 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralStatisticsResource extends Resource
 {
@@ -358,10 +358,10 @@ final class ReferralStatisticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReferralStatistics::route('/'),
+            'index'  => Pages\ListReferralStatistics::route('/'),
             'create' => Pages\CreateReferralStatistics::route('/create'),
-            'view' => Pages\ViewReferralStatistics::route('/{record}'),
-            'edit' => Pages\EditReferralStatistics::route('/{record}/edit'),
+            'view'   => Pages\ViewReferralStatistics::route('/{record}'),
+            'edit'   => Pages\EditReferralStatistics::route('/{record}/edit'),
         ];
     }
 
@@ -372,6 +372,8 @@ final class ReferralStatisticsResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) self::$model::count();
+        $count = (int) self::$model::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 }

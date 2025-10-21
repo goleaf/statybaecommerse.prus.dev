@@ -532,7 +532,7 @@ final class SeoDataResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = self::getModel()::count();
+        $count = (int) self::getModel()::count();
 
         return $count > 0 ? (string) $count : null;
     }
