@@ -16,6 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class ClicksRelationManager extends BaseRelationManager
 {
@@ -23,7 +24,7 @@ final class ClicksRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Clicks';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Select::make('click_type')
@@ -57,7 +58,7 @@ final class ClicksRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

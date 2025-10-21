@@ -36,6 +36,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
 
 /**
  * SystemSettingCategoryResource
@@ -49,7 +50,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|\BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -92,7 +93,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -166,7 +167,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([ActiveScope::class]))

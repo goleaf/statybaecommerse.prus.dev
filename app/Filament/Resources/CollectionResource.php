@@ -33,6 +33,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class CollectionResource extends Resource
 {
@@ -69,7 +70,7 @@ final class CollectionResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->components([
             Section::make(__('collections.basic_information'))
@@ -199,7 +200,7 @@ final class CollectionResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

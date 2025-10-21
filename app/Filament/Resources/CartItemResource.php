@@ -32,6 +32,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Schemas\Schema;
 
 final class CartItemResource extends Resource
 {
@@ -40,7 +41,7 @@ final class CartItemResource extends Resource
      *
      * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -67,7 +68,7 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('cart_items.basic_information'))

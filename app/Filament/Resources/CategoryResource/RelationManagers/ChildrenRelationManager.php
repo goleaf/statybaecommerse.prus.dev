@@ -22,6 +22,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class ChildrenRelationManager extends BaseRelationManager
 {
@@ -33,7 +34,7 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Subcategories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('categories.basic_information'))
@@ -107,7 +108,7 @@ final class ChildrenRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

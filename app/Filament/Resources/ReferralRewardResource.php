@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use UnitEnum;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use Filament\Schemas\Schema;
 
 final class ReferralRewardResource extends Resource
 {
@@ -49,7 +50,7 @@ final class ReferralRewardResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -162,7 +163,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -269,7 +270,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist|array
+    public static function infolist(Schema $infolist): Schema
     {
         return $infolist
             ->schema([

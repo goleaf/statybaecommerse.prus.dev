@@ -15,6 +15,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
 class ChannelResource extends Resource
 {
@@ -25,12 +26,12 @@ class ChannelResource extends Resource
         return 'heroicon-o-rectangle-stack';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return ChannelForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ChannelsTable::configure($table);
     }

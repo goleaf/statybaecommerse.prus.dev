@@ -34,6 +34,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * VariantCombinationResource
@@ -65,7 +66,7 @@ final class VariantCombinationResource extends Resource
         return __('admin.variant_combinations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->components([
@@ -131,7 +132,7 @@ final class VariantCombinationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

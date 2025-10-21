@@ -24,6 +24,7 @@ use Filament\Tables\Table;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use Filament\Schemas\Schema;
 
 final class ReferralResource extends Resource
 {
@@ -44,7 +45,7 @@ final class ReferralResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->components([
@@ -133,7 +134,7 @@ final class ReferralResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

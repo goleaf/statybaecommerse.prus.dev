@@ -23,6 +23,7 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 
 /**
  * RecommendationAnalyticsResource
@@ -62,7 +63,7 @@ final class RecommendationAnalyticsResource extends Resource
         return __('admin.recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -137,7 +138,7 @@ final class RecommendationAnalyticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

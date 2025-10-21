@@ -19,6 +19,7 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class TranslationsRelationManager extends BaseRelationManager
 {
@@ -30,7 +31,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('system_setting_categories.translations.basic_information'))
@@ -69,7 +70,7 @@ final class TranslationsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

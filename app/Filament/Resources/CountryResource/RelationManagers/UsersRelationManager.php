@@ -11,6 +11,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 
 final class UsersRelationManager extends BaseRelationManager
 {
@@ -18,7 +19,7 @@ final class UsersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Users';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -75,7 +76,7 @@ final class UsersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')

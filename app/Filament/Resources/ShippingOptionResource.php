@@ -30,6 +30,7 @@ use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * ShippingOptionResource
@@ -69,7 +70,7 @@ final class ShippingOptionResource extends Resource
         return __('admin.shipping_options.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -202,7 +203,7 @@ final class ShippingOptionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

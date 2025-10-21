@@ -22,6 +22,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Schemas\Schema;
 
 final class CompanyResource extends Resource
 {
@@ -46,7 +47,7 @@ final class CompanyResource extends Resource
     /**
      * Build the form schema for creating and editing companies.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Forms\Components\Section::make(__('companies.basic_information'))

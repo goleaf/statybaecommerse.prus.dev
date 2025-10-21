@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Lang;
+use Filament\Schemas\Schema;
 
 final class CampaignProductTargetResource extends Resource
 {
@@ -47,7 +48,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * @var string|BackedEnum|null Keep Filament navigation metadata flexible between enums and plain strings.
      */
-    protected static $navigationIcon = 'heroicon-o-bullseye-arrow';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bullseye-arrow';
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
@@ -74,7 +75,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Define the Campaign Product Target form with conditional selectors and marketing metadata.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('campaign_product_targets.basic_information'))
@@ -354,7 +355,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Provide a structured infolist for the record view page.
      */
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $infolist): Schema
     {
         return $infolist->schema([
             InfolistSection::make(__('campaign_product_targets.view.sections.overview'))

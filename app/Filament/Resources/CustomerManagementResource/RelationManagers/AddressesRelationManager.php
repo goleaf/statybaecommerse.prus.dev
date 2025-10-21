@@ -23,7 +23,7 @@ class AddressesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'addresses';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->components([
@@ -33,7 +33,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema|array
+    public function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -41,7 +41,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('id')

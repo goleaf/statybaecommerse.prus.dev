@@ -19,12 +19,13 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 
 final class MenuItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'allItems';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Grid::make(2)
@@ -63,7 +64,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -25,6 +25,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Schemas\Schema;
 
 final class AttributeResource extends Resource
 {
@@ -56,7 +57,7 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('attributes.basic_information'))
@@ -207,7 +208,7 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->query(Attribute::query()->withoutGlobalScopes())

@@ -28,6 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * MenuItemResource
@@ -61,7 +62,7 @@ final class MenuItemResource extends Resource
         return __('admin.menu_items.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -135,7 +136,7 @@ final class MenuItemResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

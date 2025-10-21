@@ -33,7 +33,7 @@ final class DashboardRecentOrdersTable extends BaseTableWidget
         return trans('admin/dashboard.tables.recent_orders');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query(fn () => $this->tableRepository->recentOrdersQuery()->limit(10))

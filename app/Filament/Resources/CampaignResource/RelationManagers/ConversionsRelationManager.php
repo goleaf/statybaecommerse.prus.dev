@@ -16,6 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class ConversionsRelationManager extends BaseRelationManager
 {
@@ -23,7 +24,7 @@ final class ConversionsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Conversions';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form->schema([
             Select::make('conversion_type')
@@ -51,7 +52,7 @@ final class ConversionsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -23,6 +23,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class AnalyticsResource extends Resource
 {
@@ -65,12 +66,12 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form;
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.

@@ -27,6 +27,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 /**
  * OrderShippingRelationManager
@@ -51,7 +52,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order shipping.
      */
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -157,7 +158,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the table for order shipping.
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

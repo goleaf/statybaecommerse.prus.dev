@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class ConditionsRelationManager extends BaseRelationManager
 {
@@ -20,7 +21,7 @@ final class ConditionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Conditions';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([
@@ -62,7 +63,7 @@ final class ConditionsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('type')

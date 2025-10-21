@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class ActivityLogRelationManager extends BaseRelationManager
 {
@@ -16,7 +17,7 @@ final class ActivityLogRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin.sections.activity_log';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $form
             ->components([
@@ -31,7 +32,7 @@ final class ActivityLogRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('description')
