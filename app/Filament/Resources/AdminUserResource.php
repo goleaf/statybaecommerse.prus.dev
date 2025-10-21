@@ -13,7 +13,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
@@ -30,6 +29,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class AdminUserResource extends Resource
 {
@@ -171,9 +171,9 @@ final class AdminUserResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.admin_users.filters.created_at'))
                     ->form([
-                        DatePicker::make('from')
+                        Flatpickr::makeDate('from')
                             ->label(__('admin.admin_users.filters.created_from')),
-                        DatePicker::make('until')
+                        Flatpickr::makeDate('until')
                             ->label(__('admin.admin_users.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

@@ -21,8 +21,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -55,6 +53,7 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderResource
@@ -320,9 +319,9 @@ final class OrderResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('shipped_at')
+                            Flatpickr::makeDateTime('shipped_at')
                                 ->label(__('orders.fields.shipped_at')),
-                            DateTimePicker::make('delivered_at')
+                            Flatpickr::makeDateTime('delivered_at')
                                 ->label(__('orders.fields.delivered_at')),
                         ]),
                     TextInput::make('tracking_number')
@@ -541,9 +540,9 @@ final class OrderResource extends Resource
                     ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
+                        Flatpickr::makeRange('range')
                             ->label(__('orders.created_at'))
-                            ->rangePicker()
+                            
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

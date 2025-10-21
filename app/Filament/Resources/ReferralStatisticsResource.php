@@ -14,7 +14,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -32,6 +31,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralStatisticsResource extends Resource
 {
@@ -81,7 +81,7 @@ final class ReferralStatisticsResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        DatePicker::make('date')
+                        Flatpickr::makeDate('date')
                             ->label(__('referral_statistics.fields.date'))
                             ->required()
                             ->default(now()),
@@ -215,9 +215,9 @@ final class ReferralStatisticsResource extends Resource
                 Filter::make('date_range')
                     ->label(__('referral_statistics.filters.date_range'))
                     ->form([
-                        DatePicker::make('from')
+                        Flatpickr::makeDate('from')
                             ->label(__('referral_statistics.filters.from_date')),
-                        DatePicker::make('until')
+                        Flatpickr::makeDate('until')
                             ->label(__('referral_statistics.filters.until_date')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

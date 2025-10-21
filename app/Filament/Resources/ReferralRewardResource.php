@@ -13,7 +13,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -34,6 +33,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralRewardResource extends Resource
 {
@@ -100,10 +100,10 @@ final class ReferralRewardResource extends Resource
                                 'cancelled' => __('referral_rewards.status.cancelled'),
                             ])
                             ->required(),
-                        DatePicker::make('applied_at')
+                        Flatpickr::makeDate('applied_at')
                             ->label(__('referral_rewards.fields.applied_at'))
                             ->nullable(),
-                        DatePicker::make('expires_at')
+                        Flatpickr::makeDate('expires_at')
                             ->label(__('referral_rewards.fields.expires_at'))
                             ->nullable(),
                         TextInput::make('title')
