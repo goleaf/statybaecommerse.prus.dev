@@ -8,6 +8,7 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
+use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
@@ -32,6 +33,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -40,6 +42,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Excel;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
@@ -265,6 +268,50 @@ final class PostResource extends Resource
                     ->sortable()
                     ->limit(50)
                     ->formatStateUsing(fn (?string $state, Post $record): ?string => $record->getTranslatedTitle()),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Post $record): array {
+                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
+                        $locales = collect($localeUrlGenerator->supportedLocales());
+
+                        return $locales
+                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
+                                $slug = method_exists($record, 'getTranslation')
+                                    ? ($record->getTranslation('slug', $locale) ?: $record->slug)
+                                    : ($record->slug ?? null);
+
+                                $url = $slug
+                                    ? $localeUrlGenerator->localizedRoute('localized.posts.show', ['post' => $slug], $locale)
+                                    : null;
+
+                                if (! $url && Route::has('frontend.posts.show')) {
+                                    $url = route('frontend.posts.show', $record);
+                                }
+
+                                if (! $url) {
+                                    return null;
+                                }
+
+                                $title = method_exists($record, 'getTranslation')
+                                    ? ($record->getTranslation('title', $locale) ?: $record->title)
+                                    : ($record->getTranslatedTitle($locale) ?: $record->title);
+
+                                return [
+                                    'label' => __('View (:locale): :title', [
+                                        'locale' => strtoupper($locale),
+                                        'title' => $title,
+                                    ]),
+                                    'url' => $url,
+                                    'icon' => 'heroicon-o-document-text',
+                                    'color' => 'primary',
+                                ];
+                            })
+                            ->filter()
+                            ->values()
+                            ->all();
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label(__('posts.fields.user_id'))
                     ->sortable()

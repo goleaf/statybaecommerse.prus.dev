@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\ExportService;
+use App\Support\Seo\LocaleUrlGenerator;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -49,6 +50,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -361,6 +363,48 @@ final class ProductResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Product $record): array {
+                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
+                        $locales = collect($localeUrlGenerator->supportedLocales());
+
+                        return $locales
+                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
+                                $slug = $record->getTranslation('slug', $locale) ?: $record->slug;
+
+                                if (! $slug) {
+                                    return null;
+                                }
+
+                                $url = $localeUrlGenerator->localizedRoute(
+                                    'localized.products.show',
+                                    ['product' => $slug],
+                                    $locale,
+                                ) ?? route('products.show', ['product' => $slug]);
+
+                                if (! $url) {
+                                    return null;
+                                }
+
+                                $name = $record->getTranslation('name', $locale) ?: $record->name;
+
+                                return [
+                                    'label' => __('Storefront (:locale): :name', [
+                                        'locale' => strtoupper($locale),
+                                        'name' => $name,
+                                    ]),
+                                    'url' => $url,
+                                    'icon' => 'heroicon-o-arrow-top-right-on-square',
+                                    'color' => 'primary',
+                                ];
+                            })
+                            ->filter()
+                            ->values()
+                            ->all();
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sku')
                     ->label(__('products.fields.sku'))
                     ->searchable()
