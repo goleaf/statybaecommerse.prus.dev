@@ -95,6 +95,8 @@ return [
     'confirm_feature_reviews_description' => 'This will mark the selected reviews as featured, making them more prominent.',
     'confirm_unfeature_reviews' => 'Unfeature Reviews',
     'confirm_unfeature_reviews_description' => 'This will remove the featured status from the selected reviews.',
+    // Review placeholders
+    'reviews.placeholders.no_rating' => 'No rating recorded yet',
     'confirm_delete_category' => 'Are you sure you want to delete this category? This action cannot be undone.',
     'confirm_remove_coupon' => 'Are you sure you want to remove this coupon?',
     'confirm_feature_products' => 'Feature Products',
