@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ProductImageResource\Pages;
 
 use App\Filament\Resources\ProductImageResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListProductImages extends ListRecords
+final class ListProductImages extends BaseListRecords
 {
     protected static string $resource = ProductImageResource::class;
 

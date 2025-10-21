@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ChannelResource\Pages;
 
 use App\Filament\Resources\ChannelResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListChannels extends ListRecords
+final class ListChannels extends BaseListRecords
 {
     protected static string $resource = ChannelResource::class;
 

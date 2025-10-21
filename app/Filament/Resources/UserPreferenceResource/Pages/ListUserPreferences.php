@@ -6,9 +6,9 @@ namespace App\Filament\Resources\UserPreferenceResource\Pages;
 
 use App\Filament\Resources\UserPreferenceResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListUserPreferences extends ListRecords
+final class ListUserPreferences extends BaseListRecords
 {
     protected static string $resource = UserPreferenceResource::class;
 

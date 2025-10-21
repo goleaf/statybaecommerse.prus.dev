@@ -6,12 +6,12 @@ namespace App\Filament\Resources\NormalSettingResource\Pages;
 
 use App\Filament\Resources\NormalSettingResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListNormalSettings extends ListRecords
+class ListNormalSettings extends BaseListRecords
 {
     use HasWidgetTabs;
 

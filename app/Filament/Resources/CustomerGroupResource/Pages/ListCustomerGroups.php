@@ -6,9 +6,9 @@ namespace App\Filament\Resources\CustomerGroupResource\Pages;
 
 use App\Filament\Resources\CustomerGroupResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListCustomerGroups extends ListRecords
+final class ListCustomerGroups extends BaseListRecords
 {
     protected static string $resource = CustomerGroupResource::class;
 

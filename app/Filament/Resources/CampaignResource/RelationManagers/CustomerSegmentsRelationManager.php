@@ -10,13 +10,13 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-final class CustomerSegmentsRelationManager extends RelationManager
+final class CustomerSegmentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'customerSegments';
 

@@ -7,9 +7,9 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListCategories extends ListRecords
+final class ListCategories extends BaseListRecords
 {
     protected static string $resource = CategoryResource::class;
 

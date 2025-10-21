@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use Filament\Actions\ViewAction;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class ReviewsRelationManager extends RelationManager
+class ReviewsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'reviews';
 

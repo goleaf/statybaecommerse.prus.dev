@@ -9,11 +9,11 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class TranslationsRelationManager extends RelationManager
+final class TranslationsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'translations';
 

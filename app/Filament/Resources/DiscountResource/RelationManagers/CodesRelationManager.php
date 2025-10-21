@@ -7,12 +7,12 @@ namespace App\Filament\Resources\DiscountResource\RelationManagers;
 use App\Models\DiscountCode;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CodesRelationManager extends RelationManager
+final class CodesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'codes';
 

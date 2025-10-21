@@ -6,9 +6,9 @@ namespace App\Filament\Resources\DiscountCodeResource\Pages;
 
 use App\Filament\Resources\DiscountCodeResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListDiscountCodes extends ListRecords
+final class ListDiscountCodes extends BaseListRecords
 {
     protected static string $resource = DiscountCodeResource::class;
 

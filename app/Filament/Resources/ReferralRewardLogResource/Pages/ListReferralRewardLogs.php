@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ReferralRewardLogResource\Pages;
 
 use App\Filament\Resources\ReferralRewardLogResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListReferralRewardLogs extends ListRecords
+final class ListReferralRewardLogs extends BaseListRecords
 {
     protected static string $resource = ReferralRewardLogResource::class;
 

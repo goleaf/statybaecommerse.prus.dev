@@ -6,12 +6,12 @@ namespace App\Filament\Resources\PriceListResource\Pages;
 
 use App\Filament\Resources\PriceListResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListPriceLists extends ListRecords
+final class ListPriceLists extends BaseListRecords
 {
     use HasWidgetTabs;
 

@@ -6,12 +6,12 @@ namespace App\Filament\Resources\DiscountConditionResource\Pages;
 
 use App\Filament\Resources\DiscountConditionResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ListDiscountConditions extends ListRecords
+final class ListDiscountConditions extends BaseListRecords
 {
     use HasWidgetTabs;
 

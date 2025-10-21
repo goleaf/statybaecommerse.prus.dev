@@ -6,9 +6,9 @@ namespace App\Filament\Resources\StockMovementResource\Pages;
 
 use App\Filament\Resources\StockMovementResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListStockMovements extends ListRecords
+final class ListStockMovements extends BaseListRecords
 {
     protected static string $resource = StockMovementResource::class;
 

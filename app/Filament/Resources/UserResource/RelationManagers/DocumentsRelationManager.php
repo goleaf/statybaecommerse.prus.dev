@@ -9,12 +9,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Storage\SecureStorage;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-final class DocumentsRelationManager extends RelationManager
+final class DocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';
 

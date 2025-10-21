@@ -6,9 +6,9 @@ namespace App\Filament\Resources\RecommendationAnalytics\Pages;
 
 use App\Filament\Resources\RecommendationAnalytics\RecommendationAnalyticsResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListRecommendationAnalytics extends ListRecords
+final class ListRecommendationAnalytics extends BaseListRecords
 {
     protected static string $resource = RecommendationAnalyticsResource::class;
 

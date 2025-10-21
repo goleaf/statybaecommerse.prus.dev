@@ -6,9 +6,9 @@ namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Filament\Resources\StockResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListStocks extends ListRecords
+class ListStocks extends BaseListRecords
 {
     protected static string $resource = StockResource::class;
 

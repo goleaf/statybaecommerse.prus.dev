@@ -6,12 +6,12 @@ namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-final class CustomersRelationManager extends RelationManager
+final class CustomersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'customers';
 

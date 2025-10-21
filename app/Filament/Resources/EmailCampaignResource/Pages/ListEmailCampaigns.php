@@ -6,9 +6,9 @@ namespace App\Filament\Resources\EmailCampaignResource\Pages;
 
 use App\Filament\Resources\EmailCampaignResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-class ListEmailCampaigns extends ListRecords
+class ListEmailCampaigns extends BaseListRecords
 {
     protected static string $resource = EmailCampaignResource::class;
 

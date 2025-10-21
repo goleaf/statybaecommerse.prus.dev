@@ -6,9 +6,9 @@ namespace App\Filament\Resources\ProductComparisonResource\Pages;
 
 use App\Filament\Resources\ProductComparisonResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListProductComparisons extends ListRecords
+final class ListProductComparisons extends BaseListRecords
 {
     protected static string $resource = ProductComparisonResource::class;
 

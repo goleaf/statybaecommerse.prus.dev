@@ -6,9 +6,9 @@ namespace App\Filament\Resources\CollectionRuleResource\Pages;
 
 use App\Filament\Resources\CollectionRuleResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
-final class ListCollectionRules extends ListRecords
+final class ListCollectionRules extends BaseListRecords
 {
     protected static string $resource = CollectionRuleResource::class;
 
