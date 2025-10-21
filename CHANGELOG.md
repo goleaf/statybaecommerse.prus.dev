@@ -12,6 +12,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
 * Updated the Feature Flag resource to bypass active/enabled scopes so administrators can review inactive toggles directly from the listing view.
 
+### Bug Fixes
+* Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
+
 ## [0.1.0] - 2025-10-20
 
 ### Features & Enhancements
