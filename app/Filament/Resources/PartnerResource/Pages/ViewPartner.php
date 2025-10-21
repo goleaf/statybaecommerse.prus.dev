@@ -8,12 +8,16 @@ use App\Filament\Resources\PartnerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewPartner extends ViewRecord
+/**
+ * Display-only Partner resource page that mirrors the edit details without mutation.
+ */
+final class ViewPartner extends ViewRecord
 {
     protected static string $resource = PartnerResource::class;
 
     protected function getHeaderActions(): array
     {
+        // Allow quick transitions into edit mode from the read-only detail view.
         return [
             Actions\EditAction::make(),
         ];

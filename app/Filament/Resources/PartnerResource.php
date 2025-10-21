@@ -8,6 +8,7 @@ use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -33,9 +34,10 @@ final class PartnerResource extends Resource
 
     public static function form(Form $form): Form|array
     {
+        // Build the Partner form using the Section helper to keep layouts consistent.
         return $form
             ->schema([
-                Forms\Components\Section::make(__('admin.partners.sections.basic_information'))
+                Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.partners.name'))
@@ -55,7 +57,7 @@ final class PartnerResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.partners.sections.contact_information'))
+                Section::make(__('admin.partners.sections.contact_information'))
                     ->schema([
                         Forms\Components\TextInput::make('contact_email')
                             ->label(__('admin.partners.contact_email'))
@@ -67,7 +69,7 @@ final class PartnerResource extends Resource
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.partners.sections.financial_settings'))
+                Section::make(__('admin.partners.sections.financial_settings'))
                     ->schema([
                         Forms\Components\TextInput::make('discount_rate')
                             ->label(__('admin.partners.discount_rate'))
@@ -83,7 +85,7 @@ final class PartnerResource extends Resource
                             ->step(0.0001),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.partners.sections.media'))
+                Section::make(__('admin.partners.sections.media'))
                     ->schema([
                         Forms\Components\FileUpload::make('logo')
                             ->label(__('admin.partners.logo'))
@@ -164,6 +166,7 @@ final class PartnerResource extends Resource
         return [
             'index'  => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
+            'view'   => Pages\ViewPartner::route('/{record}'), // Provide a dedicated read-only partner detail page.
             'edit'   => Pages\EditPartner::route('/{record}/edit'),
         ];
     }
