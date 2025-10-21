@@ -12,7 +12,6 @@ use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
-use UnitEnum;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
@@ -23,7 +22,8 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
 
     protected static $navigationLabel = 'Enh. E-commerce Overview';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
+    /** @var string|\BackedEnum|null Keep the widget under the dashboard navigation cluster. */
+    protected static $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
 

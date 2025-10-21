@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 return new class extends Migration {
     public function up(): void
     {
-        if (! Schema::hasTable('product_images')) {
+        if (! Schema::hasTable('product_images') || ! Schema::hasColumn('product_images', 'path')) {
             return;
         }
 
@@ -46,7 +46,7 @@ return new class extends Migration {
 
     public function down(): void
     {
-        if (! Schema::hasTable('product_images')) {
+        if (! Schema::hasTable('product_images') || ! Schema::hasColumn('product_images', 'path')) {
             return;
         }
 
