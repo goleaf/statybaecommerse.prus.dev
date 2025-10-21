@@ -1,5 +1,5 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+# Husky pre-push hook verifies the Composer CI suite without legacy Husky bootstrapping.
 
 set -e
 
