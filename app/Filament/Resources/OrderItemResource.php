@@ -7,14 +7,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\ProductSearch;
+use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms;
+use Filament\Forms\Get;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -110,8 +111,11 @@ final class OrderItemResource extends Resource
                                         ]);
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
                                     if ($state === null || $state === '') {
+                                        // When the lookup is cleared ensure all derived metadata and totals are reset.
+                                        ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
+
                                         return;
                                     }
 
@@ -120,6 +124,8 @@ final class OrderItemResource extends Resource
                                         ->find((int) $state);
 
                                     if (! $product instanceof Product) {
+                                        ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
+
                                         return;
                                     }
 
@@ -140,29 +146,29 @@ final class OrderItemResource extends Resource
                                     }
 
                                     $price = $product->getAttribute('price');
-                                    if (is_numeric($price)) {
-                                        $set('unit_price', number_format((float) $price, 2, '.', ''));
-                                    }
+                                    $unitPrice = is_numeric($price) ? (float) $price : 0.0;
 
+                                    $set('unit_price', number_format($unitPrice, 2, '.', ''));
                                     $set('product_variant_id', null);
+
+                                    $quantity = (int) ($get('quantity') ?? 1);
+                                    $discount = (float) ($get('discount_amount') ?? 0.0);
+                                    $total = max(0.0, ($unitPrice * $quantity) - $discount);
+
+                                    $set('total', number_format($total, 2, '.', ''));
                                 }),
                         ]),
                     Grid::make(2)
                         ->schema([
-                            Select::make('product_variant_id')
+                            SearchableInput::make('product_variant_id')
                                 ->label(__('order_items.product_variant'))
-                                ->relationship('productVariant', 'name')
-                                ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
-                                    if ($state) {
-                                        $variant = ProductVariant::find($state);
-                                        if ($variant) {
-                                            $set('name', $variant->name);
-                                            $set('sku', $variant->sku);
-                                            $set('unit_price', $variant->price);
-                                        }
-                                    }
-                                }),
+                                ->placeholder(__('orders.lookups.variant_placeholder'))
+                                ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $value): ?int => $value !== null && $value !== '' ? (int) $value : null)
+                                ->reactive()
+                                // Refer to docs/filament/variant-lookup-helpers.md for helper usage guidance.
+                                ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
+                                ->afterStateUpdated(fn (?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get)),
                             TextInput::make('name')
                                 ->label(__('order_items.product_name'))
                                 ->maxLength(255),
@@ -178,7 +184,7 @@ final class OrderItemResource extends Resource
                                 ->minValue(1)
                                 ->default(1)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
@@ -195,7 +201,7 @@ final class OrderItemResource extends Resource
                                 ->prefix('€')
                                 ->numeric()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set): void {
                                     $unitPrice = (float) $state;
                                     $quantity = (int) $get('quantity');
                                     $total = $unitPrice * $quantity;
@@ -207,7 +213,7 @@ final class OrderItemResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $get('quantity');
                                     $discount = (float) $state;
