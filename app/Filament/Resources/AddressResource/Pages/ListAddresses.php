@@ -11,16 +11,20 @@ use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
 
 final class ListAddresses extends BaseListRecords
 {
     use HasWidgetTabs;
+    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
 
     protected static string $resource = AddressResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
             Actions\CreateAction::make(),
         ];
     }

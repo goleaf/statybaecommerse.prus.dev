@@ -38,6 +38,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\MaxWidth;
@@ -75,6 +76,8 @@ use UnitEnum;
  */
 final class OrderResource extends Resource
 {
+    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+
     protected static ?string $model = Order::class;
 
     protected static ?int $navigationSort = 1;
