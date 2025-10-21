@@ -7,7 +7,7 @@ return [
 
     'basic_information' => 'Pagrindinė informacija',
     'name' => 'Pavadinimas',
-    'title' => 'Antraštė',
+    'block_title' => 'Antraštė',
     'description' => 'Aprašymas',
     'type' => 'Tipas',
     'position' => 'Pozicija',
@@ -56,5 +56,15 @@ return [
         'bulk_deactivated_success' => 'Pasirinkti elementai sėkmingai deaktyvuoti',
         'activate_selected' => 'Aktyvuoti pasirinktus',
         'deactivate_selected' => 'Deaktyvuoti pasirinktus',
+    ],
+
+    'tabs' => [
+        'all' => 'Visi blokai',
+        'active' => 'Aktyvūs blokai',
+        'featured' => 'Išskirtiniai',
+        'related' => 'Susiję',
+        'similar' => 'Panašūs',
+        'trending' => 'Populiarūs',
+        'recent' => 'Naujausi',
     ],
 ];
