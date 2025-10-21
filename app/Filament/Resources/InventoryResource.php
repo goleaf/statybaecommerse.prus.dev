@@ -6,6 +6,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
+use App\Models\Product;
+use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use BackedEnum;
 use Closure;
 use Filament\Forms\Components\Grid;
@@ -14,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -65,12 +69,46 @@ final class InventoryResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Select::make('product_id')
+                            SearchableInput::make('product_id')
                                 ->label(__('Product'))
-                                ->relationship('product', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->required(),
+                                ->placeholder('SKU / EAN / name')
+                                ->required()
+                                ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Inventory $record): void {
+                                    if ($state === null) {
+                                        return;
+                                    }
+
+                                    $product = $record?->product ?? Product::query()
+                                        ->select(['id', 'sku', 'name'])
+                                        ->find($state);
+
+                                    if (! $product instanceof Product) {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state((string) $state)
+                                        ->options([
+                                            (string) $product->getKey() => ProductSearch::label($product),
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $product = Product::query()
+                                        ->select(['id'])
+                                        ->find((int) $state);
+
+                                    if (! $product instanceof Product) {
+                                        return;
+                                    }
+
+                                    $set('product_id', $product->getKey());
+                                }),
                             Select::make('location_id')
                                 ->label(__('Location'))
                                 ->relationship('location', 'name')
