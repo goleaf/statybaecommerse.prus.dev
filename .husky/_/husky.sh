@@ -7,7 +7,7 @@ s=$(dirname "$(dirname "$0")")/$n
 [ ! -f "$s" ] && exit 0
 
 if [ -f "$HOME/.huskyrc" ]; then
-        echo "husky - '~/.huskyrc' is DEPRECATED, please move your code to ~/.config/husky/init.sh"
+    echo "husky - '~/.huskyrc' is DEPRECATED, please move your code to ~/.config/husky/init.sh"
 fi
 i="${XDG_CONFIG_HOME:-$HOME/.config}/husky/init.sh"
 [ -f "$i" ] && . "$i"
@@ -15,6 +15,7 @@ i="${XDG_CONFIG_HOME:-$HOME/.config}/husky/init.sh"
 [ "${HUSKY-}" = "0" ] && exit 0
 
 export PATH="node_modules/.bin:$PATH"
+# Ensure Git hooks execute using the repository's local toolchain so commands remain consistent.
 sh -e "$s" "$@"
 c=$?
 
