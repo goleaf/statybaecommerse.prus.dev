@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -30,7 +31,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * VariantPricingRuleResource
@@ -58,7 +58,7 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Products';
     }
@@ -98,9 +98,9 @@ final class VariantPricingRuleResource extends Resource
                                     ->label(__('variant_pricing_rules.type'))
                                     ->options([
                                         'percentage' => __('variant_pricing_rules.types.percentage'),
-                                        'fixed' => __('variant_pricing_rules.types.fixed'),
-                                        'tier' => __('variant_pricing_rules.types.tier'),
-                                        'bulk' => __('variant_pricing_rules.types.bulk'),
+                                        'fixed'      => __('variant_pricing_rules.types.fixed'),
+                                        'tier'       => __('variant_pricing_rules.types.tier'),
+                                        'bulk'       => __('variant_pricing_rules.types.bulk'),
                                     ])
                                     ->required()
                                     ->reactive(),
@@ -195,10 +195,10 @@ final class VariantPricingRuleResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'percentage' => 'blue',
-                        'fixed' => 'green',
-                        'tier' => 'purple',
-                        'bulk' => 'orange',
-                        default => 'gray',
+                        'fixed'      => 'green',
+                        'tier'       => 'purple',
+                        'bulk'       => 'orange',
+                        default      => 'gray',
                     }),
                 TextColumn::make('productVariant.name')
                     ->label(__('variant_pricing_rules.product_variant'))
@@ -212,7 +212,7 @@ final class VariantPricingRuleResource extends Resource
                     ->numeric()
                     ->formatStateUsing(function ($state, $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
+                            return $state . '%';
                         }
 
                         return Number::currency((float) $state, 'EUR');
@@ -254,9 +254,9 @@ final class VariantPricingRuleResource extends Resource
                 SelectFilter::make('type')
                     ->options([
                         'percentage' => __('variant_pricing_rules.types.percentage'),
-                        'fixed' => __('variant_pricing_rules.types.fixed'),
-                        'tier' => __('variant_pricing_rules.types.tier'),
-                        'bulk' => __('variant_pricing_rules.types.bulk'),
+                        'fixed'      => __('variant_pricing_rules.types.fixed'),
+                        'tier'       => __('variant_pricing_rules.types.tier'),
+                        'bulk'       => __('variant_pricing_rules.types.bulk'),
                     ]),
                 SelectFilter::make('product_variant_id')
                     ->relationship('productVariant', 'name')
@@ -338,10 +338,10 @@ final class VariantPricingRuleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantPricingRules::route('/'),
+            'index'  => Pages\ListVariantPricingRules::route('/'),
             'create' => Pages\CreateVariantPricingRule::route('/create'),
-            'view' => Pages\ViewVariantPricingRule::route('/{record}'),
-            'edit' => Pages\EditVariantPricingRule::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantPricingRule::route('/{record}'),
+            'edit'   => Pages\EditVariantPricingRule::route('/{record}/edit'),
         ];
     }
 }

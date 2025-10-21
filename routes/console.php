@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Schedule;
 |
 */
 
-Artisan::command('inspire', function () {
+Artisan::command('inspire', function (): void {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
@@ -26,18 +26,18 @@ Artisan::command('inspire', function () {
 Schedule::job(new CheckLowStockJob)->everySixHours();
 
 // Schedule cache warmup every hour
-Schedule::call(function () {
+Schedule::call(function (): void {
     \App\Services\CacheService::warmupCaches();
 })->hourly();
 
 // Clear old activity logs (keep 90 days) with timeout protection
-Schedule::call(function () {
+Schedule::call(function (): void {
     $timeout = now()->addMinutes(5); // 5 minute timeout for log cleanup
 
     \Spatie\Activitylog\Models\Activity::where('created_at', '<', now()->subDays(90))
         ->cursor()
         ->takeUntilTimeout($timeout)
-        ->each(function ($activity) {
+        ->each(function ($activity): void {
             $activity->delete();
         });
 })->daily();

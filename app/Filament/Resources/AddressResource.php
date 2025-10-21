@@ -40,6 +40,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 /**
  * AddressResource
@@ -64,7 +65,7 @@ final class AddressResource extends Resource
     /**
      * Get navigation group
      */
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Orders';
     }
@@ -561,7 +562,7 @@ final class AddressResource extends Resource
     /**
      * Get navigation badge color
      */
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         $count = self::getModel()::count();
         $activeCount = self::getModel()::where('is_active', true)->count();
