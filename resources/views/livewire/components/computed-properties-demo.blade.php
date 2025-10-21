@@ -122,8 +122,10 @@
                     <div class="space-y-2">
                         @foreach($expensiveAnalytics['top_products'] as $product)
                             <div class="flex items-center space-x-3 bg-white rounded-lg p-3">
-                                @if($product['image'])
-                                    <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" 
+                                {{-- Harmonise product images between cached analytics responses. --}}
+                                @php($productImage = $product['main_image'] ?? $product['thumbnail'] ?? ($product['image'] ?? null))
+                                @if($productImage)
+                                    <img src="{{ $productImage }}" alt="{{ $product['name'] }}"
                                          class="w-10 h-10 object-cover rounded">
                                 @endif
                                 <div class="flex-1">
@@ -141,8 +143,10 @@
                     <div class="space-y-2">
                         @foreach($expensiveAnalytics['top_brands'] as $brand)
                             <div class="flex items-center space-x-3 bg-white rounded-lg p-3">
-                                @if($brand['image'])
-                                    <img src="{{ $brand['image'] }}" alt="{{ $brand['name'] }}" 
+                                {{-- Harmonise brand images as well for consistency in the UI cache. --}}
+                                @php($brandImage = $brand['main_image'] ?? $brand['thumbnail'] ?? ($brand['image'] ?? null))
+                                @if($brandImage)
+                                    <img src="{{ $brandImage }}" alt="{{ $brand['name'] }}"
                                          class="w-10 h-10 object-cover rounded">
                                 @endif
                                 <div class="flex-1">
