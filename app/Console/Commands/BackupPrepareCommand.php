@@ -8,6 +8,7 @@ use App\Support\Repositories\ProductRepository;
 use App\Support\Repositories\UserRepository;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -25,7 +26,7 @@ final class BackupPrepareCommand extends Command
 
     protected $description = 'Create a timestamped backup containing the database dump and media assets.';
 
-    public function handle(UserRepository $userRepository, ProductRepository $productRepository): int
+    public function handle(): int
     {
         $databaseDefault = config('database.default', 'sqlite');
         $databaseDefaultString = is_string($databaseDefault) ? $databaseDefault : 'sqlite';
@@ -73,6 +74,8 @@ final class BackupPrepareCommand extends Command
                 throw new RuntimeException('Failed to compute artifact checksums.');
             }
 
+            $repositoryMetrics = $this->repositoryMetrics($connectionName);
+
             $metadata = [
                 'timestamp'  => $timestamp,
                 'directory'  => $directoryName,
@@ -80,9 +83,10 @@ final class BackupPrepareCommand extends Command
                     'name'   => $connectionName,
                     'driver' => $databaseArtifact['driver'],
                 ],
-                'commit_hash' => $commitHash,
-                'media_paths' => $mediaPaths,
-                'artifacts'   => [
+                'commit_hash'  => $commitHash,
+                'media_paths'  => $mediaPaths,
+                'repositories' => $repositoryMetrics['classes'],
+                'artifacts'    => [
                     'database' => [
                         'filename' => basename($databaseArtifact['path']),
                         'driver'   => $databaseArtifact['driver'],
@@ -93,10 +97,7 @@ final class BackupPrepareCommand extends Command
                         'checksum' => $mediaChecksum,
                     ],
                 ],
-                'counts' => [
-                    'users'    => $userRepository->count($connectionName),
-                    'products' => $productRepository->count($connectionName),
-                ],
+                'counts'       => $repositoryMetrics['counts'],
                 'generated_at' => CarbonImmutable::now()->toIso8601String(),
             ];
 
@@ -113,6 +114,13 @@ final class BackupPrepareCommand extends Command
             $this->components->twoColumnDetail('Database artifact', $databaseArtifact['path']);
             $this->components->twoColumnDetail('Media archive', $mediaArtifact);
             $this->components->twoColumnDetail('Metadata', $backupPath . '/metadata.json');
+
+            foreach ($repositoryMetrics['counts'] as $label => $count) {
+                $this->components->twoColumnDetail(
+                    sprintf('Records [%s]', Str::headline($label)),
+                    (string) $count,
+                );
+            }
 
             return self::SUCCESS;
         } catch (Throwable $exception) {
@@ -355,6 +363,135 @@ final class BackupPrepareCommand extends Command
         }
 
         return trim($process->getOutput()) ?: null;
+    }
+
+    /**
+     * @return array{counts: array<string, int>, classes: array<string, string>}
+     */
+    private function repositoryMetrics(string $connection): array
+    {
+        $repositories = $this->instantiateRepositories();
+
+        if ($repositories === []) {
+            return [
+                'counts'  => [],
+                'classes' => [],
+            ];
+        }
+
+        $counts = [];
+        $classes = [];
+
+        foreach ($repositories as $label => $repository) {
+            $counts[$label] = $this->repositoryCount($repository, $connection);
+            $classes[$label] = $repository::class;
+        }
+
+        return [
+            'counts'  => $counts,
+            'classes' => $classes,
+        ];
+    }
+
+    /**
+     * @return array<string, object>
+     */
+    private function instantiateRepositories(): array
+    {
+        $definitions = $this->repositoryConfiguration();
+
+        if ($definitions === []) {
+            return [];
+        }
+
+        $repositories = [];
+        $container = $this->container();
+
+        foreach ($definitions as $label => $class) {
+            if (! class_exists($class)) {
+                throw new RuntimeException(sprintf('Backup repository class [%s] does not exist.', $class));
+            }
+
+            $instance = $container->make($class);
+
+            if (! method_exists($instance, 'count')) {
+                throw new RuntimeException(sprintf('Backup repository [%s] must define a count method.', $class));
+            }
+
+            $repositories[$label] = $instance;
+        }
+
+        return $repositories;
+    }
+
+    /**
+     * @return array<string, class-string>
+     */
+    private function repositoryConfiguration(): array
+    {
+        $configured = config('backup.repositories');
+
+        if ($configured === null) {
+            return $this->defaultRepositoryConfiguration();
+        }
+
+        if ($configured === []) {
+            return [];
+        }
+
+        if (! is_array($configured) || array_is_list($configured)) {
+            throw new RuntimeException('Backup repositories configuration must be an associative array.');
+        }
+
+        $normalized = [];
+
+        foreach ($configured as $label => $class) {
+            if (! is_string($label) || $label === '') {
+                throw new RuntimeException('Backup repository keys must be non-empty strings.');
+            }
+
+            if (! is_string($class) || $class === '') {
+                throw new RuntimeException(sprintf('Backup repository [%s] must reference a class name.', $label));
+            }
+
+            $normalized[$label] = $class;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @return array<string, class-string>
+     */
+    private function defaultRepositoryConfiguration(): array
+    {
+        return [
+            'users'    => UserRepository::class,
+            'products' => ProductRepository::class,
+        ];
+    }
+
+    private function repositoryCount(object $repository, string $connection): int
+    {
+        $count = $repository->count($connection);
+
+        if (is_int($count)) {
+            return $count;
+        }
+
+        if (is_numeric($count)) {
+            return (int) $count;
+        }
+
+        throw new RuntimeException(sprintf('Backup repository [%s]::count() must return an integer.', $repository::class));
+    }
+
+    private function container(): Container
+    {
+        /** @var Container $container */
+        $container = $this->laravel;
+
+        return $container;
     }
 
     private function optionString(string $name, string $default): string

@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Support\Repositories\ProductRepository;
 use App\Support\Repositories\UserRepository;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -25,7 +26,7 @@ final class BackupVerifyCommand extends Command
 
     protected $description = 'Restore the most recent backup into an ephemeral database and run sanity checks.';
 
-    public function handle(UserRepository $userRepository, ProductRepository $productRepository): int
+    public function handle(): int
     {
         $defaultStorage = config('backup.storage_path', storage_path('app/backups'));
         $storageRoot = $this->normalizePath($this->optionString('storage-path', is_string($defaultStorage) ? $defaultStorage : storage_path('app/backups')));
@@ -74,24 +75,37 @@ final class BackupVerifyCommand extends Command
             DB::reconnect($connectionName);
 
             $this->components->info('Running sanity checks...');
-            $userCount = $userRepository->count($connectionName);
-            $productCount = $productRepository->count($connectionName);
 
+            $repositories = $this->instantiateRepositories($metadata['repositories'] ?? []);
             $expectedCounts = $metadata['counts'] ?? [];
-            $expectedUsers = $expectedCounts['users'] ?? null;
-            $expectedProducts = $expectedCounts['products'] ?? null;
+            $results = [];
 
-            $this->compareCounts('users', $expectedUsers, $userCount);
-            $this->compareCounts('products', $expectedProducts, $productCount);
+            foreach ($repositories as $label => $repository) {
+                $actualCount = $this->repositoryCount($repository, $connectionName);
+                $expected = $expectedCounts[$label] ?? null;
 
-            $this->components->twoColumnDetail(
-                'Users (expected/actual)',
-                sprintf('%s / %s', $expectedUsers !== null ? (string) $expectedUsers : 'n/a', (string) $userCount),
-            );
-            $this->components->twoColumnDetail(
-                'Products (expected/actual)',
-                sprintf('%s / %s', $expectedProducts !== null ? (string) $expectedProducts : 'n/a', (string) $productCount),
-            );
+                $this->compareCounts($label, $expected, $actualCount);
+
+                $results[$label] = [
+                    'expected' => $expected,
+                    'actual'   => $actualCount,
+                ];
+            }
+
+            if ($results === []) {
+                $this->components->warn('No repository counts were recorded in the backup metadata.');
+            } else {
+                foreach ($results as $label => $comparison) {
+                    $this->components->twoColumnDetail(
+                        sprintf('%s (expected/actual)', Str::headline($label)),
+                        sprintf(
+                            '%s / %s',
+                            $comparison['expected'] !== null ? (string) $comparison['expected'] : 'n/a',
+                            (string) $comparison['actual'],
+                        ),
+                    );
+                }
+            }
 
             $this->components->info('Backup verification completed successfully.');
 
@@ -148,7 +162,8 @@ final class BackupVerifyCommand extends Command
      *         media: array{filename: string, checksum?: string|null}
      *     },
      *     connection?: array{driver?: string|null},
-     *     counts?: array{users?: int|null, products?: int|null}
+     *     counts?: array<string, int|null>,
+     *     repositories?: array<string, string>
      * }
      */
     private function readMetadata(string $backupPath): array
@@ -258,34 +273,50 @@ final class BackupVerifyCommand extends Command
         }
 
         if (isset($decoded['counts'])) {
-            if (! is_array($decoded['counts'])) {
-                throw new RuntimeException('Backup metadata counts must be an array.');
+            if (! is_array($decoded['counts']) || array_is_list($decoded['counts'])) {
+                throw new RuntimeException('Backup metadata counts must be an associative array.');
             }
 
             $countsInfo = [];
 
-            if (array_key_exists('users', $decoded['counts'])) {
-                $users = $decoded['counts']['users'];
-
-                if ($users !== null && ! is_int($users)) {
-                    throw new RuntimeException('Backup metadata user count must be an integer or null.');
+            foreach ($decoded['counts'] as $label => $value) {
+                if (! is_string($label) || $label === '') {
+                    throw new RuntimeException('Backup metadata count keys must be non-empty strings.');
                 }
 
-                $countsInfo['users'] = $users;
-            }
-
-            if (array_key_exists('products', $decoded['counts'])) {
-                $products = $decoded['counts']['products'];
-
-                if ($products !== null && ! is_int($products)) {
-                    throw new RuntimeException('Backup metadata product count must be an integer or null.');
+                if ($value !== null && ! is_int($value)) {
+                    throw new RuntimeException(sprintf('Backup metadata count for [%s] must be an integer or null.', $label));
                 }
 
-                $countsInfo['products'] = $products;
+                $countsInfo[$label] = $value;
             }
 
             if ($countsInfo !== []) {
                 $result['counts'] = $countsInfo;
+            }
+        }
+
+        if (isset($decoded['repositories'])) {
+            if (! is_array($decoded['repositories']) || array_is_list($decoded['repositories'])) {
+                throw new RuntimeException('Backup metadata repositories must be an associative array.');
+            }
+
+            $repositoryInfo = [];
+
+            foreach ($decoded['repositories'] as $label => $class) {
+                if (! is_string($label) || $label === '') {
+                    throw new RuntimeException('Backup metadata repository keys must be non-empty strings.');
+                }
+
+                if (! is_string($class) || $class === '') {
+                    throw new RuntimeException(sprintf('Backup metadata repository [%s] must reference a class name.', $label));
+                }
+
+                $repositoryInfo[$label] = $class;
+            }
+
+            if ($repositoryInfo !== []) {
+                $result['repositories'] = $repositoryInfo;
             }
         }
 
@@ -336,6 +367,108 @@ final class BackupVerifyCommand extends Command
         $process = Process::fromShellCommandline($command);
         $process->setTimeout(null);
         $process->mustRun();
+    }
+
+    /**
+     * @param  array<string, string> $metadataRepositories
+     * @return array<string, object>
+     */
+    private function instantiateRepositories(array $metadataRepositories): array
+    {
+        $definitions = $metadataRepositories !== [] ? $metadataRepositories : $this->repositoryConfiguration();
+
+        if ($definitions === []) {
+            return [];
+        }
+
+        $repositories = [];
+        $container = $this->container();
+
+        foreach ($definitions as $label => $class) {
+            if (! class_exists($class)) {
+                throw new RuntimeException(sprintf('Backup repository class [%s] does not exist.', $class));
+            }
+
+            $instance = $container->make($class);
+
+            if (! method_exists($instance, 'count')) {
+                throw new RuntimeException(sprintf('Backup repository [%s] must define a count method.', $class));
+            }
+
+            $repositories[$label] = $instance;
+        }
+
+        return $repositories;
+    }
+
+    /**
+     * @return array<string, class-string>
+     */
+    private function repositoryConfiguration(): array
+    {
+        $configured = config('backup.repositories');
+
+        if ($configured === null) {
+            return $this->defaultRepositoryConfiguration();
+        }
+
+        if ($configured === []) {
+            return [];
+        }
+
+        if (! is_array($configured) || array_is_list($configured)) {
+            throw new RuntimeException('Backup repositories configuration must be an associative array.');
+        }
+
+        $normalized = [];
+
+        foreach ($configured as $label => $class) {
+            if (! is_string($label) || $label === '') {
+                throw new RuntimeException('Backup repository keys must be non-empty strings.');
+            }
+
+            if (! is_string($class) || $class === '') {
+                throw new RuntimeException(sprintf('Backup repository [%s] must reference a class name.', $label));
+            }
+
+            $normalized[$label] = $class;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @return array<string, class-string>
+     */
+    private function defaultRepositoryConfiguration(): array
+    {
+        return [
+            'users'    => UserRepository::class,
+            'products' => ProductRepository::class,
+        ];
+    }
+
+    private function repositoryCount(object $repository, string $connection): int
+    {
+        $count = $repository->count($connection);
+
+        if (is_int($count)) {
+            return $count;
+        }
+
+        if (is_numeric($count)) {
+            return (int) $count;
+        }
+
+        throw new RuntimeException(sprintf('Backup repository [%s]::count() must return an integer.', $repository::class));
+    }
+
+    private function container(): Container
+    {
+        /** @var Container $container */
+        $container = $this->laravel;
+
+        return $container;
     }
 
     /**
