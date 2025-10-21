@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 
 /**
- * @extends Factory<\Spatie\Permission\Models\Role>
+ * @extends Factory<\App\Models\Role>
  */
 final class RoleFactory extends Factory
 {
@@ -20,7 +20,7 @@ final class RoleFactory extends Factory
         $name = Str::slug($this->faker->unique()->jobTitle(), '_');
 
         return [
-            'name' => $name,
+            'name'       => $name,
             'guard_name' => 'web',
         ];
     }
