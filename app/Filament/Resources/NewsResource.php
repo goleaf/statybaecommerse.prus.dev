@@ -11,7 +11,6 @@ use App\Models\News;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -22,7 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use RuntimeException;
 
 class NewsResource extends Resource
@@ -40,52 +39,35 @@ class NewsResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        return $form->components([
             Forms\Components\Section::make('Article Information')
-                ->schema([
-                    Forms\Components\TextInput::make('title')
-                        ->label(__('news.fields.title'))
-                        ->required()
-                        ->maxLength(255)
-                        ->live()
-                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
-                    Forms\Components\Hidden::make('current_locale')
-                        ->default(fn (): string => app()->getLocale())
-                        ->dehydrated(false),
-                    Forms\Components\TextInput::make('slug')
-                        ->label(__('news.fields.slug'))
-                        ->required()
-                        ->maxLength(255)
-                        ->rules(function (Get $get, ?News $record): array {
-                            $locale = $get('current_locale') ?? app()->getLocale();
-
-                            $rule = Rule::unique('news_translations', 'slug')
-                                ->where(fn ($query) => $query->where('locale', $locale));
-
-                            if ($record) {
-                                $translationId = $record->translations()
-                                    ->where('locale', $locale)
-                                    ->value('id');
-
-                                if ($translationId) {
-                                    $rule->ignore($translationId);
-                                }
-                            }
-
-                            return [$rule];
-                        }),
-                    Forms\Components\Textarea::make('excerpt')
-                        ->label(__('news.fields.excerpt'))
-                        ->maxLength(500)
-                        ->rows(3),
-                    Forms\Components\RichEditor::make('content')
-                        ->label(__('news.fields.content'))
-                        ->required()
-                        ->columnSpanFull(),
+                ->components([
+                    LanguageTabs::make([
+                        Forms\Components\TextInput::make('title')
+                            ->label(__('news.fields.title'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, callable $set): void {
+                                $set('slug', \Illuminate\Support\Str::slug((string) $state));
+                            }),
+                        Forms\Components\TextInput::make('slug')
+                            ->label(__('news.fields.slug'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('summary')
+                            ->label(__('news.fields.excerpt'))
+                            ->maxLength(500)
+                            ->rows(3),
+                        Forms\Components\RichEditor::make('content')
+                            ->label(__('news.fields.content'))
+                            ->required()
+                            ->columnSpanFull(),
+                    ])->columnSpanFull(),
                 ])
-                ->columns(2),
+                ->columns(1),
             Forms\Components\Section::make('Publishing')
-                ->schema([
+                ->components([
                     Forms\Components\DateTimePicker::make('published_at')
                         ->label(__('news.fields.published_at'))
                         ->default(now()),
@@ -120,24 +102,25 @@ class NewsResource extends Resource
                 ])
                 ->columns(2),
             Forms\Components\Section::make('SEO & Metadata')
-                ->schema([
-                    Forms\Components\TextInput::make('meta_title')
-                        ->label(__('news.fields.meta_title'))
-                        ->maxLength(255),
-                    Forms\Components\Textarea::make('meta_description')
-                        ->label(__('news.fields.meta_description'))
-                        ->maxLength(500)
-                        ->rows(3),
+                ->components([
+                    LanguageTabs::make([
+                        Forms\Components\TextInput::make('meta_title')
+                            ->label(__('news.fields.meta_title'))
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('meta_description')
+                            ->label(__('news.fields.meta_description'))
+                            ->maxLength(500)
+                            ->rows(3),
+                    ]),
                     Forms\Components\TextInput::make('meta_keywords')
                         ->label(__('news.fields.meta_keywords'))
                         ->maxLength(255),
-                ])
-                ->columns(1),
+                ]),
             Forms\Components\Section::make(__('news.podcast.section_title'))
                 ->description(__('news.podcast.section_description'))
                 ->collapsible()
                 ->collapsed()
-                ->schema([
+                ->components([
                     Forms\Components\TextInput::make('meta_data.podcast_url')
                         ->label(__('news.fields.podcast_url'))
                         ->placeholder('https://share.transistor.fm/s/...')
@@ -148,7 +131,7 @@ class NewsResource extends Resource
                         ->helperText(__('news.podcast.field_help')),
                 ]),
             Forms\Components\Section::make('Categories & Tags')
-                ->schema([
+                ->components([
                     Forms\Components\Select::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
@@ -176,7 +159,8 @@ class NewsResource extends Resource
                     ->label(__('news.fields.title'))
                     ->searchable()
                     ->sortable()
-                    ->limit(50),
+                    ->limit(50)
+                    ->formatStateUsing(fn (?string $state, News $record): ?string => $record->trans('title')),
                 Tables\Columns\TextColumn::make('author_name')
                     ->label(__('news.fields.author_name'))
                     ->searchable()
