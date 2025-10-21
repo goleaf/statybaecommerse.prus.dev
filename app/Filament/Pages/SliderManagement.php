@@ -6,7 +6,13 @@ namespace App\Filament\Pages;
 
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\ContentLinkSearch;
+use App\Support\Search\SearchResultPayload;
+use BackedEnum;
+
+use function collect;
+
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -25,6 +31,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Size;
@@ -37,7 +44,7 @@ class SliderManagement extends Page implements HasActions, HasForms
     use InteractsWithActions, InteractsWithForms;
 
     /**
-     * @var string|\BackedEnum|null Navigation icon override documented to support enums without extra imports.
+     * @var string|BackedEnum|null Navigation icon override documented to support enums without extra imports.
      */
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -124,14 +131,67 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->maxLength(255)
                                 ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                    if ($state === null || $state === '') {
+                                ->afterStateHydrated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                    // Normalise Livewire payload caches before delegating to the shared helper.
+                                    $set('button_url_payload', []);
+
+                                    SearchableComponentHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static function (?string $url): ?array {
+                                            if (! is_string($url) || trim($url) === '') {
+                                                return null;
+                                            }
+
+                                            $result = collect(ContentLinkSearch::results($url))
+                                                ->first(static fn ($candidate): bool => $candidate->value() === $url);
+
+                                            if ($result !== null) {
+                                                $normalised = SearchResultPayload::hydrate($result);
+
+                                                return [
+                                                    'value'   => $normalised['id'],
+                                                    'label'   => $normalised['label'],
+                                                    'payload' => $normalised['payload'],
+                                                ];
+                                            }
+
+                                            return [
+                                                'value'   => $url,
+                                                'label'   => $url,
+                                                'payload' => [
+                                                    'id'    => $url,
+                                                    'label' => $url,
+                                                    'type'  => 'custom',
+                                                ],
+                                            ];
+                                        },
+                                        static function (array $record) use ($set): array {
+                                            $payload = $record['payload'] ?? [];
+
+                                            $set('button_url_payload', $payload);
+
+                                            return [
+                                                'value'   => $record['value'] ?? null,
+                                                'label'   => $record['label'] ?? null,
+                                                'payload' => $payload,
+                                            ];
+                                        },
+                                    );
+
+                                    // See docs/filament/searchable-inputs.md for helper expectations.
+                                })
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                    if (is_string($state) && trim($state) !== '') {
                                         return;
                                     }
 
-                                    $component
-                                        ->state($state)
-                                        ->options([$state => $state]);
+                                    SearchableComponentHelper::clear(
+                                        $component,
+                                        static function () use ($set): void {
+                                            $set('button_url_payload', []);
+                                        },
+                                    );
                                 }),
                         ]),
                     ])

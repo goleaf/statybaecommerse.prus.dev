@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
+use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\ContentLinkSearch;
+use App\Support\Search\SearchResultPayload;
+
+use function collect;
+
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -17,6 +22,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
 
@@ -52,14 +58,69 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                     ->maxLength(255)
                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                        if ($state === null || $state === '') {
+                    ->afterStateHydrated(function (SearchableInput $component, ?string $state, Set $set): void {
+                        // Reset any cached payload before hydrating the component with helper-driven data.
+                        $set('button_url_payload', []);
+
+                        SearchableComponentHelper::hydrate(
+                            $component,
+                            $state,
+                            static function (?string $url): ?array {
+                                if (! is_string($url) || trim($url) === '') {
+                                    return null;
+                                }
+
+                                $result = collect(ContentLinkSearch::results($url))
+                                    ->first(static fn ($candidate): bool => $candidate->value() === $url);
+
+                                if ($result !== null) {
+                                    $normalised = SearchResultPayload::hydrate($result);
+
+                                    return [
+                                        'value'   => $normalised['id'],
+                                        'label'   => $normalised['label'],
+                                        'payload' => $normalised['payload'],
+                                    ];
+                                }
+
+                                // Fall back to a bare payload when the lookup cannot resolve metadata from search services.
+                                return [
+                                    'value'   => $url,
+                                    'label'   => $url,
+                                    'payload' => [
+                                        'id'    => $url,
+                                        'label' => $url,
+                                        'type'  => 'custom',
+                                    ],
+                                ];
+                            },
+                            static function (array $record) use ($set): array {
+                                $payload = $record['payload'] ?? [];
+
+                                $set('button_url_payload', $payload);
+
+                                return [
+                                    'value'   => $record['value'] ?? null,
+                                    'label'   => $record['label'] ?? null,
+                                    'payload' => $payload,
+                                ];
+                            },
+                        );
+
+                        // See docs/filament/searchable-inputs.md for helper expectations.
+                    })
+                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                        if (is_string($state) && trim($state) !== '') {
                             return;
                         }
 
-                        $component
-                            ->state($state)
-                            ->options([$state => $state]);
+                        // Ensure both the component and any dependent payload caches are cleared together.
+                        SearchableComponentHelper::clear(
+                            $component,
+                            static function () use ($set): void {
+                                $set('button_url_payload', []);
+                            },
+                        );
                     }),
                 ColorPicker::make('background_color')
                     ->label(__('translations.background_color'))
