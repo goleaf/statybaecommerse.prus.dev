@@ -6,15 +6,20 @@ namespace App\Filament\Pages;
 
 use App\Data\SearchQueryData;
 use App\Services\SearchService;
-use BackedEnum;
 use Filament\Pages\Page;
 use UnitEnum;
 
 final class SearchExplorer extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    /**
+     * @return string|UnitEnum|null
+     */
+    public static function getNavigationGroup(): ?string
     {
         return 'Search';
     }
