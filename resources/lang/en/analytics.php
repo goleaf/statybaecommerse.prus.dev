@@ -27,9 +27,12 @@ return [
     'date' => 'Date',
     'order_number' => 'Order Number',
     'customer' => 'Customer',
+    'customer_email' => 'Customer Email',
     'items' => 'Items',
     'total' => 'Total',
     'created' => 'Created',
+    'updated' => 'Updated',
+    'channel' => 'Channel',
     // Summary Labels
     'total_revenue' => 'Total Revenue',
     'avg_order_value' => 'Avg Order Value',
@@ -67,6 +70,7 @@ return [
     'export_report' => 'Export Report',
     'refresh_data' => 'Refresh Data',
     'view' => 'View',
+    'view_order' => 'View Order',
     // Chart Types
     'line_chart' => 'Line Chart',
     'bar_chart' => 'Bar Chart',

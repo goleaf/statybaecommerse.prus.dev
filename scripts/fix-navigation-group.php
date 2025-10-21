@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+require_once __DIR__.'/../vendor/autoload.php';
+
+use App\Support\Filament\Constants\NavigationGroupConstants;
+
 $baseDir = __DIR__.'/../app/Filament/Resources';
 
 $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($baseDir));
@@ -28,10 +32,10 @@ foreach ($rii as $file) {
 
     // Ensure UnitEnum import if method will be added
     if ($navGroupValue !== null && strpos($code, 'getNavigationGroup(): UnitEnum|string|null') === false) {
-        if (strpos($code, 'use UnitEnum;') === false) {
+        if (strpos($code, NavigationGroupConstants::UNIT_ENUM_USE) === false) {
             // Insert after last use statement
             if (preg_match('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', $code, $mm)) {
-                $code = preg_replace('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', '$1$2'."use UnitEnum;\n", $code, 1);
+                $code = preg_replace('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', '$1$2'.NavigationGroupConstants::UNIT_ENUM_USE."\n", $code, 1);
             }
         }
         // Insert method after class opening brace

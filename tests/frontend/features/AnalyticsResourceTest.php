@@ -176,9 +176,9 @@ it('can access analytics resource with proper permissions', function () {
 });
 
 it('displays correct labels', function () {
-    expect(AnalyticsResource::getNavigationLabel())->toBe(__('Analytics Dashboard'));
-    expect(AnalyticsResource::getModelLabel())->toBe(__('Analytics'));
-    expect(AnalyticsResource::getPluralModelLabel())->toBe(__('Analytics'));
+    expect(AnalyticsResource::getNavigationLabel())->toBe(__('analytics.analytics_dashboard'));
+    expect(AnalyticsResource::getModelLabel())->toBe(__('analytics.analytics'));
+    expect(AnalyticsResource::getPluralModelLabel())->toBe(__('analytics.analytics'));
 });
 
 it('polls data every 30 seconds', function () {
