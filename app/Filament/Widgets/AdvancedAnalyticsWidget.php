@@ -40,12 +40,12 @@ class AdvancedAnalyticsWidget extends ChartWidget
 
             // Revenue
             $revenue = Order::where('status', '!=', 'cancelled')
-                ->whereDate('created_at', $date)
+                ->createdOn($date)
                 ->sum('total');
             $revenueData[] = $revenue;
 
             // Orders
-            $orders = Order::whereDate('created_at', $date)->count();
+            $orders = Order::createdOn($date)->count();
             $ordersData[] = $orders;
 
             // New Users
@@ -67,44 +67,44 @@ class AdvancedAnalyticsWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Revenue (€)',
-                    'data' => $revenueData,
-                    'borderColor' => 'rgb(34, 197, 94)',
+                    'label'           => 'Revenue (€)',
+                    'data'            => $revenueData,
+                    'borderColor'     => 'rgb(34, 197, 94)',
                     'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'Orders',
-                    'data' => $ordersData,
-                    'borderColor' => 'rgb(59, 130, 246)',
+                    'label'           => 'Orders',
+                    'data'            => $ordersData,
+                    'borderColor'     => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'New Users',
-                    'data' => $usersData,
-                    'borderColor' => 'rgb(168, 85, 247)',
+                    'label'           => 'New Users',
+                    'data'            => $usersData,
+                    'borderColor'     => 'rgb(168, 85, 247)',
                     'backgroundColor' => 'rgba(168, 85, 247, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'Page Views',
-                    'data' => $pageViewsData,
-                    'borderColor' => 'rgb(245, 158, 11)',
+                    'label'           => 'Page Views',
+                    'data'            => $pageViewsData,
+                    'borderColor'     => 'rgb(245, 158, 11)',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'Conversions',
-                    'data' => $conversionsData,
-                    'borderColor' => 'rgb(239, 68, 68)',
+                    'label'           => 'Conversions',
+                    'data'            => $conversionsData,
+                    'borderColor'     => 'rgb(239, 68, 68)',
                     'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
             ],
             'labels' => $dates,
@@ -119,21 +119,21 @@ class AdvancedAnalyticsWidget extends ChartWidget
     public function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'plugins' => [
+            'plugins'             => [
                 'legend' => [
                     'position' => 'top',
                 ],
                 'title' => [
                     'display' => true,
-                    'text' => '30-Day Analytics Overview',
+                    'text'    => '30-Day Analytics Overview',
                 ],
             ],
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'grid' => [
+                    'grid'        => [
                         'color' => 'rgba(0, 0, 0, 0.1)',
                     ],
                 ],
@@ -145,7 +145,7 @@ class AdvancedAnalyticsWidget extends ChartWidget
             ],
             'interaction' => [
                 'intersect' => false,
-                'mode' => 'index',
+                'mode'      => 'index',
             ],
         ];
     }

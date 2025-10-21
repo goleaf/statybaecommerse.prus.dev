@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
+use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
-use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
+
+use function class_exists;
+
+use Filament\Contracts\Plugin as FilamentPlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -18,15 +21,32 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
+use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
+use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use pxlrbt\FilamentExcel\FilamentExport;
 
 final class AdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        if (class_exists(FilamentExport::class)) {
+            FilamentExport::createExportUrlUsing(
+                static fn ($export): string => URL::temporarySignedRoute(
+                    'exports.signed-download',
+                    now()->addMinutes(60),
+                    ['export' => $export],
+                ),
+            );
+        }
+    }
+
     public function panel(Panel $panel): Panel
     {
         $resourceClasses = array_values(array_filter(
@@ -111,26 +131,57 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins([
-                    FilamentShieldPlugin::make(),
-                    TableLayoutTogglePlugin::make()
-                        ->setDefaultLayout('grid')
-                        ->persistLayoutUsing(
-                            persister: LocalStoragePersister::class,
-                            cacheStore: 'redis',
-                            cacheTtl: 60 * 24,
-                        )
-                        ->shareLayoutBetweenPages(false)
-                        ->displayToggleAction()
-                        ->toggleActionHook('tables::toolbar.search.after')
-                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
-                    FilamentNordThemePlugin::make(),
-                ]))
+                fn (Panel $p) => $p->plugins($this->configuredPlugins()))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->spa();
+    }
+
+    /**
+     * @return array<int, FilamentPlugin>
+     */
+    private function configuredPlugins(): array
+    {
+        $plugins = [];
+
+        if (class_exists(FilamentShieldPlugin::class)) {
+            $plugins[] = FilamentShieldPlugin::make();
+        }
+
+        if ($fullCalendar = $this->makeFullCalendarPlugin()) {
+            $plugins[] = $fullCalendar;
+        }
+
+        if (class_exists(TableLayoutTogglePlugin::class)) {
+            $tableLayoutPlugin = TableLayoutTogglePlugin::make()
+                ->setDefaultLayout('grid')
+                ->shareLayoutBetweenPages(false)
+                ->displayToggleAction()
+                ->toggleActionHook('tables::toolbar.search.after')
+                ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
+
+            if (class_exists(LocalStoragePersister::class)) {
+                $tableLayoutPlugin->persistLayoutUsing(
+                    persister: LocalStoragePersister::class,
+                    cacheStore: 'redis',
+                    cacheTtl: 60 * 24,
+                );
+            }
+
+            $plugins[] = $tableLayoutPlugin;
+        }
+
+        if (class_exists(FilamentNordThemePlugin::class)) {
+            $plugins[] = FilamentNordThemePlugin::make();
+        }
+
+        if (class_exists(ResizedColumnPlugin::class)) {
+            $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
+        }
+
+        return array_values($plugins);
     }
 
     /**
@@ -163,5 +214,20 @@ final class AdminPanelProvider extends PanelProvider
                 return $navigationGroup;
             })
             ->all();
+    }
+
+    private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
+    {
+        $pluginClass = 'Saade\\FilamentFullCalendar\\FilamentFullCalendarPlugin';
+
+        if (! class_exists($pluginClass)) {
+            return null;
+        }
+
+        return $pluginClass::make()
+            ->selectable(true)
+            ->editable(true)
+            ->timezone('Europe/Vilnius')
+            ->locale('lt');
     }
 }

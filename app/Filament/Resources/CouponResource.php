@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -30,7 +29,13 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CouponResource extends Resource
 {
@@ -143,11 +148,11 @@ final class CouponResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('valid_from')
+                            Flatpickr::makeDateTime('valid_from')
                                 ->label(__('coupons.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            DateTimePicker::make('valid_until')
+                            Flatpickr::makeDateTime('valid_until')
                                 ->label(__('coupons.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
@@ -324,6 +329,11 @@ final class CouponResource extends Resource
                     ->falseLabel(__('coupons.manual_apply_only'))
                     ->native(false),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export'))
+                    ->exports(self::getCouponExportPresets()),
+            ])
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -361,6 +371,9 @@ final class CouponResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->label(__('Export selected'))
+                        ->exports(self::getCouponExportPresets()),
                     DeleteBulkAction::make(),
                     BulkAction::make('activate')
                         ->label(__('coupons.activate_selected'))
@@ -390,6 +403,39 @@ final class CouponResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * @return array<int, ExcelExport>
+     */
+    private static function getCouponExportPresets(): array
+    {
+        return [
+            ExcelExport::make('coupon_report')
+                ->fromTable()
+                ->queue()
+                ->withChunkSize(500)
+                ->withColumns([
+                    Column::make('code')
+                        ->heading(__('coupons.code')),
+                    Column::make('type')
+                        ->heading(__('coupons.type')),
+                    Column::make('value')
+                        ->heading(__('coupons.value'))
+                        ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                        ->formatStateUsing(
+                            fn ($state, Coupon $record): string => match ($record->type) {
+                                'percentage' => $state === null ? '' : sprintf('%s%%', $state),
+                                'free_shipping' => __('coupons.free_shipping'),
+                                default => $state === null ? '' : (string) $state,
+                            }
+                        ),
+                    Column::make('starts_at')
+                        ->heading(__('coupons.starts_at')),
+                    Column::make('expires_at')
+                        ->heading(__('coupons.ends_at')),
+                ]),
+        ];
     }
 
     /**

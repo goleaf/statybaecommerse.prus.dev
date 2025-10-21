@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
+use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -154,6 +155,18 @@ final class ShippingOptionResource extends Resource
                                     ->step(0.01),
                             ]),
                     ]),
+                Section::make(__('admin.shipping_options.availability'))
+                    ->schema([
+                        MatrixFactory::checkboxGrid(
+                            'shipping_matrix',
+                            (array) config('shipping.matrix.zones', []),
+                            (array) config('shipping.matrix.methods', []),
+                        )
+                            ->label(__('admin.shipping_options.shipping_matrix'))
+                            ->helperText(__('admin.shipping_options.shipping_matrix_help'))
+                            ->rowSelectRequired(false),
+                    ])
+                    ->collapsible(),
                 Section::make(__('admin.shipping_options.delivery'))
                     ->schema([
                         Grid::make(2)

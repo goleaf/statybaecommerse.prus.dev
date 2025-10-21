@@ -15,7 +15,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -39,6 +38,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 final class UserProductInteractionResource extends Resource
 {
@@ -157,12 +157,12 @@ final class UserProductInteractionResource extends Resource
                                     ->minValue(1)
                                     ->default(1)
                                     ->helperText(__('admin.user_product_interactions.count_help')),
-                                DateTimePicker::make('first_interaction')
+                                Flatpickr::makeDateTime('first_interaction')
                                     ->label(__('admin.user_product_interactions.first_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')
                                     ->seconds(false),
-                                DateTimePicker::make('last_interaction')
+                                Flatpickr::makeDateTime('last_interaction')
                                     ->label(__('admin.user_product_interactions.last_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')

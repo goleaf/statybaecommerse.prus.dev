@@ -6,12 +6,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages;
 use App\Models\RecommendationAnalytics;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -23,7 +23,6 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 
 /**
  * RecommendationAnalyticsResource
@@ -43,7 +42,7 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Analytics';
     }
@@ -109,7 +108,7 @@ final class RecommendationAnalyticsResource extends Resource
                                     ])
                                     ->required()
                                     ->default('view'),
-                                DatePicker::make('date')
+                                Flatpickr::makeDate('date')
                                     ->label(__('admin.recommendation_analytics.date'))
                                     ->required()
                                     ->default(now()),

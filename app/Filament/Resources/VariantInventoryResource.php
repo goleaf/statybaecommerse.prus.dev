@@ -5,23 +5,28 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VariantInventoryResource\Pages;
+use App\Models\Location;
+use App\Models\ProductVariant;
 use App\Models\VariantInventory;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\LocationSearch;
+use App\Support\Search\ProductVariantSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
@@ -76,18 +81,63 @@ final class VariantInventoryResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Select::make('variant_id')
+                                SearchableInput::make('variant_id')
                                     ->label(__('admin.variant_inventory.variant'))
-                                    ->relationship('variant', 'name')
+                                    ->placeholder(__('admin.variant_inventory.variant_placeholder'))
                                     ->required()
-                                    ->searchable()
-                                    ->preload(),
-                                Select::make('location_id')
+                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find($state);
+
+                                        if (! $variant instanceof ProductVariant) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    }),
+                                SearchableInput::make('location_id')
                                     ->label(__('admin.variant_inventory.location'))
-                                    ->relationship('location', 'name')
+                                    ->placeholder(__('admin.variant_inventory.location_placeholder'))
                                     ->required()
-                                    ->searchable()
-                                    ->preload(),
+                                    ->searchUsing(fn (string $value): array => LocationSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $location = Location::query()
+                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                            ->find($state);
+
+                                        if (! $location instanceof Location) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $location->getKey() => LocationSearch::label($location),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    }),
                             ]),
                         Grid::make(2)
                             ->schema([
@@ -155,7 +205,7 @@ final class VariantInventoryResource extends Resource
                             ]),
                         Grid::make(2)
                             ->schema([
-                                DatePicker::make('expiry_date')
+                                Flatpickr::makeDate('expiry_date')
                                     ->label(__('admin.variant_inventory.expiry_date')),
                                 TextInput::make('supplier_id')
                                     ->label(__('admin.variant_inventory.supplier_id'))
@@ -186,9 +236,9 @@ final class VariantInventoryResource extends Resource
                             ]),
                         Grid::make(2)
                             ->schema([
-                                DatePicker::make('last_restocked_at')
+                                Flatpickr::makeDate('last_restocked_at')
                                     ->label(__('admin.variant_inventory.last_restocked_at')),
-                                DatePicker::make('last_sold_at')
+                                Flatpickr::makeDate('last_sold_at')
                                     ->label(__('admin.variant_inventory.last_sold_at')),
                             ]),
                     ]),

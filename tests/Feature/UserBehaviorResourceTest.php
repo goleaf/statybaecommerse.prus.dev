@@ -180,7 +180,7 @@ final class UserBehaviorResourceTest extends TestCase
             'created_at' => $yesterday,
         ]);
 
-        $response = $this->get('/admin/user-behaviors?tableFilters[created_at][created_from]='.now()->format('Y-m-d'));
+        $response = $this->get('/admin/user-behaviors?tableFilters[created_at][range][start]='.now()->format('Y-m-d'));
 
         $response->assertOk();
         $response->assertSee($this->userBehavior->behavior_type);

@@ -195,8 +195,10 @@ class OrderResourceTest extends TestCase
 
         Livewire::test(OrderResource\Pages\ListOrders::class)
             ->filterTable('created_at', [
-                'created_from' => now()->subDay()->format('Y-m-d'),
-                'created_until' => now()->addDay()->format('Y-m-d'),
+                'range' => [
+                    'start' => now()->subDay()->format('Y-m-d'),
+                    'end' => now()->addDay()->format('Y-m-d'),
+                ],
             ])
             ->assertCanSeeTableRecords([$newOrder])
             ->assertCanNotSeeTableRecords([$oldOrder]);

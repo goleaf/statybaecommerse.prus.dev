@@ -22,7 +22,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section as FormSection;
@@ -45,6 +44,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * WishlistItemResource
@@ -491,9 +491,9 @@ final class WishlistItemResource extends Resource
                     ),
                 Filter::make('created_at')
                     ->form([
-                        DateTimePicker::make('created_from')
+                        Flatpickr::makeDateTime('created_from')
                             ->label(__('admin.wishlist_items.filters.created_from')),
-                        DateTimePicker::make('created_until')
+                        Flatpickr::makeDateTime('created_until')
                             ->label(__('admin.wishlist_items.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

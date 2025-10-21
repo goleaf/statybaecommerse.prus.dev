@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -30,11 +32,14 @@ use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
+
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
@@ -45,7 +50,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Content';
     }
@@ -114,10 +119,21 @@ class SliderManagement extends Page implements HasActions, HasForms
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
-                            TextInput::make('button_url')
+                            SearchableInput::make('button_url')
                                 ->label(__('translations.button_url'))
-                                ->url()
-                                ->maxLength(255),
+                                ->placeholder(__('translations.slider_link_placeholder'))
+                                ->maxLength(255)
+                                ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $component
+                                        ->state($state)
+                                        ->options([$state => $state]);
+                                }),
                         ]),
                     ])
                     ->collapsible(),
@@ -229,10 +245,10 @@ class SliderManagement extends Page implements HasActions, HasForms
                 Section::make(__('translations.scheduling'))
                     ->components([
                         Grid::make(2)->components([
-                            DateTimePicker::make('start_date')
+                            Flatpickr::makeDateTime('start_date')
                                 ->label(__('translations.start_date'))
                                 ->default(now()),
-                            DateTimePicker::make('end_date')
+                            Flatpickr::makeDateTime('end_date')
                                 ->label(__('translations.end_date'))
                                 ->after('start_date'),
                         ]),
@@ -277,9 +293,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->label(__('translations.slide_image'))
                                     ->image()
                                     ->directory('sliders/slides'),
-                                TextInput::make('link')
+                                SearchableInput::make('link')
                                     ->label(__('translations.slide_link'))
-                                    ->url(),
+                                    ->placeholder(__('translations.slider_link_placeholder'))
+                                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state($state)
+                                            ->options([$state => $state]);
+                                    }),
                             ])
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),

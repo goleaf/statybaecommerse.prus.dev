@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\SignedExportDownloadController;
@@ -31,10 +33,17 @@ Route::prefix('v1')
                 ->withoutMiddleware('throttle:api.default')
                 ->name('autocomplete.search');
 
-            require __DIR__.'/api/notifications.php';
+            require __DIR__ . '/api/notifications.php';
         });
     });
 
 Route::get('exports/download/{export:uuid}', SignedExportDownloadController::class)
     ->middleware(['signed'])
     ->name('exports.signed-download');
+
+Route::prefix('partner')
+    ->middleware(['partner.api.auth', 'partner.api.rate_limit'])
+    ->name('api.partner.')
+    ->group(function (): void {
+        require __DIR__ . '/api/partner.php';
+    });

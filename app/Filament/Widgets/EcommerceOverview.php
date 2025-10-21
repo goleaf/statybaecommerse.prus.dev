@@ -32,12 +32,12 @@ final class EcommerceOverview extends BaseWidget
         $revenueThisMonth = (float) ($this
             ->orders()
             ->where('status', '!=', 'cancelled')
-            ->whereBetween('created_at', [$thisMonthStart, $now])
+            ->createdBetween($thisMonthStart, $now)
             ->sum('total') ?? 0);
         $revenueLastMonth = (float) ($this
             ->orders()
             ->where('status', '!=', 'cancelled')
-            ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
+            ->createdBetween($lastMonthStart, $lastMonthEnd)
             ->sum('total') ?? 0);
         $revenueChange = $revenueLastMonth > 0
             ? (($revenueThisMonth - $revenueLastMonth) / $revenueLastMonth) * 100
@@ -45,11 +45,11 @@ final class EcommerceOverview extends BaseWidget
 
         $ordersThisMonth = (int) $this
             ->orders()
-            ->whereBetween('created_at', [$thisMonthStart, $now])
+            ->createdBetween($thisMonthStart, $now)
             ->count();
         $ordersLastMonth = (int) $this
             ->orders()
-            ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
+            ->createdBetween($lastMonthStart, $lastMonthEnd)
             ->count();
         $ordersChange = $ordersLastMonth > 0
             ? (($ordersThisMonth - $ordersLastMonth) / $ordersLastMonth) * 100
@@ -62,7 +62,7 @@ final class EcommerceOverview extends BaseWidget
         $avgOrderValue = $ordersThisMonth > 0 ? $revenueThisMonth / $ordersThisMonth : 0.0;
 
         return [
-            Stat::make(__('admin.dashboard.stats.total_revenue'), '€'.number_format($revenueThisMonth, 2))
+            Stat::make(__('admin.dashboard.stats.total_revenue'), '€' . number_format($revenueThisMonth, 2))
                 ->description(sprintf('%+0.1f%%', $revenueChange))
                 ->descriptionIcon($revenueChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revenueChange >= 0 ? 'success' : 'danger'),
@@ -72,7 +72,7 @@ final class EcommerceOverview extends BaseWidget
                 ->color($ordersChange >= 0 ? 'success' : 'danger'),
             Stat::make(__('admin.dashboard.stats.total_customers'), $totalCustomers)
                 ->color('primary'),
-            Stat::make(__('admin.dashboard.stats.average_order_value'), '€'.number_format($avgOrderValue, 2))
+            Stat::make(__('admin.dashboard.stats.average_order_value'), '€' . number_format($avgOrderValue, 2))
                 ->color('info'),
             Stat::make(__('admin.dashboard.stats.total_products'), $totalProducts)
                 ->color('primary'),

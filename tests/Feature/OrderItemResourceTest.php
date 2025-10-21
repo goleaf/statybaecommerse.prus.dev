@@ -224,8 +224,10 @@ final class OrderItemResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\OrderItemResource\Pages\ListOrderItems::class)
             ->filterTable('created_at', [
-                'created_from' => now()->subDay()->format('Y-m-d'),
-                'created_until' => now()->addDay()->format('Y-m-d'),
+                'range' => [
+                    'start' => now()->subDay()->format('Y-m-d'),
+                    'end' => now()->addDay()->format('Y-m-d'),
+                ],
             ])
             ->assertCanSeeTableRecords([$recentOrderItem])
             ->assertCanNotSeeTableRecords([$oldOrderItem]);

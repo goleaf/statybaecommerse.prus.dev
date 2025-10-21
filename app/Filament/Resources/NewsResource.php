@@ -10,7 +10,6 @@ use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Components\Combobox;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
@@ -23,7 +22,9 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Novadaemon\FilamentCombobox\Combobox;
 use RuntimeException;
+use App\Support\Filament\Components\Flatpickr;
 
 class NewsResource extends Resource
 {
@@ -69,7 +70,7 @@ class NewsResource extends Resource
                 ->columns(1),
             Forms\Components\Section::make('Publishing')
                 ->components([
-                    Forms\Components\DateTimePicker::make('published_at')
+                    Flatpickr::makeDateTime('published_at')
                         ->label(__('news.fields.published_at'))
                         ->default(now()),
                     Forms\Components\TextInput::make('author_name')
@@ -136,8 +137,6 @@ class NewsResource extends Resource
                     Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->multiple()
-                        ->preload()
                         ->boxSearchs()
                         ->height('320px')
                         ->optionsLabel(__('news.combobox.categories.available'))
@@ -145,8 +144,6 @@ class NewsResource extends Resource
                     Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->multiple()
-                        ->preload()
                         ->boxSearchs()
                         ->height('320px')
                         ->optionsLabel(__('news.combobox.tags.available'))
@@ -229,9 +226,9 @@ class NewsResource extends Resource
                     ->label(__('news.fields.is_breaking')),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Forms\Components\DatePicker::make('published_from')
+                        Flatpickr::makeDate('published_from')
                             ->label(__('news.filters.published_from')),
-                        Forms\Components\DatePicker::make('published_until')
+                        Flatpickr::makeDate('published_until')
                             ->label(__('news.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

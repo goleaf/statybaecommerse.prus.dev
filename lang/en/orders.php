@@ -104,6 +104,7 @@ return [
     'mime_type' => 'MIME Type',
     'download' => 'Download',
     'description' => 'Description',
+    'document_version_tooltip' => 'Open generated document version :version',
 
     // Document types
     'document_types' => [
@@ -120,6 +121,22 @@ return [
     'address_field' => 'Field Name',
     'address_value' => 'Field Value',
     'add_address_field' => 'Add Address Field',
+
+    'lookups' => [
+        'billing_address' => 'Search billing address',
+        'shipping_address' => 'Search shipping address',
+        'address_placeholder' => 'Start typing an address, city, or postal code…',
+        'address_field' => 'Field',
+        'address_value' => 'Value',
+        'channel_placeholder' => 'Search channels by name or code…',
+        'channel_unknown' => 'Unnamed channel',
+        'partner_placeholder' => 'Search partners by name, code, or email…',
+        'partner_unknown' => 'Unnamed partner',
+        'status_placeholder' => 'Search order statuses…',
+        'variant_placeholder' => 'Search variants by SKU or name…',
+        'variant_product' => 'Product: :product',
+        'variant_unknown' => 'Variant',
+    ],
 
     // Actions
     'actions' => [

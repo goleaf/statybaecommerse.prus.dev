@@ -11,9 +11,11 @@
     "require": {
         "php": "^8.2",
         "andreia/filament-nord-theme": "^2.0",
+        "asmit/resized-column": "*",
         "awcodes/overlook": "^3.0",
         "barryvdh/laravel-dompdf": "^3.1",
         "bezhansalleh/filament-shield": "^4.0",
+        "coolsam/flatpickr": "^5.0",
         "defstudio/filament-searchable-input": "^4.0",
         "dutchcodingcompany/filament-socialite": "^3.0",
         "eightynine/filament-advanced-widgets": "^4.0",
@@ -25,6 +27,7 @@
         "kenepa/resource-lock": "^4.0",
         "lara-zeus/bolt": "^4.0.5",
         "lara-zeus/list-group": "^2.0",
+        "lara-zeus/matrix-choice": "*",
         "laravel/framework": "^12.0",
         "laravel/horizon": "^5.33",
         "laravel/scout": "^10.19",
@@ -43,7 +46,6 @@
         "spatie/laravel-sluggable": "^3.7",
         "spatie/laravel-translatable": "^6.11",
         "tapp/filament-value-range-filter": "^2.0",
-        "zircote/swagger-php": "^4.9",
         "zvizvi/relation-manager-repeater": "^2.0"
     },
     "require-dev": {
@@ -63,7 +65,8 @@
         "pestphp/pest-plugin-livewire": "^3.0",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
-        "phpunit/phpunit": "^11.5"
+        "phpunit/phpunit": "^11.5",
+        "zircote/swagger-php": "^4.9"
     },
     "autoload": {
         "psr-4": {

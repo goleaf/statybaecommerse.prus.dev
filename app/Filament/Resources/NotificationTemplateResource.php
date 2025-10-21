@@ -12,19 +12,19 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -40,7 +40,7 @@ final class NotificationTemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {
@@ -61,41 +61,64 @@ final class NotificationTemplateResource extends Resource
     {
         return $form
             ->schema([
-                SchemaSection::make(__('admin.notification_templates.basic_information'))
+                Section::make(__('admin.notification_templates.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label(__('admin.notification_templates.name'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
-                                TextInput::make('slug')
-                                    ->label(__('admin.notification_templates.slug'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->unique(NotificationTemplate::class, 'slug', ignoreRecord: true)
-                                    ->rules(['alpha_dash']),
-                                Select::make('type')
-                                    ->label(__('admin.notification_templates.type'))
-                                    ->options([
-                                        'email' => __('admin.notification_templates.types.email'),
-                                        'sms' => __('admin.notification_templates.types.sms'),
-                                        'push' => __('admin.notification_templates.types.push'),
-                                        'in_app' => __('admin.notification_templates.types.in_app'),
-                                    ])
-                                    ->required()
-                                    ->default('email')
-                                    ->live(),
-                                TextInput::make('event')
-                                    ->label(__('admin.notification_templates.event'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->helperText(__('admin.notification_templates.event_help')),
-                            ]),
-                    ]),
-                SchemaSection::make(__('admin.notification_templates.content'))
+                        TextInput::make('name')
+                            ->label(__('admin.notification_templates.name'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(
+                                function (string $operation, ?string $state, callable $set, ?callable $get = null): void {
+                                    if ($operation !== 'create') {
+                                        return;
+                                    }
+
+                                    if ($get !== null && filled($get('slug'))) {
+                                        return;
+                                    }
+
+                                    if (! filled($state)) {
+                                        return;
+                                    }
+
+                                    $set('slug', Str::slug((string) $state));
+                                }
+                            ),
+                        TextInput::make('slug')
+                            ->label(__('admin.notification_templates.slug'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(
+                                static function (?string $state, callable $set): void {
+                                    $set('slug', filled($state) ? Str::slug($state) : null);
+                                }
+                            )
+                            ->dehydrateStateUsing(
+                                static fn (?string $state): ?string => filled($state) ? Str::slug($state) : null
+                            )
+                            ->unique(NotificationTemplate::class, 'slug', ignoreRecord: true)
+                            ->rules(['alpha_dash']),
+                        Select::make('type')
+                            ->label(__('admin.notification_templates.type'))
+                            ->options([
+                                'email' => __('admin.notification_templates.types.email'),
+                                'sms' => __('admin.notification_templates.types.sms'),
+                                'push' => __('admin.notification_templates.types.push'),
+                                'in_app' => __('admin.notification_templates.types.in_app'),
+                            ])
+                            ->required()
+                            ->default('email')
+                            ->live(),
+                        TextInput::make('event')
+                            ->label(__('admin.notification_templates.event'))
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText(__('admin.notification_templates.event_help')),
+                    ])
+                    ->columns(2),
+                Section::make(__('admin.notification_templates.content'))
                     ->schema([
                         TextInput::make('subject')
                             ->label(__('admin.notification_templates.subject'))
@@ -112,14 +135,11 @@ final class NotificationTemplateResource extends Resource
                             ->rows(5)
                             ->helperText(__('admin.notification_templates.variables_help')),
                     ]),
-                SchemaSection::make(__('admin.notification_templates.status'))
+                Section::make(__('admin.notification_templates.status'))
                     ->schema([
-                        SchemaGrid::make(1)
-                            ->schema([
-                                Toggle::make('is_active')
-                                    ->label(__('admin.notification_templates.is_active'))
-                                    ->default(true),
-                            ]),
+                        Toggle::make('is_active')
+                            ->label(__('admin.notification_templates.is_active'))
+                            ->default(true),
                     ]),
             ]);
     }
@@ -154,11 +174,19 @@ final class NotificationTemplateResource extends Resource
                 TextColumn::make('subject')
                     ->label(__('admin.notification_templates.subject'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
+                    ->tooltip(
+                        static function (TextColumn $column): ?string {
+                            $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
-                    }),
+                            if (! is_string($state)) {
+                                return null;
+                            }
+
+                            $state = trim($state);
+
+                            return mb_strlen($state) > 50 ? $state : null;
+                        }
+                    ),
                 IconColumn::make('is_active')
                     ->label(__('admin.notification_templates.is_active'))
                     ->boolean(),
