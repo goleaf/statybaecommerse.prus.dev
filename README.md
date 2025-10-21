@@ -13,6 +13,10 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Operational dashboards** for activity logs, analytics, and background job health leveraging Laravel Horizon, Scout, and bespoke widgets.
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
+### Latest updates
+- Tightened the Filament price list discount filter so that only products with a genuine markdown (compare price greater than the selling price) appear when toggled.
+- Added a feature test that exercises the discount filter to ensure future changes keep the behaviour intact.
+
 ## Documentation
 - Start with the curated [documentation index](docs/INDEX.md) for the setup → deploy → data model → admin guide → troubleshooting path.
 - Browse the rest of the knowledge base directly in [docs/](docs/).

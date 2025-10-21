@@ -326,7 +326,11 @@ final class PriceListItemResource extends Resource
                 Filter::make('has_discount')
                     ->label(__('price_list_items.has_discount'))
                     ->query(fn (Builder $query): Builder => $query->where(function (Builder $query): void {
-                        $query->whereNotNull('compare_amount')->where('compare_amount', '>', 0);
+                        // Ensure only items with a meaningful discount (compare price higher than net price) are returned.
+                        $query
+                            ->whereNotNull('compare_amount')
+                            ->whereNotNull('net_amount')
+                            ->whereColumn('compare_amount', '>', 'net_amount');
                     }))
                     ->toggle(),
             ])
