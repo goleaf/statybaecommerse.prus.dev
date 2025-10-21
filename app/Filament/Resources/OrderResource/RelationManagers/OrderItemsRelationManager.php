@@ -6,7 +6,7 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
-use App\Models\ProductVariant;
+use App\Support\Filament\Forms\SearchableVariantFieldHelper;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -73,58 +73,13 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->reactive()
                                     ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
-
-                                        $variant = ProductVariant::query()
-                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                            ->with(['product:id,sku,name'])
-                                            ->find($state);
-
-                                        if (! $variant instanceof ProductVariant) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
-                                            ]);
-                                    })
-                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
-                                        if ($state === null || $state === '') {
-                                            $set('product_variant_id', null);
-
-                                            return;
-                                        }
-
-                                        $variant = ProductVariant::query()
-                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                            ->with(['product:id,sku,name'])
-                                            ->find((int) $state);
-
-                                        if (! $variant instanceof ProductVariant) {
-                                            return;
-                                        }
-
-                                        $set('product_variant_id', $variant->getKey());
-                                        $set('product_id', $variant->getAttribute('product_id'));
-
-                                        $name = $variant->getAttribute('name') ?? optional($variant->product)->name ?? '';
-                                        $sku = $variant->getAttribute('sku') ?? optional($variant->product)->sku ?? '';
-
-                                        $set('name', is_string($name) ? $name : '');
-                                        $set('sku', is_string($sku) ? $sku : '');
-
-                                        $price = (float) ($variant->getAttribute('price') ?? 0);
-                                        $set('unit_price', $price);
-
-                                        $quantity = (int) ($get('quantity') ?? 1);
-                                        $discount = (float) ($get('discount_amount') ?? 0);
-                                        $set('total', ($price * $quantity) - $discount);
-                                    }),
+                                    // Helper workflow documented in docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                    ->afterStateHydrated(fn (SearchableInput $component, ?int $state, ?OrderItem $record): void => SearchableVariantFieldHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        $record?->productVariant
+                                    ))
+                                    ->afterStateUpdated(fn (?string $state, Set $set, Get $get): void => SearchableVariantFieldHelper::handleUpdated($state, $set, $get)),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()
