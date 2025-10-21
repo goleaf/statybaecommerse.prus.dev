@@ -26,9 +26,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 
 final class CurrencyResource extends Resource
 {
+    use TranslatableResource;
+
     protected static ?string $model = Currency::class;
 
     /**
