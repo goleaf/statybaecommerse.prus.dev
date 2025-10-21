@@ -7,3 +7,4 @@
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';
 @source '../../../../vendor/defstudio/filament-searchable-input/resources/**/*.blade.php';
+@source '../../../../vendor/awcodes/filament-badgeable-column/resources/**/*.blade.php';
