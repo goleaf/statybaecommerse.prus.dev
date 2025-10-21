@@ -72,16 +72,15 @@ it('can set model class', function (): void {
 it('can set search query', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
-        ->setSearchQuery('test');
+        ->setSearchQuery(' test ');
 
     expect($component->getSearchQuery())->toBe('test');
 });
 
 it('returns empty results for invalid model class', function (): void {
-    $component = AutocompleteSelect::make('test_field')
-        ->setSearchQuery('test');
+    $component = AutocompleteSelect::make('test_field');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('test');
 
     expect($searchResults)->toHaveCount(0);
 });
@@ -91,7 +90,7 @@ it('returns empty results for empty search query', function (): void {
         ->model(Product::class)
         ->setSearchQuery('');
 
-    $searchResults = $component->getSearchResults();
+    $searchResults = $component->getSearchResults('');
 
     expect($searchResults)->toHaveCount(0);
 });

@@ -6,33 +6,34 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Filters\SingleDateFilter;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use UnitEnum;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use App\Support\Filament\Filters\SingleDateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
+use Filament\Forms\Set;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
+use Illuminate\Support\Collection;
 
 final class NotificationResource extends Resource
 {
@@ -40,15 +41,9 @@ final class NotificationResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-bell';
-    }
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bell';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 3;
 
@@ -64,56 +59,65 @@ final class NotificationResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            SchemaSection::make(__('admin.notifications.form.sections.basic_information'))
-                ->schema([
-                    SchemaGrid::make(2)
-                        ->schema([
-                            Select::make('user_id')
-                                ->label(__('admin.notifications.form.fields.user'))
-                                ->relationship('user', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->required()
-                                ->columnSpan(1),
-                            TextInput::make('type')
-                                ->label(__('admin.notifications.form.fields.type'))
-                                ->required()
-                                ->maxLength(255)
-                                ->columnSpan(1),
-                        ]),
-                    TextInput::make('title')
-                        ->label(__('admin.notifications.form.fields.title'))
-                        ->required()
-                        ->maxLength(255),
-                    Textarea::make('body')
-                        ->label(__('admin.notifications.form.fields.body'))
-                        ->required()
-                        ->rows(4),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            Toggle::make('is_read')
-                                ->label(__('admin.notifications.form.fields.is_read'))
-                                ->default(false)
-                                ->columnSpan(1),
-                            Flatpickr::makeDateTime('read_at')
-                                ->label(__('admin.notifications.form.fields.read_at'))
-                                ->columnSpan(1),
-                        ]),
-                ])
-                ->columns(1),
-            SchemaSection::make(__('admin.notifications.form.sections.metadata'))
-                ->schema([
-                    Placeholder::make('created_at')
-                        ->label(__('admin.notifications.form.fields.created_at'))
-                        ->content(fn ($record) => $record?->created_at?->format('Y-m-d H:i:s') ?? '-'),
-                    Placeholder::make('updated_at')
-                        ->label(__('admin.notifications.form.fields.updated_at'))
-                        ->content(fn ($record) => $record?->updated_at?->format('Y-m-d H:i:s') ?? '-'),
-                ])
-                ->columns(2)
-                ->collapsible(),
-        ]);
+        return $form
+            ->schema([
+                Section::make(__('admin.notifications.form.sections.basic_information'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('user_id')
+                                    ->label(__('admin.notifications.form.fields.user'))
+                                    ->relationship('user', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->columnSpan(1),
+                                TextInput::make('type')
+                                    ->label(__('admin.notifications.form.fields.type'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpan(1),
+                            ]),
+                        TextInput::make('title')
+                            ->label(__('admin.notifications.form.fields.title'))
+                            ->required()
+                            ->maxLength(255),
+                        Textarea::make('body')
+                            ->label(__('admin.notifications.form.fields.body'))
+                            ->required()
+                            ->rows(4),
+                        Grid::make(2)
+                            ->schema([
+                                Toggle::make('is_read')
+                                    ->label(__('admin.notifications.form.fields.is_read'))
+                                    ->default(false)
+                                    ->live()
+                                    ->afterStateUpdated(function (Set $set, bool $state): void {
+                                        $set('read_at', $state ? now() : null);
+                                    })
+                                    ->columnSpan(1),
+                                Flatpickr::makeDateTime('read_at')
+                                    ->label(__('admin.notifications.form.fields.read_at'))
+                                    ->live()
+                                    ->afterStateUpdated(function (Set $set, ?string $state): void {
+                                        $set('is_read', filled($state));
+                                    })
+                                    ->columnSpan(1),
+                            ]),
+                    ])
+                    ->columns(1),
+                Section::make(__('admin.notifications.form.sections.metadata'))
+                    ->schema([
+                        Placeholder::make('created_at')
+                            ->label(__('admin.notifications.form.fields.created_at'))
+                            ->content(fn ($record) => $record?->created_at?->format('Y-m-d H:i:s') ?? '-'),
+                        Placeholder::make('updated_at')
+                            ->label(__('admin.notifications.form.fields.updated_at'))
+                            ->content(fn ($record) => $record?->updated_at?->format('Y-m-d H:i:s') ?? '-'),
+                    ])
+                    ->columns(2)
+                    ->collapsible(),
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -168,20 +172,32 @@ final class NotificationResource extends Resource
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-                SelectFilter::make('type')
+                SelectFilter::make('notification_type')
                     ->label(__('admin.notifications.filters.type'))
                     ->options([
                         'info' => 'Info',
                         'success' => 'Success',
                         'warning' => 'Warning',
                         'error' => 'Error',
-                    ]),
-                Filter::make('is_read')
-                    ->label(__('admin.notifications.filters.read'))
-                    ->query(fn (Builder $query): Builder => $query->where('is_read', true)),
-                Filter::make('unread')
-                    ->label(__('admin.notifications.filters.unread'))
-                    ->query(fn (Builder $query): Builder => $query->where('is_read', false)),
+                    ])
+                    ->query(function (Builder $query, ?string $value): Builder {
+                        if (! filled($value)) {
+                            return $query;
+                        }
+
+                        return $query->where('data->type', $value);
+                    }),
+                TernaryFilter::make('is_read')
+                    ->label(__('admin.notifications.filters.read_state'))
+                    ->nullable()
+                    ->placeholder(__('admin.notifications.filters.any_state'))
+                    ->trueLabel(__('admin.notifications.filters.read'))
+                    ->falseLabel(__('admin.notifications.filters.unread'))
+                    ->queries(
+                        true: fn (Builder $query): Builder => $query->where('is_read', true),
+                        false: fn (Builder $query): Builder => $query->where('is_read', false),
+                        blank: fn (Builder $query): Builder => $query,
+                    ),
                 Filter::make('created_at')
                     ->label(__('admin.notifications.filters.created_at'))
                     ->form([
@@ -202,58 +218,60 @@ final class NotificationResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableBulkAction::make('mark_as_read')
+                Action::make('mark_as_read')
                     ->label(__('admin.notifications.actions.mark_as_read'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
+                    ->visible(fn (Notification $record): bool => ! $record->is_read)
                     ->action(function (Notification $record): void {
-                        $record->update(['is_read' => true, 'read_at' => now()]);
-                        FilamentNotification::make()
-                            ->title(__('admin.notifications.marked_as_read'))
-                            ->success()
-                            ->send();
-                    }),
-                TableBulkAction::make('mark_as_unread')
+                        $record->forceFill([
+                            'is_read' => true,
+                            'read_at' => now(),
+                        ])->save();
+                    })
+                    ->successNotificationTitle(__('admin.notifications.marked_as_read')),
+                Action::make('mark_as_unread')
                     ->label(__('admin.notifications.actions.mark_as_unread'))
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
+                    ->visible(fn (Notification $record): bool => (bool) $record->is_read)
                     ->action(function (Notification $record): void {
-                        $record->update(['is_read' => false, 'read_at' => null]);
-                        FilamentNotification::make()
-                            ->title(__('admin.notifications.marked_as_unread'))
-                            ->success()
-                            ->send();
-                    }),
+                        $record->forceFill([
+                            'is_read' => false,
+                            'read_at' => null,
+                        ])->save();
+                    })
+                    ->successNotificationTitle(__('admin.notifications.marked_as_unread')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    TableBulkAction::make('bulk_mark_as_read')
+                    BulkAction::make('bulk_mark_as_read')
                         ->label(__('admin.notifications.actions.bulk_mark_as_read'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each(function (Notification $record): void {
-                                $record->update(['is_read' => true, 'read_at' => now()]);
+                                $record->forceFill([
+                                    'is_read' => true,
+                                    'read_at' => now(),
+                                ])->save();
                             });
-                            FilamentNotification::make()
-                                ->title(__('admin.notifications.bulk_marked_as_read'))
-                                ->success()
-                                ->send();
-                        }),
-                    TableBulkAction::make('bulk_mark_as_unread')
+                        })
+                        ->successNotificationTitle(__('admin.notifications.bulk_marked_as_read')),
+                    BulkAction::make('bulk_mark_as_unread')
                         ->label(__('admin.notifications.actions.bulk_mark_as_unread'))
                         ->icon('heroicon-o-x-circle')
                         ->color('gray')
                         ->action(function (Collection $records): void {
                             $records->each(function (Notification $record): void {
-                                $record->update(['is_read' => false, 'read_at' => null]);
+                                $record->forceFill([
+                                    'is_read' => false,
+                                    'read_at' => null,
+                                ])->save();
                             });
-                            FilamentNotification::make()
-                                ->title(__('admin.notifications.bulk_marked_as_unread'))
-                                ->success()
-                                ->send();
-                        }),
+                        })
+                        ->successNotificationTitle(__('admin.notifications.bulk_marked_as_unread')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
