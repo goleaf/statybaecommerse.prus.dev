@@ -60,6 +60,11 @@ final class AddressResource extends Resource
     protected static ?int $navigationSort = 3;
 
     /**
+     * @var string|\BackedEnum|null Explicit navigation icon keeps the Address menu visually distinct.
+     */
+    protected static $navigationIcon = 'heroicon-o-map-pin';
+
+    /**
      * Get navigation label
      */
     public static function getNavigationLabel(): string
@@ -94,8 +99,9 @@ final class AddressResource extends Resource
     /**
      * Configure the Filament form schema with Filament v4 Schema class
      */
-    public static function form(Form $form): Form|array
+    public static function form(Form $form): Form
     {
+        // Returning the provided Form instance satisfies Filament v4 expectations and avoids signature fatals.
         return $form->schema([
             Section::make(__('translations.address_information'))
                 ->schema([
@@ -324,8 +330,9 @@ final class AddressResource extends Resource
     /**
      * Configure the Filament table with comprehensive columns, filters, and actions
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
+        // Returning the incoming Table ensures compatibility with Filament's table builder lifecycle.
         return $table
             ->columns([
                 TextColumn::make('id')
