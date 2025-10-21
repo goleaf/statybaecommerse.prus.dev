@@ -59,7 +59,7 @@ Route::middleware(['web'])->group(function () {
     });
 
     // Checkout
-    Route::middleware(['auth'])->prefix('checkout')->name('frontend.checkout.')->group(function () {
+    Route::middleware(['auth', 'throttle:frontend.checkout'])->prefix('checkout')->name('frontend.checkout.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('index');
         Route::post('/process', [App\Http\Controllers\Frontend\CheckoutController::class, 'process'])->name('process');
         Route::get('/success', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('success');

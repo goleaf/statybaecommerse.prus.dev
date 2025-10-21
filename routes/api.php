@@ -25,7 +25,7 @@ Route::prefix('v1')
 
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('/user', AuthenticatedUserController::class)
-                ->middleware(['abilities:profile.read'])
+                ->middleware(['abilities:profile.read', 'throttle:api.profile'])
                 ->name('user.show');
 
             Route::post('/autocomplete-search', AutocompleteSearchController::class)
