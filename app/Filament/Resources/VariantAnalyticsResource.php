@@ -9,6 +9,7 @@ use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
+use UnitEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -45,12 +46,9 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static ?string $navigationGroup = null;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {

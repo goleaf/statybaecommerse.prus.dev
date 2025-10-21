@@ -9,6 +9,8 @@ use Filament\Widgets\ChartWidget;
 
 final class NotificationTypesWidget extends ChartWidget
 {
+    protected static bool $isHeadingHidden = false;
+
     protected ?string $heading = 'Notification Types Distribution';
 
     protected int|string|array $columnSpan = 'full';

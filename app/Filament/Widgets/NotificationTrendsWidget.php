@@ -9,6 +9,8 @@ use Filament\Widgets\ChartWidget;
 
 final class NotificationTrendsWidget extends ChartWidget
 {
+    protected static bool $isHeadingHidden = false;
+
     protected ?string $heading = 'Notification Trends (Last 30 Days)';
 
     protected int|string|array $columnSpan = 'full';
