@@ -38,6 +38,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
+* Provisioned minimal Spatie permission and attribute value tables in the focused SQLite testing migrations so Filament feature suites no longer fail with missing-table errors during bootstrap.
+* Ensured attribute validation rules persist plain text inputs in tests, avoiding double-encoded JSON strings that previously broke the feature assertions.
 * Normalized search type filters to treat mixed-case input from clients as valid bucket selectors, keeping aggregated storefront results scoped correctly instead of silently reverting to every result category.
 * Prevented Pest test helper redeclaration errors by wrapping the `login()`, `get()`, and `post()` helpers in existence guards so repeated bootstrap phases during `php artisan test` succeed.
 * Expanded the orders status enum and translations to include `confirmed`, `completed`, and return flows so demo seeds and admin filters align with the schema without MySQL truncation warnings during `php artisan migrate:fresh --seed`.

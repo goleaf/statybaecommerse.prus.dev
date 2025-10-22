@@ -17,6 +17,8 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Focused SQLite migrations now ship with minimal Spatie permission, role, and attribute value tables so targeted Filament suites launch without table-not-found errors.
+- Attribute validation rule editing honours plain string inputs, ensuring the admin resource reflects saved constraints exactly as entered during regression tests.
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping Filament authentication tooling aligned with v4 expectations and eliminating namespace-related fatal errors during automated runs.
 - Pest-powered test helpers now wrap the `login()` helper in a function-existence guard so repeated bootstrap cycles during `php artisan test` runs avoid fatal redeclaration errors.

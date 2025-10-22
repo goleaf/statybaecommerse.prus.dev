@@ -8,7 +8,9 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
+use DB;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,11 +25,11 @@ use Illuminate\Support\Str;
  *
  * Eloquent model representing the Attribute entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
- * @property mixed $appends
+ * @property mixed  $table
+ * @property mixed  $fillable
+ * @property mixed  $appends
  * @property string $translationModel
- * @property mixed $translatable
+ * @property mixed  $translatable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Attribute newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Attribute newQuery()
@@ -49,7 +51,32 @@ final class Attribute extends Model
      */
     protected function casts(): array
     {
-        return ['is_required' => 'boolean', 'is_filterable' => 'boolean', 'is_searchable' => 'boolean', 'is_visible' => 'boolean', 'is_editable' => 'boolean', 'is_sortable' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'category_id' => 'integer', 'min_length' => 'integer', 'max_length' => 'integer', 'min_value' => 'float', 'max_value' => 'float', 'step_value' => 'float', 'validation_rules' => 'array', 'meta_data' => 'array'];
+        return ['is_required' => 'boolean', 'is_filterable' => 'boolean', 'is_searchable' => 'boolean', 'is_visible' => 'boolean', 'is_editable' => 'boolean', 'is_sortable' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'category_id' => 'integer', 'min_length' => 'integer', 'max_length' => 'integer', 'min_value' => 'float', 'max_value' => 'float', 'step_value' => 'float', 'meta_data' => 'array'];
+    }
+
+    /**
+     * Persist validation rules without double-encoding plain strings while still supporting array input.
+     */
+    protected function validationRules(): EloquentAttribute
+    {
+        return EloquentAttribute::make(
+            get: static function (?string $value) {
+                if ($value === null) {
+                    return null;
+                }
+
+                $decoded = json_decode($value, true);
+
+                return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
+            },
+            set: static function ($value) {
+                if (is_array($value)) {
+                    return json_encode($value);
+                }
+
+                return $value;
+            }
+        );
     }
 
     /**
@@ -122,7 +149,7 @@ final class Attribute extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -132,7 +159,7 @@ final class Attribute extends Model
     /**
      * Handle scopeFilterable functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeFilterable($query)
     {
@@ -142,7 +169,7 @@ final class Attribute extends Model
     /**
      * Handle scopeSearchable functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeSearchable($query)
     {
@@ -152,7 +179,7 @@ final class Attribute extends Model
     /**
      * Handle scopeRequired functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRequired($query)
     {
@@ -162,7 +189,7 @@ final class Attribute extends Model
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOrdered($query)
     {
@@ -172,7 +199,7 @@ final class Attribute extends Model
     /**
      * Handle scopeVisible functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeVisible($query)
     {
@@ -182,7 +209,7 @@ final class Attribute extends Model
     /**
      * Handle scopeEditable functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEditable($query)
     {
@@ -192,7 +219,7 @@ final class Attribute extends Model
     /**
      * Handle scopeSortable functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeSortable($query)
     {
@@ -202,7 +229,7 @@ final class Attribute extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType($query, string $type)
     {
@@ -212,7 +239,7 @@ final class Attribute extends Model
     /**
      * Handle scopeByCategory functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCategory($query, int $categoryId)
     {
@@ -222,7 +249,7 @@ final class Attribute extends Model
     /**
      * Handle scopeByGroup functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByGroup($query, string $groupName)
     {
@@ -232,7 +259,7 @@ final class Attribute extends Model
     /**
      * Handle scopeWithValues functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithValues($query)
     {
@@ -242,7 +269,7 @@ final class Attribute extends Model
     /**
      * Handle scopeWithEnabledValues functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithEnabledValues($query)
     {
@@ -257,17 +284,17 @@ final class Attribute extends Model
     public function getFormattedTypeAttribute(): string
     {
         return match ($this->type) {
-            'text' => 'Text',
-            'number' => 'Number',
-            'boolean' => 'Boolean',
-            'select' => 'Select',
+            'text'        => 'Text',
+            'number'      => 'Number',
+            'boolean'     => 'Boolean',
+            'select'      => 'Select',
             'multiselect' => 'Multi Select',
-            'color' => 'Color',
-            'date' => 'Date',
-            'textarea' => 'Textarea',
-            'file' => 'File',
-            'image' => 'Image',
-            default => ucfirst($this->type),
+            'color'       => 'Color',
+            'date'        => 'Date',
+            'textarea'    => 'Textarea',
+            'file'        => 'File',
+            'image'       => 'Image',
+            default       => ucfirst($this->type),
         };
     }
 
@@ -315,7 +342,7 @@ final class Attribute extends Model
     /**
      * Handle setMetaDataAttribute functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function setMetaDataAttribute($value): void
     {
@@ -379,11 +406,11 @@ final class Attribute extends Model
     {
         return match ($this->type) {
             'text', 'textarea' => '',
-            'number' => 0,
+            'number'  => 0,
             'boolean' => false,
             'select', 'multiselect' => null,
             'color' => '#000000',
-            'date' => null,
+            'date'  => null,
             'file', 'image' => null,
             default => null,
         };
@@ -437,17 +464,17 @@ final class Attribute extends Model
     public function getTypeIconAttribute(): string
     {
         return match ($this->type) {
-            'text' => 'heroicon-o-document-text',
-            'number' => 'heroicon-o-calculator',
-            'boolean' => 'heroicon-o-check-circle',
-            'select' => 'heroicon-o-list-bullet',
+            'text'        => 'heroicon-o-document-text',
+            'number'      => 'heroicon-o-calculator',
+            'boolean'     => 'heroicon-o-check-circle',
+            'select'      => 'heroicon-o-list-bullet',
             'multiselect' => 'heroicon-o-squares-2x2',
-            'color' => 'heroicon-o-swatch',
-            'date' => 'heroicon-o-calendar',
-            'textarea' => 'heroicon-o-document',
-            'file' => 'heroicon-o-paper-clip',
-            'image' => 'heroicon-o-photo',
-            default => 'heroicon-o-adjustments-horizontal',
+            'color'       => 'heroicon-o-swatch',
+            'date'        => 'heroicon-o-calendar',
+            'textarea'    => 'heroicon-o-document',
+            'file'        => 'heroicon-o-paper-clip',
+            'image'       => 'heroicon-o-photo',
+            default       => 'heroicon-o-adjustments-horizontal',
         };
     }
 
@@ -457,17 +484,17 @@ final class Attribute extends Model
     public function getTypeColorAttribute(): string
     {
         return match ($this->type) {
-            'text' => 'gray',
-            'number' => 'blue',
-            'boolean' => 'green',
-            'select' => 'yellow',
+            'text'        => 'gray',
+            'number'      => 'blue',
+            'boolean'     => 'green',
+            'select'      => 'yellow',
             'multiselect' => 'orange',
-            'color' => 'purple',
-            'date' => 'red',
-            'textarea' => 'indigo',
-            'file' => 'pink',
-            'image' => 'rose',
-            default => 'gray',
+            'color'       => 'purple',
+            'date'        => 'red',
+            'textarea'    => 'indigo',
+            'file'        => 'pink',
+            'image'       => 'rose',
+            default       => 'gray',
         };
     }
 
@@ -589,11 +616,11 @@ final class Attribute extends Model
     public function getStatusColorAttribute(): string
     {
         return match ($this->status_badge) {
-            'disabled' => 'gray',
-            'required' => 'red',
+            'disabled'   => 'gray',
+            'required'   => 'red',
             'filterable' => 'blue',
-            'standard' => 'green',
-            default => 'gray',
+            'standard'   => 'green',
+            default      => 'gray',
         };
     }
 
@@ -603,11 +630,11 @@ final class Attribute extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status_badge) {
-            'disabled' => __('attributes.disabled'),
-            'required' => __('attributes.required'),
+            'disabled'   => __('attributes.disabled'),
+            'required'   => __('attributes.required'),
             'filterable' => __('attributes.filterable'),
-            'standard' => __('attributes.standard'),
-            default => __('attributes.unknown'),
+            'standard'   => __('attributes.standard'),
+            default      => __('attributes.unknown'),
         };
     }
 
@@ -618,8 +645,8 @@ final class Attribute extends Model
     {
         $duplicate = $this->replicate();
         $duplicate->group_name = $newGroupName;
-        $duplicate->name = $this->name.' (Copy)';
-        $duplicate->slug = $this->slug.'-copy';
+        $duplicate->name = $this->name . ' (Copy)';
+        $duplicate->slug = $this->slug . '-copy';
         $duplicate->save();
         // Duplicate values
         foreach ($this->values as $value) {
@@ -640,16 +667,16 @@ final class Attribute extends Model
         $otherAttribute->values()->update(['attribute_id' => $this->id]);
         // Update product_attributes records to use this attribute instead
         // We need to update both attribute_id and attribute_value_id
-        $otherAttribute->products()->get()->each(function ($product) use ($otherAttribute) {
+        $otherAttribute->products()->get()->each(function ($product) use ($otherAttribute): void {
             // Get the attribute values for this product from the other attribute
-            $attributeValues = $otherAttribute->values()->whereHas('variants', function ($query) use ($product) {
-                $query->whereHas('product', function ($q) use ($product) {
+            $attributeValues = $otherAttribute->values()->whereHas('variants', function ($query) use ($product): void {
+                $query->whereHas('product', function ($q) use ($product): void {
                     $q->where('id', $product->id);
                 });
             })->get();
             // Update the product_attributes records
             foreach ($attributeValues as $value) {
-                \DB::table('product_attributes')->where('product_id', $product->id)->where('attribute_id', $otherAttribute->id)->where('attribute_value_id', $value->id)->update(['attribute_id' => $this->id]);
+                DB::table('product_attributes')->where('product_id', $product->id)->where('attribute_id', $otherAttribute->id)->where('attribute_value_id', $value->id)->update(['attribute_id' => $this->id]);
             }
         });
         // Delete the other attribute
@@ -675,13 +702,13 @@ final class Attribute extends Model
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
