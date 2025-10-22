@@ -71,11 +71,16 @@ final class CacheInvalidationService
             [CacheKeys::navigationTag()]
         );
 
-        if ($this->flushTags($productTags)) {
-            return;
-        }
+        $this->flushTags($productTags);
 
+        // Execute the dedicated invalidator to clear any cache entries that
+        // may have been written without tag metadata (e.g. array stores or
+        // bespoke helpers that bypass the Cache facade helpers).
         app(\App\UseCases\Cache\InvalidateProductCache::class)();
+
+        // Ensure every product mutation also refreshes dashboard caches so
+        // Livewire components immediately observe the new catalogue totals.
+        $this->flushDashboards();
     }
 
     /**
@@ -90,10 +95,10 @@ final class CacheInvalidationService
             [CacheKeys::navigationTag()]
         );
 
-        if ($this->flushTags($categoryTags)) {
-            return;
-        }
+        $this->flushTags($categoryTags);
 
+        // Always run the fallback invalidator to remove non-tagged payloads
+        // such as legacy navigation trees populated directly via Cache::put().
         app(\App\UseCases\Cache\InvalidateCategoryCache::class)();
     }
 
@@ -108,12 +113,14 @@ final class CacheInvalidationService
             [CacheKeys::homeTag()]
         );
 
-        if ($this->flushTags($brandTags)) {
-            return;
-        }
+        $this->flushTags($brandTags);
 
         foreach ([6, 8, 10, 12] as $limit) {
             Cache::forget(CacheKeys::brandTopList($limit));
+
+            if (CacheTagHelper::supportsTags()) {
+                Cache::tags(CacheTagHelper::brands())->forget(CacheKeys::brandTopList($limit));
+            }
         }
     }
 
@@ -128,12 +135,19 @@ final class CacheInvalidationService
             [CacheKeys::homeTag()]
         );
 
-        if ($this->flushTags($collectionTags)) {
-            return;
-        }
+        $this->flushTags($collectionTags);
 
         foreach ($this->supportedLocales() as $locale) {
             Cache::forget(CacheKeys::homeCollections($locale));
+
+            if (CacheTagHelper::supportsTags()) {
+                $collectionLocaleTags = CacheTagHelper::merge(
+                    CacheTagHelper::collections(),
+                    CacheTagHelper::locale($locale)
+                );
+
+                Cache::tags($collectionLocaleTags)->forget(CacheKeys::homeCollections($locale));
+            }
         }
     }
 
@@ -142,25 +156,31 @@ final class CacheInvalidationService
      */
     public function flushDashboards(): void
     {
-        if ($this->flushTags(CacheTagHelper::dashboards())) {
-            return;
-        }
-
         $ranges = ['1h', '24h', '7d', '30d'];
 
         foreach ($ranges as $range) {
             Cache::forget(CacheKeys::dashboardStats($range));
             Cache::forget(CacheKeys::dashboardActivity($range));
             Cache::forget(CacheKeys::dashboardPerformance($range));
+
+            if (CacheTagHelper::supportsTags()) {
+                Cache::tags(CacheTagHelper::dashboards())->forget(CacheKeys::dashboardStats($range));
+                Cache::tags(CacheTagHelper::dashboards())->forget(CacheKeys::dashboardActivity($range));
+                Cache::tags(CacheTagHelper::dashboards())->forget(CacheKeys::dashboardPerformance($range));
+            }
         }
 
         Cache::forget(CacheKeys::dashboardSimplifiedSummary());
+
+        if (CacheTagHelper::supportsTags()) {
+            Cache::tags(CacheTagHelper::dashboards())->forget(CacheKeys::dashboardSimplifiedSummary());
+        }
     }
 
     /**
      * Attempt to flush the given tags and gracefully handle unsupported stores.
      *
-     * @param  array<int, string>  $tags
+     * @param array<int, string> $tags
      */
     private function flushTags(array $tags): bool
     {
@@ -172,7 +192,7 @@ final class CacheInvalidationService
 
         if (! $store instanceof TaggableStore) {
             Log::warning('Cache tags unavailable; performing full cache flush', [
-                'tags' => $tags,
+                'tags'   => $tags,
                 'reason' => 'no_tags',
             ]);
 
@@ -185,7 +205,7 @@ final class CacheInvalidationService
             return true;
         } catch (Throwable $exception) {
             Log::warning('Failed to flush cache tags', [
-                'tags' => $tags,
+                'tags'  => $tags,
                 'error' => $exception->getMessage(),
             ]);
         }
