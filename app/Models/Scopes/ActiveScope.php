@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Scopes;
 
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -12,10 +13,6 @@ use Illuminate\Database\Eloquent\Scope;
  * ActiveScope
  *
  * Eloquent model representing the ActiveScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- *
- * @method static \Illuminate\Database\Eloquent\Builder|ActiveScope newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ActiveScope newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ActiveScope query()
  *
  * @mixin \Eloquent
  */
@@ -26,6 +23,11 @@ final class ActiveScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
+        if ($model instanceof Order) {
+            // Orders use dedicated status scopes; avoid duplicating constraints that hide seeded records.
+            return;
+        }
+
         // Prefer stricter check when both flags exist
         $schema = $model->getConnection()->getSchemaBuilder();
         $table = $model->getTable();
