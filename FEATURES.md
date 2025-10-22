@@ -17,6 +17,9 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Campaign conversion queries now rely solely on the status-aware scope so
+  completed, pending, and other lifecycle records remain accessible to analytics
+  tooling without fighting an `is_active` filter that the table never exposed.
 - Restored the default RefreshDatabase migration flow after the toggleable table Pest suite and ensured the news category factory seeds visible records so unit coverage can assert parent/child/category pivots without global scope interference.
 - Catalog contract docs now capture the streamlined product meta payload and nullable media thumbnails so integrators see the same shape published by the API presenter.
 - API validation errors now bundle localized violation lists with a fallback English reason so partner integrations can act on stable messaging even when the initial validation precedes locale negotiation.
