@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -117,12 +118,12 @@ final class PricesRelationManager extends BaseRelationManager
                 Tables\Filters\Filter::make('active')
                     ->query(fn (Builder $query): Builder => $query
                         ->where('is_enabled', true)
-                        ->where(function ($q) {
+                        ->where(function ($q): void {
                             $q
                                 ->whereNull('starts_at')
                                 ->orWhere('starts_at', '<=', now());
                         })
-                        ->where(function ($q) {
+                        ->where(function ($q): void {
                             $q
                                 ->whereNull('ends_at')
                                 ->orWhere('ends_at', '>=', now());

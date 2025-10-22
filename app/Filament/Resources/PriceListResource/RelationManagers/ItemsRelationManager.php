@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -171,9 +172,9 @@ final class ItemsRelationManager extends BaseRelationManager
 
                 Tables\Filters\Filter::make('valid_now')
                     ->label(__('price_list_items.valid_now'))
-                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $query) {
+                    ->query(fn (Builder $query): Builder => $query->where(function (Builder $query): void {
                         $query->where('valid_from', '<=', now())
-                            ->where(function (Builder $query) {
+                            ->where(function (Builder $query): void {
                                 $query->whereNull('valid_until')
                                     ->orWhere('valid_until', '>=', now());
                             });

@@ -40,11 +40,15 @@ final class ApiKeyResource extends Resource
 
     protected static ?string $navigationLabel = 'api_keys.navigation.label';
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-key';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-key';
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = null;
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;
 

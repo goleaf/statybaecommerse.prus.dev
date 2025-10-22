@@ -33,9 +33,14 @@ final class UserPreferenceResource extends Resource
 {
     protected static ?string $model = \App\Models\UserPreference::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 6;

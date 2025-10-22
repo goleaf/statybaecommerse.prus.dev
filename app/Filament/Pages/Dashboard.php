@@ -12,8 +12,10 @@ class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-home';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';
 

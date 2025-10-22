@@ -14,19 +14,19 @@ final class ProductPricingWidget extends ChartWidget
     protected function getData(): array
     {
         $priceRanges = [
-            '0-10' => Product::whereHas('prices', function ($query) {
+            '0-10' => Product::whereHas('prices', function ($query): void {
                 $query->whereBetween('price', [0, 10]);
             })->count(),
-            '10-50' => Product::whereHas('prices', function ($query) {
+            '10-50' => Product::whereHas('prices', function ($query): void {
                 $query->whereBetween('price', [10, 50]);
             })->count(),
-            '50-100' => Product::whereHas('prices', function ($query) {
+            '50-100' => Product::whereHas('prices', function ($query): void {
                 $query->whereBetween('price', [50, 100]);
             })->count(),
-            '100-500' => Product::whereHas('prices', function ($query) {
+            '100-500' => Product::whereHas('prices', function ($query): void {
                 $query->whereBetween('price', [100, 500]);
             })->count(),
-            '500+' => Product::whereHas('prices', function ($query) {
+            '500+' => Product::whereHas('prices', function ($query): void {
                 $query->where('price', '>', 500);
             })->count(),
         ];

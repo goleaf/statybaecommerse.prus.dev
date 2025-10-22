@@ -37,6 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 /**
  * SystemSettingCategoryResource
@@ -50,7 +51,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {

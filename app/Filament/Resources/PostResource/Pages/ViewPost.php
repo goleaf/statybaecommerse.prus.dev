@@ -10,6 +10,7 @@ use App\Models\Post;
 use App\Models\PostApproval;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Schema;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 

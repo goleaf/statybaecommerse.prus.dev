@@ -35,8 +35,10 @@ final class PriceListResource extends Resource
 {
     protected static ?string $model = PriceList::class;
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Products';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 15;
 

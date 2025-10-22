@@ -42,8 +42,10 @@ final class VariantImageResource extends Resource
 {
     protected static ?string $model = \App\Models\VariantImage::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-photo';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
     public static function getNavigationGroup(): ?string
     {
@@ -81,7 +83,7 @@ final class VariantImageResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, $set) {
+                                ->afterStateUpdated(function ($state, $set): void {
                                     if ($state) {
                                         // Auto-generate sort order based on existing images
                                         $nextSortOrder = VariantImage::where('variant_id', $state)
@@ -395,7 +397,7 @@ final class VariantImageResource extends Resource
                         ->color('info')
                         ->action(function (Collection $records): void {
                             // Auto-reorder based on current sort order
-                            $records->sortBy('sort_order')->each(function ($record, $index) {
+                            $records->sortBy('sort_order')->each(function ($record, $index): void {
                                 $record->update(['sort_order' => $index + 1]);
                             });
 
@@ -411,7 +413,7 @@ final class VariantImageResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             // Group by variant_id and set first image as primary for each variant
-                            $records->groupBy('variant_id')->each(function ($variantImages) {
+                            $records->groupBy('variant_id')->each(function ($variantImages): void {
                                 // Remove primary from all images in this variant
                                 VariantImage::where('variant_id', $variantImages->first()->variant_id)
                                     ->update(['is_primary' => false]);

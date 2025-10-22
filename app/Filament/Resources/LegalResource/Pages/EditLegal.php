@@ -23,7 +23,7 @@ class EditLegal extends EditRecord
                 ->icon('heroicon-o-eye')
                 ->color('success')
                 ->visible(fn () => ! $this->record->published_at)
-                ->action(function () {
+                ->action(function (): void {
                     $this->record->publish();
                     Notification::make()
                         ->title(__('legal.notifications.published'))
@@ -35,7 +35,7 @@ class EditLegal extends EditRecord
                 ->icon('heroicon-o-eye-slash')
                 ->color('warning')
                 ->visible(fn () => $this->record->published_at)
-                ->action(function () {
+                ->action(function (): void {
                     $this->record->unpublish();
                     Notification::make()
                         ->title(__('legal.notifications.unpublished'))
@@ -46,7 +46,7 @@ class EditLegal extends EditRecord
                 ->label(__('legal.actions.duplicate'))
                 ->icon('heroicon-o-document-duplicate')
                 ->color('gray')
-                ->action(function () {
+                ->action(function (): void {
                     $newRecord = $this->record->replicate();
                     $newRecord->key = $this->record->key . '-copy';
                     $newRecord->published_at = null;

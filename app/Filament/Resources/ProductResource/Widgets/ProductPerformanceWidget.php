@@ -15,7 +15,7 @@ final class ProductPerformanceWidget extends BaseWidget
         $totalProducts = Product::count();
         $activeProducts = Product::where('is_active', true)->count();
         $featuredProducts = Product::where('is_featured', true)->count();
-        $lowStockProducts = Product::whereHas('inventories', function ($query) {
+        $lowStockProducts = Product::whereHas('inventories', function ($query): void {
             $query->where('quantity', '<=', 10);
         })->count();
 

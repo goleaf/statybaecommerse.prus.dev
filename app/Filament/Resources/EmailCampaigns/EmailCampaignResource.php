@@ -21,8 +21,10 @@ class EmailCampaignResource extends Resource
 {
     protected static ?string $model = EmailCampaign::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

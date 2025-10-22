@@ -38,10 +38,10 @@ use Illuminate\Support\Str;
 
 final class DocumentTemplateResource extends Resource
 {
-    protected static ?string $model = \App\Models\DocumentTemplate::class;
-
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     public static function getNavigationGroup(): ?string
     {

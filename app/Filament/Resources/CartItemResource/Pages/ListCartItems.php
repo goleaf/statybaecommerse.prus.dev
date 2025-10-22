@@ -38,18 +38,18 @@ final class ListCartItems extends BaseListRecords
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_saved_for_later', true)->count()),
 
             'low_stock' => WidgetTab::make(__('cart_items.tabs.low_stock'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('product.inventories', function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('product.inventories', function ($q): void {
                     $q->where('quantity', '<=', 10);
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('product.inventories', function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('product.inventories', function ($q): void {
                     $q->where('quantity', '<=', 10);
                 })->count()),
 
             'out_of_stock' => WidgetTab::make(__('cart_items.tabs.out_of_stock'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('product.inventories', function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('product.inventories', function ($q): void {
                     $q->where('quantity', '=', 0);
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('product.inventories', function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('product.inventories', function ($q): void {
                     $q->where('quantity', '=', 0);
                 })->count()),
 
