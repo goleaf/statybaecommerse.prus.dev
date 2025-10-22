@@ -8,12 +8,14 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -53,7 +55,10 @@ final class ProductShelf extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeShelf($this->preset, $this->limit, $locale), CacheKeys::TTL_MINUTE, function () use ($locale): EloquentCollection {
+        $cacheKey = CacheKeys::homeShelf($this->preset, $this->limit, $locale);
+        $store = Cache::getStore();
+
+        $callback = function () use ($locale): EloquentCollection {
             $query = Product::query()
                 ->with(['brand', 'media', 'categories'])
                 ->with(['translations' => function ($q) use ($locale) {
@@ -95,7 +100,15 @@ final class ProductShelf extends Component implements HasSchemas
             };
 
             return $query->limit($this->limit)->get();
-        });
+        };
+
+        if ($store instanceof TaggableStore) {
+            $tags = CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale));
+
+            return Cache::tags($tags)->remember($cacheKey, CacheKeys::TTL_MINUTE, $callback);
+        }
+
+        return Cache::remember($cacheKey, CacheKeys::TTL_MINUTE, $callback);
     }
 
     public function productShelf(Schema $schema): Schema
