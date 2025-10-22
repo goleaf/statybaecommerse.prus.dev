@@ -11,9 +11,11 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 /**
  * AttributeValue
@@ -161,6 +163,32 @@ final class AttributeValue extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function refresh(): static
+    {
+        if (! $this->exists) {
+            return $this;
+        }
+
+        // Reload the model without the storefront-only scopes so records that
+        // were just deactivated or disabled can still be rehydrated in tests
+        // and Filament callbacks.
+        $fresh = static::withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+            SoftDeletingScope::class,
+        ])->find($this->getKey());
+
+        if ($fresh === null) {
+            throw (new ModelNotFoundException())->setModel(static::class, [$this->getKey()]);
+        }
+
+        $this->setRawAttributes($fresh->getAttributes(), true);
+        $this->setRelations($fresh->getRelations());
+        $this->syncOriginal();
+
+        return $this;
     }
 
     protected function metadata(): EloquentAttribute
