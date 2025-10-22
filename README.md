@@ -32,6 +32,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 -### Latest updates
+- Campaign customer segment tooling now ships with Filament v4-compatible actions, restored Livewire testing macros, and relaxed campaign/customer group uniqueness so admin CRUD, filters, and unit tests stay green after the framework upgrade.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and

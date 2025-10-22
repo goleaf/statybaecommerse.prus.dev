@@ -21,6 +21,11 @@ namespace {
         // Preserve the legacy component namespace so third-party discovery hooks can resolve Flatpickr during upgrades.
         class_alias(\Coolsam\Flatpickr\Forms\Components\Flatpickr::class, \Filament\Forms\Components\Flatpickr::class);
     }
+
+    if (! class_exists(\Filament\Tables\Actions\DeleteAction::class) && class_exists(\Filament\Actions\DeleteAction::class)) {
+        // Maintain backwards compatibility with test helpers and legacy code targeting table-specific delete actions.
+        class_alias(\Filament\Actions\DeleteAction::class, \Filament\Tables\Actions\DeleteAction::class);
+    }
 }
 
 namespace Filament\Forms\Components {
