@@ -150,6 +150,8 @@ return new class extends Migration
                 $table->id();
                 $table->string('number')->unique();
                 $table->unsignedBigInteger('user_id')->nullable();
+                // Link orders to customers so analytics, segments and widgets can scope correctly.
+                $table->foreignId('customer_id')->nullable()->constrained('customers')->nullOnDelete();
                 $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending');
                 $table->decimal('subtotal', 10, 2)->default(0);
                 $table->decimal('tax_amount', 10, 2)->default(0);
@@ -168,6 +170,7 @@ return new class extends Migration
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
                 $table->index(['status', 'created_at']);
                 $table->index(['user_id', 'created_at']);
+                $table->index(['customer_id', 'created_at']);
             });
         }
 
