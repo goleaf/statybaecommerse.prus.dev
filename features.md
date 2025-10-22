@@ -5,6 +5,7 @@
 - Shipping option delivery ranges in the Filament admin now display a precise window even when carriers promise same-day (0 day) service or when only one bound is stored, helping staff quickly spot incomplete data.
 
 ## Admin panel resilience
+- Added a foundational `customer_groups` migration so later schema updates (extra permissions, soft deletes, translations) apply cleanly during `php artisan migrate:fresh --seed` runs.
 - Filament resources, relation managers, and admin-only pages now target the v4 Schema API with normalized navigation icon docblocks, preserving enum-aware metadata resolution across the upgraded form, table, and infolist builders.
 - Navigation icons and navigation groups across every Filament resource, relation manager, widget, and custom page now declare the BackedEnum/UnitEnum union types required by v4, keeping PHP 8.3 installs from triggering property type fatals during admin boot.
 - Notification resource navigation now delegates to the central Nav registry with an explicit recursion guard, and Address forms explain their `Schema::components([...])` container pipeline for Filament reviewers.
